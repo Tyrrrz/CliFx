@@ -24,9 +24,9 @@ namespace CliFx.Tests
             var result = await Cli.Wrap(DummyFilePath).SetArguments(arguments).ExecuteAsync();
 
             // Assert
-            Assert.That(result.ExitCode, Is.Zero);
-            Assert.That(result.StandardOutput.Trim(), Is.EqualTo(expectedOutput));
-            Assert.That(result.StandardError.Trim(), Is.Empty);
+            Assert.That(result.ExitCode, Is.Zero, "Exit code");
+            Assert.That(result.StandardOutput.Trim(), Is.EqualTo(expectedOutput), "Stdout");
+            Assert.That(result.StandardError.Trim(), Is.Empty, "Stderr");
         }
     }
 }

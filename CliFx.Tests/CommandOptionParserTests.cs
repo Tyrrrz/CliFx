@@ -10,28 +10,24 @@ namespace CliFx.Tests
     {
         private static IEnumerable<TestCaseData> GetData_ParseOptions()
         {
-            yield return new TestCaseData(
-                new string[0],
-                CommandOptionSet.Empty
-            ).SetName("No arguments");
+            yield return new TestCaseData(new string[0], CommandOptionSet.Empty);
 
             yield return new TestCaseData(
-                new[] {"--argument", "value"},
+                new[] {"--option", "value"},
                 new CommandOptionSet(new Dictionary<string, string>
                 {
-                    {"argument", "value"}
+                    {"option", "value"}
                 })
-            ).SetName("Single argument");
+            );
 
             yield return new TestCaseData(
-                new[] {"--argument1", "value1", "--argument2", "value2", "--argument3", "value3"},
+                new[] {"--option1", "value1", "--option2", "value2"},
                 new CommandOptionSet(new Dictionary<string, string>
                 {
-                    {"argument1", "value1"},
-                    {"argument2", "value2"},
-                    {"argument3", "value3"}
+                    {"option1", "value1"},
+                    {"option2", "value2"}
                 })
-            ).SetName("Multiple arguments");
+            );
 
             yield return new TestCaseData(
                 new[] {"-a", "value"},
@@ -39,27 +35,25 @@ namespace CliFx.Tests
                 {
                     {"a", "value"}
                 })
-            ).SetName("Single short argument");
+            );
 
             yield return new TestCaseData(
-                new[] {"-a", "value1", "-b", "value2", "-c", "value3"},
+                new[] {"-a", "value1", "-b", "value2"},
                 new CommandOptionSet(new Dictionary<string, string>
                 {
                     {"a", "value1"},
-                    {"b", "value2"},
-                    {"c", "value3"}
+                    {"b", "value2"}
                 })
-            ).SetName("Multiple short arguments");
+            );
 
             yield return new TestCaseData(
-                new[] {"--argument1", "value1", "-b", "value2", "--argument3", "value3"},
+                new[] {"--option1", "value1", "-b", "value2"},
                 new CommandOptionSet(new Dictionary<string, string>
                 {
-                    {"argument1", "value1"},
-                    {"b", "value2"},
-                    {"argument3", "value3"}
+                    {"option1", "value1"},
+                    {"b", "value2"}
                 })
-            ).SetName("Multiple mixed arguments");
+            );
 
             yield return new TestCaseData(
                 new[] {"--switch"},
@@ -67,17 +61,16 @@ namespace CliFx.Tests
                 {
                     {"switch", null}
                 })
-            ).SetName("Single switch");
+            );
 
             yield return new TestCaseData(
-                new[] {"--switch1", "--switch2", "--switch3"},
+                new[] {"--switch1", "--switch2"},
                 new CommandOptionSet(new Dictionary<string, string>
                 {
                     {"switch1", null},
-                    {"switch2", null},
-                    {"switch3", null}
+                    {"switch2", null}
                 })
-            ).SetName("Multiple switches");
+            );
 
             yield return new TestCaseData(
                 new[] {"-s"},
@@ -85,40 +78,38 @@ namespace CliFx.Tests
                 {
                     {"s", null}
                 })
-            ).SetName("Single short switch");
+            );
 
             yield return new TestCaseData(
-                new[] {"-a", "-b", "-c"},
+                new[] {"-a", "-b"},
                 new CommandOptionSet(new Dictionary<string, string>
                 {
                     {"a", null},
-                    {"b", null},
-                    {"c", null}
+                    {"b", null}
                 })
-            ).SetName("Multiple short switches");
+            );
 
             yield return new TestCaseData(
-                new[] {"-abc"},
+                new[] {"-ab"},
                 new CommandOptionSet(new Dictionary<string, string>
                 {
                     {"a", null},
-                    {"b", null},
-                    {"c", null}
+                    {"b", null}
                 })
-            ).SetName("Multiple stacked short switches");
+            );
 
             yield return new TestCaseData(
                 new[] {"command"},
                 new CommandOptionSet("command")
-            ).SetName("No arguments (with command name)");
+            );
 
             yield return new TestCaseData(
-                new[] {"command", "--argument", "value"},
+                new[] {"command", "--option", "value"},
                 new CommandOptionSet("command", new Dictionary<string, string>
                 {
-                    {"argument", "value"}
+                    {"option", "value"}
                 })
-            ).SetName("Single argument (with command name)");
+            );
         }
 
         [Test]
@@ -132,8 +123,8 @@ namespace CliFx.Tests
             var optionSet = parser.ParseOptions(commandLineArguments);
 
             // Assert
-            Assert.That(optionSet.CommandName, Is.EqualTo(expectedCommandOptionSet.CommandName));
-            Assert.That(optionSet.Options, Is.EqualTo(expectedCommandOptionSet.Options));
+            Assert.That(optionSet.CommandName, Is.EqualTo(expectedCommandOptionSet.CommandName), "Command name");
+            Assert.That(optionSet.Options, Is.EqualTo(expectedCommandOptionSet.Options), "Options");
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using CliFx.Exceptions;
 using CliFx.Models;
 using CliFx.Services;
@@ -20,7 +19,7 @@ namespace CliFx.Tests
                     {"int", "13"}
                 }),
                 new TestCommand {IntOption = 13}
-            ).SetName("Single option");
+            );
 
             yield return new TestCaseData(
                 new CommandOptionSet(new Dictionary<string, string>
@@ -29,7 +28,7 @@ namespace CliFx.Tests
                     {"str", "hello world" }
                 }),
                 new TestCommand { IntOption = 13, StringOption = "hello world"}
-            ).SetName("Multiple options");
+            );
 
             yield return new TestCaseData(
                 new CommandOptionSet(new Dictionary<string, string>
@@ -37,7 +36,7 @@ namespace CliFx.Tests
                     {"i", "13"}
                 }),
                 new TestCommand { IntOption = 13 }
-            ).SetName("Single short option");
+            );
 
             yield return new TestCaseData(
                 new CommandOptionSet("command", new Dictionary<string, string>
@@ -45,7 +44,7 @@ namespace CliFx.Tests
                     {"int", "13"}
                 }),
                 new TestCommand { IntOption = 13 }
-            ).SetName("Single option (with command name)");
+            );
         }
 
         [Test]
@@ -78,16 +77,14 @@ namespace CliFx.Tests
 
         private static IEnumerable<TestCaseData> GetData_ResolveCommand_IsRequired()
         {
-            yield return new TestCaseData(
-                CommandOptionSet.Empty
-            ).SetName("No options");
+            yield return new TestCaseData(CommandOptionSet.Empty);
 
             yield return new TestCaseData(
                 new CommandOptionSet(new Dictionary<string, string>
                 {
                     {"str", "hello world"}
                 })
-            ).SetName("Required option is not set");
+            );
         }
 
         [Test]

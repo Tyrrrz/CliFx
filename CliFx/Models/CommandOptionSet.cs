@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using CliFx.Internal;
 
 namespace CliFx.Models
@@ -25,9 +26,18 @@ namespace CliFx.Models
         {
         }
 
-        public override string ToString() => !CommandName.IsNullOrWhiteSpace()
-            ? $"{CommandName} / {Options.Count} option(s)"
-            : $"{Options.Count} option(s)";
+        public override string ToString()
+        {
+            if (Options.Any())
+            {
+                var optionsJoined = Options.Select(o => o.Key).JoinToString(", ");
+                return !CommandName.IsNullOrWhiteSpace() ? $"{CommandName} / [{optionsJoined}]" : $"[{optionsJoined}]";
+            }
+            else
+            {
+                return !CommandName.IsNullOrWhiteSpace() ? $"{CommandName} / no options" : "no options";
+            }
+        }
     }
 
     public partial class CommandOptionSet

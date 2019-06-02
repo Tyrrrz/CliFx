@@ -27,7 +27,7 @@ namespace CliFx.Tests
             var exitCodeValue = await application.RunAsync();
 
             // Assert
-            Assert.That(exitCodeValue, Is.EqualTo(expectedExitCode.Value));
+            Assert.That(exitCodeValue, Is.EqualTo(expectedExitCode.Value), "Exit code");
         }
     }
 }
