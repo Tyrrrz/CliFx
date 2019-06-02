@@ -1,0 +1,23 @@
+version: '{build}'
+
+image: Visual Studio 2017
+configuration: Release
+
+before_build:
+- dotnet restore
+
+build:
+  verbosity: minimal
+
+artifacts:
+- path: CliFx\bin\$(configuration)\CliFx*.nupkg
+  name: CliFx.nupkg
+
+deploy:
+- provider: NuGet
+  api_key:
+    secure: 5VyEaGo5gRLr9HdkRFqS1enRq+K8Qarg1dzU33CE1dOmVXp43JaS2PQTNgsRHXkc
+  artifact: CliFx.nupkg
+  on:
+    branch: master
+    appveyor_repo_tag: true
