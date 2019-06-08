@@ -42,13 +42,10 @@ namespace CliFx.Internal
 
         public static bool IsDerivedFrom(this Type type, Type baseType)
         {
-            var currentType = type;
-            while (currentType != null)
+            for (var currentType = type; currentType != null; currentType = currentType.BaseType)
             {
                 if (currentType == baseType)
                     return true;
-
-                currentType = currentType.BaseType;
             }
 
             return false;

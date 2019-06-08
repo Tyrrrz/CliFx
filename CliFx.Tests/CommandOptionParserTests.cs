@@ -99,6 +99,15 @@ namespace CliFx.Tests
             );
 
             yield return new TestCaseData(
+                new[] {"-ab", "value"},
+                new CommandOptionSet(new Dictionary<string, string>
+                {
+                    {"a", null},
+                    {"b", "value"}
+                })
+            );
+
+            yield return new TestCaseData(
                 new[] {"command"},
                 new CommandOptionSet("command")
             );
@@ -123,8 +132,8 @@ namespace CliFx.Tests
             var optionSet = parser.ParseOptions(commandLineArguments);
 
             // Assert
-            Assert.That(optionSet.CommandName, Is.EqualTo(expectedCommandOptionSet.CommandName), "Command name");
-            Assert.That(optionSet.Options, Is.EqualTo(expectedCommandOptionSet.Options), "Options");
+            Assert.That(optionSet.CommandName, Is.EqualTo(expectedCommandOptionSet.CommandName), nameof(optionSet.CommandName));
+            Assert.That(optionSet.Options, Is.EqualTo(expectedCommandOptionSet.Options), nameof(optionSet.Options));
         }
     }
 }

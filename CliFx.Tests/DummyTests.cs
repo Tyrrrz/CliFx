@@ -8,7 +8,7 @@ namespace CliFx.Tests
     [TestFixture]
     public class DummyTests
     {
-        private string DummyFilePath => Path.Combine(TestContext.CurrentContext.TestDirectory, "CliFx.Tests.Dummy.exe");
+        private static string DummyFilePath => Path.Combine(TestContext.CurrentContext.TestDirectory, "CliFx.Tests.Dummy.exe");
 
         [Test]
         [TestCase("", "Hello world")]
@@ -24,9 +24,9 @@ namespace CliFx.Tests
             var result = await Cli.Wrap(DummyFilePath).SetArguments(arguments).ExecuteAsync();
 
             // Assert
-            Assert.That(result.ExitCode, Is.Zero, "Exit code");
-            Assert.That(result.StandardOutput.Trim(), Is.EqualTo(expectedOutput), "Stdout");
-            Assert.That(result.StandardError.Trim(), Is.Empty, "Stderr");
+            Assert.That(result.ExitCode, Is.Zero, nameof(result.ExitCode));
+            Assert.That(result.StandardOutput.Trim(), Is.EqualTo(expectedOutput), nameof(result.StandardOutput));
+            Assert.That(result.StandardError.Trim(), Is.Empty, nameof(result.StandardError));
         }
     }
 }

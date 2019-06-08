@@ -42,10 +42,10 @@ namespace CliFx.Services
                 // Multiple stacked short options
                 else if (commandLineArgument.StartsWith("-", StringComparison.OrdinalIgnoreCase))
                 {
-                    optionName = null;
                     foreach (var c in commandLineArgument.Substring(1))
                     {
-                        options[c.ToString(CultureInfo.InvariantCulture)] = null;
+                        optionName = c.ToString(CultureInfo.InvariantCulture);
+                        options[optionName] = null;
                     }
                 }
 
