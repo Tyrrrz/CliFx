@@ -44,6 +44,10 @@ namespace CliFx.Tests
             yield return new TestCaseData("01:00:00", typeof(TimeSpan?), new TimeSpan(01, 00, 00));
 
             yield return new TestCaseData(null, typeof(TimeSpan?), null);
+
+            yield return new TestCaseData("value", typeof(TestStringConstructable), new TestStringConstructable("value"));
+
+            yield return new TestCaseData("value", typeof(TestStringParseable), TestStringParseable.Parse("value"));
         }
 
         [Test]
