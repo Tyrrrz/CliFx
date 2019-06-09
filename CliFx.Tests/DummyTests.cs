@@ -14,9 +14,10 @@ namespace CliFx.Tests
         [TestCase("", "Hello world")]
         [TestCase("-t .NET", "Hello .NET")]
         [TestCase("-e", "Hello world!!!")]
-        [TestCase("add --a 1 --b 2", "3")]
-        [TestCase("add --a 2.75 --b 3.6", "6.35")]
-        [TestCase("log --value 100", "2")]
+        [TestCase("add -v 1 2", "3")]
+        [TestCase("add -v 2.75 3.6 4.18", "10.53")]
+        [TestCase("add -v 4 -v 16", "20")]
+        [TestCase("log -v 100", "2")]
         [TestCase("log --value 256 --base 2", "8")]
         public async Task Execute_Test(string arguments, string expectedOutput)
         {
@@ -24,9 +25,9 @@ namespace CliFx.Tests
             var result = await Cli.Wrap(DummyFilePath).SetArguments(arguments).ExecuteAsync();
 
             // Assert
-            Assert.That(result.ExitCode, Is.Zero, nameof(result.ExitCode));
-            Assert.That(result.StandardOutput.Trim(), Is.EqualTo(expectedOutput), nameof(result.StandardOutput));
-            Assert.That(result.StandardError.Trim(), Is.Empty, nameof(result.StandardError));
+            Assert.That(result.ExitCode, Is.Zero, "Exit code");
+            Assert.That(result.StandardOutput.Trim(), Is.EqualTo(expectedOutput), "Stdout");
+            Assert.That(result.StandardError.Trim(), Is.Empty, "Stderr");
         }
     }
 }

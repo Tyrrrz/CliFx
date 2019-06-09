@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using CliFx.Exceptions;
 using CliFx.Internal;
+using CliFx.Models;
 
 namespace CliFx.Services
 {
@@ -21,7 +22,7 @@ namespace CliFx.Services
         {
         }
 
-        public object ConvertOption(string value, Type targetType)
+        private object ConvertValue(string value, Type targetType)
         {
             // String or object
             if (targetType == typeof(string) || targetType == typeof(object))
@@ -194,7 +195,7 @@ namespace CliFx.Services
                 if (value.IsNullOrWhiteSpace())
                     return null;
 
-                return ConvertOption(value, nullableUnderlyingType);
+                return ConvertValue(value, nullableUnderlyingType);
             }
 
             // Has a constructor that accepts a single string
@@ -213,6 +214,27 @@ namespace CliFx.Services
 
             // Unknown type
             throw new CommandOptionConvertException($"Can't convert value [{value}] to unrecognized type [{targetType}].");
+        }
+
+        public object ConvertOption(CommandOption option, Type targetType)
+        {
+            if (targetType != typeof(string) && targetType.IsEnumerable())
+            {
+                var underlyingType = targetType.GetIEnumerableUnderlyingTypes().FirstOrDefault() ?? typeof(object);
+
+                if (targetType.IsAssignableFrom(underlyingType.MakeArrayType()))
+                    return option.Values.Select(v => ConvertValue(v, underlyingType)).ToArray().ToNonGenericArray(underlyingType);
+
+                throw new CommandOptionConvertException(
+                    $"Can't convert sequence of values [{option.Values.JoinToString(", ")}] to type [{targetType}].");
+            }
+            else
+            {
+                // Take first value and ignore the rest
+                var value = option.Values.FirstOrDefault();
+
+                return ConvertValue(value, targetType);
+            }
         }
     }
 }

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using CliFx.Attributes;
 using CliFx.Exceptions;
 using CliFx.Internal;
+using CliFx.Models;
 
 namespace CliFx.Services
 {
@@ -86,18 +86,19 @@ namespace CliFx.Services
             // Set command options
             foreach (var property in commandType.GetOptionProperties())
             {
-                // If option set contains this property - set value
-                if (optionSet.Options.TryGetValue(property.Name, out var value) ||
-                    optionSet.Options.TryGetValue(property.ShortName.ToString(CultureInfo.InvariantCulture), out value))
+                // Get option for this property
+                var option = optionSet.GetOptionOrDefault(property.Name, property.ShortName);
+
+                // If there are any matching options - set value
+                if (option != null)
                 {
-                    var convertedValue = _commandOptionConverter.ConvertOption(value, property.Type);
+                    var convertedValue = _commandOptionConverter.ConvertOption(option, property.Type);
                     property.SetValue(command, convertedValue);
                 }
                 // If the property is missing but it's required - throw
                 else if (property.IsRequired)
                 {
-                    throw new CommandResolveException(
-                        $"Can't resolve command [{optionSet.CommandName}] because required property [{property.Name}] is not set.");
+                    throw new CommandResolveException($"Can't resolve command because required property [{property.Name}] is not set.");
                 }
             }
 

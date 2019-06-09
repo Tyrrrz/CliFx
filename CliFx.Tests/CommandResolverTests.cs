@@ -14,36 +14,36 @@ namespace CliFx.Tests
         private static IEnumerable<TestCaseData> GetData_ResolveCommand()
         {
             yield return new TestCaseData(
-                new CommandOptionSet(new Dictionary<string, string>
+                new CommandOptionSet(new[]
                 {
-                    {"int", "13"}
+                    new CommandOption("int", "13")
                 }),
                 new TestCommand {IntOption = 13}
             );
 
             yield return new TestCaseData(
-                new CommandOptionSet(new Dictionary<string, string>
+                new CommandOptionSet(new[]
                 {
-                    {"int", "13"},
-                    {"str", "hello world" }
+                    new CommandOption("int", "13"),
+                    new CommandOption("str", "hello world")
                 }),
-                new TestCommand { IntOption = 13, StringOption = "hello world"}
+                new TestCommand {IntOption = 13, StringOption = "hello world"}
             );
 
             yield return new TestCaseData(
-                new CommandOptionSet(new Dictionary<string, string>
+                new CommandOptionSet(new[]
                 {
-                    {"i", "13"}
+                    new CommandOption("i", "13")
                 }),
-                new TestCommand { IntOption = 13 }
+                new TestCommand {IntOption = 13}
             );
 
             yield return new TestCaseData(
-                new CommandOptionSet("command", new Dictionary<string, string>
+                new CommandOptionSet("command", new[]
                 {
-                    {"int", "13"}
+                    new CommandOption("int", "13")
                 }),
-                new TestCommand { IntOption = 13 }
+                new TestCommand {IntOption = 13}
             );
         }
 
@@ -80,9 +80,9 @@ namespace CliFx.Tests
             yield return new TestCaseData(CommandOptionSet.Empty);
 
             yield return new TestCaseData(
-                new CommandOptionSet(new Dictionary<string, string>
+                new CommandOptionSet(new[]
                 {
-                    {"str", "hello world"}
+                    new CommandOption("str", "hello world")
                 })
             );
         }
@@ -92,7 +92,7 @@ namespace CliFx.Tests
         public void ResolveCommand_IsRequired_Test(CommandOptionSet commandOptionSet)
         {
             // Arrange
-            var commandTypes = new[] { typeof(TestCommand) };
+            var commandTypes = new[] {typeof(TestCommand)};
 
             var typeProviderMock = new Mock<ITypeProvider>();
             typeProviderMock.Setup(m => m.GetTypes()).Returns(commandTypes);

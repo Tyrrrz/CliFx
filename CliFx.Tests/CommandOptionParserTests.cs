@@ -14,96 +14,128 @@ namespace CliFx.Tests
 
             yield return new TestCaseData(
                 new[] {"--option", "value"},
-                new CommandOptionSet(new Dictionary<string, string>
+                new CommandOptionSet(new[]
                 {
-                    {"option", "value"}
+                    new CommandOption("option", "value")
                 })
             );
 
             yield return new TestCaseData(
                 new[] {"--option1", "value1", "--option2", "value2"},
-                new CommandOptionSet(new Dictionary<string, string>
+                new CommandOptionSet(new[]
                 {
-                    {"option1", "value1"},
-                    {"option2", "value2"}
+                    new CommandOption("option1", "value1"),
+                    new CommandOption("option2", "value2")
+                })
+            );
+
+            yield return new TestCaseData(
+                new[] {"--option", "value1", "value2"},
+                new CommandOptionSet(new[]
+                {
+                    new CommandOption("option", new[] {"value1", "value2"})
+                })
+            );
+
+            yield return new TestCaseData(
+                new[] {"--option", "value1", "--option", "value2"},
+                new CommandOptionSet(new[]
+                {
+                    new CommandOption("option", new[] {"value1", "value2"})
                 })
             );
 
             yield return new TestCaseData(
                 new[] {"-a", "value"},
-                new CommandOptionSet(new Dictionary<string, string>
+                new CommandOptionSet(new[]
                 {
-                    {"a", "value"}
+                    new CommandOption("a", "value")
                 })
             );
 
             yield return new TestCaseData(
                 new[] {"-a", "value1", "-b", "value2"},
-                new CommandOptionSet(new Dictionary<string, string>
+                new CommandOptionSet(new[]
                 {
-                    {"a", "value1"},
-                    {"b", "value2"}
+                    new CommandOption("a", "value1"),
+                    new CommandOption("b", "value2")
+                })
+            );
+
+            yield return new TestCaseData(
+                new[] {"-a", "value1", "value2"},
+                new CommandOptionSet(new[]
+                {
+                    new CommandOption("a", new[] {"value1", "value2"})
+                })
+            );
+
+            yield return new TestCaseData(
+                new[] {"-a", "value1", "-a", "value2"},
+                new CommandOptionSet(new[]
+                {
+                    new CommandOption("a", new[] {"value1", "value2"})
                 })
             );
 
             yield return new TestCaseData(
                 new[] {"--option1", "value1", "-b", "value2"},
-                new CommandOptionSet(new Dictionary<string, string>
+                new CommandOptionSet(new[]
                 {
-                    {"option1", "value1"},
-                    {"b", "value2"}
+                    new CommandOption("option1", "value1"),
+                    new CommandOption("b", "value2")
                 })
             );
 
             yield return new TestCaseData(
                 new[] {"--switch"},
-                new CommandOptionSet(new Dictionary<string, string>
+                new CommandOptionSet(new[]
                 {
-                    {"switch", null}
+                    new CommandOption("switch")
                 })
             );
 
             yield return new TestCaseData(
                 new[] {"--switch1", "--switch2"},
-                new CommandOptionSet(new Dictionary<string, string>
+                new CommandOptionSet(new[]
                 {
-                    {"switch1", null},
-                    {"switch2", null}
+                    new CommandOption("switch1"),
+                    new CommandOption("switch2")
                 })
             );
 
             yield return new TestCaseData(
                 new[] {"-s"},
-                new CommandOptionSet(new Dictionary<string, string>
+                new CommandOptionSet(new[]
                 {
-                    {"s", null}
+                    new CommandOption("s")
                 })
             );
 
             yield return new TestCaseData(
                 new[] {"-a", "-b"},
-                new CommandOptionSet(new Dictionary<string, string>
+                new CommandOptionSet(new[]
                 {
-                    {"a", null},
-                    {"b", null}
+                    new CommandOption("a"),
+                    new CommandOption("b")
                 })
             );
 
             yield return new TestCaseData(
                 new[] {"-ab"},
-                new CommandOptionSet(new Dictionary<string, string>
+                new CommandOptionSet(new[]
                 {
-                    {"a", null},
-                    {"b", null}
+                    new CommandOption("a"),
+                    new CommandOption("b")
                 })
             );
 
             yield return new TestCaseData(
                 new[] {"-ab", "value"},
-                new CommandOptionSet(new Dictionary<string, string>
+                new CommandOptionSet(new[]
                 {
-                    {"a", null},
-                    {"b", "value"}
+                    new CommandOption("a"),
+                    new CommandOption("b", "value")
                 })
             );
 
@@ -114,9 +146,9 @@ namespace CliFx.Tests
 
             yield return new TestCaseData(
                 new[] {"command", "--option", "value"},
-                new CommandOptionSet("command", new Dictionary<string, string>
+                new CommandOptionSet("command", new[]
                 {
-                    {"option", "value"}
+                    new CommandOption("option", "value")
                 })
             );
         }
@@ -132,8 +164,17 @@ namespace CliFx.Tests
             var optionSet = parser.ParseOptions(commandLineArguments);
 
             // Assert
-            Assert.That(optionSet.CommandName, Is.EqualTo(expectedCommandOptionSet.CommandName), nameof(optionSet.CommandName));
-            Assert.That(optionSet.Options, Is.EqualTo(expectedCommandOptionSet.Options), nameof(optionSet.Options));
+            Assert.That(optionSet.CommandName, Is.EqualTo(expectedCommandOptionSet.CommandName), "Command name");
+            Assert.That(optionSet.Options.Count, Is.EqualTo(expectedCommandOptionSet.Options.Count), "Option count");
+
+            for (var i = 0; i < optionSet.Options.Count; i++)
+            {
+                Assert.That(optionSet.Options[i].Name, Is.EqualTo(expectedCommandOptionSet.Options[i].Name),
+                    $"Option[{i}] name");
+
+                Assert.That(optionSet.Options[i].Values, Is.EqualTo(expectedCommandOptionSet.Options[i].Values),
+                    $"Option[{i}] values");
+            }
         }
     }
 }

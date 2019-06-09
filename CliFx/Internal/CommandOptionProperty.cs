@@ -12,13 +12,13 @@ namespace CliFx.Internal
 
         public string Name { get; }
 
-        public char ShortName { get; }
+        public char? ShortName { get; }
 
         public bool IsRequired { get; }
 
         public string Description { get; }
 
-        public CommandOptionProperty(PropertyInfo property, string name, char shortName, bool isRequired, string description)
+        public CommandOptionProperty(PropertyInfo property, string name, char? shortName, bool isRequired, string description)
         {
             _property = property;
             Name = name;

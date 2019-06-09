@@ -8,10 +8,10 @@ namespace CliFx.Tests.Dummy.Commands
     [Command("log")]
     public class LogCommand : Command
     {
-        [CommandOption("value", IsRequired = true, Description = "Value whose logarithm is to be found.")]
+        [CommandOption("value", 'v', IsRequired = true, Description = "Value whose logarithm is to be found.")]
         public double Value { get; set; }
 
-        [CommandOption("base", Description = "Logarithm base.")]
+        [CommandOption("base", 'b', Description = "Logarithm base.")]
         public double Base { get; set; } = 10;
 
         public override ExitCode Execute()

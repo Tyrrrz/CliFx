@@ -1,11 +1,15 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CliFx.Internal
 {
     internal static class Extensions
     {
         public static bool IsNullOrWhiteSpace(this string s) => string.IsNullOrWhiteSpace(s);
+
+        public static string AsString(this char c) => new string(c, 1);
 
         public static string SubstringUntil(this string s, string sub, StringComparison comparison = StringComparison.Ordinal)
         {
@@ -49,6 +53,31 @@ namespace CliFx.Internal
             }
 
             return false;
+        }
+
+        public static bool IsEnumerable(this Type type) =>
+            type == typeof(IEnumerable) || type.GetInterfaces().Contains(typeof(IEnumerable));
+
+        public static IReadOnlyList<Type> GetIEnumerableUnderlyingTypes(this Type type)
+        {
+            if (type == typeof(IEnumerable))
+                return new[] {typeof(object)};
+
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+                return new[] {type.GetGenericArguments()[0]};
+
+            return type.GetInterfaces()
+                .Where(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+                .Select(t => t.GetGenericArguments()[0])
+                .ToArray();
+        }
+
+        public static Array ToNonGenericArray(this ICollection source, Type elementType)
+        {
+            var array = Array.CreateInstance(elementType, source.Count);
+            source.CopyTo(array, 0);
+
+            return array;
         }
     }
 }

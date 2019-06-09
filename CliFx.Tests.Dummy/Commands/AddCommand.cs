@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using CliFx.Attributes;
 using CliFx.Models;
 
@@ -8,15 +10,12 @@ namespace CliFx.Tests.Dummy.Commands
     [Command("add")]
     public class AddCommand : Command
     {
-        [CommandOption("a", IsRequired = true, Description = "Left operand.")]
-        public double A { get; set; }
-
-        [CommandOption("b", IsRequired = true, Description = "Right operand.")]
-        public double B { get; set; }
+        [CommandOption("values", 'v', IsRequired = true, Description = "Values.")]
+        public IReadOnlyList<double> Values { get; set; }
 
         public override ExitCode Execute()
         {
-            var result = A + B;
+            var result = Values.Sum();
             Console.WriteLine(result.ToString(CultureInfo.InvariantCulture));
 
             return ExitCode.Success;

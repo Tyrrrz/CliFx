@@ -8,21 +8,21 @@ namespace CliFx.Models
     {
         public string CommandName { get; }
 
-        public IReadOnlyDictionary<string, string> Options { get; }
+        public IReadOnlyList<CommandOption> Options { get; }
 
-        public CommandOptionSet(string commandName, IReadOnlyDictionary<string, string> options)
+        public CommandOptionSet(string commandName, IReadOnlyList<CommandOption> options)
         {
             CommandName = commandName;
             Options = options;
         }
 
-        public CommandOptionSet(IReadOnlyDictionary<string, string> options)
+        public CommandOptionSet(IReadOnlyList<CommandOption> options)
             : this(null, options)
         {
         }
 
         public CommandOptionSet(string commandName)
-            : this(commandName, new Dictionary<string, string>())
+            : this(commandName, new CommandOption[0])
         {
         }
 
@@ -30,7 +30,7 @@ namespace CliFx.Models
         {
             if (Options.Any())
             {
-                var optionsJoined = Options.Select(o => o.Key).JoinToString(", ");
+                var optionsJoined = Options.Select(o => o.Name).JoinToString(", ");
                 return !CommandName.IsNullOrWhiteSpace() ? $"{CommandName} / [{optionsJoined}]" : $"[{optionsJoined}]";
             }
             else
@@ -42,6 +42,6 @@ namespace CliFx.Models
 
     public partial class CommandOptionSet
     {
-        public static CommandOptionSet Empty { get; } = new CommandOptionSet(new Dictionary<string, string>());
+        public static CommandOptionSet Empty { get; } = new CommandOptionSet(new CommandOption[0]);
     }
 }

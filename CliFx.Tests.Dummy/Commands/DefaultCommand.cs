@@ -8,10 +8,10 @@ namespace CliFx.Tests.Dummy.Commands
     [DefaultCommand]
     public class DefaultCommand : Command
     {
-        [CommandOption("target", ShortName = 't', Description = "Greeting target.")]
+        [CommandOption("target", 't', Description = "Greeting target.")]
         public string Target { get; set; } = "world";
 
-        [CommandOption("enthusiastic", ShortName = 'e', Description = "Whether the greeting should be enthusiastic.")]
+        [CommandOption('e', Description = "Whether the greeting should be enthusiastic.")]
         public bool IsEnthusiastic { get; set; }
 
         public override ExitCode Execute()

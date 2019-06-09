@@ -7,10 +7,10 @@ namespace CliFx.Tests.TestObjects
     [Command("command")]
     public class TestCommand : Command
     {
-        [CommandOption("int", ShortName = 'i', IsRequired = true)]
+        [CommandOption("int", 'i', IsRequired = true)]
         public int IntOption { get; set; } = 24;
 
-        [CommandOption("str", ShortName = 's')]
+        [CommandOption("str", 's')]
         public string StringOption { get; set; } = "foo bar";
 
         public override ExitCode Execute() => new ExitCode(IntOption, StringOption);

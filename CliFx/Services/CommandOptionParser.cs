@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
+using System.Linq;
 using CliFx.Internal;
 using CliFx.Models;
 
@@ -14,7 +14,7 @@ namespace CliFx.Services
             string commandName = null;
 
             // Initialize options
-            var options = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            var rawOptions = new Dictionary<string, List<string>>();
 
             // Keep track of the last option's name
             string optionName = null;
@@ -28,7 +28,9 @@ namespace CliFx.Services
                 {
                     // Extract option name (skip 2 chars)
                     optionName = commandLineArgument.Substring(2);
-                    options[optionName] = null;
+
+                    if (rawOptions.GetValueOrDefault(optionName) == null)
+                        rawOptions[optionName] = new List<string>();
                 }
 
                 // Short option name
@@ -36,7 +38,9 @@ namespace CliFx.Services
                 {
                     // Extract option name (skip 1 char)
                     optionName = commandLineArgument.Substring(1);
-                    options[optionName] = null;
+
+                    if (rawOptions.GetValueOrDefault(optionName) == null)
+                        rawOptions[optionName] = new List<string>();
                 }
 
                 // Multiple stacked short options
@@ -44,8 +48,10 @@ namespace CliFx.Services
                 {
                     foreach (var c in commandLineArgument.Substring(1))
                     {
-                        optionName = c.ToString(CultureInfo.InvariantCulture);
-                        options[optionName] = null;
+                        optionName = c.AsString();
+
+                        if (rawOptions.GetValueOrDefault(optionName) == null)
+                            rawOptions[optionName] = new List<string>();
                     }
                 }
 
@@ -59,13 +65,13 @@ namespace CliFx.Services
                 else if (!optionName.IsNullOrWhiteSpace())
                 {
                     // ReSharper disable once AssignNullToNotNullAttribute
-                    options[optionName] = commandLineArgument;
+                    rawOptions[optionName].Add(commandLineArgument);
                 }
 
                 isFirstArgument = false;
             }
 
-            return new CommandOptionSet(commandName, options);
+            return new CommandOptionSet(commandName, rawOptions.Select(p => new CommandOption(p.Key, p.Value)).ToArray());
         }
     }
 }
