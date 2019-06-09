@@ -228,12 +228,18 @@ namespace CliFx.Services
                 throw new CommandOptionConvertException(
                     $"Can't convert sequence of values [{option.Values.JoinToString(", ")}] to type [{targetType}].");
             }
-            else
+            else if (option.Values.Count <= 1)
             {
                 // Take first value and ignore the rest
-                var value = option.Values.FirstOrDefault();
+                var value = option.Values.SingleOrDefault();
 
                 return ConvertValue(value, targetType);
+            }
+            else
+            {
+                // TODO: better exception
+                throw new CommandOptionConvertException(
+                    $"Can't convert sequence of values [{option.Values.JoinToString(", ")}] to type [{targetType}].");
             }
         }
     }
