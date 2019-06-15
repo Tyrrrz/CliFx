@@ -7,10 +7,10 @@ using CliFx.Models;
 
 namespace CliFx.Tests.Dummy.Commands
 {
-    [Command("add")]
+    [Command("add", Description = "Calculate the sum of all input values.")]
     public class AddCommand : Command
     {
-        [CommandOption("values", 'v', IsRequired = true, Description = "Values.")]
+        [CommandOption("values", 'v', IsRequired = true, Description = "Input values.")]
         public IReadOnlyList<double> Values { get; set; }
 
         public override ExitCode Execute()

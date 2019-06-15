@@ -14,16 +14,18 @@ namespace CliFx.Internal
 
         public bool IsDefault { get; }
 
-        public CommandType(Type type, string name, bool isDefault)
+        public string Description { get; }
+
+        public IReadOnlyList<CommandOptionProperty> Options { get; }
+
+        public CommandType(Type type, string name, bool isDefault, string description, IReadOnlyList<CommandOptionProperty> options)
         {
             _type = type;
             Name = name;
             IsDefault = isDefault;
+            Description = description;
+            Options = options;
         }
-
-        public IEnumerable<CommandOptionProperty> GetOptionProperties() => _type.GetProperties()
-            .Where(CommandOptionProperty.IsValid)
-            .Select(CommandOptionProperty.Initialize);
 
         public Command Activate() => (Command) Activator.CreateInstance(_type);
     }
@@ -41,10 +43,18 @@ namespace CliFx.Internal
             if (!IsValid(type))
                 throw new InvalidOperationException($"[{type.Name}] is not a valid command type.");
 
-            var name = type.GetCustomAttribute<CommandAttribute>()?.Name;
-            var isDefault = type.IsDefined(typeof(DefaultCommandAttribute));
+            var attribute = type.GetCustomAttribute<CommandAttribute>();
 
-            return new CommandType(type, name, isDefault);
+            var name = attribute.Name;
+            var isDefault = attribute is DefaultCommandAttribute;
+            var description = attribute.Description;
+
+            var options = type.GetProperties()
+                .Where(CommandOptionProperty.IsValid)
+                .Select(CommandOptionProperty.Initialize)
+                .ToArray();
+
+            return new CommandType(type, name, isDefault, description, options);
         }
 
         public static IEnumerable<CommandType> GetCommandTypes(IEnumerable<Type> types) => types.Where(IsValid).Select(Initialize);

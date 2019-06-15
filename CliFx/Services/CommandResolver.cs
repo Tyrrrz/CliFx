@@ -84,7 +84,7 @@ namespace CliFx.Services
             var command = commandType.Activate();
 
             // Set command options
-            foreach (var property in commandType.GetOptionProperties())
+            foreach (var property in commandType.Options)
             {
                 // Get option for this property
                 var option = optionSet.GetOptionOrDefault(property.Name, property.ShortName);
@@ -95,7 +95,7 @@ namespace CliFx.Services
                     var convertedValue = _commandOptionConverter.ConvertOption(option, property.Type);
                     property.SetValue(command, convertedValue);
                 }
-                // If the property is missing but it's required - throw
+                // If the property is required but it's missing - throw
                 else if (property.IsRequired)
                 {
                     throw new CommandResolveException($"Can't resolve command because required property [{property.Name}] is not set.");

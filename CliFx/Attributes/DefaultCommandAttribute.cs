@@ -3,7 +3,11 @@
 namespace CliFx.Attributes
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    public class DefaultCommandAttribute : Attribute
+    public class DefaultCommandAttribute : CommandAttribute
     {
+        public DefaultCommandAttribute()
+            : base(null)
+        {
+        }
     }
 }
