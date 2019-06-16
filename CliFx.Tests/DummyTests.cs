@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using CliWrap;
 using NUnit.Framework;
 
@@ -8,7 +7,7 @@ namespace CliFx.Tests
     [TestFixture]
     public class DummyTests
     {
-        private static string DummyFilePath => Path.Combine(TestContext.CurrentContext.TestDirectory, "CliFx.Tests.Dummy.exe");
+        private static string DummyFilePath => typeof(Dummy.Program).Assembly.Location;
 
         [Test]
         [TestCase("", "Hello world")]
