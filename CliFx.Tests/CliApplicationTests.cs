@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using CliFx.Services;
 using CliFx.Tests.TestObjects;
-using Moq;
 using NUnit.Framework;
 
 namespace CliFx.Tests
@@ -17,11 +15,13 @@ namespace CliFx.Tests
             var command = new TestCommand();
             var expectedExitCode = await command.ExecuteAsync();
 
-            var commandResolverMock = new Mock<ICommandResolver>();
-            commandResolverMock.Setup(m => m.ResolveCommand(It.IsAny<IReadOnlyList<string>>())).Returns(command);
-            var commandResolver = commandResolverMock.Object;
+            var commandOptionParser = new CommandOptionParser();
 
-            var application = new CliApplication(commandResolver);
+            var typeProvider = new TypeProvider(typeof(TestCommand));
+            var commandOptionConverter = new CommandOptionConverter();
+            var commandResolver = new CommandResolver(typeProvider, commandOptionConverter);
+
+            var application = new CliApplication(commandOptionParser, commandResolver);
 
             // Act
             var exitCodeValue = await application.RunAsync();

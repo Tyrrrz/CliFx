@@ -8,7 +8,7 @@ namespace CliFx.Tests
     [TestFixture]
     public class CommandOptionParserTests
     {
-        private static IEnumerable<TestCaseData> GetData_ParseOptions()
+        private static IEnumerable<TestCaseData> GetTestCases_ParseOptions()
         {
             yield return new TestCaseData(new string[0], CommandOptionSet.Empty);
 
@@ -154,7 +154,7 @@ namespace CliFx.Tests
         }
 
         [Test]
-        [TestCaseSource(nameof(GetData_ParseOptions))]
+        [TestCaseSource(nameof(GetTestCases_ParseOptions))]
         public void ParseOptions_Test(IReadOnlyList<string> commandLineArguments, CommandOptionSet expectedCommandOptionSet)
         {
             // Arrange
@@ -164,17 +164,20 @@ namespace CliFx.Tests
             var optionSet = parser.ParseOptions(commandLineArguments);
 
             // Assert
-            Assert.That(optionSet.CommandName, Is.EqualTo(expectedCommandOptionSet.CommandName), "Command name");
-            Assert.That(optionSet.Options.Count, Is.EqualTo(expectedCommandOptionSet.Options.Count), "Option count");
-
-            for (var i = 0; i < optionSet.Options.Count; i++)
+            Assert.Multiple(() =>
             {
-                Assert.That(optionSet.Options[i].Name, Is.EqualTo(expectedCommandOptionSet.Options[i].Name),
-                    $"Option[{i}] name");
+                Assert.That(optionSet.CommandName, Is.EqualTo(expectedCommandOptionSet.CommandName), "Command name");
+                Assert.That(optionSet.Options.Count, Is.EqualTo(expectedCommandOptionSet.Options.Count), "Option count");
 
-                Assert.That(optionSet.Options[i].Values, Is.EqualTo(expectedCommandOptionSet.Options[i].Values),
-                    $"Option[{i}] values");
-            }
+                for (var i = 0; i < optionSet.Options.Count; i++)
+                {
+                    Assert.That(optionSet.Options[i].Name, Is.EqualTo(expectedCommandOptionSet.Options[i].Name),
+                        $"Option[{i}] name");
+
+                    Assert.That(optionSet.Options[i].Values, Is.EqualTo(expectedCommandOptionSet.Options[i].Values),
+                        $"Option[{i}] values");
+                }
+            });
         }
     }
 }

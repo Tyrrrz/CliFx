@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using CliFx.Models;
 
 namespace CliFx.Services
 {
     public interface ICommandResolver
     {
-        Command ResolveCommand(IReadOnlyList<string> commandLineArguments);
+        Command ResolveCommand(CommandOptionSet optionSet);
     }
 }

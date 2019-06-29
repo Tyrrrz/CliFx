@@ -26,7 +26,6 @@ To be added with a stable release...
 
 ## Libraries used
 
-- [Moq](https://github.com/Moq/moq4)
 - [NUnit](https://github.com/nunit/nunit)
 
 ## Donate

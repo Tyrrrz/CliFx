@@ -11,7 +11,7 @@ namespace CliFx.Tests
     [TestFixture]
     public class CommandOptionConverterTests
     {
-        private static IEnumerable<TestCaseData> GetData_ConvertOption()
+        private static IEnumerable<TestCaseData> GetTestCases_ConvertOption()
         {
             yield return new TestCaseData(
                 new CommandOption("option", "value"),
@@ -171,7 +171,7 @@ namespace CliFx.Tests
         }
 
         [Test]
-        [TestCaseSource(nameof(GetData_ConvertOption))]
+        [TestCaseSource(nameof(GetTestCases_ConvertOption))]
         public void ConvertOption_Test(CommandOption option, Type targetType, object expectedConvertedValue)
         {
             // Arrange
@@ -181,10 +181,13 @@ namespace CliFx.Tests
             var convertedValue = converter.ConvertOption(option, targetType);
 
             // Assert
-            Assert.That(convertedValue, Is.EqualTo(expectedConvertedValue));
+            Assert.Multiple(() =>
+            {
+                Assert.That(convertedValue, Is.EqualTo(expectedConvertedValue));
 
-            if (convertedValue != null)
-                Assert.That(convertedValue, Is.AssignableTo(targetType));
+                if (convertedValue != null)
+                    Assert.That(convertedValue, Is.AssignableTo(targetType));
+            });
         }
     }
 }

@@ -11,14 +11,11 @@ namespace CliFx.Services
     public class CommandResolver : ICommandResolver
     {
         private readonly ITypeProvider _typeProvider;
-        private readonly ICommandOptionParser _commandOptionParser;
         private readonly ICommandOptionConverter _commandOptionConverter;
 
-        public CommandResolver(ITypeProvider typeProvider,
-            ICommandOptionParser commandOptionParser, ICommandOptionConverter commandOptionConverter)
+        public CommandResolver(ITypeProvider typeProvider, ICommandOptionConverter commandOptionConverter)
         {
             _typeProvider = typeProvider;
-            _commandOptionParser = commandOptionParser;
             _commandOptionConverter = commandOptionConverter;
         }
 
@@ -71,10 +68,8 @@ namespace CliFx.Services
                 $"Apply {nameof(CommandAttribute)} to give command a name.");
         }
 
-        public Command ResolveCommand(IReadOnlyList<string> commandLineArguments)
+        public Command ResolveCommand(CommandOptionSet optionSet)
         {
-            var optionSet = _commandOptionParser.ParseOptions(commandLineArguments);
-
             // Get command type
             var commandType = !optionSet.CommandName.IsNullOrWhiteSpace()
                 ? GetCommandType(optionSet.CommandName)

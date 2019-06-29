@@ -7,25 +7,26 @@ namespace CliFx
 {
     public partial class CliApplication : ICliApplication
     {
+        private readonly ICommandOptionParser _commandOptionParser;
         private readonly ICommandResolver _commandResolver;
 
-        public CliApplication(ICommandResolver commandResolver)
+        public CliApplication(ICommandOptionParser commandOptionParser, ICommandResolver commandResolver)
         {
+            _commandOptionParser = commandOptionParser;
             _commandResolver = commandResolver;
         }
 
         public CliApplication()
-            : this(GetDefaultCommandResolver(Assembly.GetCallingAssembly()))
+            : this(new CommandOptionParser(), GetDefaultCommandResolver(Assembly.GetCallingAssembly()))
         {
         }
 
         public async Task<int> RunAsync(IReadOnlyList<string> commandLineArguments)
         {
-            // Resolve and execute command
-            var command = _commandResolver.ResolveCommand(commandLineArguments);
-            var exitCode = await command.ExecuteAsync();
+            var optionSet = _commandOptionParser.ParseOptions(commandLineArguments);
+            var command = _commandResolver.ResolveCommand(optionSet);
 
-            // TODO: print message if error?
+            var exitCode = await command.ExecuteAsync();
 
             return exitCode.Value;
         }
@@ -36,10 +37,9 @@ namespace CliFx
         private static ICommandResolver GetDefaultCommandResolver(Assembly assembly)
         {
             var typeProvider = TypeProvider.FromAssembly(assembly);
-            var commandOptionParser = new CommandOptionParser();
             var commandOptionConverter = new CommandOptionConverter();
 
-            return new CommandResolver(typeProvider, commandOptionParser, commandOptionConverter);
+            return new CommandResolver(typeProvider, commandOptionConverter);
         }
     }
 }

@@ -3,7 +3,6 @@ using CliFx.Exceptions;
 using CliFx.Models;
 using CliFx.Services;
 using CliFx.Tests.TestObjects;
-using Moq;
 using NUnit.Framework;
 
 namespace CliFx.Tests
@@ -11,7 +10,7 @@ namespace CliFx.Tests
     [TestFixture]
     public class CommandResolverTests
     {
-        private static IEnumerable<TestCaseData> GetData_ResolveCommand()
+        private static IEnumerable<TestCaseData> GetTestCases_ResolveCommand()
         {
             yield return new TestCaseData(
                 new CommandOptionSet(new[]
@@ -48,34 +47,28 @@ namespace CliFx.Tests
         }
 
         [Test]
-        [TestCaseSource(nameof(GetData_ResolveCommand))]
+        [TestCaseSource(nameof(GetTestCases_ResolveCommand))]
         public void ResolveCommand_Test(CommandOptionSet commandOptionSet, TestCommand expectedCommand)
         {
             // Arrange
-            var commandTypes = new[] {typeof(TestCommand)};
-
-            var typeProviderMock = new Mock<ITypeProvider>();
-            typeProviderMock.Setup(m => m.GetTypes()).Returns(commandTypes);
-            var typeProvider = typeProviderMock.Object;
-
-            var optionParserMock = new Mock<ICommandOptionParser>();
-            optionParserMock.Setup(m => m.ParseOptions(It.IsAny<IReadOnlyList<string>>())).Returns(commandOptionSet);
-            var optionParser = optionParserMock.Object;
-
+            var typeProvider = new TypeProvider(typeof(TestCommand));
             var optionConverter = new CommandOptionConverter();
 
-            var resolver = new CommandResolver(typeProvider, optionParser, optionConverter);
+            var resolver = new CommandResolver(typeProvider, optionConverter);
 
             // Act
-            var command = resolver.ResolveCommand() as TestCommand;
+            var command = resolver.ResolveCommand(commandOptionSet) as TestCommand;
 
             // Assert
-            Assert.That(command, Is.Not.Null);
-            Assert.That(command.StringOption, Is.EqualTo(expectedCommand.StringOption), nameof(command.StringOption));
-            Assert.That(command.IntOption, Is.EqualTo(expectedCommand.IntOption), nameof(command.IntOption));
+            Assert.Multiple(() =>
+            {
+                Assert.That(command, Is.Not.Null);
+                Assert.That(command.StringOption, Is.EqualTo(expectedCommand.StringOption), nameof(command.StringOption));
+                Assert.That(command.IntOption, Is.EqualTo(expectedCommand.IntOption), nameof(command.IntOption));
+            });
         }
 
-        private static IEnumerable<TestCaseData> GetData_ResolveCommand_IsRequired()
+        private static IEnumerable<TestCaseData> GetTestCases_ResolveCommand_IsRequired()
         {
             yield return new TestCaseData(CommandOptionSet.Empty);
 
@@ -88,26 +81,17 @@ namespace CliFx.Tests
         }
 
         [Test]
-        [TestCaseSource(nameof(GetData_ResolveCommand_IsRequired))]
+        [TestCaseSource(nameof(GetTestCases_ResolveCommand_IsRequired))]
         public void ResolveCommand_IsRequired_Test(CommandOptionSet commandOptionSet)
         {
             // Arrange
-            var commandTypes = new[] {typeof(TestCommand)};
-
-            var typeProviderMock = new Mock<ITypeProvider>();
-            typeProviderMock.Setup(m => m.GetTypes()).Returns(commandTypes);
-            var typeProvider = typeProviderMock.Object;
-
-            var optionParserMock = new Mock<ICommandOptionParser>();
-            optionParserMock.Setup(m => m.ParseOptions(It.IsAny<IReadOnlyList<string>>())).Returns(commandOptionSet);
-            var optionParser = optionParserMock.Object;
-
+            var typeProvider = new TypeProvider(typeof(TestCommand));
             var optionConverter = new CommandOptionConverter();
 
-            var resolver = new CommandResolver(typeProvider, optionParser, optionConverter);
+            var resolver = new CommandResolver(typeProvider, optionConverter);
 
             // Act & Assert
-            Assert.Throws<CommandResolveException>(() => resolver.ResolveCommand());
+            Assert.Throws<CommandResolveException>(() => resolver.ResolveCommand(commandOptionSet));
         }
     }
 }
