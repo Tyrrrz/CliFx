@@ -1,7 +1,8 @@
 # CliFx
 
-[![Build](https://img.shields.io/appveyor/ci/Tyrrrz/CliFx/master.svg)](https://ci.appveyor.com/project/Tyrrrz/CliFx)
-[![Tests](https://img.shields.io/appveyor/tests/Tyrrrz/CliFx/master.svg)](https://ci.appveyor.com/project/Tyrrrz/CliFx)
+[![Build](https://img.shields.io/appveyor/ci/Tyrrrz/CliFx/master.svg)](https://ci.appveyor.com/project/Tyrrrz/CliFx/branch/master)
+[![Tests](https://img.shields.io/appveyor/tests/Tyrrrz/CliFx/master.svg)](https://ci.appveyor.com/project/Tyrrrz/CliFx/branch/master/tests)
+[![Coverage](https://img.shields.io/codecov/c/gh/Tyrrrz/CliFx/master.svg)](https://codecov.io/gh/Tyrrrz/CliFx)
 [![NuGet](https://img.shields.io/nuget/v/CliFx.svg)](https://nuget.org/packages/CliFx)
 [![NuGet](https://img.shields.io/nuget/dt/CliFx.svg)](https://nuget.org/packages/CliFx)
 [![Donate](https://img.shields.io/badge/patreon-donate-yellow.svg)](https://patreon.com/tyrrrz)

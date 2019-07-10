@@ -9,8 +9,11 @@ before_build:
 build:
   verbosity: minimal
 
+after_test:
+- choco install codecov && codecov -f "CliFx.Tests/bin/%CONFIGURATION%/Coverage.xml" --required
+
 artifacts:
-- path: CliFx\bin\$(configuration)\CliFx*.nupkg
+- path: CliFx/bin/$(configuration)/CliFx*.nupkg
   name: CliFx.nupkg
 
 deploy:
