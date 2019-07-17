@@ -36,7 +36,7 @@ namespace CliFx.Internal
             // Derives from Command
             type.IsDerivedFrom(typeof(Command)) &&
             // Marked with DefaultCommandAttribute or CommandAttribute
-            (type.IsDefined(typeof(DefaultCommandAttribute)) || type.IsDefined(typeof(CommandAttribute)));
+            type.IsDefined(typeof(CommandAttribute));
 
         public static CommandType Initialize(Type type)
         {

@@ -1,14 +1,28 @@
 ﻿using System.Collections.Generic;
+using CliFx.Attributes;
 using CliFx.Exceptions;
 using CliFx.Models;
 using CliFx.Services;
-using CliFx.Tests.TestObjects;
 using NUnit.Framework;
 
 namespace CliFx.Tests
 {
+    public partial class CommandResolverTests
+    {
+        [DefaultCommand]
+        public class TestCommand : Command
+        {
+            [CommandOption("int", 'i', IsRequired = true)]
+            public int IntOption { get; set; } = 24;
+
+            [CommandOption("str", 's')] public string StringOption { get; set; } = "foo bar";
+
+            public override ExitCode Execute() => new ExitCode(IntOption, StringOption);
+        }
+    }
+
     [TestFixture]
-    public class CommandResolverTests
+    public partial class CommandResolverTests
     {
         private static IEnumerable<TestCaseData> GetTestCases_ResolveCommand()
         {
@@ -36,14 +50,6 @@ namespace CliFx.Tests
                 }),
                 new TestCommand {IntOption = 13}
             );
-
-            yield return new TestCaseData(
-                new CommandOptionSet("command", new[]
-                {
-                    new CommandOption("int", "13")
-                }),
-                new TestCommand {IntOption = 13}
-            );
         }
 
         [Test]
@@ -51,10 +57,7 @@ namespace CliFx.Tests
         public void ResolveCommand_Test(CommandOptionSet commandOptionSet, TestCommand expectedCommand)
         {
             // Arrange
-            var typeProvider = new TypeProvider(typeof(TestCommand));
-            var optionConverter = new CommandOptionConverter();
-
-            var resolver = new CommandResolver(typeProvider, optionConverter);
+            var resolver = new CommandResolver(new[] {typeof(TestCommand)}, new CommandOptionConverter());
 
             // Act
             var command = resolver.ResolveCommand(commandOptionSet) as TestCommand;
@@ -85,10 +88,7 @@ namespace CliFx.Tests
         public void ResolveCommand_IsRequired_Test(CommandOptionSet commandOptionSet)
         {
             // Arrange
-            var typeProvider = new TypeProvider(typeof(TestCommand));
-            var optionConverter = new CommandOptionConverter();
-
-            var resolver = new CommandResolver(typeProvider, optionConverter);
+            var resolver = new CommandResolver(new[] {typeof(TestCommand)}, new CommandOptionConverter());
 
             // Act & Assert
             Assert.Throws<CommandResolveException>(() => resolver.ResolveCommand(commandOptionSet));

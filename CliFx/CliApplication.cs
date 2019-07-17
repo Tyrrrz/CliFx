@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
-using System.Reflection;
 using System.Threading.Tasks;
 using CliFx.Services;
 
 namespace CliFx
 {
-    public partial class CliApplication : ICliApplication
+    public class CliApplication : ICliApplication
     {
         private readonly ICommandOptionParser _commandOptionParser;
         private readonly ICommandResolver _commandResolver;
@@ -17,7 +16,7 @@ namespace CliFx
         }
 
         public CliApplication()
-            : this(new CommandOptionParser(), GetDefaultCommandResolver(Assembly.GetCallingAssembly()))
+            : this(new CommandOptionParser(), new CommandResolver(new CommandOptionConverter()))
         {
         }
 
@@ -29,17 +28,6 @@ namespace CliFx
             var exitCode = await command.ExecuteAsync();
 
             return exitCode.Value;
-        }
-    }
-
-    public partial class CliApplication
-    {
-        private static ICommandResolver GetDefaultCommandResolver(Assembly assembly)
-        {
-            var typeProvider = TypeProvider.FromAssembly(assembly);
-            var commandOptionConverter = new CommandOptionConverter();
-
-            return new CommandResolver(typeProvider, commandOptionConverter);
         }
     }
 }

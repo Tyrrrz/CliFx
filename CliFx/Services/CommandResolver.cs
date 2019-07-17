@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using CliFx.Attributes;
 using CliFx.Exceptions;
 using CliFx.Internal;
@@ -8,18 +9,23 @@ using CliFx.Models;
 
 namespace CliFx.Services
 {
-    public class CommandResolver : ICommandResolver
+    public partial class CommandResolver : ICommandResolver
     {
-        private readonly ITypeProvider _typeProvider;
+        private readonly IReadOnlyList<Type> _availableTypes;
         private readonly ICommandOptionConverter _commandOptionConverter;
 
-        public CommandResolver(ITypeProvider typeProvider, ICommandOptionConverter commandOptionConverter)
+        public CommandResolver(IReadOnlyList<Type> availableTypes, ICommandOptionConverter commandOptionConverter)
         {
-            _typeProvider = typeProvider;
+            _availableTypes = availableTypes;
             _commandOptionConverter = commandOptionConverter;
         }
 
-        private IEnumerable<CommandType> GetCommandTypes() => CommandType.GetCommandTypes(_typeProvider.GetTypes());
+        public CommandResolver(ICommandOptionConverter commandOptionConverter)
+            : this(GetDefaultAvailableTypes(), commandOptionConverter)
+        {
+        }
+
+        private IEnumerable<CommandType> GetCommandTypes() => CommandType.GetCommandTypes(_availableTypes);
 
         private CommandType GetDefaultCommandType()
         {
@@ -99,5 +105,10 @@ namespace CliFx.Services
 
             return command;
         }
+    }
+
+    public partial class CommandResolver
+    {
+        private static IReadOnlyList<Type> GetDefaultAvailableTypes() => Assembly.GetEntryAssembly()?.GetExportedTypes() ?? new Type[0];
     }
 }

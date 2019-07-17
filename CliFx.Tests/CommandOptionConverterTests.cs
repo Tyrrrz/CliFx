@@ -3,13 +3,44 @@ using System.Collections;
 using System.Collections.Generic;
 using CliFx.Models;
 using CliFx.Services;
-using CliFx.Tests.TestObjects;
 using NUnit.Framework;
 
 namespace CliFx.Tests
 {
+    public partial class CommandOptionConverterTests
+    {
+        public enum TestEnum
+        {
+            Value1,
+            Value2,
+            Value3
+        }
+
+        public struct TestStringConstructable
+        {
+            public string Value { get; }
+
+            public TestStringConstructable(string value)
+            {
+                Value = value;
+            }
+        }
+
+        public struct TestStringParseable
+        {
+            public string Value { get; }
+
+            private TestStringParseable(string value)
+            {
+                Value = value;
+            }
+
+            public static TestStringParseable Parse(string value) => new TestStringParseable(value);
+        }
+    }
+
     [TestFixture]
-    public class CommandOptionConverterTests
+    public partial class CommandOptionConverterTests
     {
         private static IEnumerable<TestCaseData> GetTestCases_ConvertOption()
         {
