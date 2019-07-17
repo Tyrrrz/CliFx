@@ -4,7 +4,7 @@ using CliFx.Models;
 
 namespace CliFx
 {
-    public abstract class Command
+    public abstract class Command : ICommand
     {
         public virtual ExitCode Execute() => throw new InvalidOperationException(
             "Can't execute command because its execution method is not defined. " +

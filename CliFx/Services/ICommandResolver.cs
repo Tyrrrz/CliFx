@@ -4,6 +4,6 @@ namespace CliFx.Services
 {
     public interface ICommandResolver
     {
-        Command ResolveCommand(CommandOptionSet optionSet);
+        ICommand ResolveCommand(CommandOptionSet optionSet);
     }
 }

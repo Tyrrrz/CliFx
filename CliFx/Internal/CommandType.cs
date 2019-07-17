@@ -33,9 +33,7 @@ namespace CliFx.Internal
     internal partial class CommandType
     {
         public static bool IsValid(Type type) =>
-            // Derives from Command
-            type.IsDerivedFrom(typeof(Command)) &&
-            // Marked with DefaultCommandAttribute or CommandAttribute
+            type.GetInterfaces().Contains(typeof(ICommand)) &&
             type.IsDefined(typeof(CommandAttribute));
 
         public static CommandType Initialize(Type type)

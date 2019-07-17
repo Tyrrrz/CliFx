@@ -74,7 +74,7 @@ namespace CliFx.Services
                 $"Apply {nameof(CommandAttribute)} to give command a name.");
         }
 
-        public Command ResolveCommand(CommandOptionSet optionSet)
+        public ICommand ResolveCommand(CommandOptionSet optionSet)
         {
             // Get command type
             var commandType = !optionSet.CommandName.IsNullOrWhiteSpace()
