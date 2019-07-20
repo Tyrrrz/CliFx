@@ -8,10 +8,14 @@ namespace CliFx.Tests
 {
     public partial class CliApplicationTests
     {
-        [DefaultCommand]
-        public class TestCommand : Command
+        [Command]
+        public class TestCommand : ICommand
         {
-            public override ExitCode Execute() => new ExitCode(13);
+            public static ExitCode ExitCode { get; } = new ExitCode(13);
+
+            public CommandContext Context { get; set; }
+
+            public Task<ExitCode> ExecuteAsync() => Task.FromResult(ExitCode);
         }
     }
 
@@ -23,14 +27,14 @@ namespace CliFx.Tests
         {
             // Arrange
             var application = new CliApplication(
-                new CommandOptionParser(),
-                new CommandResolver(new[] {typeof(TestCommand)}, new CommandOptionConverter()));
+                new CommandInputParser(),
+                new CommandInitializer(new CommandSchemaResolver(new[] {typeof(TestCommand)})));
 
             // Act
             var exitCodeValue = await application.RunAsync();
 
             // Assert
-            Assert.That(exitCodeValue, Is.EqualTo(13), "Exit code");
+            Assert.That(exitCodeValue, Is.EqualTo(TestCommand.ExitCode.Value), "Exit code");
         }
     }
 }

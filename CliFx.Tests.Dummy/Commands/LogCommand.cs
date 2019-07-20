@@ -15,10 +15,10 @@ namespace CliFx.Tests.Dummy.Commands
         [CommandOption("base", 'b', Description = "Logarithm base.")]
         public double Base { get; set; } = 10;
 
-        public override ExitCode Execute()
+        protected override ExitCode Process()
         {
             var result = Math.Log(Value, Base);
-            Console.WriteLine(result.ToString(CultureInfo.InvariantCulture));
+            Output.WriteLine(result.ToString(CultureInfo.InvariantCulture));
 
             return ExitCode.Success;
         }

@@ -1,11 +1,11 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using CliFx.Attributes;
 using CliFx.Models;
+using CliFx.Services;
 
 namespace CliFx.Tests.Dummy.Commands
 {
-    [DefaultCommand]
+    [Command]
     public class DefaultCommand : Command
     {
         [CommandOption("target", 't', Description = "Greeting target.")]
@@ -14,7 +14,7 @@ namespace CliFx.Tests.Dummy.Commands
         [CommandOption('e', Description = "Whether the greeting should be enthusiastic.")]
         public bool IsEnthusiastic { get; set; }
 
-        public override ExitCode Execute()
+        protected override ExitCode Process()
         {
             var buffer = new StringBuilder();
 
@@ -23,7 +23,7 @@ namespace CliFx.Tests.Dummy.Commands
             if (IsEnthusiastic)
                 buffer.Append("!!!");
 
-            Console.WriteLine(buffer.ToString());
+            Output.WriteLine(buffer.ToString());
 
             return ExitCode.Success;
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using CliFx.Internal;
 
 namespace CliFx.Attributes
 {
@@ -9,9 +10,16 @@ namespace CliFx.Attributes
 
         public string Description { get; set; }
 
+        public bool IsDefault => Name.IsNullOrWhiteSpace();
+
         public CommandAttribute(string name)
         {
             Name = name;
+        }
+
+        public CommandAttribute()
+            : this(null)
+        {
         }
     }
 }

@@ -6,7 +6,7 @@ namespace CliFx.Models
 {
     public static class Extensions
     {
-        public static CommandOption GetOptionOrDefault(this CommandOptionSet set, string name, char? shortName) =>
+        public static CommandOptionInput GetOptionOrDefault(this CommandInput set, string name, char? shortName) =>
             set.Options.FirstOrDefault(o =>
             {
                 if (!name.IsNullOrWhiteSpace() && string.Equals(o.Name, name, StringComparison.Ordinal))

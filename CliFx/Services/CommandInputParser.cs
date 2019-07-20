@@ -6,9 +6,10 @@ using CliFx.Models;
 
 namespace CliFx.Services
 {
-    public class CommandOptionParser : ICommandOptionParser
+    public class CommandInputParser : ICommandInputParser
     {
-        public CommandOptionSet ParseOptions(IReadOnlyList<string> commandLineArguments)
+        // TODO: refactor
+        public CommandInput ParseInput(IReadOnlyList<string> commandLineArguments)
         {
             // Initialize command name placeholder
             string commandName = null;
@@ -71,7 +72,7 @@ namespace CliFx.Services
                 isFirstArgument = false;
             }
 
-            return new CommandOptionSet(commandName, rawOptions.Select(p => new CommandOption(p.Key, p.Value)).ToArray());
+            return new CommandInput(commandName, rawOptions.Select(p => new CommandOptionInput(p.Key, p.Value)).ToArray());
         }
     }
 }

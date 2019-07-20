@@ -6,24 +6,24 @@ namespace CliFx
 {
     public class CliApplication : ICliApplication
     {
-        private readonly ICommandOptionParser _commandOptionParser;
-        private readonly ICommandResolver _commandResolver;
+        private readonly ICommandInputParser _commandInputParser;
+        private readonly ICommandInitializer _commandInitializer;
 
-        public CliApplication(ICommandOptionParser commandOptionParser, ICommandResolver commandResolver)
+        public CliApplication(ICommandInputParser commandInputParser, ICommandInitializer commandInitializer)
         {
-            _commandOptionParser = commandOptionParser;
-            _commandResolver = commandResolver;
+            _commandInputParser = commandInputParser;
+            _commandInitializer = commandInitializer;
         }
 
         public CliApplication()
-            : this(new CommandOptionParser(), new CommandResolver(new CommandOptionConverter()))
+            : this(new CommandInputParser(), new CommandInitializer())
         {
         }
 
         public async Task<int> RunAsync(IReadOnlyList<string> commandLineArguments)
         {
-            var optionSet = _commandOptionParser.ParseOptions(commandLineArguments);
-            var command = _commandResolver.ResolveCommand(optionSet);
+            var input = _commandInputParser.ParseInput(commandLineArguments);
+            var command = _commandInitializer.InitializeCommand(input);
 
             var exitCode = await command.ExecuteAsync();
 

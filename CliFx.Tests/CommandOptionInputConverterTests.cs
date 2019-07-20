@@ -7,7 +7,7 @@ using NUnit.Framework;
 
 namespace CliFx.Tests
 {
-    public partial class CommandOptionConverterTests
+    public partial class CommandOptionInputConverterTests
     {
         public enum TestEnum
         {
@@ -40,162 +40,162 @@ namespace CliFx.Tests
     }
 
     [TestFixture]
-    public partial class CommandOptionConverterTests
+    public partial class CommandOptionInputConverterTests
     {
         private static IEnumerable<TestCaseData> GetTestCases_ConvertOption()
         {
             yield return new TestCaseData(
-                new CommandOption("option", "value"),
+                new CommandOptionInput("option", "value"),
                 typeof(string),
                 "value"
             );
 
             yield return new TestCaseData(
-                new CommandOption("option", "value"),
+                new CommandOptionInput("option", "value"),
                 typeof(object),
                 "value"
             );
 
             yield return new TestCaseData(
-                new CommandOption("option", "true"),
+                new CommandOptionInput("option", "true"),
                 typeof(bool),
                 true
             );
 
             yield return new TestCaseData(
-                new CommandOption("option", "false"),
+                new CommandOptionInput("option", "false"),
                 typeof(bool),
                 false
             );
 
             yield return new TestCaseData(
-                new CommandOption("option"),
+                new CommandOptionInput("option"),
                 typeof(bool),
                 true
             );
 
             yield return new TestCaseData(
-                new CommandOption("option", "123"),
+                new CommandOptionInput("option", "123"),
                 typeof(int),
                 123
             );
 
             yield return new TestCaseData(
-                new CommandOption("option", "123.45"),
+                new CommandOptionInput("option", "123.45"),
                 typeof(double),
                 123.45
             );
 
             yield return new TestCaseData(
-                new CommandOption("option", "28 Apr 1995"),
+                new CommandOptionInput("option", "28 Apr 1995"),
                 typeof(DateTime),
                 new DateTime(1995, 04, 28)
             );
 
             yield return new TestCaseData(
-                new CommandOption("option", "28 Apr 1995"),
+                new CommandOptionInput("option", "28 Apr 1995"),
                 typeof(DateTimeOffset),
                 new DateTimeOffset(new DateTime(1995, 04, 28))
             );
 
             yield return new TestCaseData(
-                new CommandOption("option", "00:14:59"),
+                new CommandOptionInput("option", "00:14:59"),
                 typeof(TimeSpan),
                 new TimeSpan(00, 14, 59)
             );
 
             yield return new TestCaseData(
-                new CommandOption("option", "value2"),
+                new CommandOptionInput("option", "value2"),
                 typeof(TestEnum),
                 TestEnum.Value2
             );
 
             yield return new TestCaseData(
-                new CommandOption("option", "666"),
+                new CommandOptionInput("option", "666"),
                 typeof(int?),
                 666
             );
 
             yield return new TestCaseData(
-                new CommandOption("option"),
+                new CommandOptionInput("option"),
                 typeof(int?),
                 null
             );
 
             yield return new TestCaseData(
-                new CommandOption("option", "value3"),
+                new CommandOptionInput("option", "value3"),
                 typeof(TestEnum?),
                 TestEnum.Value3
             );
 
             yield return new TestCaseData(
-                new CommandOption("option"),
+                new CommandOptionInput("option"),
                 typeof(TestEnum?),
                 null
             );
 
             yield return new TestCaseData(
-                new CommandOption("option", "01:00:00"),
+                new CommandOptionInput("option", "01:00:00"),
                 typeof(TimeSpan?),
                 new TimeSpan(01, 00, 00)
             );
 
             yield return new TestCaseData(
-                new CommandOption("option"),
+                new CommandOptionInput("option"),
                 typeof(TimeSpan?),
                 null
             );
 
             yield return new TestCaseData(
-                new CommandOption("option", "value"),
+                new CommandOptionInput("option", "value"),
                 typeof(TestStringConstructable),
                 new TestStringConstructable("value")
             );
 
             yield return new TestCaseData(
-                new CommandOption("option", "value"),
+                new CommandOptionInput("option", "value"),
                 typeof(TestStringParseable),
                 TestStringParseable.Parse("value")
             );
 
             yield return new TestCaseData(
-                new CommandOption("option", new[] {"value1", "value2"}),
+                new CommandOptionInput("option", new[] {"value1", "value2"}),
                 typeof(string[]),
                 new[] {"value1", "value2"}
             );
 
             yield return new TestCaseData(
-                new CommandOption("option", new[] {"value1", "value2"}),
+                new CommandOptionInput("option", new[] {"value1", "value2"}),
                 typeof(object[]),
                 new[] {"value1", "value2"}
             );
 
             yield return new TestCaseData(
-                new CommandOption("option", new[] {"47", "69"}),
+                new CommandOptionInput("option", new[] {"47", "69"}),
                 typeof(int[]),
                 new[] {47, 69}
             );
 
             yield return new TestCaseData(
-                new CommandOption("option", new[] {"value1", "value3"}),
+                new CommandOptionInput("option", new[] {"value1", "value3"}),
                 typeof(TestEnum[]),
                 new[] {TestEnum.Value1, TestEnum.Value3}
             );
 
             yield return new TestCaseData(
-                new CommandOption("option", new[] {"value1", "value2"}),
+                new CommandOptionInput("option", new[] {"value1", "value2"}),
                 typeof(IEnumerable),
                 new[] {"value1", "value2"}
             );
 
             yield return new TestCaseData(
-                new CommandOption("option", new[] {"value1", "value2"}),
+                new CommandOptionInput("option", new[] {"value1", "value2"}),
                 typeof(IEnumerable<string>),
                 new[] {"value1", "value2"}
             );
 
             yield return new TestCaseData(
-                new CommandOption("option", new[] {"value1", "value2"}),
+                new CommandOptionInput("option", new[] {"value1", "value2"}),
                 typeof(IReadOnlyList<string>),
                 new[] {"value1", "value2"}
             );
@@ -203,13 +203,13 @@ namespace CliFx.Tests
 
         [Test]
         [TestCaseSource(nameof(GetTestCases_ConvertOption))]
-        public void ConvertOption_Test(CommandOption option, Type targetType, object expectedConvertedValue)
+        public void ConvertOption_Test(CommandOptionInput optionInput, Type targetType, object expectedConvertedValue)
         {
             // Arrange
-            var converter = new CommandOptionConverter();
+            var converter = new CommandOptionInputConverter();
 
             // Act
-            var convertedValue = converter.ConvertOption(option, targetType);
+            var convertedValue = converter.ConvertOption(optionInput, targetType);
 
             // Assert
             Assert.Multiple(() =>

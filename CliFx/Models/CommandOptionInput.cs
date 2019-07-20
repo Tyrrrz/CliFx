@@ -2,24 +2,24 @@
 
 namespace CliFx.Models
 {
-    public class CommandOption
+    public class CommandOptionInput
     {
         public string Name { get; }
 
         public IReadOnlyList<string> Values { get; }
 
-        public CommandOption(string name, IReadOnlyList<string> values)
+        public CommandOptionInput(string name, IReadOnlyList<string> values)
         {
             Name = name;
             Values = values;
         }
 
-        public CommandOption(string name, string value)
+        public CommandOptionInput(string name, string value)
             : this(name, new[] {value})
         {
         }
 
-        public CommandOption(string name)
+        public CommandOptionInput(string name)
             : this(name, new string[0])
         {
         }

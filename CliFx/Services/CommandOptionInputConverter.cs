@@ -8,16 +8,16 @@ using CliFx.Models;
 
 namespace CliFx.Services
 {
-    public class CommandOptionConverter : ICommandOptionConverter
+    public class CommandOptionInputConverter : ICommandOptionInputConverter
     {
         private readonly IFormatProvider _formatProvider;
 
-        public CommandOptionConverter(IFormatProvider formatProvider)
+        public CommandOptionInputConverter(IFormatProvider formatProvider)
         {
             _formatProvider = formatProvider;
         }
 
-        public CommandOptionConverter()
+        public CommandOptionInputConverter()
             : this(CultureInfo.InvariantCulture)
         {
         }
@@ -216,7 +216,8 @@ namespace CliFx.Services
             throw new CommandOptionConvertException($"Can't convert value [{value}] to unrecognized type [{targetType}].");
         }
 
-        public object ConvertOption(CommandOption option, Type targetType)
+        // TODO: refactor this
+        public object ConvertOption(CommandOptionInput option, Type targetType)
         {
             if (targetType != typeof(string) && targetType.IsEnumerable())
             {

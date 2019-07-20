@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using CliFx.Attributes;
 using CliFx.Models;
+using CliFx.Services;
 
 namespace CliFx.Tests.Dummy.Commands
 {
@@ -13,10 +13,10 @@ namespace CliFx.Tests.Dummy.Commands
         [CommandOption("values", 'v', IsRequired = true, Description = "Input values.")]
         public IReadOnlyList<double> Values { get; set; }
 
-        public override ExitCode Execute()
+        protected override ExitCode Process()
         {
             var result = Values.Sum();
-            Console.WriteLine(result.ToString(CultureInfo.InvariantCulture));
+            Output.WriteLine(result.ToString(CultureInfo.InvariantCulture));
 
             return ExitCode.Success;
         }
