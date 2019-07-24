@@ -1,74 +1,42 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using CliFx.Attributes;
+using CliFx.Internal;
 using CliFx.Models;
 
 namespace CliFx.Services
 {
     public class CommandSchemaResolver : ICommandSchemaResolver
     {
-        private readonly IReadOnlyList<Type> _sourceTypes;
-
-        public CommandSchemaResolver(IReadOnlyList<Type> sourceTypes)
+        private CommandOptionSchema GetCommandOptionSchema(PropertyInfo optionProperty)
         {
-            _sourceTypes = sourceTypes;
+            var attribute = optionProperty.GetCustomAttribute<CommandOptionAttribute>();
+
+            if (attribute == null)
+                return null;
+
+            return new CommandOptionSchema(optionProperty,
+                attribute.Name,
+                attribute.ShortName,
+                attribute.GroupName,
+                attribute.IsRequired, attribute.Description);
         }
 
-        public CommandSchemaResolver(IReadOnlyList<Assembly> sourceAssemblies)
-            : this(sourceAssemblies.SelectMany(a => a.ExportedTypes).ToArray())
+        // TODO: validate stuff like duplicate names, multiple default commands, etc
+        public CommandSchema GetCommandSchema(Type commandType)
         {
-        }
+            if (!commandType.Implements(typeof(ICommand)))
+                throw new ArgumentException($"Command type must implement {nameof(ICommand)}.", nameof(commandType));
 
-        public CommandSchemaResolver()
-            : this(new[] {Assembly.GetEntryAssembly()})
-        {
-        }
+            var attribute = commandType.GetCustomAttribute<CommandAttribute>();
 
-        private IEnumerable<Type> GetCommandTypes() => _sourceTypes.Where(t => t.GetInterfaces().Contains(typeof(ICommand)));
+            var options = commandType.GetProperties().Select(GetCommandOptionSchema).ExceptNull().ToArray();
 
-        private IReadOnlyList<CommandOptionSchema> GetCommandOptionSchemas(Type commandType)
-        {
-            var result = new List<CommandOptionSchema>();
-
-            foreach (var optionProperty in commandType.GetProperties())
-            {
-                var optionAttribute = optionProperty.GetCustomAttribute<CommandOptionAttribute>();
-
-                if (optionAttribute == null)
-                    continue;
-
-                result.Add(new CommandOptionSchema(optionProperty,
-                    optionAttribute.Name,
-                    optionAttribute.ShortName,
-                    optionAttribute.IsRequired,
-                    optionAttribute.GroupName,
-                    optionAttribute.Description));
-            }
-
-            return result;
-        }
-
-        public IReadOnlyList<CommandSchema> ResolveAllSchemas()
-        {
-            var result = new List<CommandSchema>();
-
-            foreach (var commandType in GetCommandTypes())
-            {
-                var commandAttribute = commandType.GetCustomAttribute<CommandAttribute>();
-
-                if (commandAttribute == null)
-                    continue;
-
-                result.Add(new CommandSchema(commandType,
-                    commandAttribute.Name,
-                    commandAttribute.IsDefault,
-                    commandAttribute.Description,
-                    GetCommandOptionSchemas(commandType)));
-            }
-
-            return result;
+            return new CommandSchema(commandType,
+                attribute?.Name,
+                attribute?.Description,
+                options);
         }
     }
 }

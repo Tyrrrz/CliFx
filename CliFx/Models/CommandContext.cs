@@ -1,17 +1,29 @@
 ﻿using System.Collections.Generic;
+using CliFx.Services;
 
 namespace CliFx.Models
 {
     public class CommandContext
     {
+        public CommandInput CommandInput { get; }
+
         public IReadOnlyList<CommandSchema> AvailableCommandSchemas { get; }
 
-        public CommandSchema CommandSchema { get; }
+        public CommandSchema MatchingCommandSchema { get; }
 
-        public CommandContext(IReadOnlyList<CommandSchema> availableCommandSchemas, CommandSchema commandSchema)
+        public IConsoleWriter Output { get; }
+
+        public IConsoleWriter Error { get; }
+
+        public CommandContext(CommandInput commandInput,
+            IReadOnlyList<CommandSchema> availableCommandSchemas, CommandSchema matchingCommandSchema,
+            IConsoleWriter output, IConsoleWriter error)
         {
+            CommandInput = commandInput;
             AvailableCommandSchemas = availableCommandSchemas;
-            CommandSchema = commandSchema;
+            MatchingCommandSchema = matchingCommandSchema;
+            Output = output;
+            Error = error;
         }
     }
 }

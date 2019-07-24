@@ -14,61 +14,59 @@ namespace CliFx.Tests
         [Test]
         [TestCase("", "Hello world")]
         [TestCase("-t .NET", "Hello .NET")]
-        [TestCase("-e", "Hello world!!!")]
-        [TestCase("add -v 1 2", "3")]
-        [TestCase("add -v 2.75 3.6 4.18", "10.53")]
-        [TestCase("add -v 4 -v 16", "20")]
+        [TestCase("-e", "Hello world!")]
+        [TestCase("sum -v 1 2", "3")]
+        [TestCase("sum -v 2.75 3.6 4.18", "10.53")]
+        [TestCase("sum -v 4 -v 16", "20")]
+        [TestCase("sum --values 2 5 --values 3", "10")]
         [TestCase("log -v 100", "2")]
         [TestCase("log --value 256 --base 2", "8")]
         public async Task CliApplication_RunAsync_Test(string arguments, string expectedOutput)
         {
-            // Act
-            var result = await Cli.Wrap(DummyFilePath).SetArguments(arguments).ExecuteAsync();
+            // Arrange & Act
+            var result = await Cli.Wrap(DummyFilePath)
+                .SetArguments(arguments)
+                .EnableExitCodeValidation()
+                .EnableStandardErrorValidation()
+                .ExecuteAsync();
 
             // Assert
-            Assert.Multiple(() =>
-            {
-                Assert.That(result.ExitCode, Is.Zero, "Exit code");
-                Assert.That(result.StandardOutput.Trim(), Is.EqualTo(expectedOutput), "Stdout");
-                Assert.That(result.StandardError.Trim(), Is.Empty, "Stderr");
-            });
+            Assert.That(result.StandardOutput.Trim(), Is.EqualTo(expectedOutput), "Stdout");
         }
 
         [Test]
         [TestCase("--version")]
-        public async Task CliApplication_RunAsync_Version_Test(string arguments)
+        public async Task CliApplication_RunAsync_ShowVersion_Test(string arguments)
         {
-            // Act
-            var result = await Cli.Wrap(DummyFilePath).SetArguments(arguments).ExecuteAsync();
+            // Arrange & Act
+            var result = await Cli.Wrap(DummyFilePath)
+                .SetArguments(arguments)
+                .EnableExitCodeValidation()
+                .EnableStandardErrorValidation()
+                .ExecuteAsync();
 
             // Assert
-            Assert.Multiple(() =>
-            {
-                Assert.That(result.ExitCode, Is.Zero, "Exit code");
-                Assert.That(result.StandardOutput.Trim(), Is.EqualTo(DummyVersionText), "Stdout");
-                Assert.That(result.StandardError.Trim(), Is.Empty, "Stderr");
-            });
+            Assert.That(result.StandardOutput.Trim(), Is.EqualTo(DummyVersionText), "Stdout");
         }
 
         [Test]
         [TestCase("--help")]
         [TestCase("-h")]
-        [TestCase("add -h")]
-        [TestCase("add --help")]
+        [TestCase("sum -h")]
+        [TestCase("sum --help")]
         [TestCase("log -h")]
         [TestCase("log --help")]
-        public async Task CliApplication_RunAsync_Help_Test(string arguments)
+        public async Task CliApplication_RunAsync_ShowHelp_Test(string arguments)
         {
-            // Act
-            var result = await Cli.Wrap(DummyFilePath).SetArguments(arguments).ExecuteAsync();
+            // Arrange & Act
+            var result = await Cli.Wrap(DummyFilePath)
+                .SetArguments(arguments)
+                .EnableExitCodeValidation()
+                .EnableStandardErrorValidation()
+                .ExecuteAsync();
 
             // Assert
-            Assert.Multiple(() =>
-            {
-                Assert.That(result.ExitCode, Is.Zero, "Exit code");
-                Assert.That(result.StandardOutput.Trim(), Is.Not.Empty, "Stdout");
-                Assert.That(result.StandardError.Trim(), Is.Empty, "Stderr");
-            });
+            Assert.That(result.StandardOutput.Trim(), Is.Not.Empty, "Stdout");
         }
     }
 }

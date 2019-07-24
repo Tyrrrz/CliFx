@@ -9,17 +9,14 @@ namespace CliFx.Models
 
         public string Name { get; }
 
-        public bool IsDefault { get; }
-
         public string Description { get; }
 
         public IReadOnlyList<CommandOptionSchema> Options { get; }
 
-        public CommandSchema(Type type, string name, bool isDefault, string description, IReadOnlyList<CommandOptionSchema> options)
+        public CommandSchema(Type type, string name, string description, IReadOnlyList<CommandOptionSchema> options)
         {
             Type = type;
             Name = name;
-            IsDefault = isDefault;
             Description = description;
             Options = options;
         }

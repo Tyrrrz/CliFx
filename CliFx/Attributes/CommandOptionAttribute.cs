@@ -9,9 +9,9 @@ namespace CliFx.Attributes
 
         public char? ShortName { get; }
 
-        public bool IsRequired { get; set; }
-
         public string GroupName { get; set; }
+
+        public bool IsRequired { get; set; }
 
         public string Description { get; set; }
 

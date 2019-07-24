@@ -2,8 +2,9 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net45</TargetFramework>
+    <TargetFramework>net46</TargetFramework>
     <LangVersion>latest</LangVersion>
+    <Version>1.2.3.4</Version>
   </PropertyGroup>
 
   <ItemGroup>

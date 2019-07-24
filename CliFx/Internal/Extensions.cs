@@ -11,49 +11,12 @@ namespace CliFx.Internal
 
         public static string AsString(this char c) => new string(c, 1);
 
-        public static string SubstringUntil(this string s, string sub, StringComparison comparison = StringComparison.Ordinal)
-        {
-            var index = s.IndexOf(sub, comparison);
-            return index < 0 ? s : s.Substring(0, index);
-        }
-
-        public static string SubstringAfter(this string s, string sub, StringComparison comparison = StringComparison.Ordinal)
-        {
-            var index = s.IndexOf(sub, comparison);
-            return index < 0 ? string.Empty : s.Substring(index + sub.Length, s.Length - index - sub.Length);
-        }
+        public static string JoinToString<T>(this IEnumerable<T> source, string separator) => string.Join(separator, source);
 
         public static TValue GetValueOrDefault<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dic, TKey key) =>
             dic.TryGetValue(key, out var result) ? result : default;
 
-        public static string TrimStart(this string s, string sub, StringComparison comparison = StringComparison.Ordinal)
-        {
-            while (s.StartsWith(sub, comparison))
-                s = s.Substring(sub.Length);
-
-            return s;
-        }
-
-        public static string TrimEnd(this string s, string sub, StringComparison comparison = StringComparison.Ordinal)
-        {
-            while (s.EndsWith(sub, comparison))
-                s = s.Substring(0, s.Length - sub.Length);
-
-            return s;
-        }
-
-        public static string JoinToString<T>(this IEnumerable<T> source, string separator) => string.Join(separator, source);
-
-        public static bool IsDerivedFrom(this Type type, Type baseType)
-        {
-            for (var currentType = type; currentType != null; currentType = currentType.BaseType)
-            {
-                if (currentType == baseType)
-                    return true;
-            }
-
-            return false;
-        }
+        public static IEnumerable<T> ExceptNull<T>(this IEnumerable<T> source) where T : class => source.Where(i => i != null);
 
         public static bool IsEnumerable(this Type type) =>
             type == typeof(IEnumerable) || type.GetInterfaces().Contains(typeof(IEnumerable));
@@ -79,5 +42,7 @@ namespace CliFx.Internal
 
             return array;
         }
+
+        public static bool Implements(this Type type, Type interfaceType) => type.GetInterfaces().Contains(interfaceType);
     }
 }

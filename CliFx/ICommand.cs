@@ -5,8 +5,6 @@ namespace CliFx
 {
     public interface ICommand
     {
-        CommandContext Context { get; set; }
-
-        Task<ExitCode> ExecuteAsync();
+        Task ExecuteAsync(CommandContext context);
     }
 }

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Reflection;
-using CliFx.Internal;
+﻿using System.Reflection;
 
 namespace CliFx.Models
 {
@@ -12,14 +10,14 @@ namespace CliFx.Models
 
         public char? ShortName { get; }
 
-        public bool IsRequired { get; }
-
         public string GroupName { get; }
+
+        public bool IsRequired { get; }
 
         public string Description { get; }
 
         public CommandOptionSchema(PropertyInfo property, string name, char? shortName,
-            bool isRequired, string groupName, string description)
+            string groupName, bool isRequired, string description)
         {
             Property = property;
             Name = name;

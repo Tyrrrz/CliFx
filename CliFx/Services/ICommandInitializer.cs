@@ -4,6 +4,6 @@ namespace CliFx.Services
 {
     public interface ICommandInitializer
     {
-        ICommand InitializeCommand(CommandInput input);
+        void InitializeCommand(ICommand command, CommandSchema schema, CommandInput input);
     }
 }

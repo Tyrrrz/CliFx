@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using CliFx.Attributes;
 using CliFx.Exceptions;
@@ -10,7 +11,6 @@ namespace CliFx.Tests
 {
     public partial class CommandInitializerTests
     {
-        [Command]
         public class TestCommand : ICommand
         {
             [CommandOption("int", 'i', IsRequired = true)]
@@ -22,9 +22,7 @@ namespace CliFx.Tests
             [CommandOption("bool", 'b', GroupName = "other-group")]
             public bool BoolOption { get; set; }
 
-            public CommandContext Context { get; set; }
-
-            public Task<ExitCode> ExecuteAsync() => throw new System.NotImplementedException();
+            public Task ExecuteAsync(CommandContext context) => throw new NotImplementedException();
         }
     }
 
@@ -94,26 +92,6 @@ namespace CliFx.Tests
             );
         }
 
-        [Test]
-        [TestCaseSource(nameof(GetTestCases_InitializeCommand))]
-        public void InitializeCommand_Test(CommandInput commandInput, TestCommand expectedCommand)
-        {
-            // Arrange
-            var initializer = new CommandInitializer(new CommandSchemaResolver(new[] {typeof(TestCommand)}));
-
-            // Act
-            var command = initializer.InitializeCommand(commandInput) as TestCommand;
-
-            // Assert
-            Assert.Multiple(() =>
-            {
-                Assert.That(command, Is.Not.Null);
-                Assert.That(command.StringOption, Is.EqualTo(expectedCommand.StringOption), nameof(command.StringOption));
-                Assert.That(command.IntOption, Is.EqualTo(expectedCommand.IntOption), nameof(command.IntOption));
-                Assert.That(command.BoolOption, Is.EqualTo(expectedCommand.BoolOption), nameof(command.BoolOption));
-            });
-        }
-
         private static IEnumerable<TestCaseData> GetTestCases_InitializeCommand_IsRequired()
         {
             yield return new TestCaseData(CommandInput.Empty);
@@ -127,14 +105,37 @@ namespace CliFx.Tests
         }
 
         [Test]
+        [TestCaseSource(nameof(GetTestCases_InitializeCommand))]
+        public void InitializeCommand_Test(CommandInput commandInput, TestCommand expectedCommand)
+        {
+            // Arrange
+            var initializer = new CommandInitializer();
+
+            // Act
+            var schema = new CommandSchemaResolver().GetCommandSchema(typeof(TestCommand));
+            var command = new TestCommand();
+            initializer.InitializeCommand(command, schema, commandInput);
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.That(command.StringOption, Is.EqualTo(expectedCommand.StringOption), nameof(command.StringOption));
+                Assert.That(command.IntOption, Is.EqualTo(expectedCommand.IntOption), nameof(command.IntOption));
+                Assert.That(command.BoolOption, Is.EqualTo(expectedCommand.BoolOption), nameof(command.BoolOption));
+            });
+        }
+
+        [Test]
         [TestCaseSource(nameof(GetTestCases_InitializeCommand_IsRequired))]
         public void InitializeCommand_IsRequired_Test(CommandInput commandInput)
         {
             // Arrange
-            var initializer = new CommandInitializer(new CommandSchemaResolver(new[] {typeof(TestCommand)}));
+            var initializer = new CommandInitializer();
 
             // Act & Assert
-            Assert.Throws<CommandResolveException>(() => initializer.InitializeCommand(commandInput));
+            var schema = new CommandSchemaResolver().GetCommandSchema(typeof(TestCommand));
+            var command = new TestCommand();
+            Assert.Throws<MissingCommandOptionException>(() => initializer.InitializeCommand(command, schema, commandInput));
         }
     }
 }

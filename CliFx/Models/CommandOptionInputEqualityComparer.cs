@@ -16,13 +16,13 @@ namespace CliFx.Models
             if (x is null || y is null)
                 return false;
 
-            return StringComparer.OrdinalIgnoreCase.Equals(x.Name, y.Name) &&
+            return StringComparer.OrdinalIgnoreCase.Equals(x.Alias, y.Alias) &&
                    x.Values.SequenceEqual(y.Values, StringComparer.Ordinal);
         }
 
         /// <inheritdoc />
         public int GetHashCode(CommandOptionInput obj) => new HashCodeBuilder()
-            .Add(obj.Name, StringComparer.OrdinalIgnoreCase)
+            .Add(obj.Alias, StringComparer.OrdinalIgnoreCase)
             .AddMany(obj.Values, StringComparer.Ordinal)
             .Build();
     }

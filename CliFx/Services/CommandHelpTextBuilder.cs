@@ -1,0 +1,141 @@
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using CliFx.Internal;
+using CliFx.Models;
+
+namespace CliFx.Services
+{
+    // TODO: add color
+    public class CommandHelpTextBuilder : ICommandHelpTextBuilder
+    {
+        // TODO: move to context?
+        private string GetExeName() => Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly()?.Location);
+
+        private void AddDescription(StringBuilder buffer, CommandSchema commands)
+        {
+            if (commands.Description.IsNullOrWhiteSpace())
+                return;
+
+            buffer.AppendLine("Description:");
+
+            buffer.Append("  ");
+            buffer.AppendLine(commands.Description);
+
+            buffer.AppendLine();
+        }
+
+        private void AddUsage(StringBuilder buffer, CommandSchema command, IReadOnlyList<CommandSchema> subCommands)
+        {
+            buffer.AppendLine("Usage:");
+
+            buffer.Append("  ");
+            buffer.Append(GetExeName());
+
+            if (!command.Name.IsNullOrWhiteSpace())
+            {
+                buffer.Append(' ');
+                buffer.Append(command.Name);
+            }
+
+            if (subCommands.Any())
+            {
+                buffer.Append(' ');
+                buffer.Append("[command]");
+            }
+
+            if (command.Options.Any())
+            {
+                buffer.Append(' ');
+                buffer.Append("[options]");
+            }
+
+            buffer.AppendLine().AppendLine();
+        }
+
+        private void AddOptions(StringBuilder buffer, CommandSchema command)
+        {
+            if (!command.Options.Any())
+                return;
+
+            buffer.AppendLine("Options:");
+
+            foreach (var option in command.Options)
+            {
+                buffer.Append(option.IsRequired ? "* " : "  ");
+
+                buffer.Append(option.GetAliasesWithPrefixes().JoinToString("|"));
+
+                if (!option.Description.IsNullOrWhiteSpace())
+                {
+                    buffer.Append("  ");
+                    buffer.Append(option.Description);
+                }
+
+                buffer.AppendLine();
+            }
+
+            // Help option
+            {
+                buffer.Append("  ");
+                buffer.Append("--help|-h");
+                buffer.Append("  ");
+                buffer.Append("Shows helps text.");
+                buffer.AppendLine();
+            }
+
+            // Version option
+            if (command.IsDefault())
+            {
+                buffer.Append("  ");
+                buffer.Append("--version");
+                buffer.Append("  ");
+                buffer.Append("Shows application version.");
+                buffer.AppendLine();
+            }
+
+            buffer.AppendLine();
+        }
+
+        private void AddSubCommands(StringBuilder buffer, IReadOnlyList<CommandSchema> subCommands)
+        {
+            if (!subCommands.Any())
+                return;
+
+            buffer.AppendLine("Commands:");
+
+            foreach (var command in subCommands)
+            {
+                buffer.Append("  ");
+
+                buffer.Append(command.Name);
+
+                if (!command.Description.IsNullOrWhiteSpace())
+                {
+                    buffer.Append("  ");
+                    buffer.Append(command.Description);
+                }
+
+                buffer.AppendLine();
+            }
+
+            buffer.AppendLine();
+        }
+
+        public string Build(IReadOnlyList<CommandSchema> commandSchemas, CommandSchema commandSchema)
+        {
+            var buffer = new StringBuilder();
+
+            var subCommands = commandSchemas.FindSubCommandSchemas(commandSchema.Name);
+
+            AddDescription(buffer, commandSchema);
+            AddUsage(buffer, commandSchema, subCommands);
+            AddOptions(buffer, commandSchema);
+            AddSubCommands(buffer, subCommands);
+
+            return buffer.ToString().Trim();
+        }
+    }
+}

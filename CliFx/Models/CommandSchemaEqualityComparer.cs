@@ -18,7 +18,6 @@ namespace CliFx.Models
 
             return x.Type == y.Type &&
                    StringComparer.OrdinalIgnoreCase.Equals(x.Name, y.Name) &&
-                   x.IsDefault == y.IsDefault &&
                    StringComparer.Ordinal.Equals(x.Description, y.Description) &&
                    x.Options.SequenceEqual(y.Options, CommandOptionSchemaEqualityComparer.Instance);
         }
@@ -27,7 +26,6 @@ namespace CliFx.Models
         public int GetHashCode(CommandSchema obj) => new HashCodeBuilder()
             .Add(obj.Type)
             .Add(obj.Name, StringComparer.OrdinalIgnoreCase)
-            .Add(obj.IsDefault)
             .Add(obj.Description, StringComparer.Ordinal)
             .AddMany(obj.Options, CommandOptionSchemaEqualityComparer.Instance)
             .Build();

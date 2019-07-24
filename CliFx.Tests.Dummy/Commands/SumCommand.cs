@@ -1,24 +1,24 @@
 ﻿using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using CliFx.Attributes;
 using CliFx.Models;
 using CliFx.Services;
 
 namespace CliFx.Tests.Dummy.Commands
 {
-    [Command("add", Description = "Calculate the sum of all input values.")]
-    public class AddCommand : Command
+    [Command("sum", Description = "Calculates the sum of all input values.")]
+    public class SumCommand : ICommand
     {
         [CommandOption("values", 'v', IsRequired = true, Description = "Input values.")]
         public IReadOnlyList<double> Values { get; set; }
 
-        protected override ExitCode Process()
+        public Task ExecuteAsync(CommandContext context)
         {
             var result = Values.Sum();
-            Output.WriteLine(result.ToString(CultureInfo.InvariantCulture));
+            context.Output.WriteLine(result);
 
-            return ExitCode.Success;
+            return Task.CompletedTask;
         }
     }
 }

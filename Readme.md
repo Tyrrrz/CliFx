@@ -18,7 +18,7 @@ CliFx is a powerful framework for building command line applications.
 ## Features
 
 - ...to be added with a stable release...
-- Targets .NET Framework 4.5+ and .NET Standard 2.0+
+- Targets .NET Framework 4.6+ and .NET Standard 2.0+
 - No external dependencies
 
 ## Usage

@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using CliFx.Models;
 
 namespace CliFx.Services
 {
     public interface ICommandSchemaResolver
     {
-        IReadOnlyList<CommandSchema> ResolveAllSchemas();
+        CommandSchema GetCommandSchema(Type commandType);
     }
 }

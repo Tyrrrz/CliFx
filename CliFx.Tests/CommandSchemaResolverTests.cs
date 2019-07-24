@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using CliFx.Attributes;
 using CliFx.Models;
@@ -10,8 +11,10 @@ namespace CliFx.Tests
 {
     public partial class CommandSchemaResolverTests
     {
-        [Command(Description = "Command description")]
-        public class TestCommand : ICommand
+        [Command("Command name", Description = "Command description")]
+        [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Local")]
+        [SuppressMessage("ReSharper", "MemberCanBePrivate.Local")]
+        private class TestCommand : ICommand
         {
             [CommandOption("option-a", 'a', GroupName = "Group 1")]
             public int OptionA { get; set; }
@@ -22,9 +25,7 @@ namespace CliFx.Tests
             [CommandOption("option-c", Description = "Option C description")]
             public bool OptionC { get; set; }
 
-            public CommandContext Context { get; set; }
-
-            public Task<ExitCode> ExecuteAsync() => throw new NotImplementedException();
+            public Task ExecuteAsync(CommandContext context) => throw new NotImplementedException();
         }
     }
 
@@ -34,36 +35,32 @@ namespace CliFx.Tests
         private static IEnumerable<TestCaseData> GetTestCases_ResolveAllSchemas()
         {
             yield return new TestCaseData(
-                new[] {typeof(TestCommand)},
-                new[]
-                {
-                    new CommandSchema(typeof(TestCommand),
-                        null, true, "Command description",
-                        new[]
-                        {
-                            new CommandOptionSchema(typeof(TestCommand).GetProperty(nameof(TestCommand.OptionA)),
-                                "option-a", 'a', false, "Group 1", null),
-                            new CommandOptionSchema(typeof(TestCommand).GetProperty(nameof(TestCommand.OptionB)),
-                                "option-b", null, true, null, null),
-                            new CommandOptionSchema(typeof(TestCommand).GetProperty(nameof(TestCommand.OptionC)),
-                                "option-c", null, false, null, "Option C description")
-                        })
-                }
+                typeof(TestCommand),
+                new CommandSchema(typeof(TestCommand), "Command name", "Command description",
+                    new[]
+                    {
+                        new CommandOptionSchema(typeof(TestCommand).GetProperty(nameof(TestCommand.OptionA)),
+                            "option-a", 'a', "Group 1", false, null),
+                        new CommandOptionSchema(typeof(TestCommand).GetProperty(nameof(TestCommand.OptionB)),
+                            "option-b", null, null, true, null),
+                        new CommandOptionSchema(typeof(TestCommand).GetProperty(nameof(TestCommand.OptionC)),
+                            "option-c", null, null, false, "Option C description")
+                    })
             );
         }
 
         [Test]
         [TestCaseSource(nameof(GetTestCases_ResolveAllSchemas))]
-        public void ResolveAllSchemas_Test(IReadOnlyList<Type> sourceTypes, IReadOnlyList<CommandSchema> expectedSchemas)
+        public void GetCommandSchema_Test(Type commandType, CommandSchema expectedSchema)
         {
             // Arrange
-            var resolver = new CommandSchemaResolver(sourceTypes);
+            var resolver = new CommandSchemaResolver();
 
             // Act
-            var schemas = resolver.ResolveAllSchemas();
+            var schema = resolver.GetCommandSchema(commandType);
 
             // Assert
-            Assert.That(schemas, Is.EqualTo(expectedSchemas).Using(CommandSchemaEqualityComparer.Instance));
+            Assert.That(schema, Is.EqualTo(expectedSchema).Using(CommandSchemaEqualityComparer.Instance));
         }
     }
 }

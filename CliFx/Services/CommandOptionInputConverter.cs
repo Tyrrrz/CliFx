@@ -39,7 +39,7 @@ namespace CliFx.Services
                 if (bool.TryParse(value, out var result))
                     return result;
 
-                throw new CommandOptionConvertException($"Can't convert value [{value}] to boolean.");
+                throw new CannotConvertCommandOptionException($"Can't convert value [{value}] to boolean.");
             }
 
             // Char
@@ -48,7 +48,7 @@ namespace CliFx.Services
                 if (value.Length == 1)
                     return value[0];
 
-                throw new CommandOptionConvertException(
+                throw new CannotConvertCommandOptionException(
                     $"Can't convert value [{value}] to char. The value is either empty or longer than one character.");
             }
 
@@ -58,7 +58,7 @@ namespace CliFx.Services
                 if (sbyte.TryParse(value, NumberStyles.Integer, _formatProvider, out var result))
                     return result;
 
-                throw new CommandOptionConvertException($"Can't convert value [{value}] to sbyte.");
+                throw new CannotConvertCommandOptionException($"Can't convert value [{value}] to sbyte.");
             }
 
             // Byte
@@ -67,7 +67,7 @@ namespace CliFx.Services
                 if (byte.TryParse(value, NumberStyles.Integer, _formatProvider, out var result))
                     return result;
 
-                throw new CommandOptionConvertException($"Can't convert value [{value}] to byte.");
+                throw new CannotConvertCommandOptionException($"Can't convert value [{value}] to byte.");
             }
 
             // Short
@@ -76,7 +76,7 @@ namespace CliFx.Services
                 if (short.TryParse(value, NumberStyles.Integer, _formatProvider, out var result))
                     return result;
 
-                throw new CommandOptionConvertException($"Can't convert value [{value}] to short.");
+                throw new CannotConvertCommandOptionException($"Can't convert value [{value}] to short.");
             }
 
             // Ushort
@@ -85,7 +85,7 @@ namespace CliFx.Services
                 if (ushort.TryParse(value, NumberStyles.Integer, _formatProvider, out var result))
                     return result;
 
-                throw new CommandOptionConvertException($"Can't convert value [{value}] to ushort.");
+                throw new CannotConvertCommandOptionException($"Can't convert value [{value}] to ushort.");
             }
 
             // Int
@@ -94,7 +94,7 @@ namespace CliFx.Services
                 if (int.TryParse(value, NumberStyles.Integer, _formatProvider, out var result))
                     return result;
 
-                throw new CommandOptionConvertException($"Can't convert value [{value}] to int.");
+                throw new CannotConvertCommandOptionException($"Can't convert value [{value}] to int.");
             }
 
             // Uint
@@ -103,7 +103,7 @@ namespace CliFx.Services
                 if (uint.TryParse(value, NumberStyles.Integer, _formatProvider, out var result))
                     return result;
 
-                throw new CommandOptionConvertException($"Can't convert value [{value}] to uint.");
+                throw new CannotConvertCommandOptionException($"Can't convert value [{value}] to uint.");
             }
 
             // Long
@@ -112,7 +112,7 @@ namespace CliFx.Services
                 if (long.TryParse(value, NumberStyles.Integer, _formatProvider, out var result))
                     return result;
 
-                throw new CommandOptionConvertException($"Can't convert value [{value}] to long.");
+                throw new CannotConvertCommandOptionException($"Can't convert value [{value}] to long.");
             }
 
             // Ulong
@@ -121,7 +121,7 @@ namespace CliFx.Services
                 if (ulong.TryParse(value, NumberStyles.Integer, _formatProvider, out var result))
                     return result;
 
-                throw new CommandOptionConvertException($"Can't convert value [{value}] to ulong.");
+                throw new CannotConvertCommandOptionException($"Can't convert value [{value}] to ulong.");
             }
 
             // Float
@@ -130,7 +130,7 @@ namespace CliFx.Services
                 if (float.TryParse(value, NumberStyles.Float | NumberStyles.AllowThousands, _formatProvider, out var result))
                     return result;
 
-                throw new CommandOptionConvertException($"Can't convert value [{value}] to float.");
+                throw new CannotConvertCommandOptionException($"Can't convert value [{value}] to float.");
             }
 
             // Double
@@ -139,7 +139,7 @@ namespace CliFx.Services
                 if (double.TryParse(value, NumberStyles.Float | NumberStyles.AllowThousands, _formatProvider, out var result))
                     return result;
 
-                throw new CommandOptionConvertException($"Can't convert value [{value}] to double.");
+                throw new CannotConvertCommandOptionException($"Can't convert value [{value}] to double.");
             }
 
             // Decimal
@@ -148,7 +148,7 @@ namespace CliFx.Services
                 if (decimal.TryParse(value, NumberStyles.Number, _formatProvider, out var result))
                     return result;
 
-                throw new CommandOptionConvertException($"Can't convert value [{value}] to decimal.");
+                throw new CannotConvertCommandOptionException($"Can't convert value [{value}] to decimal.");
             }
 
             // DateTime
@@ -157,7 +157,7 @@ namespace CliFx.Services
                 if (DateTime.TryParse(value, _formatProvider, DateTimeStyles.None, out var result))
                     return result;
 
-                throw new CommandOptionConvertException($"Can't convert value [{value}] to DateTime.");
+                throw new CannotConvertCommandOptionException($"Can't convert value [{value}] to DateTime.");
             }
 
             // DateTimeOffset
@@ -166,7 +166,7 @@ namespace CliFx.Services
                 if (DateTimeOffset.TryParse(value, _formatProvider, DateTimeStyles.None, out var result))
                     return result;
 
-                throw new CommandOptionConvertException($"Can't convert value [{value}] to DateTimeOffset.");
+                throw new CannotConvertCommandOptionException($"Can't convert value [{value}] to DateTimeOffset.");
             }
 
             // TimeSpan
@@ -175,7 +175,7 @@ namespace CliFx.Services
                 if (TimeSpan.TryParse(value, _formatProvider, out var result))
                     return result;
 
-                throw new CommandOptionConvertException($"Can't convert value [{value}] to TimeSpan.");
+                throw new CannotConvertCommandOptionException($"Can't convert value [{value}] to TimeSpan.");
             }
 
             // Enum
@@ -184,7 +184,7 @@ namespace CliFx.Services
                 if (Enum.GetNames(targetType).Contains(value, StringComparer.OrdinalIgnoreCase))
                     return Enum.Parse(targetType, value, true);
 
-                throw new CommandOptionConvertException(
+                throw new CannotConvertCommandOptionException(
                     $"Can't convert value [{value}] to [{targetType}]. The value is not defined on the enum.");
             }
 
@@ -213,7 +213,7 @@ namespace CliFx.Services
             }
 
             // Unknown type
-            throw new CommandOptionConvertException($"Can't convert value [{value}] to unrecognized type [{targetType}].");
+            throw new CannotConvertCommandOptionException($"Can't convert value [{value}] to unrecognized type [{targetType}].");
         }
 
         // TODO: refactor this
@@ -226,7 +226,7 @@ namespace CliFx.Services
                 if (targetType.IsAssignableFrom(underlyingType.MakeArrayType()))
                     return option.Values.Select(v => ConvertValue(v, underlyingType)).ToArray().ToNonGenericArray(underlyingType);
 
-                throw new CommandOptionConvertException(
+                throw new CannotConvertCommandOptionException(
                     $"Can't convert sequence of values [{option.Values.JoinToString(", ")}] to type [{targetType}].");
             }
             else if (option.Values.Count <= 1)
@@ -239,7 +239,7 @@ namespace CliFx.Services
             else
             {
                 // TODO: better exception
-                throw new CommandOptionConvertException(
+                throw new CannotConvertCommandOptionException(
                     $"Can't convert sequence of values [{option.Values.JoinToString(", ")}] to type [{targetType}].");
             }
         }

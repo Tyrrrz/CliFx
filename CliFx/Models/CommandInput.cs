@@ -50,7 +50,7 @@ namespace CliFx.Models
 
                 foreach (var option in Options)
                 {
-                    buffer.Append(option.Name);
+                    buffer.Append(option.Alias);
                 }
 
                 buffer.Append(']');
