@@ -12,7 +12,8 @@ namespace CliFx.Services
     public class CommandHelpTextBuilder : ICommandHelpTextBuilder
     {
         // TODO: move to context?
-        private string GetExeName() => Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly()?.Location);
+        // Entry assembly is null in tests
+        private string GetExeName() => Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly()?.Location) ?? "app";
 
         private void AddDescription(StringBuilder buffer, CommandSchema commands)
         {
@@ -46,20 +47,14 @@ namespace CliFx.Services
                 buffer.Append("[command]");
             }
 
-            if (command.Options.Any())
-            {
-                buffer.Append(' ');
-                buffer.Append("[options]");
-            }
+            buffer.Append(' ');
+            buffer.Append("[options]");
 
             buffer.AppendLine().AppendLine();
         }
 
         private void AddOptions(StringBuilder buffer, CommandSchema command)
         {
-            if (!command.Options.Any())
-                return;
-
             buffer.AppendLine("Options:");
 
             foreach (var option in command.Options)
@@ -139,7 +134,7 @@ namespace CliFx.Services
             {
                 buffer.Append("You can run ");
                 buffer.Append('`').Append(GetExeName()).Append(" [command] --help").Append('`');
-                buffer.Append(" to show information for a specific command.");
+                buffer.Append(" to show help on a specific command.");
                 buffer.AppendLine();
             }
 
