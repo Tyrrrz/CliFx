@@ -5,6 +5,8 @@ namespace CliFx.Services
 {
     public interface ICommandHelpTextBuilder
     {
-        string Build(IReadOnlyList<CommandSchema> availableCommandSchemas, CommandSchema matchingCommandSchema);
+        string Build(ApplicationMetadata applicationMetadata,
+            IReadOnlyList<CommandSchema> availableCommandSchemas,
+            CommandSchema matchingCommandSchema);
     }
 }

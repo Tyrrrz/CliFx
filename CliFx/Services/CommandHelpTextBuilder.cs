@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using CliFx.Internal;
 using CliFx.Models;
@@ -11,10 +9,6 @@ namespace CliFx.Services
     // TODO: add color
     public class CommandHelpTextBuilder : ICommandHelpTextBuilder
     {
-        // TODO: move to context?
-        // Entry assembly is null in tests
-        private string GetExeName() => Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly()?.Location) ?? "app";
-
         private void AddDescription(StringBuilder buffer, CommandSchema commands)
         {
             if (commands.Description.IsNullOrWhiteSpace())
@@ -28,12 +22,13 @@ namespace CliFx.Services
             buffer.AppendLine();
         }
 
-        private void AddUsage(StringBuilder buffer, CommandSchema command, IReadOnlyList<CommandSchema> subCommands)
+        private void AddUsage(StringBuilder buffer, ApplicationMetadata applicationMetadata, CommandSchema command,
+            IReadOnlyList<CommandSchema> subCommands)
         {
             buffer.AppendLine("Usage:");
 
             buffer.Append("  ");
-            buffer.Append(GetExeName());
+            buffer.Append(applicationMetadata.ExecutableName);
 
             if (!command.Name.IsNullOrWhiteSpace())
             {
@@ -119,21 +114,31 @@ namespace CliFx.Services
             buffer.AppendLine();
         }
 
-        public string Build(IReadOnlyList<CommandSchema> availableCommandSchemas, CommandSchema matchingCommandSchema)
+        public string Build(ApplicationMetadata applicationMetadata,
+            IReadOnlyList<CommandSchema> availableCommandSchemas,
+            CommandSchema matchingCommandSchema)
         {
-            var buffer = new StringBuilder();
-
             var subCommands = availableCommandSchemas.FindSubCommandSchemas(matchingCommandSchema.Name);
 
+            var buffer = new StringBuilder();
+
+            if (matchingCommandSchema.IsDefault())
+            {
+                buffer.Append(applicationMetadata.Title);
+                buffer.Append(" v");
+                buffer.Append(applicationMetadata.VersionText);
+                buffer.AppendLine().AppendLine();
+            }
+
             AddDescription(buffer, matchingCommandSchema);
-            AddUsage(buffer, matchingCommandSchema, subCommands);
+            AddUsage(buffer, applicationMetadata, matchingCommandSchema, subCommands);
             AddOptions(buffer, matchingCommandSchema);
             AddSubCommands(buffer, subCommands);
 
             if (matchingCommandSchema.IsDefault() && subCommands.Any())
             {
                 buffer.Append("You can run ");
-                buffer.Append('`').Append(GetExeName()).Append(" [command] --help").Append('`');
+                buffer.Append('`').Append(applicationMetadata.ExecutableName).Append(" [command] --help").Append('`');
                 buffer.Append(" to show help on a specific command.");
                 buffer.AppendLine();
             }
