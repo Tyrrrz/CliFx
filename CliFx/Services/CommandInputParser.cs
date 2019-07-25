@@ -21,7 +21,7 @@ namespace CliFx.Services
             string optionName = null;
 
             // Loop through all arguments
-            var isFirstArgument = true;
+            var encounteredFirstOption = false;
             foreach (var commandLineArgument in commandLineArguments)
             {
                 // Option name
@@ -32,6 +32,8 @@ namespace CliFx.Services
 
                     if (rawOptions.GetValueOrDefault(optionName) == null)
                         rawOptions[optionName] = new List<string>();
+
+                    encounteredFirstOption = true;
                 }
 
                 // Short option name
@@ -42,6 +44,8 @@ namespace CliFx.Services
 
                     if (rawOptions.GetValueOrDefault(optionName) == null)
                         rawOptions[optionName] = new List<string>();
+
+                    encounteredFirstOption = true;
                 }
 
                 // Multiple stacked short options
@@ -54,12 +58,17 @@ namespace CliFx.Services
                         if (rawOptions.GetValueOrDefault(optionName) == null)
                             rawOptions[optionName] = new List<string>();
                     }
+
+                    encounteredFirstOption = true;
                 }
 
                 // Command name
-                else if (isFirstArgument)
+                else if (!encounteredFirstOption)
                 {
-                    commandName = commandLineArgument;
+                    if (commandName.IsNullOrWhiteSpace())
+                        commandName = commandLineArgument;
+                    else
+                        commandName += " " + commandLineArgument;
                 }
 
                 // Option value
@@ -68,8 +77,6 @@ namespace CliFx.Services
                     // ReSharper disable once AssignNullToNotNullAttribute
                     rawOptions[optionName].Add(commandLineArgument);
                 }
-
-                isFirstArgument = false;
             }
 
             return new CommandInput(commandName, rawOptions.Select(p => new CommandOptionInput(p.Key, p.Value)).ToArray());

@@ -11,6 +11,7 @@ namespace CliFx.Tests
 {
     public partial class CommandInitializerTests
     {
+        [Command]
         public class TestCommand : ICommand
         {
             [CommandOption("int", 'i', IsRequired = true)]

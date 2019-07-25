@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using CliFx.Attributes;
 using CliFx.Models;
 using CliFx.Services;
 using NUnit.Framework;
@@ -9,6 +10,7 @@ namespace CliFx.Tests
 {
     public partial class CommandFactoryTests
     {
+        [Command]
         private class TestCommand : ICommand
         {
             public Task ExecuteAsync(CommandContext context) => throw new NotImplementedException();

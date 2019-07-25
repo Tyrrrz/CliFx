@@ -22,7 +22,7 @@ namespace CliFx.Tests
             public Task ExecuteAsync(CommandContext context) => Task.CompletedTask;
         }
 
-        [Command("faulty-command")]
+        [Command("faulty command")]
         private class TestFaultyCommand : ICommand
         {
             public Task ExecuteAsync(CommandContext context) => Task.FromException(new CommandErrorException(-1337));
@@ -115,17 +115,17 @@ namespace CliFx.Tests
 
             yield return new TestCaseData(
                 new[] {typeof(TestFaultyCommand)},
-                new[] {"faulty-command", "--help"}
+                new[] {"faulty", "command", "--help"}
             );
 
             yield return new TestCaseData(
                 new[] {typeof(TestFaultyCommand)},
-                new[] {"faulty-command", "-h"}
+                new[] {"faulty", "command", "-h"}
             );
 
             yield return new TestCaseData(
                 new[] {typeof(TestFaultyCommand)},
-                new[] {"faulty-command", "-?"}
+                new[] {"faulty", "command", "-?"}
             );
         }
 
@@ -165,7 +165,7 @@ namespace CliFx.Tests
 
             yield return new TestCaseData(
                 new Type[0],
-                new[] {"faulty-command"}
+                new[] {"faulty", "command"}
             );
 
             // Specified command is not defined
@@ -194,7 +194,7 @@ namespace CliFx.Tests
 
             yield return new TestCaseData(
                 new[] {typeof(TestFaultyCommand)},
-                new[] {"faulty-command"}
+                new[] {"faulty", "command"}
             );
         }
 
