@@ -23,7 +23,7 @@ namespace CliFx.Tests
         }
 
         [Command("faulty-command")]
-        private class FaultyCommand : ICommand
+        private class TestFaultyCommand : ICommand
         {
             public Task ExecuteAsync(CommandContext context) => Task.FromException(new CommandErrorException(-1337));
         }
@@ -87,6 +87,53 @@ namespace CliFx.Tests
             // Default command is not defined
 
             yield return new TestCaseData(
+                new[] {typeof(TestNamedCommand)},
+                new string[0]
+            );
+
+            yield return new TestCaseData(
+                new[] {typeof(TestNamedCommand)},
+                new[] {"--version"}
+            );
+
+            yield return new TestCaseData(
+                new[] {typeof(TestNamedCommand)},
+                new[] {"--help"}
+            );
+
+            yield return new TestCaseData(
+                new[] {typeof(TestNamedCommand)},
+                new[] {"-h"}
+            );
+
+            yield return new TestCaseData(
+                new[] {typeof(TestNamedCommand)},
+                new[] {"-?"}
+            );
+
+            // Specified a faulty command
+
+            yield return new TestCaseData(
+                new[] {typeof(TestFaultyCommand)},
+                new[] {"faulty-command", "--help"}
+            );
+
+            yield return new TestCaseData(
+                new[] {typeof(TestFaultyCommand)},
+                new[] {"faulty-command", "-h"}
+            );
+
+            yield return new TestCaseData(
+                new[] {typeof(TestFaultyCommand)},
+                new[] {"faulty-command", "-?"}
+            );
+        }
+
+        private static IEnumerable<TestCaseData> GetTestCases_RunAsync_Negative()
+        {
+            // No commands defined
+
+            yield return new TestCaseData(
                 new Type[0],
                 new string[0]
             );
@@ -111,33 +158,6 @@ namespace CliFx.Tests
                 new[] {"-?"}
             );
 
-            // Specified a faulty command
-
-            yield return new TestCaseData(
-                new[] {typeof(FaultyCommand)},
-                new[] {"--version"}
-            );
-
-            yield return new TestCaseData(
-                new[] {typeof(FaultyCommand)},
-                new[] {"--help"}
-            );
-
-            yield return new TestCaseData(
-                new[] {typeof(FaultyCommand)},
-                new[] {"-h"}
-            );
-
-            yield return new TestCaseData(
-                new[] {typeof(FaultyCommand)},
-                new[] {"-?"}
-            );
-        }
-
-        private static IEnumerable<TestCaseData> GetTestCases_RunAsync_Negative()
-        {
-            // Specified command is not defined
-
             yield return new TestCaseData(
                 new Type[0],
                 new[] {"command"}
@@ -145,23 +165,35 @@ namespace CliFx.Tests
 
             yield return new TestCaseData(
                 new Type[0],
+                new[] {"faulty-command"}
+            );
+
+            // Specified command is not defined
+
+            yield return new TestCaseData(
+                new[] {typeof(TestDefaultCommand)},
+                new[] {"command"}
+            );
+
+            yield return new TestCaseData(
+                new[] {typeof(TestDefaultCommand)},
                 new[] {"command", "--help"}
             );
 
             yield return new TestCaseData(
-                new Type[0],
+                new[] {typeof(TestDefaultCommand)},
                 new[] {"command", "-h"}
             );
 
             yield return new TestCaseData(
-                new Type[0],
+                new[] {typeof(TestDefaultCommand)},
                 new[] {"command", "-?"}
             );
 
             // Specified a faulty command
 
             yield return new TestCaseData(
-                new[] {typeof(FaultyCommand)},
+                new[] {typeof(TestFaultyCommand)},
                 new[] {"faulty-command"}
             );
         }

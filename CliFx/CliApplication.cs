@@ -55,11 +55,24 @@ namespace CliFx
                 var availableCommandSchemas = _commandSchemaResolver.GetCommandSchemas(_commandTypes);
                 var matchingCommandSchema = availableCommandSchemas.FindByNameOrNull(commandInput.CommandName);
 
+                // Fail if there are no commands defined
+                if (!availableCommandSchemas.Any())
+                {
+                    stdErr.WriteLine("There are no commands defined in this application.");
+                    return -1;
+                }
+
                 // Fail if specified a command which is not defined
                 if (commandInput.IsCommandSpecified() && matchingCommandSchema == null)
                 {
-                    stdErr.WriteLine($"Specified command [{commandInput.CommandName}] doesn't exist.");
+                    stdErr.WriteLine($"Specified command [{commandInput.CommandName}] is not defined.");
                     return -1;
+                }
+
+                // Use a stub if command was not specified but there is no default command defined
+                if (matchingCommandSchema == null)
+                {
+                    matchingCommandSchema = _commandSchemaResolver.GetCommandSchema(typeof(StubDefaultCommand));
                 }
 
                 // Show version if it was requested without specifying a command
@@ -68,12 +81,6 @@ namespace CliFx
                     var versionText = Assembly.GetEntryAssembly()?.GetName().Version.ToString();
                     stdOut.WriteLine(versionText);
                     return 0;
-                }
-
-                // Use a stub if command was not specified but there is no default command defined
-                if (matchingCommandSchema == null)
-                {
-                    matchingCommandSchema = _commandSchemaResolver.GetCommandSchema(typeof(StubDefaultCommand));
                 }
 
                 // Show help if it was requested
