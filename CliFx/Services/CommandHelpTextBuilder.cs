@@ -124,16 +124,24 @@ namespace CliFx.Services
             buffer.AppendLine();
         }
 
-        public string Build(IReadOnlyList<CommandSchema> commandSchemas, CommandSchema commandSchema)
+        public string Build(IReadOnlyList<CommandSchema> availableCommandSchemas, CommandSchema matchingCommandSchema)
         {
             var buffer = new StringBuilder();
 
-            var subCommands = commandSchemas.FindSubCommandSchemas(commandSchema.Name);
+            var subCommands = availableCommandSchemas.FindSubCommandSchemas(matchingCommandSchema.Name);
 
-            AddDescription(buffer, commandSchema);
-            AddUsage(buffer, commandSchema, subCommands);
-            AddOptions(buffer, commandSchema);
+            AddDescription(buffer, matchingCommandSchema);
+            AddUsage(buffer, matchingCommandSchema, subCommands);
+            AddOptions(buffer, matchingCommandSchema);
             AddSubCommands(buffer, subCommands);
+
+            if (matchingCommandSchema.IsDefault() && subCommands.Any())
+            {
+                buffer.Append("You can run ");
+                buffer.Append('`').Append(GetExeName()).Append(" [command] --help").Append('`');
+                buffer.Append(" to show information for a specific command.");
+                buffer.AppendLine();
+            }
 
             return buffer.ToString().Trim();
         }
