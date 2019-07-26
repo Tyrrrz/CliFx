@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using CliFx.Attributes;
 using CliFx.Models;
 using CliFx.Services;
+using FluentAssertions;
 using NUnit.Framework;
 
 namespace CliFx.Tests
@@ -31,13 +32,13 @@ namespace CliFx.Tests
         {
             // Arrange
             var factory = new CommandFactory();
+            var schema = new CommandSchemaResolver().GetCommandSchema(commandType);
 
             // Act
-            var schema = new CommandSchemaResolver().GetCommandSchema(commandType);
             var command = factory.CreateCommand(schema);
 
             // Assert
-            Assert.That(command, Is.TypeOf(commandType));
+            command.Should().BeOfType(commandType);
         }
     }
 }

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using CliFx.Attributes;
 using CliFx.Models;
 using CliFx.Services;
-using CliFx.Tests.Internal;
+using FluentAssertions;
 using NUnit.Framework;
 
 namespace CliFx.Tests
@@ -61,7 +61,7 @@ namespace CliFx.Tests
             var schema = resolver.GetCommandSchema(commandType);
 
             // Assert
-            Assert.That(schema, Is.EqualTo(expectedSchema).Using(CommandSchemaEqualityComparer.Instance));
+            schema.Should().BeEquivalentTo(expectedSchema);
         }
     }
 }

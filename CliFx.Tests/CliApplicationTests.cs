@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using CliFx.Attributes;
 using CliFx.Exceptions;
 using CliFx.Models;
+using FluentAssertions;
 using NUnit.Framework;
 
 namespace CliFx.Tests
@@ -209,7 +210,7 @@ namespace CliFx.Tests
             var exitCodeValue = await application.RunAsync(commandLineArguments);
 
             // Assert
-            Assert.That(exitCodeValue, Is.Zero, "Exit code");
+            exitCodeValue.Should().Be(0);
         }
 
         [Test]
@@ -223,7 +224,7 @@ namespace CliFx.Tests
             var exitCodeValue = await application.RunAsync(commandLineArguments);
 
             // Assert
-            Assert.That(exitCodeValue, Is.Not.Zero, "Exit code");
+            exitCodeValue.Should().NotBe(0);
         }
     }
 }

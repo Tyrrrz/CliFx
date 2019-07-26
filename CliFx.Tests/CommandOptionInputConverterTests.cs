@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using CliFx.Models;
 using CliFx.Services;
+using FluentAssertions;
 using NUnit.Framework;
 
 namespace CliFx.Tests
@@ -212,13 +213,10 @@ namespace CliFx.Tests
             var convertedValue = converter.ConvertOption(optionInput, targetType);
 
             // Assert
-            Assert.Multiple(() =>
-            {
-                Assert.That(convertedValue, Is.EqualTo(expectedConvertedValue));
+            convertedValue.Should().BeEquivalentTo(expectedConvertedValue);
 
-                if (convertedValue != null)
-                    Assert.That(convertedValue, Is.AssignableTo(targetType));
-            });
+            if (convertedValue != null)
+                convertedValue.Should().BeAssignableTo(targetType);
         }
     }
 }

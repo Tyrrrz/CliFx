@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using CliFx.Models;
 using CliFx.Services;
-using CliFx.Tests.Internal;
+using FluentAssertions;
 using NUnit.Framework;
 
 namespace CliFx.Tests
@@ -170,7 +170,7 @@ namespace CliFx.Tests
             var commandInput = parser.ParseInput(commandLineArguments);
 
             // Assert
-            Assert.That(commandInput, Is.EqualTo(expectedCommandInput).Using(CommandInputEqualityComparer.Instance));
+            commandInput.Should().BeEquivalentTo(expectedCommandInput);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using CliWrap;
+using FluentAssertions;
 using NUnit.Framework;
 
 namespace CliFx.Tests
@@ -31,7 +32,7 @@ namespace CliFx.Tests
                 .ExecuteAsync();
 
             // Assert
-            Assert.That(result.StandardOutput.Trim(), Is.EqualTo(expectedOutput), "Stdout");
+            result.StandardOutput.Trim().Should().Be(expectedOutput);
         }
 
         [Test]
@@ -46,7 +47,7 @@ namespace CliFx.Tests
                 .ExecuteAsync();
 
             // Assert
-            Assert.That(result.StandardOutput.Trim(), Is.EqualTo(DummyVersionText), "Stdout");
+            result.StandardOutput.Trim().Should().Be(DummyVersionText);
         }
 
         [Test]
@@ -66,7 +67,7 @@ namespace CliFx.Tests
                 .ExecuteAsync();
 
             // Assert
-            Assert.That(result.StandardOutput.Trim(), Is.Not.Empty, "Stdout");
+            result.StandardOutput.Trim().Should().NotBeNullOrWhiteSpace();
         }
     }
 }

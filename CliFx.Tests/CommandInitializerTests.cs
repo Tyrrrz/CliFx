@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using CliFx.Attributes;
 using CliFx.Exceptions;
 using CliFx.Models;
 using CliFx.Services;
+using FluentAssertions;
 using NUnit.Framework;
 
 namespace CliFx.Tests
@@ -12,7 +14,9 @@ namespace CliFx.Tests
     public partial class CommandInitializerTests
     {
         [Command]
-        public class TestCommand : ICommand
+        [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Local")]
+        [SuppressMessage("ReSharper", "MemberCanBePrivate.Local")]
+        private class TestCommand : ICommand
         {
             [CommandOption("int", 'i', IsRequired = true)]
             public int IntOption { get; set; } = 24;
@@ -107,23 +111,18 @@ namespace CliFx.Tests
 
         [Test]
         [TestCaseSource(nameof(GetTestCases_InitializeCommand))]
-        public void InitializeCommand_Test(CommandInput commandInput, TestCommand expectedCommand)
+        public void InitializeCommand_Test(CommandInput commandInput, ICommand expectedCommand)
         {
             // Arrange
             var initializer = new CommandInitializer();
-
-            // Act
             var schema = new CommandSchemaResolver().GetCommandSchema(typeof(TestCommand));
             var command = new TestCommand();
+
+            // Act
             initializer.InitializeCommand(command, schema, commandInput);
 
             // Assert
-            Assert.Multiple(() =>
-            {
-                Assert.That(command.StringOption, Is.EqualTo(expectedCommand.StringOption), nameof(command.StringOption));
-                Assert.That(command.IntOption, Is.EqualTo(expectedCommand.IntOption), nameof(command.IntOption));
-                Assert.That(command.BoolOption, Is.EqualTo(expectedCommand.BoolOption), nameof(command.BoolOption));
-            });
+            command.Should().BeEquivalentTo(expectedCommand, o => o.RespectingRuntimeTypes());
         }
 
         [Test]
@@ -132,11 +131,12 @@ namespace CliFx.Tests
         {
             // Arrange
             var initializer = new CommandInitializer();
-
-            // Act & Assert
             var schema = new CommandSchemaResolver().GetCommandSchema(typeof(TestCommand));
             var command = new TestCommand();
-            Assert.Throws<MissingCommandOptionException>(() => initializer.InitializeCommand(command, schema, commandInput));
+
+            // Act & Assert
+            initializer.Invoking(i => i.InitializeCommand(command, schema, commandInput))
+                .Should().ThrowExactly<MissingCommandOptionException>();
         }
     }
 }

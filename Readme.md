@@ -28,6 +28,9 @@ To be added with a stable release...
 ## Libraries used
 
 - [NUnit](https://github.com/nunit/nunit)
+- [FluentAssertions](https://github.com/fluentassertions/fluentassertions)
+- [CliWrap](https://github.com/Tyrrrz/CliWrap)
+- [Coverlet](https://github.com/tonerdo/coverlet)
 
 ## Donate
 
