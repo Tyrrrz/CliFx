@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CliFx.Internal;
+using CliFx.Models;
 
-namespace CliFx.Models
+namespace CliFx.Tests.Internal
 {
     public partial class CommandSchemaEqualityComparer : IEqualityComparer<CommandSchema>
     {
@@ -23,12 +23,7 @@ namespace CliFx.Models
         }
 
         /// <inheritdoc />
-        public int GetHashCode(CommandSchema obj) => new HashCodeBuilder()
-            .Add(obj.Type)
-            .Add(obj.Name, StringComparer.OrdinalIgnoreCase)
-            .Add(obj.Description, StringComparer.Ordinal)
-            .AddMany(obj.Options, CommandOptionSchemaEqualityComparer.Instance)
-            .Build();
+        public int GetHashCode(CommandSchema obj) => throw new NotSupportedException();
     }
 
     public partial class CommandSchemaEqualityComparer

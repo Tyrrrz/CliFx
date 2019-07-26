@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CliFx.Attributes;
 using CliFx.Models;
 using CliFx.Services;
+using CliFx.Tests.Internal;
 using NUnit.Framework;
 
 namespace CliFx.Tests

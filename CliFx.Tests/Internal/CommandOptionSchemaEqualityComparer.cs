@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using CliFx.Internal;
+using CliFx.Models;
 
-namespace CliFx.Models
+namespace CliFx.Tests.Internal
 {
     public partial class CommandOptionSchemaEqualityComparer : IEqualityComparer<CommandOptionSchema>
     {
@@ -23,13 +23,7 @@ namespace CliFx.Models
         }
 
         /// <inheritdoc />
-        public int GetHashCode(CommandOptionSchema obj) => new HashCodeBuilder()
-            .Add(obj.Property)
-            .Add(obj.Name, StringComparer.OrdinalIgnoreCase)
-            .Add(obj.ShortName)
-            .Add(obj.GroupName, StringComparer.OrdinalIgnoreCase)
-            .Add(obj.Description, StringComparer.Ordinal)
-            .Build();
+        public int GetHashCode(CommandOptionSchema obj) => throw new NotSupportedException();
     }
 
     public partial class CommandOptionSchemaEqualityComparer

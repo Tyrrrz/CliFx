@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using CliFx.Models;
 using CliFx.Services;
+using CliFx.Tests.Internal;
 using NUnit.Framework;
 
 namespace CliFx.Tests
