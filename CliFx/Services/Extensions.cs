@@ -1,16 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using CliFx.Models;
 
 namespace CliFx.Services
 {
     public static class Extensions
     {
-        public static IReadOnlyList<CommandSchema> GetCommandSchemas(this ICommandSchemaResolver commandSchemaResolver,
-            IEnumerable<Type> commandTypes) => commandTypes.Select(commandSchemaResolver.GetCommandSchema).ToArray();
-
         public static void Write(this IConsoleWriter consoleWriter, string text) =>
             consoleWriter.Write(new TextSpan(text));
 

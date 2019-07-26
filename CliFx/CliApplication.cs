@@ -51,6 +51,28 @@ namespace CliFx
         {
         }
 
+        private IReadOnlyList<CommandSchema> GetAvailableCommandSchemas() =>
+            _commandTypes.Select(_commandSchemaResolver.GetCommandSchema).ToArray();
+
+        private CommandSchema GetMatchingCommandSchema(IReadOnlyList<CommandSchema> availableCommandSchemas, string commandName) =>
+            availableCommandSchemas.FirstOrDefault(c => string.Equals(c.Name, commandName, StringComparison.OrdinalIgnoreCase));
+
+        private bool IsHelpRequested(CommandInput commandInput)
+        {
+            var firstOptionAlias = commandInput.Options.FirstOrDefault()?.Alias;
+
+            return string.Equals(firstOptionAlias, "help", StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(firstOptionAlias, "h", StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(firstOptionAlias, "?", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private bool IsVersionRequested(CommandInput commandInput)
+        {
+            var firstOptionAlias = commandInput.Options.FirstOrDefault()?.Alias;
+
+            return string.Equals(firstOptionAlias, "version", StringComparison.OrdinalIgnoreCase);
+        }
+
         public async Task<int> RunAsync(IReadOnlyList<string> commandLineArguments)
         {
             var stdOut = ConsoleWriter.GetStandardOutput();
@@ -60,8 +82,8 @@ namespace CliFx
             {
                 var commandInput = _commandInputParser.ParseInput(commandLineArguments);
 
-                var availableCommandSchemas = _commandSchemaResolver.GetCommandSchemas(_commandTypes);
-                var matchingCommandSchema = availableCommandSchemas.FindByNameOrNull(commandInput.CommandName);
+                var availableCommandSchemas = GetAvailableCommandSchemas();
+                var matchingCommandSchema = GetMatchingCommandSchema(availableCommandSchemas, commandInput.CommandName);
 
                 // Fail if there are no commands defined
                 if (!availableCommandSchemas.Any())
@@ -71,7 +93,7 @@ namespace CliFx
                 }
 
                 // Fail if specified a command which is not defined
-                if (commandInput.IsCommandSpecified() && matchingCommandSchema == null)
+                if (!commandInput.CommandName.IsNullOrWhiteSpace() && matchingCommandSchema == null)
                 {
                     stdErr.WriteLine($"Specified command [{commandInput.CommandName}] is not defined.");
                     return -1;
@@ -84,14 +106,14 @@ namespace CliFx
                 }
 
                 // Show version if it was requested without specifying a command
-                if (commandInput.IsVersionRequested() && !commandInput.IsCommandSpecified())
+                if (IsVersionRequested(commandInput) && commandInput.CommandName.IsNullOrWhiteSpace())
                 {
                     stdOut.WriteLine(_applicationMetadata.VersionText);
                     return 0;
                 }
 
                 // Show help if it was requested
-                if (commandInput.IsHelpRequested())
+                if (IsHelpRequested(commandInput))
                 {
                     var helpText = _commandHelpTextBuilder.Build(_applicationMetadata, availableCommandSchemas, matchingCommandSchema);
                     stdOut.WriteLine(helpText);

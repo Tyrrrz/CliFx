@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using CliFx.Internal;
@@ -9,6 +10,29 @@ namespace CliFx.Services
     // TODO: add color
     public class CommandHelpTextBuilder : ICommandHelpTextBuilder
     {
+        private IReadOnlyList<string> GetOptionAliasesWithPrefixes(CommandOptionSchema optionSchema)
+        {
+            var result = new List<string>();
+
+            if (!optionSchema.Name.IsNullOrWhiteSpace())
+                result.Add("--" + optionSchema.Name);
+
+            if (optionSchema.ShortName != null)
+                result.Add("-" + optionSchema.ShortName.Value);
+
+            return result;
+        }
+
+        private IReadOnlyList<CommandSchema> GetChildCommandSchemas(IReadOnlyList<CommandSchema> availableCommandSchemas,
+            CommandSchema parentCommandSchema)
+        {
+            // TODO: this doesn't really work properly, it shows all descendants instead of direct children
+            var prefix = !parentCommandSchema.Name.IsNullOrWhiteSpace() ? parentCommandSchema.Name + " " : "";
+
+            return availableCommandSchemas
+                .Where(c => !c.Name.IsNullOrWhiteSpace() && c.Name.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)).ToArray();
+        }
+
         private void AddDescription(StringBuilder buffer, CommandSchema commands)
         {
             if (commands.Description.IsNullOrWhiteSpace())
@@ -56,7 +80,7 @@ namespace CliFx.Services
             {
                 buffer.Append(option.IsRequired ? "* " : "  ");
 
-                buffer.Append(option.GetAliasesWithPrefixes().JoinToString("|"));
+                buffer.Append(GetOptionAliasesWithPrefixes(option).JoinToString("|"));
 
                 if (!option.Description.IsNullOrWhiteSpace())
                 {
@@ -77,7 +101,7 @@ namespace CliFx.Services
             }
 
             // Version option
-            if (command.IsDefault())
+            if (command.Name.IsNullOrWhiteSpace())
             {
                 buffer.Append("  ");
                 buffer.Append("--version");
@@ -118,11 +142,11 @@ namespace CliFx.Services
             IReadOnlyList<CommandSchema> availableCommandSchemas,
             CommandSchema matchingCommandSchema)
         {
-            var subCommands = availableCommandSchemas.FindSubCommandSchemas(matchingCommandSchema.Name);
+            var childCommandSchemas = GetChildCommandSchemas(availableCommandSchemas, matchingCommandSchema);
 
             var buffer = new StringBuilder();
 
-            if (matchingCommandSchema.IsDefault())
+            if (matchingCommandSchema.Name.IsNullOrWhiteSpace())
             {
                 buffer.Append(applicationMetadata.Title);
                 buffer.Append(" v");
@@ -131,11 +155,11 @@ namespace CliFx.Services
             }
 
             AddDescription(buffer, matchingCommandSchema);
-            AddUsage(buffer, applicationMetadata, matchingCommandSchema, subCommands);
+            AddUsage(buffer, applicationMetadata, matchingCommandSchema, childCommandSchemas);
             AddOptions(buffer, matchingCommandSchema);
-            AddSubCommands(buffer, subCommands);
+            AddSubCommands(buffer, childCommandSchemas);
 
-            if (matchingCommandSchema.IsDefault() && subCommands.Any())
+            if (matchingCommandSchema.Name.IsNullOrWhiteSpace() && childCommandSchemas.Any())
             {
                 buffer.Append("You can run ");
                 buffer.Append('`').Append(applicationMetadata.ExecutableName).Append(" [command] --help").Append('`');

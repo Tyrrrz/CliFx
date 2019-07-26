@@ -21,6 +21,25 @@ namespace CliFx.Services
         {
         }
 
+        private CommandOptionSchema GetMatchingOptionSchema(CommandSchema commandSchema, CommandOptionInput optionInput)
+        {
+            foreach (var optionSchema in commandSchema.Options)
+            {
+                var matchesByName =
+                    !optionSchema.Name.IsNullOrWhiteSpace() &&
+                    string.Equals(optionSchema.Name, optionInput.Alias, StringComparison.OrdinalIgnoreCase);
+
+                var matchesByShortName =
+                    optionSchema.ShortName != null &&
+                    string.Equals(optionSchema.ShortName.Value.AsString(), optionInput.Alias, StringComparison.OrdinalIgnoreCase);
+
+                if (matchesByName || matchesByShortName)
+                    return optionSchema;
+            }
+
+            return null;
+        }
+
         public void InitializeCommand(ICommand command, CommandSchema schema, CommandInput input)
         {
             // Set command options
@@ -29,7 +48,7 @@ namespace CliFx.Services
             var properties = new HashSet<CommandOptionSchema>();
             foreach (var option in input.Options)
             {
-                var optionSchema = schema.Options.FindByAliasOrNull(option.Alias);
+                var optionSchema = GetMatchingOptionSchema(schema, option);
 
                 if (optionSchema == null)
                     continue;
