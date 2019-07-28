@@ -28,8 +28,9 @@ To be added with a stable release...
 ## Libraries used
 
 - [NUnit](https://github.com/nunit/nunit)
-- [FluentAssertions](https://github.com/fluentassertions/fluentassertions)
 - [CliWrap](https://github.com/Tyrrrz/CliWrap)
+- [FluentAssertions](https://github.com/fluentassertions/fluentassertions)
+- [BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet)
 - [Coverlet](https://github.com/tonerdo/coverlet)
 
 ## Donate
