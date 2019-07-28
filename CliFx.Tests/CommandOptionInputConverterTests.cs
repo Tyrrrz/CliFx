@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using CliFx.Models;
 using CliFx.Services;
 using FluentAssertions;
@@ -10,14 +11,14 @@ namespace CliFx.Tests
 {
     public partial class CommandOptionInputConverterTests
     {
-        public enum TestEnum
+        private enum TestEnum
         {
             Value1,
             Value2,
             Value3
         }
 
-        public struct TestStringConstructable
+        private class TestStringConstructable
         {
             public string Value { get; }
 
@@ -27,7 +28,7 @@ namespace CliFx.Tests
             }
         }
 
-        public struct TestStringParseable
+        private class TestStringParseable
         {
             public string Value { get; }
 
@@ -37,6 +38,19 @@ namespace CliFx.Tests
             }
 
             public static TestStringParseable Parse(string value) => new TestStringParseable(value);
+        }
+
+        private class TestStringParseableWithFormatProvider
+        {
+            public string Value { get; }
+
+            private TestStringParseableWithFormatProvider(string value)
+            {
+                Value = value;
+            }
+
+            public static TestStringParseableWithFormatProvider Parse(string value, IFormatProvider formatProvider) =>
+                new TestStringParseableWithFormatProvider(value);
         }
     }
 
@@ -157,6 +171,12 @@ namespace CliFx.Tests
                 new CommandOptionInput("option", "value"),
                 typeof(TestStringParseable),
                 TestStringParseable.Parse("value")
+            );
+
+            yield return new TestCaseData(
+                new CommandOptionInput("option", "value"),
+                typeof(TestStringParseableWithFormatProvider),
+                TestStringParseableWithFormatProvider.Parse("value", CultureInfo.InvariantCulture)
             );
 
             yield return new TestCaseData(

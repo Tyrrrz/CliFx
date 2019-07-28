@@ -22,6 +22,14 @@ namespace CliFx.Services
         {
         }
 
+        private ConstructorInfo GetStringConstructor(Type type) => type.GetConstructor(new[] {typeof(string)});
+
+        private MethodInfo GetStaticParseMethod(Type type) =>
+            type.GetMethod("Parse", BindingFlags.Public | BindingFlags.Static, null, new[] {typeof(string)}, null);
+
+        private MethodInfo GetStaticParseMethodWithFormatProvider(Type type) =>
+            type.GetMethod("Parse", BindingFlags.Public | BindingFlags.Static, null, new[] {typeof(string), typeof(IFormatProvider)}, null);
+
         private object ConvertValue(string value, Type targetType)
         {
             // String or object
@@ -199,14 +207,21 @@ namespace CliFx.Services
             }
 
             // Has a constructor that accepts a single string
-            var stringConstructor = targetType.GetConstructor(new[] {typeof(string)});
+            var stringConstructor = GetStringConstructor(targetType);
             if (stringConstructor != null)
             {
                 return stringConstructor.Invoke(new object[] {value});
             }
 
+            // Has a static parse method that accepts a single string and a format provider
+            var parseMethodWithFormatProvider = GetStaticParseMethodWithFormatProvider(targetType);
+            if (parseMethodWithFormatProvider != null)
+            {
+                return parseMethodWithFormatProvider.Invoke(null, new object[] { value, _formatProvider });
+            }
+
             // Has a static parse method that accepts a single string
-            var parseMethod = targetType.GetMethod("Parse", BindingFlags.Public | BindingFlags.Static, null, new[] {typeof(string)}, null);
+            var parseMethod = GetStaticParseMethod(targetType);
             if (parseMethod != null)
             {
                 return parseMethod.Invoke(null, new object[] {value});
