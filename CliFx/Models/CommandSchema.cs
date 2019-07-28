@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
+using CliFx.Internal;
 
 namespace CliFx.Models
 {
@@ -19,6 +21,24 @@ namespace CliFx.Models
             Name = name;
             Description = description;
             Options = options;
+        }
+
+        public override string ToString()
+        {
+            var buffer = new StringBuilder();
+
+            if (!Name.IsNullOrWhiteSpace())
+                buffer.Append(Name);
+
+            foreach (var option in Options)
+            {
+                buffer.Append(' ');
+                buffer.Append('[');
+                buffer.Append(option);
+                buffer.Append(']');
+            }
+
+            return buffer.Trim().ToString();
         }
     }
 }

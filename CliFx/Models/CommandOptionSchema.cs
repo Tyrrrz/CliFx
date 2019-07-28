@@ -1,4 +1,6 @@
 ﻿using System.Reflection;
+using System.Text;
+using CliFx.Internal;
 
 namespace CliFx.Models
 {
@@ -25,6 +27,25 @@ namespace CliFx.Models
             IsRequired = isRequired;
             GroupName = groupName;
             Description = description;
+        }
+
+        public override string ToString()
+        {
+            var buffer = new StringBuilder();
+
+            if (IsRequired)
+                buffer.Append('*');
+
+            if (!Name.IsNullOrWhiteSpace())
+                buffer.Append(Name);
+
+            if (!Name.IsNullOrWhiteSpace() && ShortName != null)
+                buffer.Append('|');
+
+            if (ShortName != null)
+                buffer.Append(ShortName);
+
+            return buffer.ToString();
         }
     }
 }

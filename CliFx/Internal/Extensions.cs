@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace CliFx.Internal
 {
@@ -12,6 +13,17 @@ namespace CliFx.Internal
         public static string AsString(this char c) => new string(c, 1);
 
         public static string JoinToString<T>(this IEnumerable<T> source, string separator) => string.Join(separator, source);
+
+        public static StringBuilder Trim(this StringBuilder builder)
+        {
+            while (builder.Length > 0 && char.IsWhiteSpace(builder[0]))
+                builder.Remove(0, 1);
+
+            while (builder.Length > 0 && char.IsWhiteSpace(builder[builder.Length - 1]))
+                builder.Remove(builder.Length - 1, 1);
+
+            return builder;
+        }
 
         public static TValue GetValueOrDefault<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dic, TKey key) =>
             dic.TryGetValue(key, out var result) ? result : default;
