@@ -25,6 +25,13 @@ namespace CliFx.Internal
             return builder;
         }
 
+        public static string SubstringUntilLast(this string s, string sub,
+            StringComparison comparison = StringComparison.Ordinal)
+        {
+            var index = s.LastIndexOf(sub, comparison);
+            return index < 0 ? s : s.Substring(0, index);
+        }
+
         public static TValue GetValueOrDefault<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dic, TKey key) =>
             dic.TryGetValue(key, out var result) ? result : default;
 

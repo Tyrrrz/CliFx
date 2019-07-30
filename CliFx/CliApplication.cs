@@ -92,9 +92,18 @@ namespace CliFx
                             c => c.Error.WriteLine($"Specified command [{commandInput.CommandName}] is not defined."));
                     }
 
+                    // Get default command schema
+                    var defaultCommandSchema = availableCommandSchemas.FirstOrDefault(c => c.IsDefault());
+
+                    // Use a stub if default command schema is not defined
+                    if (defaultCommandSchema == null)
+                    {
+                        defaultCommandSchema = _commandSchemaResolver.GetCommandSchema(typeof(StubDefaultCommand));
+                        availableCommandSchemas = availableCommandSchemas.Concat(new[] {defaultCommandSchema}).ToArray();
+                    }
+
                     // Show help
-                    var stubDefaultCommandSchema = _commandSchemaResolver.GetCommandSchema(typeof(StubDefaultCommand));
-                    _commandHelpTextRenderer.RenderHelpText(_applicationMetadata, availableCommandSchemas, stubDefaultCommandSchema);
+                    _commandHelpTextRenderer.RenderHelpText(_applicationMetadata, availableCommandSchemas, defaultCommandSchema);
 
                     return commandInput.IsCommandSpecified() ? -1 : 0;
                 }

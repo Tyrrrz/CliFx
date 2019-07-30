@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using CliFx.Internal;
 using CliFx.Models;
 
@@ -20,191 +21,218 @@ namespace CliFx.Services
         {
         }
 
+        private void RenderDescription(CommandSchema commandSchema)
+        {
+            if (commandSchema.Description.IsNullOrWhiteSpace())
+                return;
+
+            _console.WithColor(ConsoleColor.Black, ConsoleColor.DarkGray, c =>
+            {
+                c.Output.WriteLine("Description");
+            });
+
+            _console.Output.Write("  ");
+            _console.Output.Write(commandSchema.Description);
+            _console.Output.WriteLine();
+
+            _console.Output.WriteLine();
+        }
+
+        private void RenderUsage(ApplicationMetadata applicationMetadata, CommandSchema commandSchema, bool hasChildCommands)
+        {
+            _console.WithColor(ConsoleColor.Black, ConsoleColor.DarkGray, c =>
+            {
+                c.Output.WriteLine("Usage");
+            });
+
+            _console.Output.Write("  ");
+
+            _console.Output.Write(applicationMetadata.ExecutableName);
+            _console.Output.Write(' ');
+
+            if (!commandSchema.IsDefault())
+            {
+                _console.Output.Write(commandSchema.Name);
+                _console.Output.Write(' ');
+            }
+
+            if (hasChildCommands)
+            {
+                _console.Output.Write("[command]");
+                _console.Output.Write(' ');
+            }
+
+            _console.Output.Write("[options]");
+            _console.Output.WriteLine();
+            _console.Output.WriteLine();
+        }
+
+        private void RenderOptions(CommandSchema commandSchema)
+        {
+            var options = new List<CommandOptionSchema>();
+            options.AddRange(commandSchema.Options);
+
+            options.Add(new CommandOptionSchema(null, "help", 'h', null, false, "Shows help text."));
+
+            if (commandSchema.IsDefault())
+                options.Add(new CommandOptionSchema(null, "version", 'v', null, false, "Shows application version."));
+
+            _console.WithColor(ConsoleColor.Black, ConsoleColor.DarkGray, c =>
+            {
+                c.Output.WriteLine("Options");
+            });
+
+            foreach (var option in options)
+            {
+                _console.Output.Write("  ");
+
+                if (!option.Name.IsNullOrWhiteSpace())
+                {
+                    _console.WithColor(option.IsRequired ? ConsoleColor.White : ConsoleColor.Gray, c =>
+                    {
+                        c.Output.Write("--");
+                        c.Output.Write(option.Name);
+                    });
+                }
+
+                if (!option.Name.IsNullOrWhiteSpace() && option.ShortName != null)
+                {
+                    _console.Output.Write('|');
+                }
+
+                if (option.ShortName != null)
+                {
+                    _console.WithColor(option.IsRequired ? ConsoleColor.White: ConsoleColor.Gray, c =>
+                    {
+                        c.Output.Write('-');
+                        c.Output.Write(option.ShortName);
+                    });
+                }
+
+                if (!option.Description.IsNullOrWhiteSpace())
+                {
+                    _console.Output.Write("    ");
+                    _console.Output.Write(option.Description);
+                }
+
+                _console.Output.WriteLine();
+            }
+
+            _console.Output.WriteLine();
+        }
+
+        private void RenderChildCommands(ApplicationMetadata applicationMetadata, CommandSchema commandSchema,
+            IReadOnlyList<CommandSchema> childCommandSchemas)
+        {
+            if (!childCommandSchemas.Any())
+                return;
+
+            _console.WithColor(ConsoleColor.Black, ConsoleColor.DarkGray, c =>
+            {
+                c.Output.WriteLine("Commands");
+            });
+
+            foreach (var childCommandSchema in childCommandSchemas)
+            {
+                _console.Output.Write("  ");
+
+                _console.Output.Write(GetRelativeCommandName(childCommandSchema, commandSchema));
+
+                if (!childCommandSchema.Description.IsNullOrWhiteSpace())
+                {
+                    _console.Output.Write("    ");
+                    _console.Output.Write(childCommandSchema.Description);
+                }
+
+                _console.Output.WriteLine();
+            }
+
+            _console.Output.WriteLine();
+
+            // Child command help tip
+
+            _console.Output.Write("You can run `");
+
+            _console.Output.Write(applicationMetadata.ExecutableName);
+            _console.Output.Write(' ');
+
+            if (!commandSchema.IsDefault())
+            {
+                _console.Output.Write(commandSchema.Name);
+                _console.Output.Write(' ');
+            }
+
+            _console.Output.Write("[command] --help` to show help on a specific command.");
+
+            _console.Output.WriteLine();
+        }
+
         public void RenderHelpText(ApplicationMetadata applicationMetadata,
-            IReadOnlyList<CommandSchema> availableCommandSchemas, CommandSchema matchingCommandSchema = null) =>
-            new RenderHelpTextImpl(_console, applicationMetadata, availableCommandSchemas, matchingCommandSchema).Render();
+            IReadOnlyList<CommandSchema> availableCommandSchemas, CommandSchema matchingCommandSchema)
+        {
+            var childCommandSchemas = GetChildCommandSchemas(availableCommandSchemas, matchingCommandSchema);
+
+            // Render application info
+            if (matchingCommandSchema.IsDefault())
+            {
+                _console.Output.Write(applicationMetadata.Title);
+                _console.Output.Write(" v");
+                _console.Output.Write(applicationMetadata.VersionText);
+                _console.Output.WriteLine();
+                _console.Output.WriteLine();
+            }
+
+            RenderDescription(matchingCommandSchema);
+            RenderUsage(applicationMetadata, matchingCommandSchema, childCommandSchemas.Any());
+            RenderOptions(matchingCommandSchema);
+            RenderChildCommands(applicationMetadata, matchingCommandSchema, childCommandSchemas);
+        }
     }
 
     public partial class CommandHelpTextRenderer
     {
-        private class RenderHelpTextImpl
+        private static CommandSchema GetParentOrNull(CommandSchema commandSchema, IReadOnlyList<CommandSchema> availableCommandSchemas)
         {
-            private readonly IConsole _console;
-            private readonly ApplicationMetadata _applicationMetadata;
-            private readonly IReadOnlyList<CommandSchema> _availableCommandSchemas;
-            private readonly CommandSchema _matchingCommandSchema;
+            if (commandSchema.IsDefault())
+                return null;
 
-            private readonly IReadOnlyList<CommandSchema> _childCommandSchemas;
-
-            public RenderHelpTextImpl(IConsole console, ApplicationMetadata applicationMetadata,
-                IReadOnlyList<CommandSchema> availableCommandSchemas, CommandSchema matchingCommandSchema)
+            var nameBuffer = commandSchema.Name;
+            while (nameBuffer.Contains(' '))
             {
-                _console = console;
-                _applicationMetadata = applicationMetadata;
-                _availableCommandSchemas = availableCommandSchemas;
-                _matchingCommandSchema = matchingCommandSchema;
+                nameBuffer = nameBuffer.SubstringUntilLast(" ");
+                var parent = availableCommandSchemas.FirstOrDefault(c =>
+                    string.Equals(c.Name, nameBuffer, StringComparison.OrdinalIgnoreCase));
 
-                _childCommandSchemas = GetChildCommandSchemas();
+                if (parent != null)
+                    return parent;
             }
 
-            private IReadOnlyList<CommandSchema> GetChildCommandSchemas()
-            {
-                // TODO:
-                var prefix = _matchingCommandSchema == null || _matchingCommandSchema.Name.IsNullOrWhiteSpace()
-                    ? ""
-                    : _matchingCommandSchema.Name + " ";
+            return availableCommandSchemas.FirstOrDefault(c => c.IsDefault());
+        }
 
-                return new CommandSchema[0];
+        private static IReadOnlyList<CommandSchema> GetChildCommandSchemas(IReadOnlyList<CommandSchema> availableCommandSchemas,
+            CommandSchema parentCommandSchema)
+        {
+            var result = new List<CommandSchema>();
+
+            foreach (var commandSchema in availableCommandSchemas)
+            {
+                if (commandSchema == parentCommandSchema)
+                    continue;
+
+                if (GetParentOrNull(commandSchema, availableCommandSchemas) == parentCommandSchema)
+                    result.Add(commandSchema);
             }
 
-            private void RenderAppInfo()
-            {
-                if (_matchingCommandSchema != null && !_matchingCommandSchema.Name.IsNullOrWhiteSpace())
-                    return;
+            return result;
+        }
 
-                _console.Output.Write(_applicationMetadata.Title);
-                _console.Output.Write(" v");
-                _console.Output.Write(_applicationMetadata.VersionText);
-                _console.Output.WriteLine();
-                _console.Output.WriteLine();
-            }
+        private static string GetRelativeCommandName(CommandSchema commandSchema, CommandSchema parentCommandSchema)
+        {
+            if (parentCommandSchema.Name.IsNullOrWhiteSpace())
+                return commandSchema.Name;
 
-            private void RenderDescription()
-            {
-                if (_matchingCommandSchema == null || _matchingCommandSchema.Description.IsNullOrWhiteSpace())
-                    return;
-
-                _console.WithColor(ConsoleColor.Black, ConsoleColor.DarkCyan, c =>
-                {
-                    c.Output.WriteLine("Description");
-                });
-
-                _console.Output.Write("  ");
-                _console.Output.Write(_matchingCommandSchema.Description);
-                _console.Output.WriteLine();
-
-                _console.Output.WriteLine();
-            }
-
-            private void RenderUsage()
-            {
-                var hasChildCommands = _childCommandSchemas.Any();
-
-                _console.WithColor(ConsoleColor.Black, ConsoleColor.DarkCyan, c =>
-                {
-                    c.Output.WriteLine("Usage");
-                });
-
-                _console.Output.Write("  ");
-
-                _console.Output.Write(_applicationMetadata.ExecutableName);
-                _console.Output.Write(' ');
-
-                if (_matchingCommandSchema != null && !_matchingCommandSchema.Name.IsNullOrWhiteSpace())
-                {
-                    _console.Output.Write(_matchingCommandSchema.Name);
-                    _console.Output.Write(' ');
-                }
-
-                if (hasChildCommands)
-                {
-                    _console.Output.Write("[command]");
-                    _console.Output.Write(' ');
-                }
-
-                _console.Output.Write("[options]");
-                _console.Output.WriteLine();
-                _console.Output.WriteLine();
-            }
-
-            private void RenderOptions()
-            {
-                var options = new List<CommandOptionSchema>();
-                options.AddRange(_matchingCommandSchema?.Options ?? Enumerable.Empty<CommandOptionSchema>());
-                options.Add(new CommandOptionSchema(null, "help", 'h', null, false, "Shows help text."));
-
-                if (_matchingCommandSchema == null || _matchingCommandSchema.Name.IsNullOrWhiteSpace())
-                    options.Add(new CommandOptionSchema(null, "version", 'v', null, false, "Shows application version."));
-
-                _console.WithColor(ConsoleColor.Black, ConsoleColor.DarkCyan, c =>
-                {
-                    c.Output.WriteLine("Options");
-                });
-
-                foreach (var option in options)
-                {
-                    _console.Output.Write("  ");
-
-                    if (!option.Name.IsNullOrWhiteSpace())
-                    {
-                        _console.WithColor(option.IsRequired ? ConsoleColor.Yellow : ConsoleColor.White, c =>
-                        {
-                            c.Output.Write("--");
-                            c.Output.Write(option.Name);
-                        });
-                    }
-
-                    if (!option.Name.IsNullOrWhiteSpace() && option.ShortName != null)
-                    {
-                        _console.Output.Write('|');
-                    }
-
-                    if (option.ShortName != null)
-                    {
-                        _console.WithColor(option.IsRequired ? ConsoleColor.Yellow : ConsoleColor.White, c =>
-                        {
-                            c.Output.Write('-');
-                            c.Output.Write(option.ShortName);
-                        });
-                    }
-
-                    if (!option.Description.IsNullOrWhiteSpace())
-                    {
-                        _console.Output.Write("    ");
-                        _console.Output.Write(option.Description);
-                    }
-
-                    _console.Output.WriteLine();
-                }
-
-                _console.Output.WriteLine();
-            }
-
-            private void RenderChildCommands()
-            {
-                // TODO
-            }
-
-            private void RenderSubCommandHelpTip()
-            {
-                if (!_childCommandSchemas.Any())
-                    return;
-
-                _console.Output.Write("You can run `");
-
-                _console.Output.Write(_applicationMetadata.ExecutableName);
-                _console.Output.Write(' ');
-
-                if (_matchingCommandSchema != null && !_matchingCommandSchema.Name.IsNullOrWhiteSpace())
-                {
-                    _console.Output.Write(_matchingCommandSchema.Name);
-                    _console.Output.Write(' ');
-                }
-
-                _console.Output.Write("[command] --help` to show help on a specific command.");
-
-                _console.Output.WriteLine();
-            }
-
-            public void Render()
-            {
-                RenderAppInfo();
-                RenderDescription();
-                RenderUsage();
-                RenderOptions();
-                RenderChildCommands();
-                RenderSubCommandHelpTip();
-            }
+            return commandSchema.Name.Substring(parentCommandSchema.Name.Length + 1);
         }
     }
 }
