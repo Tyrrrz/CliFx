@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using CliFx.Attributes;
 using CliFx.Exceptions;
 using CliFx.Internal;
 using CliFx.Models;
@@ -61,21 +62,7 @@ namespace CliFx
         private CommandSchema GetMatchingCommandSchema(IReadOnlyList<CommandSchema> availableCommandSchemas, string commandName) =>
             availableCommandSchemas.FirstOrDefault(c => string.Equals(c.Name, commandName, StringComparison.OrdinalIgnoreCase));
 
-        private bool IsHelpRequested(CommandInput commandInput)
-        {
-            var firstOptionAlias = commandInput.Options.FirstOrDefault()?.Alias;
-
-            return string.Equals(firstOptionAlias, "help", StringComparison.OrdinalIgnoreCase) ||
-                   string.Equals(firstOptionAlias, "h", StringComparison.OrdinalIgnoreCase) ||
-                   string.Equals(firstOptionAlias, "?", StringComparison.OrdinalIgnoreCase);
-        }
-
-        private bool IsVersionRequested(CommandInput commandInput)
-        {
-            var firstOptionAlias = commandInput.Options.FirstOrDefault()?.Alias;
-
-            return string.Equals(firstOptionAlias, "version", StringComparison.OrdinalIgnoreCase);
-        }
+        
 
         public async Task<int> RunAsync(IReadOnlyList<string> commandLineArguments)
         {
@@ -94,17 +81,26 @@ namespace CliFx
 
                     return -1;
                 }
-                // Fail if specified a command which is not defined
-                if (!commandInput.CommandName.IsNullOrWhiteSpace() && matchingCommandSchema == null)
+                
+                // Handle cases where requested command is not defined
+                if (matchingCommandSchema == null)
                 {
-                    _console.WithColor(ConsoleColor.Red,
-                        c => c.Error.WriteLine($"Specified command [{commandInput.CommandName}] is not defined."));
+                    // If specified a command - show error
+                    if (commandInput.IsCommandSpecified())
+                    {
+                        _console.WithColor(ConsoleColor.Red,
+                            c => c.Error.WriteLine($"Specified command [{commandInput.CommandName}] is not defined."));
+                    }
 
-                    return -1;
+                    // Show help
+                    var stubDefaultCommandSchema = _commandSchemaResolver.GetCommandSchema(typeof(StubDefaultCommand));
+                    _commandHelpTextRenderer.RenderHelpText(_applicationMetadata, availableCommandSchemas, stubDefaultCommandSchema);
+
+                    return commandInput.IsCommandSpecified() ? -1 : 0;
                 }
 
                 // Show version if it was requested without specifying a command
-                if (IsVersionRequested(commandInput) && commandInput.CommandName.IsNullOrWhiteSpace())
+                if (commandInput.IsVersionRequested() && !commandInput.IsCommandSpecified())
                 {
                     _console.Output.WriteLine(_applicationMetadata.VersionText);
 
@@ -112,17 +108,9 @@ namespace CliFx
                 }
 
                 // Show help if it was requested
-                if (IsHelpRequested(commandInput))
+                if (commandInput.IsHelpRequested())
                 {
                     _commandHelpTextRenderer.RenderHelpText(_applicationMetadata, availableCommandSchemas, matchingCommandSchema);
-
-                    return 0;
-                }
-
-                // Show help if command wasn't specified but a default command isn't defined
-                if (commandInput.CommandName.IsNullOrWhiteSpace() && matchingCommandSchema == null)
-                {
-                    _commandHelpTextRenderer.RenderHelpText(_applicationMetadata, availableCommandSchemas);
 
                     return 0;
                 }
@@ -169,6 +157,15 @@ namespace CliFx
                 return Type.EmptyTypes;
 
             return entryAssembly.ExportedTypes.Where(t => t.Implements(typeof(ICommand))).ToArray();
+        }
+    }
+
+    public partial class CliApplication
+    {
+        [Command]
+        private sealed class StubDefaultCommand : ICommand
+        {
+            public Task ExecuteAsync(IConsole console) => Task.CompletedTask;
         }
     }
 }
