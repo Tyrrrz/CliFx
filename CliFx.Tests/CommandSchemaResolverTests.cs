@@ -26,7 +26,7 @@ namespace CliFx.Tests
             [CommandOption("option-c", Description = "Option C description")]
             public bool OptionC { get; set; }
 
-            public Task ExecuteAsync(CommandContext context) => throw new NotImplementedException();
+            public Task ExecuteAsync(IConsole console) => Task.CompletedTask;
         }
     }
 

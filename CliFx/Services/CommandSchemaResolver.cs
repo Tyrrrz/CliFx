@@ -20,7 +20,8 @@ namespace CliFx.Services
                 attribute.Name,
                 attribute.ShortName,
                 attribute.GroupName,
-                attribute.IsRequired, attribute.Description);
+                attribute.IsRequired,
+                attribute.Description);
         }
 
         // TODO: validate stuff like duplicate names, multiple default commands, etc

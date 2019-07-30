@@ -15,29 +15,33 @@ namespace CliFx
     {
         private readonly ApplicationMetadata _applicationMetadata;
         private readonly IReadOnlyList<Type> _commandTypes;
+
+        private readonly IConsole _console;
         private readonly ICommandInputParser _commandInputParser;
         private readonly ICommandSchemaResolver _commandSchemaResolver;
         private readonly ICommandFactory _commandFactory;
         private readonly ICommandInitializer _commandInitializer;
-        private readonly ICommandHelpTextBuilder _commandHelpTextBuilder;
+        private readonly ICommandHelpTextRenderer _commandHelpTextRenderer;
 
         public CliApplication(ApplicationMetadata applicationMetadata, IReadOnlyList<Type> commandTypes,
-            ICommandInputParser commandInputParser, ICommandSchemaResolver commandSchemaResolver,
-            ICommandFactory commandFactory, ICommandInitializer commandInitializer, ICommandHelpTextBuilder commandHelpTextBuilder)
+            IConsole console, ICommandInputParser commandInputParser, ICommandSchemaResolver commandSchemaResolver,
+            ICommandFactory commandFactory, ICommandInitializer commandInitializer, ICommandHelpTextRenderer commandHelpTextRenderer)
         {
             _applicationMetadata = applicationMetadata;
             _commandTypes = commandTypes;
+
+            _console = console;
             _commandInputParser = commandInputParser;
             _commandSchemaResolver = commandSchemaResolver;
             _commandFactory = commandFactory;
             _commandInitializer = commandInitializer;
-            _commandHelpTextBuilder = commandHelpTextBuilder;
+            _commandHelpTextRenderer = commandHelpTextRenderer;
         }
 
         public CliApplication(ApplicationMetadata applicationMetadata, IReadOnlyList<Type> commandTypes)
             : this(applicationMetadata, commandTypes,
-                new CommandInputParser(), new CommandSchemaResolver(), new CommandFactory(),
-                new CommandInitializer(), new CommandHelpTextBuilder())
+                new SystemConsole(), new CommandInputParser(), new CommandSchemaResolver(),
+                new CommandFactory(), new CommandInitializer(), new CommandHelpTextRenderer())
         {
         }
 
@@ -75,9 +79,6 @@ namespace CliFx
 
         public async Task<int> RunAsync(IReadOnlyList<string> commandLineArguments)
         {
-            var stdOut = ConsoleWriter.GetStandardOutput();
-            var stdErr = ConsoleWriter.GetStandardError();
-
             try
             {
                 var commandInput = _commandInputParser.ParseInput(commandLineArguments);
@@ -88,64 +89,59 @@ namespace CliFx
                 // Fail if there are no commands defined
                 if (!availableCommandSchemas.Any())
                 {
-                    stdErr.WriteLine("There are no commands defined in this application.");
+                    _console.WithColor(ConsoleColor.Red,
+                        c => c.Error.WriteLine("There are no commands defined in this application."));
+
                     return -1;
                 }
-
                 // Fail if specified a command which is not defined
                 if (!commandInput.CommandName.IsNullOrWhiteSpace() && matchingCommandSchema == null)
                 {
-                    stdErr.WriteLine($"Specified command [{commandInput.CommandName}] is not defined.");
-                    return -1;
-                }
+                    _console.WithColor(ConsoleColor.Red,
+                        c => c.Error.WriteLine($"Specified command [{commandInput.CommandName}] is not defined."));
 
-                // Use a stub if command was not specified but there is no default command defined
-                if (matchingCommandSchema == null)
-                {
-                    matchingCommandSchema = _commandSchemaResolver.GetCommandSchema(typeof(StubDefaultCommand));
+                    return -1;
                 }
 
                 // Show version if it was requested without specifying a command
                 if (IsVersionRequested(commandInput) && commandInput.CommandName.IsNullOrWhiteSpace())
                 {
-                    stdOut.WriteLine(_applicationMetadata.VersionText);
+                    _console.Output.WriteLine(_applicationMetadata.VersionText);
+
                     return 0;
                 }
 
                 // Show help if it was requested
                 if (IsHelpRequested(commandInput))
                 {
-                    var helpText = _commandHelpTextBuilder.Build(_applicationMetadata, availableCommandSchemas, matchingCommandSchema);
-                    stdOut.WriteLine(helpText);
+                    _commandHelpTextRenderer.RenderHelpText(_applicationMetadata, availableCommandSchemas, matchingCommandSchema);
+
+                    return 0;
+                }
+
+                // Show help if command wasn't specified but a default command isn't defined
+                if (commandInput.CommandName.IsNullOrWhiteSpace() && matchingCommandSchema == null)
+                {
+                    _commandHelpTextRenderer.RenderHelpText(_applicationMetadata, availableCommandSchemas);
+
                     return 0;
                 }
 
                 // Create an instance of the command
-                var command = matchingCommandSchema.Type == typeof(StubDefaultCommand)
-                    ? new StubDefaultCommand(_commandHelpTextBuilder)
-                    : _commandFactory.CreateCommand(matchingCommandSchema);
+                var command = _commandFactory.CreateCommand(matchingCommandSchema.Type);
 
                 // Populate command with options according to its schema
                 _commandInitializer.InitializeCommand(command, matchingCommandSchema, commandInput);
 
-                // Create context and execute command
-                var commandContext = new CommandContext(_applicationMetadata,
-                    availableCommandSchemas, matchingCommandSchema,
-                    commandInput, stdOut, stdErr);
-
-                await command.ExecuteAsync(commandContext);
+                await command.ExecuteAsync(_console);
 
                 return 0;
             }
             catch (Exception ex)
             {
-                stdErr.WriteLine(ex.ToString());
+                _console.WithColor(ConsoleColor.Red, c => c.Error.WriteLine(ex));
+
                 return ex is CommandErrorException errorException ? errorException.ExitCode : -1;
-            }
-            finally
-            {
-                stdOut.Dispose();
-                stdErr.Dispose();
             }
         }
     }
@@ -157,7 +153,7 @@ namespace CliFx
             // Entry assembly is null in tests
             var entryAssembly = Assembly.GetEntryAssembly();
 
-            var title = entryAssembly?.GetName().FullName ?? "App";
+            var title = entryAssembly?.GetName().Name ?? "App";
             var executableName = Path.GetFileNameWithoutExtension(entryAssembly?.Location) ?? "app";
             var versionText = entryAssembly?.GetName().Version.ToString() ?? "1.0";
 
@@ -173,27 +169,6 @@ namespace CliFx
                 return Type.EmptyTypes;
 
             return entryAssembly.ExportedTypes.Where(t => t.Implements(typeof(ICommand))).ToArray();
-        }
-
-        private sealed class StubDefaultCommand : ICommand
-        {
-            private readonly ICommandHelpTextBuilder _commandHelpTextBuilder;
-
-            public StubDefaultCommand(ICommandHelpTextBuilder commandHelpTextBuilder)
-            {
-                _commandHelpTextBuilder = commandHelpTextBuilder;
-            }
-
-            public Task ExecuteAsync(CommandContext context)
-            {
-                var helpText = _commandHelpTextBuilder.Build(context.ApplicationMetadata,
-                    context.AvailableCommandSchemas,
-                    context.MatchingCommandSchema);
-
-                context.Output.WriteLine(helpText);
-
-                return Task.CompletedTask;
-            }
         }
     }
 }

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using CliFx.Attributes;
-using CliFx.Models;
 using CliFx.Services;
 using FluentAssertions;
 using NUnit.Framework;
@@ -14,7 +13,7 @@ namespace CliFx.Tests
         [Command]
         private class TestCommand : ICommand
         {
-            public Task ExecuteAsync(CommandContext context) => throw new NotImplementedException();
+            public Task ExecuteAsync(IConsole console) => Task.CompletedTask;
         }
     }
 
@@ -32,10 +31,9 @@ namespace CliFx.Tests
         {
             // Arrange
             var factory = new CommandFactory();
-            var schema = new CommandSchemaResolver().GetCommandSchema(commandType);
 
             // Act
-            var command = factory.CreateCommand(schema);
+            var command = factory.CreateCommand(commandType);
 
             // Assert
             command.Should().BeOfType(commandType);

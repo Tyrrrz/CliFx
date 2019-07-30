@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
-using CliFx.Models;
+using CliFx.Services;
 
 namespace CliFx
 {
     public interface ICommand
     {
-        Task ExecuteAsync(CommandContext context);
+        Task ExecuteAsync(IConsole console);
     }
 }

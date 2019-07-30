@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using CliFx.Attributes;
-using CliFx.Models;
 using CliFx.Services;
 
 namespace CliFx.Tests.Dummy.Commands
@@ -13,10 +12,10 @@ namespace CliFx.Tests.Dummy.Commands
         [CommandOption("values", 'v', IsRequired = true, Description = "Input values.")]
         public IReadOnlyList<double> Values { get; set; }
 
-        public Task ExecuteAsync(CommandContext context)
+        public Task ExecuteAsync(IConsole console)
         {
             var result = Values.Sum();
-            context.Output.WriteLine(result);
+            console.Output.WriteLine(result);
 
             return Task.CompletedTask;
         }

@@ -1,7 +1,6 @@
 ﻿using System.Text;
 using System.Threading.Tasks;
 using CliFx.Attributes;
-using CliFx.Models;
 using CliFx.Services;
 
 namespace CliFx.Tests.Dummy.Commands
@@ -15,7 +14,7 @@ namespace CliFx.Tests.Dummy.Commands
         [CommandOption('e', Description = "Whether the greeting should be exclaimed.")]
         public bool IsExclaimed { get; set; }
 
-        public Task ExecuteAsync(CommandContext context)
+        public Task ExecuteAsync(IConsole console)
         {
             var buffer = new StringBuilder();
 
@@ -24,7 +23,7 @@ namespace CliFx.Tests.Dummy.Commands
             if (IsExclaimed)
                 buffer.Append('!');
 
-            context.Output.WriteLine(buffer.ToString());
+            console.Output.WriteLine(buffer.ToString());
 
             return Task.CompletedTask;
         }

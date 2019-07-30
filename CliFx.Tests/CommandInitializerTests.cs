@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using CliFx.Attributes;
@@ -27,7 +26,7 @@ namespace CliFx.Tests
             [CommandOption("bool", 'b', GroupName = "other-group")]
             public bool BoolOption { get; set; }
 
-            public Task ExecuteAsync(CommandContext context) => throw new NotImplementedException();
+            public Task ExecuteAsync(IConsole console) => Task.CompletedTask;
         }
     }
 

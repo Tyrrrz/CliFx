@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using CliFx.Attributes;
-using CliFx.Models;
+using CliFx.Services;
 
 namespace CliFx.Benchmarks.Commands
 {
@@ -16,6 +16,6 @@ namespace CliFx.Benchmarks.Commands
         [CommandOption("bool", 'b')]
         public bool BoolOption { get; set; }
 
-        public Task ExecuteAsync(CommandContext context) => Task.CompletedTask;
+        public Task ExecuteAsync(IConsole console) => Task.CompletedTask;
     }
 }

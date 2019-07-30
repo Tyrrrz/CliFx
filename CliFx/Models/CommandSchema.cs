@@ -28,14 +28,17 @@ namespace CliFx.Models
             var buffer = new StringBuilder();
 
             if (!Name.IsNullOrWhiteSpace())
+            {
                 buffer.Append(Name);
+                buffer.Append(' ');
+            }
 
             foreach (var option in Options)
             {
-                buffer.Append(' ');
                 buffer.Append('[');
                 buffer.Append(option);
                 buffer.Append(']');
+                buffer.Append(' ');
             }
 
             return buffer.Trim().ToString();

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using CliFx.Internal;
 
@@ -37,12 +36,15 @@ namespace CliFx.Models
             var buffer = new StringBuilder();
 
             if (!CommandName.IsNullOrWhiteSpace())
+            {
                 buffer.Append(CommandName);
+                buffer.Append(' ');
+            }
 
             foreach (var option in Options)
             {
-                buffer.Append(' ');
                 buffer.Append(option);
+                buffer.Append(' ');
             }
 
             return buffer.Trim().ToString();

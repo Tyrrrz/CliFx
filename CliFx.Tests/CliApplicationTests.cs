@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using CliFx.Attributes;
 using CliFx.Exceptions;
-using CliFx.Models;
+using CliFx.Services;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -14,19 +14,19 @@ namespace CliFx.Tests
         [Command]
         private class TestDefaultCommand : ICommand
         {
-            public Task ExecuteAsync(CommandContext context) => Task.CompletedTask;
+            public Task ExecuteAsync(IConsole console) => Task.CompletedTask;
         }
 
         [Command("command")]
         private class TestNamedCommand : ICommand
         {
-            public Task ExecuteAsync(CommandContext context) => Task.CompletedTask;
+            public Task ExecuteAsync(IConsole console) => Task.CompletedTask;
         }
 
         [Command("faulty command")]
         private class TestFaultyCommand : ICommand
         {
-            public Task ExecuteAsync(CommandContext context) => Task.FromException(new CommandErrorException(-1337));
+            public Task ExecuteAsync(IConsole console) => Task.FromException(new CommandErrorException(-1337));
         }
     }
 
