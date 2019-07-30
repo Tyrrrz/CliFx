@@ -39,10 +39,15 @@ namespace CliFx
             _commandHelpTextRenderer = commandHelpTextRenderer;
         }
 
-        public CliApplication(ApplicationMetadata applicationMetadata, IReadOnlyList<Type> commandTypes)
+        public CliApplication(ApplicationMetadata applicationMetadata, IReadOnlyList<Type> commandTypes, IConsole console)
             : this(applicationMetadata, commandTypes,
-                new SystemConsole(), new CommandInputParser(), new CommandSchemaResolver(),
-                new CommandFactory(), new CommandInitializer(), new CommandHelpTextRenderer())
+                console, new CommandInputParser(), new CommandSchemaResolver(),
+                new CommandFactory(), new CommandInitializer(), new CommandHelpTextRenderer(console))
+        {
+        }
+
+        public CliApplication(ApplicationMetadata applicationMetadata, IReadOnlyList<Type> commandTypes)
+            : this(applicationMetadata, commandTypes, new SystemConsole())
         {
         }
 
@@ -56,22 +61,14 @@ namespace CliFx
         {
         }
 
-        private IReadOnlyList<CommandSchema> GetAvailableCommandSchemas() =>
-            _commandTypes.Select(_commandSchemaResolver.GetCommandSchema).ToArray();
-
-        private CommandSchema GetMatchingCommandSchema(IReadOnlyList<CommandSchema> availableCommandSchemas, string commandName) =>
-            availableCommandSchemas.FirstOrDefault(c => string.Equals(c.Name, commandName, StringComparison.OrdinalIgnoreCase));
-
-        
-
         public async Task<int> RunAsync(IReadOnlyList<string> commandLineArguments)
         {
             try
             {
                 var commandInput = _commandInputParser.ParseInput(commandLineArguments);
 
-                var availableCommandSchemas = GetAvailableCommandSchemas();
-                var matchingCommandSchema = GetMatchingCommandSchema(availableCommandSchemas, commandInput.CommandName);
+                var availableCommandSchemas = _commandSchemaResolver.GetCommandSchemas(_commandTypes);
+                var matchingCommandSchema = availableCommandSchemas.FindByName(commandInput.CommandName);
 
                 // Fail if there are no commands defined
                 if (!availableCommandSchemas.Any())
@@ -85,27 +82,31 @@ namespace CliFx
                 // Handle cases where requested command is not defined
                 if (matchingCommandSchema == null)
                 {
+                    var isError = false;
+
                     // If specified a command - show error
                     if (commandInput.IsCommandSpecified())
                     {
+                        isError = true;
+
                         _console.WithColor(ConsoleColor.Red,
                             c => c.Error.WriteLine($"Specified command [{commandInput.CommandName}] is not defined."));
                     }
 
-                    // Get default command schema
-                    var defaultCommandSchema = availableCommandSchemas.FirstOrDefault(c => c.IsDefault());
+                    // Get parent command schema
+                    var parentCommandSchema = availableCommandSchemas.FindParent(commandInput.CommandName);
 
-                    // Use a stub if default command schema is not defined
-                    if (defaultCommandSchema == null)
+                    // Use a stub if parent command schema is not found
+                    if (parentCommandSchema == null)
                     {
-                        defaultCommandSchema = _commandSchemaResolver.GetCommandSchema(typeof(StubDefaultCommand));
-                        availableCommandSchemas = availableCommandSchemas.Concat(new[] {defaultCommandSchema}).ToArray();
+                        parentCommandSchema = _commandSchemaResolver.GetCommandSchema(typeof(StubDefaultCommand));
+                        availableCommandSchemas = availableCommandSchemas.Concat(new[] { parentCommandSchema }).ToArray();
                     }
 
                     // Show help
-                    _commandHelpTextRenderer.RenderHelpText(_applicationMetadata, availableCommandSchemas, defaultCommandSchema);
+                    _commandHelpTextRenderer.RenderHelpText(_applicationMetadata, availableCommandSchemas, parentCommandSchema);
 
-                    return commandInput.IsCommandSpecified() ? -1 : 0;
+                    return isError ? -1 : 0;
                 }
 
                 // Show version if it was requested without specifying a command

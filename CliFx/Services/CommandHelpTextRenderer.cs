@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using CliFx.Internal;
 using CliFx.Models;
 
@@ -14,11 +13,6 @@ namespace CliFx.Services
         public CommandHelpTextRenderer(IConsole console)
         {
             _console = console;
-        }
-
-        public CommandHelpTextRenderer()
-            : this(new SystemConsole())
-        {
         }
 
         private void RenderDescription(CommandSchema commandSchema)
@@ -170,7 +164,9 @@ namespace CliFx.Services
         public void RenderHelpText(ApplicationMetadata applicationMetadata,
             IReadOnlyList<CommandSchema> availableCommandSchemas, CommandSchema matchingCommandSchema)
         {
-            var childCommandSchemas = GetChildCommandSchemas(availableCommandSchemas, matchingCommandSchema);
+            var childCommandSchemas = availableCommandSchemas
+                .Where(c => availableCommandSchemas.FindParent(c.Name) == matchingCommandSchema)
+                .ToArray();
 
             // Render application info
             if (matchingCommandSchema.IsDefault())
@@ -191,48 +187,9 @@ namespace CliFx.Services
 
     public partial class CommandHelpTextRenderer
     {
-        private static CommandSchema GetParentOrNull(CommandSchema commandSchema, IReadOnlyList<CommandSchema> availableCommandSchemas)
-        {
-            if (commandSchema.IsDefault())
-                return null;
-
-            var nameBuffer = commandSchema.Name;
-            while (nameBuffer.Contains(' '))
-            {
-                nameBuffer = nameBuffer.SubstringUntilLast(" ");
-                var parent = availableCommandSchemas.FirstOrDefault(c =>
-                    string.Equals(c.Name, nameBuffer, StringComparison.OrdinalIgnoreCase));
-
-                if (parent != null)
-                    return parent;
-            }
-
-            return availableCommandSchemas.FirstOrDefault(c => c.IsDefault());
-        }
-
-        private static IReadOnlyList<CommandSchema> GetChildCommandSchemas(IReadOnlyList<CommandSchema> availableCommandSchemas,
-            CommandSchema parentCommandSchema)
-        {
-            var result = new List<CommandSchema>();
-
-            foreach (var commandSchema in availableCommandSchemas)
-            {
-                if (commandSchema == parentCommandSchema)
-                    continue;
-
-                if (GetParentOrNull(commandSchema, availableCommandSchemas) == parentCommandSchema)
-                    result.Add(commandSchema);
-            }
-
-            return result;
-        }
-
-        private static string GetRelativeCommandName(CommandSchema commandSchema, CommandSchema parentCommandSchema)
-        {
-            if (parentCommandSchema.Name.IsNullOrWhiteSpace())
-                return commandSchema.Name;
-
-            return commandSchema.Name.Substring(parentCommandSchema.Name.Length + 1);
-        }
+        private static string GetRelativeCommandName(CommandSchema commandSchema, CommandSchema parentCommandSchema) =>
+            parentCommandSchema.Name.IsNullOrWhiteSpace()
+                ? commandSchema.Name
+                : commandSchema.Name.Substring(parentCommandSchema.Name.Length + 1);
     }
 }

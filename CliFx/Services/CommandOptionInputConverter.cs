@@ -217,7 +217,7 @@ namespace CliFx.Services
             var parseMethodWithFormatProvider = GetStaticParseMethodWithFormatProvider(targetType);
             if (parseMethodWithFormatProvider != null)
             {
-                return parseMethodWithFormatProvider.Invoke(null, new object[] { value, _formatProvider });
+                return parseMethodWithFormatProvider.Invoke(null, new object[] {value, _formatProvider});
             }
 
             // Has a static parse method that accepts a single string
