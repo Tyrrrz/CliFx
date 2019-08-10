@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using CliFx.Attributes;
 using CliFx.Exceptions;
-using CliFx.Internal;
 using CliFx.Models;
 using CliFx.Services;
 
@@ -37,28 +34,6 @@ namespace CliFx
             _commandFactory = commandFactory;
             _commandInitializer = commandInitializer;
             _commandHelpTextRenderer = commandHelpTextRenderer;
-        }
-
-        public CliApplication(ApplicationMetadata applicationMetadata, IReadOnlyList<Type> commandTypes, IConsole console)
-            : this(applicationMetadata, commandTypes,
-                console, new CommandInputParser(), new CommandSchemaResolver(),
-                new CommandFactory(), new CommandInitializer(), new CommandHelpTextRenderer(console))
-        {
-        }
-
-        public CliApplication(ApplicationMetadata applicationMetadata, IReadOnlyList<Type> commandTypes)
-            : this(applicationMetadata, commandTypes, new SystemConsole())
-        {
-        }
-
-        public CliApplication(IReadOnlyList<Type> commandTypes)
-            : this(GetDefaultApplicationMetadata(), commandTypes)
-        {
-        }
-
-        public CliApplication()
-            : this(GetDefaultCommandTypes())
-        {
         }
 
         public async Task<int> RunAsync(IReadOnlyList<string> commandLineArguments)
@@ -141,32 +116,6 @@ namespace CliFx
 
                 return ex is CommandErrorException errorException ? errorException.ExitCode : -1;
             }
-        }
-    }
-
-    public partial class CliApplication
-    {
-        private static ApplicationMetadata GetDefaultApplicationMetadata()
-        {
-            // Entry assembly is null in tests
-            var entryAssembly = Assembly.GetEntryAssembly();
-
-            var title = entryAssembly?.GetName().Name ?? "App";
-            var executableName = Path.GetFileNameWithoutExtension(entryAssembly?.Location) ?? "app";
-            var versionText = entryAssembly?.GetName().Version.ToString() ?? "1.0";
-
-            return new ApplicationMetadata(title, executableName, versionText);
-        }
-
-        private static IReadOnlyList<Type> GetDefaultCommandTypes()
-        {
-            // Entry assembly is null in tests
-            var entryAssembly = Assembly.GetEntryAssembly();
-
-            if (entryAssembly == null)
-                return Type.EmptyTypes;
-
-            return entryAssembly.ExportedTypes.Where(t => t.Implements(typeof(ICommand))).ToArray();
         }
     }
 
