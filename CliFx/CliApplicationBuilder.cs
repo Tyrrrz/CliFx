@@ -78,10 +78,10 @@ namespace CliFx
             var commandFactory = _commandFactory ?? new CommandFactory();
 
             // Project parameters to expected types
-            var applicationMetadata = new ApplicationMetadata(title, executableName, versionText);
+            var metadata = new ApplicationMetadata(title, executableName, versionText);
             var commandTypes = _commandTypes.ToArray();
 
-            return new CliApplication(applicationMetadata, commandTypes,
+            return new CliApplication(metadata, commandTypes,
                 console, new CommandInputParser(), new CommandSchemaResolver(),
                 commandFactory, new CommandInitializer(), new CommandHelpTextRenderer(console));
         }
