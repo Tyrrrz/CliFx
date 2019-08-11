@@ -2,7 +2,7 @@
 
 namespace CliFx.Exceptions
 {
-    public class CommandErrorException : Exception
+    public class CommandErrorException : CliFxException
     {
         public int ExitCode { get; }
 

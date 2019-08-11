@@ -2,7 +2,7 @@
 
 namespace CliFx.Exceptions
 {
-    public class MissingCommandOptionException : Exception
+    public class MissingCommandOptionException : CliFxException
     {
         public MissingCommandOptionException()
         {

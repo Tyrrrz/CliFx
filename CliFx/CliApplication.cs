@@ -48,12 +48,14 @@ namespace CliFx
                 // Fail if there are no commands defined
                 if (!availableCommandSchemas.Any())
                 {
-                    _console.WithColor(ConsoleColor.Red,
-                        c => c.Error.WriteLine("There are no commands defined in this application."));
+                    _console.WithColor(ConsoleColor.Red, c =>
+                    {
+                        c.Error.WriteLine("There are no commands defined in this application.");
+                    });
 
                     return -1;
                 }
-                
+
                 // Handle cases where requested command is not defined
                 if (matchingCommandSchema == null)
                 {
@@ -64,8 +66,10 @@ namespace CliFx
                     {
                         isError = true;
 
-                        _console.WithColor(ConsoleColor.Red,
-                            c => c.Error.WriteLine($"Specified command [{commandInput.CommandName}] is not defined."));
+                        _console.WithColor(ConsoleColor.Red, c =>
+                        {
+                            c.Error.WriteLine($"Specified command [{commandInput.CommandName}] is not defined.");
+                        });
                     }
 
                     // Get parent command schema
@@ -112,9 +116,15 @@ namespace CliFx
             }
             catch (Exception ex)
             {
-                _console.WithColor(ConsoleColor.Red, c => c.Error.WriteLine(ex));
+                var message = ex is CliFxException ? ex.Message : ex.ToString();
+                var exitCode = ex is CommandErrorException errorException ? errorException.ExitCode : -1;
 
-                return ex is CommandErrorException errorException ? errorException.ExitCode : -1;
+                _console.WithColor(ConsoleColor.Red, c =>
+                {
+                    c.Error.WriteLine(message);
+                });
+
+                return exitCode;
             }
         }
     }

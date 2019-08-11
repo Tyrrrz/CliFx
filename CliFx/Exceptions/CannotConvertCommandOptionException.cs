@@ -2,7 +2,7 @@
 
 namespace CliFx.Exceptions
 {
-    public class CannotConvertCommandOptionException : Exception
+    public class CannotConvertCommandOptionException : CliFxException
     {
         public CannotConvertCommandOptionException()
         {
