@@ -10,7 +10,9 @@ namespace CliFx.Internal
     {
         public static bool IsNullOrWhiteSpace(this string s) => string.IsNullOrWhiteSpace(s);
 
-        public static string AsString(this char c) => new string(c, 1);
+        public static string Repeat(this char c, int count) => new string(c, count);
+
+        public static string AsString(this char c) => c.Repeat(1);
 
         public static string JoinToString<T>(this IEnumerable<T> source, string separator) => string.Join(separator, source);
 

@@ -10,55 +10,80 @@ namespace CliFx.Services
     {
         private readonly IConsole _console;
 
+        private int _position;
+
         public CommandHelpTextRenderer(IConsole console)
         {
             _console = console;
         }
+
+        private void Render(string text)
+        {
+            _console.Output.Write(text);
+            _position += text.Length;
+        }
+
+        private void RenderNewLine()
+        {
+            _console.Output.WriteLine();
+            _position = 0;
+        }
+
+        private void RenderIndent(int depth = 2) => Render(' '.Repeat(depth));
+
+        private void Render(string text, ConsoleColor foregroundColor, ConsoleColor backgroundColor = ConsoleColor.Black) =>
+            _console.WithColor(foregroundColor, backgroundColor, c => Render(text));
 
         private void RenderDescription(CommandSchema commandSchema)
         {
             if (commandSchema.Description.IsNullOrWhiteSpace())
                 return;
 
-            _console.WithColor(ConsoleColor.Black, ConsoleColor.DarkGray, c =>
-            {
-                c.Output.WriteLine("Description");
-            });
+            // Header
+            Render("Description", ConsoleColor.Black, ConsoleColor.DarkGray);
+            RenderNewLine();
 
-            _console.Output.Write("  ");
-            _console.Output.Write(commandSchema.Description);
-            _console.Output.WriteLine();
+            // Description
+            RenderIndent();
+            Render(commandSchema.Description);
+            RenderNewLine();
 
-            _console.Output.WriteLine();
+            // Margin
+            RenderNewLine();
         }
 
-        private void RenderUsage(ApplicationMetadata applicationMetadata, CommandSchema commandSchema, bool hasChildCommands)
+        private void RenderUsage(ApplicationMetadata applicationMetadata, CommandSchema commandSchema,
+            IReadOnlyList<CommandSchema> childCommandSchemas)
         {
-            _console.WithColor(ConsoleColor.Black, ConsoleColor.DarkGray, c =>
-            {
-                c.Output.WriteLine("Usage");
-            });
+            // Header
+            Render("Usage", ConsoleColor.Black, ConsoleColor.DarkGray);
+            RenderNewLine();
 
-            _console.Output.Write("  ");
+            // Exe name
+            RenderIndent();
+            Render(applicationMetadata.ExecutableName);
 
-            _console.Output.Write(applicationMetadata.ExecutableName);
-            _console.Output.Write(' ');
-
+            // Command name
             if (!commandSchema.IsDefault())
             {
-                _console.Output.Write(commandSchema.Name);
-                _console.Output.Write(' ');
+                Render(" ");
+                Render(commandSchema.Name, ConsoleColor.Cyan);
             }
 
-            if (hasChildCommands)
+            // Child command
+            if (childCommandSchemas.Any())
             {
-                _console.Output.Write("[command]");
-                _console.Output.Write(' ');
+                Render(" ");
+                Render("[command]", ConsoleColor.Cyan);
             }
 
-            _console.Output.Write("[options]");
-            _console.Output.WriteLine();
-            _console.Output.WriteLine();
+            // Options
+            Render(" ");
+            Render("[options]", ConsoleColor.White);
+            RenderNewLine();
+
+            // Margin
+            RenderNewLine();
         }
 
         private void RenderOptions(CommandSchema commandSchema)
@@ -69,50 +94,57 @@ namespace CliFx.Services
             options.Add(new CommandOptionSchema(null, "help", 'h', null, false, "Shows help text."));
 
             if (commandSchema.IsDefault())
-                options.Add(new CommandOptionSchema(null, "version", 'v', null, false, "Shows application version."));
+                options.Add(new CommandOptionSchema(null, "version", null, null, false, "Shows application version."));
 
-            _console.WithColor(ConsoleColor.Black, ConsoleColor.DarkGray, c =>
-            {
-                c.Output.WriteLine("Options");
-            });
+            // Header
+            Render("Options", ConsoleColor.Black, ConsoleColor.DarkGray);
+            RenderNewLine();
 
+            // Options
             foreach (var option in options)
             {
-                _console.Output.Write("  ");
+                RenderIndent();
 
-                if (!option.Name.IsNullOrWhiteSpace())
-                {
-                    _console.WithColor(option.IsRequired ? ConsoleColor.White : ConsoleColor.Gray, c =>
-                    {
-                        c.Output.Write("--");
-                        c.Output.Write(option.Name);
-                    });
-                }
-
-                if (!option.Name.IsNullOrWhiteSpace() && option.ShortName != null)
-                {
-                    _console.Output.Write('|');
-                }
-
+                // Short name
                 if (option.ShortName != null)
                 {
-                    _console.WithColor(option.IsRequired ? ConsoleColor.White: ConsoleColor.Gray, c =>
-                    {
-                        c.Output.Write('-');
-                        c.Output.Write(option.ShortName);
-                    });
+                    Render($"-{option.ShortName}", ConsoleColor.White);
                 }
 
+                // Delimiter
+                if (!option.Name.IsNullOrWhiteSpace() && option.ShortName != null)
+                {
+                    Render("|");
+                }
+
+                // Name
+                if (!option.Name.IsNullOrWhiteSpace())
+                {
+                    Render($"--{option.Name}", ConsoleColor.White);
+                }
+
+                // Description
                 if (!option.Description.IsNullOrWhiteSpace())
                 {
-                    _console.Output.Write("    ");
-                    _console.Output.Write(option.Description);
+                    const int threshold = 20;
+
+                    if (_position >= threshold)
+                    {
+                        RenderNewLine();
+                        RenderIndent(threshold);
+                    }
+                    else
+                    {
+                        RenderIndent(threshold - _position);
+                    }
+
+                    Render(option.Description);
                 }
 
-                _console.Output.WriteLine();
+                RenderNewLine();
             }
 
-            _console.Output.WriteLine();
+            RenderNewLine();
         }
 
         private void RenderChildCommands(ApplicationMetadata applicationMetadata, CommandSchema commandSchema,
@@ -121,44 +153,62 @@ namespace CliFx.Services
             if (!childCommandSchemas.Any())
                 return;
 
-            _console.WithColor(ConsoleColor.Black, ConsoleColor.DarkGray, c =>
-            {
-                c.Output.WriteLine("Commands");
-            });
+            // Header
+            Render("Commands", ConsoleColor.Black, ConsoleColor.DarkGray);
+            RenderNewLine();
 
+            // Child commands
             foreach (var childCommandSchema in childCommandSchemas)
             {
-                _console.Output.Write("  ");
+                var relativeCommandName = GetRelativeCommandName(childCommandSchema, commandSchema);
 
-                _console.Output.Write(GetRelativeCommandName(childCommandSchema, commandSchema));
+                // Name
+                RenderIndent();
+                Render(relativeCommandName, ConsoleColor.Cyan);
 
+                // Description
                 if (!childCommandSchema.Description.IsNullOrWhiteSpace())
                 {
-                    _console.Output.Write("    ");
-                    _console.Output.Write(childCommandSchema.Description);
+                    const int threshold = 20;
+
+                    if (_position >= threshold)
+                    {
+                        RenderNewLine();
+                        RenderIndent(threshold);
+                    }
+                    else
+                    {
+                        RenderIndent(threshold - _position);
+                    }
+
+                    Render(childCommandSchema.Description);
                 }
 
-                _console.Output.WriteLine();
+                RenderNewLine();
             }
 
-            _console.Output.WriteLine();
+            // Margin
+            RenderNewLine();
 
             // Child command help tip
-
-            _console.Output.Write("You can run `");
-
-            _console.Output.Write(applicationMetadata.ExecutableName);
-            _console.Output.Write(' ');
+            Render("You can run `");
+            Render(applicationMetadata.ExecutableName);
 
             if (!commandSchema.IsDefault())
             {
-                _console.Output.Write(commandSchema.Name);
-                _console.Output.Write(' ');
+                Render(" ");
+                Render(commandSchema.Name, ConsoleColor.Cyan);
             }
 
-            _console.Output.Write("[command] --help` to show help on a specific command.");
+            Render(" ");
+            Render("[command]", ConsoleColor.Cyan);
 
-            _console.Output.WriteLine();
+            Render(" ");
+            Render("--help", ConsoleColor.White);
+
+            Render("` to show help on a specific command.");
+
+            RenderNewLine();
         }
 
         public void RenderHelpText(ApplicationMetadata applicationMetadata,
@@ -171,15 +221,13 @@ namespace CliFx.Services
             // Render application info
             if (matchingCommandSchema.IsDefault())
             {
-                _console.Output.Write(applicationMetadata.Title);
-                _console.Output.Write(" v");
-                _console.Output.Write(applicationMetadata.VersionText);
-                _console.Output.WriteLine();
-                _console.Output.WriteLine();
+                Render($"{applicationMetadata.Title} v{applicationMetadata.VersionText}", ConsoleColor.Yellow);
+                RenderNewLine();
+                RenderNewLine();
             }
 
             RenderDescription(matchingCommandSchema);
-            RenderUsage(applicationMetadata, matchingCommandSchema, childCommandSchemas.Any());
+            RenderUsage(applicationMetadata, matchingCommandSchema, childCommandSchemas);
             RenderOptions(matchingCommandSchema);
             RenderChildCommands(applicationMetadata, matchingCommandSchema, childCommandSchemas);
         }
