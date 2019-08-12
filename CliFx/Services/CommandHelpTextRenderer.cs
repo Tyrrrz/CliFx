@@ -29,10 +29,10 @@ namespace CliFx.Services
             _position = 0;
         }
 
-        private void RenderIndent(int depth = 2) => Render(' '.Repeat(depth));
+        private void RenderIndent(int spaces = 2) => Render(' '.Repeat(spaces));
 
         private void Render(string text, ConsoleColor foregroundColor, ConsoleColor backgroundColor = ConsoleColor.Black) =>
-            _console.WithColor(foregroundColor, backgroundColor, c => Render(text));
+            _console.WithColor(foregroundColor, backgroundColor, () => Render(text));
 
         private void RenderDescription(CommandSchema commandSchema)
         {
