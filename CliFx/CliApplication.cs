@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CliFx.Attributes;
 using CliFx.Exceptions;
+using CliFx.Internal;
 using CliFx.Models;
 using CliFx.Services;
 
@@ -36,6 +37,67 @@ namespace CliFx
             _commandHelpTextRenderer = commandHelpTextRenderer;
         }
 
+        private IReadOnlyList<string> GetAvailableCommandSchemasValidationErrors(IReadOnlyList<CommandSchema> availableCommandSchemas)
+        {
+            var result = new List<string>();
+
+            // Fail if there are no commands defined
+            if (!availableCommandSchemas.Any())
+            {
+                result.Add("There are no commands defined in this application.");
+            }
+
+            // Fail if there are multiple commands with the same name
+            var nonUniqueCommandNames = availableCommandSchemas
+                .Select(c => c.Name?.Trim())
+                .GroupBy(i => i, StringComparer.OrdinalIgnoreCase)
+                .Where(g => g.Count() >= 2)
+                .SelectMany(g => g)
+                .Distinct()
+                .ToArray();
+
+            foreach (var commandName in nonUniqueCommandNames)
+            {
+                result.Add($"There are multiple commands defined with name [{commandName}].");
+            }
+
+            // Fail if there are multiple options with the same name inside the same command
+            foreach (var commandSchema in availableCommandSchemas)
+            {
+                var nonUniqueOptionNames = commandSchema.Options
+                    .Where(o => !o.Name.IsNullOrWhiteSpace())
+                    .Select(o => o.Name)
+                    .GroupBy(i => i, StringComparer.OrdinalIgnoreCase)
+                    .Where(g => g.Count() >= 2)
+                    .SelectMany(g => g)
+                    .Distinct()
+                    .ToArray();
+
+                foreach (var optionName in nonUniqueOptionNames)
+                {
+                    result.Add(
+                        $"There are multiple options defined with name [{optionName}] for command [{commandSchema.Name}].");
+                }
+
+                var nonUniqueOptionShortNames = commandSchema.Options
+                    .Where(o => o.ShortName != null)
+                    .Select(o => o.ShortName.Value)
+                    .GroupBy(i => i)
+                    .Where(g => g.Count() >= 2)
+                    .SelectMany(g => g)
+                    .Distinct()
+                    .ToArray();
+
+                foreach (var optionShortName in nonUniqueOptionShortNames)
+                {
+                    result.Add(
+                        $"There are multiple options defined with short name [{optionShortName}] for command [{commandSchema.Name}].");
+                }
+            }
+
+            return result;
+        }
+
         public async Task<int> RunAsync(IReadOnlyList<string> commandLineArguments)
         {
             try
@@ -45,11 +107,12 @@ namespace CliFx
                 var availableCommandSchemas = _commandSchemaResolver.GetCommandSchemas(_commandTypes);
                 var matchingCommandSchema = availableCommandSchemas.FindByName(commandInput.CommandName);
 
-                // Fail if there are no commands defined
-                if (!availableCommandSchemas.Any())
+                // Validate available command schemas
+                var validationErrors = GetAvailableCommandSchemasValidationErrors(availableCommandSchemas);
+                if (validationErrors.Any())
                 {
-                    _console.WithForegroundColor(ConsoleColor.Red,
-                        () => _console.Error.WriteLine("There are no commands defined in this application."));
+                    foreach (var error in validationErrors)
+                        _console.WithForegroundColor(ConsoleColor.Red, () => _console.Output.WriteLine(error));
 
                     return -1;
                 }
