@@ -9,6 +9,9 @@ using CliFx.Services;
 
 namespace CliFx
 {
+    /// <summary>
+    /// Default implementation of <see cref="ICliApplicationBuilder"/>.
+    /// </summary>
     public class CliApplicationBuilder : ICliApplicationBuilder
     {
         private readonly HashSet<Type> _commandTypes = new HashSet<Type>();
@@ -19,12 +22,14 @@ namespace CliFx
         private IConsole _console;
         private ICommandFactory _commandFactory;
 
+        /// <inheritdoc />
         public ICliApplicationBuilder WithCommand(Type commandType)
         {
             _commandTypes.Add(commandType);
             return this;
         }
 
+        /// <inheritdoc />
         public ICliApplicationBuilder WithCommandsFrom(Assembly commandAssembly)
         {
             var commandTypes = commandAssembly.ExportedTypes.Where(t => t.Implements(typeof(ICommand)));
@@ -35,30 +40,35 @@ namespace CliFx
             return this;
         }
 
+        /// <inheritdoc />
         public ICliApplicationBuilder UseTitle(string title)
         {
             _title = title;
             return this;
         }
 
-        public ICliApplicationBuilder UseExecutableName(string exeName)
+        /// <inheritdoc />
+        public ICliApplicationBuilder UseExecutableName(string executableName)
         {
-            _executableName = exeName;
+            _executableName = executableName;
             return this;
         }
 
+        /// <inheritdoc />
         public ICliApplicationBuilder UseVersionText(string version)
         {
             _versionText = version;
             return this;
         }
 
+        /// <inheritdoc />
         public ICliApplicationBuilder UseConsole(IConsole console)
         {
             _console = console;
             return this;
         }
 
+        /// <inheritdoc />
         public ICliApplicationBuilder UseCommandFactory(ICommandFactory factory)
         {
             _commandFactory = factory;
@@ -86,6 +96,7 @@ namespace CliFx
                 UseCommandFactory(new CommandFactory());
         }
 
+        /// <inheritdoc />
         public ICliApplication Build()
         {
             // Use defaults for required parameters that were not configured

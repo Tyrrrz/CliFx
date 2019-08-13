@@ -10,6 +10,9 @@ using CliFx.Services;
 
 namespace CliFx
 {
+    /// <summary>
+    /// Default implementation of <see cref="ICliApplication"/>.
+    /// </summary>
     public partial class CliApplication : ICliApplication
     {
         private readonly ApplicationMetadata _applicationMetadata;
@@ -22,6 +25,9 @@ namespace CliFx
         private readonly ICommandInitializer _commandInitializer;
         private readonly ICommandHelpTextRenderer _commandHelpTextRenderer;
 
+        /// <summary>
+        /// Initializes an instance of <see cref="CliApplication"/>.
+        /// </summary>
         public CliApplication(ApplicationMetadata applicationMetadata, IReadOnlyList<Type> commandTypes,
             IConsole console, ICommandInputParser commandInputParser, ICommandSchemaResolver commandSchemaResolver,
             ICommandFactory commandFactory, ICommandInitializer commandInitializer, ICommandHelpTextRenderer commandHelpTextRenderer)
@@ -98,6 +104,7 @@ namespace CliFx
             return result;
         }
 
+        /// <inheritdoc />
         public async Task<int> RunAsync(IReadOnlyList<string> commandLineArguments)
         {
             try

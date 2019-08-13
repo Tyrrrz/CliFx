@@ -5,16 +5,34 @@ using CliFx.Internal;
 
 namespace CliFx.Models
 {
+    /// <summary>
+    /// Schema of a defined command.
+    /// </summary>
     public class CommandSchema
     {
+        /// <summary>
+        /// Underlying type.
+        /// </summary>
         public Type Type { get; }
 
+        /// <summary>
+        /// Command name.
+        /// </summary>
         public string Name { get; }
 
+        /// <summary>
+        /// Command description.
+        /// </summary>
         public string Description { get; }
 
+        /// <summary>
+        /// Command options.
+        /// </summary>
         public IReadOnlyList<CommandOptionSchema> Options { get; }
 
+        /// <summary>
+        /// Initializes an instance of <see cref="CommandSchema"/>.
+        /// </summary>
         public CommandSchema(Type type, string name, string description, IReadOnlyList<CommandOptionSchema> options)
         {
             Type = type;
@@ -23,6 +41,7 @@ namespace CliFx.Models
             Options = options;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             var buffer = new StringBuilder();

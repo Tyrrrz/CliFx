@@ -6,9 +6,13 @@ using CliFx.Models;
 
 namespace CliFx.Services
 {
+    /// <summary>
+    /// Default implementation of <see cref="ICommandInputParser"/>.
+    /// </summary>
     public class CommandInputParser : ICommandInputParser
     {
         // TODO: refactor
+        /// <inheritdoc />
         public CommandInput ParseInput(IReadOnlyList<string> commandLineArguments)
         {
             // Initialize command name placeholder

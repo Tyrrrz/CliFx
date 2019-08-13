@@ -7,20 +7,30 @@ using CliFx.Models;
 
 namespace CliFx.Services
 {
+    /// <summary>
+    /// Default implementation of <see cref="ICommandInitializer"/>.
+    /// </summary>
     public class CommandInitializer : ICommandInitializer
     {
         private readonly ICommandOptionInputConverter _commandOptionInputConverter;
 
+        /// <summary>
+        /// Initializes an instance of <see cref="CommandInitializer"/>.
+        /// </summary>
         public CommandInitializer(ICommandOptionInputConverter commandOptionInputConverter)
         {
             _commandOptionInputConverter = commandOptionInputConverter;
         }
 
+        /// <summary>
+        /// Initializes an instance of <see cref="CommandInitializer"/>.
+        /// </summary>
         public CommandInitializer()
             : this(new CommandOptionInputConverter())
         {
         }
 
+        /// <inheritdoc />
         public void InitializeCommand(ICommand command, CommandSchema schema, CommandInput input)
         {
             // Set command options

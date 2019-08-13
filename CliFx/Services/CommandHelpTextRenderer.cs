@@ -6,8 +6,12 @@ using CliFx.Models;
 
 namespace CliFx.Services
 {
+    /// <summary>
+    /// Default implementation of <see cref="ICommandHelpTextRenderer"/>.
+    /// </summary>
     public partial class CommandHelpTextRenderer : ICommandHelpTextRenderer
     {
+        /// <inheritdoc />
         public void RenderHelpText(IConsole console, HelpTextSource source) => new Impl(console, source).RenderHelpText();
     }
 

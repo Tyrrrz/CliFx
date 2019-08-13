@@ -5,10 +5,19 @@ using CliFx.Internal;
 
 namespace CliFx.Models
 {
+    /// <summary>
+    /// Extensions for <see cref="Models"/>.
+    /// </summary>
     public static class Extensions
     {
+        /// <summary>
+        /// Gets whether a command was specified in the input.
+        /// </summary>
         public static bool IsCommandSpecified(this CommandInput commandInput) => !commandInput.CommandName.IsNullOrWhiteSpace();
 
+        /// <summary>
+        /// Gets whether help was requested in the input.
+        /// </summary>
         public static bool IsHelpRequested(this CommandInput commandInput)
         {
             var firstOptionAlias = commandInput.Options.FirstOrDefault()?.Alias;
@@ -18,6 +27,9 @@ namespace CliFx.Models
                    string.Equals(firstOptionAlias, "?", StringComparison.Ordinal);
         }
 
+        /// <summary>
+        /// Gets whether version information was requested in the input.
+        /// </summary>
         public static bool IsVersionRequested(this CommandInput commandInput)
         {
             var firstOptionAlias = commandInput.Options.FirstOrDefault()?.Alias;
@@ -25,11 +37,20 @@ namespace CliFx.Models
             return string.Equals(firstOptionAlias, "version", StringComparison.OrdinalIgnoreCase);
         }
 
+        /// <summary>
+        /// Gets whether this command is the default command, i.e. without a name.
+        /// </summary>
         public static bool IsDefault(this CommandSchema commandSchema) => commandSchema.Name.IsNullOrWhiteSpace();
 
+        /// <summary>
+        /// Finds a command that has specified name, or null if not found.
+        /// </summary>
         public static CommandSchema FindByName(this IReadOnlyList<CommandSchema> commandSchemas, string commandName) =>
             commandSchemas.FirstOrDefault(c => string.Equals(c.Name, commandName, StringComparison.OrdinalIgnoreCase));
 
+        /// <summary>
+        /// Finds parent command to the command that has specified name, or null if not found.
+        /// </summary>
         public static CommandSchema FindParent(this IReadOnlyList<CommandSchema> commandSchemas, string commandName)
         {
             // If command has no name, it's the default command so it doesn't have a parent
@@ -51,6 +72,9 @@ namespace CliFx.Models
             return commandSchemas.FirstOrDefault(c => c.IsDefault());
         }
 
+        /// <summary>
+        /// Finds an option that matches specified alias, or null if not found.
+        /// </summary>
         public static CommandOptionSchema FindByAlias(this IReadOnlyList<CommandOptionSchema> optionSchemas, string alias)
         {
             foreach (var optionSchema in optionSchemas)

@@ -7,6 +7,9 @@ using CliFx.Models;
 
 namespace CliFx.Services
 {
+    /// <summary>
+    /// Default implementation of <see cref="ICommandSchemaResolver"/>.
+    /// </summary>
     public class CommandSchemaResolver : ICommandSchemaResolver
     {
         private CommandOptionSchema GetCommandOptionSchema(PropertyInfo optionProperty)
@@ -24,7 +27,7 @@ namespace CliFx.Services
                 attribute.Description);
         }
 
-        // TODO: validate stuff like duplicate names, multiple default commands, etc
+        /// <inheritdoc />
         public CommandSchema GetCommandSchema(Type commandType)
         {
             if (!commandType.Implements(typeof(ICommand)))

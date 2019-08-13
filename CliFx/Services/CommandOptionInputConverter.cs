@@ -8,15 +8,24 @@ using CliFx.Models;
 
 namespace CliFx.Services
 {
+    /// <summary>
+    /// Default implementation of <see cref="ICommandOptionInputConverter"/>.
+    /// </summary>
     public class CommandOptionInputConverter : ICommandOptionInputConverter
     {
         private readonly IFormatProvider _formatProvider;
 
+        /// <summary>
+        /// Initializes an instance of <see cref="CommandOptionInputConverter"/>.
+        /// </summary>
         public CommandOptionInputConverter(IFormatProvider formatProvider)
         {
             _formatProvider = formatProvider;
         }
 
+        /// <summary>
+        /// Initializes an instance of <see cref="CommandOptionInputConverter"/>.
+        /// </summary>
         public CommandOptionInputConverter()
             : this(CultureInfo.InvariantCulture)
         {
@@ -232,6 +241,7 @@ namespace CliFx.Services
         }
 
         // TODO: refactor this
+        /// <inheritdoc />
         public object ConvertOption(CommandOptionInput option, Type targetType)
         {
             if (targetType != typeof(string) && targetType.IsEnumerable())
