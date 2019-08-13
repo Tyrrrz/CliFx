@@ -79,7 +79,8 @@ namespace CliFx
                     }
 
                     // Show help
-                    _commandHelpTextRenderer.RenderHelpText(_applicationMetadata, availableCommandSchemas, parentCommandSchema);
+                    var helpTextSource = new HelpTextSource(_applicationMetadata, availableCommandSchemas, parentCommandSchema);
+                    _commandHelpTextRenderer.RenderHelpText(_console, helpTextSource);
 
                     return isError ? -1 : 0;
                 }
@@ -95,7 +96,8 @@ namespace CliFx
                 // Show help if it was requested
                 if (commandInput.IsHelpRequested())
                 {
-                    _commandHelpTextRenderer.RenderHelpText(_applicationMetadata, availableCommandSchemas, matchingCommandSchema);
+                    var helpTextSource = new HelpTextSource(_applicationMetadata, availableCommandSchemas, matchingCommandSchema);
+                    _commandHelpTextRenderer.RenderHelpText(_console, helpTextSource);
 
                     return 0;
                 }

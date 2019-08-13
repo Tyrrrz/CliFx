@@ -83,7 +83,7 @@ namespace CliFx
 
             return new CliApplication(metadata, commandTypes,
                 console, new CommandInputParser(), new CommandSchemaResolver(),
-                commandFactory, new CommandInitializer(), new CommandHelpTextRenderer(console));
+                commandFactory, new CommandInitializer(), new CommandHelpTextRenderer());
         }
     }
 }
