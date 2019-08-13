@@ -11,24 +11,27 @@ namespace CliFx.Services
             IReadOnlyList<Type> commandTypes) =>
             commandTypes.Select(resolver.GetCommandSchema).ToArray();
 
-        public static void WithColor(this IConsole console, ConsoleColor foregroundColor, Action action)
+        public static void WithForegroundColor(this IConsole console, ConsoleColor foregroundColor, Action action)
         {
-            var lastForegroundColor = console.ForegroundColor;
+            var lastColor = console.ForegroundColor;
             console.ForegroundColor = foregroundColor;
 
             action();
 
-            console.ForegroundColor = lastForegroundColor;
+            console.ForegroundColor = lastColor;
         }
 
-        public static void WithColor(this IConsole console, ConsoleColor foregroundColor, ConsoleColor backgroundColor, Action action)
+        public static void WithBackgroundColor(this IConsole console, ConsoleColor backgroundColor, Action action)
         {
-            var lastBackgroundColor = console.BackgroundColor;
+            var lastColor = console.BackgroundColor;
             console.BackgroundColor = backgroundColor;
 
-            console.WithColor(foregroundColor, action);
+            action();
 
-            console.BackgroundColor = lastBackgroundColor;
+            console.BackgroundColor = lastColor;
         }
+
+        public static void WithColors(this IConsole console, ConsoleColor foregroundColor, ConsoleColor backgroundColor, Action action) =>
+            console.WithForegroundColor(foregroundColor, () => console.WithBackgroundColor(backgroundColor, action));
     }
 }

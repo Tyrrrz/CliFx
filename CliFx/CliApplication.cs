@@ -48,7 +48,7 @@ namespace CliFx
                 // Fail if there are no commands defined
                 if (!availableCommandSchemas.Any())
                 {
-                    _console.WithColor(ConsoleColor.Red,
+                    _console.WithForegroundColor(ConsoleColor.Red,
                         () => _console.Error.WriteLine("There are no commands defined in this application."));
 
                     return -1;
@@ -64,7 +64,7 @@ namespace CliFx
                     {
                         isError = true;
 
-                        _console.WithColor(ConsoleColor.Red,
+                        _console.WithForegroundColor(ConsoleColor.Red,
                             () => _console.Error.WriteLine($"Specified command [{commandInput.CommandName}] is not defined."));
                     }
 
@@ -115,7 +115,7 @@ namespace CliFx
                 var message = ex is CliFxException ? ex.Message : ex.ToString();
                 var exitCode = ex is CommandErrorException errorException ? errorException.ExitCode : -1;
 
-                _console.WithColor(ConsoleColor.Red, () => _console.Error.WriteLine(message));
+                _console.WithForegroundColor(ConsoleColor.Red, () => _console.Error.WriteLine(message));
 
                 return exitCode;
             }
