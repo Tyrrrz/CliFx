@@ -65,25 +65,39 @@ namespace CliFx
             return this;
         }
 
-        public ICliApplication Build()
+        private void SetFallbackValues()
         {
             // Entry assembly is null in tests
             var entryAssembly = Assembly.GetEntryAssembly();
 
+            if (_title.IsNullOrWhiteSpace())
+                UseTitle(entryAssembly?.GetName().Name ?? "App");
+
+            if (_executableName.IsNullOrWhiteSpace())
+                UseExecutableName(Path.GetFileNameWithoutExtension(entryAssembly?.Location) ?? "app");
+
+            if (_versionText.IsNullOrWhiteSpace())
+                UseVersionText(entryAssembly?.GetName().Version.ToString() ?? "1.0");
+
+            if (_console == null)
+                UseConsole(new SystemConsole());
+
+            if (_commandFactory == null)
+                UseCommandFactory(new CommandFactory());
+        }
+
+        public ICliApplication Build()
+        {
             // Use defaults for required parameters that were not configured
-            var title = _title ?? entryAssembly?.GetName().Name ?? "App";
-            var executableName = _executableName ?? Path.GetFileNameWithoutExtension(entryAssembly?.Location) ?? "app";
-            var versionText = _versionText ?? entryAssembly?.GetName().Version.ToString() ?? "1.0";
-            var console = _console ?? new SystemConsole();
-            var commandFactory = _commandFactory ?? new CommandFactory();
+            SetFallbackValues();
 
             // Project parameters to expected types
-            var metadata = new ApplicationMetadata(title, executableName, versionText);
+            var metadata = new ApplicationMetadata(_title, _executableName, _versionText);
             var commandTypes = _commandTypes.ToArray();
 
             return new CliApplication(metadata, commandTypes,
-                console, new CommandInputParser(), new CommandSchemaResolver(),
-                commandFactory, new CommandInitializer(), new CommandHelpTextRenderer());
+                _console, new CommandInputParser(), new CommandSchemaResolver(),
+                _commandFactory, new CommandInitializer(), new CommandHelpTextRenderer());
         }
     }
 }
