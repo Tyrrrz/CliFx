@@ -14,8 +14,8 @@ namespace CliFx.Models
             var firstOptionAlias = commandInput.Options.FirstOrDefault()?.Alias;
 
             return string.Equals(firstOptionAlias, "help", StringComparison.OrdinalIgnoreCase) ||
-                   string.Equals(firstOptionAlias, "h", StringComparison.OrdinalIgnoreCase) ||
-                   string.Equals(firstOptionAlias, "?", StringComparison.OrdinalIgnoreCase);
+                   string.Equals(firstOptionAlias, "h", StringComparison.Ordinal) ||
+                   string.Equals(firstOptionAlias, "?", StringComparison.Ordinal);
         }
 
         public static bool IsVersionRequested(this CommandInput commandInput)
@@ -55,13 +55,16 @@ namespace CliFx.Models
         {
             foreach (var optionSchema in optionSchemas)
             {
+                // Compare against name. Case is ignored.
                 var matchesByName =
                     !optionSchema.Name.IsNullOrWhiteSpace() &&
                     string.Equals(optionSchema.Name, alias, StringComparison.OrdinalIgnoreCase);
 
+                // Compare against short name. Case is NOT ignored.
                 var matchesByShortName =
                     optionSchema.ShortName != null &&
-                    string.Equals(optionSchema.ShortName.Value.AsString(), alias, StringComparison.OrdinalIgnoreCase);
+                    alias.Length == 1 &&
+                    alias[0] == optionSchema.ShortName;
 
                 if (matchesByName || matchesByShortName)
                     return optionSchema;
