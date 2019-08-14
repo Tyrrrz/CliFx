@@ -25,7 +25,9 @@ CliFx is a powerful framework for building command line applications.
 
 ### Configuring application
 
-To turn your application into a command line interface, you need to change your program's `Main` method so that it delegates execution to `CliApplication`.
+To turn your application into a command line interface you need to change your program's `Main` method so that it delegates execution to `CliApplication`.
+
+The following code will create and run default `CliApplication` that will resolve commands defined in the calling assembly. Using fluent interface provided by `CliApplicationBuilder` you can easily configure different aspects of your application.
 
 ```c#
 public static class Program
@@ -38,16 +40,16 @@ public static class Program
 }
 ```
 
-The above code will create and run a default `CliApplication` that will resolve commands defined in the calling assembly.
-If you want to configure different aspects of your application, you can use the fluent interface provided by the `CliApplicationBuilder`.
-
 ### Defining a command
 
-To define a command, you need to create a class that implements `ICommand` and decorate it with a `Command` attribute.
-To define options, the corresponding properties need to be decorated with a `CommandOption` attribute.
+In order to add functionality to your application you need to define commands. Commands are essentially entry points for the user to interact with your application. You can think of them as something similar to controllers in ASP.NET Core applications.
+
+In CliFx you define a command by making a new class that implements `ICommand` and annotating it with `CommandAttribute`. To specify properties that will be set from command line you need to annotate them with `CommandOptionAttribute`.
+
+Here's an example command that calculates logarithm. It has a name (`"log"`) which the user can specify to invoke it and it also contains two options, the source value (`"value"`/`'v'`) and logarithm base (`"base"`/`'b'`).
 
 ```c#
-[Command("log", Description = "Calculates the logarithm of a value.")]
+[Command("log", Description = "Calculate the logarithm of a value.")]
 public class LogCommand : ICommand
 {
     [CommandOption("value", 'v', IsRequired = true, Description = "Value whose logarithm is to be found.")]
@@ -66,13 +68,9 @@ public class LogCommand : ICommand
 }
 ```
 
-Commands may or may not have a name (which is `"log"` in this case). Command that doesn't have a name is the default command, which is executed when the user doesn't specify a command. If your application doesn't define a default command, a stub will be provided at runtime automatically by CliFx.
+By implementing `ICommand` this class also provides `ExecuteAsync` method. This is the method that gets called when the user invokes the command. Its return type is `Task` in order to facilitate asynchronous execution, but if your command runs synchronously you can simply return `Task.CompletedTask`.
 
-Commands usually also have options, each with a name (`"value"`, `"base"`), a short name (`'v'`, `'b'`), or both. Properties marked with `CommandOption` attribute need to be public and have an accessible setter. If you want to set a default value for an option, simply set the default value for the corresponding property.
-
-By implementing `ICommand`, you're required to provide an `ExecuteAsync` method. This is the method that will be called when the command is invoked. Its return type is `Task` in order to facilitate asynchronous execution, but if your command runs synchronously you can simply return `Task.CompletedTask` at the end.
-
-When interacting with the console, the command is expected to use the `IConsole` instance provided as a parameter to `ExecuteAsync` instead of using `System.Console`. This makes testing easier because you will be able to substitute or mock `IConsole` in your tests.
+The `ExecuteAsync` method also takes an instance of `IConsole` as a parameter. You should use this abstraction to interact with the console instead of calling `System.Console` so that your commands are testable.
 
 Finally, the command defined above can be executed from the command line in one of the following ways:
 
@@ -83,7 +81,8 @@ Finally, the command defined above can be executed from the command line in one 
 ### Dependency injection
 
 CliFx uses an implementation of `ICommandFactory` to initialize commands and by default it only works with types that have parameterless constructors.
-In real-life scenarios your commands will most likely have dependencies which need to be injected. CliFx makes it really easy to plug in any dependency container of your choice.
+
+In real-life scenarios your commands will most likely have dependencies that need to be injected. CliFx doesn't have its own dependency container but it's really easy to set it up to use any 3rd party dependency container of your choice.
 
 For example, here is how you would configure your application to use [`Microsoft.Extensions.DependencyInjection`](https://nuget.org/packages/Microsoft.Extensions.DependencyInjection/) (aka the built-in dependency container in ASP.NET Core).
 
@@ -111,15 +110,15 @@ public static class Program
 }
 ```
 
-### Resolve specific commands or commands from other assemblies
+### Resolve commands from other assemblies
 
-In most cases, your commands will probably be defined in your main assembly, which is where CliFx will look if you initialize the application using the following code.
+In most cases, your commands will be defined in your main assembly which is where CliFx will look if you initialize the application using the following code.
 
 ```c#
 var app = new CliApplicationBuilder().WithCommandsFromThisAssembly().Build();
 ```
 
-If you want to resolve specific commands or commands from another assembly you can use `WithCommand` and `WithCommandsFrom` methods to do that.
+If you want to configure your application to resolve specific commands or commands from another assembly you can use `WithCommand` and `WithCommandsFrom` methods for that.
 
 ```c#
 var app = new CliApplicationBuilder()
@@ -155,11 +154,13 @@ public class SecondSubCommand : ICommand
 }
 ```
 
+If your application doesn't define a default command (i.e. command with no name), CliFx will provide a stub so that all your commands have a root command.
+
 ### Reporting errors
 
-You may have noticed that commands in CliFx don't return exit codes. This is by design, exit codes are handled by `CliApplication`, not by individual commands.
+You may have noticed that commands in CliFx don't return exit codes. This is by design as exit codes are handled by `CliApplication`, not by individual commands.
 
-Commands can report execution failure simply by throwing an exception, just like in any other C# code. The exit code will be automatically set to a non-zero value to indicate failure to the calling process.
+Commands can report execution failure simply by throwing exceptions just like any other C# code. When an exception is thrown, `CliApplication` will catch it, print the error, and return a non-zero exit code to the calling process.
 
 If you want to communicate a specific error through exit code, you can throw an instance of `CommandErrorException` which takes exit code as a constructor parameter.
 
@@ -177,8 +178,8 @@ public class DivideCommand : ICommand
     {
         if (Math.Abs(Divisor) < double.Epsilon)
         {
-            // Exit code will be 1337
-            throw new CommandErrorException(1337, "Division by zero is not supported");
+            // This will print the error and set exit code to 1337
+            throw new CommandErrorException(1337, "Division by zero is not supported.");
         }
 
         var result = Dividend / Divisor;
@@ -191,11 +192,11 @@ public class DivideCommand : ICommand
 
 ### Testing
 
-Testing of commands is enabled by the `IConsole` interface.
+CliFx makes it really easy to test your commands thanks to the `IConsole` interface.
 
-The easiest way to substitute custom stdin, stdout, stderr is by using an instance of `TestConsole` class. It has multiple constructor overloads allowing you to specify the exact set of streams that you want. Streams that are not provided are treated as empty, i.e. `TestConsole` doesn't leak to `System.Console` in any way.
+When writing tests, you can use `TestConsole` which lets you provide your own streams in place of your application's stdin, stdout and stderr. It has multiple constructor overloads allowing you to specify the exact set of streams that you want. Streams that are not provided are treated as empty, i.e. `TestConsole` doesn't leak to `System.Console` in any way.
 
-Let's assume you have a simple command such as this one.
+Let's assume you want to test a simple command such as this one.
 
 ```c#
 [Command]
