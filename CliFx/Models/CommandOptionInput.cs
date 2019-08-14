@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text;
+using CliFx.Internal;
 
 namespace CliFx.Models
 {
@@ -23,8 +24,8 @@ namespace CliFx.Models
         /// </summary>
         public CommandOptionInput(string alias, IReadOnlyList<string> values)
         {
-            Alias = alias;
-            Values = values;
+            Alias = alias.GuardNotNull(nameof(alias));
+            Values = values.GuardNotNull(nameof(values));
         }
 
         /// <summary>

@@ -45,12 +45,12 @@ namespace CliFx.Models
         public CommandOptionSchema(PropertyInfo property, string name, char? shortName,
             string groupName, bool isRequired, string description)
         {
-            Property = property;
-            Name = name;
-            ShortName = shortName;
+            Property = property; // can be null
+            Name = name; // can be null
+            ShortName = shortName; // can be null
             IsRequired = isRequired;
-            GroupName = groupName;
-            Description = description;
+            GroupName = groupName; // can be null
+            Description = description; // can be null
         }
 
         /// <inheritdoc />

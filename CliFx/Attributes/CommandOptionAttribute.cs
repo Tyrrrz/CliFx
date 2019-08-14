@@ -38,8 +38,8 @@ namespace CliFx.Attributes
         /// </summary>
         public CommandOptionAttribute(string name, char? shortName)
         {
-            Name = name;
-            ShortName = shortName;
+            Name = name; // can be null
+            ShortName = shortName; // can be null
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
 ﻿using System;
+using CliFx.Internal;
 
 namespace CliFx.Exceptions
 {
@@ -19,7 +20,7 @@ namespace CliFx.Exceptions
         public CommandErrorException(int exitCode, string message, Exception innerException)
             : base(message, innerException)
         {
-            ExitCode = exitCode;
+            ExitCode = exitCode.GuardNotZero(nameof(exitCode));
         }
 
         /// <summary>

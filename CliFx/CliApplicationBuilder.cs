@@ -25,13 +25,18 @@ namespace CliFx
         /// <inheritdoc />
         public ICliApplicationBuilder WithCommand(Type commandType)
         {
+            commandType.GuardNotNull(nameof(commandType));
+
             _commandTypes.Add(commandType);
+
             return this;
         }
 
         /// <inheritdoc />
         public ICliApplicationBuilder WithCommandsFrom(Assembly commandAssembly)
         {
+            commandAssembly.GuardNotNull(nameof(commandAssembly));
+
             var commandTypes = commandAssembly.ExportedTypes.Where(t => t.Implements(typeof(ICommand)));
 
             foreach (var commandType in commandTypes)
@@ -43,35 +48,35 @@ namespace CliFx
         /// <inheritdoc />
         public ICliApplicationBuilder UseTitle(string title)
         {
-            _title = title;
+            _title = title.GuardNotNull(nameof(title));
             return this;
         }
 
         /// <inheritdoc />
         public ICliApplicationBuilder UseExecutableName(string executableName)
         {
-            _executableName = executableName;
+            _executableName = executableName.GuardNotNull(nameof(executableName));
             return this;
         }
 
         /// <inheritdoc />
-        public ICliApplicationBuilder UseVersionText(string version)
+        public ICliApplicationBuilder UseVersionText(string versionText)
         {
-            _versionText = version;
+            _versionText = versionText.GuardNotNull(nameof(versionText));
             return this;
         }
 
         /// <inheritdoc />
         public ICliApplicationBuilder UseConsole(IConsole console)
         {
-            _console = console;
+            _console = console.GuardNotNull(nameof(console));
             return this;
         }
 
         /// <inheritdoc />
         public ICliApplicationBuilder UseCommandFactory(ICommandFactory factory)
         {
-            _commandFactory = factory;
+            _commandFactory = factory.GuardNotNull(nameof(factory));
             return this;
         }
 

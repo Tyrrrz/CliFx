@@ -1,4 +1,6 @@
-﻿namespace CliFx.Models
+﻿using CliFx.Internal;
+
+namespace CliFx.Models
 {
     /// <summary>
     /// Metadata associated with an application.
@@ -25,9 +27,9 @@
         /// </summary>
         public ApplicationMetadata(string title, string executableName, string versionText)
         {
-            Title = title;
-            ExecutableName = executableName;
-            VersionText = versionText;
+            Title = title.GuardNotNull(nameof(title));
+            ExecutableName = executableName.GuardNotNull(nameof(executableName));
+            VersionText = versionText.GuardNotNull(nameof(versionText));
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using CliFx.Internal;
 
 namespace CliFx.Services
 {
@@ -14,10 +15,14 @@ namespace CliFx.Services
         /// </summary>
         public DelegateCommandFactory(Func<Type, ICommand> factoryMethod)
         {
-            _factoryMethod = factoryMethod;
+            _factoryMethod = factoryMethod.GuardNotNull(nameof(factoryMethod));
         }
 
         /// <inheritdoc />
-        public ICommand CreateCommand(Type commandType) => _factoryMethod(commandType);
+        public ICommand CreateCommand(Type commandType)
+        {
+            commandType.GuardNotNull(nameof(commandType));
+            return _factoryMethod(commandType);
+        }
     }
 }

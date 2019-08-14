@@ -19,7 +19,7 @@ namespace CliFx.Services
         /// </summary>
         public CommandInitializer(ICommandOptionInputConverter commandOptionInputConverter)
         {
-            _commandOptionInputConverter = commandOptionInputConverter;
+            _commandOptionInputConverter = commandOptionInputConverter.GuardNotNull(nameof(commandOptionInputConverter));
         }
 
         /// <summary>
@@ -33,6 +33,10 @@ namespace CliFx.Services
         /// <inheritdoc />
         public void InitializeCommand(ICommand command, CommandSchema schema, CommandInput input)
         {
+            command.GuardNotNull(nameof(command));
+            schema.GuardNotNull(nameof(schema));
+            input.GuardNotNull(nameof(input));
+
             // Set command options
             var isGroupNameDetected = false;
             var groupName = default(string);

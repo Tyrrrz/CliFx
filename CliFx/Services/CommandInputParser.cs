@@ -15,6 +15,8 @@ namespace CliFx.Services
         /// <inheritdoc />
         public CommandInput ParseInput(IReadOnlyList<string> commandLineArguments)
         {
+            commandLineArguments.GuardNotNull(nameof(commandLineArguments));
+
             // Initialize command name placeholder
             string commandName = null;
 

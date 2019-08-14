@@ -30,8 +30,7 @@ namespace CliFx.Services
         /// <inheritdoc />
         public CommandSchema GetCommandSchema(Type commandType)
         {
-            if (!commandType.Implements(typeof(ICommand)))
-                throw new ArgumentException($"Command type must implement {nameof(ICommand)}.", nameof(commandType));
+            commandType.GuardNotNull(nameof(commandType));
 
             var attribute = commandType.GetCustomAttribute<CommandAttribute>();
 

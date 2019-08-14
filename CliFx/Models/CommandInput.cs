@@ -11,6 +11,7 @@ namespace CliFx.Models
     {
         /// <summary>
         /// Specified command name.
+        /// Can be null if command was not specified.
         /// </summary>
         public string CommandName { get; }
 
@@ -24,8 +25,8 @@ namespace CliFx.Models
         /// </summary>
         public CommandInput(string commandName, IReadOnlyList<CommandOptionInput> options)
         {
-            CommandName = commandName;
-            Options = options;
+            CommandName = commandName; // can be null
+            Options = options.GuardNotNull(nameof(options));
         }
 
         /// <summary>

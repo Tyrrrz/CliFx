@@ -32,15 +32,15 @@ namespace CliFx
             IConsole console, ICommandInputParser commandInputParser, ICommandSchemaResolver commandSchemaResolver,
             ICommandFactory commandFactory, ICommandInitializer commandInitializer, ICommandHelpTextRenderer commandHelpTextRenderer)
         {
-            _applicationMetadata = applicationMetadata;
-            _commandTypes = commandTypes;
+            _applicationMetadata = applicationMetadata.GuardNotNull(nameof(applicationMetadata));
+            _commandTypes = commandTypes.GuardNotNull(nameof(commandTypes));
 
-            _console = console;
-            _commandInputParser = commandInputParser;
-            _commandSchemaResolver = commandSchemaResolver;
-            _commandFactory = commandFactory;
-            _commandInitializer = commandInitializer;
-            _commandHelpTextRenderer = commandHelpTextRenderer;
+            _console = console.GuardNotNull(nameof(console));
+            _commandInputParser = commandInputParser.GuardNotNull(nameof(commandInputParser));
+            _commandSchemaResolver = commandSchemaResolver.GuardNotNull(nameof(commandSchemaResolver));
+            _commandFactory = commandFactory.GuardNotNull(nameof(commandFactory));
+            _commandInitializer = commandInitializer.GuardNotNull(nameof(commandInitializer));
+            _commandHelpTextRenderer = commandHelpTextRenderer.GuardNotNull(nameof(commandHelpTextRenderer));
         }
 
         private IReadOnlyList<string> GetAvailableCommandSchemasValidationErrors(IReadOnlyList<CommandSchema> availableCommandSchemas)
@@ -107,6 +107,8 @@ namespace CliFx
         /// <inheritdoc />
         public async Task<int> RunAsync(IReadOnlyList<string> commandLineArguments)
         {
+            commandLineArguments.GuardNotNull(nameof(commandLineArguments));
+
             try
             {
                 var commandInput = _commandInputParser.ParseInput(commandLineArguments);

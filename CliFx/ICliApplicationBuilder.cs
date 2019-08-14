@@ -32,7 +32,7 @@ namespace CliFx
         /// <summary>
         /// Sets application version text, which appears in the help text and when the user requests version information.
         /// </summary>
-        ICliApplicationBuilder UseVersionText(string version);
+        ICliApplicationBuilder UseVersionText(string versionText);
 
         /// <summary>
         /// Configures application to use specified implementation of <see cref="IConsole"/>.

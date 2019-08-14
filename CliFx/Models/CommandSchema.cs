@@ -35,10 +35,10 @@ namespace CliFx.Models
         /// </summary>
         public CommandSchema(Type type, string name, string description, IReadOnlyList<CommandOptionSchema> options)
         {
-            Type = type;
-            Name = name;
-            Description = description;
-            Options = options;
+            Type = type; // can be null
+            Name = name; // can be null
+            Description = description; // can be null
+            Options = options.GuardNotNull(nameof(options));
         }
 
         /// <inheritdoc />

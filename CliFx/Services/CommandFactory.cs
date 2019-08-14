@@ -1,4 +1,5 @@
 ﻿using System;
+using CliFx.Internal;
 
 namespace CliFx.Services
 {
@@ -8,6 +9,10 @@ namespace CliFx.Services
     public class CommandFactory : ICommandFactory
     {
         /// <inheritdoc />
-        public ICommand CreateCommand(Type commandType) => (ICommand) Activator.CreateInstance(commandType);
+        public ICommand CreateCommand(Type commandType)
+        {
+            commandType.GuardNotNull(nameof(commandType));
+            return (ICommand) Activator.CreateInstance(commandType);
+        }
     }
 }

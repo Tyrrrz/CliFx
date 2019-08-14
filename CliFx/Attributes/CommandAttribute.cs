@@ -23,7 +23,7 @@ namespace CliFx.Attributes
         /// </summary>
         public CommandAttribute(string name)
         {
-            Name = name;
+            Name = name; // can be null
         }
 
         /// <summary>

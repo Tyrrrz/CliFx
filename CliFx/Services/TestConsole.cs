@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using CliFx.Internal;
 
 namespace CliFx.Services
 {
@@ -39,9 +40,9 @@ namespace CliFx.Services
         /// </summary>
         public TestConsole(TextReader input, TextWriter output, TextWriter error)
         {
-            Input = input;
-            Output = output;
-            Error = error;
+            Input = input.GuardNotNull(nameof(input));
+            Output = output.GuardNotNull(nameof(output));
+            Error = error.GuardNotNull(nameof(error));
         }
 
         /// <summary>

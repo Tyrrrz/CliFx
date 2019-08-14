@@ -20,7 +20,7 @@ namespace CliFx.Services
         /// </summary>
         public CommandOptionInputConverter(IFormatProvider formatProvider)
         {
-            _formatProvider = formatProvider;
+            _formatProvider = formatProvider.GuardNotNull(nameof(formatProvider));
         }
 
         /// <summary>
@@ -244,6 +244,9 @@ namespace CliFx.Services
         /// <inheritdoc />
         public object ConvertOption(CommandOptionInput option, Type targetType)
         {
+            option.GuardNotNull(nameof(option));
+            targetType.GuardNotNull(nameof(targetType));
+
             if (targetType != typeof(string) && targetType.IsEnumerable())
             {
                 var underlyingType = targetType.GetIEnumerableUnderlyingTypes().FirstOrDefault() ?? typeof(object);

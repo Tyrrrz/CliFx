@@ -14,6 +14,9 @@ namespace CliFx.Services
         /// <inheritdoc />
         public void RenderHelpText(IConsole console, HelpTextSource source)
         {
+            console.GuardNotNull(nameof(console));
+            source.GuardNotNull(nameof(source));
+
             // Track position
             var column = 0;
             var row = 0;
