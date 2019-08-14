@@ -5,7 +5,7 @@ using CliFx.Services;
 
 namespace CliFx.Tests.Dummy.Commands
 {
-    [Command("log", Description = "Calculates the logarithm of a value.")]
+    [Command("log", Description = "Calculate the logarithm of a value.")]
     public class LogCommand : ICommand
     {
         [CommandOption("value", 'v', IsRequired = true, Description = "Value whose logarithm is to be found.")]

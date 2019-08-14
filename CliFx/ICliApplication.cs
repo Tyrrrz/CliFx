@@ -9,8 +9,7 @@ namespace CliFx
     public interface ICliApplication
     {
         /// <summary>
-        /// Runs application with specified command line arguments.
-        /// Returns exit code.
+        /// Runs application with specified command line arguments and returns an exit code.
         /// </summary>
         Task<int> RunAsync(IReadOnlyList<string> commandLineArguments);
     }

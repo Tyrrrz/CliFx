@@ -6,7 +6,7 @@ using CliFx.Services;
 
 namespace CliFx.Tests.Dummy.Commands
 {
-    [Command("sum", Description = "Calculates the sum of all input values.")]
+    [Command("sum", Description = "Calculate the sum of all input values.")]
     public class SumCommand : ICommand
     {
         [CommandOption("values", 'v', IsRequired = true, Description = "Input values.")]
