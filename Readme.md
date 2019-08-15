@@ -8,7 +8,9 @@
 [![Donate](https://img.shields.io/badge/patreon-donate-yellow.svg)](https://patreon.com/tyrrrz)
 [![Donate](https://img.shields.io/badge/buymeacoffee-donate-yellow.svg)](https://buymeacoffee.com/tyrrrz)
 
-CliFx is a powerful framework for building command line applications.
+CliFx is a simple but powerful framework for building command line applications. Its goal is to eliminate boilerplate code associated with handling command line arguments so that developers can focus on writing business logic instead. One of CliFx's main strengths is its reflection-based declarative approach for defining commands.
+
+_CliFx to command line interfaces is what ASP.NET Core is to web applications._
 
 ## Download
 
@@ -17,9 +19,22 @@ CliFx is a powerful framework for building command line applications.
 
 ## Features
 
-- ...to be added with a stable release...
+- Declarative approach for defining commands
+- Minimal required initialization code
+- Handles options of various types
+- Support for multi-level command hierarchies
+- Automatic help text generation
+- Designed with testability in mind
+- Highly customizable
 - Targets .NET Framework 4.6+ and .NET Standard 2.0+
 - No external dependencies
+
+### Currently unsupported
+
+- Positional arguments aka anonymous options
+- Autocompletion
+- Environment variables
+- Runtime directives
 
 ## Usage
 
@@ -40,7 +55,7 @@ public static class Program
 }
 ```
 
-### Defining a command
+### Defining commands
 
 In order to add functionality to your application you need to define commands. Commands are essentially entry points for the user to interact with your application. You can think of them as something similar to controllers in ASP.NET Core applications.
 
@@ -77,6 +92,20 @@ Finally, the command defined above can be executed from the command line in one 
 - `myapp log -v 1000`
 - `myapp log --value 8 --base 2`
 - `myapp log -v 81 -b 3`
+
+### Custom option types
+
+When resolving options, CliFx can convert string values obtained from the command line to any of the following types:
+
+- Primitive types, i.e. `int`, `bool`, `double`, `ulong`, `char`, etc
+- Date and time types, i.e. `DateTime`, `DateTimeOffset`, `TimeSpan`
+- Enums
+- Types that have a constructor that accepts a single `string` parameter, e.g. `FileInfo`, `DirectoryInfo`
+- Types that have a static `Parse` method that takes a `string` parameter (optionally with `IFormatProvider`)
+- Nullable versions of the above types
+- Collections of the above types, i.e. `IEnumerable<T>`, `T[]`, `IReadOnlyList<T>`, etc
+
+If you want to define an option of your own type, the easiest way to do it is to make sure that it has a `Parse` method or a constructor that takes a single parameter of type `string`.
 
 ### Dependency injection
 
