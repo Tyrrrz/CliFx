@@ -8,9 +8,9 @@
 [![Donate](https://img.shields.io/badge/patreon-donate-yellow.svg)](https://patreon.com/tyrrrz)
 [![Donate](https://img.shields.io/badge/buymeacoffee-donate-yellow.svg)](https://buymeacoffee.com/tyrrrz)
 
-CliFx is a simple but powerful framework for building command line applications. Its goal is to eliminate boilerplate code associated with handling command line arguments so that developers can focus on writing business logic instead. One of CliFx's main strengths is its reflection-based declarative approach for defining commands.
+CliFx is a simple to use but powerful framework for building command line applications. Its primary goal is to completely take over the user input layer, letting you focus more on writing your application. This framework uses a declarative approach for defining commands, avoiding excessive boilerplate code and complex configurations.
 
-_CliFx to command line interfaces is what ASP.NET Core is to web applications._
+_CliFx is to command line interfaces what ASP.NET Core is to web applications._
 
 ## Download
 
@@ -19,20 +19,21 @@ _CliFx to command line interfaces is what ASP.NET Core is to web applications._
 
 ## Features
 
-- Declarative approach for defining commands
-- Minimal required initialization code
-- Handles options of various types
-- Support for multi-level command hierarchies
-- Automatic help text generation
-- Designed with testability in mind
-- Highly customizable
+- Complete application framework, not just an argument parser
+- Requires minimal amount of code to get started
+- Resolves commands using attributes
+- Handles options of various types, including custom types
+- Supports multi-level command hierarchies
+- Generates contextual help text
+- Prints errors and routes exit codes on exceptions
+- Highly testable and easy to customize
 - Targets .NET Framework 4.6+ and .NET Standard 2.0+
 - No external dependencies
 
-### Currently unsupported
+### Currently not implemented
 
-- Positional arguments aka anonymous options
-- Autocompletion
+- Positional arguments (anonymous options)
+- Auto-completion support
 - Environment variables
 - Runtime directives
 
@@ -113,7 +114,7 @@ CliFx uses an implementation of `ICommandFactory` to initialize commands and by 
 
 In real-life scenarios your commands will most likely have dependencies that need to be injected. CliFx doesn't have its own dependency container but it's really easy to set it up to use any 3rd party dependency container of your choice.
 
-For example, here is how you would configure your application to use [`Microsoft.Extensions.DependencyInjection`](https://nuget.org/packages/Microsoft.Extensions.DependencyInjection/) (aka the built-in dependency container in ASP.NET Core).
+For example, here is how you would configure your application to use [`Microsoft.Extensions.DependencyInjection`](https://nuget.org/packages/Microsoft.Extensions.DependencyInjection) (aka the built-in dependency container in ASP.NET Core).
 
 ```c#
 public static class Program
