@@ -19,6 +19,7 @@ namespace CliFx
         private string _title;
         private string _executableName;
         private string _versionText;
+        private string _description;
         private IConsole _console;
         private ICommandFactory _commandFactory;
 
@@ -67,6 +68,13 @@ namespace CliFx
         }
 
         /// <inheritdoc />
+        public ICliApplicationBuilder UseDescription(string description)
+        {
+            _description = description; // can be null
+            return this;
+        }
+
+        /// <inheritdoc />
         public ICliApplicationBuilder UseConsole(IConsole console)
         {
             _console = console.GuardNotNull(nameof(console));
@@ -108,7 +116,7 @@ namespace CliFx
             SetFallbackValues();
 
             // Project parameters to expected types
-            var metadata = new ApplicationMetadata(_title, _executableName, _versionText);
+            var metadata = new ApplicationMetadata(_title, _executableName, _versionText, _description);
             var commandTypes = _commandTypes.ToArray();
 
             return new CliApplication(metadata, commandTypes,

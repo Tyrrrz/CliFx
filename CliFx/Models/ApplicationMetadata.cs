@@ -23,13 +23,19 @@ namespace CliFx.Models
         public string VersionText { get; }
 
         /// <summary>
+        /// Application description.
+        /// </summary>
+        public string Description { get; }
+
+        /// <summary>
         /// Initializes an instance of <see cref="ApplicationMetadata"/>.
         /// </summary>
-        public ApplicationMetadata(string title, string executableName, string versionText)
+        public ApplicationMetadata(string title, string executableName, string versionText, string description)
         {
             Title = title.GuardNotNull(nameof(title));
             ExecutableName = executableName.GuardNotNull(nameof(executableName));
             VersionText = versionText.GuardNotNull(nameof(versionText));
+            Description = description; // can be null
         }
     }
 }

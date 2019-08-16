@@ -35,6 +35,11 @@ namespace CliFx
         ICliApplicationBuilder UseVersionText(string versionText);
 
         /// <summary>
+        /// Sets application description, which appears in the help text.
+        /// </summary>
+        ICliApplicationBuilder UseDescription(string description);
+
+        /// <summary>
         /// Configures application to use specified implementation of <see cref="IConsole"/>.
         /// </summary>
         ICliApplicationBuilder UseConsole(IConsole console);

@@ -89,6 +89,13 @@ namespace CliFx.Services
                 Render(" ");
                 RenderWithColor(source.ApplicationMetadata.VersionText, ConsoleColor.Yellow);
                 RenderNewLine();
+
+                // Description
+                if (!source.ApplicationMetadata.Description.IsNullOrWhiteSpace())
+                {
+                    Render(source.ApplicationMetadata.Description);
+                    RenderNewLine();
+                }
             }
 
             void RenderDescription()
