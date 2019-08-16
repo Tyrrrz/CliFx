@@ -186,7 +186,15 @@ namespace CliFx
             }
             catch (Exception ex)
             {
-                var message = ex is CliFxException ? ex.Message : ex.ToString();
+                // We want to catch exceptions in order to print error and return correct exit code.
+                // Also, by doing this we get rid of the annoying Windows troubleshooting dialog that shows up on unhandled exceptions.
+
+                // In case we catch a CliFx-specific exception, we want to just show the error message, not the stack trace.
+                // Stack trace isn't very useful to the end user if the exception is not really coming from their code.
+
+                // CommandException is the same, but it also lets users specify exit code so we want to return that instead of default.
+
+                var message = ex is CliFxException && !ex.Message.IsNullOrWhiteSpace() ? ex.Message : ex.ToString();
                 var exitCode = ex is CommandErrorException errorException ? errorException.ExitCode : -1;
 
                 _console.WithForegroundColor(ConsoleColor.Red, () => _console.Error.WriteLine(message));
