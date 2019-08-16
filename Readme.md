@@ -225,7 +225,7 @@ public class DivideCommand : ICommand
 
 CliFx makes it really easy to test your commands thanks to the `IConsole` interface.
 
-When writing tests, you can use `TestConsole` which lets you provide your own streams in place of your application's stdin, stdout and stderr. It has multiple constructor overloads allowing you to specify the exact set of streams that you want. Streams that are not provided are treated as empty, i.e. `TestConsole` doesn't leak to `System.Console` in any way.
+When writing tests, you can use `VirtualConsole` which lets you provide your own streams in place of your application's stdin, stdout and stderr. It has multiple constructor overloads allowing you to specify the exact set of streams that you want. Streams that are not provided are replaced with stubs, i.e. `VirtualConsole` doesn't leak to `System.Console` in any way.
 
 Let's assume you want to test a simple command such as this one.
 
@@ -259,7 +259,7 @@ public async Task ConcatCommand_Test()
     // Arrange
     using (var stdout = new StringWriter())
     {
-        var console = new TestConsole(stdout);
+        var console = new VirtualConsole(stdout);
 
         var command = new ConcatCommand
         {
@@ -285,7 +285,7 @@ public async Task ConcatCommand_Test()
     // Arrange
     using (var stdout = new StringWriter())
     {
-        var console = new TestConsole(stdout);
+        var console = new VirtualConsole(stdout);
 
         var app = new CliApplicationBuilder()
             .WithCommand(typeof(ConcatCommand))

@@ -9,7 +9,7 @@ namespace CliFx.Services
     /// Does not leak to <see cref="Console"/> in any way.
     /// Provides an isolated instance of <see cref="IConsole"/> which is useful for testing purposes.
     /// </summary>
-    public class TestConsole : IConsole
+    public class VirtualConsole : IConsole
     {
         /// <inheritdoc />
         public TextReader Input { get; }
@@ -36,9 +36,9 @@ namespace CliFx.Services
         public ConsoleColor BackgroundColor { get; set; } = ConsoleColor.Black;
 
         /// <summary>
-        /// Initializes an instance of <see cref="TestConsole"/>.
+        /// Initializes an instance of <see cref="VirtualConsole"/>.
         /// </summary>
-        public TestConsole(TextReader input, TextWriter output, TextWriter error)
+        public VirtualConsole(TextReader input, TextWriter output, TextWriter error)
         {
             Input = input.GuardNotNull(nameof(input));
             Output = output.GuardNotNull(nameof(output));
@@ -46,19 +46,19 @@ namespace CliFx.Services
         }
 
         /// <summary>
-        /// Initializes an instance of <see cref="TestConsole"/> using output stream (stdout) and error stream (stderr).
-        /// Input stream (stdin) is considered empty.
+        /// Initializes an instance of <see cref="VirtualConsole"/> using output stream (stdout) and error stream (stderr).
+        /// Input stream (stdin) is replaced with a no-op stub.
         /// </summary>
-        public TestConsole(TextWriter output, TextWriter error)
+        public VirtualConsole(TextWriter output, TextWriter error)
             : this(TextReader.Null, output, error)
         {
         }
 
         /// <summary>
-        /// Initializes an instance of <see cref="TestConsole"/> using output stream (stdout).
-        /// Input stream (stdin) and error stream (stderr) are considered empty.
+        /// Initializes an instance of <see cref="VirtualConsole"/> using output stream (stdout).
+        /// Input stream (stdin) and error stream (stderr) are replaced with no-op stubs.
         /// </summary>
-        public TestConsole(TextWriter output)
+        public VirtualConsole(TextWriter output)
             : this(output, TextWriter.Null)
         {
         }
