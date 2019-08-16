@@ -94,19 +94,22 @@ Finally, the command defined above can be executed from the command line in one 
 - `myapp log --value 8 --base 2`
 - `myapp log -v 81 -b 3`
 
-### Custom option types
+### Option conversion
 
 When resolving options, CliFx can convert string values obtained from the command line to any of the following types:
 
-- Primitive types, i.e. `int`, `bool`, `double`, `ulong`, `char`, etc
-- Date and time types, i.e. `DateTime`, `DateTimeOffset`, `TimeSpan`
-- Enums
-- Types that have a constructor that accepts a single `string` parameter, e.g. `FileInfo`, `DirectoryInfo`
-- Types that have a static `Parse` method that takes a `string` parameter (optionally with `IFormatProvider`)
-- Nullable versions of the above types
-- Collections of the above types, i.e. `IEnumerable<T>`, `T[]`, `IReadOnlyList<T>`, etc
+- Standard types
+  - Primitives (`int`, `bool`, `double`, `ulong`, `char`, etc)
+  - Date and time types (`DateTime`, `DateTimeOffset`, `TimeSpan`)
+  - Enums
+- String-initializable types
+  - Types with constructor that accepts a single `string` parameter (e.g. `FileInfo`, `DirectoryInfo`)
+  - Types with static method `Parse` that accepts a single `string` parameter and an `IFormatProvider` parameter
+  - Types with static method `Parse` that accepts a single `string` parameter
+- Nullable versions of all above types (`decimal?`, `TimeSpan?`, etc)
+- Collections of all above types (`IReadOnlyList<long>`, `FileInfo[]`, `IEnumerable<bool?>`, etc)
 
-If you want to define an option of your own type, the easiest way to do it is to make sure that it has a `Parse` method or a constructor that takes a single parameter of type `string`.
+If you want to define an option of your own type, the easiest way to do it is to make sure that your type is string-initializable, as explained above.
 
 ### Dependency injection
 
@@ -183,8 +186,6 @@ public class SecondSubCommand : ICommand
     // ...
 }
 ```
-
-If your application doesn't define a default command (i.e. command with no name), CliFx will provide a stub so that all your commands have a root command.
 
 ### Reporting errors
 
