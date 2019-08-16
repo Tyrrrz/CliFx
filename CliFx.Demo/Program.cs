@@ -21,7 +21,7 @@ namespace CliFx.Demo
             services.AddTransient<BookRemoveCommand>();
             services.AddTransient<BookListCommand>();
 
-            var serviceProvider = new DefaultServiceProviderFactory().CreateServiceProvider(services);
+            var serviceProvider = services.BuildServiceProvider();
 
             return new CliApplicationBuilder()
                 .WithCommandsFromThisAssembly()

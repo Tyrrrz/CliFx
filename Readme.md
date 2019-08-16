@@ -129,7 +129,7 @@ public static class Program
         // Register commands
         services.AddTransient<MyCommand>();
 
-        var serviceProvider = new DefaultServiceProviderFactory().CreateServiceProvider(services);
+        var serviceProvider = services.BuildServiceProvider();
 
         return new CliApplicationBuilder()
             .WithCommandsFromThisAssembly()
