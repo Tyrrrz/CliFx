@@ -151,15 +151,15 @@ namespace CliFx.Services
             else
             {
                 var underlyingType = targetType.GetEnumerableUnderlyingType() ?? typeof(object);
-                var underlyingArrayType = underlyingType.MakeArrayType();
                 var convertedValues = option.Values.Select(v => ConvertValue(v, underlyingType)).ToNonGenericArray(underlyingType);
+                var convertedValuesType = convertedValues.GetType();
 
                 // Assignable from array of values (e.g. T[], IReadOnlyList<T>, IEnumerable<T>)
-                if (targetType.IsAssignableFrom(underlyingArrayType))
+                if (targetType.IsAssignableFrom(convertedValuesType))
                     return convertedValues;
 
                 // Can be constructed from array of values (e.g. HashSet<T>, List<T>)
-                var arrayConstructor = targetType.GetConstructor(new[] {underlyingArrayType});
+                var arrayConstructor = targetType.GetConstructor(new[] {convertedValuesType});
                 if (arrayConstructor != null)
                     return arrayConstructor.Invoke(new object[] {convertedValues});
 
