@@ -50,7 +50,7 @@ namespace CliFx
             // Fail if there are no commands defined
             if (!availableCommandSchemas.Any())
             {
-                result.Add("There are no commands defined in this application.");
+                result.Add("There are no commands defined.");
             }
 
             // Fail if there are commands that don't implement ICommand
@@ -62,7 +62,9 @@ namespace CliFx
 
             foreach (var commandName in nonImplementedCommandNames)
             {
-                result.Add($"Command [{commandName}] doesn't implement ICommand.");
+                result.Add(!commandName.IsNullOrWhiteSpace()
+                    ? $"Command [{commandName}] doesn't implement ICommand."
+                    : "Default command doesn't implement ICommand.");
             }
 
             // Fail if there are multiple commands with the same name
@@ -76,7 +78,9 @@ namespace CliFx
 
             foreach (var commandName in nonUniqueCommandNames)
             {
-                result.Add($"There are multiple commands defined with name [{commandName}].");
+                result.Add(!commandName.IsNullOrWhiteSpace()
+                    ? $"There are multiple commands defined with name [{commandName}]."
+                    : "There are multiple default commands defined.");
             }
 
             // Fail if there are multiple options with the same name inside the same command
@@ -93,8 +97,9 @@ namespace CliFx
 
                 foreach (var optionName in nonUniqueOptionNames)
                 {
-                    result.Add(
-                        $"There are multiple options defined with name [{optionName}] for command [{commandSchema.Name}].");
+                    result.Add(!commandSchema.Name.IsNullOrWhiteSpace()
+                        ? $"There are multiple options defined with name [{optionName}] on command [{commandSchema.Name}]."
+                        : $"There are multiple options defined with name [{optionName}] on default command.");
                 }
 
                 var nonUniqueOptionShortNames = commandSchema.Options
@@ -108,8 +113,9 @@ namespace CliFx
 
                 foreach (var optionShortName in nonUniqueOptionShortNames)
                 {
-                    result.Add(
-                        $"There are multiple options defined with short name [{optionShortName}] for command [{commandSchema.Name}].");
+                    result.Add(!commandSchema.Name.IsNullOrWhiteSpace()
+                        ? $"There are multiple options defined with short name [{optionShortName}] on command [{commandSchema.Name}]."
+                        : $"There are multiple options defined with short name [{optionShortName}] on default command.");
                 }
             }
 
