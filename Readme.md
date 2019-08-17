@@ -99,15 +99,18 @@ Finally, the command defined above can be executed from the command line in one 
 When resolving options, CliFx can convert string values obtained from the command line to any of the following types:
 
 - Standard types
-  - Primitives (`int`, `bool`, `double`, `ulong`, `char`, etc)
+  - Primitive types (`int`, `bool`, `double`, `ulong`, `char`, etc)
   - Date and time types (`DateTime`, `DateTimeOffset`, `TimeSpan`)
-  - Enums
+  - Enum types
 - String-initializable types
-  - Types with constructor that accepts a single `string` parameter (e.g. `FileInfo`, `DirectoryInfo`)
+  - Types with constructor that accepts a single `string` parameter (`FileInfo`, `DirectoryInfo`, etc)
   - Types with static method `Parse` that accepts a single `string` parameter and an `IFormatProvider` parameter
   - Types with static method `Parse` that accepts a single `string` parameter
 - Nullable versions of all above types (`decimal?`, `TimeSpan?`, etc)
-- Collections of all above types (`IReadOnlyList<long>`, `FileInfo[]`, `IEnumerable<bool?>`, etc)
+- Collections of all above types
+  - Array types (`T[]`)
+  - Types that are assignable from arrays (`IReadOnlyList<T>`, `ICollection<T>`, etc)
+  - Types with constructor that accepts a single `T[]` parameter (`HashSet<T>`, `List<T>`, etc)
 
 If you want to define an option of your own type, the easiest way to do it is to make sure that your type is string-initializable, as explained above.
 

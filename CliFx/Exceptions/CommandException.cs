@@ -4,11 +4,14 @@ using CliFx.Internal;
 namespace CliFx.Exceptions
 {
     /// <summary>
-    /// Thrown when a command cannot proceed with normal execution due to error.
-    /// Use this exception if you want to specify an exit code to return when the process terminates.
+    /// Thrown when a command cannot proceed with normal execution due to an error.
+    /// Use this exception if you want to report an error that occured during execution of a command.
+    /// This exception also allows specifying exit code which will be returned to the calling process.
     /// </summary>
     public class CommandException : CliFxException
     {
+        private const int DefaultExitCode = -100;
+
         /// <summary>
         /// Process exit code.
         /// </summary>
@@ -17,7 +20,7 @@ namespace CliFx.Exceptions
         /// <summary>
         /// Initializes an instance of <see cref="CommandException"/>.
         /// </summary>
-        public CommandException(string message, int exitCode, Exception innerException)
+        public CommandException(string message, Exception innerException, int exitCode = DefaultExitCode)
             : base(message, innerException)
         {
             ExitCode = exitCode.GuardNotZero(nameof(exitCode));
@@ -26,15 +29,15 @@ namespace CliFx.Exceptions
         /// <summary>
         /// Initializes an instance of <see cref="CommandException"/>.
         /// </summary>
-        public CommandException(string message, int exitCode)
-            : this(message, exitCode,  null)
+        public CommandException(string message, int exitCode = DefaultExitCode)
+            : this(message, null, exitCode)
         {
         }
 
         /// <summary>
         /// Initializes an instance of <see cref="CommandException"/>.
         /// </summary>
-        public CommandException(int exitCode)
+        public CommandException(int exitCode = DefaultExitCode)
             : this(null, exitCode)
         {
         }

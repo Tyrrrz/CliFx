@@ -97,7 +97,7 @@ namespace CliFx.Tests
 
             // Act & Assert
             initializer.Invoking(i => i.InitializeCommand(command, schema, commandInput))
-                .Should().ThrowExactly<MissingCommandOptionException>();
+                .Should().ThrowExactly<MissingCommandOptionInputException>();
         }
     }
 }

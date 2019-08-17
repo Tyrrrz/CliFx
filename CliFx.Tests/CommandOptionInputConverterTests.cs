@@ -50,7 +50,7 @@ namespace CliFx.Tests
             }
 
             public static TestStringParseableWithFormatProvider Parse(string value, IFormatProvider formatProvider) =>
-                new TestStringParseableWithFormatProvider(value);
+                new TestStringParseableWithFormatProvider(value + " " + formatProvider);
         }
     }
 
@@ -204,6 +204,18 @@ namespace CliFx.Tests
             );
 
             yield return new TestCaseData(
+                new CommandOptionInput("option", new[] {"1337", "2441"}),
+                typeof(int?[]),
+                new int?[] {1337, 2441}
+            );
+
+            yield return new TestCaseData(
+                new CommandOptionInput("option", new[] {"value1", "value2"}),
+                typeof(TestStringConstructable[]),
+                new[] {new TestStringConstructable("value1"), new TestStringConstructable("value2")}
+            );
+
+            yield return new TestCaseData(
                 new CommandOptionInput("option", new[] {"value1", "value2"}),
                 typeof(IEnumerable),
                 new[] {"value1", "value2"}
@@ -220,6 +232,18 @@ namespace CliFx.Tests
                 typeof(IReadOnlyList<string>),
                 new[] {"value1", "value2"}
             );
+
+            yield return new TestCaseData(
+                new CommandOptionInput("option", new[] {"value1", "value2"}),
+                typeof(List<string>),
+                new List<string> {"value1", "value2"}
+            );
+
+            yield return new TestCaseData(
+                new CommandOptionInput("option", new[] {"value1", "value2"}),
+                typeof(HashSet<string>),
+                new HashSet<string> {"value1", "value2"}
+            );
         }
 
         [Test]
@@ -234,9 +258,7 @@ namespace CliFx.Tests
 
             // Assert
             convertedValue.Should().BeEquivalentTo(expectedConvertedValue);
-
-            if (convertedValue != null)
-                convertedValue.Should().BeAssignableTo(targetType);
+            convertedValue?.Should().BeAssignableTo(targetType);
         }
     }
 }

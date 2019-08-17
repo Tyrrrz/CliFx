@@ -22,12 +22,5 @@ namespace CliFx.Exceptions
             : base(message, innerException)
         {
         }
-
-        /// <summary>
-        /// Initializes an instance of <see cref="CliFxException"/>.
-        /// </summary>
-        protected CliFxException()
-        {
-        }
     }
 }
