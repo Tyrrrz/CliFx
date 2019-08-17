@@ -90,15 +90,75 @@ namespace CliFx.Tests
             );
 
             yield return new TestCaseData(
+                new CommandOptionInput("option", "a"),
+                typeof(char),
+                'a'
+            );
+
+            yield return new TestCaseData(
+                new CommandOptionInput("option", "15"),
+                typeof(sbyte),
+                (sbyte) 15
+            );
+
+            yield return new TestCaseData(
+                new CommandOptionInput("option", "15"),
+                typeof(byte),
+                (byte) 15
+            );
+
+            yield return new TestCaseData(
+                new CommandOptionInput("option", "15"),
+                typeof(short),
+                (short) 15
+            );
+
+            yield return new TestCaseData(
+                new CommandOptionInput("option", "15"),
+                typeof(ushort),
+                (ushort) 15
+            );
+
+            yield return new TestCaseData(
                 new CommandOptionInput("option", "123"),
                 typeof(int),
                 123
             );
 
             yield return new TestCaseData(
+                new CommandOptionInput("option", "123"),
+                typeof(uint),
+                123u
+            );
+
+            yield return new TestCaseData(
+                new CommandOptionInput("option", "123"),
+                typeof(long),
+                123L
+            );
+
+            yield return new TestCaseData(
+                new CommandOptionInput("option", "123"),
+                typeof(ulong),
+                123UL
+            );
+
+            yield return new TestCaseData(
+                new CommandOptionInput("option", "123.45"),
+                typeof(float),
+                123.45f
+            );
+
+            yield return new TestCaseData(
                 new CommandOptionInput("option", "123.45"),
                 typeof(double),
                 123.45
+            );
+
+            yield return new TestCaseData(
+                new CommandOptionInput("option", "123.45"),
+                typeof(decimal),
+                123.45m
             );
 
             yield return new TestCaseData(
