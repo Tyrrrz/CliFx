@@ -26,7 +26,7 @@ namespace CliFx.Tests
         [Command("faulty command")]
         private class TestFaultyCommand : ICommand
         {
-            public Task ExecuteAsync(IConsole console) => Task.FromException(new CommandErrorException(-1337));
+            public Task ExecuteAsync(IConsole console) => Task.FromException(new CommandException(-1337));
         }
     }
 

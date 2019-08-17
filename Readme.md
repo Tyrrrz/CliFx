@@ -193,7 +193,7 @@ You may have noticed that commands in CliFx don't return exit codes. This is by 
 
 Commands can report execution failure simply by throwing exceptions just like any other C# code. When an exception is thrown, `CliApplication` will catch it, print the error, and return a non-zero exit code to the calling process.
 
-If you want to communicate a specific error through exit code, you can throw an instance of `CommandErrorException` which takes exit code as a constructor parameter.
+If you want to communicate a specific error through exit code, you can throw an instance of `CommandException` which takes exit code as a constructor parameter.
 
 ```c#
 [Command]
@@ -210,7 +210,7 @@ public class DivideCommand : ICommand
         if (Math.Abs(Divisor) < double.Epsilon)
         {
             // This will print the error and set exit code to 1337
-            throw new CommandErrorException(1337, "Division by zero is not supported.");
+            throw new CommandException("Division by zero is not supported.", 1337);
         }
 
         var result = Dividend / Divisor;

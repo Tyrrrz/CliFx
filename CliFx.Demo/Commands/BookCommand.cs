@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using CliFx.Attributes;
 using CliFx.Demo.Internal;
 using CliFx.Demo.Services;
@@ -26,7 +25,7 @@ namespace CliFx.Demo.Commands
             var book = _libraryService.GetBook(Title);
 
             if (book == null)
-                throw new CommandErrorException(1, "Book not found.");
+                throw new CommandException("Book not found.", 1);
 
             console.RenderBook(book);
 

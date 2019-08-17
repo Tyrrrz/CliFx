@@ -40,7 +40,7 @@ namespace CliFx.Demo.Commands
                 Isbn = CreateRandomIsbn();
 
             if (_libraryService.GetBook(Title) != null)
-                throw new CommandErrorException(1, "Book already exists.");
+                throw new CommandException("Book already exists.", 1);
 
             var book = new Book(Title, Author, Published, Isbn);
             _libraryService.AddBook(book);
