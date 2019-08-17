@@ -23,16 +23,8 @@ namespace CliFx.Internal
             return index < 0 ? s : s.Substring(0, index);
         }
 
-        public static StringBuilder Trim(this StringBuilder builder)
-        {
-            while (builder.Length > 0 && char.IsWhiteSpace(builder[0]))
-                builder.Remove(0, 1);
-
-            while (builder.Length > 0 && char.IsWhiteSpace(builder[builder.Length - 1]))
-                builder.Remove(builder.Length - 1, 1);
-
-            return builder;
-        }
+        public static StringBuilder AppendIfEmpty(this StringBuilder builder, char value) =>
+            builder.Length == 0 ? builder.Append(value) : builder;
 
         public static TValue GetValueOrDefault<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dic, TKey key) =>
             dic.TryGetValue(key, out var result) ? result : default;

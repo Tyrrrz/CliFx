@@ -59,18 +59,15 @@ namespace CliFx.Models
             var buffer = new StringBuilder();
 
             if (!CommandName.IsNullOrWhiteSpace())
-            {
                 buffer.Append(CommandName);
-                buffer.Append(' ');
-            }
 
             foreach (var option in Options)
             {
+                buffer.AppendIfEmpty(' ');
                 buffer.Append(option);
-                buffer.Append(' ');
             }
 
-            return buffer.Trim().ToString();
+            return buffer.ToString();
         }
     }
 
