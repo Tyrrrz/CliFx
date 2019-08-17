@@ -15,8 +15,8 @@ namespace CliFx
     /// </summary>
     public partial class CliApplication : ICliApplication
     {
-        private readonly ApplicationMetadata _applicationMetadata;
-        private readonly IReadOnlyList<Type> _commandTypes;
+        private readonly ApplicationMetadata _metadata;
+        private readonly ApplicationConfiguration _configuration;
 
         private readonly IConsole _console;
         private readonly ICommandInputParser _commandInputParser;
@@ -28,12 +28,12 @@ namespace CliFx
         /// <summary>
         /// Initializes an instance of <see cref="CliApplication"/>.
         /// </summary>
-        public CliApplication(ApplicationMetadata applicationMetadata, IReadOnlyList<Type> commandTypes,
+        public CliApplication(ApplicationMetadata metadata, ApplicationConfiguration configuration,
             IConsole console, ICommandInputParser commandInputParser, ICommandSchemaResolver commandSchemaResolver,
             ICommandFactory commandFactory, ICommandInitializer commandInitializer, ICommandHelpTextRenderer commandHelpTextRenderer)
         {
-            _applicationMetadata = applicationMetadata.GuardNotNull(nameof(applicationMetadata));
-            _commandTypes = commandTypes.GuardNotNull(nameof(commandTypes));
+            _metadata = metadata.GuardNotNull(nameof(metadata));
+            _configuration = configuration.GuardNotNull(nameof(configuration));
 
             _console = console.GuardNotNull(nameof(console));
             _commandInputParser = commandInputParser.GuardNotNull(nameof(commandInputParser));
@@ -131,7 +131,7 @@ namespace CliFx
             {
                 var commandInput = _commandInputParser.ParseInput(commandLineArguments);
 
-                var availableCommandSchemas = _commandSchemaResolver.GetCommandSchemas(_commandTypes);
+                var availableCommandSchemas = _commandSchemaResolver.GetCommandSchemas(_configuration.CommandTypes);
                 var matchingCommandSchema = availableCommandSchemas.FindByName(commandInput.CommandName);
 
                 // Validate available command schemas
@@ -169,7 +169,7 @@ namespace CliFx
                     }
 
                     // Show help
-                    var helpTextSource = new HelpTextSource(_applicationMetadata, availableCommandSchemas, parentCommandSchema);
+                    var helpTextSource = new HelpTextSource(_metadata, availableCommandSchemas, parentCommandSchema);
                     _commandHelpTextRenderer.RenderHelpText(_console, helpTextSource);
 
                     return isError ? -1 : 0;
@@ -178,7 +178,7 @@ namespace CliFx
                 // Show version if it was requested without specifying a command
                 if (commandInput.IsVersionRequested() && !commandInput.IsCommandSpecified())
                 {
-                    _console.Output.WriteLine(_applicationMetadata.VersionText);
+                    _console.Output.WriteLine(_metadata.VersionText);
 
                     return 0;
                 }
@@ -186,7 +186,7 @@ namespace CliFx
                 // Show help if it was requested
                 if (commandInput.IsHelpRequested())
                 {
-                    var helpTextSource = new HelpTextSource(_applicationMetadata, availableCommandSchemas, matchingCommandSchema);
+                    var helpTextSource = new HelpTextSource(_metadata, availableCommandSchemas, matchingCommandSchema);
                     _commandHelpTextRenderer.RenderHelpText(_console, helpTextSource);
 
                     return 0;

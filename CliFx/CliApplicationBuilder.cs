@@ -117,9 +117,9 @@ namespace CliFx
 
             // Project parameters to expected types
             var metadata = new ApplicationMetadata(_title, _executableName, _versionText, _description);
-            var commandTypes = _commandTypes.ToArray();
+            var configuration = new ApplicationConfiguration(_commandTypes.ToArray());
 
-            return new CliApplication(metadata, commandTypes,
+            return new CliApplication(metadata, configuration,
                 _console, new CommandInputParser(), new CommandSchemaResolver(),
                 _commandFactory, new CommandInitializer(), new CommandHelpTextRenderer());
         }
