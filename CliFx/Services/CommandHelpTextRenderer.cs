@@ -154,10 +154,10 @@ namespace CliFx.Services
                 var options = new List<CommandOptionSchema>();
                 options.AddRange(source.TargetCommandSchema.Options);
 
-                options.Add(new CommandOptionSchema(null, "help", 'h', null, false, "Shows help text."));
+                options.Add(new CommandOptionSchema(null, "help", 'h', false, "Shows help text."));
 
                 if (source.TargetCommandSchema.IsDefault())
-                    options.Add(new CommandOptionSchema(null, "version", null, null, false, "Shows application version."));
+                    options.Add(new CommandOptionSchema(null, "version", null, false, "Shows application version."));
 
                 // Margin
                 if (!IsEmpty())

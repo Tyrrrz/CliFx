@@ -17,7 +17,7 @@ namespace CliFx.Tests
         [SuppressMessage("ReSharper", "MemberCanBePrivate.Local")]
         private class TestCommand : ICommand
         {
-            [CommandOption("option-a", 'a', GroupName = "Group 1")]
+            [CommandOption("option-a", 'a')]
             public int OptionA { get; set; }
 
             [CommandOption("option-b", IsRequired = true)]
@@ -41,11 +41,11 @@ namespace CliFx.Tests
                     new[]
                     {
                         new CommandOptionSchema(typeof(TestCommand).GetProperty(nameof(TestCommand.OptionA)),
-                            "option-a", 'a', "Group 1", false, null),
+                            "option-a", 'a', false, null),
                         new CommandOptionSchema(typeof(TestCommand).GetProperty(nameof(TestCommand.OptionB)),
-                            "option-b", null, null, true, null),
+                            "option-b", null, true, null),
                         new CommandOptionSchema(typeof(TestCommand).GetProperty(nameof(TestCommand.OptionC)),
-                            "option-c", null, null, false, "Option C description")
+                            "option-c", null, false, "Option C description")
                     })
             );
         }

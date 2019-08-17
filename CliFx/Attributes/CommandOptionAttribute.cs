@@ -19,11 +19,6 @@ namespace CliFx.Attributes
         public char? ShortName { get; }
 
         /// <summary>
-        /// Option group name.
-        /// </summary>
-        public string GroupName { get; set; }
-
-        /// <summary>
         /// Whether an option is required.
         /// </summary>
         public bool IsRequired { get; set; }

@@ -25,11 +25,6 @@ namespace CliFx.Models
         public char? ShortName { get; }
 
         /// <summary>
-        /// Option group name.
-        /// </summary>
-        public string GroupName { get; }
-
-        /// <summary>
         /// Whether an option is required.
         /// </summary>
         public bool IsRequired { get; }
@@ -42,14 +37,12 @@ namespace CliFx.Models
         /// <summary>
         /// Initializes an instance of <see cref="CommandOptionSchema"/>.
         /// </summary>
-        public CommandOptionSchema(PropertyInfo property, string name, char? shortName,
-            string groupName, bool isRequired, string description)
+        public CommandOptionSchema(PropertyInfo property, string name, char? shortName, bool isRequired, string description)
         {
             Property = property; // can be null
             Name = name; // can be null
             ShortName = shortName; // can be null
             IsRequired = isRequired;
-            GroupName = groupName; // can be null
             Description = description; // can be null
         }
 

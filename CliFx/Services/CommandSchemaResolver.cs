@@ -22,7 +22,6 @@ namespace CliFx.Services
             return new CommandOptionSchema(optionProperty,
                 attribute.Name,
                 attribute.ShortName,
-                attribute.GroupName,
                 attribute.IsRequired,
                 attribute.Description);
         }

@@ -4,7 +4,7 @@ using CliFx.Services;
 
 namespace CliFx.Demo.Internal
 {
-    internal static class ConsoleExtensions
+    internal static class Extensions
     {
         public static void RenderBook(this IConsole console, Book book)
         {

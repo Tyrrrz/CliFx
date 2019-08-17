@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using CliFx.Exceptions;
 using CliFx.Internal;
 using CliFx.Models;
@@ -37,10 +35,9 @@ namespace CliFx.Services
             schema.GuardNotNull(nameof(schema));
             input.GuardNotNull(nameof(input));
 
+            var unsetRequiredOptions = schema.Options.Where(o => o.IsRequired).ToList();
+
             // Set command options
-            var isGroupNameDetected = false;
-            var groupName = default(string);
-            var properties = new HashSet<CommandOptionSchema>();
             foreach (var option in input.Options)
             {
                 var optionSchema = schema.Options.FindByAlias(option.Alias);
@@ -48,30 +45,19 @@ namespace CliFx.Services
                 if (optionSchema == null)
                     continue;
 
-                if (isGroupNameDetected && !string.Equals(groupName, optionSchema.GroupName, StringComparison.OrdinalIgnoreCase))
-                    continue;
-
-                if (!isGroupNameDetected)
-                {
-                    groupName = optionSchema.GroupName;
-                    isGroupNameDetected = true;
-                }
-
                 var convertedValue = _commandOptionInputConverter.ConvertOption(option, optionSchema.Property.PropertyType);
                 optionSchema.Property.SetValue(command, convertedValue);
 
-                properties.Add(optionSchema);
+                if (optionSchema.IsRequired)
+                    unsetRequiredOptions.Remove(optionSchema);
             }
 
-            var unsetRequiredOptions = schema.Options
-                .Except(properties)
-                .Where(p => p.IsRequired)
-                .Where(p => string.Equals(p.GroupName, groupName, StringComparison.OrdinalIgnoreCase))
-                .ToArray();
-
+            // Throw if any of the required options were not set
             if (unsetRequiredOptions.Any())
-                throw new MissingCommandOptionException(
-                    $"Can't resolve command because one or more required properties were not set: {unsetRequiredOptions.Select(p => p.Name).JoinToString(", ")}");
+            {
+                var unsetRequiredOptionNames = unsetRequiredOptions.Select(o => o.GetAliases().FirstOrDefault()).JoinToString(", ");
+                throw new MissingCommandOptionException($"One or more required options were not set: {unsetRequiredOptionNames}.");
+            }
         }
     }
 }

@@ -107,14 +107,29 @@ namespace CliFx.Models
                 // Compare against short name. Case is NOT ignored.
                 var matchesByShortName =
                     optionSchema.ShortName != null &&
-                    alias.Length == 1 &&
-                    alias[0] == optionSchema.ShortName;
+                    alias.Length == 1 && alias[0] == optionSchema.ShortName;
 
                 if (matchesByName || matchesByShortName)
                     return optionSchema;
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Gets valid aliases for the option.
+        /// </summary>
+        public static IReadOnlyList<string> GetAliases(this CommandOptionSchema optionSchema)
+        {
+            var result = new List<string>(2);
+
+            if (!optionSchema.Name.IsNullOrWhiteSpace())
+                result.Add(optionSchema.Name);
+
+            if (optionSchema.ShortName != null)
+                result.Add(optionSchema.ShortName.Value.AsString());
+
+            return result;
         }
     }
 }

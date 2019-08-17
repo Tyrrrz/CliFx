@@ -23,9 +23,6 @@ namespace CliFx.Tests
             [CommandOption("str", 's')]
             public string StringOption { get; set; } = "foo bar";
 
-            [CommandOption("bool", 'b', GroupName = "other-group")]
-            public bool BoolOption { get; set; }
-
             public Task ExecuteAsync(IConsole console) => Task.CompletedTask;
         }
     }
@@ -58,41 +55,6 @@ namespace CliFx.Tests
                     new CommandOptionInput("i", "13")
                 }),
                 new TestCommand {IntOption = 13}
-            );
-
-            yield return new TestCaseData(
-                new CommandInput(new[]
-                {
-                    new CommandOptionInput("bool")
-                }),
-                new TestCommand {BoolOption = true}
-            );
-
-            yield return new TestCaseData(
-                new CommandInput(new[]
-                {
-                    new CommandOptionInput("b")
-                }),
-                new TestCommand {BoolOption = true}
-            );
-
-            yield return new TestCaseData(
-                new CommandInput(new[]
-                {
-                    new CommandOptionInput("bool"),
-                    new CommandOptionInput("str", "hello world")
-                }),
-                new TestCommand {BoolOption = true}
-            );
-
-            yield return new TestCaseData(
-                new CommandInput(new[]
-                {
-                    new CommandOptionInput("int", "13"),
-                    new CommandOptionInput("str", "hello world"),
-                    new CommandOptionInput("bool")
-                }),
-                new TestCommand {IntOption = 13, StringOption = "hello world"}
             );
         }
 
