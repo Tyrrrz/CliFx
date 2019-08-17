@@ -53,9 +53,21 @@ namespace CliFx
                 result.Add("There are no commands defined in this application.");
             }
 
+            // Fail if there are commands that don't implement ICommand
+            var nonImplementedCommandNames = availableCommandSchemas
+                .Where(c => !c.Type.Implements(typeof(ICommand)))
+                .Select(c => c.Name)
+                .Distinct()
+                .ToArray();
+
+            foreach (var commandName in nonImplementedCommandNames)
+            {
+                result.Add($"Command [{commandName}] doesn't implement ICommand.");
+            }
+
             // Fail if there are multiple commands with the same name
             var nonUniqueCommandNames = availableCommandSchemas
-                .Select(c => c.Name?.Trim())
+                .Select(c => c.Name)
                 .GroupBy(i => i, StringComparer.OrdinalIgnoreCase)
                 .Where(g => g.Count() >= 2)
                 .SelectMany(g => g)
