@@ -22,9 +22,9 @@ namespace CliFx.Services
             var row = 0;
 
             // Get built-in option schemas (help and version)
-            var builtInOptionSchemas = new List<CommandOptionSchema> { CommandOptionSchema.Help };
+            var builtInOptionSchemas = new List<CommandOptionSchema> {CommandOptionSchema.HelpOption};
             if (source.TargetCommandSchema.IsDefault())
-                builtInOptionSchemas.Add(CommandOptionSchema.Version);
+                builtInOptionSchemas.Add(CommandOptionSchema.VersionOption);
 
             // Get child command schemas
             var childCommandSchemas = source.AvailableCommandSchemas

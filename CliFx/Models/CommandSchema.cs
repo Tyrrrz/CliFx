@@ -8,7 +8,7 @@ namespace CliFx.Models
     /// <summary>
     /// Schema of a defined command.
     /// </summary>
-    public class CommandSchema
+    public partial class CommandSchema
     {
         /// <summary>
         /// Underlying type.
@@ -59,5 +59,11 @@ namespace CliFx.Models
 
             return buffer.ToString();
         }
+    }
+
+    public partial class CommandSchema
+    {
+        internal static CommandSchema StubDefaultCommand { get; } =
+            new CommandSchema(null, null, null, new CommandOptionSchema[0]);
     }
 }

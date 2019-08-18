@@ -74,10 +74,10 @@ namespace CliFx.Models
         // We define them here to serve as a single source of truth, because they are used...
         // ...in CliApplication (when reading) and HelpTextRenderer (when writing).
 
-        internal static CommandOptionSchema Help { get; } =
+        internal static CommandOptionSchema HelpOption { get; } =
             new CommandOptionSchema(null, "help", 'h', false, "Shows help text.");
 
-        internal static CommandOptionSchema Version { get; } =
+        internal static CommandOptionSchema VersionOption { get; } =
             new CommandOptionSchema(null, "version", null, false, "Shows version information.");
     }
 }

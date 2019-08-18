@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using CliFx.Internal;
 using CliFx.Models;
@@ -12,15 +11,14 @@ namespace CliFx.Services
     public static class Extensions
     {
         /// <summary>
-        /// Resolves command schemas for commands of specified types.
+        /// Resolves command schema for specified command type.
         /// </summary>
-        public static IReadOnlyList<CommandSchema> GetCommandSchemas(this ICommandSchemaResolver resolver,
-            IReadOnlyList<Type> commandTypes)
+        public static CommandSchema GetCommandSchema(this ICommandSchemaResolver resolver, Type commandType)
         {
             resolver.GuardNotNull(nameof(resolver));
-            commandTypes.GuardNotNull(nameof(commandTypes));
+            commandType.GuardNotNull(nameof(commandType));
 
-            return commandTypes.Select(resolver.GetCommandSchema).ToArray();
+            return resolver.GetCommandSchemas(new[] {commandType}).First();
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using CliFx.Models;
 
 namespace CliFx.Services
@@ -9,8 +10,8 @@ namespace CliFx.Services
     public interface ICommandSchemaResolver
     {
         /// <summary>
-        /// Resolves schema of a command of specified type.
+        /// Resolves schemas of specified command types.
         /// </summary>
-        CommandSchema GetCommandSchema(Type commandType);
+        IReadOnlyList<CommandSchema> GetCommandSchemas(IReadOnlyList<Type> commandTypes);
     }
 }

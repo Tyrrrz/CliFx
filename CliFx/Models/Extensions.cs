@@ -111,7 +111,7 @@ namespace CliFx.Models
 
             var firstOption = commandInput.Options.FirstOrDefault();
 
-            return firstOption != null && CommandOptionSchema.Help.MatchesAlias(firstOption.Alias);
+            return firstOption != null && CommandOptionSchema.HelpOption.MatchesAlias(firstOption.Alias);
         }
 
         /// <summary>
@@ -123,7 +123,7 @@ namespace CliFx.Models
 
             var firstOption = commandInput.Options.FirstOrDefault();
 
-            return firstOption != null && CommandOptionSchema.Version.MatchesAlias(firstOption.Alias);
+            return firstOption != null && CommandOptionSchema.VersionOption.MatchesAlias(firstOption.Alias);
         }
 
         /// <summary>

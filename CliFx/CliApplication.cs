@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CliFx.Attributes;
 using CliFx.Exceptions;
 using CliFx.Internal;
 using CliFx.Models;
@@ -13,7 +12,7 @@ namespace CliFx
     /// <summary>
     /// Default implementation of <see cref="ICliApplication"/>.
     /// </summary>
-    public partial class CliApplication : ICliApplication
+    public class CliApplication : ICliApplication
     {
         private readonly ApplicationMetadata _metadata;
         private readonly ApplicationConfiguration _configuration;
@@ -43,85 +42,6 @@ namespace CliFx
             _helpTextRenderer = helpTextRenderer.GuardNotNull(nameof(helpTextRenderer));
         }
 
-        private IReadOnlyList<string> GetAvailableCommandSchemasValidationErrors(IReadOnlyList<CommandSchema> availableCommandSchemas)
-        {
-            var result = new List<string>();
-
-            // Fail if there are no commands defined
-            if (!availableCommandSchemas.Any())
-            {
-                result.Add("There are no commands defined.");
-            }
-
-            // Fail if there are commands that don't implement ICommand
-            var nonImplementedCommandNames = availableCommandSchemas
-                .Where(c => !c.Type.Implements(typeof(ICommand)))
-                .Select(c => c.Name)
-                .Distinct()
-                .ToArray();
-
-            foreach (var commandName in nonImplementedCommandNames)
-            {
-                result.Add(!commandName.IsNullOrWhiteSpace()
-                    ? $"Command [{commandName}] doesn't implement ICommand."
-                    : "Default command doesn't implement ICommand.");
-            }
-
-            // Fail if there are multiple commands with the same name
-            var nonUniqueCommandNames = availableCommandSchemas
-                .Select(c => c.Name)
-                .GroupBy(i => i, StringComparer.OrdinalIgnoreCase)
-                .Where(g => g.Count() >= 2)
-                .SelectMany(g => g)
-                .Distinct()
-                .ToArray();
-
-            foreach (var commandName in nonUniqueCommandNames)
-            {
-                result.Add(!commandName.IsNullOrWhiteSpace()
-                    ? $"There are multiple commands defined with name [{commandName}]."
-                    : "There are multiple default commands defined.");
-            }
-
-            // Fail if there are multiple options with the same name inside the same command
-            foreach (var commandSchema in availableCommandSchemas)
-            {
-                var nonUniqueOptionNames = commandSchema.Options
-                    .Where(o => !o.Name.IsNullOrWhiteSpace())
-                    .Select(o => o.Name)
-                    .GroupBy(i => i, StringComparer.OrdinalIgnoreCase)
-                    .Where(g => g.Count() >= 2)
-                    .SelectMany(g => g)
-                    .Distinct()
-                    .ToArray();
-
-                foreach (var optionName in nonUniqueOptionNames)
-                {
-                    result.Add(!commandSchema.Name.IsNullOrWhiteSpace()
-                        ? $"There are multiple options defined with name [{optionName}] on command [{commandSchema.Name}]."
-                        : $"There are multiple options defined with name [{optionName}] on default command.");
-                }
-
-                var nonUniqueOptionShortNames = commandSchema.Options
-                    .Where(o => o.ShortName != null)
-                    .Select(o => o.ShortName.Value)
-                    .GroupBy(i => i)
-                    .Where(g => g.Count() >= 2)
-                    .SelectMany(g => g)
-                    .Distinct()
-                    .ToArray();
-
-                foreach (var optionShortName in nonUniqueOptionShortNames)
-                {
-                    result.Add(!commandSchema.Name.IsNullOrWhiteSpace()
-                        ? $"There are multiple options defined with short name [{optionShortName}] on command [{commandSchema.Name}]."
-                        : $"There are multiple options defined with short name [{optionShortName}] on default command.");
-                }
-            }
-
-            return result;
-        }
-
         /// <inheritdoc />
         public async Task<int> RunAsync(IReadOnlyList<string> commandLineArguments)
         {
@@ -129,23 +49,17 @@ namespace CliFx
 
             try
             {
+                // Get schemas for all available command types
+                var availableCommandSchemas = _commandSchemaResolver.GetCommandSchemas(_configuration.CommandTypes);
+
+                // Parse command input from arguments
                 var commandInput = _commandInputParser.ParseCommandInput(commandLineArguments);
 
-                var availableCommandSchemas = _commandSchemaResolver.GetCommandSchemas(_configuration.CommandTypes);
-                var matchingCommandSchema = availableCommandSchemas.FindByName(commandInput.CommandName);
-
-                // Validate available command schemas
-                var validationErrors = GetAvailableCommandSchemasValidationErrors(availableCommandSchemas);
-                if (validationErrors.Any())
-                {
-                    foreach (var error in validationErrors)
-                        _console.WithForegroundColor(ConsoleColor.Red, () => _console.Output.WriteLine(error));
-
-                    return -1;
-                }
+                // Find command schema matching the name specified in the input
+                var targetCommandSchema = availableCommandSchemas.FindByName(commandInput.CommandName);
 
                 // Handle cases where requested command is not defined
-                if (matchingCommandSchema == null)
+                if (targetCommandSchema == null)
                 {
                     var isError = false;
 
@@ -164,7 +78,7 @@ namespace CliFx
                     // Use a stub if parent command schema is not found
                     if (parentCommandSchema == null)
                     {
-                        parentCommandSchema = _commandSchemaResolver.GetCommandSchema(typeof(StubDefaultCommand));
+                        parentCommandSchema = CommandSchema.StubDefaultCommand;
                         availableCommandSchemas = availableCommandSchemas.Concat(new[] { parentCommandSchema }).ToArray();
                     }
 
@@ -186,18 +100,19 @@ namespace CliFx
                 // Show help if it was requested
                 if (commandInput.IsHelpRequested())
                 {
-                    var helpTextSource = new HelpTextSource(_metadata, availableCommandSchemas, matchingCommandSchema);
+                    var helpTextSource = new HelpTextSource(_metadata, availableCommandSchemas, targetCommandSchema);
                     _helpTextRenderer.RenderHelpText(_console, helpTextSource);
 
                     return 0;
                 }
 
                 // Create an instance of the command
-                var command = _commandFactory.CreateCommand(matchingCommandSchema.Type);
+                var command = _commandFactory.CreateCommand(targetCommandSchema.Type);
 
                 // Populate command with options according to its schema
-                _commandInitializer.InitializeCommand(command, matchingCommandSchema, commandInput);
+                _commandInitializer.InitializeCommand(command, targetCommandSchema, commandInput);
 
+                // Execute command
                 await command.ExecuteAsync(_console);
 
                 return 0;
@@ -219,15 +134,6 @@ namespace CliFx
 
                 return exitCode;
             }
-        }
-    }
-
-    public partial class CliApplication
-    {
-        [Command]
-        private sealed class StubDefaultCommand : ICommand
-        {
-            public Task ExecuteAsync(IConsole console) => Task.CompletedTask;
         }
     }
 }
