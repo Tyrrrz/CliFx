@@ -45,6 +45,15 @@ namespace CliFx.Services
                 row++;
             }
 
+            void RenderMargin(int lines = 1)
+            {
+                if (!IsEmpty())
+                {
+                    for (var i = 0; i < lines; i++)
+                        RenderNewLine();
+                }
+            }
+
             void RenderIndent(int spaces = 2)
             {
                 Render(' '.Repeat(spaces));
@@ -104,8 +113,7 @@ namespace CliFx.Services
                     return;
 
                 // Margin
-                if (!IsEmpty())
-                    RenderNewLine();
+                RenderMargin();
 
                 // Header
                 RenderHeader("Description");
@@ -119,8 +127,7 @@ namespace CliFx.Services
             void RenderUsage()
             {
                 // Margin
-                if (!IsEmpty())
-                    RenderNewLine();
+                RenderMargin();
 
                 // Header
                 RenderHeader("Usage");
@@ -160,8 +167,7 @@ namespace CliFx.Services
                     options.Add(new CommandOptionSchema(null, "version", null, false, "Shows application version."));
 
                 // Margin
-                if (!IsEmpty())
-                    RenderNewLine();
+                RenderMargin();
 
                 // Header
                 RenderHeader("Options");
@@ -206,8 +212,7 @@ namespace CliFx.Services
                     return;
 
                 // Margin
-                if (!IsEmpty())
-                    RenderNewLine();
+                RenderMargin();
 
                 // Header
                 RenderHeader("Commands");
@@ -232,7 +237,7 @@ namespace CliFx.Services
                 }
 
                 // Margin
-                RenderNewLine();
+                RenderMargin();
 
                 // Child command help tip
                 Render("You can run `");
