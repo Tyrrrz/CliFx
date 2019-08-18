@@ -21,6 +21,11 @@ namespace CliFx.Services
             var column = 0;
             var row = 0;
 
+            // Get built-in option schemas (help and version)
+            var builtInOptionSchemas = new List<CommandOptionSchema> { CommandOptionSchema.Help };
+            if (source.TargetCommandSchema.IsDefault())
+                builtInOptionSchemas.Add(CommandOptionSchema.Version);
+
             // Get child command schemas
             var childCommandSchemas = source.AvailableCommandSchemas
                 .Where(c => source.AvailableCommandSchemas.FindParent(c.Name) == source.TargetCommandSchema)
@@ -158,14 +163,6 @@ namespace CliFx.Services
 
             void RenderOptions()
             {
-                var options = new List<CommandOptionSchema>();
-                options.AddRange(source.TargetCommandSchema.Options);
-
-                options.Add(new CommandOptionSchema(null, "help", 'h', false, "Shows help text."));
-
-                if (source.TargetCommandSchema.IsDefault())
-                    options.Add(new CommandOptionSchema(null, "version", null, false, "Shows application version."));
-
                 // Margin
                 RenderMargin();
 
@@ -173,10 +170,10 @@ namespace CliFx.Services
                 RenderHeader("Options");
 
                 // Options
-                foreach (var option in options)
+                foreach (var optionSchema in source.TargetCommandSchema.Options.Concat(builtInOptionSchemas))
                 {
                     // Is required
-                    if (option.IsRequired)
+                    if (optionSchema.IsRequired)
                     {
                         RenderWithColor("* ", ConsoleColor.Red);
                     }
@@ -186,28 +183,28 @@ namespace CliFx.Services
                     }
 
                     // Short name
-                    if (option.ShortName != null)
+                    if (optionSchema.ShortName != null)
                     {
-                        RenderWithColor($"-{option.ShortName}", ConsoleColor.White);
+                        RenderWithColor($"-{optionSchema.ShortName}", ConsoleColor.White);
                     }
 
                     // Delimiter
-                    if (!option.Name.IsNullOrWhiteSpace() && option.ShortName != null)
+                    if (!optionSchema.Name.IsNullOrWhiteSpace() && optionSchema.ShortName != null)
                     {
                         Render("|");
                     }
 
                     // Name
-                    if (!option.Name.IsNullOrWhiteSpace())
+                    if (!optionSchema.Name.IsNullOrWhiteSpace())
                     {
-                        RenderWithColor($"--{option.Name}", ConsoleColor.White);
+                        RenderWithColor($"--{optionSchema.Name}", ConsoleColor.White);
                     }
 
                     // Description
-                    if (!option.Description.IsNullOrWhiteSpace())
+                    if (!optionSchema.Description.IsNullOrWhiteSpace())
                     {
                         RenderColumnIndent();
-                        Render(option.Description);
+                        Render(optionSchema.Description);
                     }
 
                     RenderNewLine();

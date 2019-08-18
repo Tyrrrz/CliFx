@@ -52,12 +52,6 @@ namespace CliFx.Tests
                 new[] {"command", "-h"}
             );
 
-            yield return new TestCaseData(
-                new[] {typeof(TestNamedCommand)},
-                new[] {"command", "-?"}
-            );
-
-
             // Default command is defined
 
             yield return new TestCaseData(
@@ -78,11 +72,6 @@ namespace CliFx.Tests
             yield return new TestCaseData(
                 new[] {typeof(TestDefaultCommand)},
                 new[] {"-h"}
-            );
-
-            yield return new TestCaseData(
-                new[] {typeof(TestDefaultCommand)},
-                new[] {"-?"}
             );
 
             // Default command is not defined
@@ -107,11 +96,6 @@ namespace CliFx.Tests
                 new[] {"-h"}
             );
 
-            yield return new TestCaseData(
-                new[] {typeof(TestNamedCommand)},
-                new[] {"-?"}
-            );
-
             // Specified a faulty command
 
             yield return new TestCaseData(
@@ -122,11 +106,6 @@ namespace CliFx.Tests
             yield return new TestCaseData(
                 new[] {typeof(TestFaultyCommand)},
                 new[] {"faulty", "command", "-h"}
-            );
-
-            yield return new TestCaseData(
-                new[] {typeof(TestFaultyCommand)},
-                new[] {"faulty", "command", "-?"}
             );
         }
 
@@ -156,11 +135,6 @@ namespace CliFx.Tests
 
             yield return new TestCaseData(
                 new Type[0],
-                new[] {"-?"}
-            );
-
-            yield return new TestCaseData(
-                new Type[0],
                 new[] {"command"}
             );
 
@@ -184,11 +158,6 @@ namespace CliFx.Tests
             yield return new TestCaseData(
                 new[] {typeof(TestDefaultCommand)},
                 new[] {"command", "-h"}
-            );
-
-            yield return new TestCaseData(
-                new[] {typeof(TestDefaultCommand)},
-                new[] {"command", "-?"}
             );
 
             // Specified a faulty command

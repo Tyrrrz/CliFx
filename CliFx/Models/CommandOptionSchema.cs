@@ -7,7 +7,7 @@ namespace CliFx.Models
     /// <summary>
     /// Schema of a defined command option.
     /// </summary>
-    public class CommandOptionSchema
+    public partial class CommandOptionSchema
     {
         /// <summary>
         /// Underlying property.
@@ -65,5 +65,19 @@ namespace CliFx.Models
 
             return buffer.ToString();
         }
+    }
+
+    public partial class CommandOptionSchema
+    {
+        // Here we define some built-in options.
+        // This is probably a bit hacky but I couldn't come up with a better solution given this architecture.
+        // We define them here to serve as a single source of truth, because they are used...
+        // ...in CliApplication (when reading) and HelpTextRenderer (when writing).
+
+        internal static CommandOptionSchema Help { get; } =
+            new CommandOptionSchema(null, "help", 'h', false, "Shows help text.");
+
+        internal static CommandOptionSchema Version { get; } =
+            new CommandOptionSchema(null, "version", null, false, "Shows version information.");
     }
 }
