@@ -175,7 +175,15 @@ namespace CliFx.Services
                 // Options
                 foreach (var option in options)
                 {
-                    RenderIndent();
+                    // Is required
+                    if (option.IsRequired)
+                    {
+                        RenderWithColor("* ", ConsoleColor.Red);
+                    }
+                    else
+                    {
+                        RenderIndent();
+                    }
 
                     // Short name
                     if (option.ShortName != null)
