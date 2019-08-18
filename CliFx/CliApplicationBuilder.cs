@@ -24,7 +24,7 @@ namespace CliFx
         private ICommandFactory _commandFactory;
 
         /// <inheritdoc />
-        public ICliApplicationBuilder WithCommand(Type commandType)
+        public ICliApplicationBuilder AddCommand(Type commandType)
         {
             commandType.GuardNotNull(nameof(commandType));
 
@@ -34,14 +34,14 @@ namespace CliFx
         }
 
         /// <inheritdoc />
-        public ICliApplicationBuilder WithCommandsFrom(Assembly commandAssembly)
+        public ICliApplicationBuilder AddCommandsFrom(Assembly commandAssembly)
         {
             commandAssembly.GuardNotNull(nameof(commandAssembly));
 
             var commandTypes = commandAssembly.ExportedTypes.Where(t => t.Implements(typeof(ICommand)));
 
             foreach (var commandType in commandTypes)
-                WithCommand(commandType);
+                AddCommand(commandType);
 
             return this;
         }

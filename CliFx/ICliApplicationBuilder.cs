@@ -12,12 +12,12 @@ namespace CliFx
         /// <summary>
         /// Adds a command of specified type to the application.
         /// </summary>
-        ICliApplicationBuilder WithCommand(Type commandType);
+        ICliApplicationBuilder AddCommand(Type commandType);
 
         /// <summary>
         /// Adds commands from specified assembly to the application.
         /// </summary>
-        ICliApplicationBuilder WithCommandsFrom(Assembly commandAssembly);
+        ICliApplicationBuilder AddCommandsFrom(Assembly commandAssembly);
 
         /// <summary>
         /// Sets application title, which appears in the help text.

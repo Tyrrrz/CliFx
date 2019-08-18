@@ -24,7 +24,7 @@ namespace CliFx.Demo
             var serviceProvider = services.BuildServiceProvider();
 
             return new CliApplicationBuilder()
-                .WithCommandsFromThisAssembly()
+                .AddCommandsFromThisAssembly()
                 .UseCommandFactory(type => (ICommand) serviceProvider.GetRequiredService(type))
                 .Build()
                 .RunAsync(args);

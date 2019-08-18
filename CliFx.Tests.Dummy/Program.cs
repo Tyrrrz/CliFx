@@ -12,7 +12,7 @@ namespace CliFx.Tests.Dummy
             CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
 
             return new CliApplicationBuilder()
-                .WithCommandsFromThisAssembly()
+                .AddCommandsFromThisAssembly()
                 .UseDescription("Dummy program used for E2E tests.")
                 .Build()
                 .RunAsync(args);

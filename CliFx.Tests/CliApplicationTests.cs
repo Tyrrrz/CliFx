@@ -204,7 +204,7 @@ namespace CliFx.Tests
         public async Task RunAsync_Test(IReadOnlyList<Type> commandTypes, IReadOnlyList<string> commandLineArguments)
         {
             // Arrange
-            var application = new CliApplicationBuilder().WithCommands(commandTypes).Build();
+            var application = new CliApplicationBuilder().AddCommands(commandTypes).Build();
 
             // Act
             var exitCodeValue = await application.RunAsync(commandLineArguments);
@@ -218,7 +218,7 @@ namespace CliFx.Tests
         public async Task RunAsync_Negative_Test(IReadOnlyList<Type> commandTypes, IReadOnlyList<string> commandLineArguments)
         {
             // Arrange
-            var application = new CliApplicationBuilder().WithCommands(commandTypes).Build();
+            var application = new CliApplicationBuilder().AddCommands(commandTypes).Build();
 
             // Act
             var exitCodeValue = await application.RunAsync(commandLineArguments);

@@ -50,7 +50,7 @@ public static class Program
 {
     public static Task<int> Main(string[] args) =>
         new CliApplicationBuilder()
-            .WithCommandsFromThisAssembly()
+            .AddCommandsFromThisAssembly()
             .Build()
             .RunAsync(args);
 }
@@ -138,7 +138,7 @@ public static class Program
         var serviceProvider = services.BuildServiceProvider();
 
         return new CliApplicationBuilder()
-            .WithCommandsFromThisAssembly()
+            .AddCommandsFromThisAssembly()
             .UseCommandFactory(type => (ICommand) serviceProvider.GetRequiredService(type))
             .Build()
             .RunAsync(args);
@@ -151,16 +151,16 @@ public static class Program
 In most cases, your commands will be defined in your main assembly which is where CliFx will look if you initialize the application using the following code.
 
 ```c#
-var app = new CliApplicationBuilder().WithCommandsFromThisAssembly().Build();
+var app = new CliApplicationBuilder().AddCommandsFromThisAssembly().Build();
 ```
 
-If you want to configure your application to resolve specific commands or commands from another assembly you can use `WithCommand` and `WithCommandsFrom` methods for that.
+If you want to configure your application to resolve specific commands or commands from another assembly you can use `AddCommand` and `AddCommandsFrom` methods for that.
 
 ```c#
 var app = new CliApplicationBuilder()
-    .WithCommand(typeof(CommandA)) // include CommandA specifically
-    .WithCommand(typeof(CommandB)) // include CommandB specifically
-    .WithCommandsFrom(typeof(CommandC).Assembly) // include all commands from assembly that contains CommandC
+    .AddCommand(typeof(CommandA)) // include CommandA specifically
+    .AddCommand(typeof(CommandB)) // include CommandB specifically
+    .AddCommandsFrom(typeof(CommandC).Assembly) // include all commands from assembly that contains CommandC
     .Build();
 ```
 
@@ -291,7 +291,7 @@ public async Task ConcatCommand_Test()
         var console = new VirtualConsole(stdout);
 
         var app = new CliApplicationBuilder()
-            .WithCommand(typeof(ConcatCommand))
+            .AddCommand(typeof(ConcatCommand))
             .UseConsole(console)
             .Build();
 

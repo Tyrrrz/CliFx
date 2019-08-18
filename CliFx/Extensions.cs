@@ -14,13 +14,13 @@ namespace CliFx
         /// <summary>
         /// Adds multiple commands to the application.
         /// </summary>
-        public static ICliApplicationBuilder WithCommands(this ICliApplicationBuilder builder, IReadOnlyList<Type> commandTypes)
+        public static ICliApplicationBuilder AddCommands(this ICliApplicationBuilder builder, IReadOnlyList<Type> commandTypes)
         {
             builder.GuardNotNull(nameof(builder));
             commandTypes.GuardNotNull(nameof(commandTypes));
 
             foreach (var commandType in commandTypes)
-                builder.WithCommand(commandType);
+                builder.AddCommand(commandType);
 
             return builder;
         }
@@ -28,13 +28,13 @@ namespace CliFx
         /// <summary>
         /// Adds commands from specified assemblies to the application.
         /// </summary>
-        public static ICliApplicationBuilder WithCommandsFrom(this ICliApplicationBuilder builder, IReadOnlyList<Assembly> commandAssemblies)
+        public static ICliApplicationBuilder AddCommandsFrom(this ICliApplicationBuilder builder, IReadOnlyList<Assembly> commandAssemblies)
         {
             builder.GuardNotNull(nameof(builder));
             commandAssemblies.GuardNotNull(nameof(commandAssemblies));
 
             foreach (var commandAssembly in commandAssemblies)
-                builder.WithCommandsFrom(commandAssembly);
+                builder.AddCommandsFrom(commandAssembly);
 
             return builder;
         }
@@ -42,10 +42,10 @@ namespace CliFx
         /// <summary>
         /// Adds commands from calling assembly to the application.
         /// </summary>
-        public static ICliApplicationBuilder WithCommandsFromThisAssembly(this ICliApplicationBuilder builder)
+        public static ICliApplicationBuilder AddCommandsFromThisAssembly(this ICliApplicationBuilder builder)
         {
             builder.GuardNotNull(nameof(builder));
-            return builder.WithCommandsFrom(Assembly.GetCallingAssembly());
+            return builder.AddCommandsFrom(Assembly.GetCallingAssembly());
         }
 
         /// <summary>

@@ -11,7 +11,7 @@ namespace CliFx.Benchmarks
         private static readonly string[] Arguments = { "--str", "hello world", "-i", "13", "-b" };
 
         [Benchmark(Description = "CliFx", Baseline = true)]
-        public Task<int> ExecuteWithCliFx() => new CliApplicationBuilder().WithCommand(typeof(CliFxCommand)).Build().RunAsync(Arguments);
+        public Task<int> ExecuteWithCliFx() => new CliApplicationBuilder().AddCommand(typeof(CliFxCommand)).Build().RunAsync(Arguments);
 
         [Benchmark(Description = "System.CommandLine")]
         public Task<int> ExecuteWithSystemCommandLine() => new SystemCommandLineCommand().ExecuteAsync(Arguments);
