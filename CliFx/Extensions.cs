@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using CliFx.Internal;
+using CliFx.Models;
 using CliFx.Services;
 
 namespace CliFx
@@ -51,7 +52,7 @@ namespace CliFx
         /// <summary>
         /// Configures application to use specified factory method for creating new instances of <see cref="ICommand"/>.
         /// </summary>
-        public static ICliApplicationBuilder UseCommandFactory(this ICliApplicationBuilder builder, Func<Type, ICommand> factoryMethod)
+        public static ICliApplicationBuilder UseCommandFactory(this ICliApplicationBuilder builder, Func<CommandSchema, ICommand> factoryMethod)
         {
             builder.GuardNotNull(nameof(builder));
             factoryMethod.GuardNotNull(nameof(factoryMethod));

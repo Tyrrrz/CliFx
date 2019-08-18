@@ -1,4 +1,5 @@
 ﻿using System;
+using CliFx.Models;
 
 namespace CliFx.Services
 {
@@ -8,8 +9,8 @@ namespace CliFx.Services
     public interface ICommandFactory
     {
         /// <summary>
-        /// Initializes an instance of <see cref="ICommand"/> of specified type.
+        /// Initializes an instance of <see cref="ICommand"/> with specified schema.
         /// </summary>
-        ICommand CreateCommand(Type commandType);
+        ICommand CreateCommand(CommandSchema commandSchema);
     }
 }

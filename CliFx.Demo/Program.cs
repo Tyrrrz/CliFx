@@ -25,7 +25,7 @@ namespace CliFx.Demo
 
             return new CliApplicationBuilder()
                 .AddCommandsFromThisAssembly()
-                .UseCommandFactory(type => (ICommand) serviceProvider.GetRequiredService(type))
+                .UseCommandFactory(schema => (ICommand) serviceProvider.GetRequiredService(schema.Type))
                 .Build()
                 .RunAsync(args);
         }

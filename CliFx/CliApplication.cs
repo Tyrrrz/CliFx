@@ -107,7 +107,7 @@ namespace CliFx
                 }
 
                 // Create an instance of the command
-                var command = _commandFactory.CreateCommand(targetCommandSchema.Type);
+                var command = _commandFactory.CreateCommand(targetCommandSchema);
 
                 // Populate command with options according to its schema
                 _commandInitializer.InitializeCommand(command, targetCommandSchema, commandInput);
