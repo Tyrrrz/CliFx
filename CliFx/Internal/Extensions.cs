@@ -23,8 +23,8 @@ namespace CliFx.Internal
             return index < 0 ? s : s.Substring(0, index);
         }
 
-        public static StringBuilder AppendIfEmpty(this StringBuilder builder, char value) =>
-            builder.Length == 0 ? builder.Append(value) : builder;
+        public static StringBuilder AppendIfNotEmpty(this StringBuilder builder, char value) =>
+            builder.Length > 0 ? builder.Append(value) : builder;
 
         public static TValue GetValueOrDefault<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dic, TKey key) =>
             dic.TryGetValue(key, out var result) ? result : default;

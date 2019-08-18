@@ -54,7 +54,7 @@ namespace CliFx.Models
 
             foreach (var value in Values)
             {
-                buffer.AppendIfEmpty(' ');
+                buffer.AppendIfNotEmpty(' ');
 
                 var isEscaped = value.Contains(" ");
 

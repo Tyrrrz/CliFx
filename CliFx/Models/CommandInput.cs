@@ -63,7 +63,7 @@ namespace CliFx.Models
 
             foreach (var option in Options)
             {
-                buffer.AppendIfEmpty(' ');
+                buffer.AppendIfNotEmpty(' ');
                 buffer.Append(option);
             }
 
