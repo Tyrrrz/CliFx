@@ -150,7 +150,10 @@ namespace CliFx.Services
             // Multiple values
             else
             {
+                // Determine underlying type of elements inside the target collection type
                 var underlyingType = targetType.GetEnumerableUnderlyingType() ?? typeof(object);
+
+                // Convert values to that type
                 var convertedValues = option.Values.Select(v => ConvertValue(v, underlyingType)).ToNonGenericArray(underlyingType);
                 var convertedValuesType = convertedValues.GetType();
 
@@ -158,7 +161,7 @@ namespace CliFx.Services
                 if (targetType.IsAssignableFrom(convertedValuesType))
                     return convertedValues;
 
-                // Can be constructed from array of values (e.g. HashSet<T>, List<T>)
+                // Has a constructor that accepts an array of values (e.g. HashSet<T>, List<T>)
                 var arrayConstructor = targetType.GetConstructor(new[] {convertedValuesType});
                 if (arrayConstructor != null)
                     return arrayConstructor.Invoke(new object[] {convertedValues});

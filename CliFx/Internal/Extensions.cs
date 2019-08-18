@@ -44,7 +44,7 @@ namespace CliFx.Internal
             return type.GetInterfaces()
                 .Select(GetEnumerableUnderlyingType)
                 .ExceptNull()
-                .OrderByDescending(t => t != typeof(object))
+                .OrderByDescending(t => t != typeof(object)) // prioritize more specific types
                 .FirstOrDefault();
         }
 

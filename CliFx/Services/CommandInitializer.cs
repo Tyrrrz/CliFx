@@ -35,19 +35,24 @@ namespace CliFx.Services
             schema.GuardNotNull(nameof(schema));
             input.GuardNotNull(nameof(input));
 
+            // Keep track of unset required options to report an error at a later stage
             var unsetRequiredOptions = schema.Options.Where(o => o.IsRequired).ToList();
 
             // Set command options
-            foreach (var option in input.Options)
+            foreach (var optionInput in input.Options)
             {
-                var optionSchema = schema.Options.FindByAlias(option.Alias);
-
+                // Find matching option schema for this option input
+                var optionSchema = schema.Options.FindByAlias(optionInput.Alias);
                 if (optionSchema == null)
                     continue;
 
-                var convertedValue = _commandOptionInputConverter.ConvertOption(option, optionSchema.Property.PropertyType);
+                // Convert option to the type of the underlying property
+                var convertedValue = _commandOptionInputConverter.ConvertOption(optionInput, optionSchema.Property.PropertyType);
+
+                // Set value of the underlying property
                 optionSchema.Property.SetValue(command, convertedValue);
 
+                // Mark this required option as set
                 if (optionSchema.IsRequired)
                     unsetRequiredOptions.Remove(optionSchema);
             }

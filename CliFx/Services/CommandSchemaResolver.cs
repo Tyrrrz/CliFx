@@ -31,6 +31,7 @@ namespace CliFx.Services
         {
             commandType.GuardNotNull(nameof(commandType));
 
+            // Attribute is optional for commands in order to reduce runtime rule complexity
             var attribute = commandType.GetCustomAttribute<CommandAttribute>();
 
             var options = commandType.GetProperties().Select(GetCommandOptionSchema).ExceptNull().ToArray();
