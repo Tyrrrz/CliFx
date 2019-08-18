@@ -23,14 +23,14 @@ namespace CliFx
         private readonly ICommandSchemaResolver _commandSchemaResolver;
         private readonly ICommandFactory _commandFactory;
         private readonly ICommandInitializer _commandInitializer;
-        private readonly ICommandHelpTextRenderer _commandHelpTextRenderer;
+        private readonly IHelpTextRenderer _helpTextRenderer;
 
         /// <summary>
         /// Initializes an instance of <see cref="CliApplication"/>.
         /// </summary>
         public CliApplication(ApplicationMetadata metadata, ApplicationConfiguration configuration,
             IConsole console, ICommandInputParser commandInputParser, ICommandSchemaResolver commandSchemaResolver,
-            ICommandFactory commandFactory, ICommandInitializer commandInitializer, ICommandHelpTextRenderer commandHelpTextRenderer)
+            ICommandFactory commandFactory, ICommandInitializer commandInitializer, IHelpTextRenderer helpTextRenderer)
         {
             _metadata = metadata.GuardNotNull(nameof(metadata));
             _configuration = configuration.GuardNotNull(nameof(configuration));
@@ -40,7 +40,7 @@ namespace CliFx
             _commandSchemaResolver = commandSchemaResolver.GuardNotNull(nameof(commandSchemaResolver));
             _commandFactory = commandFactory.GuardNotNull(nameof(commandFactory));
             _commandInitializer = commandInitializer.GuardNotNull(nameof(commandInitializer));
-            _commandHelpTextRenderer = commandHelpTextRenderer.GuardNotNull(nameof(commandHelpTextRenderer));
+            _helpTextRenderer = helpTextRenderer.GuardNotNull(nameof(helpTextRenderer));
         }
 
         private IReadOnlyList<string> GetAvailableCommandSchemasValidationErrors(IReadOnlyList<CommandSchema> availableCommandSchemas)
@@ -170,7 +170,7 @@ namespace CliFx
 
                     // Show help
                     var helpTextSource = new HelpTextSource(_metadata, availableCommandSchemas, parentCommandSchema);
-                    _commandHelpTextRenderer.RenderHelpText(_console, helpTextSource);
+                    _helpTextRenderer.RenderHelpText(_console, helpTextSource);
 
                     return isError ? -1 : 0;
                 }
@@ -187,7 +187,7 @@ namespace CliFx
                 if (commandInput.IsHelpRequested())
                 {
                     var helpTextSource = new HelpTextSource(_metadata, availableCommandSchemas, matchingCommandSchema);
-                    _commandHelpTextRenderer.RenderHelpText(_console, helpTextSource);
+                    _helpTextRenderer.RenderHelpText(_console, helpTextSource);
 
                     return 0;
                 }

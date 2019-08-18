@@ -7,9 +7,9 @@ using CliFx.Models;
 namespace CliFx.Services
 {
     /// <summary>
-    /// Default implementation of <see cref="ICommandHelpTextRenderer"/>.
+    /// Default implementation of <see cref="IHelpTextRenderer"/>.
     /// </summary>
-    public partial class CommandHelpTextRenderer : ICommandHelpTextRenderer
+    public partial class HelpTextRenderer : IHelpTextRenderer
     {
         /// <inheritdoc />
         public void RenderHelpText(IConsole console, HelpTextSource source)
@@ -280,7 +280,7 @@ namespace CliFx.Services
         }
     }
 
-    public partial class CommandHelpTextRenderer
+    public partial class HelpTextRenderer
     {
         private static string GetRelativeCommandName(CommandSchema commandSchema, CommandSchema parentCommandSchema) =>
             parentCommandSchema.Name.IsNullOrWhiteSpace()
