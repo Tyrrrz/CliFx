@@ -268,6 +268,9 @@ namespace CliFx.Services
                 RenderNewLine();
             }
 
+            // Reset color just in case
+            console.ResetColor();
+
             // Render everything
             RenderApplicationInfo();
             RenderDescription();
