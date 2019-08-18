@@ -62,7 +62,7 @@ In order to add functionality to your application you need to define commands. C
 
 In CliFx you define a command by making a new class that implements `ICommand` and annotating it with `CommandAttribute`. To specify properties that will be set from command line you need to annotate them with `CommandOptionAttribute`.
 
-Here's an example command that calculates logarithm. It has a name (`"log"`) which the user can specify to invoke it and it also contains two options, the source value (`"value"`/`'v'`) and logarithm base (`"base"`/`'b'`).
+Here's an example command that calculates logarithm. It has a name (`"log"`) which the user needs to specify in order to invoke it. It also contains two options, the source value (`"value"`/`'v'`) and logarithm base (`"base"`/`'b'`).
 
 ```c#
 [Command("log", Description = "Calculate the logarithm of a value.")]
@@ -166,7 +166,7 @@ var app = new CliApplicationBuilder()
 
 ### Child commands
 
-In a more complex application you may need to build a hierarchy of commands. CliFx takes the approach of resolving hierarchy at runtime using command names so that you don't have to explicitly specify any child-parent relationships.
+In a more complex application you may need to build a hierarchy of commands. CliFx takes the approach of resolving hierarchy at runtime based on command names, so you don't have to specify any parent-child relationships explicitly.
 
 If you have a command `"cmd"` and you want to define commands `"sub1"` and `"sub2"` as its children, simply name them accordingly.
 
@@ -192,9 +192,9 @@ public class SecondSubCommand : ICommand
 
 ### Reporting errors
 
-You may have noticed that commands in CliFx don't return exit codes. This is by design as exit codes are handled by `CliApplication`, not by individual commands.
+You may have noticed that commands in CliFx don't return exit codes. This is by design as exit codes are considered a higher-level concern and thus handled by `CliApplication`, not by individual commands.
 
-Commands can report execution failure simply by throwing exceptions just like any other C# code. When an exception is thrown, `CliApplication` will catch it, print the error, and return a non-zero exit code to the calling process.
+Commands can report execution failure simply by throwing exceptions just like any other C# code. When an exception is thrown, `CliApplication` will catch it, print the error, and return an appropriate exit code to the calling process.
 
 If you want to communicate a specific error through exit code, you can throw an instance of `CommandException` which takes exit code as a constructor parameter.
 
@@ -305,6 +305,30 @@ public async Task ConcatCommand_Test()
     }
 }
 ```
+
+## Benchmarks
+
+CliFx has the smallest performance overhead compared to other command line parsers and frameworks.
+Below you can see a table comparing execution times of a simple command across different libraries.
+
+```ini
+
+BenchmarkDotNet=v0.11.5, OS=Windows 10.0.14393.0 (1607/AnniversaryUpdate/Redstone1)
+Intel Core i5-4460 CPU 3.20GHz (Haswell), 1 CPU, 4 logical and 4 physical cores
+Frequency=3125008 Hz, Resolution=319.9992 ns, Timer=TSC
+.NET Core SDK=2.2.401
+  [Host] : .NET Core 2.2.6 (CoreCLR 4.6.27817.03, CoreFX 4.6.27818.02), 64bit RyuJIT
+  Core   : .NET Core 2.2.6 (CoreCLR 4.6.27817.03, CoreFX 4.6.27818.02), 64bit RyuJIT
+
+Job=Core  Runtime=Core  
+
+```
+|                               Method |      Mean |     Error |    StdDev | Ratio | RatioSD | Rank |
+|------------------------------------- |----------:|----------:|----------:|------:|--------:|-----:|
+|                                CliFx |  39.47 us | 0.7490 us | 0.9198 us |  1.00 |    0.00 |    1 |
+|                   System.CommandLine | 153.98 us | 0.7112 us | 0.6652 us |  3.90 |    0.09 |    2 |
+| McMaster.Extensions.CommandLineUtils | 180.36 us | 3.5893 us | 6.7416 us |  4.59 |    0.16 |    3 |
+|                            PowerArgs | 427.54 us | 6.9006 us | 6.4548 us | 10.82 |    0.26 |    4 |
 
 ## Libraries used
 
