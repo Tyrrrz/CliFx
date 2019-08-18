@@ -129,7 +129,7 @@ namespace CliFx
 
             try
             {
-                var commandInput = _commandInputParser.ParseInput(commandLineArguments);
+                var commandInput = _commandInputParser.ParseCommandInput(commandLineArguments);
 
                 var availableCommandSchemas = _commandSchemaResolver.GetCommandSchemas(_configuration.CommandTypes);
                 var matchingCommandSchema = availableCommandSchemas.FindByName(commandInput.CommandName);

@@ -11,6 +11,6 @@ namespace CliFx.Services
         /// <summary>
         /// Parses specified command line arguments.
         /// </summary>
-        CommandInput ParseInput(IReadOnlyList<string> commandLineArguments);
+        CommandInput ParseCommandInput(IReadOnlyList<string> commandLineArguments);
     }
 }

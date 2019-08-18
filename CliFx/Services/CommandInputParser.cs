@@ -11,9 +11,8 @@ namespace CliFx.Services
     /// </summary>
     public class CommandInputParser : ICommandInputParser
     {
-        // TODO: refactor
         /// <inheritdoc />
-        public CommandInput ParseInput(IReadOnlyList<string> commandLineArguments)
+        public CommandInput ParseCommandInput(IReadOnlyList<string> commandLineArguments)
         {
             commandLineArguments.GuardNotNull(nameof(commandLineArguments));
 

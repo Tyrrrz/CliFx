@@ -10,6 +10,6 @@ namespace CliFx.Services
         /// <summary>
         /// Populates an instance of <see cref="ICommand"/> with specified input according to specified schema.
         /// </summary>
-        void InitializeCommand(ICommand command, CommandSchema schema, CommandInput input);
+        void InitializeCommand(ICommand command, CommandSchema commandSchema, CommandInput commandInput);
     }
 }

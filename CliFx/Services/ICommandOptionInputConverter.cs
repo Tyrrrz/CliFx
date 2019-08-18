@@ -11,6 +11,6 @@ namespace CliFx.Services
         /// <summary>
         /// Converts an option to specified target type.
         /// </summary>
-        object ConvertOption(CommandOptionInput option, Type targetType);
+        object ConvertOptionInput(CommandOptionInput optionInput, Type targetType);
     }
 }

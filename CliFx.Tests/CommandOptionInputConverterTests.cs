@@ -57,7 +57,7 @@ namespace CliFx.Tests
     [TestFixture]
     public partial class CommandOptionInputConverterTests
     {
-        private static IEnumerable<TestCaseData> GetTestCases_ConvertOption()
+        private static IEnumerable<TestCaseData> GetTestCases_ConvertOptionInput()
         {
             yield return new TestCaseData(
                 new CommandOptionInput("option", "value"),
@@ -307,14 +307,14 @@ namespace CliFx.Tests
         }
 
         [Test]
-        [TestCaseSource(nameof(GetTestCases_ConvertOption))]
-        public void ConvertOption_Test(CommandOptionInput optionInput, Type targetType, object expectedConvertedValue)
+        [TestCaseSource(nameof(GetTestCases_ConvertOptionInput))]
+        public void ConvertOptionInput_Test(CommandOptionInput optionInput, Type targetType, object expectedConvertedValue)
         {
             // Arrange
             var converter = new CommandOptionInputConverter();
 
             // Act
-            var convertedValue = converter.ConvertOption(optionInput, targetType);
+            var convertedValue = converter.ConvertOptionInput(optionInput, targetType);
 
             // Assert
             convertedValue.Should().BeEquivalentTo(expectedConvertedValue);

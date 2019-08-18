@@ -29,25 +29,25 @@ namespace CliFx.Services
         }
 
         /// <inheritdoc />
-        public void InitializeCommand(ICommand command, CommandSchema schema, CommandInput input)
+        public void InitializeCommand(ICommand command, CommandSchema commandSchema, CommandInput commandInput)
         {
             command.GuardNotNull(nameof(command));
-            schema.GuardNotNull(nameof(schema));
-            input.GuardNotNull(nameof(input));
+            commandSchema.GuardNotNull(nameof(commandSchema));
+            commandInput.GuardNotNull(nameof(commandInput));
 
             // Keep track of unset required options to report an error at a later stage
-            var unsetRequiredOptions = schema.Options.Where(o => o.IsRequired).ToList();
+            var unsetRequiredOptions = commandSchema.Options.Where(o => o.IsRequired).ToList();
 
             // Set command options
-            foreach (var optionInput in input.Options)
+            foreach (var optionInput in commandInput.Options)
             {
                 // Find matching option schema for this option input
-                var optionSchema = schema.Options.FindByAlias(optionInput.Alias);
+                var optionSchema = commandSchema.Options.FindByAlias(optionInput.Alias);
                 if (optionSchema == null)
                     continue;
 
                 // Convert option to the type of the underlying property
-                var convertedValue = _commandOptionInputConverter.ConvertOption(optionInput, optionSchema.Property.PropertyType);
+                var convertedValue = _commandOptionInputConverter.ConvertOptionInput(optionInput, optionSchema.Property.PropertyType);
 
                 // Set value of the underlying property
                 optionSchema.Property.SetValue(command, convertedValue);

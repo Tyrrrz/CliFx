@@ -9,7 +9,7 @@ namespace CliFx.Tests
     [TestFixture]
     public class CommandInputParserTests
     {
-        private static IEnumerable<TestCaseData> GetTestCases_ParseInput()
+        private static IEnumerable<TestCaseData> GetTestCases_ParseCommandInput()
         {
             yield return new TestCaseData(new string[0], CommandInput.Empty);
 
@@ -160,14 +160,14 @@ namespace CliFx.Tests
         }
 
         [Test]
-        [TestCaseSource(nameof(GetTestCases_ParseInput))]
-        public void ParseInput_Test(IReadOnlyList<string> commandLineArguments, CommandInput expectedCommandInput)
+        [TestCaseSource(nameof(GetTestCases_ParseCommandInput))]
+        public void ParseCommandInput_Test(IReadOnlyList<string> commandLineArguments, CommandInput expectedCommandInput)
         {
             // Arrange
             var parser = new CommandInputParser();
 
             // Act
-            var commandInput = parser.ParseInput(commandLineArguments);
+            var commandInput = parser.ParseCommandInput(commandLineArguments);
 
             // Assert
             commandInput.Should().BeEquivalentTo(expectedCommandInput);

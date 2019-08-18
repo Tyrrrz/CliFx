@@ -136,15 +136,15 @@ namespace CliFx.Services
         }
 
         /// <inheritdoc />
-        public object ConvertOption(CommandOptionInput option, Type targetType)
+        public object ConvertOptionInput(CommandOptionInput optionInput, Type targetType)
         {
-            option.GuardNotNull(nameof(option));
+            optionInput.GuardNotNull(nameof(optionInput));
             targetType.GuardNotNull(nameof(targetType));
 
             // Single value
-            if (option.Values.Count <= 1)
+            if (optionInput.Values.Count <= 1)
             {
-                var value = option.Values.SingleOrDefault();
+                var value = optionInput.Values.SingleOrDefault();
                 return ConvertValue(value, targetType);
             }
             // Multiple values
@@ -154,7 +154,7 @@ namespace CliFx.Services
                 var underlyingType = targetType.GetEnumerableUnderlyingType() ?? typeof(object);
 
                 // Convert values to that type
-                var convertedValues = option.Values.Select(v => ConvertValue(v, underlyingType)).ToNonGenericArray(underlyingType);
+                var convertedValues = optionInput.Values.Select(v => ConvertValue(v, underlyingType)).ToNonGenericArray(underlyingType);
                 var convertedValuesType = convertedValues.GetType();
 
                 // Assignable from array of values (e.g. T[], IReadOnlyList<T>, IEnumerable<T>)
@@ -167,7 +167,7 @@ namespace CliFx.Services
                     return arrayConstructor.Invoke(new object[] {convertedValues});
 
                 throw new InvalidCommandOptionInputException(
-                    $"Can't convert sequence of values [{option.Values.JoinToString(", ")}] to type [{targetType}].");
+                    $"Can't convert sequence of values [{optionInput.Values.JoinToString(", ")}] to type [{targetType}].");
             }
         }
     }
