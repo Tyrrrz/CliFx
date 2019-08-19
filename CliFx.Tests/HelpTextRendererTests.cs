@@ -86,7 +86,7 @@ namespace CliFx.Tests
 
         [Test]
         [TestCaseSource(nameof(GetTestCases_RenderHelpText))]
-        public void RenderHelpText_Test(HelpTextSource source, IReadOnlyList<string> substrings)
+        public void RenderHelpText_Test(HelpTextSource source, IReadOnlyList<string> expectedSubstrings)
         {
             // Arrange
             using (var stdout = new StringWriter())
@@ -98,7 +98,7 @@ namespace CliFx.Tests
                 renderer.RenderHelpText(console, source);
 
                 // Assert
-                stdout.ToString().Should().ContainAll(substrings);
+                stdout.ToString().Should().ContainAll(expectedSubstrings);
             }
         }
     }
