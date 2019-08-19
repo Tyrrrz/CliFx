@@ -98,7 +98,7 @@ namespace CliFx.Services
                 if (!source.TargetCommandSchema.IsDefault())
                     return;
 
-                // Title
+                // Title and version
                 RenderWithColor(source.ApplicationMetadata.Title, ConsoleColor.Yellow);
                 Render(" ");
                 RenderWithColor(source.ApplicationMetadata.VersionText, ConsoleColor.Yellow);

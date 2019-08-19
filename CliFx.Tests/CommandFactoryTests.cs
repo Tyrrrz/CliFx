@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using CliFx.Attributes;
 using CliFx.Models;
 using CliFx.Services;
 using FluentAssertions;
@@ -9,15 +7,6 @@ using NUnit.Framework;
 
 namespace CliFx.Tests
 {
-    public partial class CommandFactoryTests
-    {
-        [Command]
-        private class TestCommand : ICommand
-        {
-            public Task ExecuteAsync(IConsole console) => Task.CompletedTask;
-        }
-    }
-
     [TestFixture]
     public partial class CommandFactoryTests
     {

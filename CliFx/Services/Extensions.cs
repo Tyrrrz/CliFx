@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Linq;
 using CliFx.Internal;
-using CliFx.Models;
 
 namespace CliFx.Services
 {
@@ -10,17 +8,6 @@ namespace CliFx.Services
     /// </summary>
     public static class Extensions
     {
-        /// <summary>
-        /// Resolves command schema for specified command type.
-        /// </summary>
-        public static CommandSchema GetCommandSchema(this ICommandSchemaResolver resolver, Type commandType)
-        {
-            resolver.GuardNotNull(nameof(resolver));
-            commandType.GuardNotNull(nameof(commandType));
-
-            return resolver.GetCommandSchemas(new[] {commandType}).Single();
-        }
-
         /// <summary>
         /// Sets console foreground color, executes specified action, and sets the color back to the original value.
         /// </summary>

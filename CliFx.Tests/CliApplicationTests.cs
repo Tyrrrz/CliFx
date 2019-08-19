@@ -1,35 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using CliFx.Attributes;
-using CliFx.Exceptions;
-using CliFx.Services;
 using FluentAssertions;
 using NUnit.Framework;
 
 namespace CliFx.Tests
 {
-    public partial class CliApplicationTests
-    {
-        [Command]
-        private class TestDefaultCommand : ICommand
-        {
-            public Task ExecuteAsync(IConsole console) => Task.CompletedTask;
-        }
-
-        [Command("command")]
-        private class TestNamedCommand : ICommand
-        {
-            public Task ExecuteAsync(IConsole console) => Task.CompletedTask;
-        }
-
-        [Command("faulty command")]
-        private class TestFaultyCommand : ICommand
-        {
-            public Task ExecuteAsync(IConsole console) => Task.FromException(new CommandException(-1337));
-        }
-    }
-
     [TestFixture]
     public partial class CliApplicationTests
     {
