@@ -114,82 +114,6 @@ When resolving options, CliFx can convert string values obtained from the comman
 
 If you want to define an option of your own type, the easiest way to do it is to make sure that your type is string-initializable, as explained above.
 
-### Dependency injection
-
-CliFx uses an implementation of `ICommandFactory` to initialize commands and by default it only works with types that have parameterless constructors.
-
-In real-life scenarios your commands will most likely have dependencies that need to be injected. CliFx doesn't have its own dependency container but it's really easy to set it up to use any 3rd party dependency container of your choice.
-
-For example, here is how you would configure your application to use [`Microsoft.Extensions.DependencyInjection`](https://nuget.org/packages/Microsoft.Extensions.DependencyInjection) (aka the built-in dependency container in ASP.NET Core).
-
-```c#
-public static class Program
-{
-    public static Task<int> Main(string[] args)
-    {
-        var services = new ServiceCollection();
-
-        // Register services
-        services.AddSingleton<MyService>();
-
-        // Register commands
-        services.AddTransient<MyCommand>();
-
-        var serviceProvider = services.BuildServiceProvider();
-
-        return new CliApplicationBuilder()
-            .AddCommandsFromThisAssembly()
-            .UseCommandFactory(schema => (ICommand) serviceProvider.GetRequiredService(schema.Type))
-            .Build()
-            .RunAsync(args);
-    }
-}
-```
-
-### Resolve commands from other assemblies
-
-In most cases, your commands will be defined in your main assembly which is where CliFx will look if you initialize the application using the following code.
-
-```c#
-var app = new CliApplicationBuilder().AddCommandsFromThisAssembly().Build();
-```
-
-If you want to configure your application to resolve specific commands or commands from another assembly you can use `AddCommand` and `AddCommandsFrom` methods for that.
-
-```c#
-var app = new CliApplicationBuilder()
-    .AddCommand(typeof(CommandA)) // include CommandA specifically
-    .AddCommand(typeof(CommandB)) // include CommandB specifically
-    .AddCommandsFrom(typeof(CommandC).Assembly) // include all commands from assembly that contains CommandC
-    .Build();
-```
-
-### Child commands
-
-In a more complex application you may need to build a hierarchy of commands. CliFx takes the approach of resolving hierarchy at runtime based on command names, so you don't have to specify any parent-child relationships explicitly.
-
-If you have a command `"cmd"` and you want to define commands `"sub1"` and `"sub2"` as its children, simply name them accordingly.
-
-```c#
-[Command("cmd")]
-public class ParentCommand : ICommand
-{
-    // ...
-}
-
-[Command("cmd sub1")]
-public class FirstSubCommand : ICommand
-{
-    // ...
-}
-
-[Command("cmd sub2")]
-public class SecondSubCommand : ICommand
-{
-    // ...
-}
-```
-
 ### Reporting errors
 
 You may have noticed that commands in CliFx don't return exit codes. This is by design as exit codes are considered a higher-level concern and thus handled by `CliApplication`, not by individual commands.
@@ -222,6 +146,120 @@ public class DivideCommand : ICommand
         return Task.CompletedTask;
     }
 }
+```
+
+### Child commands
+
+In a more complex application you may need to build a hierarchy of commands. CliFx takes the approach of resolving hierarchy at runtime based on command names, so you don't have to specify any parent-child relationships explicitly.
+
+If you have a command `"cmd"` and you want to define commands `"sub1"` and `"sub2"` as its children, simply name them accordingly.
+
+```c#
+[Command("cmd")]
+public class ParentCommand : ICommand
+{
+    // ...
+}
+
+[Command("cmd sub1")]
+public class FirstSubCommand : ICommand
+{
+    // ...
+}
+
+[Command("cmd sub2")]
+public class SecondSubCommand : ICommand
+{
+    // ...
+}
+```
+
+### Dependency injection
+
+CliFx uses an implementation of `ICommandFactory` to initialize commands and by default it only works with types that have parameterless constructors.
+
+In real-life scenarios your commands will most likely have dependencies that need to be injected. CliFx doesn't come with its own dependency container but instead it makes it really easy to integrate any 3rd party dependency container of your choice.
+
+For example, here is how you would configure your application to use [`Microsoft.Extensions.DependencyInjection`](https://nuget.org/packages/Microsoft.Extensions.DependencyInjection) (aka the built-in dependency container in ASP.NET Core).
+
+```c#
+public static class Program
+{
+    public static Task<int> Main(string[] args)
+    {
+        var services = new ServiceCollection();
+
+        // Register services
+        services.AddSingleton<MyService>();
+
+        // Register commands
+        services.AddTransient<MyCommand>();
+
+        var serviceProvider = services.BuildServiceProvider();
+
+        return new CliApplicationBuilder()
+            .AddCommandsFromThisAssembly()
+            .UseCommandFactory(schema => (ICommand) serviceProvider.GetRequiredService(schema.Type))
+            .Build()
+            .RunAsync(args);
+    }
+}
+```
+
+### Option validation
+
+Similar to dependency injection, CliFx offers complete flexibility when it comes to option validation.
+
+The following example demonstrates how to add validation to commands using [`FluentValidation`](https://github.com/JeremySkinner/FluentValidation).
+
+```c#
+[Command("user add")]
+public class UserAddCommand : ICommand
+{
+    [CommandOption("name", 'n', IsRequired = true)]
+    public string Username { get; set; }
+
+    [CommandOption("email", 'e')]
+    public string Email { get; set; }
+
+    public Task ExecuteAsync(IConsole console)
+    {
+        var validationResult = new UserAddCommandValidator().Validate(this);
+        if (!validationResult.IsValid)
+            throw new CommandException(validationResult.ToString());
+
+        // ...
+    }
+}
+```
+
+```c#
+public class UserAddCommandValidator : AbstractValidator<UserAddCommand>
+{
+    public UserAddCommandValidator()
+    {
+        RuleFor(u => u.Username).NotEmpty().Length(0, 255);
+        RuleFor(u => u.Email).EmailAddress();
+    }
+}
+```
+
+### Resolve commands from other assemblies
+
+In most cases, your commands will be defined in your main assembly which is where CliFx will look if you initialize the application using the following code.
+
+```c#
+var app = new CliApplicationBuilder().AddCommandsFromThisAssembly().Build();
+```
+
+If you want to configure your application to resolve specific commands or commands from another assembly you can use `AddCommand` and `AddCommandsFrom` methods for that.
+
+```c#
+var app = new CliApplicationBuilder()
+    .AddCommand(typeof(CommandA)) // include CommandA specifically
+    .AddCommand(typeof(CommandB)) // include CommandB specifically
+    .AddCommandsFrom(typeof(CommandC).Assembly) // include all commands from assembly that contains CommandC
+    .Build();
 ```
 
 ### Testing
@@ -312,7 +350,6 @@ CliFx has the smallest performance overhead compared to other command line parse
 Below you can see a table comparing execution times of a simple command across different libraries.
 
 ```ini
-
 BenchmarkDotNet=v0.11.5, OS=Windows 10.0.14393.0 (1607/AnniversaryUpdate/Redstone1)
 Intel Core i5-4460 CPU 3.20GHz (Haswell), 1 CPU, 4 logical and 4 physical cores
 Frequency=3125008 Hz, Resolution=319.9992 ns, Timer=TSC
@@ -321,8 +358,8 @@ Frequency=3125008 Hz, Resolution=319.9992 ns, Timer=TSC
   Core   : .NET Core 2.2.6 (CoreCLR 4.6.27817.03, CoreFX 4.6.27818.02), 64bit RyuJIT
 
 Job=Core  Runtime=Core
-
 ```
+
 |                               Method |      Mean |     Error |    StdDev | Ratio | RatioSD | Rank |
 |------------------------------------- |----------:|----------:|----------:|------:|--------:|-----:|
 |                                CliFx |  39.47 us | 0.7490 us | 0.9198 us |  1.00 |    0.00 |    1 |
