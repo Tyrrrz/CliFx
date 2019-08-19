@@ -27,7 +27,7 @@ _CliFx is to command line interfaces what ASP.NET Core is to web applications._
 - Generates contextual help text
 - Prints errors and routes exit codes on exceptions
 - Highly testable and easy to customize
-- Targets .NET Framework 4.6+ and .NET Standard 2.0+
+- Targets .NET Framework 4.5+ and .NET Standard 2.0+
 - No external dependencies
 
 ### Currently not implemented
