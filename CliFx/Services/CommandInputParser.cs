@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using CliFx.Internal;
 using CliFx.Models;
 
@@ -16,75 +17,55 @@ namespace CliFx.Services
         {
             commandLineArguments.GuardNotNull(nameof(commandLineArguments));
 
-            // Initialize command name placeholder
-            string commandName = null;
+            var commandNameBuilder = new StringBuilder();
+            var optionsDic = new Dictionary<string, List<string>>();
 
-            // Initialize options
-            var rawOptions = new Dictionary<string, List<string>>();
+            var lastOptionAlias = "";
 
-            // Keep track of the last option's name
-            string optionName = null;
-
-            // Loop through all arguments
-            var encounteredFirstOption = false;
             foreach (var commandLineArgument in commandLineArguments)
             {
-                // Option name
+                // Encountered option name
                 if (commandLineArgument.StartsWith("--", StringComparison.OrdinalIgnoreCase))
                 {
-                    // Extract option name (skip 2 chars)
-                    optionName = commandLineArgument.Substring(2);
+                    // Extract option alias
+                    lastOptionAlias = commandLineArgument.Substring(2);
 
-                    if (rawOptions.GetValueOrDefault(optionName) == null)
-                        rawOptions[optionName] = new List<string>();
-
-                    encounteredFirstOption = true;
+                    if (!optionsDic.ContainsKey(lastOptionAlias))
+                        optionsDic[lastOptionAlias] = new List<string>();
                 }
 
-                // Short option name
-                else if (commandLineArgument.StartsWith("-", StringComparison.OrdinalIgnoreCase) && commandLineArgument.Length == 2)
-                {
-                    // Extract option name (skip 1 char)
-                    optionName = commandLineArgument.Substring(1);
-
-                    if (rawOptions.GetValueOrDefault(optionName) == null)
-                        rawOptions[optionName] = new List<string>();
-
-                    encounteredFirstOption = true;
-                }
-
-                // Multiple stacked short options
+                // Encountered short option name or multiple thereof
                 else if (commandLineArgument.StartsWith("-", StringComparison.OrdinalIgnoreCase))
                 {
+                    // Handle stacked options
                     foreach (var c in commandLineArgument.Substring(1))
                     {
-                        optionName = c.AsString();
+                        // Extract option alias
+                        lastOptionAlias = c.AsString();
 
-                        if (rawOptions.GetValueOrDefault(optionName) == null)
-                            rawOptions[optionName] = new List<string>();
+                        if (!optionsDic.ContainsKey(lastOptionAlias))
+                            optionsDic[lastOptionAlias] = new List<string>();
                     }
-
-                    encounteredFirstOption = true;
                 }
 
-                // Command name
-                else if (!encounteredFirstOption)
+                // Encountered command name or part thereof
+                else if (lastOptionAlias.IsNullOrWhiteSpace())
                 {
-                    if (commandName.IsNullOrWhiteSpace())
-                        commandName = commandLineArgument;
-                    else
-                        commandName += " " + commandLineArgument;
+                    commandNameBuilder.AppendIfNotEmpty(' ');
+                    commandNameBuilder.Append(commandLineArgument);
                 }
 
-                // Option value
-                else if (!optionName.IsNullOrWhiteSpace())
+                // Encountered option value
+                else if (!lastOptionAlias.IsNullOrWhiteSpace())
                 {
-                    // ReSharper disable once AssignNullToNotNullAttribute
-                    rawOptions[optionName].Add(commandLineArgument);
+                    optionsDic[lastOptionAlias].Add(commandLineArgument);
                 }
             }
 
-            return new CommandInput(commandName, rawOptions.Select(p => new CommandOptionInput(p.Key, p.Value)).ToArray());
+            var commandName = commandNameBuilder.Length > 0 ? commandNameBuilder.ToString() : null;
+            var options = optionsDic.Select(p => new CommandOptionInput(p.Key, p.Value)).ToArray();
+
+            return new CommandInput(commandName, options);
         }
     }
 }

@@ -16,6 +16,12 @@ namespace CliFx.Models
         public static CommandSchema FindByName(this IReadOnlyList<CommandSchema> commandSchemas, string commandName)
         {
             commandSchemas.GuardNotNull(nameof(commandSchemas));
+
+            // If looking for default command, don't compare names directly
+            // ...because null and empty are both valid names for default command
+            if (commandName.IsNullOrWhiteSpace())
+                return commandSchemas.FirstOrDefault(c => c.IsDefault());
+
             return commandSchemas.FirstOrDefault(c => string.Equals(c.Name, commandName, StringComparison.OrdinalIgnoreCase));
         }
 

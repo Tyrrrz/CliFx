@@ -18,7 +18,7 @@ namespace CliFx.Services
             resolver.GuardNotNull(nameof(resolver));
             commandType.GuardNotNull(nameof(commandType));
 
-            return resolver.GetCommandSchemas(new[] {commandType}).First();
+            return resolver.GetCommandSchemas(new[] {commandType}).Single();
         }
 
         /// <summary>
