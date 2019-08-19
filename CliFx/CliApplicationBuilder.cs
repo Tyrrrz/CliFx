@@ -93,30 +93,39 @@ namespace CliFx
             if (_title.IsNullOrWhiteSpace())
             {
                 // Entry assembly is null in tests
-                var title = EntryAssembly?.GetName().Name ?? "App";
-
-                UseTitle(title);
+                UseTitle(EntryAssembly?.GetName().Name ?? "App");
             }
 
             if (_executableName.IsNullOrWhiteSpace())
             {
                 // Entry assembly is null in tests
                 var entryAssemblyLocation = EntryAssembly?.Location;
-                var executableName = Path.GetFileNameWithoutExtension(entryAssemblyLocation) ?? "app";
 
-                // Set proper executable name for apps launched with dotnet SDK
-                if (string.Equals(Path.GetExtension(entryAssemblyLocation), ".dll", StringComparison.OrdinalIgnoreCase))
-                    executableName = "dotnet " + executableName;
-
-                UseExecutableName(executableName);
+                // Set different executable name depending on location
+                if (!entryAssemblyLocation.IsNullOrWhiteSpace())
+                {
+                    // Prepend 'dotnet' to assembly file name if the entry assembly is a dll file (extension needs to be kept)
+                    if (string.Equals(Path.GetExtension(entryAssemblyLocation), ".dll", StringComparison.OrdinalIgnoreCase))
+                    {
+                        UseExecutableName("dotnet " + Path.GetFileName(entryAssemblyLocation));
+                    }
+                    // Otherwise just use assembly file name without extension
+                    else
+                    {
+                        UseExecutableName(Path.GetFileNameWithoutExtension(entryAssemblyLocation));
+                    }
+                }
+                // If location is null then just use a stub
+                else
+                {
+                    UseExecutableName("app");
+                }
             }
 
             if (_versionText.IsNullOrWhiteSpace())
             {
                 // Entry assembly is null in tests
-                var versionText = EntryAssembly?.GetName().Version.ToString() ?? "1.0";
-
-                UseVersionText(versionText);
+                UseVersionText(EntryAssembly?.GetName().Version.ToString() ?? "1.0");
             }
 
             if (_console == null)
