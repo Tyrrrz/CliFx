@@ -10,6 +10,8 @@ namespace CliFx.Tests
         [Command("cmd", Description = "NormalCommand1 description.")]
         private class NormalCommand1 : ICommand
         {
+            public string NotAnOption { get; set; }
+
             [CommandOption("option-a", 'a')]
             public int OptionA { get; set; }
 
@@ -47,7 +49,12 @@ namespace CliFx.Tests
         }
 
         [Command]
-        private class InvalidCommand1 : ICommand
+        private class InvalidCommand1
+        {
+        }
+
+        [Command]
+        private class InvalidCommand2 : ICommand
         {
             [CommandOption("conflict")]
             public string ConflictingOption1 { get; set; }
@@ -59,7 +66,7 @@ namespace CliFx.Tests
         }
 
         [Command]
-        private class InvalidCommand2 : ICommand
+        private class InvalidCommand3 : ICommand
         {
             [CommandOption('c')]
             public string ConflictingOption1 { get; set; }
