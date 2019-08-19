@@ -338,11 +338,13 @@ Given that there are probably a dozen libraries that help with building CLI appl
 
 - **Declarative setup**. CliFx makes it easier to think of your CLI more as a class library than an application. As a library it has an API defined in a form of classes and properties, so there shouldn't be any reason to have to redefine everything again in a different form. Attributes work really well here because they are concise and are placed right next to the types/members they annotate, eliminating additional cognitive load and unnecessary boilerplate code.
 
-- **Command separation**. CliFx has a "one class per command" principle, as opposed to having different commands defined as methods of the same class. This is important for segregation of concerns but also makes sense because commands often have different dependencies. When defining options, you also have a lot more freedom when they are properties rather than method parameters.
+- **Command separation**. CliFx follows "one class per command" principle, as opposed to having different commands defined as methods of the same class. This is important for segregation of concerns but also makes sense because commands often have different dependencies. When defining options, you also have a lot more freedom when they are properties rather than method parameters.
 
 - **Command contract**. CliFx enforces a contract on all commands to make them consistent and to reduce runtime-validated rules. Instead of having to look up the signature of the entry point method, you can simply generate a stub from the interface and build from there.
 
 - **Async-first**. CliFx commands are asynchronous by default to facilitate execution of both synchronous and asynchronous code. In the modern era of programming, it would be a disaster if asynchronous commands weren't supported.
+
+- **Implicit exit codes**. CliFx moves the concern of dealing with exit codes from command level to the application level. When writing commands, you don't have to bother with printing errors and returning exit codes, just throw an appropriate exception and CliFx will take care of everything on its own.
 
 - **Testability**. CliFx commands and applications are designed to be easily testable. One major downside of most other frameworks is that it's really hard to test how commands interact with the console.
 
