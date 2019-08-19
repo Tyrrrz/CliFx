@@ -320,7 +320,7 @@ Frequency=3125008 Hz, Resolution=319.9992 ns, Timer=TSC
   [Host] : .NET Core 2.2.6 (CoreCLR 4.6.27817.03, CoreFX 4.6.27818.02), 64bit RyuJIT
   Core   : .NET Core 2.2.6 (CoreCLR 4.6.27817.03, CoreFX 4.6.27818.02), 64bit RyuJIT
 
-Job=Core  Runtime=Core  
+Job=Core  Runtime=Core
 
 ```
 |                               Method |      Mean |     Error |    StdDev | Ratio | RatioSD | Rank |
@@ -329,6 +329,24 @@ Job=Core  Runtime=Core
 |                   System.CommandLine | 153.98 us | 0.7112 us | 0.6652 us |  3.90 |    0.09 |    2 |
 | McMaster.Extensions.CommandLineUtils | 180.36 us | 3.5893 us | 6.7416 us |  4.59 |    0.16 |    3 |
 |                            PowerArgs | 427.54 us | 6.9006 us | 6.4548 us | 10.82 |    0.26 |    4 |
+
+## Philosophy
+
+Given that there are probably a dozen libraries that help with building CLI applications, I wanted to add this section to explain how is CliFx any different and what are the driving vectors for its design.
+
+- **Application framework**. CliFx is not a command line parser, CliFx is an application framework. It takes care of the whole input layer so that you may as well forget you're writing a command line application. While a regular console application has one entry point, the `Main()` method, in CliFx each command is a separate entry point, elevating the abstraction one level higher.
+
+- **Declarative setup**. CliFx makes it easier to think of your CLI more as a class library than an application. As a library it has an API defined in a form of classes and properties, so there shouldn't be any reason to have to redefine everything again in a different form. Attributes work really well here because they are concise and are placed right next to the types/members they annotate, eliminating additional cognitive load and unnecessary boilerplate code.
+
+- **Command separation**. CliFx has a "one class per command" principle, as opposed to having different commands defined as methods of the same class. This is important for segregation of concerns but also makes sense because commands often have different dependencies. When defining options, you also have a lot more freedom when they are properties rather than method parameters.
+
+- **Command contract**. CliFx enforces a contract on all commands to make them consistent and to reduce runtime-validated rules. Instead of having to look up the signature of the entry point method, you can simply generate a stub from the interface and build from there.
+
+- **Async-first**. CliFx commands are asynchronous by default to facilitate execution of both synchronous and asynchronous code. In the modern era of programming, it would be a disaster if asynchronous commands weren't supported.
+
+- **Testability**. CliFx commands and applications are designed to be easily testable. One major downside of most other frameworks is that it's really hard to test how commands interact with the console.
+
+- **Pretty help text**. CliFx emphasizes the importance of good user interface by rendering help text using multiple colors. It's a mystery why nobody bothers making the help text more appealing, it's almost as if nobody cares about the end user.
 
 ## Libraries used
 
