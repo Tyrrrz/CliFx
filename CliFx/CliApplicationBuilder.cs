@@ -12,7 +12,7 @@ namespace CliFx
     /// <summary>
     /// Default implementation of <see cref="ICliApplicationBuilder"/>.
     /// </summary>
-    public class CliApplicationBuilder : ICliApplicationBuilder
+    public partial class CliApplicationBuilder : ICliApplicationBuilder
     {
         private readonly HashSet<Type> _commandTypes = new HashSet<Type>();
 
@@ -90,23 +90,44 @@ namespace CliFx
 
         private void SetFallbackValues()
         {
-            // Entry assembly is null in tests
-            var entryAssembly = Assembly.GetEntryAssembly();
-
             if (_title.IsNullOrWhiteSpace())
-                UseTitle(entryAssembly?.GetName().Name ?? "App");
+            {
+                // Entry assembly is null in tests
+                var title = EntryAssembly?.GetName().Name ?? "App";
+
+                UseTitle(title);
+            }
 
             if (_executableName.IsNullOrWhiteSpace())
-                UseExecutableName(Path.GetFileNameWithoutExtension(entryAssembly?.Location) ?? "app");
+            {
+                // Entry assembly is null in tests
+                var entryAssemblyLocation = EntryAssembly?.Location;
+                var executableName = Path.GetFileNameWithoutExtension(entryAssemblyLocation) ?? "app";
+
+                // Set proper executable name for apps launched with dotnet SDK
+                if (string.Equals(Path.GetExtension(entryAssemblyLocation), ".dll", StringComparison.OrdinalIgnoreCase))
+                    executableName = "dotnet " + executableName;
+
+                UseExecutableName(executableName);
+            }
 
             if (_versionText.IsNullOrWhiteSpace())
-                UseVersionText(entryAssembly?.GetName().Version.ToString() ?? "1.0");
+            {
+                // Entry assembly is null in tests
+                var versionText = EntryAssembly?.GetName().Version.ToString() ?? "1.0";
+
+                UseVersionText(versionText);
+            }
 
             if (_console == null)
+            {
                 UseConsole(new SystemConsole());
+            }
 
             if (_commandFactory == null)
+            {
                 UseCommandFactory(new CommandFactory());
+            }
         }
 
         /// <inheritdoc />
@@ -123,5 +144,12 @@ namespace CliFx
                 _console, new CommandInputParser(), new CommandSchemaResolver(),
                 _commandFactory, new CommandInitializer(), new HelpTextRenderer());
         }
+    }
+
+    public partial class CliApplicationBuilder
+    {
+        private static readonly Lazy<Assembly> LazyEntryAssembly = new Lazy<Assembly>(Assembly.GetEntryAssembly);
+
+        private static Assembly EntryAssembly => LazyEntryAssembly.Value;
     }
 }
