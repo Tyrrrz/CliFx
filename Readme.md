@@ -348,6 +348,10 @@ Given that there are probably a dozen libraries that help with building CLI appl
 
 - **Pretty help text**. CliFx emphasizes the importance of good user interface by rendering help text using multiple colors. It's a mystery why nobody bothers making the help text more appealing, it's almost as if nobody cares about the end user.
 
+## Etymology
+
+CliFx is made out of "Cli" for "Command Line Interface" and "Fx" for "Framework". It's pronounced as "cliff ex".
+
 ## Libraries used
 
 - [NUnit](https://github.com/nunit/nunit)
