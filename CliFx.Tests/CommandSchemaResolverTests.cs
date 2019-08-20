@@ -84,11 +84,11 @@ namespace CliFx.Tests
         public void GetCommandSchemas_Negative_Test(IReadOnlyList<Type> commandTypes)
         {
             // Arrange
-            var commandSchemaResolver = new CommandSchemaResolver();
+            var resolver = new CommandSchemaResolver();
 
             // Act & Assert
-            commandSchemaResolver.Invoking(r => r.GetCommandSchemas(commandTypes)).Should()
-                .ThrowExactly<InvalidCommandSchemaException>();
+            resolver.Invoking(r => r.GetCommandSchemas(commandTypes))
+                .Should().ThrowExactly<InvalidCommandSchemaException>();
         }
     }
 }

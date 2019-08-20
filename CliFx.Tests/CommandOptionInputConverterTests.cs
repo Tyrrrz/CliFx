@@ -280,10 +280,10 @@ namespace CliFx.Tests
         public void ConvertOptionInput_Test(CommandOptionInput optionInput, Type targetType, object expectedConvertedValue)
         {
             // Arrange
-            var commandOptionInputConverter = new CommandOptionInputConverter();
+            var converter = new CommandOptionInputConverter();
 
             // Act
-            var convertedValue = commandOptionInputConverter.ConvertOptionInput(optionInput, targetType);
+            var convertedValue = converter.ConvertOptionInput(optionInput, targetType);
 
             // Assert
             convertedValue.Should().BeEquivalentTo(expectedConvertedValue);
@@ -295,11 +295,11 @@ namespace CliFx.Tests
         public void ConvertOptionInput_Negative_Test(CommandOptionInput optionInput, Type targetType)
         {
             // Arrange
-            var commandOptionInputConverter = new CommandOptionInputConverter();
+            var converter = new CommandOptionInputConverter();
 
             // Act & Assert
-            commandOptionInputConverter.Invoking(c => c.ConvertOptionInput(optionInput, targetType)).Should()
-                .ThrowExactly<InvalidCommandOptionInputException>();
+            converter.Invoking(c => c.ConvertOptionInput(optionInput, targetType))
+                .Should().ThrowExactly<InvalidCommandOptionInputException>();
         }
     }
 }

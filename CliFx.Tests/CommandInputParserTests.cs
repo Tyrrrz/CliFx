@@ -157,6 +157,14 @@ namespace CliFx.Tests
                 new[] {"long", "command", "name"},
                 new CommandInput("long command name")
             );
+
+            yield return new TestCaseData(
+                new[] {"long", "command", "name", "--option", "value"},
+                new CommandInput("long command name", new[]
+                {
+                    new CommandOptionInput("option", "value")
+                })
+            );
         }
 
         [Test]

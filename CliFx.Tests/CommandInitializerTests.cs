@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using CliFx.Exceptions;
 using CliFx.Models;
 using CliFx.Services;
-using CliFx.Tests.Internal;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -11,9 +12,14 @@ namespace CliFx.Tests
     [TestFixture]
     public partial class CommandInitializerTests
     {
+        private static CommandSchema GetCommandSchema(Type commandType) =>
+            new CommandSchemaResolver().GetCommandSchemas(new[] {commandType}).Single();
+
         private static IEnumerable<TestCaseData> GetTestCases_InitializeCommand()
         {
             yield return new TestCaseData(
+                new TestCommand(),
+                GetCommandSchema(typeof(TestCommand)),
                 new CommandInput(new[]
                 {
                     new CommandOptionInput("int", "13")
@@ -22,6 +28,8 @@ namespace CliFx.Tests
             );
 
             yield return new TestCaseData(
+                new TestCommand(),
+                GetCommandSchema(typeof(TestCommand)),
                 new CommandInput(new[]
                 {
                     new CommandOptionInput("int", "13"),
@@ -31,6 +39,8 @@ namespace CliFx.Tests
             );
 
             yield return new TestCaseData(
+                new TestCommand(),
+                GetCommandSchema(typeof(TestCommand)),
                 new CommandInput(new[]
                 {
                     new CommandOptionInput("i", "13")
@@ -39,11 +49,17 @@ namespace CliFx.Tests
             );
         }
 
-        private static IEnumerable<TestCaseData> GetTestCases_InitializeCommand_IsRequired()
+        private static IEnumerable<TestCaseData> GetTestCases_InitializeCommand_Negative()
         {
-            yield return new TestCaseData(CommandInput.Empty);
+            yield return new TestCaseData(
+                new TestCommand(),
+                GetCommandSchema(typeof(TestCommand)),
+                CommandInput.Empty
+            );
 
             yield return new TestCaseData(
+                new TestCommand(),
+                GetCommandSchema(typeof(TestCommand)),
                 new CommandInput(new[]
                 {
                     new CommandOptionInput("str", "hello world")
@@ -53,31 +69,27 @@ namespace CliFx.Tests
 
         [Test]
         [TestCaseSource(nameof(GetTestCases_InitializeCommand))]
-        public void InitializeCommand_Test(CommandInput commandInput, ICommand expectedCommand)
+        public void InitializeCommand_Test(ICommand command, CommandSchema commandSchema, CommandInput commandInput, ICommand expectedCommand)
         {
             // Arrange
             var initializer = new CommandInitializer();
-            var schema = new CommandSchemaResolver().GetCommandSchema(typeof(TestCommand));
-            var command = new TestCommand();
 
             // Act
-            initializer.InitializeCommand(command, schema, commandInput);
+            initializer.InitializeCommand(command, commandSchema, commandInput);
 
             // Assert
             command.Should().BeEquivalentTo(expectedCommand, o => o.RespectingRuntimeTypes());
         }
 
         [Test]
-        [TestCaseSource(nameof(GetTestCases_InitializeCommand_IsRequired))]
-        public void InitializeCommand_IsRequired_Test(CommandInput commandInput)
+        [TestCaseSource(nameof(GetTestCases_InitializeCommand_Negative))]
+        public void InitializeCommand_Negative_Test(ICommand command, CommandSchema commandSchema, CommandInput commandInput)
         {
             // Arrange
             var initializer = new CommandInitializer();
-            var schema = new CommandSchemaResolver().GetCommandSchema(typeof(TestCommand));
-            var command = new TestCommand();
 
             // Act & Assert
-            initializer.Invoking(i => i.InitializeCommand(command, schema, commandInput))
+            initializer.Invoking(i => i.InitializeCommand(command, commandSchema, commandInput))
                 .Should().ThrowExactly<MissingCommandOptionInputException>();
         }
     }

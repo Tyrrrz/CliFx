@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
+using CliFx.Services;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -11,151 +13,139 @@ namespace CliFx.Tests
     {
         private static IEnumerable<TestCaseData> GetTestCases_RunAsync()
         {
-            // Specified command is defined
-
             yield return new TestCaseData(
-                new[] {typeof(TestNamedCommand)},
-                new[] {"command"}
+                new[] {typeof(DefaultCommand)},
+                new string[0],
+                "DefaultCommand executed."
             );
 
             yield return new TestCaseData(
-                new[] {typeof(TestNamedCommand)},
-                new[] {"command", "--help"}
+                new[] {typeof(NamedCommand)},
+                new[] {"cmd"},
+                "NamedCommand executed."
             );
+        }
 
+        private static IEnumerable<TestCaseData> GetTestCases_HelpAndVersion_RunAsync()
+        {
             yield return new TestCaseData(
-                new[] {typeof(TestNamedCommand)},
-                new[] {"command", "-h"}
-            );
-
-            // Default command is defined
-
-            yield return new TestCaseData(
-                new[] {typeof(TestDefaultCommand)},
+                new[] {typeof(DefaultCommand)},
                 new string[0]
             );
 
             yield return new TestCaseData(
-                new[] {typeof(TestDefaultCommand)},
-                new[] {"--version"}
+                new[] {typeof(DefaultCommand)},
+                new[] {"-h"}
             );
 
             yield return new TestCaseData(
-                new[] {typeof(TestDefaultCommand)},
+                new[] {typeof(DefaultCommand)},
                 new[] {"--help"}
             );
 
             yield return new TestCaseData(
-                new[] {typeof(TestDefaultCommand)},
-                new[] {"-h"}
+                new[] {typeof(DefaultCommand)},
+                new[] {"--version"}
             );
 
-            // Default command is not defined
-
             yield return new TestCaseData(
-                new[] {typeof(TestNamedCommand)},
+                new[] {typeof(NamedCommand)},
                 new string[0]
             );
 
             yield return new TestCaseData(
-                new[] {typeof(TestNamedCommand)},
-                new[] {"--version"}
+                new[] {typeof(NamedCommand)},
+                new[] {"cmd", "-h"}
             );
 
             yield return new TestCaseData(
-                new[] {typeof(TestNamedCommand)},
-                new[] {"--help"}
+                new[] {typeof(FaultyCommand1)},
+                new[] {"faulty1", "-h"}
             );
 
             yield return new TestCaseData(
-                new[] {typeof(TestNamedCommand)},
-                new[] {"-h"}
-            );
-
-            // Specified a faulty command
-
-            yield return new TestCaseData(
-                new[] {typeof(TestFaultyCommand)},
-                new[] {"faulty", "command", "--help"}
+                new[] {typeof(FaultyCommand2)},
+                new[] {"faulty2", "-h"}
             );
 
             yield return new TestCaseData(
-                new[] {typeof(TestFaultyCommand)},
-                new[] {"faulty", "command", "-h"}
+                new[] {typeof(FaultyCommand3)},
+                new[] {"faulty3", "-h"}
             );
         }
 
         private static IEnumerable<TestCaseData> GetTestCases_RunAsync_Negative()
         {
-            // No commands defined
-
             yield return new TestCaseData(
                 new Type[0],
                 new string[0]
             );
 
             yield return new TestCaseData(
-                new Type[0],
-                new[] {"--version"}
+                new[] {typeof(DefaultCommand)},
+                new[] {"non-existing"}
             );
 
             yield return new TestCaseData(
-                new Type[0],
-                new[] {"--help"}
+                new[] {typeof(FaultyCommand1)},
+                new[] {"faulty1"}
             );
 
             yield return new TestCaseData(
-                new Type[0],
-                new[] {"-h"}
+                new[] {typeof(FaultyCommand2)},
+                new[] {"faulty2"}
             );
 
             yield return new TestCaseData(
-                new Type[0],
-                new[] {"command"}
-            );
-
-            yield return new TestCaseData(
-                new Type[0],
-                new[] {"faulty", "command"}
-            );
-
-            // Specified command is not defined
-
-            yield return new TestCaseData(
-                new[] {typeof(TestDefaultCommand)},
-                new[] {"command"}
-            );
-
-            yield return new TestCaseData(
-                new[] {typeof(TestDefaultCommand)},
-                new[] {"command", "--help"}
-            );
-
-            yield return new TestCaseData(
-                new[] {typeof(TestDefaultCommand)},
-                new[] {"command", "-h"}
-            );
-
-            // Specified a faulty command
-
-            yield return new TestCaseData(
-                new[] {typeof(TestFaultyCommand)},
-                new[] {"faulty", "command"}
+                new[] {typeof(FaultyCommand3)},
+                new[] {"faulty3"}
             );
         }
 
         [Test]
         [TestCaseSource(nameof(GetTestCases_RunAsync))]
-        public async Task RunAsync_Test(IReadOnlyList<Type> commandTypes, IReadOnlyList<string> commandLineArguments)
+        public async Task RunAsync_Test(IReadOnlyList<Type> commandTypes, IReadOnlyList<string> commandLineArguments, string expectedStdOut)
         {
             // Arrange
-            var application = new CliApplicationBuilder().AddCommands(commandTypes).Build();
+            using (var stdout = new StringWriter())
+            {
+                var console = new VirtualConsole(stdout);
 
-            // Act
-            var exitCodeValue = await application.RunAsync(commandLineArguments);
+                var application = new CliApplicationBuilder()
+                    .AddCommands(commandTypes)
+                    .UseConsole(console)
+                    .Build();
 
-            // Assert
-            exitCodeValue.Should().Be(0);
+                // Act
+                var exitCode = await application.RunAsync(commandLineArguments);
+
+                // Assert
+                exitCode.Should().Be(0);
+                stdout.ToString().Trim().Should().Be(expectedStdOut);
+            }
+        }
+
+        [Test]
+        [TestCaseSource(nameof(GetTestCases_HelpAndVersion_RunAsync))]
+        public async Task RunAsync_HelpAndVersion_Test(IReadOnlyList<Type> commandTypes, IReadOnlyList<string> commandLineArguments)
+        {
+            // Arrange
+            using (var stdout = new StringWriter())
+            {
+                var console = new VirtualConsole(stdout);
+
+                var application = new CliApplicationBuilder()
+                    .AddCommands(commandTypes)
+                    .UseConsole(console)
+                    .Build();
+
+                // Act
+                var exitCode = await application.RunAsync(commandLineArguments);
+
+                // Assert
+                exitCode.Should().Be(0);
+                stdout.ToString().Should().NotBeNullOrWhiteSpace();
+            }
         }
 
         [Test]
@@ -163,13 +153,22 @@ namespace CliFx.Tests
         public async Task RunAsync_Negative_Test(IReadOnlyList<Type> commandTypes, IReadOnlyList<string> commandLineArguments)
         {
             // Arrange
-            var application = new CliApplicationBuilder().AddCommands(commandTypes).Build();
+            using (var stderr = new StringWriter())
+            {
+                var console = new VirtualConsole(TextWriter.Null, stderr);
 
-            // Act
-            var exitCodeValue = await application.RunAsync(commandLineArguments);
+                var application = new CliApplicationBuilder()
+                    .AddCommands(commandTypes)
+                    .UseConsole(console)
+                    .Build();
 
-            // Assert
-            exitCodeValue.Should().NotBe(0);
+                // Act
+                var exitCode = await application.RunAsync(commandLineArguments);
+
+                // Assert
+                exitCode.Should().NotBe(0);
+                stderr.ToString().Should().NotBeNullOrWhiteSpace();
+            }
         }
     }
 }
