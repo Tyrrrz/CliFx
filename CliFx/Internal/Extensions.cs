@@ -31,6 +31,14 @@ namespace CliFx.Internal
 
         public static IEnumerable<T> ExceptNull<T>(this IEnumerable<T> source) where T : class => source.Where(i => i != null);
 
+        public static IEnumerable<T> Concat<T>(this IEnumerable<T> source, T value)
+        {
+            foreach (var i in source)
+                yield return i;
+
+            yield return value;
+        }
+
         public static bool Implements(this Type type, Type interfaceType) => type.GetInterfaces().Contains(interfaceType);
 
         public static Type GetEnumerableUnderlyingType(this Type type)

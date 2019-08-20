@@ -75,16 +75,21 @@ namespace CliFx
                     // Get parent command schema
                     var parentCommandSchema = availableCommandSchemas.FindParent(commandInput.CommandName);
 
-                    // Use a stub if parent command schema is not found
-                    if (parentCommandSchema == null)
+                    // Show help for parent command if it's defined
+                    if (parentCommandSchema != null)
                     {
-                        parentCommandSchema = CommandSchema.StubDefaultCommand;
-                        availableCommandSchemas = availableCommandSchemas.Concat(new[] { parentCommandSchema }).ToArray();
+                        var helpTextSource = new HelpTextSource(_metadata, availableCommandSchemas, parentCommandSchema);
+                        _helpTextRenderer.RenderHelpText(_console, helpTextSource);
                     }
+                    // Otherwise show help for a stub default command
+                    else
+                    {
+                        var helpTextSource = new HelpTextSource(_metadata,
+                            availableCommandSchemas.Concat(CommandSchema.StubDefaultCommand).ToArray(),
+                            CommandSchema.StubDefaultCommand);
 
-                    // Show help
-                    var helpTextSource = new HelpTextSource(_metadata, availableCommandSchemas, parentCommandSchema);
-                    _helpTextRenderer.RenderHelpText(_console, helpTextSource);
+                        _helpTextRenderer.RenderHelpText(_console, helpTextSource);
+                    }
 
                     return isError ? -1 : 0;
                 }
