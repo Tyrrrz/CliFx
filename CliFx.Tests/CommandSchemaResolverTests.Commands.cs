@@ -10,8 +10,6 @@ namespace CliFx.Tests
         [Command("cmd", Description = "NormalCommand1 description.")]
         private class NormalCommand1 : ICommand
         {
-            public string NotAnOption { get; set; }
-
             [CommandOption("option-a", 'a')]
             public int OptionA { get; set; }
 
@@ -30,10 +28,13 @@ namespace CliFx.Tests
             [CommandOption("option-d", 'd')]
             public DateTimeOffset OptionD { get; set; }
 
+            public string NotAnOption { get; set; }
+
             public Task ExecuteAsync(IConsole console) => Task.CompletedTask;
         }
     }
 
+    // Negative
     public partial class CommandSchemaResolverTests
     {
         [Command("conflict")]

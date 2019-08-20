@@ -87,7 +87,8 @@ namespace CliFx.Tests
             var commandSchemaResolver = new CommandSchemaResolver();
 
             // Act & Assert
-            commandSchemaResolver.Invoking(r => r.GetCommandSchemas(commandTypes)).Should().ThrowExactly<InvalidCommandSchemaException>();
+            commandSchemaResolver.Invoking(r => r.GetCommandSchemas(commandTypes)).Should()
+                .ThrowExactly<InvalidCommandSchemaException>();
         }
     }
 }

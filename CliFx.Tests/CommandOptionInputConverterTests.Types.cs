@@ -46,4 +46,18 @@ namespace CliFx.Tests
                 new TestStringParseableWithFormatProvider(value + " " + formatProvider);
         }
     }
+
+    // Negative
+    public partial class CommandOptionInputConverterTests
+    {
+        private class NonStringParseable
+        {
+            public int Value { get; }
+
+            public NonStringParseable(int value)
+            {
+                Value = value;
+            }
+        }
+    }
 }

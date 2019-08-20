@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
+using CliFx.Exceptions;
 using CliFx.Models;
 using CliFx.Services;
 using FluentAssertions;
@@ -261,19 +262,44 @@ namespace CliFx.Tests
             );
         }
 
+        private static IEnumerable<TestCaseData> GetTestCases_ConvertOptionInput_Negative()
+        {
+            yield return new TestCaseData(
+                new CommandOptionInput("option", "1234.5"),
+                typeof(int)
+            );
+
+            yield return new TestCaseData(
+                new CommandOptionInput("option", "123"),
+                typeof(NonStringParseable)
+            );
+        }
+
         [Test]
         [TestCaseSource(nameof(GetTestCases_ConvertOptionInput))]
         public void ConvertOptionInput_Test(CommandOptionInput optionInput, Type targetType, object expectedConvertedValue)
         {
             // Arrange
-            var converter = new CommandOptionInputConverter();
+            var commandOptionInputConverter = new CommandOptionInputConverter();
 
             // Act
-            var convertedValue = converter.ConvertOptionInput(optionInput, targetType);
+            var convertedValue = commandOptionInputConverter.ConvertOptionInput(optionInput, targetType);
 
             // Assert
             convertedValue.Should().BeEquivalentTo(expectedConvertedValue);
             convertedValue?.Should().BeAssignableTo(targetType);
+        }
+
+        [Test]
+        [TestCaseSource(nameof(GetTestCases_ConvertOptionInput_Negative))]
+        public void ConvertOptionInput_Negative_Test(CommandOptionInput optionInput, Type targetType)
+        {
+            // Arrange
+            var commandOptionInputConverter = new CommandOptionInputConverter();
+
+            // Act & Assert
+            commandOptionInputConverter.Invoking(c => c.ConvertOptionInput(optionInput, targetType)).Should()
+                .ThrowExactly<InvalidCommandOptionInputException>();
         }
     }
 }
