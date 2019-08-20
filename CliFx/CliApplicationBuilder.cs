@@ -38,7 +38,9 @@ namespace CliFx
         {
             commandAssembly.GuardNotNull(nameof(commandAssembly));
 
-            var commandTypes = commandAssembly.ExportedTypes.Where(t => t.Implements(typeof(ICommand)));
+            var commandTypes = commandAssembly.ExportedTypes
+                .Where(t => t.Implements(typeof(ICommand)))
+                .Where(t => !t.IsAbstract && !t.IsInterface);
 
             foreach (var commandType in commandTypes)
                 AddCommand(commandType);
