@@ -10,7 +10,7 @@ namespace CliFx.Tests
     {
         private static string DummyFilePath => typeof(Dummy.Program).Assembly.Location;
 
-        private static string DummyVersionText => typeof(Dummy.Program).Assembly.GetName().Version.ToString();
+        private static string DummyVersionText => $"v{typeof(Dummy.Program).Assembly.GetName().Version}";
 
         [Test]
         [TestCase("", "Hello world")]

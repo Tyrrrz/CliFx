@@ -94,13 +94,11 @@ namespace CliFx
         {
             if (_title.IsNullOrWhiteSpace())
             {
-                // Entry assembly is null in tests
                 UseTitle(EntryAssembly?.GetName().Name ?? "App");
             }
 
             if (_executableName.IsNullOrWhiteSpace())
             {
-                // Entry assembly is null in tests
                 var entryAssemblyLocation = EntryAssembly?.Location;
 
                 // Set different executable name depending on location
@@ -126,8 +124,7 @@ namespace CliFx
 
             if (_versionText.IsNullOrWhiteSpace())
             {
-                // Entry assembly is null in tests
-                UseVersionText(EntryAssembly?.GetName().Version.ToString() ?? "1.0");
+                UseVersionText(EntryAssembly != null ? $"v{EntryAssembly.GetName().Version}" : "v1.0");
             }
 
             if (_console == null)
@@ -161,6 +158,7 @@ namespace CliFx
     {
         private static readonly Lazy<Assembly> LazyEntryAssembly = new Lazy<Assembly>(Assembly.GetEntryAssembly);
 
+        // Entry assembly is null in tests
         private static Assembly EntryAssembly => LazyEntryAssembly.Value;
     }
 }
