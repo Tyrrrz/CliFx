@@ -169,8 +169,14 @@ namespace CliFx.Services
                 // Header
                 RenderHeader("Options");
 
+                // Order options and append built-in options
+                var allOptionSchemas = source.TargetCommandSchema.Options
+                    .OrderByDescending(o => o.IsRequired)
+                    .Concat(builtInOptionSchemas)
+                    .ToArray();
+
                 // Options
-                foreach (var optionSchema in source.TargetCommandSchema.Options.Concat(builtInOptionSchemas))
+                foreach (var optionSchema in allOptionSchemas)
                 {
                     // Is required
                     if (optionSchema.IsRequired)
