@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using CliFx.Attributes;
 using CliFx.Internal;
 using CliFx.Models;
 using CliFx.Services;
@@ -40,6 +41,7 @@ namespace CliFx
 
             var commandTypes = commandAssembly.ExportedTypes
                 .Where(t => t.Implements(typeof(ICommand)))
+                .Where(t => t.IsDefined(typeof(CommandAttribute)))
                 .Where(t => !t.IsAbstract && !t.IsInterface);
 
             foreach (var commandType in commandTypes)
