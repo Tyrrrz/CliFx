@@ -63,6 +63,11 @@ namespace CliFx.Tests
             {
                 new[] {typeof(InvalidCommand3)}
             });
+
+            yield return new TestCaseData(new object[]
+            {
+                new[] {typeof(InvalidCommand4)}
+            });
         }
 
         [Test]

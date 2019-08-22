@@ -54,8 +54,14 @@ namespace CliFx.Tests
         {
         }
 
-        [Command]
+        // No attribute
         private class InvalidCommand2 : ICommand
+        {
+            public Task ExecuteAsync(IConsole console) => Task.CompletedTask;
+        }
+
+        [Command]
+        private class InvalidCommand3 : ICommand
         {
             [CommandOption("conflict")]
             public string ConflictingOption1 { get; set; }
@@ -67,7 +73,7 @@ namespace CliFx.Tests
         }
 
         [Command]
-        private class InvalidCommand3 : ICommand
+        private class InvalidCommand4 : ICommand
         {
             [CommandOption('c')]
             public string ConflictingOption1 { get; set; }
