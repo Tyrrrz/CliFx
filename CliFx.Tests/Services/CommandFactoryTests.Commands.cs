@@ -2,9 +2,9 @@
 using CliFx.Attributes;
 using CliFx.Services;
 
-namespace CliFx.Tests
+namespace CliFx.Tests.Services
 {
-    public partial class DelegateCommandFactoryTests
+    public partial class CommandFactoryTests
     {
         [Command]
         private class TestCommand : ICommand

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CliFx.Tests
+namespace CliFx.Tests.Services
 {
     public partial class CommandOptionInputConverterTests
     {

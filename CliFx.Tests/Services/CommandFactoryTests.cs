@@ -6,7 +6,7 @@ using CliFx.Services;
 using FluentAssertions;
 using NUnit.Framework;
 
-namespace CliFx.Tests
+namespace CliFx.Tests.Services
 {
     [TestFixture]
     public partial class CommandFactoryTests
