@@ -27,6 +27,7 @@ _CliFx is to command line interfaces what ASP.NET Core is to web applications._
 - Generates contextual help text
 - Prints errors and routes exit codes on exceptions
 - Highly testable and easy to customize
+- Contains utilties such as progress reporting
 - Targets .NET Framework 4.5+ and .NET Standard 2.0+
 - No external dependencies
 
@@ -260,6 +261,19 @@ var app = new CliApplicationBuilder()
     .AddCommand(typeof(CommandB)) // include CommandB specifically
     .AddCommandsFrom(typeof(CommandC).Assembly) // include all commands from assembly that contains CommandC
     .Build();
+```
+
+### Report progress
+
+CliFx comes with a simple utility for rendering progress to the console, `ProgressReporter`. It implements a well-known `IProgress<double>` interface so you can pass it to methods that are aware of this abstraction.
+
+To avoid polluting output when it's not bound to a console, `ProgressReporter` will simply no-op if stdout is redirected.
+
+```c#
+var progressReporter = console.CreateProgressReporter();
+
+for (var i = 0.0; i <= 1; i += 0.01)
+    progressReporter.Report(i);
 ```
 
 ### Testing

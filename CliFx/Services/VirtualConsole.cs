@@ -15,19 +15,19 @@ namespace CliFx.Services
         public TextReader Input { get; }
 
         /// <inheritdoc />
-        public bool IsInputRedirected => true;
+        public bool IsInputRedirected { get; }
 
         /// <inheritdoc />
         public TextWriter Output { get; }
 
         /// <inheritdoc />
-        public bool IsOutputRedirected => true;
+        public bool IsOutputRedirected { get; }
 
         /// <inheritdoc />
         public TextWriter Error { get; }
 
         /// <inheritdoc />
-        public bool IsErrorRedirected => true;
+        public bool IsErrorRedirected { get; }
 
         /// <inheritdoc />
         public ConsoleColor ForegroundColor { get; set; } = ConsoleColor.Gray;
@@ -38,11 +38,24 @@ namespace CliFx.Services
         /// <summary>
         /// Initializes an instance of <see cref="VirtualConsole"/>.
         /// </summary>
-        public VirtualConsole(TextReader input, TextWriter output, TextWriter error)
+        public VirtualConsole(TextReader input, bool isInputRedirected,
+            TextWriter output, bool isOutputRedirected,
+            TextWriter error, bool isErrorRedirected)
         {
             Input = input.GuardNotNull(nameof(input));
+            IsInputRedirected = isInputRedirected;
             Output = output.GuardNotNull(nameof(output));
+            IsOutputRedirected = isOutputRedirected;
             Error = error.GuardNotNull(nameof(error));
+            IsErrorRedirected = isErrorRedirected;
+        }
+
+        /// <summary>
+        /// Initializes an instance of <see cref="VirtualConsole"/>.
+        /// </summary>
+        public VirtualConsole(TextReader input, TextWriter output, TextWriter error)
+            : this(input, true, output, true, error, true)
+        {
         }
 
         /// <summary>
