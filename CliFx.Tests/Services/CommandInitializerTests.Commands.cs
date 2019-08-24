@@ -10,10 +10,13 @@ namespace CliFx.Tests.Services
         private class TestCommand : ICommand
         {
             [CommandOption("int", 'i', IsRequired = true)]
-            public int IntOption { get; set; } = 24;
+            public int Option1 { get; set; } = 24;
 
             [CommandOption("str", 's')]
-            public string StringOption { get; set; } = "foo bar";
+            public string Option2 { get; set; } = "foo bar";
+
+            [CommandOption('S')]
+            public bool Option3 { get; set; }
 
             public Task ExecuteAsync(IConsole console) => Task.CompletedTask;
         }

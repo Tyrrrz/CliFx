@@ -24,7 +24,7 @@ namespace CliFx.Tests.Services
                 {
                     new CommandOptionInput("int", "13")
                 }),
-                new TestCommand {IntOption = 13}
+                new TestCommand {Option1 = 13}
             );
 
             yield return new TestCaseData(
@@ -35,7 +35,7 @@ namespace CliFx.Tests.Services
                     new CommandOptionInput("int", "13"),
                     new CommandOptionInput("str", "hello world")
                 }),
-                new TestCommand {IntOption = 13, StringOption = "hello world"}
+                new TestCommand {Option1 = 13, Option2 = "hello world"}
             );
 
             yield return new TestCaseData(
@@ -45,7 +45,19 @@ namespace CliFx.Tests.Services
                 {
                     new CommandOptionInput("i", "13")
                 }),
-                new TestCommand {IntOption = 13}
+                new TestCommand {Option1 = 13}
+            );
+
+            yield return new TestCaseData(
+                new TestCommand(),
+                GetCommandSchema(typeof(TestCommand)),
+                new CommandInput(new[]
+                {
+                    new CommandOptionInput("i", "13"),
+                    new CommandOptionInput("s", "hello world"),
+                    new CommandOptionInput("S")
+                }),
+                new TestCommand {Option1 = 13, Option2 = "hello world", Option3 = true}
             );
         }
 
