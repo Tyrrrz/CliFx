@@ -8,8 +8,8 @@ namespace CliFx.Utilities
     public static class Extensions
     {
         /// <summary>
-        /// Creates a progress reporter for this console.
+        /// Creates a <see cref="ProgressTicker"/> bound to this console.
         /// </summary>
-        public static ProgressReporter CreateProgressReporter(this IConsole console) => new ProgressReporter(console);
+        public static ProgressTicker CreateProgressTicker(this IConsole console) => new ProgressTicker(console);
     }
 }

@@ -4,18 +4,18 @@ using CliFx.Services;
 namespace CliFx.Utilities
 {
     /// <summary>
-    /// Utility that provides continuous progress reporting to the console.
+    /// Utility for rendering current progress to the console that erases and rewrites output on every tick.
     /// </summary>
-    public class ProgressReporter : IProgress<double>
+    public class ProgressTicker : IProgress<double>
     {
         private readonly IConsole _console;
 
         private string _lastOutput = "";
 
         /// <summary>
-        /// Initializes an instance of <see cref="ProgressReporter"/>.
+        /// Initializes an instance of <see cref="ProgressTicker"/>.
         /// </summary>
-        public ProgressReporter(IConsole console)
+        public ProgressTicker(IConsole console)
         {
             _console = console;
         }
@@ -33,7 +33,7 @@ namespace CliFx.Utilities
         }
 
         /// <summary>
-        /// Reports progress and renders it to console.
+        /// Erases previous output and renders new progress to the console.
         /// If console's stdout is redirected, this method returns without doing anything.
         /// </summary>
         public void Report(double progress)

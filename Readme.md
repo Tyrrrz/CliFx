@@ -265,15 +265,17 @@ var app = new CliApplicationBuilder()
 
 ### Report progress
 
-CliFx comes with a simple utility for rendering progress to the console, `ProgressReporter`. It implements a well-known `IProgress<double>` interface so you can pass it to methods that are aware of this abstraction.
+CliFx comes with a simple utility for reporting progress to the console, `ProgressTicker`, which renders progress in-place on every tick.
 
-To avoid polluting output when it's not bound to a console, `ProgressReporter` will simply no-op if stdout is redirected.
+It implements a well-known `IProgress<double>` interface so you can pass it to methods that are aware of this abstraction.
+
+To avoid polluting output when it's not bound to a console, `ProgressTicker` will simply no-op if stdout is redirected.
 
 ```c#
-var progressReporter = console.CreateProgressReporter();
+var progressTicker = console.CreateProgressTicker();
 
 for (var i = 0.0; i <= 1; i += 0.01)
-    progressReporter.Report(i);
+    progressTicker.Report(i);
 ```
 
 ### Testing
