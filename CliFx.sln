@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CliFx", "CliFx\CliFx.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CliFx.Tests", "CliFx.Tests\CliFx.Tests.csproj", "{268CF863-65A5-49BB-93CF-08972B7756DC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CliFx.Tests.Dummy", "CliFx.Tests.Dummy\CliFx.Tests.Dummy.csproj", "{4904B3EB-3286-4F1B-8B74-6FF051C8E787}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3AAE8166-BB8E-49DA-844C-3A0EE6BD40A0}"
 	ProjectSection(SolutionItems) = preProject
 		Changelog.md = Changelog.md
@@ -18,7 +16,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CliFx.Benchmarks", "CliFx.Benchmarks\CliFx.Benchmarks.csproj", "{8ACD6DC2-D768-4850-9223-5B7C83A78513}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CliFx.Demo", "CliFx.Demo\CliFx.Demo.csproj", "{AAB6844C-BF71-448F-A11B-89AEE459AB15}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CliFx.Demo", "CliFx.Demo\CliFx.Demo.csproj", "{AAB6844C-BF71-448F-A11B-89AEE459AB15}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -54,18 +52,6 @@ Global
 		{268CF863-65A5-49BB-93CF-08972B7756DC}.Release|x64.Build.0 = Release|Any CPU
 		{268CF863-65A5-49BB-93CF-08972B7756DC}.Release|x86.ActiveCfg = Release|Any CPU
 		{268CF863-65A5-49BB-93CF-08972B7756DC}.Release|x86.Build.0 = Release|Any CPU
-		{4904B3EB-3286-4F1B-8B74-6FF051C8E787}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4904B3EB-3286-4F1B-8B74-6FF051C8E787}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4904B3EB-3286-4F1B-8B74-6FF051C8E787}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{4904B3EB-3286-4F1B-8B74-6FF051C8E787}.Debug|x64.Build.0 = Debug|Any CPU
-		{4904B3EB-3286-4F1B-8B74-6FF051C8E787}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{4904B3EB-3286-4F1B-8B74-6FF051C8E787}.Debug|x86.Build.0 = Debug|Any CPU
-		{4904B3EB-3286-4F1B-8B74-6FF051C8E787}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4904B3EB-3286-4F1B-8B74-6FF051C8E787}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4904B3EB-3286-4F1B-8B74-6FF051C8E787}.Release|x64.ActiveCfg = Release|Any CPU
-		{4904B3EB-3286-4F1B-8B74-6FF051C8E787}.Release|x64.Build.0 = Release|Any CPU
-		{4904B3EB-3286-4F1B-8B74-6FF051C8E787}.Release|x86.ActiveCfg = Release|Any CPU
-		{4904B3EB-3286-4F1B-8B74-6FF051C8E787}.Release|x86.Build.0 = Release|Any CPU
 		{8ACD6DC2-D768-4850-9223-5B7C83A78513}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8ACD6DC2-D768-4850-9223-5B7C83A78513}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8ACD6DC2-D768-4850-9223-5B7C83A78513}.Debug|x64.ActiveCfg = Debug|Any CPU

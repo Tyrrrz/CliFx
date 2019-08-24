@@ -426,7 +426,6 @@ CliFx is made out of "Cli" for "Command Line Interface" and "Fx" for "Framework"
 ## Libraries used
 
 - [NUnit](https://github.com/nunit/nunit)
-- [CliWrap](https://github.com/Tyrrrz/CliWrap)
 - [FluentAssertions](https://github.com/fluentassertions/fluentassertions)
 - [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json)
 - [BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet)

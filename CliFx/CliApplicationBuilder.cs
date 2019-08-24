@@ -108,59 +108,15 @@ namespace CliFx
             return this;
         }
 
-        private void SetFallbackValues()
-        {
-            if (_title.IsNullOrWhiteSpace())
-            {
-                UseTitle(EntryAssembly?.GetName().Name ?? "App");
-            }
-
-            if (_executableName.IsNullOrWhiteSpace())
-            {
-                var entryAssemblyLocation = EntryAssembly?.Location;
-
-                // Set different executable name depending on location
-                if (!entryAssemblyLocation.IsNullOrWhiteSpace())
-                {
-                    // Prepend 'dotnet' to assembly file name if the entry assembly is a dll file (extension needs to be kept)
-                    if (string.Equals(Path.GetExtension(entryAssemblyLocation), ".dll", StringComparison.OrdinalIgnoreCase))
-                    {
-                        UseExecutableName("dotnet " + Path.GetFileName(entryAssemblyLocation));
-                    }
-                    // Otherwise just use assembly file name without extension
-                    else
-                    {
-                        UseExecutableName(Path.GetFileNameWithoutExtension(entryAssemblyLocation));
-                    }
-                }
-                // If location is null then just use a stub
-                else
-                {
-                    UseExecutableName("app");
-                }
-            }
-
-            if (_versionText.IsNullOrWhiteSpace())
-            {
-                UseVersionText(EntryAssembly != null ? $"v{EntryAssembly.GetName().Version}" : "v1.0");
-            }
-
-            if (_console == null)
-            {
-                UseConsole(new SystemConsole());
-            }
-
-            if (_commandFactory == null)
-            {
-                UseCommandFactory(new CommandFactory());
-            }
-        }
-
         /// <inheritdoc />
         public ICliApplication Build()
         {
             // Use defaults for required parameters that were not configured
-            SetFallbackValues();
+            _title = _title ?? GetDefaultTitle() ?? "App";
+            _executableName = _executableName ?? GetDefaultExecutableName() ?? "app";
+            _versionText = _versionText ?? GetDefaultVersionText() ?? "v1.0";
+            _console = _console ?? new SystemConsole();
+            _commandFactory = _commandFactory ?? new CommandFactory();
 
             // Project parameters to expected types
             var metadata = new ApplicationMetadata(_title, _executableName, _versionText, _description);
@@ -178,5 +134,23 @@ namespace CliFx
 
         // Entry assembly is null in tests
         private static Assembly EntryAssembly => LazyEntryAssembly.Value;
+
+        private static string GetDefaultTitle() => EntryAssembly?.GetName().Name;
+
+        private static string GetDefaultExecutableName()
+        {
+            var entryAssemblyLocation = EntryAssembly?.Location;
+
+            // If it's a .dll assembly, prepend 'dotnet' and keep the file extension
+            if (string.Equals(Path.GetExtension(entryAssemblyLocation), ".dll", StringComparison.OrdinalIgnoreCase))
+            {
+                return "dotnet " + Path.GetFileName(entryAssemblyLocation);
+            }
+
+            // Otherwise just use assembly file name without extension
+            return Path.GetFileNameWithoutExtension(entryAssemblyLocation);
+        }
+
+        private static string GetDefaultVersionText() => EntryAssembly != null ? $"v{EntryAssembly.GetName().Version}" : null;
     }
 }

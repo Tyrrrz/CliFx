@@ -8,11 +8,10 @@ namespace CliFx.Tests
     [TestFixture]
     public partial class CliApplicationBuilderTests
     {
+        // Make sure all builder methods work
         [Test]
         public void Build_Smoke_Test()
         {
-            // Just test that application can be built after calling all methods
-
             // Arrange
             var builder = new CliApplicationBuilder();
 
@@ -32,6 +31,17 @@ namespace CliFx.Tests
                 .UseConsole(new VirtualConsole(TextWriter.Null))
                 .UseCommandFactory(schema => (ICommand) Activator.CreateInstance(schema.Type))
                 .Build();
+        }
+
+        // Make sure builder can produce a default application
+        [Test]
+        public void Build_Fallback_Smoke_Test()
+        {
+            // Arrange
+            var builder = new CliApplicationBuilder();
+
+            // Act
+            builder.Build();
         }
     }
 }
