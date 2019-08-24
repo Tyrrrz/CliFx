@@ -92,6 +92,14 @@ namespace CliFx
                 // Get schemas for all available command types
                 var availableCommandSchemas = _commandSchemaResolver.GetCommandSchemas(_configuration.CommandTypes);
 
+                // Show version if version option was specified and command was not specified (only works on default command)
+                if (commandInput.IsVersionOptionSpecified() && !commandInput.IsCommandSpecified())
+                {
+                    _console.Output.WriteLine(_metadata.VersionText);
+
+                    return 0;
+                }
+
                 // Find command schema matching the name specified in the input
                 var targetCommandSchema = availableCommandSchemas.FindByName(commandInput.CommandName);
 
@@ -129,14 +137,6 @@ namespace CliFx
                     }
 
                     return isError ? -1 : 0;
-                }
-
-                // Show version if version option was specified and command was not specified (only works on default command)
-                if (commandInput.IsVersionOptionSpecified() && !commandInput.IsCommandSpecified())
-                {
-                    _console.Output.WriteLine(_metadata.VersionText);
-
-                    return 0;
                 }
 
                 // Show help if help option was specified

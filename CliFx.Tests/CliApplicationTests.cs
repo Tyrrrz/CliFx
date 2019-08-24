@@ -11,6 +11,8 @@ namespace CliFx.Tests
     [TestFixture]
     public partial class CliApplicationTests
     {
+        private const string TestVersionText = "v1.0";
+
         private static IEnumerable<TestCaseData> GetTestCases_RunAsync()
         {
             yield return new TestCaseData(
@@ -23,6 +25,18 @@ namespace CliFx.Tests
                 new[] {typeof(NamedCommand)},
                 new[] {"cmd"},
                 "NamedCommand executed."
+            );
+
+            yield return new TestCaseData(
+                new[] {typeof(DefaultCommand)},
+                new[] {"--version"},
+                TestVersionText
+            );
+
+            yield return new TestCaseData(
+                new[] {typeof(NamedCommand)},
+                new[] {"--version"},
+                TestVersionText
             );
         }
 
@@ -143,6 +157,7 @@ namespace CliFx.Tests
 
                 var application = new CliApplicationBuilder()
                     .AddCommands(commandTypes)
+                    .UseVersionText(TestVersionText)
                     .UseConsole(console)
                     .Build();
 
@@ -166,6 +181,7 @@ namespace CliFx.Tests
 
                 var application = new CliApplicationBuilder()
                     .AddCommands(commandTypes)
+                    .UseVersionText(TestVersionText)
                     .UseConsole(console)
                     .Build();
 
@@ -189,6 +205,7 @@ namespace CliFx.Tests
 
                 var application = new CliApplicationBuilder()
                     .AddCommands(commandTypes)
+                    .UseVersionText(TestVersionText)
                     .UseConsole(console)
                     .Build();
 
