@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using CliFx.Exceptions;
@@ -49,11 +50,47 @@ namespace CliFx
 
             try
             {
-                // Get schemas for all available command types
-                var availableCommandSchemas = _commandSchemaResolver.GetCommandSchemas(_configuration.CommandTypes);
-
                 // Parse command input from arguments
                 var commandInput = _commandInputParser.ParseCommandInput(commandLineArguments);
+
+                // Wait for debugger to be attached if debug mode is requested
+                if (_configuration.IsDebugModeAllowed && commandInput.IsDebugModeRequested())
+                {
+                    // Whoever comes up with an idea on how to cover this in tests is a genius
+
+                    _console.WithForegroundColor(ConsoleColor.Green,
+                        () => _console.Output.WriteLine($"Attach debugger to PID {Process.GetCurrentProcess().Id} to continue."));
+
+                    while (!Debugger.IsAttached)
+                        await Task.Delay(100);
+                }
+
+                // Show parse results if preview mode is requested
+                if (_configuration.IsPreviewModeAllowed && commandInput.IsPreviewModeRequested())
+                {
+                    _console.Output.WriteLine($"Command name: {commandInput.CommandName}");
+                    _console.Output.WriteLine();
+
+                    _console.Output.WriteLine("Directives:");
+                    foreach (var directive in commandInput.Directives)
+                    {
+                        _console.Output.Write(" ");
+                        _console.Output.WriteLine(directive);
+                    }
+                    _console.Output.WriteLine();
+
+                    _console.Output.WriteLine("Options:");
+                    foreach (var option in commandInput.Options)
+                    {
+                        _console.Output.Write(" ");
+                        _console.Output.WriteLine(option);
+                    }
+
+                    return 0;
+                }
+
+                // Get schemas for all available command types
+                var availableCommandSchemas = _commandSchemaResolver.GetCommandSchemas(_configuration.CommandTypes);
 
                 // Find command schema matching the name specified in the input
                 var targetCommandSchema = availableCommandSchemas.FindByName(commandInput.CommandName);
@@ -94,7 +131,7 @@ namespace CliFx
                     return isError ? -1 : 0;
                 }
 
-                // Show version if it was requested without specifying a command
+                // Show version if it was requested and command wasn't specified
                 if (commandInput.IsVersionRequested() && !commandInput.IsCommandSpecified())
                 {
                     _console.Output.WriteLine(_metadata.VersionText);

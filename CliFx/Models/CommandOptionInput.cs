@@ -7,7 +7,7 @@ namespace CliFx.Models
     /// <summary>
     /// Parsed option from command line input.
     /// </summary>
-    public class CommandOptionInput
+    public partial class CommandOptionInput
     {
         /// <summary>
         /// Specified option alias.
@@ -40,7 +40,7 @@ namespace CliFx.Models
         /// Initializes an instance of <see cref="CommandOptionInput"/>.
         /// </summary>
         public CommandOptionInput(string alias)
-            : this(alias, new string[0])
+            : this(alias, EmptyValues)
         {
         }
 
@@ -69,5 +69,10 @@ namespace CliFx.Models
 
             return buffer.ToString();
         }
+    }
+
+    public partial class CommandOptionInput
+    {
+        private static readonly IReadOnlyList<string> EmptyValues = new string[0];
     }
 }

@@ -109,6 +109,24 @@ namespace CliFx.Models
         }
 
         /// <summary>
+        /// Gets whether debug mode was requested in the input.
+        /// </summary>
+        public static bool IsDebugModeRequested(this CommandInput commandInput)
+        {
+            commandInput.GuardNotNull(nameof(commandInput));
+            return commandInput.Directives.Contains("debug", StringComparer.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// Gets whether preview mode was requested in the input.
+        /// </summary>
+        public static bool IsPreviewModeRequested(this CommandInput commandInput)
+        {
+            commandInput.GuardNotNull(nameof(commandInput));
+            return commandInput.Directives.Contains("preview", StringComparer.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
         /// Gets whether help was requested in the input.
         /// </summary>
         public static bool IsHelpRequested(this CommandInput commandInput)
@@ -116,7 +134,6 @@ namespace CliFx.Models
             commandInput.GuardNotNull(nameof(commandInput));
 
             var firstOption = commandInput.Options.FirstOrDefault();
-
             return firstOption != null && CommandOptionSchema.HelpOption.MatchesAlias(firstOption.Alias);
         }
 
@@ -128,7 +145,6 @@ namespace CliFx.Models
             commandInput.GuardNotNull(nameof(commandInput));
 
             var firstOption = commandInput.Options.FirstOrDefault();
-
             return firstOption != null && CommandOptionSchema.VersionOption.MatchesAlias(firstOption.Alias);
         }
 

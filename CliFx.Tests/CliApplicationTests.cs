@@ -26,7 +26,7 @@ namespace CliFx.Tests
             );
         }
 
-        private static IEnumerable<TestCaseData> GetTestCases_HelpAndVersion_RunAsync()
+        private static IEnumerable<TestCaseData> GetTestCases_RunAsync_Smoke()
         {
             yield return new TestCaseData(
                 new[] {typeof(DefaultCommand)},
@@ -55,6 +55,21 @@ namespace CliFx.Tests
 
             yield return new TestCaseData(
                 new[] {typeof(NamedCommand)},
+                new[] {"-h"}
+            );
+
+            yield return new TestCaseData(
+                new[] {typeof(NamedCommand)},
+                new[] {"--help"}
+            );
+
+            yield return new TestCaseData(
+                new[] {typeof(NamedCommand)},
+                new[] {"--version"}
+            );
+
+            yield return new TestCaseData(
+                new[] {typeof(NamedCommand)},
                 new[] {"cmd", "-h"}
             );
 
@@ -71,6 +86,21 @@ namespace CliFx.Tests
             yield return new TestCaseData(
                 new[] {typeof(FaultyCommand3)},
                 new[] {"faulty3", "-h"}
+            );
+
+            yield return new TestCaseData(
+                new[] {typeof(DefaultCommand)},
+                new[] {"[preview]"}
+            );
+
+            yield return new TestCaseData(
+                new[] {typeof(FaultyCommand1)},
+                new[] {"faulty1", "[preview]"}
+            );
+
+            yield return new TestCaseData(
+                new[] {typeof(FaultyCommand1)},
+                new[] {"faulty1", "[preview]", "-o", "value"}
             );
         }
 
@@ -126,8 +156,8 @@ namespace CliFx.Tests
         }
 
         [Test]
-        [TestCaseSource(nameof(GetTestCases_HelpAndVersion_RunAsync))]
-        public async Task RunAsync_HelpAndVersion_Test(IReadOnlyList<Type> commandTypes, IReadOnlyList<string> commandLineArguments)
+        [TestCaseSource(nameof(GetTestCases_RunAsync_Smoke))]
+        public async Task RunAsync_Smoke_Test(IReadOnlyList<Type> commandTypes, IReadOnlyList<string> commandLineArguments)
         {
             // Arrange
             using (var stdout = new StringWriter())

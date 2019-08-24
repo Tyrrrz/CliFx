@@ -21,13 +21,12 @@ _CliFx is to command line interfaces what ASP.NET Core is to web applications._
 
 - Complete application framework, not just an argument parser
 - Requires minimal amount of code to get started
-- Resolves commands using attributes
+- Resolves commands and options using attributes
 - Handles options of various types, including custom types
 - Supports multi-level command hierarchies
 - Generates contextual help text
 - Prints errors and routes exit codes on exceptions
-- Highly testable and easy to customize
-- Contains utilties such as progress reporting
+- Highly testable and easy to debug
 - Targets .NET Framework 4.5+ and .NET Standard 2.0+
 - No external dependencies
 
@@ -36,7 +35,6 @@ _CliFx is to command line interfaces what ASP.NET Core is to web applications._
 - Positional arguments (anonymous options)
 - Auto-completion support
 - Environment variables
-- Runtime directives
 
 ## Usage
 
@@ -358,6 +356,24 @@ public async Task ConcatCommand_Test()
         Assert.That(stdout.ToString(), Is.EqualTo("foo bar"));
     }
 }
+```
+
+### Debug and preview mode
+
+When troubleshooting issues, you may find it useful to run your app in debug or preview mode. To do it, simply pass the corresponding directive to your app along with other command line arguments, e.g.: `myapp [debug] user add -n "John Doe" -e john.doe@example.com`
+
+If your application is ran in debug mode (`[debug]` directive), it will wait for debugger to be attached before proceeding. This is useful for debugging apps that were ran outside of your IDE.
+
+If preview mode is specified (`[preview]` directive), the app will print consumed command line arguments as they were parsed. This is useful when troubleshooting issues related to option parsing.
+
+You can also disallow these directives, e.g. when running in production, by calling `AllowDebugMode` and `AllowPreviewMode` methods on `CliApplicationBuilder`.
+
+```c#
+var app = new CliApplicationBuilder()
+    .AddCommandsFromThisAssembly()
+    .AllowDebugMode(true) // allow debug mode
+    .AllowPreviewMode(false) // disallow preview mode
+    .Build();
 ```
 
 ## Benchmarks

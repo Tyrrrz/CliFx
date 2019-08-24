@@ -18,8 +18,10 @@ namespace CliFx.Services
             commandLineArguments.GuardNotNull(nameof(commandLineArguments));
 
             var commandNameBuilder = new StringBuilder();
+            var directives = new List<string>();
             var optionsDic = new Dictionary<string, List<string>>();
 
+            // Option aliases and values are parsed in pairs so we need to keep track of last alias
             var lastOptionAlias = "";
 
             foreach (var commandLineArgument in commandLineArguments)
@@ -34,7 +36,7 @@ namespace CliFx.Services
                         optionsDic[lastOptionAlias] = new List<string>();
                 }
 
-                // Encountered short option name or multiple thereof
+                // Encountered short option name or multiple short option names
                 else if (commandLineArgument.StartsWith("-", StringComparison.OrdinalIgnoreCase))
                 {
                     // Handle stacked options
@@ -48,11 +50,22 @@ namespace CliFx.Services
                     }
                 }
 
-                // Encountered command name or part thereof
+                // Encountered directive or (part of) command name
                 else if (lastOptionAlias.IsNullOrWhiteSpace())
                 {
-                    commandNameBuilder.AppendIfNotEmpty(' ');
-                    commandNameBuilder.Append(commandLineArgument);
+                    if (commandLineArgument.StartsWith("[", StringComparison.OrdinalIgnoreCase) &&
+                        commandLineArgument.EndsWith("]", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Extract directive
+                        var directive = commandLineArgument.Substring(1, commandLineArgument.Length - 2);
+
+                        directives.Add(directive);
+                    }
+                    else
+                    {
+                        commandNameBuilder.AppendIfNotEmpty(' ');
+                        commandNameBuilder.Append(commandLineArgument);
+                    }
                 }
 
                 // Encountered option value
@@ -65,7 +78,7 @@ namespace CliFx.Services
             var commandName = commandNameBuilder.Length > 0 ? commandNameBuilder.ToString() : null;
             var options = optionsDic.Select(p => new CommandOptionInput(p.Key, p.Value)).ToArray();
 
-            return new CommandInput(commandName, options);
+            return new CommandInput(commandName, directives, options);
         }
     }
 }

@@ -165,6 +165,40 @@ namespace CliFx.Tests.Services
                     new CommandOptionInput("option", "value")
                 })
             );
+
+            yield return new TestCaseData(
+                new[] {"[debug]"},
+                new CommandInput(null,
+                    new[] {"debug"},
+                    new CommandOptionInput[0])
+            );
+
+            yield return new TestCaseData(
+                new[] {"[debug]", "[preview]"},
+                new CommandInput(null,
+                    new[] {"debug", "preview"},
+                    new CommandOptionInput[0])
+            );
+
+            yield return new TestCaseData(
+                new[] {"[debug]", "[preview]", "-o", "value"},
+                new CommandInput(null,
+                    new[] {"debug", "preview"},
+                    new[]
+                    {
+                        new CommandOptionInput("o", "value")
+                    })
+            );
+
+            yield return new TestCaseData(
+                new[] {"command", "[debug]", "[preview]", "-o", "value"},
+                new CommandInput("command",
+                    new[] {"debug", "preview"},
+                    new[]
+                    {
+                        new CommandOptionInput("o", "value")
+                    })
+            );
         }
 
         [Test]

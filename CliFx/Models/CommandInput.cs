@@ -16,6 +16,11 @@ namespace CliFx.Models
         public string CommandName { get; }
 
         /// <summary>
+        /// Specified directives.
+        /// </summary>
+        public IReadOnlyList<string> Directives { get; }
+
+        /// <summary>
         /// Specified options.
         /// </summary>
         public IReadOnlyList<CommandOptionInput> Options { get; }
@@ -23,10 +28,19 @@ namespace CliFx.Models
         /// <summary>
         /// Initializes an instance of <see cref="CommandInput"/>.
         /// </summary>
-        public CommandInput(string commandName, IReadOnlyList<CommandOptionInput> options)
+        public CommandInput(string commandName, IReadOnlyList<string> directives, IReadOnlyList<CommandOptionInput> options)
         {
             CommandName = commandName; // can be null
+            Directives = directives.GuardNotNull(nameof(directives));
             Options = options.GuardNotNull(nameof(options));
+        }
+
+        /// <summary>
+        /// Initializes an instance of <see cref="CommandInput"/>.
+        /// </summary>
+        public CommandInput(string commandName, IReadOnlyList<CommandOptionInput> options)
+            : this(commandName, EmptyDirectives, options)
+        {
         }
 
         /// <summary>
@@ -41,15 +55,7 @@ namespace CliFx.Models
         /// Initializes an instance of <see cref="CommandInput"/>.
         /// </summary>
         public CommandInput(string commandName)
-            : this(commandName, new CommandOptionInput[0])
-        {
-        }
-
-        /// <summary>
-        /// Initializes an instance of <see cref="CommandInput"/>.
-        /// </summary>
-        public CommandInput()
-            : this(null, new CommandOptionInput[0])
+            : this(commandName, EmptyOptions)
         {
         }
 
@@ -73,9 +79,12 @@ namespace CliFx.Models
 
     public partial class CommandInput
     {
+        private static readonly IReadOnlyList<string> EmptyDirectives = new string[0];
+        private static readonly IReadOnlyList<CommandOptionInput> EmptyOptions = new CommandOptionInput[0];
+
         /// <summary>
         /// Empty input.
         /// </summary>
-        public static CommandInput Empty { get; } = new CommandInput();
+        public static CommandInput Empty { get; } = new CommandInput(EmptyOptions);
     }
 }

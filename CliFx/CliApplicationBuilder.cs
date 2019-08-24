@@ -17,6 +17,8 @@ namespace CliFx
     {
         private readonly HashSet<Type> _commandTypes = new HashSet<Type>();
 
+        private bool _isDebugModeAllowed = true;
+        private bool _isPreviewModeAllowed = true;
         private string _title;
         private string _executableName;
         private string _versionText;
@@ -47,6 +49,20 @@ namespace CliFx
             foreach (var commandType in commandTypes)
                 AddCommand(commandType);
 
+            return this;
+        }
+
+        /// <inheritdoc />
+        public ICliApplicationBuilder AllowDebugMode(bool isAllowed = true)
+        {
+            _isDebugModeAllowed = isAllowed;
+            return this;
+        }
+
+        /// <inheritdoc />
+        public ICliApplicationBuilder AllowPreviewMode(bool isAllowed = true)
+        {
+            _isPreviewModeAllowed = isAllowed;
             return this;
         }
 
@@ -148,7 +164,7 @@ namespace CliFx
 
             // Project parameters to expected types
             var metadata = new ApplicationMetadata(_title, _executableName, _versionText, _description);
-            var configuration = new ApplicationConfiguration(_commandTypes.ToArray());
+            var configuration = new ApplicationConfiguration(_commandTypes.ToArray(), _isDebugModeAllowed, _isPreviewModeAllowed);
 
             return new CliApplication(metadata, configuration,
                 _console, new CommandInputParser(), new CommandSchemaResolver(),

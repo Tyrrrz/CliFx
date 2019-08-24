@@ -20,6 +20,16 @@ namespace CliFx
         ICliApplicationBuilder AddCommandsFrom(Assembly commandAssembly);
 
         /// <summary>
+        /// Specifies whether debug mode (enabled with [debug] directive) is allowed in the application.
+        /// </summary>
+        ICliApplicationBuilder AllowDebugMode(bool isAllowed = true);
+
+        /// <summary>
+        /// Specifies whether preview mode (enabled with [preview] directive) is allowed in the application.
+        /// </summary>
+        ICliApplicationBuilder AllowPreviewMode(bool isAllowed = true);
+
+        /// <summary>
         /// Sets application title, which appears in the help text.
         /// </summary>
         ICliApplicationBuilder UseTitle(string title);
