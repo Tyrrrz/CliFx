@@ -13,6 +13,9 @@ namespace CliFx.Tests.Services
             [CommandOption("option-a", 'a')]
             public int OptionA { get; set; }
 
+            [CommandOption('A')]
+            public int AlmostOptionA { get; set; }
+
             [CommandOption("option-b", IsRequired = true)]
             public string OptionB { get; set; }
 

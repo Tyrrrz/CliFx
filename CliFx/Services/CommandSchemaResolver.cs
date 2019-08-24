@@ -14,84 +14,54 @@ namespace CliFx.Services
     /// </summary>
     public class CommandSchemaResolver : ICommandSchemaResolver
     {
-        private CommandOptionSchema GetCommandOptionSchema(PropertyInfo optionProperty)
+        private IReadOnlyList<CommandOptionSchema> GetCommandOptionSchemas(Type commandType)
         {
-            var attribute = optionProperty.GetCustomAttribute<CommandOptionAttribute>();
+            var result = new List<CommandOptionSchema>();
 
-            // If an attribute is not set, then it's not an option so we just skip it
-            if (attribute == null)
-                return null;
-
-            return new CommandOptionSchema(optionProperty,
-                attribute.Name,
-                attribute.ShortName,
-                attribute.IsRequired,
-                attribute.Description);
-        }
-
-        private CommandSchema GetCommandSchema(Type commandType)
-        {
-            var attribute = commandType.GetCustomAttribute<CommandAttribute>();
-
-            // Make sure attribute is set
-            if (attribute == null)
+            foreach (var property in commandType.GetProperties())
             {
-                throw new InvalidCommandSchemaException($"Command type [{commandType}] must be annotated with [{typeof(CommandAttribute)}].");
+                var attribute = property.GetCustomAttribute<CommandOptionAttribute>();
+
+                // If an attribute is not set, then it's not an option so we just skip it
+                if (attribute == null)
+                    continue;
+
+                // Build option schema
+                var optionSchema = new CommandOptionSchema(property,
+                    attribute.Name,
+                    attribute.ShortName,
+                    attribute.IsRequired,
+                    attribute.Description);
+
+                // Make sure there are no other options with the same name
+                var existingOptionWithSameName = result
+                    .Where(o => !o.Name.IsNullOrWhiteSpace())
+                    .FirstOrDefault(o => string.Equals(o.Name, optionSchema.Name, StringComparison.OrdinalIgnoreCase));
+
+                if (existingOptionWithSameName != null)
+                {
+                    throw new SchemaValidationException(
+                        $"Command type [{commandType}] has options defined with the same name: " +
+                        $"[{existingOptionWithSameName.Property}] and [{optionSchema.Property}].");
+                }
+
+                // Make sure there are no other options with the same short name
+                var existingOptionWithSameShortName = result
+                    .Where(o => o.ShortName != null)
+                    .FirstOrDefault(o => o.ShortName == optionSchema.ShortName);
+
+                if (existingOptionWithSameShortName != null)
+                {
+                    throw new SchemaValidationException(
+                        $"Command type [{commandType}] has options defined with the same short name: " +
+                        $"[{existingOptionWithSameShortName.Property}] and [{optionSchema.Property}].");
+                }
+
+                // Add schema to list
+                result.Add(optionSchema);
             }
 
-            // Get option schemas
-            var options = commandType.GetProperties().Select(GetCommandOptionSchema).ExceptNull().ToArray();
-
-            // Create command schema
-            var commandSchema = new CommandSchema(commandType,
-                attribute.Name,
-                attribute.Description,
-                options);
-
-            // Make sure command type implements ICommand.
-            // (we check using command schema to provide a more useful error message)
-            if (!commandSchema.Type.Implements(typeof(ICommand)))
-            {
-                throw new InvalidCommandSchemaException(!commandSchema.Name.IsNullOrWhiteSpace()
-                    ? $"Command [{commandSchema.Name}] doesn't implement ICommand."
-                    : "Default command doesn't implement ICommand.");
-            }
-
-            // Make sure there are no options with duplicate names
-            var nonUniqueOptionName = options
-                .Where(o => !o.Name.IsNullOrWhiteSpace())
-                .Select(o => o.Name)
-                .GroupBy(i => i, StringComparer.OrdinalIgnoreCase)
-                .Where(g => g.Count() >= 2)
-                .SelectMany(g => g)
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .FirstOrDefault();
-
-            if (nonUniqueOptionName != null)
-            {
-                throw new InvalidCommandSchemaException(!commandSchema.Name.IsNullOrWhiteSpace()
-                    ? $"There are multiple options defined with name [{nonUniqueOptionName}] on command [{commandSchema.Name}]."
-                    : $"There are multiple options defined with name [{nonUniqueOptionName}] on default command.");
-            }
-
-            // Make sure there are no options with duplicate short names
-            var nonUniqueOptionShortName = commandSchema.Options
-                .Where(o => o.ShortName != null)
-                .Select(o => o.ShortName)
-                .GroupBy(i => i)
-                .Where(g => g.Count() >= 2)
-                .SelectMany(g => g)
-                .Distinct()
-                .FirstOrDefault();
-
-            if (nonUniqueOptionShortName != null)
-            {
-                throw new InvalidCommandSchemaException(!commandSchema.Name.IsNullOrWhiteSpace()
-                    ? $"There are multiple options defined with short name [{nonUniqueOptionShortName}] on command [{commandSchema.Name}]."
-                    : $"There are multiple options defined with short name [{nonUniqueOptionShortName}] on default command.");
-            }
-
-            return commandSchema;
+            return result;
         }
 
         /// <inheritdoc />
@@ -99,32 +69,57 @@ namespace CliFx.Services
         {
             commandTypes.GuardNotNull(nameof(commandTypes));
 
-            // Throw if there are no command types specified
+            // Make sure there's at least one command defined
             if (!commandTypes.Any())
             {
-                throw new InvalidCommandSchemaException("There are no commands defined.");
+                throw new SchemaValidationException("There are no commands defined.");
             }
 
-            // Get command schemas
-            var commandSchemas = commandTypes.Select(GetCommandSchema).ToArray();
+            var result = new List<CommandSchema>();
 
-            // Make sure there are no commands with duplicate names
-            var nonUniqueCommandName = commandSchemas
-                .Select(c => c.Name)
-                .GroupBy(i => i, StringComparer.OrdinalIgnoreCase)
-                .Where(g => g.Count() >= 2)
-                .SelectMany(g => g)
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .FirstOrDefault();
-
-            if (nonUniqueCommandName != null)
+            foreach (var commandType in commandTypes)
             {
-                throw new InvalidCommandSchemaException(!nonUniqueCommandName.IsNullOrWhiteSpace()
-                    ? $"There are multiple commands defined with name [{nonUniqueCommandName}]."
-                    : "There are multiple default commands defined.");
+                // Make sure command type implements ICommand.
+                if (!commandType.Implements(typeof(ICommand)))
+                {
+                    throw new SchemaValidationException(
+                        $"Command type [{commandType}] must implement {typeof(ICommand)}.");
+                }
+
+                // Get attribute
+                var attribute = commandType.GetCustomAttribute<CommandAttribute>();
+
+                // Make sure attribute is set
+                if (attribute == null)
+                {
+                    throw new SchemaValidationException(
+                        $"Command type [{commandType}] must be annotated with [{typeof(CommandAttribute)}].");
+                }
+
+                // Get option schemas
+                var optionSchemas = GetCommandOptionSchemas(commandType);
+
+                // Build command schema
+                var commandSchema = new CommandSchema(commandType,
+                    attribute.Name,
+                    attribute.Description,
+                    optionSchemas);
+
+                // Make sure there are no other commands with the same name
+                var existingCommandWithSameName = result
+                    .FirstOrDefault(c => string.Equals(c.Name, commandSchema.Name, StringComparison.OrdinalIgnoreCase));
+
+                if (existingCommandWithSameName != null)
+                {
+                    throw new SchemaValidationException(
+                        $"Command type [{existingCommandWithSameName.Type}] has the same name as another command type [{commandType}].");
+                }
+
+                // Add schema to list
+                result.Add(commandSchema);
             }
 
-            return commandSchemas;
+            return result;
         }
     }
 }

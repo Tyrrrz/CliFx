@@ -22,6 +22,8 @@ namespace CliFx.Tests.Services
                         {
                             new CommandOptionSchema(typeof(NormalCommand1).GetProperty(nameof(NormalCommand1.OptionA)),
                                 "option-a", 'a', false, null),
+                            new CommandOptionSchema(typeof(NormalCommand1).GetProperty(nameof(NormalCommand1.AlmostOptionA)),
+                                null, 'A', false, null),
                             new CommandOptionSchema(typeof(NormalCommand1).GetProperty(nameof(NormalCommand1.OptionB)),
                                 "option-b", null, true, null)
                         }),
@@ -93,7 +95,7 @@ namespace CliFx.Tests.Services
 
             // Act & Assert
             resolver.Invoking(r => r.GetCommandSchemas(commandTypes))
-                .Should().ThrowExactly<InvalidCommandSchemaException>();
+                .Should().ThrowExactly<SchemaValidationException>();
         }
     }
 }

@@ -26,11 +26,6 @@ namespace CliFx.Internal
         public static StringBuilder AppendIfNotEmpty(this StringBuilder builder, char value) =>
             builder.Length > 0 ? builder.Append(value) : builder;
 
-        public static TValue GetValueOrDefault<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dic, TKey key) =>
-            dic.TryGetValue(key, out var result) ? result : default;
-
-        public static IEnumerable<T> ExceptNull<T>(this IEnumerable<T> source) where T : class => source.Where(i => i != null);
-
         public static IEnumerable<T> Concat<T>(this IEnumerable<T> source, T value)
         {
             foreach (var i in source)
@@ -51,7 +46,7 @@ namespace CliFx.Internal
 
             return type.GetInterfaces()
                 .Select(GetEnumerableUnderlyingType)
-                .ExceptNull()
+                .Where(t => t != default)
                 .OrderByDescending(t => t != typeof(object)) // prioritize more specific types
                 .FirstOrDefault();
         }
