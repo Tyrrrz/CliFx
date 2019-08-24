@@ -109,27 +109,27 @@ namespace CliFx.Models
         }
 
         /// <summary>
-        /// Gets whether debug mode was requested in the input.
+        /// Gets whether debug directive was specified in the input.
         /// </summary>
-        public static bool IsDebugModeRequested(this CommandInput commandInput)
+        public static bool IsDebugDirectiveSpecified(this CommandInput commandInput)
         {
             commandInput.GuardNotNull(nameof(commandInput));
             return commandInput.Directives.Contains("debug", StringComparer.OrdinalIgnoreCase);
         }
 
         /// <summary>
-        /// Gets whether preview mode was requested in the input.
+        /// Gets whether preview directive was specified in the input.
         /// </summary>
-        public static bool IsPreviewModeRequested(this CommandInput commandInput)
+        public static bool IsPreviewDirectiveSpecified(this CommandInput commandInput)
         {
             commandInput.GuardNotNull(nameof(commandInput));
             return commandInput.Directives.Contains("preview", StringComparer.OrdinalIgnoreCase);
         }
 
         /// <summary>
-        /// Gets whether help was requested in the input.
+        /// Gets whether help option was specified in the input.
         /// </summary>
-        public static bool IsHelpRequested(this CommandInput commandInput)
+        public static bool IsHelpOptionSpecified(this CommandInput commandInput)
         {
             commandInput.GuardNotNull(nameof(commandInput));
 
@@ -138,9 +138,9 @@ namespace CliFx.Models
         }
 
         /// <summary>
-        /// Gets whether version information was requested in the input.
+        /// Gets whether version option was specified in the input.
         /// </summary>
-        public static bool IsVersionRequested(this CommandInput commandInput)
+        public static bool IsVersionOptionSpecified(this CommandInput commandInput)
         {
             commandInput.GuardNotNull(nameof(commandInput));
 

@@ -53,8 +53,8 @@ namespace CliFx
                 // Parse command input from arguments
                 var commandInput = _commandInputParser.ParseCommandInput(commandLineArguments);
 
-                // Wait for debugger to be attached if debug mode is requested
-                if (_configuration.IsDebugModeAllowed && commandInput.IsDebugModeRequested())
+                // Wait for debugger to be attached if debug directive was specified
+                if (_configuration.IsDebugModeAllowed && commandInput.IsDebugDirectiveSpecified())
                 {
                     // Whoever comes up with an idea on how to cover this in tests is a genius
 
@@ -65,8 +65,8 @@ namespace CliFx
                         await Task.Delay(100);
                 }
 
-                // Show parse results if preview mode is requested
-                if (_configuration.IsPreviewModeAllowed && commandInput.IsPreviewModeRequested())
+                // Show parsed arguments if preview directive was specified
+                if (_configuration.IsPreviewModeAllowed && commandInput.IsPreviewDirectiveSpecified())
                 {
                     _console.Output.WriteLine($"Command name: {commandInput.CommandName}");
                     _console.Output.WriteLine();
@@ -131,16 +131,16 @@ namespace CliFx
                     return isError ? -1 : 0;
                 }
 
-                // Show version if it was requested and command wasn't specified
-                if (commandInput.IsVersionRequested() && !commandInput.IsCommandSpecified())
+                // Show version if version option was specified and command was not specified (only works on default command)
+                if (commandInput.IsVersionOptionSpecified() && !commandInput.IsCommandSpecified())
                 {
                     _console.Output.WriteLine(_metadata.VersionText);
 
                     return 0;
                 }
 
-                // Show help if it was requested
-                if (commandInput.IsHelpRequested())
+                // Show help if help option was specified
+                if (commandInput.IsHelpOptionSpecified())
                 {
                     var helpTextSource = new HelpTextSource(_metadata, availableCommandSchemas, targetCommandSchema);
                     _helpTextRenderer.RenderHelpText(_console, helpTextSource);
