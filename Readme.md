@@ -30,11 +30,21 @@ _CliFx is to command line interfaces what ASP.NET Core is to web applications._
 - Targets .NET Framework 4.5+ and .NET Standard 2.0+
 - No external dependencies
 
-### Currently not implemented
+## Argument syntax
 
-- Positional arguments (anonymous options)
-- Auto-completion support
-- Environment variables
+This library employs a variation of the GNU command line argument syntax. Because CliFx uses a context-unaware parser, the syntax rules are generally more consistent and intuitive.
+
+The following examples are valid for any application created with CliFx:
+
+- `myapp --foo bar` sets option `"foo"` to value `"bar"`
+- `myapp -f bar` sets option `'f'` to value `"bar"`
+- `myapp --switch` sets option `"switch"` to value `true` 
+- `myapp -s` sets option `'s'` to value `true` 
+- `myapp -abc` sets options `'a'`, `'b'` and `'c'` to value `true`
+- `myapp -xqf bar` sets options `'x'` and `'q'` to value `true`, and option `'f'` to value `"bar"`
+- `myapp -i file1.txt file2.txt` sets option `'i'` to a sequence of values `"file1.txt"` and `"file2.txt"`
+- `myapp -i file1.txt -i file2.txt` sets option `'i'` to a sequence of values `"file1.txt"` and `"file2.txt"`
+- `myapp jar new -o cookie` invokes command `jar new` and sets option `'o'` to value `"cookie"`
 
 ## Usage
 
