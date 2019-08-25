@@ -1,12 +1,13 @@
 ﻿using System;
 using System.IO;
 using CliFx.Services;
+using CliFx.Tests.TestCommands;
 using NUnit.Framework;
 
 namespace CliFx.Tests
 {
     [TestFixture]
-    public partial class CliApplicationBuilderTests
+    public class CliApplicationBuilderTests
     {
         // Make sure all builder methods work
         [Test]
@@ -17,10 +18,10 @@ namespace CliFx.Tests
 
             // Act
             builder
-                .AddCommand(typeof(TestCommand))
-                .AddCommandsFrom(typeof(TestCommand).Assembly)
-                .AddCommands(new[] {typeof(TestCommand)})
-                .AddCommandsFrom(new[] {typeof(TestCommand).Assembly})
+                .AddCommand(typeof(EchoCommand))
+                .AddCommandsFrom(typeof(EchoCommand).Assembly)
+                .AddCommands(new[] {typeof(EchoCommand)})
+                .AddCommandsFrom(new[] {typeof(EchoCommand).Assembly})
                 .AddCommandsFromThisAssembly()
                 .AllowDebugMode()
                 .AllowPreviewMode()

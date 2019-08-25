@@ -5,13 +5,14 @@ using System.Globalization;
 using CliFx.Exceptions;
 using CliFx.Models;
 using CliFx.Services;
+using CliFx.Tests.TestCustomTypes;
 using FluentAssertions;
 using NUnit.Framework;
 
 namespace CliFx.Tests.Services
 {
     [TestFixture]
-    public partial class CommandOptionInputConverterTests
+    public class CommandOptionInputConverterTests
     {
         private static IEnumerable<TestCaseData> GetTestCases_ConvertOptionInput()
         {
@@ -271,7 +272,7 @@ namespace CliFx.Tests.Services
 
             yield return new TestCaseData(
                 new CommandOptionInput("option", "123"),
-                typeof(NonStringParseable)
+                typeof(TestNonStringParseable)
             );
         }
 

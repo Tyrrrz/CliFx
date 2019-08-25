@@ -3,37 +3,49 @@ using System.Collections.Generic;
 using CliFx.Exceptions;
 using CliFx.Models;
 using CliFx.Services;
+using CliFx.Tests.TestCommands;
 using FluentAssertions;
 using NUnit.Framework;
 
 namespace CliFx.Tests.Services
 {
     [TestFixture]
-    public partial class CommandSchemaResolverTests
+    public class CommandSchemaResolverTests
     {
         private static IEnumerable<TestCaseData> GetTestCases_GetCommandSchemas()
         {
             yield return new TestCaseData(
-                new[] {typeof(NormalCommand1), typeof(NormalCommand2)},
+                new[] {typeof(DivideCommand), typeof(ConcatCommand)},
                 new[]
                 {
-                    new CommandSchema(typeof(NormalCommand1), "cmd", "NormalCommand1 description.",
+                    new CommandSchema(typeof(DivideCommand), "div", "Divide one number by another.",
                         new[]
                         {
-                            new CommandOptionSchema(typeof(NormalCommand1).GetProperty(nameof(NormalCommand1.OptionA)),
-                                "option-a", 'a', false, null),
-                            new CommandOptionSchema(typeof(NormalCommand1).GetProperty(nameof(NormalCommand1.AlmostOptionA)),
-                                null, 'A', false, null),
-                            new CommandOptionSchema(typeof(NormalCommand1).GetProperty(nameof(NormalCommand1.OptionB)),
-                                "option-b", null, true, null)
+                            new CommandOptionSchema(typeof(DivideCommand).GetProperty(nameof(DivideCommand.Dividend)),
+                                "dividend", 'D', true, "The number to divide."),
+                            new CommandOptionSchema(typeof(DivideCommand).GetProperty(nameof(DivideCommand.Divisor)),
+                                "divisor", 'd', true, "The number to divide by.")
                         }),
-                    new CommandSchema(typeof(NormalCommand2), null, "NormalCommand2 description.",
+                    new CommandSchema(typeof(ConcatCommand), "concat", "Concatenate strings.",
                         new[]
                         {
-                            new CommandOptionSchema(typeof(NormalCommand2).GetProperty(nameof(NormalCommand2.OptionC)),
-                                "option-c", null, false, "OptionC description."),
-                            new CommandOptionSchema(typeof(NormalCommand2).GetProperty(nameof(NormalCommand2.OptionD)),
-                                "option-d", 'd', false, null)
+                            new CommandOptionSchema(typeof(ConcatCommand).GetProperty(nameof(ConcatCommand.Inputs)),
+                                null, 'i', true, "Input strings."),
+                            new CommandOptionSchema(typeof(ConcatCommand).GetProperty(nameof(ConcatCommand.Separator)),
+                                null, 's', false, "String separator.")
+                        })
+                }
+            );
+
+            yield return new TestCaseData(
+                new[] {typeof(EchoDefaultCommand)},
+                new[]
+                {
+                    new CommandSchema(typeof(EchoDefaultCommand), null, null,
+                        new[]
+                        {
+                            new CommandOptionSchema(typeof(EchoDefaultCommand).GetProperty(nameof(EchoDefaultCommand.Message)),
+                                "message", 'm', true, null)
                         })
                 }
             );
@@ -48,27 +60,27 @@ namespace CliFx.Tests.Services
 
             yield return new TestCaseData(new object[]
             {
-                new[] {typeof(ConflictingCommand1), typeof(ConflictingCommand2)}
+                new[] {typeof(NonImplementedCommand)}
             });
 
             yield return new TestCaseData(new object[]
             {
-                new[] {typeof(InvalidCommand1)}
+                new[] {typeof(NonAnnotatedCommand)}
+            });
+            
+            yield return new TestCaseData(new object[]
+            {
+                new[] {typeof(DuplicateOptionNamesCommand)}
             });
 
             yield return new TestCaseData(new object[]
             {
-                new[] {typeof(InvalidCommand2)}
+                new[] {typeof(DuplicateOptionShortNamesCommand)}
             });
-
+            
             yield return new TestCaseData(new object[]
             {
-                new[] {typeof(InvalidCommand3)}
-            });
-
-            yield return new TestCaseData(new object[]
-            {
-                new[] {typeof(InvalidCommand4)}
+                new[] {typeof(ExceptionCommand), typeof(CommandExceptionCommand)}
             });
         }
 

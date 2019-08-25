@@ -3,38 +3,39 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using CliFx.Services;
+using CliFx.Tests.TestCommands;
 using FluentAssertions;
 using NUnit.Framework;
 
 namespace CliFx.Tests
 {
     [TestFixture]
-    public partial class CliApplicationTests
+    public class CliApplicationTests
     {
         private const string TestVersionText = "v1.0";
 
         private static IEnumerable<TestCaseData> GetTestCases_RunAsync()
         {
             yield return new TestCaseData(
-                new[] {typeof(DefaultCommand)},
-                new string[0],
-                "DefaultCommand executed."
+                new[] {typeof(EchoDefaultCommand)},
+                new[] {"-m", "foo bar"},
+                "foo bar"
             );
 
             yield return new TestCaseData(
-                new[] {typeof(NamedCommand)},
-                new[] {"cmd"},
-                "NamedCommand executed."
+                new[] {typeof(EchoCommand)},
+                new[] {"echo", "-m", "foo bar"},
+                "foo bar"
             );
 
             yield return new TestCaseData(
-                new[] {typeof(DefaultCommand)},
+                new[] {typeof(EchoDefaultCommand)},
                 new[] {"--version"},
                 TestVersionText
             );
 
             yield return new TestCaseData(
-                new[] {typeof(NamedCommand)},
+                new[] {typeof(EchoCommand)},
                 new[] {"--version"},
                 TestVersionText
             );
@@ -43,78 +44,68 @@ namespace CliFx.Tests
         private static IEnumerable<TestCaseData> GetTestCases_RunAsync_Smoke()
         {
             yield return new TestCaseData(
-                new[] {typeof(DefaultCommand)},
-                new string[0]
-            );
-
-            yield return new TestCaseData(
-                new[] {typeof(DefaultCommand)},
+                new[] {typeof(EchoDefaultCommand)},
                 new[] {"-h"}
             );
 
             yield return new TestCaseData(
-                new[] {typeof(DefaultCommand)},
+                new[] {typeof(EchoDefaultCommand)},
                 new[] {"--help"}
             );
 
             yield return new TestCaseData(
-                new[] {typeof(DefaultCommand)},
+                new[] {typeof(EchoDefaultCommand)},
                 new[] {"--version"}
             );
 
             yield return new TestCaseData(
-                new[] {typeof(NamedCommand)},
+                new[] {typeof(EchoCommand)},
                 new string[0]
             );
 
             yield return new TestCaseData(
-                new[] {typeof(NamedCommand)},
+                new[] {typeof(EchoCommand)},
                 new[] {"-h"}
             );
 
             yield return new TestCaseData(
-                new[] {typeof(NamedCommand)},
+                new[] {typeof(EchoCommand)},
                 new[] {"--help"}
             );
 
             yield return new TestCaseData(
-                new[] {typeof(NamedCommand)},
+                new[] {typeof(EchoCommand)},
                 new[] {"--version"}
             );
 
             yield return new TestCaseData(
-                new[] {typeof(NamedCommand)},
-                new[] {"cmd", "-h"}
+                new[] {typeof(EchoCommand)},
+                new[] {"echo", "-h"}
             );
 
             yield return new TestCaseData(
-                new[] {typeof(FaultyCommand1)},
-                new[] {"faulty1", "-h"}
+                new[] {typeof(ExceptionCommand)},
+                new[] {"exc", "-h"}
             );
 
             yield return new TestCaseData(
-                new[] {typeof(FaultyCommand2)},
-                new[] {"faulty2", "-h"}
+                new[] {typeof(CommandExceptionCommand)},
+                new[] {"exc", "-h"}
             );
 
             yield return new TestCaseData(
-                new[] {typeof(FaultyCommand3)},
-                new[] {"faulty3", "-h"}
-            );
-
-            yield return new TestCaseData(
-                new[] {typeof(DefaultCommand)},
+                new[] {typeof(EchoDefaultCommand)},
                 new[] {"[preview]"}
             );
 
             yield return new TestCaseData(
-                new[] {typeof(FaultyCommand1)},
-                new[] {"faulty1", "[preview]"}
+                new[] {typeof(ExceptionCommand)},
+                new[] {"exc", "[preview]"}
             );
 
             yield return new TestCaseData(
-                new[] {typeof(FaultyCommand1)},
-                new[] {"faulty1", "[preview]", "-o", "value"}
+                new[] {typeof(EchoCommand)},
+                new[] {"echo", "[preview]", "-o", "value"}
             );
         }
 
@@ -126,23 +117,23 @@ namespace CliFx.Tests
             );
 
             yield return new TestCaseData(
-                new[] {typeof(DefaultCommand)},
+                new[] {typeof(EchoCommand)},
                 new[] {"non-existing"}
             );
 
             yield return new TestCaseData(
-                new[] {typeof(FaultyCommand1)},
-                new[] {"faulty1"}
+                new[] {typeof(ExceptionCommand)},
+                new[] {"exc"}
             );
 
             yield return new TestCaseData(
-                new[] {typeof(FaultyCommand2)},
-                new[] {"faulty2"}
+                new[] {typeof(CommandExceptionCommand)},
+                new[] {"exc"}
             );
 
             yield return new TestCaseData(
-                new[] {typeof(FaultyCommand3)},
-                new[] {"faulty3"}
+                new[] {typeof(CommandExceptionCommand)},
+                new[] {"exc", "-c", "666"}
             );
         }
 

@@ -4,13 +4,14 @@ using System.Linq;
 using CliFx.Exceptions;
 using CliFx.Models;
 using CliFx.Services;
+using CliFx.Tests.TestCommands;
 using FluentAssertions;
 using NUnit.Framework;
 
 namespace CliFx.Tests.Services
 {
     [TestFixture]
-    public partial class CommandInitializerTests
+    public class CommandInitializerTests
     {
         private static CommandSchema GetCommandSchema(Type commandType) =>
             new CommandSchemaResolver().GetCommandSchemas(new[] {commandType}).Single();
@@ -18,63 +19,89 @@ namespace CliFx.Tests.Services
         private static IEnumerable<TestCaseData> GetTestCases_InitializeCommand()
         {
             yield return new TestCaseData(
-                new TestCommand(),
-                GetCommandSchema(typeof(TestCommand)),
-                new CommandInput(new[]
+                new DivideCommand(),
+                GetCommandSchema(typeof(DivideCommand)),
+                new CommandInput("div", new[]
                 {
-                    new CommandOptionInput("int", "13")
+                    new CommandOptionInput("dividend", "13"),
+                    new CommandOptionInput("divisor", "8")
                 }),
-                new TestCommand {Option1 = 13}
+                new DivideCommand {Dividend = 13, Divisor = 8}
             );
 
             yield return new TestCaseData(
-                new TestCommand(),
-                GetCommandSchema(typeof(TestCommand)),
-                new CommandInput(new[]
+                new DivideCommand(),
+                GetCommandSchema(typeof(DivideCommand)),
+                new CommandInput("div", new[]
                 {
-                    new CommandOptionInput("int", "13"),
-                    new CommandOptionInput("str", "hello world")
+                    new CommandOptionInput("dividend", "13"),
+                    new CommandOptionInput("d", "8")
                 }),
-                new TestCommand {Option1 = 13, Option2 = "hello world"}
+                new DivideCommand {Dividend = 13, Divisor = 8}
             );
 
             yield return new TestCaseData(
-                new TestCommand(),
-                GetCommandSchema(typeof(TestCommand)),
-                new CommandInput(new[]
+                new DivideCommand(),
+                GetCommandSchema(typeof(DivideCommand)),
+                new CommandInput("div", new[]
                 {
-                    new CommandOptionInput("i", "13")
+                    new CommandOptionInput("D", "13"),
+                    new CommandOptionInput("d", "8")
                 }),
-                new TestCommand {Option1 = 13}
+                new DivideCommand {Dividend = 13, Divisor = 8}
             );
 
             yield return new TestCaseData(
-                new TestCommand(),
-                GetCommandSchema(typeof(TestCommand)),
-                new CommandInput(new[]
+                new ConcatCommand(),
+                GetCommandSchema(typeof(ConcatCommand)),
+                new CommandInput("concat", new[]
                 {
-                    new CommandOptionInput("i", "13"),
-                    new CommandOptionInput("s", "hello world"),
-                    new CommandOptionInput("S")
+                    new CommandOptionInput("i", new[] {"foo", " ", "bar"})
                 }),
-                new TestCommand {Option1 = 13, Option2 = "hello world", Option3 = true}
+                new ConcatCommand {Inputs = new[] {"foo", " ", "bar"}}
+            );
+
+            yield return new TestCaseData(
+                new ConcatCommand(),
+                GetCommandSchema(typeof(ConcatCommand)),
+                new CommandInput("concat", new[]
+                {
+                    new CommandOptionInput("i", new[] {"foo", "bar"}),
+                    new CommandOptionInput("s", " ")
+                }),
+                new ConcatCommand {Inputs = new[] {"foo", "bar"}, Separator = " "}
             );
         }
 
         private static IEnumerable<TestCaseData> GetTestCases_InitializeCommand_Negative()
         {
             yield return new TestCaseData(
-                new TestCommand(),
-                GetCommandSchema(typeof(TestCommand)),
-                CommandInput.Empty
+                new DivideCommand(),
+                GetCommandSchema(typeof(DivideCommand)),
+                new CommandInput("div")
             );
 
             yield return new TestCaseData(
-                new TestCommand(),
-                GetCommandSchema(typeof(TestCommand)),
-                new CommandInput(new[]
+                new DivideCommand(),
+                GetCommandSchema(typeof(DivideCommand)),
+                new CommandInput("div", new[]
                 {
-                    new CommandOptionInput("str", "hello world")
+                    new CommandOptionInput("D", "13")
+                })
+            );
+
+            yield return new TestCaseData(
+                new ConcatCommand(),
+                GetCommandSchema(typeof(ConcatCommand)),
+                new CommandInput("concat")
+            );
+
+            yield return new TestCaseData(
+                new ConcatCommand(),
+                GetCommandSchema(typeof(ConcatCommand)),
+                new CommandInput("concat", new[]
+                {
+                    new CommandOptionInput("s", "_")
                 })
             );
         }

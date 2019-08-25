@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using CliFx.Models;
 using CliFx.Services;
+using CliFx.Tests.TestCommands;
 using FluentAssertions;
 using NUnit.Framework;
 
 namespace CliFx.Tests.Services
 {
     [TestFixture]
-    public partial class DelegateCommandFactoryTests
+    public class DelegateCommandFactoryTests
     {
         private static CommandSchema GetCommandSchema(Type commandType) =>
             new CommandSchemaResolver().GetCommandSchemas(new[] {commandType}).Single();
@@ -18,7 +19,7 @@ namespace CliFx.Tests.Services
         {
             yield return new TestCaseData(
                 new Func<CommandSchema, ICommand>(schema => (ICommand) Activator.CreateInstance(schema.Type)),
-                GetCommandSchema(typeof(TestCommand))
+                GetCommandSchema(typeof(EchoCommand))
             );
         }
 

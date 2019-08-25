@@ -4,13 +4,14 @@ using System.IO;
 using System.Linq;
 using CliFx.Models;
 using CliFx.Services;
+using CliFx.Tests.TestCommands;
 using FluentAssertions;
 using NUnit.Framework;
 
 namespace CliFx.Tests.Services
 {
     [TestFixture]
-    public partial class HelpTextRendererTests
+    public class HelpTextRendererTests
     {
         private static HelpTextSource CreateHelpTextSource(IReadOnlyList<Type> availableCommandTypes, Type targetCommandType)
         {
@@ -27,11 +28,13 @@ namespace CliFx.Tests.Services
         {
             yield return new TestCaseData(
                 CreateHelpTextSource(
-                    new[] {typeof(DefaultCommand), typeof(NamedCommand), typeof(NamedSubCommand)},
-                    typeof(DefaultCommand)),
+                    new[] {typeof(HelpDefaultCommand), typeof(HelpNamedCommand), typeof(HelpSubCommand)},
+                    typeof(HelpDefaultCommand)),
 
                 new[]
                 {
+                    "Description",
+                    "HelpDefaultCommand description.",
                     "Usage",
                     "[command]", "[options]",
                     "Options",
@@ -40,20 +43,20 @@ namespace CliFx.Tests.Services
                     "-h|--help", "Shows help text.",
                     "--version", "Shows version information.",
                     "Commands",
-                    "cmd", "NamedCommand description.",
+                    "cmd", "HelpNamedCommand description.",
                     "You can run", "to show help on a specific command."
                 }
             );
 
             yield return new TestCaseData(
                 CreateHelpTextSource(
-                    new[] {typeof(DefaultCommand), typeof(NamedCommand), typeof(NamedSubCommand)},
-                    typeof(NamedCommand)),
+                    new[] {typeof(HelpDefaultCommand), typeof(HelpNamedCommand), typeof(HelpSubCommand)},
+                    typeof(HelpNamedCommand)),
 
                 new[]
                 {
                     "Description",
-                    "NamedCommand description.",
+                    "HelpNamedCommand description.",
                     "Usage",
                     "cmd", "[command]", "[options]",
                     "Options",
@@ -61,20 +64,20 @@ namespace CliFx.Tests.Services
                     "-d|--option-d", "OptionD description.",
                     "-h|--help", "Shows help text.",
                     "Commands",
-                    "sub", "NamedSubCommand description.",
+                    "sub", "HelpSubCommand description.",
                     "You can run", "to show help on a specific command."
                 }
             );
 
             yield return new TestCaseData(
                 CreateHelpTextSource(
-                    new[] {typeof(DefaultCommand), typeof(NamedCommand), typeof(NamedSubCommand)},
-                    typeof(NamedSubCommand)),
+                    new[] {typeof(HelpDefaultCommand), typeof(HelpNamedCommand), typeof(HelpSubCommand)},
+                    typeof(HelpSubCommand)),
 
                 new[]
                 {
                     "Description",
-                    "NamedSubCommand description.",
+                    "HelpSubCommand description.",
                     "Usage",
                     "cmd sub", "[options]",
                     "Options",

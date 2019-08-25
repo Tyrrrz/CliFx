@@ -1,5 +1,4 @@
-﻿using System;
-using CliFx.Models;
+﻿using CliFx.Models;
 
 namespace CliFx.Services
 {

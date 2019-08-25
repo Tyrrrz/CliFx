@@ -129,7 +129,7 @@ namespace CliFx
             // Keep track whether there was an error in the input
             var isError = false;
 
-            // If target command isn't defined, find its parent
+            // If target command isn't defined, find its contextual replacement
             if (targetCommandSchema == null)
             {
                 // If command was specified, inform the user that it's not defined
