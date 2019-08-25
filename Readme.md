@@ -30,6 +30,10 @@ _CliFx is to command line interfaces what ASP.NET Core is to web applications._
 - Targets .NET Framework 4.5+ and .NET Standard 2.0+
 - No external dependencies
 
+## Screenshots
+
+![](http://www.tyrrrz.me/Projects/CliFx/Images/1.png)
+
 ## Argument syntax
 
 This library employs a variation of the GNU command line argument syntax. Because CliFx uses a context-unaware parser, the syntax rules are generally more consistent and intuitive.
