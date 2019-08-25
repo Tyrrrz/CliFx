@@ -67,6 +67,12 @@ namespace CliFx.Models
             if (!CommandName.IsNullOrWhiteSpace())
                 buffer.Append(CommandName);
 
+            foreach (var directive in Directives)
+            {
+                buffer.AppendIfNotEmpty(' ');
+                buffer.Append(directive);
+            }
+
             foreach (var option in Options)
             {
                 buffer.AppendIfNotEmpty(' ');

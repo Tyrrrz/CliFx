@@ -61,7 +61,7 @@ namespace CliFx.Services
             if (unsetRequiredOptions.Any())
             {
                 var unsetRequiredOptionNames = unsetRequiredOptions.Select(o => o.GetAliases().FirstOrDefault()).JoinToString(", ");
-                throw new MissingCommandOptionInputException($"One or more required options were not set: {unsetRequiredOptionNames}.");
+                throw new CliFxException($"One or more required options were not set: {unsetRequiredOptionNames}.");
             }
         }
     }

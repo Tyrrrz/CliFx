@@ -40,7 +40,7 @@ namespace CliFx.Services
 
                 if (existingOptionWithSameName != null)
                 {
-                    throw new SchemaValidationException(
+                    throw new CliFxException(
                         $"Command type [{commandType}] has options defined with the same name: " +
                         $"[{existingOptionWithSameName.Property}] and [{optionSchema.Property}].");
                 }
@@ -52,7 +52,7 @@ namespace CliFx.Services
 
                 if (existingOptionWithSameShortName != null)
                 {
-                    throw new SchemaValidationException(
+                    throw new CliFxException(
                         $"Command type [{commandType}] has options defined with the same short name: " +
                         $"[{existingOptionWithSameShortName.Property}] and [{optionSchema.Property}].");
                 }
@@ -72,7 +72,7 @@ namespace CliFx.Services
             // Make sure there's at least one command defined
             if (!commandTypes.Any())
             {
-                throw new SchemaValidationException("There are no commands defined.");
+                throw new CliFxException("There are no commands defined.");
             }
 
             var result = new List<CommandSchema>();
@@ -82,8 +82,7 @@ namespace CliFx.Services
                 // Make sure command type implements ICommand.
                 if (!commandType.Implements(typeof(ICommand)))
                 {
-                    throw new SchemaValidationException(
-                        $"Command type [{commandType}] must implement {typeof(ICommand)}.");
+                    throw new CliFxException($"Command type [{commandType}] must implement {typeof(ICommand)}.");
                 }
 
                 // Get attribute
@@ -92,8 +91,7 @@ namespace CliFx.Services
                 // Make sure attribute is set
                 if (attribute == null)
                 {
-                    throw new SchemaValidationException(
-                        $"Command type [{commandType}] must be annotated with [{typeof(CommandAttribute)}].");
+                    throw new CliFxException($"Command type [{commandType}] must be annotated with [{typeof(CommandAttribute)}].");
                 }
 
                 // Get option schemas
@@ -111,7 +109,7 @@ namespace CliFx.Services
 
                 if (existingCommandWithSameName != null)
                 {
-                    throw new SchemaValidationException(
+                    throw new CliFxException(
                         $"Command type [{existingCommandWithSameName.Type}] has the same name as another command type [{commandType}].");
                 }
 

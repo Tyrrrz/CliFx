@@ -301,7 +301,7 @@ namespace CliFx.Tests.Services
 
             // Act & Assert
             converter.Invoking(c => c.ConvertOptionInput(optionInput, targetType))
-                .Should().ThrowExactly<InvalidCommandOptionInputException>();
+                .Should().ThrowExactly<CliFxException>();
         }
     }
 }

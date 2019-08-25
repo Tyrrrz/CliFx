@@ -127,11 +127,11 @@ namespace CliFx.Services
                 if (parseMethod != null)
                     return parseMethod.Invoke(null, new object[] {value});
 
-                throw new InvalidCommandOptionInputException($"Can't convert value [{value}] to type [{targetType}].");
+                throw new CliFxException($"Can't convert value [{value}] to type [{targetType}].");
             }
             catch (Exception ex)
             {
-                throw new InvalidCommandOptionInputException($"Can't convert value [{value}] to type [{targetType}].", ex);
+                throw new CliFxException($"Can't convert value [{value}] to type [{targetType}].", ex);
             }
         }
 
@@ -166,7 +166,7 @@ namespace CliFx.Services
                 if (arrayConstructor != null)
                     return arrayConstructor.Invoke(new object[] {convertedValues});
 
-                throw new InvalidCommandOptionInputException(
+                throw new CliFxException(
                     $"Can't convert sequence of values [{optionInput.Values.JoinToString(", ")}] to type [{targetType}].");
             }
         }

@@ -103,7 +103,7 @@ namespace CliFx.Tests.Services
 
             // Act & Assert
             resolver.Invoking(r => r.GetCommandSchemas(commandTypes))
-                .Should().ThrowExactly<SchemaValidationException>();
+                .Should().ThrowExactly<CliFxException>();
         }
     }
 }
