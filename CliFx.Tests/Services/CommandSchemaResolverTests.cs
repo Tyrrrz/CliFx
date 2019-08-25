@@ -38,15 +38,10 @@ namespace CliFx.Tests.Services
             );
 
             yield return new TestCaseData(
-                new[] {typeof(EchoDefaultCommand)},
+                new[] {typeof(HelloWorldDefaultCommand)},
                 new[]
                 {
-                    new CommandSchema(typeof(EchoDefaultCommand), null, null,
-                        new[]
-                        {
-                            new CommandOptionSchema(typeof(EchoDefaultCommand).GetProperty(nameof(EchoDefaultCommand.Message)),
-                                "message", 'm', true, null)
-                        })
+                    new CommandSchema(typeof(HelloWorldDefaultCommand), null, null, new CommandOptionSchema[0])
                 }
             );
         }
@@ -86,7 +81,8 @@ namespace CliFx.Tests.Services
 
         [Test]
         [TestCaseSource(nameof(GetTestCases_GetCommandSchemas))]
-        public void GetCommandSchemas_Test(IReadOnlyList<Type> commandTypes, IReadOnlyList<CommandSchema> expectedCommandSchemas)
+        public void GetCommandSchemas_Test(IReadOnlyList<Type> commandTypes,
+            IReadOnlyList<CommandSchema> expectedCommandSchemas)
         {
             // Arrange
             var commandSchemaResolver = new CommandSchemaResolver();

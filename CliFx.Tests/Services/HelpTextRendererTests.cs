@@ -89,13 +89,14 @@ namespace CliFx.Tests.Services
 
         [Test]
         [TestCaseSource(nameof(GetTestCases_RenderHelpText))]
-        public void RenderHelpText_Test(HelpTextSource source, IReadOnlyList<string> expectedSubstrings)
+        public void RenderHelpText_Test(HelpTextSource source,
+            IReadOnlyList<string> expectedSubstrings)
         {
             // Arrange
             using (var stdout = new StringWriter())
             {
-                var renderer = new HelpTextRenderer();
                 var console = new VirtualConsole(stdout);
+                var renderer = new HelpTextRenderer();
 
                 // Act
                 renderer.RenderHelpText(console, source);

@@ -17,95 +17,105 @@ namespace CliFx.Tests
         private static IEnumerable<TestCaseData> GetTestCases_RunAsync()
         {
             yield return new TestCaseData(
-                new[] {typeof(EchoDefaultCommand)},
-                new[] {"-m", "foo bar"},
+                new[] {typeof(HelloWorldDefaultCommand)},
+                new string[0],
+                "Hello world."
+            );
+            
+            yield return new TestCaseData(
+                new[] {typeof(ConcatCommand)},
+                new[] {"concat", "-i", "foo", "-i", "bar", "-s", " "},
                 "foo bar"
+            );
+            
+            yield return new TestCaseData(
+                new[] {typeof(ConcatCommand)},
+                new[] {"concat", "-i", "one", "two", "three", "-s", ", "},
+                "one, two, three"
             );
 
             yield return new TestCaseData(
-                new[] {typeof(EchoCommand)},
-                new[] {"echo", "-m", "foo bar"},
-                "foo bar"
+                new[] {typeof(DivideCommand)},
+                new[] {"div", "-D", "24", "-d", "8"},
+                "3"
             );
 
             yield return new TestCaseData(
-                new[] {typeof(EchoDefaultCommand)},
+                new[] {typeof(HelloWorldDefaultCommand)},
                 new[] {"--version"},
                 TestVersionText
             );
 
             yield return new TestCaseData(
-                new[] {typeof(EchoCommand)},
+                new[] {typeof(ConcatCommand)},
                 new[] {"--version"},
                 TestVersionText
             );
-        }
-
-        private static IEnumerable<TestCaseData> GetTestCases_RunAsync_Smoke()
-        {
+            
             yield return new TestCaseData(
-                new[] {typeof(EchoDefaultCommand)},
-                new[] {"-h"}
+                new[] {typeof(HelloWorldDefaultCommand)},
+                new[] {"-h"},
+                null
             );
 
             yield return new TestCaseData(
-                new[] {typeof(EchoDefaultCommand)},
-                new[] {"--help"}
+                new[] {typeof(HelloWorldDefaultCommand)},
+                new[] {"--help"},
+                null
+            );
+            
+            yield return new TestCaseData(
+                new[] {typeof(ConcatCommand)},
+                new string[0],
+                null
+            );
+            
+            yield return new TestCaseData(
+                new[] {typeof(ConcatCommand)},
+                new[] {"-h"},
+                null
             );
 
             yield return new TestCaseData(
-                new[] {typeof(EchoDefaultCommand)},
-                new[] {"--version"}
+                new[] {typeof(ConcatCommand)},
+                new[] {"--help"},
+                null
             );
-
+            
             yield return new TestCaseData(
-                new[] {typeof(EchoCommand)},
-                new string[0]
-            );
-
-            yield return new TestCaseData(
-                new[] {typeof(EchoCommand)},
-                new[] {"-h"}
-            );
-
-            yield return new TestCaseData(
-                new[] {typeof(EchoCommand)},
-                new[] {"--help"}
-            );
-
-            yield return new TestCaseData(
-                new[] {typeof(EchoCommand)},
-                new[] {"--version"}
-            );
-
-            yield return new TestCaseData(
-                new[] {typeof(EchoCommand)},
-                new[] {"echo", "-h"}
+                new[] {typeof(ConcatCommand)},
+                new[] {"concat", "-h"},
+                null
             );
 
             yield return new TestCaseData(
                 new[] {typeof(ExceptionCommand)},
-                new[] {"exc", "-h"}
+                new[] {"exc", "-h"},
+                null
             );
 
             yield return new TestCaseData(
                 new[] {typeof(CommandExceptionCommand)},
-                new[] {"exc", "-h"}
+                new[] {"exc", "-h"},
+                null
             );
 
             yield return new TestCaseData(
-                new[] {typeof(EchoDefaultCommand)},
-                new[] {"[preview]"}
+                new[] {typeof(ConcatCommand)},
+                new[] {"[preview]"},
+                null
             );
 
             yield return new TestCaseData(
                 new[] {typeof(ExceptionCommand)},
-                new[] {"exc", "[preview]"}
+                new[] {"exc", "[preview]"},
+                null
             );
 
             yield return new TestCaseData(
-                new[] {typeof(EchoCommand)},
-                new[] {"echo", "[preview]", "-o", "value"}
+                new[] {typeof(ConcatCommand)},
+                new[] {"concat", "[preview]", "-o", "value"},
+                null
             );
         }
 
@@ -113,38 +123,56 @@ namespace CliFx.Tests
         {
             yield return new TestCaseData(
                 new Type[0],
-                new string[0]
+                new string[0],
+                null, null
             );
 
             yield return new TestCaseData(
-                new[] {typeof(EchoCommand)},
-                new[] {"non-existing"}
+                new[] {typeof(ConcatCommand)},
+                new[] {"non-existing"},
+                null, null
             );
 
             yield return new TestCaseData(
                 new[] {typeof(ExceptionCommand)},
-                new[] {"exc"}
+                new[] {"exc"},
+                null, null
             );
 
             yield return new TestCaseData(
                 new[] {typeof(CommandExceptionCommand)},
-                new[] {"exc"}
+                new[] {"exc"},
+                null, null
             );
 
             yield return new TestCaseData(
                 new[] {typeof(CommandExceptionCommand)},
-                new[] {"exc", "-c", "666"}
+                new[] {"exc"},
+                null, null
+            );
+         
+            yield return new TestCaseData(
+                new[] {typeof(CommandExceptionCommand)},
+                new[] {"exc", "-m", "foo bar"},
+                "foo bar", null
+            );
+            
+            yield return new TestCaseData(
+                new[] {typeof(CommandExceptionCommand)},
+                new[] {"exc", "-m", "foo bar", "-c", "666"},
+                "foo bar", 666
             );
         }
 
         [Test]
         [TestCaseSource(nameof(GetTestCases_RunAsync))]
-        public async Task RunAsync_Test(IReadOnlyList<Type> commandTypes, IReadOnlyList<string> commandLineArguments, string expectedStdOut)
+        public async Task RunAsync_Test(IReadOnlyList<Type> commandTypes, IReadOnlyList<string> commandLineArguments,
+            string expectedStdOut = null)
         {
             // Arrange
-            using (var stdout = new StringWriter())
+            using (var stdoutStream = new StringWriter())
             {
-                var console = new VirtualConsole(stdout);
+                var console = new VirtualConsole(stdoutStream);
 
                 var application = new CliApplicationBuilder()
                     .AddCommands(commandTypes)
@@ -154,45 +182,27 @@ namespace CliFx.Tests
 
                 // Act
                 var exitCode = await application.RunAsync(commandLineArguments);
+                var stdOut = stdoutStream.ToString().Trim();
 
                 // Assert
                 exitCode.Should().Be(0);
-                stdout.ToString().Trim().Should().Be(expectedStdOut);
-            }
-        }
 
-        [Test]
-        [TestCaseSource(nameof(GetTestCases_RunAsync_Smoke))]
-        public async Task RunAsync_Smoke_Test(IReadOnlyList<Type> commandTypes, IReadOnlyList<string> commandLineArguments)
-        {
-            // Arrange
-            using (var stdout = new StringWriter())
-            {
-                var console = new VirtualConsole(stdout);
-
-                var application = new CliApplicationBuilder()
-                    .AddCommands(commandTypes)
-                    .UseVersionText(TestVersionText)
-                    .UseConsole(console)
-                    .Build();
-
-                // Act
-                var exitCode = await application.RunAsync(commandLineArguments);
-
-                // Assert
-                exitCode.Should().Be(0);
-                stdout.ToString().Should().NotBeNullOrWhiteSpace();
+                if (expectedStdOut != null)
+                    stdOut.Should().Be(expectedStdOut);
+                else
+                    stdOut.Should().NotBeNullOrWhiteSpace();
             }
         }
 
         [Test]
         [TestCaseSource(nameof(GetTestCases_RunAsync_Negative))]
-        public async Task RunAsync_Negative_Test(IReadOnlyList<Type> commandTypes, IReadOnlyList<string> commandLineArguments)
+        public async Task RunAsync_Negative_Test(IReadOnlyList<Type> commandTypes, IReadOnlyList<string> commandLineArguments,
+            string expectedStdErr = null, int? expectedExitCode = null)
         {
             // Arrange
-            using (var stderr = new StringWriter())
+            using (var stderrStream = new StringWriter())
             {
-                var console = new VirtualConsole(TextWriter.Null, stderr);
+                var console = new VirtualConsole(TextWriter.Null, stderrStream);
 
                 var application = new CliApplicationBuilder()
                     .AddCommands(commandTypes)
@@ -202,10 +212,18 @@ namespace CliFx.Tests
 
                 // Act
                 var exitCode = await application.RunAsync(commandLineArguments);
+                var stderr = stderrStream.ToString().Trim();
 
                 // Assert
-                exitCode.Should().NotBe(0);
-                stderr.ToString().Should().NotBeNullOrWhiteSpace();
+                if (expectedExitCode != null)
+                    exitCode.Should().Be(expectedExitCode);
+                else
+                    exitCode.Should().NotBe(0);
+                
+                if (expectedStdErr != null)
+                    stderr.Should().Be(expectedStdErr);
+                else
+                    stderr.Should().NotBeNullOrWhiteSpace();
             }
         }
     }

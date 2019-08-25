@@ -278,7 +278,8 @@ namespace CliFx.Tests.Services
 
         [Test]
         [TestCaseSource(nameof(GetTestCases_ConvertOptionInput))]
-        public void ConvertOptionInput_Test(CommandOptionInput optionInput, Type targetType, object expectedConvertedValue)
+        public void ConvertOptionInput_Test(CommandOptionInput optionInput, Type targetType,
+            object expectedConvertedValue)
         {
             // Arrange
             var converter = new CommandOptionInputConverter();

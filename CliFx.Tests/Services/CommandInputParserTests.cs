@@ -203,7 +203,8 @@ namespace CliFx.Tests.Services
 
         [Test]
         [TestCaseSource(nameof(GetTestCases_ParseCommandInput))]
-        public void ParseCommandInput_Test(IReadOnlyList<string> commandLineArguments, CommandInput expectedCommandInput)
+        public void ParseCommandInput_Test(IReadOnlyList<string> commandLineArguments,
+            CommandInput expectedCommandInput)
         {
             // Arrange
             var parser = new CommandInputParser();

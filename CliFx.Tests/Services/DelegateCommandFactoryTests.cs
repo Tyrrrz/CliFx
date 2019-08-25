@@ -19,7 +19,7 @@ namespace CliFx.Tests.Services
         {
             yield return new TestCaseData(
                 new Func<CommandSchema, ICommand>(schema => (ICommand) Activator.CreateInstance(schema.Type)),
-                GetCommandSchema(typeof(EchoCommand))
+                GetCommandSchema(typeof(HelloWorldDefaultCommand))
             );
         }
 

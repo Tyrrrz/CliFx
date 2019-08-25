@@ -108,7 +108,8 @@ namespace CliFx.Tests.Services
 
         [Test]
         [TestCaseSource(nameof(GetTestCases_InitializeCommand))]
-        public void InitializeCommand_Test(ICommand command, CommandSchema commandSchema, CommandInput commandInput, ICommand expectedCommand)
+        public void InitializeCommand_Test(ICommand command, CommandSchema commandSchema, CommandInput commandInput,
+            ICommand expectedCommand)
         {
             // Arrange
             var initializer = new CommandInitializer();

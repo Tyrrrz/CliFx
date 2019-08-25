@@ -8,7 +8,14 @@ namespace CliFx.Tests.Services
     [TestFixture]
     public class SystemConsoleTests
     {
-        // Test that it correctly wraps around System.Console
+        [TearDown]
+        public void TearDown()
+        {
+            // Reset console color so it doesn't carry on into next tests
+            Console.ResetColor();
+        }
+        
+        // Make sure console correctly wraps around System.Console
         [Test]
         public void All_Smoke_Test()
         {

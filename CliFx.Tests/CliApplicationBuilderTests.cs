@@ -11,17 +11,17 @@ namespace CliFx.Tests
     {
         // Make sure all builder methods work
         [Test]
-        public void Build_Smoke_Test()
+        public void All_Smoke_Test()
         {
             // Arrange
             var builder = new CliApplicationBuilder();
 
             // Act
             builder
-                .AddCommand(typeof(EchoCommand))
-                .AddCommandsFrom(typeof(EchoCommand).Assembly)
-                .AddCommands(new[] {typeof(EchoCommand)})
-                .AddCommandsFrom(new[] {typeof(EchoCommand).Assembly})
+                .AddCommand(typeof(HelloWorldDefaultCommand))
+                .AddCommandsFrom(typeof(HelloWorldDefaultCommand).Assembly)
+                .AddCommands(new[] {typeof(HelloWorldDefaultCommand)})
+                .AddCommandsFrom(new[] {typeof(HelloWorldDefaultCommand).Assembly})
                 .AddCommandsFromThisAssembly()
                 .AllowDebugMode()
                 .AllowPreviewMode()
@@ -34,9 +34,9 @@ namespace CliFx.Tests
                 .Build();
         }
 
-        // Make sure builder can produce a default application
+        // Make sure builder can produce an application with no parameters specified
         [Test]
-        public void Build_Fallback_Smoke_Test()
+        public void Build_Test()
         {
             // Arrange
             var builder = new CliApplicationBuilder();
