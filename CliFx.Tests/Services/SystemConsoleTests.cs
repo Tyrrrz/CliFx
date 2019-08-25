@@ -15,6 +15,7 @@ namespace CliFx.Tests.Services
             // Arrange
             var console = new SystemConsole();
 
+            // Act
             console.ResetColor();
             console.ForegroundColor = ConsoleColor.DarkMagenta;
             console.BackgroundColor = ConsoleColor.DarkMagenta;
