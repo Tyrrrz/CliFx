@@ -392,13 +392,12 @@ var app = new CliApplicationBuilder()
 
 ## Benchmarks
 
-CliFx has the smallest performance overhead compared to other command line parsers and frameworks.
-Below you can see a table comparing execution times of a simple command across different libraries.
+Here's how CliFx's execution overhead compares to that of other libraries.
 
 ```ini
-BenchmarkDotNet=v0.11.5, OS=Windows 10.0.14393.0 (1607/AnniversaryUpdate/Redstone1)
+BenchmarkDotNet=v0.11.5, OS=Windows 10.0.14393.3144 (1607/AnniversaryUpdate/Redstone1)
 Intel Core i5-4460 CPU 3.20GHz (Haswell), 1 CPU, 4 logical and 4 physical cores
-Frequency=3125008 Hz, Resolution=319.9992 ns, Timer=TSC
+Frequency=3125011 Hz, Resolution=319.9989 ns, Timer=TSC
 .NET Core SDK=2.2.401
   [Host] : .NET Core 2.2.6 (CoreCLR 4.6.27817.03, CoreFX 4.6.27818.02), 64bit RyuJIT
   Core   : .NET Core 2.2.6 (CoreCLR 4.6.27817.03, CoreFX 4.6.27818.02), 64bit RyuJIT
@@ -408,10 +407,12 @@ Job=Core  Runtime=Core
 
 |                               Method |      Mean |     Error |    StdDev | Ratio | RatioSD | Rank |
 |------------------------------------- |----------:|----------:|----------:|------:|--------:|-----:|
-|                                CliFx |  39.47 us | 0.7490 us | 0.9198 us |  1.00 |    0.00 |    1 |
-|                   System.CommandLine | 153.98 us | 0.7112 us | 0.6652 us |  3.90 |    0.09 |    2 |
-| McMaster.Extensions.CommandLineUtils | 180.36 us | 3.5893 us | 6.7416 us |  4.59 |    0.16 |    3 |
-|                            PowerArgs | 427.54 us | 6.9006 us | 6.4548 us | 10.82 |    0.26 |    4 |
+|                                CliFx |  31.29 us | 0.6147 us | 0.7774 us |  1.00 |    0.00 |    2 |
+|                   System.CommandLine | 184.44 us | 3.4993 us | 4.0297 us |  5.90 |    0.21 |    4 |
+| McMaster.Extensions.CommandLineUtils | 165.50 us | 1.4805 us | 1.3124 us |  5.33 |    0.13 |    3 |
+|                    CommandLineParser |  26.65 us | 0.5530 us | 0.5679 us |  0.85 |    0.03 |    1 |
+|                            PowerArgs | 405.44 us | 7.7133 us | 9.1821 us | 12.96 |    0.47 |    6 |
+|                                Clipr | 220.82 us | 4.4567 us | 4.9536 us |  7.06 |    0.25 |    5 |
 
 ## Philosophy
 
