@@ -215,6 +215,12 @@ namespace CliFx.Tests.Services
             );
 
             yield return new TestCaseData(
+                new CommandOptionInput("option", new[] {"47"}),
+                typeof(int[]),
+                new[] {47}
+            );
+
+            yield return new TestCaseData(
                 new CommandOptionInput("option", new[] {"value1", "value3"}),
                 typeof(TestEnum[]),
                 new[] {TestEnum.Value1, TestEnum.Value3}
@@ -267,6 +273,16 @@ namespace CliFx.Tests.Services
         {
             yield return new TestCaseData(
                 new CommandOptionInput("option", "1234.5"),
+                typeof(int)
+            );
+
+            yield return new TestCaseData(
+                new CommandOptionInput("option", new[] {"123", "456"}),
+                typeof(int)
+            );
+
+            yield return new TestCaseData(
+                new CommandOptionInput("option"),
                 typeof(int)
             );
 

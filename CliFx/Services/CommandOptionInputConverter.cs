@@ -113,7 +113,7 @@ namespace CliFx.Services
                     return Enum.Parse(targetType, value, true);
 
                 // Nullable
-                var nullableUnderlyingType = Nullable.GetUnderlyingType(targetType);
+                var nullableUnderlyingType = targetType.GetNullableUnderlyingType();
                 if (nullableUnderlyingType != null)
                     return !value.IsNullOrWhiteSpace() ? ConvertValue(value, nullableUnderlyingType) : null;
 
@@ -134,11 +134,11 @@ namespace CliFx.Services
             }
             catch (Exception ex)
             {
-                // An exception was thrown when trying to convert the value
+                // Wrap and rethrow exceptions that occur when trying to convert the value
                 throw new CliFxException($"Can't convert value [{value}] to type [{targetType}].", ex);
             }
 
-            // Couldn't find a way to convert the value
+            // Throw if we can't find a way to convert the value
             throw new CliFxException($"Can't convert value [{value}] to type [{targetType}].");
         }
 
@@ -148,33 +148,49 @@ namespace CliFx.Services
             optionInput.GuardNotNull(nameof(optionInput));
             targetType.GuardNotNull(nameof(targetType));
 
-            // Single value
-            if (optionInput.Values.Count <= 1)
+            // Get the underlying type of IEnumerable<T> if it's implemented by the target type.
+            // Ignore string type because it's IEnumerable<T> but we don't treat it as such.
+            var enumerableUnderlyingType = targetType != typeof(string) ? targetType.GetEnumerableUnderlyingType() : null;
+
+            // Convert to a non-enumerable type
+            if (enumerableUnderlyingType == null)
             {
+                // Throw if provided with more than 1 value
+                if (optionInput.Values.Count > 1)
+                {
+                    throw new CliFxException(
+                        $"Can't convert a sequence of values [{optionInput.Values.JoinToString(", ")}] " +
+                        $"to non-enumerable type [{targetType}].");
+                }
+
+                // Retrieve a single value and convert
                 var value = optionInput.Values.SingleOrDefault();
                 return ConvertValue(value, targetType);
             }
-            // Multiple values
+            // Convert to an enumerable type
             else
             {
-                // Determine underlying type of elements inside the target collection type
-                var underlyingType = targetType.GetEnumerableUnderlyingType() ?? typeof(object);
+                // Convert values to the underlying enumerable type and cast it to dynamic array
+                var convertedValues = optionInput.Values
+                    .Select(v => ConvertValue(v, enumerableUnderlyingType))
+                    .ToNonGenericArray(enumerableUnderlyingType);
 
-                // Convert values to that type
-                var convertedValues = optionInput.Values.Select(v => ConvertValue(v, underlyingType)).ToNonGenericArray(underlyingType);
+                // Get the type of produced array
                 var convertedValuesType = convertedValues.GetType();
 
-                // Assignable from array of values (e.g. T[], IReadOnlyList<T>, IEnumerable<T>)
+                // Try to assign the array (works for T[], IReadOnlyList<T>, IEnumerable<T>, etc)
                 if (targetType.IsAssignableFrom(convertedValuesType))
                     return convertedValues;
 
-                // Has a constructor that accepts an array of values (e.g. HashSet<T>, List<T>)
+                // Try to inject the array into the constructor (works for HashSet<T>, List<T>, etc)
                 var arrayConstructor = targetType.GetConstructor(new[] {convertedValuesType});
                 if (arrayConstructor != null)
                     return arrayConstructor.Invoke(new object[] {convertedValues});
 
+                // Throw if we can't find a way to convert the values
                 throw new CliFxException(
-                    $"Can't convert sequence of values [{optionInput.Values.JoinToString(", ")}] to type [{targetType}].");
+                    $"Can't convert a sequence of values [{optionInput.Values.JoinToString(", ")}] " +
+                    $"to type [{targetType}].");
             }
         }
     }

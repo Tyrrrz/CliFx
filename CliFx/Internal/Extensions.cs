@@ -36,8 +36,13 @@ namespace CliFx.Internal
 
         public static bool Implements(this Type type, Type interfaceType) => type.GetInterfaces().Contains(interfaceType);
 
+        public static Type GetNullableUnderlyingType(this Type type) => Nullable.GetUnderlyingType(type);
+
         public static Type GetEnumerableUnderlyingType(this Type type)
         {
+            if (type.IsPrimitive)
+                return null;
+
             if (type == typeof(IEnumerable))
                 return typeof(object);
 
