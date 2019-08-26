@@ -25,6 +25,7 @@ namespace CliFx
         private string _description;
         private IConsole _console;
         private ICommandFactory _commandFactory;
+        private ICommandOptionInputConverter _commandOptionInputConverter;
 
         /// <inheritdoc />
         public ICliApplicationBuilder AddCommand(Type commandType)
@@ -109,6 +110,13 @@ namespace CliFx
         }
 
         /// <inheritdoc />
+        public ICliApplicationBuilder UseCommandOptionInputConverter(ICommandOptionInputConverter converter)
+        {
+            _commandOptionInputConverter = converter.GuardNotNull(nameof(converter));
+            return this;
+        }
+
+        /// <inheritdoc />
         public ICliApplication Build()
         {
             // Use defaults for required parameters that were not configured
@@ -117,6 +125,7 @@ namespace CliFx
             _versionText = _versionText ?? GetDefaultVersionText() ?? "v1.0";
             _console = _console ?? new SystemConsole();
             _commandFactory = _commandFactory ?? new CommandFactory();
+            _commandOptionInputConverter = _commandOptionInputConverter ?? new CommandOptionInputConverter();
 
             // Project parameters to expected types
             var metadata = new ApplicationMetadata(_title, _executableName, _versionText, _description);
@@ -124,7 +133,7 @@ namespace CliFx
 
             return new CliApplication(metadata, configuration,
                 _console, new CommandInputParser(), new CommandSchemaResolver(),
-                _commandFactory, new CommandInitializer(), new HelpTextRenderer());
+                _commandFactory, new CommandInitializer(_commandOptionInputConverter), new HelpTextRenderer());
         }
     }
 

@@ -127,6 +127,34 @@ When resolving options, CliFx can convert string values obtained from the comman
 
 If you want to define an option of your own type, the easiest way to do it is to make sure that your type is string-initializable, as explained above.
 
+It is also possible to configure the application to use your own converter, by calling `UseCommandOptionInputConverter` method on `CliApplicationBuilder`.
+
+```c#
+var app = new CliApplicationBuilder()
+    .AddCommandsFromThisAssembly()
+    .UseCommandOptionInputConverter(new MyConverter())
+    .Build();
+```
+
+The converter class must implement `ICommandOptionInputConverter` but you can also derive from `CommandOptionInputConverter` to extend the default behavior.
+
+```c#
+public class MyConverter : CommandOptionInputConverter
+{
+    protected override object ConvertValue(string value, Type targetType)
+    {
+        // Custom conversion for MyType
+        if (targetType == typeof(MyType))
+        {
+            // ...
+        }
+
+        // Default behavior for other types
+        return base.ConvertValue(value, targetType);
+    }
+}
+```
+
 ### Reporting errors
 
 You may have noticed that commands in CliFx don't return exit codes. This is by design as exit codes are considered a higher-level concern and thus handled by `CliApplication`, not by individual commands.

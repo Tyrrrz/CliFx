@@ -31,8 +31,13 @@ namespace CliFx.Services
         {
         }
 
-        private object ConvertValue(string value, Type targetType)
+        /// <summary>
+        /// Converts a single string value to specified target type.
+        /// </summary>
+        protected virtual object ConvertValue(string value, Type targetType)
         {
+            targetType.GuardNotNull(nameof(targetType));
+
             try
             {
                 // String or object
@@ -126,17 +131,19 @@ namespace CliFx.Services
                 var parseMethod = GetStaticParseMethod(targetType);
                 if (parseMethod != null)
                     return parseMethod.Invoke(null, new object[] {value});
-
-                throw new CliFxException($"Can't convert value [{value}] to type [{targetType}].");
             }
             catch (Exception ex)
             {
+                // An exception was thrown when trying to convert the value
                 throw new CliFxException($"Can't convert value [{value}] to type [{targetType}].", ex);
             }
+
+            // Couldn't find a way to convert the value
+            throw new CliFxException($"Can't convert value [{value}] to type [{targetType}].");
         }
 
         /// <inheritdoc />
-        public object ConvertOptionInput(CommandOptionInput optionInput, Type targetType)
+        public virtual object ConvertOptionInput(CommandOptionInput optionInput, Type targetType)
         {
             optionInput.GuardNotNull(nameof(optionInput));
             targetType.GuardNotNull(nameof(targetType));

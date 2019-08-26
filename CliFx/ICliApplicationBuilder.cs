@@ -60,6 +60,11 @@ namespace CliFx
         ICliApplicationBuilder UseCommandFactory(ICommandFactory factory);
 
         /// <summary>
+        /// Configures application to use specified implementation of <see cref="ICommandOptionInputConverter"/>.
+        /// </summary>
+        ICliApplicationBuilder UseCommandOptionInputConverter(ICommandOptionInputConverter converter);
+
+        /// <summary>
         /// Creates an instance of <see cref="ICliApplication"/> using configured parameters.
         /// Default values are used in place of parameters that were not specified.
         /// </summary>

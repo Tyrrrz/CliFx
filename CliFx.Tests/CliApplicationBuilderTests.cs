@@ -31,6 +31,7 @@ namespace CliFx.Tests
                 .UseDescription("test")
                 .UseConsole(new VirtualConsole(TextWriter.Null))
                 .UseCommandFactory(schema => (ICommand) Activator.CreateInstance(schema.Type))
+                .UseCommandOptionInputConverter(new CommandOptionInputConverter())
                 .Build();
         }
 
