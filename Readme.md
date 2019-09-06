@@ -32,7 +32,7 @@ _CliFx is to command line interfaces what ASP.NET Core is to web applications._
 
 ## Screenshots
 
-![](http://www.tyrrrz.me/Projects/CliFx/Images/1.png)
+![help screen](.screenshots/help.png)
 
 ## Argument syntax
 
@@ -42,8 +42,8 @@ The following examples are valid for any application created with CliFx:
 
 - `myapp --foo bar` sets option `"foo"` to value `"bar"`
 - `myapp -f bar` sets option `'f'` to value `"bar"`
-- `myapp --switch` sets option `"switch"` to value `true` 
-- `myapp -s` sets option `'s'` to value `true` 
+- `myapp --switch` sets option `"switch"` to value `true`
+- `myapp -s` sets option `'s'` to value `true`
 - `myapp -abc` sets options `'a'`, `'b'` and `'c'` to value `true`
 - `myapp -xqf bar` sets options `'x'` and `'q'` to value `true`, and option `'f'` to value `"bar"`
 - `myapp -i file1.txt file2.txt` sets option `'i'` to a sequence of values `"file1.txt"` and `"file2.txt"`
