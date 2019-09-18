@@ -28,6 +28,11 @@ namespace CliFx.Attributes
         /// </summary>
         public string Description { get; set; }
 
+		/// <summary>
+		/// Optional environment variable name that will be used as fallback value if no option value is specified.
+		/// </summary>
+		public string EnvironmentVariableName { get; set; }
+
         /// <summary>
         /// Initializes an instance of <see cref="CommandOptionAttribute"/>.
         /// </summary>

@@ -34,16 +34,22 @@ namespace CliFx.Models
         /// </summary>
         public string Description { get; }
 
+		/// <summary>
+		/// Optional environment variable name that will be used as fallback value if no option value is specified.
+		/// </summary>
+		public string EnvironmentVariableName { get; }
+
         /// <summary>
         /// Initializes an instance of <see cref="CommandOptionSchema"/>.
         /// </summary>
-        public CommandOptionSchema(PropertyInfo property, string name, char? shortName, bool isRequired, string description)
+        public CommandOptionSchema(PropertyInfo property, string name, char? shortName, bool isRequired, string description, string environmentVariableName)
         {
             Property = property; // can be null
             Name = name; // can be null
             ShortName = shortName; // can be null
             IsRequired = isRequired;
             Description = description; // can be null
+			EnvironmentVariableName = environmentVariableName; //can be null
         }
 
         /// <inheritdoc />
@@ -75,9 +81,9 @@ namespace CliFx.Models
         // ...in CliApplication (when reading) and HelpTextRenderer (when writing).
 
         internal static CommandOptionSchema HelpOption { get; } =
-            new CommandOptionSchema(null, "help", 'h', false, "Shows help text.");
+            new CommandOptionSchema(null, "help", 'h', false, "Shows help text.", null);
 
         internal static CommandOptionSchema VersionOption { get; } =
-            new CommandOptionSchema(null, "version", null, false, "Shows version information.");
+            new CommandOptionSchema(null, "version", null, false, "Shows version information.", null);
     }
 }

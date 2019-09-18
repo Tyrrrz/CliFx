@@ -14,26 +14,33 @@ namespace CliFx.Tests.Services
     {
         private static IEnumerable<TestCaseData> GetTestCases_GetCommandSchemas()
         {
-            yield return new TestCaseData(
-                new[] {typeof(DivideCommand), typeof(ConcatCommand)},
-                new[]
-                {
-                    new CommandSchema(typeof(DivideCommand), "div", "Divide one number by another.",
-                        new[]
-                        {
-                            new CommandOptionSchema(typeof(DivideCommand).GetProperty(nameof(DivideCommand.Dividend)),
-                                "dividend", 'D', true, "The number to divide."),
+			yield return new TestCaseData(
+				new[] { typeof(DivideCommand), typeof(ConcatCommand), typeof(EnvironmentVariableCommand) },
+				new[]
+				{
+					new CommandSchema(typeof(DivideCommand), "div", "Divide one number by another.",
+						new[]
+						{
+							new CommandOptionSchema(typeof(DivideCommand).GetProperty(nameof(DivideCommand.Dividend)),
+								"dividend", 'D', true, "The number to divide.", null),
                             new CommandOptionSchema(typeof(DivideCommand).GetProperty(nameof(DivideCommand.Divisor)),
-                                "divisor", 'd', true, "The number to divide by.")
+                                "divisor", 'd', true, "The number to divide by.", null)
                         }),
                     new CommandSchema(typeof(ConcatCommand), "concat", "Concatenate strings.",
                         new[]
                         {
                             new CommandOptionSchema(typeof(ConcatCommand).GetProperty(nameof(ConcatCommand.Inputs)),
-                                null, 'i', true, "Input strings."),
+                                null, 'i', true, "Input strings.", null),
                             new CommandOptionSchema(typeof(ConcatCommand).GetProperty(nameof(ConcatCommand.Separator)),
-                                null, 's', false, "String separator.")
-                        })
+                                null, 's', false, "String separator.", null)
+                        }),
+					new CommandSchema(typeof(EnvironmentVariableCommand), null, "Read options from environment variables.",
+						new[]
+						{
+							new CommandOptionSchema(typeof(EnvironmentVariableCommand).GetProperty(nameof(EnvironmentVariableCommand.Option)),
+								"opt", null, false, null, "OPTION_VALUE_FROM_ENV")
+						}
+					)
                 }
             );
 
