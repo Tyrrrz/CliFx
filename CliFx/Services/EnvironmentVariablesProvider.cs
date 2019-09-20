@@ -34,7 +34,8 @@ namespace CliFx.Services
         /// <inheritdoc />
         public IEnumerable<string> GetValues(string variableName)
         {
-            variableName.GuardNotNull(nameof(variableName));
+            //If variableName is null simply return nothing, this may happen if a Command has not EnvironmentVariable fallback
+            if (variableName == null) return null;
 
             try
             {

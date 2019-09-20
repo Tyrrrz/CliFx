@@ -133,7 +133,7 @@ namespace CliFx
 
             return new CliApplication(metadata, configuration,
                 _console, new CommandInputParser(), new CommandSchemaResolver(),
-                _commandFactory, new CommandInitializer(_commandOptionInputConverter), new HelpTextRenderer());
+                _commandFactory, new CommandInitializer(_commandOptionInputConverter, new EnvironmentVariablesProvider()), new HelpTextRenderer());
         }
     }
 
