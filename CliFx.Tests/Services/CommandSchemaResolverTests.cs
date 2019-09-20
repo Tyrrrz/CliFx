@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using CliFx.Exceptions;
+﻿using CliFx.Exceptions;
 using CliFx.Models;
 using CliFx.Services;
 using CliFx.Tests.TestCommands;
 using FluentAssertions;
 using NUnit.Framework;
+using System;
+using System.Collections.Generic;
 
 namespace CliFx.Tests.Services
 {
@@ -14,15 +14,15 @@ namespace CliFx.Tests.Services
     {
         private static IEnumerable<TestCaseData> GetTestCases_GetCommandSchemas()
         {
-			yield return new TestCaseData(
-				new[] { typeof(DivideCommand), typeof(ConcatCommand), typeof(EnvironmentVariableCommand) },
-				new[]
-				{
-					new CommandSchema(typeof(DivideCommand), "div", "Divide one number by another.",
-						new[]
-						{
-							new CommandOptionSchema(typeof(DivideCommand).GetProperty(nameof(DivideCommand.Dividend)),
-								"dividend", 'D', true, "The number to divide.", null),
+            yield return new TestCaseData(
+                new[] { typeof(DivideCommand), typeof(ConcatCommand), typeof(EnvironmentVariableCommand) },
+                new[]
+                {
+                    new CommandSchema(typeof(DivideCommand), "div", "Divide one number by another.",
+                        new[]
+                        {
+                            new CommandOptionSchema(typeof(DivideCommand).GetProperty(nameof(DivideCommand.Dividend)),
+                                "dividend", 'D', true, "The number to divide.", null),
                             new CommandOptionSchema(typeof(DivideCommand).GetProperty(nameof(DivideCommand.Divisor)),
                                 "divisor", 'd', true, "The number to divide by.", null)
                         }),
@@ -34,18 +34,18 @@ namespace CliFx.Tests.Services
                             new CommandOptionSchema(typeof(ConcatCommand).GetProperty(nameof(ConcatCommand.Separator)),
                                 null, 's', false, "String separator.", null)
                         }),
-					new CommandSchema(typeof(EnvironmentVariableCommand), null, "Read options from environment variables.",
-						new[]
-						{
-							new CommandOptionSchema(typeof(EnvironmentVariableCommand).GetProperty(nameof(EnvironmentVariableCommand.Option)),
-								"opt", null, false, null, "OPTION_VALUE_FROM_ENV")
-						}
-					)
+                    new CommandSchema(typeof(EnvironmentVariableCommand), null, "Read option values from environment variables.",
+                        new[]
+                        {
+                            new CommandOptionSchema(typeof(EnvironmentVariableCommand).GetProperty(nameof(EnvironmentVariableCommand.Option)),
+                                "opt", null, false, null, "ENV_VAR_1")
+                        }
+                    )
                 }
             );
 
             yield return new TestCaseData(
-                new[] {typeof(HelloWorldDefaultCommand)},
+                new[] { typeof(HelloWorldDefaultCommand) },
                 new[]
                 {
                     new CommandSchema(typeof(HelloWorldDefaultCommand), null, null, new CommandOptionSchema[0])
@@ -69,7 +69,7 @@ namespace CliFx.Tests.Services
             {
                 new[] {typeof(NonAnnotatedCommand)}
             });
-            
+
             yield return new TestCaseData(new object[]
             {
                 new[] {typeof(DuplicateOptionNamesCommand)}
@@ -79,7 +79,7 @@ namespace CliFx.Tests.Services
             {
                 new[] {typeof(DuplicateOptionShortNamesCommand)}
             });
-            
+
             yield return new TestCaseData(new object[]
             {
                 new[] {typeof(ExceptionCommand), typeof(CommandExceptionCommand)}

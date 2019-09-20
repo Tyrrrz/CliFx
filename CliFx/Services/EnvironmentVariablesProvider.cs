@@ -1,6 +1,6 @@
-﻿using CliFx.Internal;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security;
 
 namespace CliFx.Services
@@ -32,7 +32,7 @@ namespace CliFx.Services
         }
 
         /// <inheritdoc />
-        public IEnumerable<string> GetValues(string variableName)
+        public IReadOnlyList<string> GetValues(string variableName)
         {
             //If variableName is null simply return nothing, this may happen if a Command has not EnvironmentVariable fallback
             if (variableName == null) return null;
@@ -43,7 +43,10 @@ namespace CliFx.Services
 
                 if (string.IsNullOrWhiteSpace(variableValue)) return null;
 
-                return variableValue.Split(_valuesDelimiter);
+                var values = variableValue.Split(_valuesDelimiter)
+                    .Select(v => v.Trim());
+
+                return values.ToList();
             }
             catch (SecurityException)
             {

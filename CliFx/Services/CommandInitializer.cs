@@ -1,7 +1,6 @@
 ﻿using CliFx.Exceptions;
 using CliFx.Internal;
 using CliFx.Models;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace CliFx.Services
@@ -26,6 +25,14 @@ namespace CliFx.Services
         /// <summary>
         /// Initializes an instance of <see cref="CommandInitializer"/>.
         /// </summary>
+        public CommandInitializer(IEnvironmentVariablesProvider environmentVariablesProvider)
+            : this(new CommandOptionInputConverter(), environmentVariablesProvider)
+        {
+        }
+
+        /// <summary>
+        /// Initializes an instance of <see cref="CommandInitializer"/>.
+        /// </summary>
         public CommandInitializer()
             : this(new CommandOptionInputConverter(), new EnvironmentVariablesProvider())
         {
@@ -44,19 +51,22 @@ namespace CliFx.Services
             //Set command options
             foreach (var optionSchema in commandSchema.Options)
             {
-                IEnumerable<string> optionValues = null;
-
                 //Find matching option input
                 CommandOptionInput optionInput = commandInput.Options.FindByOptionSchema(optionSchema);
 
-                //If not option input is available fallback to environment variables
-                optionValues = optionInput?.Values ?? _environmentVariablesProvider.GetValues(optionSchema.EnvironmentVariableName);
+                //If no option input is available fall back to environment variable values
+                if (optionInput == null)
+                {
+                    var environmentValues = _environmentVariablesProvider.GetValues(optionSchema.EnvironmentVariableName);
 
-                //If no values are found skip this option initialization
-                if (optionValues == null)
-                    continue;
+                    //If the environment variable values are also missing skip this option
+                    if (environmentValues == null)
+                        continue;
 
-                // Convert option to the type of the underlying property
+                    //Make a new CommandOptionInput using environment variables
+                    optionInput = new CommandOptionInput(optionSchema.EnvironmentVariableName, environmentValues);
+                }
+
                 var convertedValue = _commandOptionInputConverter.ConvertOptionInput(optionInput, optionSchema.Property.PropertyType);
 
                 // Set value of the underlying property

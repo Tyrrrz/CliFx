@@ -1,6 +1,6 @@
-﻿using System.Reflection;
+﻿using CliFx.Internal;
+using System.Reflection;
 using System.Text;
-using CliFx.Internal;
 
 namespace CliFx.Models
 {
@@ -34,10 +34,10 @@ namespace CliFx.Models
         /// </summary>
         public string Description { get; }
 
-		/// <summary>
-		/// Optional environment variable name that will be used as fallback value if no option value is specified.
-		/// </summary>
-		public string EnvironmentVariableName { get; }
+        /// <summary>
+        /// Optional environment variable name that will be used as fallback value if no option value is specified.
+        /// </summary>
+        public string EnvironmentVariableName { get; }
 
         /// <summary>
         /// Initializes an instance of <see cref="CommandOptionSchema"/>.
@@ -49,7 +49,7 @@ namespace CliFx.Models
             ShortName = shortName; // can be null
             IsRequired = isRequired;
             Description = description; // can be null
-			EnvironmentVariableName = environmentVariableName; //can be null
+            EnvironmentVariableName = environmentVariableName; //can be null
         }
 
         /// <inheritdoc />

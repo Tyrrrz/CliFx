@@ -1,6 +1,6 @@
-﻿using System;
+﻿using CliFx.Services;
+using System;
 using System.Reflection;
-using CliFx.Services;
 
 namespace CliFx
 {
@@ -63,6 +63,11 @@ namespace CliFx
         /// Configures application to use specified implementation of <see cref="ICommandOptionInputConverter"/>.
         /// </summary>
         ICliApplicationBuilder UseCommandOptionInputConverter(ICommandOptionInputConverter converter);
+
+        /// <summary>
+        /// Configures application to use specified implementation of <see cref="IEnvironmentVariablesProvider"/>.
+        /// </summary>
+        ICliApplicationBuilder UseEnvironmentVariablesProvider(IEnvironmentVariablesProvider environmentVariablesProvider);
 
         /// <summary>
         /// Creates an instance of <see cref="ICliApplication"/> using configured parameters.

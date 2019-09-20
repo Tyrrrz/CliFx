@@ -1,12 +1,12 @@
-﻿using System;
+﻿using CliFx.Attributes;
+using CliFx.Internal;
+using CliFx.Models;
+using CliFx.Services;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using CliFx.Attributes;
-using CliFx.Internal;
-using CliFx.Models;
-using CliFx.Services;
 
 namespace CliFx
 {
@@ -26,6 +26,7 @@ namespace CliFx
         private IConsole _console;
         private ICommandFactory _commandFactory;
         private ICommandOptionInputConverter _commandOptionInputConverter;
+        private IEnvironmentVariablesProvider _environmentVariablesProvider;
 
         /// <inheritdoc />
         public ICliApplicationBuilder AddCommand(Type commandType)
@@ -117,6 +118,13 @@ namespace CliFx
         }
 
         /// <inheritdoc />
+        public ICliApplicationBuilder UseEnvironmentVariablesProvider(IEnvironmentVariablesProvider environmentVariablesProvider)
+        {
+            _environmentVariablesProvider = environmentVariablesProvider.GuardNotNull(nameof(environmentVariablesProvider));
+            return this;
+        }
+
+        /// <inheritdoc />
         public ICliApplication Build()
         {
             // Use defaults for required parameters that were not configured
@@ -126,6 +134,7 @@ namespace CliFx
             _console = _console ?? new SystemConsole();
             _commandFactory = _commandFactory ?? new CommandFactory();
             _commandOptionInputConverter = _commandOptionInputConverter ?? new CommandOptionInputConverter();
+            _environmentVariablesProvider = _environmentVariablesProvider ?? new EnvironmentVariablesProvider();
 
             // Project parameters to expected types
             var metadata = new ApplicationMetadata(_title, _executableName, _versionText, _description);
@@ -133,7 +142,7 @@ namespace CliFx
 
             return new CliApplication(metadata, configuration,
                 _console, new CommandInputParser(), new CommandSchemaResolver(),
-                _commandFactory, new CommandInitializer(_commandOptionInputConverter, new EnvironmentVariablesProvider()), new HelpTextRenderer());
+                _commandFactory, new CommandInitializer(_commandOptionInputConverter, _environmentVariablesProvider), new HelpTextRenderer());
         }
     }
 

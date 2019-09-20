@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using CliFx.Attributes;
+﻿using CliFx.Attributes;
 using CliFx.Exceptions;
 using CliFx.Internal;
 using CliFx.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace CliFx.Services
 {
@@ -32,7 +32,7 @@ namespace CliFx.Services
                     attribute.ShortName,
                     attribute.IsRequired,
                     attribute.Description,
-					attribute.EnvironmentVariableName);
+                    attribute.EnvironmentVariableName);
 
                 // Make sure there are no other options with the same name
                 var existingOptionWithSameName = result

@@ -11,6 +11,6 @@ namespace CliFx.Services
         /// Returns one or more values for the environment variable provided, otherwise returns null.
         /// </summary>
         /// <remarks>If the User is not allowed to read environment variables it will return null.</remarks>
-        IEnumerable<string> GetValues(string variableName);
+        IReadOnlyList<string> GetValues(string variableName);
     }
 }
