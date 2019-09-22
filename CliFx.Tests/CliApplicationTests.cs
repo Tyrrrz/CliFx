@@ -206,10 +206,12 @@ namespace CliFx.Tests
             using (var stderrStream = new StringWriter())
             {
                 var console = new VirtualConsole(TextWriter.Null, stderrStream);
+                var environmentVariablesProvider = new EnvironmentVariablesProviderStub();
 
                 var application = new CliApplicationBuilder()
                     .AddCommands(commandTypes)
                     .UseVersionText(TestVersionText)
+                    .UseEnvironmentVariablesProvider(environmentVariablesProvider)
                     .UseConsole(console)
                     .Build();
 

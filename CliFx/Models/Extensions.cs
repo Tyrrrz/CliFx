@@ -73,17 +73,6 @@ namespace CliFx.Models
         }
 
         /// <summary>
-        /// Finds an option that matches specified alias, or null if not found.
-        /// </summary>
-        public static CommandOptionSchema FindByAlias(this IReadOnlyList<CommandOptionSchema> optionSchemas, string alias)
-        {
-            optionSchemas.GuardNotNull(nameof(optionSchemas));
-            alias.GuardNotNull(nameof(alias));
-
-            return optionSchemas.FirstOrDefault(o => o.MatchesAlias(alias));
-        }
-
-        /// <summary>
         /// Finds an option input that matches the option schema specified, or null if not found.
         /// </summary>
         public static CommandOptionInput FindByOptionSchema(this IReadOnlyList<CommandOptionInput> optionInputs, CommandOptionSchema optionSchema)
