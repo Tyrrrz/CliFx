@@ -1,13 +1,13 @@
-﻿using CliFx.Exceptions;
-using CliFx.Models;
-using CliFx.Services;
-using CliFx.Tests.Stubs;
-using CliFx.Tests.TestCommands;
-using FluentAssertions;
+﻿using FluentAssertions;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CliFx.Exceptions;
+using CliFx.Models;
+using CliFx.Services;
+using CliFx.Tests.TestCommands;
+using CliFx.Tests.Stubs;
 
 namespace CliFx.Tests.Services
 {
@@ -77,7 +77,7 @@ namespace CliFx.Tests.Services
             yield return new TestCaseData(
                 new EnvironmentVariableCommand(),
                 GetCommandSchema(typeof(EnvironmentVariableCommand)),
-                new CommandInput(null, new CommandOptionInput[] { }),
+                new CommandInput(null, new CommandOptionInput[0], EnvironmentVariablesProviderStub.EnvironmentVariables),
                 new EnvironmentVariableCommand { Option = "A" }
             );
 
@@ -85,7 +85,7 @@ namespace CliFx.Tests.Services
             yield return new TestCaseData(
                 new EnvironmentVariableWithMultipleValuesCommand(),
                 GetCommandSchema(typeof(EnvironmentVariableWithMultipleValuesCommand)),
-                new CommandInput(null, new CommandOptionInput[] { }),
+                new CommandInput(null, new CommandOptionInput[0], EnvironmentVariablesProviderStub.EnvironmentVariables),
                 new EnvironmentVariableWithMultipleValuesCommand { Option = new[] { "A", "B", "C" } }
             );
 
@@ -95,9 +95,18 @@ namespace CliFx.Tests.Services
                 GetCommandSchema(typeof(EnvironmentVariableCommand)),
                 new CommandInput(null, new[]
                 {
-                    new CommandOptionInput("opt", new[] {"X"})
-                }),
+                    new CommandOptionInput("opt", new[] { "X" })
+                },
+                EnvironmentVariablesProviderStub.EnvironmentVariables),
                 new EnvironmentVariableCommand { Option = "X" }
+            );
+
+            //Will not split environment variable values because underlying property is not a collection
+            yield return new TestCaseData(
+                new EnvironmentVariableWithoutCollectionPropertyCommand(),
+                GetCommandSchema(typeof(EnvironmentVariableWithoutCollectionPropertyCommand)),
+                new CommandInput(null, new CommandOptionInput[0], EnvironmentVariablesProviderStub.EnvironmentVariables),
+                new EnvironmentVariableWithoutCollectionPropertyCommand { Option = "A;B;C;" }
             );
         }
 
@@ -140,7 +149,7 @@ namespace CliFx.Tests.Services
             ICommand expectedCommand)
         {
             // Arrange
-            var initializer = new CommandInitializer(new EnvironmentVariablesProviderStub());
+            var initializer = new CommandInitializer();
 
             // Act
             initializer.InitializeCommand(command, commandSchema, commandInput);
@@ -154,7 +163,7 @@ namespace CliFx.Tests.Services
         public void InitializeCommand_Negative_Test(ICommand command, CommandSchema commandSchema, CommandInput commandInput)
         {
             // Arrange
-            var initializer = new CommandInitializer(new EnvironmentVariablesProviderStub());
+            var initializer = new CommandInitializer();
 
             // Act & Assert
             initializer.Invoking(i => i.InitializeCommand(command, commandSchema, commandInput))

@@ -1,7 +1,7 @@
-﻿using CliFx.Exceptions;
+﻿using System.Linq;
+using CliFx.Exceptions;
 using CliFx.Internal;
 using CliFx.Models;
-using System.Linq;
 
 namespace CliFx.Services
 {
@@ -11,22 +11,22 @@ namespace CliFx.Services
     public class CommandInitializer : ICommandInitializer
     {
         private readonly ICommandOptionInputConverter _commandOptionInputConverter;
-        private readonly IEnvironmentVariablesProvider _environmentVariablesProvider;
+        private readonly IEnvironmentVariablesParser _environmentVariablesParser;
 
         /// <summary>
         /// Initializes an instance of <see cref="CommandInitializer"/>.
         /// </summary>
-        public CommandInitializer(ICommandOptionInputConverter commandOptionInputConverter, IEnvironmentVariablesProvider environmentVariablesProvider)
+        public CommandInitializer(ICommandOptionInputConverter commandOptionInputConverter, IEnvironmentVariablesParser environmentVariablesParser)
         {
             _commandOptionInputConverter = commandOptionInputConverter.GuardNotNull(nameof(commandOptionInputConverter));
-            _environmentVariablesProvider = environmentVariablesProvider.GuardNotNull(nameof(environmentVariablesProvider));
+            _environmentVariablesParser = environmentVariablesParser.GuardNotNull(nameof(environmentVariablesParser));
         }
 
         /// <summary>
         /// Initializes an instance of <see cref="CommandInitializer"/>.
         /// </summary>
-        public CommandInitializer(IEnvironmentVariablesProvider environmentVariablesProvider)
-            : this(new CommandOptionInputConverter(), environmentVariablesProvider)
+        public CommandInitializer(IEnvironmentVariablesParser environmentVariablesParser)
+            : this(new CommandOptionInputConverter(), environmentVariablesParser)
         {
         }
 
@@ -34,7 +34,7 @@ namespace CliFx.Services
         /// Initializes an instance of <see cref="CommandInitializer"/>.
         /// </summary>
         public CommandInitializer()
-            : this(new CommandOptionInputConverter(), new EnvironmentVariablesProvider())
+            : this(new CommandOptionInputConverter(), new EnvironmentVariablesParser())
         {
         }
 
@@ -52,20 +52,23 @@ namespace CliFx.Services
             foreach (var optionSchema in commandSchema.Options)
             {
                 //Find matching option input
-                CommandOptionInput optionInput = commandInput.Options.FindByOptionSchema(optionSchema);
+                var optionInput = commandInput.Options.FindByOptionSchema(optionSchema);
 
                 //If no option input is available fall back to environment variable values
-                if (optionInput == null)
+                if (optionInput == null && !optionSchema.EnvironmentVariableName.IsNullOrWhiteSpace())
                 {
-                    var environmentValues = _environmentVariablesProvider.GetValues(optionSchema.EnvironmentVariableName);
+                    var fallbackEnvironmentVariableExists = commandInput.EnvironmentVariables.ContainsKey(optionSchema.EnvironmentVariableName);
 
-                    //If the environment variable values are also missing skip this option
-                    if (environmentValues == null)
+                    //If no environment variable is found or there is no valid value for this option skip it
+                    if (!fallbackEnvironmentVariableExists || commandInput.EnvironmentVariables[optionSchema.EnvironmentVariableName].IsNullOrWhiteSpace())
                         continue;
 
-                    //Make a new CommandOptionInput using environment variables
-                    optionInput = new CommandOptionInput(optionSchema.EnvironmentVariableName, environmentValues);
+                    optionInput = _environmentVariablesParser.GetCommandOptionInputFromEnvironmentVariable(commandInput.EnvironmentVariables[optionSchema.EnvironmentVariableName], optionSchema);
                 }
+
+                //No fallback available and no option input was specified, skip option
+                if (optionInput == null)
+                    continue;
 
                 var convertedValue = _commandOptionInputConverter.ConvertOptionInput(optionInput, optionSchema.Property.PropertyType);
 

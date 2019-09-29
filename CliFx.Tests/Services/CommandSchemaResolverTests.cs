@@ -1,11 +1,11 @@
-﻿using CliFx.Exceptions;
-using CliFx.Models;
-using CliFx.Services;
-using CliFx.Tests.TestCommands;
-using FluentAssertions;
+﻿using FluentAssertions;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using CliFx.Exceptions;
+using CliFx.Models;
+using CliFx.Services;
+using CliFx.Tests.TestCommands;
 
 namespace CliFx.Tests.Services
 {
@@ -34,11 +34,11 @@ namespace CliFx.Tests.Services
                             new CommandOptionSchema(typeof(ConcatCommand).GetProperty(nameof(ConcatCommand.Separator)),
                                 null, 's', false, "String separator.", null)
                         }),
-                    new CommandSchema(typeof(EnvironmentVariableCommand), null, "Read option values from environment variables.",
+                    new CommandSchema(typeof(EnvironmentVariableCommand), null, "Reads option values from environment variables.",
                         new[]
                         {
                             new CommandOptionSchema(typeof(EnvironmentVariableCommand).GetProperty(nameof(EnvironmentVariableCommand.Option)),
-                                "opt", null, false, null, "ENV_VAR_1")
+                                "opt", null, false, null, "ENV_SINGLE_VALUE")
                         }
                     )
                 }

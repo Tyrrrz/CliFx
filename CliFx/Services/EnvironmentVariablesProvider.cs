@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security;
 
 namespace CliFx.Services
@@ -8,49 +8,28 @@ namespace CliFx.Services
     /// <inheritdoc />
     public class EnvironmentVariablesProvider : IEnvironmentVariablesProvider
     {
-        /// <summary>
-        /// Default delimiter for multiple values
-        /// </summary>
-        public const char DEFAULT_VALUES_DELIMITER = ',';
-
-        private readonly char _valuesDelimiter;
-
-        /// <summary>
-        /// Initializes a new instance of <see cref="EnvironmentVariablesProvider"/> with the values delimiter specified
-        /// </summary>
-        public EnvironmentVariablesProvider(char valuesDelimiter)
-        {
-            _valuesDelimiter = valuesDelimiter;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of <see cref="EnvironmentVariablesProvider"/> with the default values delimiter
-        /// </summary>
-        public EnvironmentVariablesProvider()
-            : this(DEFAULT_VALUES_DELIMITER)
-        {
-        }
-
         /// <inheritdoc />
-        public IReadOnlyList<string> GetValues(string variableName)
+        public IReadOnlyDictionary<string, string> GetEnvironmentVariables()
         {
-            //If variableName is null simply return nothing, this may happen if a Command has not EnvironmentVariable fallback
-            if (variableName == null) return null;
-
             try
             {
-                string variableValue = Environment.GetEnvironmentVariable(variableName);
+                var environmentVariables = Environment.GetEnvironmentVariables();
 
-                if (string.IsNullOrWhiteSpace(variableValue)) return null;
+                //Constructing the dictionary manually allows to specify a key comparer that ignores case
+                //This allows to ignore casing when looking for a fallback environment variable of an option
+                var environmentVariablesAsDictionary = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-                var values = variableValue.Split(_valuesDelimiter)
-                    .Select(v => v.Trim());
+                //Type DictionaryEntry must be explicitly used otherwise it will enumerate as a collection of objects
+                foreach (DictionaryEntry environmentVariable in environmentVariables)
+                {
+                    environmentVariablesAsDictionary.Add(environmentVariable.Key.ToString(), environmentVariable.Value.ToString());
+                }
 
-                return values.ToList();
+                return environmentVariablesAsDictionary;
             }
             catch (SecurityException)
             {
-                return null;
+                return new Dictionary<string, string>();
             }
         }
     }

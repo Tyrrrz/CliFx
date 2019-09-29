@@ -1,12 +1,12 @@
-﻿using CliFx.Attributes;
-using CliFx.Internal;
-using CliFx.Models;
-using CliFx.Services;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using CliFx.Attributes;
+using CliFx.Internal;
+using CliFx.Models;
+using CliFx.Services;
 
 namespace CliFx
 {
@@ -141,8 +141,8 @@ namespace CliFx
             var configuration = new ApplicationConfiguration(_commandTypes.ToArray(), _isDebugModeAllowed, _isPreviewModeAllowed);
 
             return new CliApplication(metadata, configuration,
-                _console, new CommandInputParser(), new CommandSchemaResolver(),
-                _commandFactory, new CommandInitializer(_commandOptionInputConverter, _environmentVariablesProvider), new HelpTextRenderer());
+                _console, new CommandInputParser(_environmentVariablesProvider), new CommandSchemaResolver(),
+                _commandFactory, new CommandInitializer(_commandOptionInputConverter, new EnvironmentVariablesParser()), new HelpTextRenderer());
         }
     }
 

@@ -1,11 +1,11 @@
-﻿using CliFx.Attributes;
-using CliFx.Exceptions;
-using CliFx.Internal;
-using CliFx.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using CliFx.Attributes;
+using CliFx.Exceptions;
+using CliFx.Internal;
+using CliFx.Models;
 
 namespace CliFx.Services
 {

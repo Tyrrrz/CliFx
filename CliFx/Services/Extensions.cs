@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using CliFx.Internal;
 
 namespace CliFx.Services
@@ -49,6 +50,26 @@ namespace CliFx.Services
             action.GuardNotNull(nameof(action));
 
             console.WithForegroundColor(foregroundColor, () => console.WithBackgroundColor(backgroundColor, action));
+        }
+
+        /// <summary>
+        /// Gets wether a string representing an environment variable value is escaped (i.e.: surrounded by double quotation marks)
+        /// </summary>
+        public static bool IsEnvironmentVariableEscaped(this string environmentVariableValue)
+        {
+            environmentVariableValue.GuardNotNull(nameof(environmentVariableValue));
+
+            return environmentVariableValue.StartsWith("\"") && environmentVariableValue.EndsWith("\"");
+        }
+
+        /// <summary>
+        /// Gets wether the <see cref="Type"/> supplied is a collection implementing <see cref="IEnumerable{T}"/>
+        /// </summary>
+        public static bool IsCollection(this Type type)
+        {
+            type.GuardNotNull(nameof(type));
+
+            return type != typeof(string) && type.GetEnumerableUnderlyingType() != null;
         }
     }
 }

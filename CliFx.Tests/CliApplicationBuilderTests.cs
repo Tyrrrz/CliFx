@@ -1,9 +1,9 @@
-﻿using CliFx.Services;
-using CliFx.Tests.Stubs;
-using CliFx.Tests.TestCommands;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using System;
 using System.IO;
+using CliFx.Services;
+using CliFx.Tests.Stubs;
+using CliFx.Tests.TestCommands;
 
 namespace CliFx.Tests
 {

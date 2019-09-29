@@ -1,6 +1,6 @@
-﻿using CliFx.Services;
-using System;
+﻿using System;
 using System.Reflection;
+using CliFx.Services;
 
 namespace CliFx
 {

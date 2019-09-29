@@ -8,9 +8,9 @@ namespace CliFx.Services
     public interface IEnvironmentVariablesProvider
     {
         /// <summary>
-        /// Returns one or more values for the environment variable provided, otherwise returns null.
+        /// Returns all the environment variables available.
         /// </summary>
-        /// <remarks>If the User is not allowed to read environment variables it will return null.</remarks>
-        IReadOnlyList<string> GetValues(string variableName);
+        /// <remarks>If the User is not allowed to read environment variables it will return an empty dictionary.</remarks>
+        IReadOnlyDictionary<string, string> GetEnvironmentVariables();
     }
 }

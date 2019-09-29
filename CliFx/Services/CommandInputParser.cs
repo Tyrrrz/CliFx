@@ -12,6 +12,26 @@ namespace CliFx.Services
     /// </summary>
     public class CommandInputParser : ICommandInputParser
     {
+        private readonly IEnvironmentVariablesProvider _environmentVariablesProvider;
+
+        /// <summary>
+        /// Initializes an instance of <see cref="CommandInputParser"/>
+        /// </summary>
+        public CommandInputParser(IEnvironmentVariablesProvider environmentVariablesProvider)
+        {
+            environmentVariablesProvider.GuardNotNull(nameof(environmentVariablesProvider));
+
+            _environmentVariablesProvider = environmentVariablesProvider;
+        }
+
+        /// <summary>
+        /// Initializes an instance of <see cref="CommandInputParser"/>
+        /// </summary>
+        public CommandInputParser()
+            : this(new EnvironmentVariablesProvider())
+        {
+        }
+
         /// <inheritdoc />
         public CommandInput ParseCommandInput(IReadOnlyList<string> commandLineArguments)
         {
@@ -78,7 +98,9 @@ namespace CliFx.Services
             var commandName = commandNameBuilder.Length > 0 ? commandNameBuilder.ToString() : null;
             var options = optionsDic.Select(p => new CommandOptionInput(p.Key, p.Value)).ToArray();
 
-            return new CommandInput(commandName, directives, options);
+            var environmentVariables = _environmentVariablesProvider.GetEnvironmentVariables();
+
+            return new CommandInput(commandName, directives, options, environmentVariables);
         }
     }
 }

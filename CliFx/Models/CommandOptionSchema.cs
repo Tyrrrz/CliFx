@@ -1,6 +1,6 @@
-﻿using CliFx.Internal;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Text;
+using CliFx.Internal;
 
 namespace CliFx.Models
 {

@@ -26,13 +26,35 @@ namespace CliFx.Models
         public IReadOnlyList<CommandOptionInput> Options { get; }
 
         /// <summary>
+        /// Environment variables available when the command was parsed
+        /// </summary>
+        public IReadOnlyDictionary<string, string> EnvironmentVariables { get; }
+
+        /// <summary>
         /// Initializes an instance of <see cref="CommandInput"/>.
         /// </summary>
-        public CommandInput(string commandName, IReadOnlyList<string> directives, IReadOnlyList<CommandOptionInput> options)
+        public CommandInput(string commandName, IReadOnlyList<string> directives, IReadOnlyList<CommandOptionInput> options, IReadOnlyDictionary<string, string> environmentVariables)
         {
             CommandName = commandName; // can be null
             Directives = directives.GuardNotNull(nameof(directives));
             Options = options.GuardNotNull(nameof(options));
+            EnvironmentVariables = environmentVariables.GuardNotNull(nameof(environmentVariables));
+        }
+
+        /// <summary>
+        /// Initializes an instance of <see cref="CommandInput"/>.
+        /// </summary>
+        public CommandInput(string commandName, IReadOnlyList<string> directives, IReadOnlyList<CommandOptionInput> options)
+            : this(commandName, directives, options, EmptyEnvironmentVariables)
+        {
+        }
+
+        /// <summary>
+        /// Initializes an instance of <see cref="CommandInput"/>.
+        /// </summary>
+        public CommandInput(string commandName, IReadOnlyList<CommandOptionInput> options, IReadOnlyDictionary<string, string> environmentVariables)
+            : this(commandName, EmptyDirectives, options, environmentVariables)
+        {
         }
 
         /// <summary>
@@ -87,6 +109,7 @@ namespace CliFx.Models
     {
         private static readonly IReadOnlyList<string> EmptyDirectives = new string[0];
         private static readonly IReadOnlyList<CommandOptionInput> EmptyOptions = new CommandOptionInput[0];
+        private static readonly IReadOnlyDictionary<string, string> EmptyEnvironmentVariables = new Dictionary<string, string>();
 
         /// <summary>
         /// Empty input.
