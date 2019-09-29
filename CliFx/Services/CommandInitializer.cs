@@ -11,20 +11,30 @@ namespace CliFx.Services
     public class CommandInitializer : ICommandInitializer
     {
         private readonly ICommandOptionInputConverter _commandOptionInputConverter;
+        private readonly IEnvironmentVariablesParser _environmentVariablesParser;
 
         /// <summary>
         /// Initializes an instance of <see cref="CommandInitializer"/>.
         /// </summary>
-        public CommandInitializer(ICommandOptionInputConverter commandOptionInputConverter)
+        public CommandInitializer(ICommandOptionInputConverter commandOptionInputConverter, IEnvironmentVariablesParser environmentVariablesParser)
         {
             _commandOptionInputConverter = commandOptionInputConverter.GuardNotNull(nameof(commandOptionInputConverter));
+            _environmentVariablesParser = environmentVariablesParser.GuardNotNull(nameof(environmentVariablesParser));
+        }
+
+        /// <summary>
+        /// Initializes an instance of <see cref="CommandInitializer"/>.
+        /// </summary>
+        public CommandInitializer(IEnvironmentVariablesParser environmentVariablesParser)
+            : this(new CommandOptionInputConverter(), environmentVariablesParser)
+        {
         }
 
         /// <summary>
         /// Initializes an instance of <see cref="CommandInitializer"/>.
         /// </summary>
         public CommandInitializer()
-            : this(new CommandOptionInputConverter())
+            : this(new CommandOptionInputConverter(), new EnvironmentVariablesParser())
         {
         }
 
@@ -38,15 +48,28 @@ namespace CliFx.Services
             // Keep track of unset required options to report an error at a later stage
             var unsetRequiredOptions = commandSchema.Options.Where(o => o.IsRequired).ToList();
 
-            // Set command options
-            foreach (var optionInput in commandInput.Options)
+            //Set command options
+            foreach (var optionSchema in commandSchema.Options)
             {
-                // Find matching option schema for this option input
-                var optionSchema = commandSchema.Options.FindByAlias(optionInput.Alias);
-                if (optionSchema == null)
+                //Find matching option input
+                var optionInput = commandInput.Options.FindByOptionSchema(optionSchema);
+
+                //If no option input is available fall back to environment variable values
+                if (optionInput == null && !optionSchema.EnvironmentVariableName.IsNullOrWhiteSpace())
+                {
+                    var fallbackEnvironmentVariableExists = commandInput.EnvironmentVariables.ContainsKey(optionSchema.EnvironmentVariableName);
+
+                    //If no environment variable is found or there is no valid value for this option skip it
+                    if (!fallbackEnvironmentVariableExists || commandInput.EnvironmentVariables[optionSchema.EnvironmentVariableName].IsNullOrWhiteSpace())
+                        continue;
+
+                    optionInput = _environmentVariablesParser.GetCommandOptionInputFromEnvironmentVariable(commandInput.EnvironmentVariables[optionSchema.EnvironmentVariableName], optionSchema);
+                }
+
+                //No fallback available and no option input was specified, skip option
+                if (optionInput == null)
                     continue;
 
-                // Convert option to the type of the underlying property
                 var convertedValue = _commandOptionInputConverter.ConvertOptionInput(optionInput, optionSchema.Property.PropertyType);
 
                 // Set value of the underlying property

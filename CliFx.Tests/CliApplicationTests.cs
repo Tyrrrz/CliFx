@@ -1,11 +1,12 @@
-﻿using System;
+﻿using FluentAssertions;
+using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using CliFx.Services;
+using CliFx.Tests.Stubs;
 using CliFx.Tests.TestCommands;
-using FluentAssertions;
-using NUnit.Framework;
 
 namespace CliFx.Tests
 {
@@ -17,104 +18,104 @@ namespace CliFx.Tests
         private static IEnumerable<TestCaseData> GetTestCases_RunAsync()
         {
             yield return new TestCaseData(
-                new[] {typeof(HelloWorldDefaultCommand)},
+                new[] { typeof(HelloWorldDefaultCommand) },
                 new string[0],
                 "Hello world."
             );
-            
+
             yield return new TestCaseData(
-                new[] {typeof(ConcatCommand)},
-                new[] {"concat", "-i", "foo", "-i", "bar", "-s", " "},
+                new[] { typeof(ConcatCommand) },
+                new[] { "concat", "-i", "foo", "-i", "bar", "-s", " " },
                 "foo bar"
             );
-            
+
             yield return new TestCaseData(
-                new[] {typeof(ConcatCommand)},
-                new[] {"concat", "-i", "one", "two", "three", "-s", ", "},
+                new[] { typeof(ConcatCommand) },
+                new[] { "concat", "-i", "one", "two", "three", "-s", ", " },
                 "one, two, three"
             );
 
             yield return new TestCaseData(
-                new[] {typeof(DivideCommand)},
-                new[] {"div", "-D", "24", "-d", "8"},
+                new[] { typeof(DivideCommand) },
+                new[] { "div", "-D", "24", "-d", "8" },
                 "3"
             );
 
             yield return new TestCaseData(
-                new[] {typeof(HelloWorldDefaultCommand)},
-                new[] {"--version"},
+                new[] { typeof(HelloWorldDefaultCommand) },
+                new[] { "--version" },
                 TestVersionText
             );
 
             yield return new TestCaseData(
-                new[] {typeof(ConcatCommand)},
-                new[] {"--version"},
+                new[] { typeof(ConcatCommand) },
+                new[] { "--version" },
                 TestVersionText
             );
-            
+
             yield return new TestCaseData(
-                new[] {typeof(HelloWorldDefaultCommand)},
-                new[] {"-h"},
+                new[] { typeof(HelloWorldDefaultCommand) },
+                new[] { "-h" },
                 null
             );
 
             yield return new TestCaseData(
-                new[] {typeof(HelloWorldDefaultCommand)},
-                new[] {"--help"},
+                new[] { typeof(HelloWorldDefaultCommand) },
+                new[] { "--help" },
                 null
             );
-            
+
             yield return new TestCaseData(
-                new[] {typeof(ConcatCommand)},
+                new[] { typeof(ConcatCommand) },
                 new string[0],
                 null
             );
-            
+
             yield return new TestCaseData(
-                new[] {typeof(ConcatCommand)},
-                new[] {"-h"},
+                new[] { typeof(ConcatCommand) },
+                new[] { "-h" },
                 null
             );
 
             yield return new TestCaseData(
-                new[] {typeof(ConcatCommand)},
-                new[] {"--help"},
-                null
-            );
-            
-            yield return new TestCaseData(
-                new[] {typeof(ConcatCommand)},
-                new[] {"concat", "-h"},
+                new[] { typeof(ConcatCommand) },
+                new[] { "--help" },
                 null
             );
 
             yield return new TestCaseData(
-                new[] {typeof(ExceptionCommand)},
-                new[] {"exc", "-h"},
+                new[] { typeof(ConcatCommand) },
+                new[] { "concat", "-h" },
                 null
             );
 
             yield return new TestCaseData(
-                new[] {typeof(CommandExceptionCommand)},
-                new[] {"exc", "-h"},
+                new[] { typeof(ExceptionCommand) },
+                new[] { "exc", "-h" },
                 null
             );
 
             yield return new TestCaseData(
-                new[] {typeof(ConcatCommand)},
-                new[] {"[preview]"},
+                new[] { typeof(CommandExceptionCommand) },
+                new[] { "exc", "-h" },
                 null
             );
 
             yield return new TestCaseData(
-                new[] {typeof(ExceptionCommand)},
-                new[] {"exc", "[preview]"},
+                new[] { typeof(ConcatCommand) },
+                new[] { "[preview]" },
                 null
             );
 
             yield return new TestCaseData(
-                new[] {typeof(ConcatCommand)},
-                new[] {"concat", "[preview]", "-o", "value"},
+                new[] { typeof(ExceptionCommand) },
+                new[] { "exc", "[preview]" },
+                null
+            );
+
+            yield return new TestCaseData(
+                new[] { typeof(ConcatCommand) },
+                new[] { "concat", "[preview]", "-o", "value" },
                 null
             );
         }
@@ -128,38 +129,38 @@ namespace CliFx.Tests
             );
 
             yield return new TestCaseData(
-                new[] {typeof(ConcatCommand)},
-                new[] {"non-existing"},
+                new[] { typeof(ConcatCommand) },
+                new[] { "non-existing" },
                 null, null
             );
 
             yield return new TestCaseData(
-                new[] {typeof(ExceptionCommand)},
-                new[] {"exc"},
+                new[] { typeof(ExceptionCommand) },
+                new[] { "exc" },
                 null, null
             );
 
             yield return new TestCaseData(
-                new[] {typeof(CommandExceptionCommand)},
-                new[] {"exc"},
+                new[] { typeof(CommandExceptionCommand) },
+                new[] { "exc" },
                 null, null
             );
 
             yield return new TestCaseData(
-                new[] {typeof(CommandExceptionCommand)},
-                new[] {"exc"},
+                new[] { typeof(CommandExceptionCommand) },
+                new[] { "exc" },
                 null, null
             );
-         
+
             yield return new TestCaseData(
-                new[] {typeof(CommandExceptionCommand)},
-                new[] {"exc", "-m", "foo bar"},
+                new[] { typeof(CommandExceptionCommand) },
+                new[] { "exc", "-m", "foo bar" },
                 "foo bar", null
             );
-            
+
             yield return new TestCaseData(
-                new[] {typeof(CommandExceptionCommand)},
-                new[] {"exc", "-m", "foo bar", "-c", "666"},
+                new[] { typeof(CommandExceptionCommand) },
+                new[] { "exc", "-m", "foo bar", "-c", "666" },
                 "foo bar", 666
             );
         }
@@ -173,11 +174,13 @@ namespace CliFx.Tests
             using (var stdoutStream = new StringWriter())
             {
                 var console = new VirtualConsole(stdoutStream);
+                var environmentVariablesProvider = new EnvironmentVariablesProviderStub();
 
                 var application = new CliApplicationBuilder()
                     .AddCommands(commandTypes)
                     .UseVersionText(TestVersionText)
                     .UseConsole(console)
+                    .UseEnvironmentVariablesProvider(environmentVariablesProvider)
                     .Build();
 
                 // Act
@@ -203,10 +206,12 @@ namespace CliFx.Tests
             using (var stderrStream = new StringWriter())
             {
                 var console = new VirtualConsole(TextWriter.Null, stderrStream);
+                var environmentVariablesProvider = new EnvironmentVariablesProviderStub();
 
                 var application = new CliApplicationBuilder()
                     .AddCommands(commandTypes)
                     .UseVersionText(TestVersionText)
+                    .UseEnvironmentVariablesProvider(environmentVariablesProvider)
                     .UseConsole(console)
                     .Build();
 
@@ -219,7 +224,7 @@ namespace CliFx.Tests
                     exitCode.Should().Be(expectedExitCode);
                 else
                     exitCode.Should().NotBe(0);
-                
+
                 if (expectedStdErr != null)
                     stderr.Should().Be(expectedStdErr);
                 else
