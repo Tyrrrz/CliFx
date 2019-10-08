@@ -10,7 +10,7 @@
     <PackageTags>command line executable interface framework parser arguments net core</PackageTags>
     <PackageProjectUrl>https://github.com/Tyrrrz/CliFx</PackageProjectUrl>
     <PackageReleaseNotes>https://github.com/Tyrrrz/CliFx/blob/master/Changelog.md</PackageReleaseNotes>
-    <PackageIconUrl>https://raw.githubusercontent.com/Tyrrrz/CliFx/master/favicon.png</PackageIconUrl>
+    <PackageIcon>favicon.png</PackageIcon>
     <PackageLicenseExpression>LGPL-3.0-only</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/Tyrrrz/CliFx</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
@@ -18,5 +18,9 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <DocumentationFile>bin/$(Configuration)/$(TargetFramework)/$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../favicon.png" Pack="True" PackagePath="" />
+  </ItemGroup>
 
 </Project>
