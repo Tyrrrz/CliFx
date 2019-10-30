@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using CliFx.Attributes;
 using CliFx.Services;
 
@@ -10,6 +11,6 @@ namespace CliFx.Tests.TestCommands
 		[CommandOption("opt", EnvironmentVariableName = "ENV_SINGLE_VALUE")]
 		public string Option { get; set; }
 
-		public Task ExecuteAsync(IConsole console) => Task.CompletedTask;
+		public Task ExecuteAsync(IConsole console, CancellationToken cancellationToken) => Task.CompletedTask;
 	}
 }

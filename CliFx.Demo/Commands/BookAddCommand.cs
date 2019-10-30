@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using CliFx.Attributes;
 using CliFx.Demo.Internal;
@@ -31,7 +32,7 @@ namespace CliFx.Demo.Commands
             _libraryService = libraryService;
         }
 
-        public Task ExecuteAsync(IConsole console)
+        public Task ExecuteAsync(IConsole console, CancellationToken cancellationToken)
         {
             // To make the demo simpler, we will just generate random publish date and ISBN if they were not set
             if (Published == default)

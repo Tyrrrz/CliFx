@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 using CliFx.Internal;
 
 namespace CliFx.Services
@@ -11,6 +12,8 @@ namespace CliFx.Services
     /// </summary>
     public class VirtualConsole : IConsole
     {
+        private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+
         /// <inheritdoc />
         public TextReader Input { get; }
 
@@ -81,6 +84,17 @@ namespace CliFx.Services
         {
             ForegroundColor = ConsoleColor.Gray;
             BackgroundColor = ConsoleColor.Black;
+        }
+
+        /// <inheritdoc />
+        public CancellationToken CancellationToken => _cancellationTokenSource.Token;
+
+        /// <summary>
+        /// Simulates cancellation.
+        /// </summary>
+        public void Cancel()
+        {
+            _cancellationTokenSource.Cancel();
         }
     }
 }

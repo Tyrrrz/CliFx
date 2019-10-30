@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using CliFx.Attributes;
 using CliFx.Services;
 
@@ -13,6 +14,6 @@ namespace CliFx.Tests.TestCommands
         [CommandOption("fruits")]
         public string Oranges { get; set; }
         
-        public Task ExecuteAsync(IConsole console) => Task.CompletedTask;
+        public Task ExecuteAsync(IConsole console, CancellationToken cancellationToken) => Task.CompletedTask;
     }
 }

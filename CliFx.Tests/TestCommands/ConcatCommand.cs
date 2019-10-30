@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using CliFx.Attributes;
 using CliFx.Services;
@@ -14,7 +15,7 @@ namespace CliFx.Tests.TestCommands
         [CommandOption('s', Description = "String separator.")]
         public string Separator { get; set; } = ""; 
         
-        public Task ExecuteAsync(IConsole console)
+        public Task ExecuteAsync(IConsole console, CancellationToken cancellationToken)
         {
             console.Output.WriteLine(string.Join(Separator, Inputs));
             return Task.CompletedTask;
