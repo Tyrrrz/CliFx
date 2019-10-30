@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using CliFx.Attributes;
 using CliFx.Demo.Internal;
 using CliFx.Demo.Services;
@@ -20,7 +21,7 @@ namespace CliFx.Demo.Commands
             _libraryService = libraryService;
         }
 
-        public Task ExecuteAsync(IConsole console)
+        public Task ExecuteAsync(IConsole console, CancellationToken cancellationToken)
         {
             var book = _libraryService.GetBook(Title);
 

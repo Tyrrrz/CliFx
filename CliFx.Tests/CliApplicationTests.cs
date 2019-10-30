@@ -231,5 +231,31 @@ namespace CliFx.Tests
                     stderr.Should().NotBeNullOrWhiteSpace();
             }
         }
+
+        [Test]
+        public async Task RunAsync_Cancellation_Test()
+        {
+            // Arrange
+            using (var stdoutStream = new StringWriter())
+            {
+                var console = new VirtualConsole(stdoutStream);
+                
+                var application = new CliApplicationBuilder()
+                    .AddCommand(typeof(CancellableCommand))
+                    .UseConsole(console)
+                    .Build();
+                var args = new[] { "cancel" };
+
+                // Act
+                var runTask = application.RunAsync(args);
+                console.Cancel();
+                var exitCode = await runTask.ConfigureAwait(false);
+                var stdOut = stdoutStream.ToString().Trim();
+
+                // Assert
+                exitCode.Should().Be(-2146233029);
+                stdOut.Should().Be("Printed");
+            }
+        }
     }
 }

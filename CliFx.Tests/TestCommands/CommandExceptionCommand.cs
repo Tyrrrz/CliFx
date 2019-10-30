@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using CliFx.Attributes;
 using CliFx.Exceptions;
 using CliFx.Services;
@@ -14,6 +15,6 @@ namespace CliFx.Tests.TestCommands
         [CommandOption("msg", 'm')]
         public string Message { get; set; }
         
-        public Task ExecuteAsync(IConsole console) => throw new CommandException(Message, ExitCode);
+        public Task ExecuteAsync(IConsole console, CancellationToken cancellationToken) => throw new CommandException(Message, ExitCode);
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using CliFx.Attributes;
 using CliFx.Services;
 
@@ -16,7 +17,7 @@ namespace CliFx.Tests.TestCommands
         // This property should be ignored by resolver
         public bool NotAnOption { get; set; }
         
-        public Task ExecuteAsync(IConsole console)
+        public Task ExecuteAsync(IConsole console, CancellationToken cancellationToken)
         {
             console.Output.WriteLine(Dividend / Divisor);
             return Task.CompletedTask;

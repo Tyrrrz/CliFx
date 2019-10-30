@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using CliFx.Services;
 
 namespace CliFx
@@ -12,6 +13,6 @@ namespace CliFx
         /// Executes command using specified implementation of <see cref="IConsole"/>.
         /// This method is called when the command is invoked by a user through command line interface.
         /// </summary>
-        Task ExecuteAsync(IConsole console);
+        Task ExecuteAsync(IConsole console, CancellationToken cancellationToken);
     }
 }

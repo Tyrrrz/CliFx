@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 
 namespace CliFx.Services
 {
@@ -52,5 +53,10 @@ namespace CliFx.Services
         /// Resets foreground and background color to default values.
         /// </summary>
         void ResetColor();
+
+        /// <summary>
+        /// Cancels when soft cancellation requested.
+        /// </summary>
+        CancellationToken CancellationToken { get; }
     }
 }
