@@ -87,7 +87,7 @@ public class LogCommand : ICommand
     [CommandOption("base", 'b', Description = "Logarithm base.")]
     public double Base { get; set; } = 10;
 
-    public Task ExecuteAsync(IConsole console)
+    public Task ExecuteAsync(IConsole console, CancellationToken cancellationToken)
     {
         var result = Math.Log(Value, Base);
         console.Output.WriteLine(result);
@@ -99,7 +99,10 @@ public class LogCommand : ICommand
 
 By implementing `ICommand` this class also provides `ExecuteAsync` method. This is the method that gets called when the user invokes the command. Its return type is `Task` in order to facilitate asynchronous execution, but if your command runs synchronously you can simply return `Task.CompletedTask`.
 
-The `ExecuteAsync` method also takes an instance of `IConsole` as a parameter. You should use this abstraction to interact with the console instead of calling `System.Console` so that your commands are testable.
+This method takes two parameters: an instance of `IConsole` and `CancellationToken`.
+
+You should use the `console` parameter in places where you would normally use `System.Console`, in order to make your command testable.
+The `cancellationToken` parameter can be used to handle interrupt signal (Ctrl+C or Ctrl+Break) to gracefully cancel execution and perform any necessary cleanup. If another interrupt signal is received after the first one, the application will terminate immediately.
 
 Finally, the command defined above can be executed from the command line in one of the following ways:
 
@@ -173,7 +176,7 @@ public class DivideCommand : ICommand
     [CommandOption("divisor", IsRequired = true)]
     public double Divisor { get; set; }
 
-    public Task ExecuteAsync(IConsole console)
+    public Task ExecuteAsync(IConsole console, CancellationToken cancellationToken)
     {
         if (Math.Abs(Divisor) < double.Epsilon)
         {
@@ -263,7 +266,7 @@ public class UserAddCommand : ICommand
     [CommandOption("email", 'e')]
     public string Email { get; set; }
 
-    public Task ExecuteAsync(IConsole console)
+    public Task ExecuteAsync(IConsole console, CancellationToken cancellationToken)
     {
         var validationResult = new UserAddCommandValidator().Validate(this);
         if (!validationResult.IsValid)
@@ -336,7 +339,7 @@ public class ConcatCommand : ICommand
     [CommandOption("right")]
     public string Right { get; set; } = "world";
 
-    public Task ExecuteAsync(IConsole console)
+    public Task ExecuteAsync(IConsole console, CancellationToken cancellationToken)
     {
         console.Output.Write(Left);
         console.Output.Write(' ');
@@ -365,7 +368,7 @@ public async Task ConcatCommand_Test()
         };
 
         // Act
-        await command.ExecuteAsync(console);
+        await command.ExecuteAsync(console, CancellationToken.None);
 
         // Assert
         Assert.That(stdout.ToString(), Is.EqualTo("foo bar"));
