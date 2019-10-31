@@ -220,7 +220,7 @@ public class SecondSubCommand : ICommand
 
 It is possible to gracefully cancel execution of a command and preform any necessary cleanup. By default an app gets forcefully killed when it receives an interrupt signal (Ctrl+C or Ctrl+Break). You can call `console.GetCancellationToken()` to override the default behavior and get `CancellationToken` that represents the first interrupt signal. Second interrupt signal terminates an app immediately. Note that the code that executes before the first call to `GetCancellationToken` will not be cancellation aware.
 
-You can pass `CancellationToken` around and check its state. Make sure you catch `TaskCancelledException`, `OperationCancelledException` with other possible cancellation exceptions.
+You can pass `CancellationToken` around and check its state. 
 
 Cancelled or terminated app returns non-zero exit code.
 
