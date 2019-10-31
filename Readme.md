@@ -104,6 +104,8 @@ This method takes two parameters: an instance of `IConsole` and `CancellationTok
 You should use the `console` parameter in places where you would normally use `System.Console`, in order to make your command testable.
 The `cancellationToken` parameter can be used to handle interrupt signal (Ctrl+C or Ctrl+Break) to gracefully cancel execution and perform any necessary cleanup. If another interrupt signal is received after the first one, the application will terminate immediately.
 
+It is possible to cancel an execution of a command by using `СancellationToken` parameter or passing it to other asynchronous calls. The `CancellationToken` will be signaled once an app receives SIGINT (Ctrl+C or Ctrl+Break). Make sure you check `CancellationToken` or catch `TaskCancelledException`, `OperationCancelledException` with other possible cancellation exceptions and perform a cleanup. App that receives the second SIGINT while still operating will be killed immediately. Cancelled app returns non-zero exit code.
+
 Finally, the command defined above can be executed from the command line in one of the following ways:
 
 - `myapp log -v 1000`
