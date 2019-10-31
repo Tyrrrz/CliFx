@@ -232,8 +232,8 @@ public class CancellableCommand : ICommand
     {
         console.Output.WriteLine("Printed");
 
-		// Long-running cancellable operation that throws when canceled
-        await Task.Delay(Timeout.InfiniteTimeSpan, console.GetCancellationToken());
+        // Long-running cancellable operation that throws when canceled
+        await Task.Delay(Timeout.InfiniteTimeSpan, console.RegisterCancellation());
 
         console.Output.WriteLine("Never printed");
     }
