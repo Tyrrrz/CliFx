@@ -8,7 +8,7 @@ namespace CliFx.Tests.TestCommands
     [Command]
     public class HelloWorldDefaultCommand : ICommand
     {
-        public Task ExecuteAsync(IConsole console, CancellationToken cancellationToken)
+        public Task ExecuteAsync(IConsole console)
         {
             console.Output.WriteLine("Hello world.");
             return Task.CompletedTask;

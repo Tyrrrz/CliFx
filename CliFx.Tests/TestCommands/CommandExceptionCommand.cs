@@ -15,6 +15,6 @@ namespace CliFx.Tests.TestCommands
         [CommandOption("msg", 'm')]
         public string Message { get; set; }
         
-        public Task ExecuteAsync(IConsole console, CancellationToken cancellationToken) => throw new CommandException(Message, ExitCode);
+        public Task ExecuteAsync(IConsole console) => throw new CommandException(Message, ExitCode);
     }
 }

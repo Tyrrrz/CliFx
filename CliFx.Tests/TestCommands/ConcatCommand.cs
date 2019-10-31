@@ -15,7 +15,7 @@ namespace CliFx.Tests.TestCommands
         [CommandOption('s', Description = "String separator.")]
         public string Separator { get; set; } = ""; 
         
-        public Task ExecuteAsync(IConsole console, CancellationToken cancellationToken)
+        public Task ExecuteAsync(IConsole console)
         {
             console.Output.WriteLine(string.Join(Separator, Inputs));
             return Task.CompletedTask;

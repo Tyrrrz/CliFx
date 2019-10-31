@@ -171,7 +171,7 @@ namespace CliFx
             _commandInitializer.InitializeCommand(command, targetCommandSchema, commandInput);
 
             // Execute command
-            await command.ExecuteAsync(_console, _console.CancellationToken);
+            await command.ExecuteAsync(_console);
 
             // Finish the chain with exit code 0
             return 0;
