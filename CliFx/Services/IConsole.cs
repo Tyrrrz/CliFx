@@ -55,8 +55,9 @@ namespace CliFx.Services
         void ResetColor();
 
         /// <summary>
-        /// Cancels when soft cancellation requested.
+        /// Registers cancellation and provides token that cancels when soft cancellation requested.
+        /// Subsequent calls return the same token.
         /// </summary>
-        CancellationToken CancellationToken { get; }
+        CancellationToken RegisterCancellation();
     }
 }

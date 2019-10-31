@@ -17,7 +17,7 @@ namespace CliFx.Tests.TestCommands
         // This property should be ignored by resolver
         public bool NotAnOption { get; set; }
         
-        public Task ExecuteAsync(IConsole console, CancellationToken cancellationToken)
+        public Task ExecuteAsync(IConsole console)
         {
             console.Output.WriteLine(Dividend / Divisor);
             return Task.CompletedTask;

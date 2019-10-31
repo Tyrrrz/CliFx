@@ -12,7 +12,7 @@ namespace CliFx.Services
     /// </summary>
     public class VirtualConsole : IConsole
     {
-        private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        private readonly CancellationToken _cancellationToken;
 
         /// <inheritdoc />
         public TextReader Input { get; }
@@ -43,7 +43,8 @@ namespace CliFx.Services
         /// </summary>
         public VirtualConsole(TextReader input, bool isInputRedirected,
             TextWriter output, bool isOutputRedirected,
-            TextWriter error, bool isErrorRedirected)
+            TextWriter error, bool isErrorRedirected,
+            CancellationToken cancellationToken)
         {
             Input = input.GuardNotNull(nameof(input));
             IsInputRedirected = isInputRedirected;
@@ -51,6 +52,18 @@ namespace CliFx.Services
             IsOutputRedirected = isOutputRedirected;
             Error = error.GuardNotNull(nameof(error));
             IsErrorRedirected = isErrorRedirected;
+            _cancellationToken = cancellationToken;
+        }
+
+        /// <summary>
+        /// Initializes an instance of <see cref="VirtualConsole"/>.
+        /// </summary>
+        public VirtualConsole(TextReader input, bool isInputRedirected,
+            TextWriter output, bool isOutputRedirected,
+            TextWriter error, bool isErrorRedirected)
+            : this(input, isInputRedirected, output, isOutputRedirected, error, isErrorRedirected, 
+                CancellationToken.None)
+        {
         }
 
         /// <summary>
@@ -58,6 +71,15 @@ namespace CliFx.Services
         /// </summary>
         public VirtualConsole(TextReader input, TextWriter output, TextWriter error)
             : this(input, true, output, true, error, true)
+        {
+        }
+
+        /// <summary>
+        /// Initializes an instance of <see cref="VirtualConsole"/>.
+        /// </summary>
+        public VirtualConsole(TextReader input, TextWriter output, TextWriter error, 
+            CancellationToken cancellationToken)
+            : this(input, true, output, true, error, true, cancellationToken)
         {
         }
 
@@ -71,11 +93,29 @@ namespace CliFx.Services
         }
 
         /// <summary>
+        /// Initializes an instance of <see cref="VirtualConsole"/> using output stream (stdout) and error stream (stderr).
+        /// Input stream (stdin) is replaced with a no-op stub.
+        /// </summary>
+        public VirtualConsole(TextWriter output, TextWriter error, CancellationToken cancellationToken)
+            : this(TextReader.Null, output, error, cancellationToken)
+        {
+        }
+
+        /// <summary>
         /// Initializes an instance of <see cref="VirtualConsole"/> using output stream (stdout).
         /// Input stream (stdin) and error stream (stderr) are replaced with no-op stubs.
         /// </summary>
         public VirtualConsole(TextWriter output)
             : this(output, TextWriter.Null)
+        {
+        }
+
+        /// <summary>
+        /// Initializes an instance of <see cref="VirtualConsole"/> using output stream (stdout).
+        /// Input stream (stdin) and error stream (stderr) are replaced with no-op stubs.
+        /// </summary>
+        public VirtualConsole(TextWriter output, CancellationToken cancellationToken)
+            : this(output, TextWriter.Null, cancellationToken)
         {
         }
 
@@ -87,14 +127,6 @@ namespace CliFx.Services
         }
 
         /// <inheritdoc />
-        public CancellationToken CancellationToken => _cancellationTokenSource.Token;
-
-        /// <summary>
-        /// Simulates cancellation.
-        /// </summary>
-        public void Cancel()
-        {
-            _cancellationTokenSource.Cancel();
-        }
+        public CancellationToken RegisterCancellation() => _cancellationToken;
     }
 }

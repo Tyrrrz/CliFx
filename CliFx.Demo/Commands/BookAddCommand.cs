@@ -32,7 +32,7 @@ namespace CliFx.Demo.Commands
             _libraryService = libraryService;
         }
 
-        public Task ExecuteAsync(IConsole console, CancellationToken cancellationToken)
+        public Task ExecuteAsync(IConsole console)
         {
             // To make the demo simpler, we will just generate random publish date and ISBN if they were not set
             if (Published == default)

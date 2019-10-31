@@ -6,6 +6,6 @@ namespace CliFx.Tests.TestCommands
 {
     public class NonAnnotatedCommand : ICommand
     {
-        public Task ExecuteAsync(IConsole console, CancellationToken cancellationToken) => Task.CompletedTask;
+        public Task ExecuteAsync(IConsole console) => Task.CompletedTask;
     }
 }

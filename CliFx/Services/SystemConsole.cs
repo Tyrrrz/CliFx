@@ -9,21 +9,7 @@ namespace CliFx.Services
     /// </summary>
     public class SystemConsole : IConsole
     {
-        private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
-
-        /// <inheritdoc />
-        public SystemConsole()
-        {
-            // Subscribe to CancelKeyPress event with cancellation token source
-            // Kills app on second cancellation (hard cancellation)
-            Console.CancelKeyPress += (_, args) =>
-            {
-                if (_cancellationTokenSource.IsCancellationRequested) 
-                    return;
-                args.Cancel = true;
-                _cancellationTokenSource.Cancel();
-            };
-        }
+        private CancellationTokenSource _cancellationTokenSource;
         
         /// <inheritdoc />
         public TextReader Input => Console.In;
@@ -61,6 +47,24 @@ namespace CliFx.Services
         public void ResetColor() => Console.ResetColor();
 
         /// <inheritdoc />
-        public CancellationToken CancellationToken => _cancellationTokenSource.Token;
+        public CancellationToken RegisterCancellation()
+        {
+            if (_cancellationTokenSource is null)
+            {
+                _cancellationTokenSource = new CancellationTokenSource();
+
+                // Subscribe to CancelKeyPress event with cancellation token source
+                // Kills app on second cancellation (hard cancellation)
+                Console.CancelKeyPress += (_, args) =>
+                {
+                    if (_cancellationTokenSource.IsCancellationRequested)
+                        return;
+                    args.Cancel = true;
+                    _cancellationTokenSource.Cancel();
+                };
+            }
+
+            return _cancellationTokenSource.Token;
+        }
     }
 }

@@ -11,6 +11,6 @@ namespace CliFx.Tests.TestCommands
         [CommandOption("option-e", 'e', Description = "OptionE description.")]
         public string OptionE { get; set; }
 
-        public Task ExecuteAsync(IConsole console, CancellationToken cancellationToken) => Task.CompletedTask;
+        public Task ExecuteAsync(IConsole console) => Task.CompletedTask;
     }
 }

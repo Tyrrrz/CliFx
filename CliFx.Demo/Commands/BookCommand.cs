@@ -21,7 +21,7 @@ namespace CliFx.Demo.Commands
             _libraryService = libraryService;
         }
 
-        public Task ExecuteAsync(IConsole console, CancellationToken cancellationToken)
+        public Task ExecuteAsync(IConsole console)
         {
             var book = _libraryService.GetBook(Title);
 

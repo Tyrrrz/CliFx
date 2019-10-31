@@ -3,6 +3,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using CliFx.Services;
 using CliFx.Tests.Stubs;
@@ -238,7 +239,8 @@ namespace CliFx.Tests
             // Arrange
             using (var stdoutStream = new StringWriter())
             {
-                var console = new VirtualConsole(stdoutStream);
+                var cancellationTokenSource = new CancellationTokenSource();
+                var console = new VirtualConsole(stdoutStream, cancellationTokenSource.Token);
                 
                 var application = new CliApplicationBuilder()
                     .AddCommand(typeof(CancellableCommand))
@@ -248,7 +250,7 @@ namespace CliFx.Tests
 
                 // Act
                 var runTask = application.RunAsync(args);
-                console.Cancel();
+                cancellationTokenSource.Cancel();
                 var exitCode = await runTask.ConfigureAwait(false);
                 var stdOut = stdoutStream.ToString().Trim();
 
