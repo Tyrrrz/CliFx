@@ -24,6 +24,7 @@ _CliFx is to command line interfaces what ASP.NET Core is to web applications._
 - Resolves commands and options using attributes
 - Handles options of various types, including custom types
 - Supports multi-level command hierarchies
+- Allows cancellation
 - Generates contextual help text
 - Prints errors and routes exit codes on exceptions
 - Highly testable and easy to debug
@@ -87,7 +88,7 @@ public class LogCommand : ICommand
     [CommandOption("base", 'b', Description = "Logarithm base.")]
     public double Base { get; set; } = 10;
 
-    public Task ExecuteAsync(IConsole console, CancellationToken cancellationToken)
+    public Task ExecuteAsync(IConsole console)
     {
         var result = Math.Log(Value, Base);
         console.Output.WriteLine(result);
@@ -99,12 +100,7 @@ public class LogCommand : ICommand
 
 By implementing `ICommand` this class also provides `ExecuteAsync` method. This is the method that gets called when the user invokes the command. Its return type is `Task` in order to facilitate asynchronous execution, but if your command runs synchronously you can simply return `Task.CompletedTask`.
 
-This method takes two parameters: an instance of `IConsole` and `CancellationToken`.
-
-You should use the `console` parameter in places where you would normally use `System.Console`, in order to make your command testable.
-The `cancellationToken` parameter can be used to handle interrupt signal (Ctrl+C or Ctrl+Break) to gracefully cancel execution and perform any necessary cleanup. If another interrupt signal is received after the first one, the application will terminate immediately.
-
-It is possible to cancel an execution of a command by using `СancellationToken` parameter or passing it to other asynchronous calls. The `CancellationToken` will be signaled once an app receives SIGINT (Ctrl+C or Ctrl+Break). Make sure you check `CancellationToken` or catch `TaskCancelledException`, `OperationCancelledException` with other possible cancellation exceptions and perform a cleanup. App that receives the second SIGINT while still operating will be killed immediately. Cancelled app returns non-zero exit code.
+The `ExecuteAsync` method also takes an instance of `IConsole` as a parameter. You should use the `console` parameter in places where you would normally use `System.Console`, in order to make your command testable.
 
 Finally, the command defined above can be executed from the command line in one of the following ways:
 
@@ -178,7 +174,7 @@ public class DivideCommand : ICommand
     [CommandOption("divisor", IsRequired = true)]
     public double Divisor { get; set; }
 
-    public Task ExecuteAsync(IConsole console, CancellationToken cancellationToken)
+    public Task ExecuteAsync(IConsole console)
     {
         if (Math.Abs(Divisor) < double.Epsilon)
         {
@@ -217,6 +213,30 @@ public class FirstSubCommand : ICommand
 public class SecondSubCommand : ICommand
 {
     // ...
+}
+```
+
+### Cancellation
+
+It is possible to gracefully cancel execution of a command and preform any necessary cleanup. By default an app gets forcefully killed when it receives an interrupt signal (Ctrl+C or Ctrl+Break). Make call to `console.RegisterCancellation()` to override the default behavior and get `CancellationToken` that represents the first interrupt signal. Second interrupt signal terminates an app immediately. 
+
+You can pass `CancellationToken` around and check its state. Make sure you catch `TaskCancelledException`, `OperationCancelledException` with other possible cancellation exceptions.
+
+Cancelled or terminated app returns non-zero exit code.
+
+```c#
+[Command("cancel")]
+public class CancellableCommand : ICommand
+{
+    public async Task ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine("Printed");
+
+		// Long-running cancellable operation that throws when canceled
+        await Task.Delay(Timeout.InfiniteTimeSpan, console.RegisterCancellation());
+
+        console.Output.WriteLine("Never printed");
+    }
 }
 ```
 
@@ -268,7 +288,7 @@ public class UserAddCommand : ICommand
     [CommandOption("email", 'e')]
     public string Email { get; set; }
 
-    public Task ExecuteAsync(IConsole console, CancellationToken cancellationToken)
+    public Task ExecuteAsync(IConsole console)
     {
         var validationResult = new UserAddCommandValidator().Validate(this);
         if (!validationResult.IsValid)
@@ -341,7 +361,7 @@ public class ConcatCommand : ICommand
     [CommandOption("right")]
     public string Right { get; set; } = "world";
 
-    public Task ExecuteAsync(IConsole console, CancellationToken cancellationToken)
+    public Task ExecuteAsync(IConsole console)
     {
         console.Output.Write(Left);
         console.Output.Write(' ');
@@ -370,7 +390,7 @@ public async Task ConcatCommand_Test()
         };
 
         // Act
-        await command.ExecuteAsync(console, CancellationToken.None);
+        await command.ExecuteAsync(console);
 
         // Assert
         Assert.That(stdout.ToString(), Is.EqualTo("foo bar"));
