@@ -44,7 +44,7 @@ namespace CliFx.Services
         public VirtualConsole(TextReader input, bool isInputRedirected,
             TextWriter output, bool isOutputRedirected,
             TextWriter error, bool isErrorRedirected,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             Input = input.GuardNotNull(nameof(input));
             IsInputRedirected = isInputRedirected;
@@ -58,27 +58,8 @@ namespace CliFx.Services
         /// <summary>
         /// Initializes an instance of <see cref="VirtualConsole"/>.
         /// </summary>
-        public VirtualConsole(TextReader input, bool isInputRedirected,
-            TextWriter output, bool isOutputRedirected,
-            TextWriter error, bool isErrorRedirected)
-            : this(input, isInputRedirected, output, isOutputRedirected, error, isErrorRedirected, 
-                CancellationToken.None)
-        {
-        }
-
-        /// <summary>
-        /// Initializes an instance of <see cref="VirtualConsole"/>.
-        /// </summary>
-        public VirtualConsole(TextReader input, TextWriter output, TextWriter error)
-            : this(input, true, output, true, error, true)
-        {
-        }
-
-        /// <summary>
-        /// Initializes an instance of <see cref="VirtualConsole"/>.
-        /// </summary>
         public VirtualConsole(TextReader input, TextWriter output, TextWriter error, 
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
             : this(input, true, output, true, error, true, cancellationToken)
         {
         }
@@ -87,16 +68,7 @@ namespace CliFx.Services
         /// Initializes an instance of <see cref="VirtualConsole"/> using output stream (stdout) and error stream (stderr).
         /// Input stream (stdin) is replaced with a no-op stub.
         /// </summary>
-        public VirtualConsole(TextWriter output, TextWriter error)
-            : this(TextReader.Null, output, error)
-        {
-        }
-
-        /// <summary>
-        /// Initializes an instance of <see cref="VirtualConsole"/> using output stream (stdout) and error stream (stderr).
-        /// Input stream (stdin) is replaced with a no-op stub.
-        /// </summary>
-        public VirtualConsole(TextWriter output, TextWriter error, CancellationToken cancellationToken)
+        public VirtualConsole(TextWriter output, TextWriter error, CancellationToken cancellationToken = default)
             : this(TextReader.Null, output, error, cancellationToken)
         {
         }
@@ -105,16 +77,7 @@ namespace CliFx.Services
         /// Initializes an instance of <see cref="VirtualConsole"/> using output stream (stdout).
         /// Input stream (stdin) and error stream (stderr) are replaced with no-op stubs.
         /// </summary>
-        public VirtualConsole(TextWriter output)
-            : this(output, TextWriter.Null)
-        {
-        }
-
-        /// <summary>
-        /// Initializes an instance of <see cref="VirtualConsole"/> using output stream (stdout).
-        /// Input stream (stdin) and error stream (stderr) are replaced with no-op stubs.
-        /// </summary>
-        public VirtualConsole(TextWriter output, CancellationToken cancellationToken)
+        public VirtualConsole(TextWriter output, CancellationToken cancellationToken = default)
             : this(output, TextWriter.Null, cancellationToken)
         {
         }
