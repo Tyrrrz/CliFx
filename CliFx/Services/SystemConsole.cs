@@ -47,7 +47,7 @@ namespace CliFx.Services
         public void ResetColor() => Console.ResetColor();
 
         /// <inheritdoc />
-        public CancellationToken RegisterCancellation()
+        public CancellationToken GetCancellationToken()
         {
             if (_cancellationTokenSource is null)
             {

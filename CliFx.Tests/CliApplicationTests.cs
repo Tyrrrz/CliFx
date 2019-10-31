@@ -238,8 +238,8 @@ namespace CliFx.Tests
         {
             // Arrange
             using (var stdoutStream = new StringWriter())
+            using (var cancellationTokenSource = new CancellationTokenSource())
             {
-                var cancellationTokenSource = new CancellationTokenSource();
                 var console = new VirtualConsole(stdoutStream, cancellationTokenSource.Token);
                 
                 var application = new CliApplicationBuilder()

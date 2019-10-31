@@ -218,7 +218,7 @@ public class SecondSubCommand : ICommand
 
 ### Cancellation
 
-It is possible to gracefully cancel execution of a command and preform any necessary cleanup. By default an app gets forcefully killed when it receives an interrupt signal (Ctrl+C or Ctrl+Break). Make call to `console.RegisterCancellation()` to override the default behavior and get `CancellationToken` that represents the first interrupt signal. Second interrupt signal terminates an app immediately. 
+It is possible to gracefully cancel execution of a command and preform any necessary cleanup. By default an app gets forcefully killed when it receives an interrupt signal (Ctrl+C or Ctrl+Break). You can call `console.GetCancellationToken()` to override the default behavior and get `CancellationToken` that represents the first interrupt signal. Second interrupt signal terminates an app immediately. Note that the code that executes before the first call to `GetCancellationToken` will not be cancellation aware.
 
 You can pass `CancellationToken` around and check its state. Make sure you catch `TaskCancelledException`, `OperationCancelledException` with other possible cancellation exceptions.
 
@@ -233,7 +233,7 @@ public class CancellableCommand : ICommand
         console.Output.WriteLine("Printed");
 
 		// Long-running cancellable operation that throws when canceled
-        await Task.Delay(Timeout.InfiniteTimeSpan, console.RegisterCancellation());
+        await Task.Delay(Timeout.InfiniteTimeSpan, console.GetCancellationToken());
 
         console.Output.WriteLine("Never printed");
     }

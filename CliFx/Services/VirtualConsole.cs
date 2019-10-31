@@ -127,6 +127,6 @@ namespace CliFx.Services
         }
 
         /// <inheritdoc />
-        public CancellationToken RegisterCancellation() => _cancellationToken;
+        public CancellationToken GetCancellationToken() => _cancellationToken;
     }
 }
