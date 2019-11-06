@@ -15,9 +15,12 @@
     <RepositoryUrl>https://github.com/Tyrrrz/CliFx</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <DocumentationFile>bin/$(Configuration)/$(TargetFramework)/$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" PrivateAssets="all" Version="1.0.0-preview.2" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Include="../favicon.png" Pack="True" PackagePath="" />
