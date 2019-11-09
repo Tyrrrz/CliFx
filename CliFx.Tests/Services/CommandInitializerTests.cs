@@ -8,6 +8,7 @@ using CliFx.Models;
 using CliFx.Services;
 using CliFx.Tests.TestCommands;
 using CliFx.Tests.Stubs;
+using System.IO;
 
 namespace CliFx.Tests.Services
 {
@@ -106,7 +107,7 @@ namespace CliFx.Tests.Services
                 new EnvironmentVariableWithoutCollectionPropertyCommand(),
                 GetCommandSchema(typeof(EnvironmentVariableWithoutCollectionPropertyCommand)),
                 new CommandInput(null, new CommandOptionInput[0], EnvironmentVariablesProviderStub.EnvironmentVariables),
-                new EnvironmentVariableWithoutCollectionPropertyCommand { Option = "A;B;C;" }
+                new EnvironmentVariableWithoutCollectionPropertyCommand { Option = $"A{Path.PathSeparator}B{Path.PathSeparator}C{Path.PathSeparator}" }
             );
         }
 
