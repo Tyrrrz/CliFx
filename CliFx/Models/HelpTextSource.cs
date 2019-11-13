@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using CliFx.Internal;
 
 namespace CliFx.Models
 {
@@ -30,9 +29,9 @@ namespace CliFx.Models
             IReadOnlyList<CommandSchema> availableCommandSchemas,
             CommandSchema targetCommandSchema)
         {
-            ApplicationMetadata = applicationMetadata.GuardNotNull(nameof(applicationMetadata));
-            AvailableCommandSchemas = availableCommandSchemas.GuardNotNull(nameof(availableCommandSchemas));
-            TargetCommandSchema = targetCommandSchema.GuardNotNull(nameof(targetCommandSchema));
+            ApplicationMetadata = applicationMetadata;
+            AvailableCommandSchemas = availableCommandSchemas;
+            TargetCommandSchema = targetCommandSchema;
         }
     }
 }

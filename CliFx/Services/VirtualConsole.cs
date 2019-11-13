@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
-using CliFx.Internal;
 
 namespace CliFx.Services
 {
@@ -46,11 +45,11 @@ namespace CliFx.Services
             TextWriter error, bool isErrorRedirected,
             CancellationToken cancellationToken = default)
         {
-            Input = input.GuardNotNull(nameof(input));
+            Input = input;
             IsInputRedirected = isInputRedirected;
-            Output = output.GuardNotNull(nameof(output));
+            Output = output;
             IsOutputRedirected = isOutputRedirected;
-            Error = error.GuardNotNull(nameof(error));
+            Error = error;
             IsErrorRedirected = isErrorRedirected;
             _cancellationToken = cancellationToken;
         }

@@ -10,27 +10,27 @@ namespace CliFx.Attributes
     {
         /// <summary>
         /// Command name.
+        /// This can be null if this is the default command.
         /// </summary>
-        public string Name { get; }
+        public string? Name { get; }
 
         /// <summary>
         /// Command description, which is used in help text.
         /// </summary>
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         /// <summary>
         /// Initializes an instance of <see cref="CommandAttribute"/>.
         /// </summary>
         public CommandAttribute(string name)
         {
-            Name = name; // can be null
+            Name = name;
         }
 
         /// <summary>
         /// Initializes an instance of <see cref="CommandAttribute"/>.
         /// </summary>
         public CommandAttribute()
-            : this(null)
         {
         }
     }

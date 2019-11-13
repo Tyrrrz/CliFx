@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
 using CliFx.Attributes;
 using CliFx.Services;
@@ -10,7 +9,7 @@ namespace CliFx.Tests.TestCommands
     public class ExceptionCommand : ICommand
     {
         [CommandOption("msg", 'm')]
-        public string Message { get; set; }
+        public string? Message { get; set; }
         
         public Task ExecuteAsync(IConsole console) => throw new Exception(Message);
     }

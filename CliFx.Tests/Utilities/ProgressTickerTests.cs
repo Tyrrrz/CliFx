@@ -17,41 +17,39 @@ namespace CliFx.Tests.Utilities
             // Arrange
             var formatProvider = CultureInfo.InvariantCulture;
 
-            using (var stdout = new StringWriter(formatProvider))
-            {
-                var console = new VirtualConsole(TextReader.Null, false, stdout, false, TextWriter.Null, false);
-                var ticker = console.CreateProgressTicker();
+            using var stdout = new StringWriter(formatProvider);
 
-                var progressValues = Enumerable.Range(0, 100).Select(p => p / 100.0).ToArray();
-                var progressStringValues = progressValues.Select(p => p.ToString("P2", formatProvider)).ToArray();
+            var console = new VirtualConsole(TextReader.Null, false, stdout, false, TextWriter.Null, false);
+            var ticker = console.CreateProgressTicker();
 
-                // Act
-                foreach (var progress in progressValues)
-                    ticker.Report(progress);
+            var progressValues = Enumerable.Range(0, 100).Select(p => p / 100.0).ToArray();
+            var progressStringValues = progressValues.Select(p => p.ToString("P2", formatProvider)).ToArray();
 
-                // Assert
-                stdout.ToString().Should().ContainAll(progressStringValues);
-            }
+            // Act
+            foreach (var progress in progressValues)
+                ticker.Report(progress);
+
+            // Assert
+            stdout.ToString().Should().ContainAll(progressStringValues);
         }
 
         [Test]
         public void Report_Redirected_Test()
         {
             // Arrange
-            using (var stdout = new StringWriter())
-            {
-                var console = new VirtualConsole(stdout);
-                var ticker = console.CreateProgressTicker();
+            using var stdout = new StringWriter();
 
-                var progressValues = Enumerable.Range(0, 100).Select(p => p / 100.0).ToArray();
+            var console = new VirtualConsole(stdout);
+            var ticker = console.CreateProgressTicker();
 
-                // Act
-                foreach (var progress in progressValues)
-                    ticker.Report(progress);
+            var progressValues = Enumerable.Range(0, 100).Select(p => p / 100.0).ToArray();
 
-                // Assert
-                stdout.ToString().Should().BeEmpty();
-            }
+            // Act
+            foreach (var progress in progressValues)
+                ticker.Report(progress);
+
+            // Assert
+            stdout.ToString().Should().BeEmpty();
         }
     }
 }

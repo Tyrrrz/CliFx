@@ -5,7 +5,7 @@ namespace CliFx.Benchmarks.Commands
     public class McMasterCommand
     {
         [Option("--str|-s")]
-        public string StrOption { get; set; }
+        public string? StrOption { get; set; }
 
         [Option("--int|-i")]
         public int IntOption { get; set; }

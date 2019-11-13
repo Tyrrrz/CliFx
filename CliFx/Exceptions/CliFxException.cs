@@ -10,7 +10,7 @@ namespace CliFx.Exceptions
         /// <summary>
         /// Initializes an instance of <see cref="CliFxException"/>.
         /// </summary>
-        public CliFxException(string message)
+        public CliFxException(string? message)
             : base(message)
         {
         }
@@ -18,7 +18,7 @@ namespace CliFx.Exceptions
         /// <summary>
         /// Initializes an instance of <see cref="CliFxException"/>.
         /// </summary>
-        public CliFxException(string message, Exception innerException)
+        public CliFxException(string? message, Exception? innerException)
             : base(message, innerException)
         {
         }

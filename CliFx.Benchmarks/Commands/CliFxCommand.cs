@@ -1,5 +1,4 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using CliFx.Attributes;
 using CliFx.Services;
 
@@ -9,7 +8,7 @@ namespace CliFx.Benchmarks.Commands
     public class CliFxCommand : ICommand
     {
         [CommandOption("str", 's')]
-        public string StrOption { get; set; }
+        public string? StrOption { get; set; }
 
         [CommandOption("int", 'i')]
         public int IntOption { get; set; }

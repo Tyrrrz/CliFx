@@ -19,20 +19,18 @@ namespace CliFx
 
         private bool _isDebugModeAllowed = true;
         private bool _isPreviewModeAllowed = true;
-        private string _title;
-        private string _executableName;
-        private string _versionText;
-        private string _description;
-        private IConsole _console;
-        private ICommandFactory _commandFactory;
-        private ICommandOptionInputConverter _commandOptionInputConverter;
-        private IEnvironmentVariablesProvider _environmentVariablesProvider;
+        private string? _title;
+        private string? _executableName;
+        private string? _versionText;
+        private string? _description;
+        private IConsole? _console;
+        private ICommandFactory? _commandFactory;
+        private ICommandOptionInputConverter? _commandOptionInputConverter;
+        private IEnvironmentVariablesProvider? _environmentVariablesProvider;
 
         /// <inheritdoc />
         public ICliApplicationBuilder AddCommand(Type commandType)
         {
-            commandType.GuardNotNull(nameof(commandType));
-
             _commandTypes.Add(commandType);
 
             return this;
@@ -41,8 +39,6 @@ namespace CliFx
         /// <inheritdoc />
         public ICliApplicationBuilder AddCommandsFrom(Assembly commandAssembly)
         {
-            commandAssembly.GuardNotNull(nameof(commandAssembly));
-
             var commandTypes = commandAssembly.ExportedTypes
                 .Where(t => t.Implements(typeof(ICommand)))
                 .Where(t => t.IsDefined(typeof(CommandAttribute)))
@@ -71,56 +67,56 @@ namespace CliFx
         /// <inheritdoc />
         public ICliApplicationBuilder UseTitle(string title)
         {
-            _title = title.GuardNotNull(nameof(title));
+            _title = title;
             return this;
         }
 
         /// <inheritdoc />
         public ICliApplicationBuilder UseExecutableName(string executableName)
         {
-            _executableName = executableName.GuardNotNull(nameof(executableName));
+            _executableName = executableName;
             return this;
         }
 
         /// <inheritdoc />
         public ICliApplicationBuilder UseVersionText(string versionText)
         {
-            _versionText = versionText.GuardNotNull(nameof(versionText));
+            _versionText = versionText;
             return this;
         }
 
         /// <inheritdoc />
-        public ICliApplicationBuilder UseDescription(string description)
+        public ICliApplicationBuilder UseDescription(string? description)
         {
-            _description = description; // can be null
+            _description = description;
             return this;
         }
 
         /// <inheritdoc />
         public ICliApplicationBuilder UseConsole(IConsole console)
         {
-            _console = console.GuardNotNull(nameof(console));
+            _console = console;
             return this;
         }
 
         /// <inheritdoc />
         public ICliApplicationBuilder UseCommandFactory(ICommandFactory factory)
         {
-            _commandFactory = factory.GuardNotNull(nameof(factory));
+            _commandFactory = factory;
             return this;
         }
 
         /// <inheritdoc />
         public ICliApplicationBuilder UseCommandOptionInputConverter(ICommandOptionInputConverter converter)
         {
-            _commandOptionInputConverter = converter.GuardNotNull(nameof(converter));
+            _commandOptionInputConverter = converter;
             return this;
         }
 
         /// <inheritdoc />
         public ICliApplicationBuilder UseEnvironmentVariablesProvider(IEnvironmentVariablesProvider environmentVariablesProvider)
         {
-            _environmentVariablesProvider = environmentVariablesProvider.GuardNotNull(nameof(environmentVariablesProvider));
+            _environmentVariablesProvider = environmentVariablesProvider;
             return this;
         }
 
@@ -128,13 +124,13 @@ namespace CliFx
         public ICliApplication Build()
         {
             // Use defaults for required parameters that were not configured
-            _title = _title ?? GetDefaultTitle() ?? "App";
-            _executableName = _executableName ?? GetDefaultExecutableName() ?? "app";
-            _versionText = _versionText ?? GetDefaultVersionText() ?? "v1.0";
-            _console = _console ?? new SystemConsole();
-            _commandFactory = _commandFactory ?? new CommandFactory();
-            _commandOptionInputConverter = _commandOptionInputConverter ?? new CommandOptionInputConverter();
-            _environmentVariablesProvider = _environmentVariablesProvider ?? new EnvironmentVariablesProvider();
+            _title ??= GetDefaultTitle() ?? "App";
+            _executableName ??= GetDefaultExecutableName() ?? "app";
+            _versionText ??= GetDefaultVersionText() ?? "v1.0";
+            _console ??= new SystemConsole();
+            _commandFactory ??= new CommandFactory();
+            _commandOptionInputConverter ??= new CommandOptionInputConverter();
+            _environmentVariablesProvider ??= new EnvironmentVariablesProvider();
 
             // Project parameters to expected types
             var metadata = new ApplicationMetadata(_title, _executableName, _versionText, _description);
@@ -153,7 +149,7 @@ namespace CliFx
         // Entry assembly is null in tests
         private static Assembly EntryAssembly => LazyEntryAssembly.Value;
 
-        private static string GetDefaultTitle() => EntryAssembly?.GetName().Name;
+        private static string GetDefaultTitle() => EntryAssembly?.GetName().Name ?? "";
 
         private static string GetDefaultExecutableName()
         {
@@ -169,6 +165,6 @@ namespace CliFx
             return Path.GetFileNameWithoutExtension(entryAssemblyLocation);
         }
 
-        private static string GetDefaultVersionText() => EntryAssembly != null ? $"v{EntryAssembly.GetName().Version}" : null;
+        private static string GetDefaultVersionText() => EntryAssembly != null ? $"v{EntryAssembly.GetName().Version}" : "";
     }
 }

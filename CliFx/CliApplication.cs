@@ -32,15 +32,15 @@ namespace CliFx
             IConsole console, ICommandInputParser commandInputParser, ICommandSchemaResolver commandSchemaResolver,
             ICommandFactory commandFactory, ICommandInitializer commandInitializer, IHelpTextRenderer helpTextRenderer)
         {
-            _metadata = metadata.GuardNotNull(nameof(metadata));
-            _configuration = configuration.GuardNotNull(nameof(configuration));
+            _metadata = metadata;
+            _configuration = configuration;
 
-            _console = console.GuardNotNull(nameof(console));
-            _commandInputParser = commandInputParser.GuardNotNull(nameof(commandInputParser));
-            _commandSchemaResolver = commandSchemaResolver.GuardNotNull(nameof(commandSchemaResolver));
-            _commandFactory = commandFactory.GuardNotNull(nameof(commandFactory));
-            _commandInitializer = commandInitializer.GuardNotNull(nameof(commandInitializer));
-            _helpTextRenderer = helpTextRenderer.GuardNotNull(nameof(helpTextRenderer));
+            _console = console;
+            _commandInputParser = commandInputParser;
+            _commandSchemaResolver = commandSchemaResolver;
+            _commandFactory = commandFactory;
+            _commandInitializer = commandInitializer;
+            _helpTextRenderer = helpTextRenderer;
         }
 
         private async Task<int?> HandleDebugDirectiveAsync(CommandInput commandInput)
@@ -117,7 +117,7 @@ namespace CliFx
         }
 
         private int? HandleHelpOption(CommandInput commandInput,
-            IReadOnlyList<CommandSchema> availableCommandSchemas, CommandSchema targetCommandSchema)
+            IReadOnlyList<CommandSchema> availableCommandSchemas, CommandSchema? targetCommandSchema)
         {
             // Help should be rendered if it was requested, or when executing a command which isn't defined
             var shouldRenderHelp = commandInput.IsHelpOptionSpecified() || targetCommandSchema == null;
@@ -180,8 +180,6 @@ namespace CliFx
         /// <inheritdoc />
         public async Task<int> RunAsync(IReadOnlyList<string> commandLineArguments)
         {
-            commandLineArguments.GuardNotNull(nameof(commandLineArguments));
-
             try
             {
                 // Parse command input from arguments
@@ -199,7 +197,7 @@ namespace CliFx
                     HandlePreviewDirective(commandInput) ??
                     HandleVersionOption(commandInput) ??
                     HandleHelpOption(commandInput, availableCommandSchemas, targetCommandSchema) ??
-                    await HandleCommandExecutionAsync(commandInput, targetCommandSchema);
+                    await HandleCommandExecutionAsync(commandInput, targetCommandSchema!);
             }
             catch (Exception ex)
             {
@@ -207,7 +205,7 @@ namespace CliFx
                 // Doing this also gets rid of the annoying Windows troubleshooting dialog that shows up on unhandled exceptions.
 
                 // Prefer showing message without stack trace on exceptions coming from CliFx or on CommandException
-                if (!ex.Message.IsNullOrWhiteSpace() && (ex is CliFxException || ex is CommandException))
+                if (!string.IsNullOrWhiteSpace(ex.Message) && (ex is CliFxException || ex is CommandException))
                 {
                     _console.WithForegroundColor(ConsoleColor.Red, () => _console.Error.WriteLine(ex.Message));
                 }

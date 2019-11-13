@@ -36,7 +36,7 @@ namespace CliFx.Services
 
                 // Make sure there are no other options with the same name
                 var existingOptionWithSameName = result
-                    .Where(o => !o.Name.IsNullOrWhiteSpace())
+                    .Where(o => !string.IsNullOrWhiteSpace(o.Name))
                     .FirstOrDefault(o => string.Equals(o.Name, optionSchema.Name, StringComparison.OrdinalIgnoreCase));
 
                 if (existingOptionWithSameName != null)
@@ -68,8 +68,6 @@ namespace CliFx.Services
         /// <inheritdoc />
         public IReadOnlyList<CommandSchema> GetCommandSchemas(IReadOnlyList<Type> commandTypes)
         {
-            commandTypes.GuardNotNull(nameof(commandTypes));
-
             // Make sure there's at least one command defined
             if (!commandTypes.Any())
             {

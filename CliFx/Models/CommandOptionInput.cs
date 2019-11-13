@@ -24,8 +24,8 @@ namespace CliFx.Models
         /// </summary>
         public CommandOptionInput(string alias, IReadOnlyList<string> values)
         {
-            Alias = alias.GuardNotNull(nameof(alias));
-            Values = values.GuardNotNull(nameof(values));
+            Alias = alias;
+            Values = values;
         }
 
         /// <summary>

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using CliFx.Internal;
 
 namespace CliFx.Models
 {
@@ -30,7 +29,7 @@ namespace CliFx.Models
         public ApplicationConfiguration(IReadOnlyList<Type> commandTypes,
             bool isDebugModeAllowed, bool isPreviewModeAllowed)
         {
-            CommandTypes = commandTypes.GuardNotNull(nameof(commandTypes));
+            CommandTypes = commandTypes;
             IsDebugModeAllowed = isDebugModeAllowed;
             IsPreviewModeAllowed = isPreviewModeAllowed;
         }

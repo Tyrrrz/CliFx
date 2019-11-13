@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
 using CliFx.Attributes;
 using CliFx.Demo.Internal;
@@ -25,7 +24,7 @@ namespace CliFx.Demo.Commands
         public DateTimeOffset Published { get; set; }
 
         [CommandOption("isbn", 'n', Description = "Book ISBN.")]
-        public Isbn Isbn { get; set; }
+        public Isbn? Isbn { get; set; }
 
         public BookAddCommand(LibraryService libraryService)
         {

@@ -1,5 +1,4 @@
 ﻿using System;
-using CliFx.Internal;
 
 namespace CliFx.Exceptions
 {
@@ -20,16 +19,16 @@ namespace CliFx.Exceptions
         /// <summary>
         /// Initializes an instance of <see cref="CommandException"/>.
         /// </summary>
-        public CommandException(string message, Exception innerException, int exitCode = DefaultExitCode)
+        public CommandException(string? message, Exception? innerException, int exitCode = DefaultExitCode)
             : base(message, innerException)
         {
-            ExitCode = exitCode.GuardNotZero(nameof(exitCode));
+            ExitCode = exitCode != 0 ? exitCode : throw new ArgumentException("Exit code cannot be zero because that signifies success.");
         }
 
         /// <summary>
         /// Initializes an instance of <see cref="CommandException"/>.
         /// </summary>
-        public CommandException(string message, int exitCode = DefaultExitCode)
+        public CommandException(string? message, int exitCode = DefaultExitCode)
             : this(message, null, exitCode)
         {
         }

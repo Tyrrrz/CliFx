@@ -10,11 +10,13 @@ namespace CliFx.Attributes
     {
         /// <summary>
         /// Option name.
+        /// Either <see cref="Name"/> or <see cref="ShortName"/> must be set.
         /// </summary>
-        public string Name { get; }
+        public string? Name { get; }
 
         /// <summary>
         /// Option short name.
+        /// Either <see cref="Name"/> or <see cref="ShortName"/> must be set.
         /// </summary>
         public char? ShortName { get; }
 
@@ -26,27 +28,27 @@ namespace CliFx.Attributes
         /// <summary>
         /// Option description, which is used in help text.
         /// </summary>
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         /// <summary>
         /// Optional environment variable name that will be used as fallback value if no option value is specified.
         /// </summary>
-        public string EnvironmentVariableName { get; set; }
+        public string? EnvironmentVariableName { get; set; }
 
         /// <summary>
         /// Initializes an instance of <see cref="CommandOptionAttribute"/>.
         /// </summary>
-        public CommandOptionAttribute(string name, char? shortName)
+        private CommandOptionAttribute(string? name, char? shortName)
         {
-            Name = name; // can be null
-            ShortName = shortName; // can be null
+            Name = name;
+            ShortName = shortName;
         }
 
         /// <summary>
         /// Initializes an instance of <see cref="CommandOptionAttribute"/>.
         /// </summary>
         public CommandOptionAttribute(string name, char shortName)
-            : this(name, (char?)shortName)
+            : this(name, (char?) shortName)
         {
         }
 
@@ -62,7 +64,7 @@ namespace CliFx.Attributes
         /// Initializes an instance of <see cref="CommandOptionAttribute"/>.
         /// </summary>
         public CommandOptionAttribute(char shortName)
-            : this(null, shortName)
+            : this(null, (char?) shortName)
         {
         }
     }

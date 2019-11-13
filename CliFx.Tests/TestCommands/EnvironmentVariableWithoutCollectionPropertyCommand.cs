@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using CliFx.Attributes;
 using CliFx.Services;
 
@@ -10,7 +8,7 @@ namespace CliFx.Tests.TestCommands
     public class EnvironmentVariableWithoutCollectionPropertyCommand : ICommand
     {
         [CommandOption("opt", EnvironmentVariableName = "ENV_MULTIPLE_VALUES")]
-        public string Option { get; set; }
+        public string? Option { get; set; }
 
         public Task ExecuteAsync(IConsole console) => Task.CompletedTask;
     }

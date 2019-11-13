@@ -18,7 +18,7 @@ namespace CliFx.Tests.Services
         private static IEnumerable<TestCaseData> GetTestCases_CreateCommand()
         {
             yield return new TestCaseData(
-                new Func<CommandSchema, ICommand>(schema => (ICommand) Activator.CreateInstance(schema.Type)),
+                new Func<CommandSchema, ICommand>(schema => (ICommand) Activator.CreateInstance(schema.Type!)!),
                 GetCommandSchema(typeof(HelloWorldDefaultCommand))
             );
         }

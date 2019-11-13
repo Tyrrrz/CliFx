@@ -8,8 +8,6 @@ namespace CliFx.Internal
 {
     internal static class Extensions
     {
-        public static bool IsNullOrWhiteSpace(this string s) => string.IsNullOrWhiteSpace(s);
-
         public static string Repeat(this char c, int count) => new string(c, count);
 
         public static string AsString(this char c) => c.Repeat(1);
@@ -36,9 +34,9 @@ namespace CliFx.Internal
 
         public static bool Implements(this Type type, Type interfaceType) => type.GetInterfaces().Contains(interfaceType);
 
-        public static Type GetNullableUnderlyingType(this Type type) => Nullable.GetUnderlyingType(type);
+        public static Type? GetNullableUnderlyingType(this Type type) => Nullable.GetUnderlyingType(type);
 
-        public static Type GetEnumerableUnderlyingType(this Type type)
+        public static Type? GetEnumerableUnderlyingType(this Type type)
         {
             if (type.IsPrimitive)
                 return null;
@@ -65,5 +63,8 @@ namespace CliFx.Internal
 
             return array;
         }
+
+        public static bool IsCollection(this Type type) =>
+            type != typeof(string) && type.GetEnumerableUnderlyingType() != null;
     }
 }

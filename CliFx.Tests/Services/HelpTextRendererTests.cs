@@ -93,17 +93,16 @@ namespace CliFx.Tests.Services
             IReadOnlyList<string> expectedSubstrings)
         {
             // Arrange
-            using (var stdout = new StringWriter())
-            {
-                var console = new VirtualConsole(stdout);
-                var renderer = new HelpTextRenderer();
+            using var stdout = new StringWriter();
 
-                // Act
-                renderer.RenderHelpText(console, source);
+            var console = new VirtualConsole(stdout);
+            var renderer = new HelpTextRenderer();
 
-                // Assert
-                stdout.ToString().Should().ContainAll(expectedSubstrings);
-            }
+            // Act
+            renderer.RenderHelpText(console, source);
+
+            // Assert
+            stdout.ToString().Should().ContainAll(expectedSubstrings);
         }
     }
 }

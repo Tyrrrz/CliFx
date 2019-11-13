@@ -19,8 +19,6 @@ namespace CliFx.Services
         /// </summary>
         public CommandInputParser(IEnvironmentVariablesProvider environmentVariablesProvider)
         {
-            environmentVariablesProvider.GuardNotNull(nameof(environmentVariablesProvider));
-
             _environmentVariablesProvider = environmentVariablesProvider;
         }
 
@@ -35,8 +33,6 @@ namespace CliFx.Services
         /// <inheritdoc />
         public CommandInput ParseCommandInput(IReadOnlyList<string> commandLineArguments)
         {
-            commandLineArguments.GuardNotNull(nameof(commandLineArguments));
-
             var commandNameBuilder = new StringBuilder();
             var directives = new List<string>();
             var optionsDic = new Dictionary<string, List<string>>();
@@ -71,7 +67,7 @@ namespace CliFx.Services
                 }
 
                 // Encountered directive or (part of) command name
-                else if (lastOptionAlias.IsNullOrWhiteSpace())
+                else if (string.IsNullOrWhiteSpace(lastOptionAlias))
                 {
                     if (commandLineArgument.StartsWith("[", StringComparison.OrdinalIgnoreCase) &&
                         commandLineArgument.EndsWith("]", StringComparison.OrdinalIgnoreCase))
@@ -89,7 +85,7 @@ namespace CliFx.Services
                 }
 
                 // Encountered option value
-                else if (!lastOptionAlias.IsNullOrWhiteSpace())
+                else if (!string.IsNullOrWhiteSpace(lastOptionAlias))
                 {
                     optionsDic[lastOptionAlias].Add(commandLineArgument);
                 }

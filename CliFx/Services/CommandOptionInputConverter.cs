@@ -20,7 +20,7 @@ namespace CliFx.Services
         /// </summary>
         public CommandOptionInputConverter(IFormatProvider formatProvider)
         {
-            _formatProvider = formatProvider.GuardNotNull(nameof(formatProvider));
+            _formatProvider = formatProvider;
         }
 
         /// <summary>
@@ -34,10 +34,8 @@ namespace CliFx.Services
         /// <summary>
         /// Converts a single string value to specified target type.
         /// </summary>
-        protected virtual object ConvertValue(string value, Type targetType)
+        protected virtual object? ConvertValue(string value, Type targetType)
         {
-            targetType.GuardNotNull(nameof(targetType));
-
             try
             {
                 // String or object
@@ -46,7 +44,7 @@ namespace CliFx.Services
 
                 // Bool
                 if (targetType == typeof(bool))
-                    return value.IsNullOrWhiteSpace() || bool.Parse(value);
+                    return string.IsNullOrWhiteSpace(value) || bool.Parse(value);
 
                 // Char
                 if (targetType == typeof(char))
@@ -115,7 +113,7 @@ namespace CliFx.Services
                 // Nullable
                 var nullableUnderlyingType = targetType.GetNullableUnderlyingType();
                 if (nullableUnderlyingType != null)
-                    return !value.IsNullOrWhiteSpace() ? ConvertValue(value, nullableUnderlyingType) : null;
+                    return !string.IsNullOrWhiteSpace(value) ? ConvertValue(value, nullableUnderlyingType) : null;
 
                 // Has a constructor that accepts a single string
                 var stringConstructor = GetStringConstructor(targetType);
@@ -143,11 +141,8 @@ namespace CliFx.Services
         }
 
         /// <inheritdoc />
-        public virtual object ConvertOptionInput(CommandOptionInput optionInput, Type targetType)
+        public virtual object? ConvertOptionInput(CommandOptionInput optionInput, Type targetType)
         {
-            optionInput.GuardNotNull(nameof(optionInput));
-            targetType.GuardNotNull(nameof(targetType));
-
             // Get the underlying type of IEnumerable<T> if it's implemented by the target type.
             // Ignore string type because it's IEnumerable<T> but we don't treat it as such.
             var enumerableUnderlyingType = targetType != typeof(string) ? targetType.GetEnumerableUnderlyingType() : null;

@@ -13,17 +13,17 @@ namespace CliFx.Models
         /// <summary>
         /// Underlying type.
         /// </summary>
-        public Type Type { get; }
+        public Type? Type { get; }
 
         /// <summary>
         /// Command name.
         /// </summary>
-        public string Name { get; }
+        public string? Name { get; }
 
         /// <summary>
         /// Command description.
         /// </summary>
-        public string Description { get; }
+        public string? Description { get; }
 
         /// <summary>
         /// Command options.
@@ -33,12 +33,12 @@ namespace CliFx.Models
         /// <summary>
         /// Initializes an instance of <see cref="CommandSchema"/>.
         /// </summary>
-        public CommandSchema(Type type, string name, string description, IReadOnlyList<CommandOptionSchema> options)
+        public CommandSchema(Type? type, string? name, string? description, IReadOnlyList<CommandOptionSchema> options)
         {
-            Type = type; // can be null
-            Name = name; // can be null
-            Description = description; // can be null
-            Options = options.GuardNotNull(nameof(options));
+            Type = type;
+            Name = name;
+            Description = description;
+            Options = options;
         }
 
         /// <inheritdoc />
@@ -46,7 +46,7 @@ namespace CliFx.Models
         {
             var buffer = new StringBuilder();
 
-            if (!Name.IsNullOrWhiteSpace())
+            if (!string.IsNullOrWhiteSpace(Name))
                 buffer.Append(Name);
 
             foreach (var option in Options)

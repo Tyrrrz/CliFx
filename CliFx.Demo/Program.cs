@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using CliFx.Demo.Commands;
 using CliFx.Demo.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,7 +8,7 @@ namespace CliFx.Demo
 {
     public static class Program
     {
-        public static Task<int> Main(string[] args)
+        private static IServiceProvider ConfigureServices()
         {
             // We use Microsoft.Extensions.DependencyInjection for injecting dependencies in commands
             var services = new ServiceCollection();
@@ -21,7 +22,12 @@ namespace CliFx.Demo
             services.AddTransient<BookRemoveCommand>();
             services.AddTransient<BookListCommand>();
 
-            var serviceProvider = services.BuildServiceProvider();
+            return services.BuildServiceProvider();
+        }
+
+        public static Task<int> Main(string[] args)
+        {
+            var serviceProvider = ConfigureServices();
 
             return new CliApplicationBuilder()
                 .AddCommandsFromThisAssembly()

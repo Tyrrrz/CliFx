@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using System.Text;
-using CliFx.Internal;
 
 namespace CliFx.Models
 {
@@ -12,12 +11,12 @@ namespace CliFx.Models
         /// <summary>
         /// Underlying property.
         /// </summary>
-        public PropertyInfo Property { get; }
+        public PropertyInfo? Property { get; }
 
         /// <summary>
         /// Option name.
         /// </summary>
-        public string Name { get; }
+        public string? Name { get; }
 
         /// <summary>
         /// Option short name.
@@ -32,24 +31,24 @@ namespace CliFx.Models
         /// <summary>
         /// Option description.
         /// </summary>
-        public string Description { get; }
+        public string? Description { get; }
 
         /// <summary>
         /// Optional environment variable name that will be used as fallback value if no option value is specified.
         /// </summary>
-        public string EnvironmentVariableName { get; }
+        public string? EnvironmentVariableName { get; }
 
         /// <summary>
         /// Initializes an instance of <see cref="CommandOptionSchema"/>.
         /// </summary>
-        public CommandOptionSchema(PropertyInfo property, string name, char? shortName, bool isRequired, string description, string environmentVariableName)
+        public CommandOptionSchema(PropertyInfo? property, string? name, char? shortName, bool isRequired, string? description, string? environmentVariableName)
         {
-            Property = property; // can be null
-            Name = name; // can be null
-            ShortName = shortName; // can be null
+            Property = property;
+            Name = name;
+            ShortName = shortName;
             IsRequired = isRequired;
-            Description = description; // can be null
-            EnvironmentVariableName = environmentVariableName; //can be null
+            Description = description;
+            EnvironmentVariableName = environmentVariableName;
         }
 
         /// <inheritdoc />
@@ -60,10 +59,10 @@ namespace CliFx.Models
             if (IsRequired)
                 buffer.Append('*');
 
-            if (!Name.IsNullOrWhiteSpace())
+            if (!string.IsNullOrWhiteSpace(Name))
                 buffer.Append(Name);
 
-            if (!Name.IsNullOrWhiteSpace() && ShortName != null)
+            if (!string.IsNullOrWhiteSpace(Name) && ShortName != null)
                 buffer.Append('|');
 
             if (ShortName != null)

@@ -21,8 +21,8 @@ namespace CliFx.Tests
             builder
                 .AddCommand(typeof(HelloWorldDefaultCommand))
                 .AddCommandsFrom(typeof(HelloWorldDefaultCommand).Assembly)
-                .AddCommands(new[] { typeof(HelloWorldDefaultCommand) })
-                .AddCommandsFrom(new[] { typeof(HelloWorldDefaultCommand).Assembly })
+                .AddCommands(new[] {typeof(HelloWorldDefaultCommand)})
+                .AddCommandsFrom(new[] {typeof(HelloWorldDefaultCommand).Assembly})
                 .AddCommandsFromThisAssembly()
                 .AllowDebugMode()
                 .AllowPreviewMode()
@@ -31,7 +31,7 @@ namespace CliFx.Tests
                 .UseVersionText("test")
                 .UseDescription("test")
                 .UseConsole(new VirtualConsole(TextWriter.Null))
-                .UseCommandFactory(schema => (ICommand)Activator.CreateInstance(schema.Type))
+                .UseCommandFactory(schema => (ICommand) Activator.CreateInstance(schema.Type!)!)
                 .UseCommandOptionInputConverter(new CommandOptionInputConverter())
                 .UseEnvironmentVariablesProvider(new EnvironmentVariablesProviderStub())
                 .Build();

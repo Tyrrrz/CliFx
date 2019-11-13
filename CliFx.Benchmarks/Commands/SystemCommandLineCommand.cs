@@ -14,7 +14,7 @@ namespace CliFx.Benchmarks.Commands
             {
                 new Option(new[] {"--str", "-s"})
                 {
-                    Argument = new Argument<string>()
+                    Argument = new Argument<string?>()
                 },
                 new Option(new[] {"--int", "-i"})
                 {

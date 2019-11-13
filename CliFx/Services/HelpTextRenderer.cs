@@ -14,9 +14,6 @@ namespace CliFx.Services
         /// <inheritdoc />
         public void RenderHelpText(IConsole console, HelpTextSource source)
         {
-            console.GuardNotNull(nameof(console));
-            source.GuardNotNull(nameof(source));
-
             // Track position
             var column = 0;
             var row = 0;
@@ -105,7 +102,7 @@ namespace CliFx.Services
                 RenderNewLine();
 
                 // Description
-                if (!source.ApplicationMetadata.Description.IsNullOrWhiteSpace())
+                if (!string.IsNullOrWhiteSpace(source.ApplicationMetadata.Description))
                 {
                     Render(source.ApplicationMetadata.Description);
                     RenderNewLine();
@@ -114,7 +111,7 @@ namespace CliFx.Services
 
             void RenderDescription()
             {
-                if (source.TargetCommandSchema.Description.IsNullOrWhiteSpace())
+                if (string.IsNullOrWhiteSpace(source.TargetCommandSchema.Description))
                     return;
 
                 // Margin
@@ -142,7 +139,7 @@ namespace CliFx.Services
                 Render(source.ApplicationMetadata.ExecutableName);
 
                 // Command name
-                if (!source.TargetCommandSchema.IsDefault())
+                if (!string.IsNullOrWhiteSpace(source.TargetCommandSchema.Name))
                 {
                     Render(" ");
                     RenderWithColor(source.TargetCommandSchema.Name, ConsoleColor.Cyan);
@@ -195,19 +192,19 @@ namespace CliFx.Services
                     }
 
                     // Delimiter
-                    if (!optionSchema.Name.IsNullOrWhiteSpace() && optionSchema.ShortName != null)
+                    if (!string.IsNullOrWhiteSpace(optionSchema.Name) && optionSchema.ShortName != null)
                     {
                         Render("|");
                     }
 
                     // Name
-                    if (!optionSchema.Name.IsNullOrWhiteSpace())
+                    if (!string.IsNullOrWhiteSpace(optionSchema.Name))
                     {
                         RenderWithColor($"--{optionSchema.Name}", ConsoleColor.White);
                     }
 
                     // Description
-                    if (!optionSchema.Description.IsNullOrWhiteSpace())
+                    if (!string.IsNullOrWhiteSpace(optionSchema.Description))
                     {
                         RenderColumnIndent();
                         Render(optionSchema.Description);
@@ -231,14 +228,14 @@ namespace CliFx.Services
                 // Child commands
                 foreach (var childCommandSchema in childCommandSchemas)
                 {
-                    var relativeCommandName = GetRelativeCommandName(childCommandSchema, source.TargetCommandSchema);
+                    var relativeCommandName = GetRelativeCommandName(childCommandSchema, source.TargetCommandSchema)!;
 
                     // Name
                     RenderIndent();
                     RenderWithColor(relativeCommandName, ConsoleColor.Cyan);
 
                     // Description
-                    if (!childCommandSchema.Description.IsNullOrWhiteSpace())
+                    if (!string.IsNullOrWhiteSpace(childCommandSchema.Description))
                     {
                         RenderColumnIndent();
                         Render(childCommandSchema.Description);
@@ -254,7 +251,7 @@ namespace CliFx.Services
                 Render("You can run `");
                 Render(source.ApplicationMetadata.ExecutableName);
 
-                if (!source.TargetCommandSchema.IsDefault())
+                if (!string.IsNullOrWhiteSpace(source.TargetCommandSchema.Name))
                 {
                     Render(" ");
                     RenderWithColor(source.TargetCommandSchema.Name, ConsoleColor.Cyan);
@@ -285,8 +282,8 @@ namespace CliFx.Services
 
     public partial class HelpTextRenderer
     {
-        private static string GetRelativeCommandName(CommandSchema commandSchema, CommandSchema parentCommandSchema) =>
-            parentCommandSchema.Name.IsNullOrWhiteSpace()
+        private static string? GetRelativeCommandName(CommandSchema commandSchema, CommandSchema parentCommandSchema) =>
+            string.IsNullOrWhiteSpace(parentCommandSchema.Name) || string.IsNullOrWhiteSpace(commandSchema.Name)
                 ? commandSchema.Name
                 : commandSchema.Name.Substring(parentCommandSchema.Name.Length + 1);
     }

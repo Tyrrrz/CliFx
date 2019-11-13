@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using CliFx.Internal;
 
 namespace CliFx.Services
 {
@@ -14,9 +12,6 @@ namespace CliFx.Services
         /// </summary>
         public static void WithForegroundColor(this IConsole console, ConsoleColor foregroundColor, Action action)
         {
-            console.GuardNotNull(nameof(console));
-            action.GuardNotNull(nameof(action));
-
             var lastColor = console.ForegroundColor;
             console.ForegroundColor = foregroundColor;
 
@@ -30,9 +25,6 @@ namespace CliFx.Services
         /// </summary>
         public static void WithBackgroundColor(this IConsole console, ConsoleColor backgroundColor, Action action)
         {
-            console.GuardNotNull(nameof(console));
-            action.GuardNotNull(nameof(action));
-
             var lastColor = console.BackgroundColor;
             console.BackgroundColor = backgroundColor;
 
@@ -44,32 +36,7 @@ namespace CliFx.Services
         /// <summary>
         /// Sets console foreground and background colors, executes specified action, and sets the colors back to the original values.
         /// </summary>
-        public static void WithColors(this IConsole console, ConsoleColor foregroundColor, ConsoleColor backgroundColor, Action action)
-        {
-            console.GuardNotNull(nameof(console));
-            action.GuardNotNull(nameof(action));
-
+        public static void WithColors(this IConsole console, ConsoleColor foregroundColor, ConsoleColor backgroundColor, Action action) =>
             console.WithForegroundColor(foregroundColor, () => console.WithBackgroundColor(backgroundColor, action));
-        }
-
-        /// <summary>
-        /// Gets wether a string representing an environment variable value is escaped (i.e.: surrounded by double quotation marks)
-        /// </summary>
-        public static bool IsEnvironmentVariableEscaped(this string environmentVariableValue)
-        {
-            environmentVariableValue.GuardNotNull(nameof(environmentVariableValue));
-
-            return environmentVariableValue.StartsWith("\"") && environmentVariableValue.EndsWith("\"");
-        }
-
-        /// <summary>
-        /// Gets wether the <see cref="Type"/> supplied is a collection implementing <see cref="IEnumerable{T}"/>
-        /// </summary>
-        public static bool IsCollection(this Type type)
-        {
-            type.GuardNotNull(nameof(type));
-
-            return type != typeof(string) && type.GetEnumerableUnderlyingType() != null;
-        }
     }
 }

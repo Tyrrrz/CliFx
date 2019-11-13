@@ -9,7 +9,7 @@ namespace CliFx.Services
     /// </summary>
     public class SystemConsole : IConsole
     {
-        private CancellationTokenSource _cancellationTokenSource;
+        private CancellationTokenSource? _cancellationTokenSource;
         
         /// <inheritdoc />
         public TextReader Input => Console.In;

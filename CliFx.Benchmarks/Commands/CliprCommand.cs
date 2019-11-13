@@ -5,7 +5,7 @@ namespace CliFx.Benchmarks.Commands
     public class CliprCommand
     {
         [NamedArgument('s', "str")]
-        public string StrOption { get; set; }
+        public string? StrOption { get; set; }
 
         [NamedArgument('i', "int")]
         public int IntOption { get; set; }
