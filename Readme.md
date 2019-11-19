@@ -4,8 +4,7 @@
 [![Coverage](https://codecov.io/gh/Tyrrrz/CliFx/branch/master/graph/badge.svg)](https://codecov.io/gh/Tyrrrz/CliFx)
 [![Version](https://img.shields.io/nuget/v/CliFx.svg)](https://nuget.org/packages/CliFx)
 [![Downloads](https://img.shields.io/nuget/dt/CliFx.svg)](https://nuget.org/packages/CliFx)
-[![Donate](https://img.shields.io/badge/patreon-donate-yellow.svg)](https://patreon.com/tyrrrz)
-[![Donate](https://img.shields.io/badge/buymeacoffee-donate-yellow.svg)](https://buymeacoffee.com/tyrrrz)
+[![Donate](https://img.shields.io/badge/donate-$$$-purple.svg)](https://tyrrrz.me/donate)
 
 CliFx is a simple to use but powerful framework for building command line applications. Its primary goal is to completely take over the user input layer, letting you focus more on writing your application. This framework uses a declarative approach for defining commands, avoiding excessive boilerplate code and complex configurations.
 
@@ -496,7 +495,3 @@ CliFx is made out of "Cli" for "Command Line Interface" and "Fx" for "Framework"
 - [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json)
 - [BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet)
 - [Coverlet](https://github.com/tonerdo/coverlet)
-
-## Donate
-
-If you really like my projects and want to support me, consider donating to me on [Patreon](https://patreon.com/tyrrrz) or [BuyMeACoffee](https://buymeacoffee.com/tyrrrz). All donations are optional and are greatly appreciated. 🙏
