@@ -23,7 +23,7 @@ namespace CliFx.Tests.Services
             yield return new TestCaseData(
                 new DivideCommand(),
                 GetCommandSchema(typeof(DivideCommand)),
-                new CommandInput("div", new[]
+                new CommandInput(new[] { "div" }, new[]
                 {
                     new CommandOptionInput("dividend", "13"),
                     new CommandOptionInput("divisor", "8")
@@ -34,7 +34,7 @@ namespace CliFx.Tests.Services
             yield return new TestCaseData(
                 new DivideCommand(),
                 GetCommandSchema(typeof(DivideCommand)),
-                new CommandInput("div", new[]
+                new CommandInput(new[] { "div" }, new[]
                 {
                     new CommandOptionInput("dividend", "13"),
                     new CommandOptionInput("d", "8")
@@ -45,7 +45,7 @@ namespace CliFx.Tests.Services
             yield return new TestCaseData(
                 new DivideCommand(),
                 GetCommandSchema(typeof(DivideCommand)),
-                new CommandInput("div", new[]
+                new CommandInput(new[] { "div" }, new[]
                 {
                     new CommandOptionInput("D", "13"),
                     new CommandOptionInput("d", "8")
@@ -56,9 +56,9 @@ namespace CliFx.Tests.Services
             yield return new TestCaseData(
                 new ConcatCommand(),
                 GetCommandSchema(typeof(ConcatCommand)),
-                new CommandInput("concat", new[]
+                new CommandInput(new[] { "concat" }, new[]
                 {
-                    new CommandOptionInput("i", new[] {"foo", " ", "bar"})
+                    new CommandOptionInput("i", new[] { "foo", " ", "bar" })
                 }),
                 new ConcatCommand { Inputs = new[] { "foo", " ", "bar" } }
             );
@@ -66,9 +66,9 @@ namespace CliFx.Tests.Services
             yield return new TestCaseData(
                 new ConcatCommand(),
                 GetCommandSchema(typeof(ConcatCommand)),
-                new CommandInput("concat", new[]
+                new CommandInput(new[] { "concat" }, new[]
                 {
-                    new CommandOptionInput("i", new[] {"foo", "bar"}),
+                    new CommandOptionInput("i", new[] { "foo", "bar" }),
                     new CommandOptionInput("s", " ")
                 }),
                 new ConcatCommand { Inputs = new[] { "foo", "bar" }, Separator = " " }
@@ -78,7 +78,7 @@ namespace CliFx.Tests.Services
             yield return new TestCaseData(
                 new EnvironmentVariableCommand(),
                 GetCommandSchema(typeof(EnvironmentVariableCommand)),
-                new CommandInput(null, new CommandOptionInput[0], EnvironmentVariablesProviderStub.EnvironmentVariables),
+                new CommandInput(new string[0], new CommandOptionInput[0], EnvironmentVariablesProviderStub.EnvironmentVariables),
                 new EnvironmentVariableCommand { Option = "A" }
             );
 
@@ -86,7 +86,7 @@ namespace CliFx.Tests.Services
             yield return new TestCaseData(
                 new EnvironmentVariableWithMultipleValuesCommand(),
                 GetCommandSchema(typeof(EnvironmentVariableWithMultipleValuesCommand)),
-                new CommandInput(null, new CommandOptionInput[0], EnvironmentVariablesProviderStub.EnvironmentVariables),
+                new CommandInput(new string[0], new CommandOptionInput[0], EnvironmentVariablesProviderStub.EnvironmentVariables),
                 new EnvironmentVariableWithMultipleValuesCommand { Option = new[] { "A", "B", "C" } }
             );
 
@@ -94,11 +94,11 @@ namespace CliFx.Tests.Services
             yield return new TestCaseData(
                 new EnvironmentVariableCommand(),
                 GetCommandSchema(typeof(EnvironmentVariableCommand)),
-                new CommandInput(null, new[]
-                {
-                    new CommandOptionInput("opt", new[] { "X" })
-                },
-                EnvironmentVariablesProviderStub.EnvironmentVariables),
+                new CommandInput(new string[0], new[]
+                    {
+                        new CommandOptionInput("opt", new[] { "X" })
+                    },
+                    EnvironmentVariablesProviderStub.EnvironmentVariables),
                 new EnvironmentVariableCommand { Option = "X" }
             );
 
@@ -106,7 +106,7 @@ namespace CliFx.Tests.Services
             yield return new TestCaseData(
                 new EnvironmentVariableWithoutCollectionPropertyCommand(),
                 GetCommandSchema(typeof(EnvironmentVariableWithoutCollectionPropertyCommand)),
-                new CommandInput(null, new CommandOptionInput[0], EnvironmentVariablesProviderStub.EnvironmentVariables),
+                new CommandInput(new string[0], new CommandOptionInput[0], EnvironmentVariablesProviderStub.EnvironmentVariables),
                 new EnvironmentVariableWithoutCollectionPropertyCommand { Option = $"A{Path.PathSeparator}B{Path.PathSeparator}C{Path.PathSeparator}" }
             );
         }
@@ -116,13 +116,13 @@ namespace CliFx.Tests.Services
             yield return new TestCaseData(
                 new DivideCommand(),
                 GetCommandSchema(typeof(DivideCommand)),
-                new CommandInput("div")
+                new CommandInput(new[] { "div" })
             );
 
             yield return new TestCaseData(
                 new DivideCommand(),
                 GetCommandSchema(typeof(DivideCommand)),
-                new CommandInput("div", new[]
+                new CommandInput(new[] { "div" }, new[]
                 {
                     new CommandOptionInput("D", "13")
                 })
@@ -131,13 +131,13 @@ namespace CliFx.Tests.Services
             yield return new TestCaseData(
                 new ConcatCommand(),
                 GetCommandSchema(typeof(ConcatCommand)),
-                new CommandInput("concat")
+                new CommandInput(new[] { "concat" })
             );
 
             yield return new TestCaseData(
                 new ConcatCommand(),
                 GetCommandSchema(typeof(ConcatCommand)),
-                new CommandInput("concat", new[]
+                new CommandInput(new[] { "concat" }, new[]
                 {
                     new CommandOptionInput("s", "_")
                 })

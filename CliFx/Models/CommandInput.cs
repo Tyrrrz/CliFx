@@ -10,10 +10,9 @@ namespace CliFx.Models
     public partial class CommandInput
     {
         /// <summary>
-        /// Specified command name.
-        /// Can be null if command was not specified.
+        /// Specified arguments.
         /// </summary>
-        public string? CommandName { get; }
+        public IReadOnlyList<string> Arguments { get; }
 
         /// <summary>
         /// Specified directives.
@@ -33,10 +32,10 @@ namespace CliFx.Models
         /// <summary>
         /// Initializes an instance of <see cref="CommandInput"/>.
         /// </summary>
-        public CommandInput(string? commandName, IReadOnlyList<string> directives, IReadOnlyList<CommandOptionInput> options,
+        public CommandInput(IReadOnlyList<string> arguments, IReadOnlyList<string> directives, IReadOnlyList<CommandOptionInput> options,
             IReadOnlyDictionary<string, string> environmentVariables)
         {
-            CommandName = commandName;
+            Arguments = arguments;
             Directives = directives;
             Options = options;
             EnvironmentVariables = environmentVariables;
@@ -45,24 +44,24 @@ namespace CliFx.Models
         /// <summary>
         /// Initializes an instance of <see cref="CommandInput"/>.
         /// </summary>
-        public CommandInput(string? commandName, IReadOnlyList<string> directives, IReadOnlyList<CommandOptionInput> options)
-            : this(commandName, directives, options, EmptyEnvironmentVariables)
+        public CommandInput(IReadOnlyList<string> arguments, IReadOnlyList<string> directives, IReadOnlyList<CommandOptionInput> options)
+            : this(arguments, directives, options, EmptyEnvironmentVariables)
         {
         }
 
         /// <summary>
         /// Initializes an instance of <see cref="CommandInput"/>.
         /// </summary>
-        public CommandInput(string? commandName, IReadOnlyList<CommandOptionInput> options, IReadOnlyDictionary<string, string> environmentVariables)
-            : this(commandName, EmptyDirectives, options, environmentVariables)
+        public CommandInput(IReadOnlyList<string> arguments, IReadOnlyList<CommandOptionInput> options, IReadOnlyDictionary<string, string> environmentVariables)
+            : this(arguments, EmptyDirectives, options, environmentVariables)
         {
         }
 
         /// <summary>
         /// Initializes an instance of <see cref="CommandInput"/>.
         /// </summary>
-        public CommandInput(string? commandName, IReadOnlyList<CommandOptionInput> options)
-            : this(commandName, EmptyDirectives, options)
+        public CommandInput(IReadOnlyList<string> arguments, IReadOnlyList<CommandOptionInput> options)
+            : this(arguments, EmptyDirectives, options)
         {
         }
 
@@ -70,15 +69,15 @@ namespace CliFx.Models
         /// Initializes an instance of <see cref="CommandInput"/>.
         /// </summary>
         public CommandInput(IReadOnlyList<CommandOptionInput> options)
-            : this(null, options)
+            : this(new string[0], options)
         {
         }
 
         /// <summary>
         /// Initializes an instance of <see cref="CommandInput"/>.
         /// </summary>
-        public CommandInput(string? commandName)
-            : this(commandName, EmptyOptions)
+        public CommandInput(IReadOnlyList<string> arguments)
+            : this(arguments, EmptyOptions)
         {
         }
 
@@ -87,8 +86,11 @@ namespace CliFx.Models
         {
             var buffer = new StringBuilder();
 
-            if (!string.IsNullOrWhiteSpace(CommandName))
-                buffer.Append(CommandName);
+            foreach (var argument in Arguments)
+            {
+                buffer.AppendIfNotEmpty(' ');
+                buffer.Append(argument);
+            }
 
             foreach (var directive in Directives)
             {

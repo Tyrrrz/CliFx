@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace CliFx.Models
 {
@@ -21,6 +22,25 @@ namespace CliFx.Models
                 return commandSchemas.FirstOrDefault(c => c.IsDefault());
 
             return commandSchemas.FirstOrDefault(c => string.Equals(c.Name, commandName, StringComparison.OrdinalIgnoreCase));
+        }
+
+        /// <summary>
+        /// Finds the most specific command that matches the given arguments.
+        /// </summary>
+        public static CommandSchema? FindFromArguments(this IReadOnlyList<CommandSchema> commandSchemas, IReadOnlyList<string> arguments)
+        {
+            // If no arguments are given, use the default command
+            if (!arguments.Any())
+                return commandSchemas.FirstOrDefault(c => c.IsDefault());
+
+            // Arguments can be part of the a command name as long as they are single words, i.e. no whitespace characters
+            var longestPossibleCommandName = string.Join(" ", arguments.TakeWhile(arg => !Regex.IsMatch(arg, @"\s")));
+
+            // Find the longest matching schema
+            var orderedSchemas = commandSchemas.OrderByDescending(x => x.Name?.Length);
+            var bestMatch = orderedSchemas.FirstOrDefault(c => longestPossibleCommandName.StartsWith(c.Name ?? string.Empty));
+
+            return bestMatch;
         }
 
         /// <summary>
@@ -90,7 +110,7 @@ namespace CliFx.Models
         /// <summary>
         /// Gets whether a command was specified in the input.
         /// </summary>
-        public static bool IsCommandSpecified(this CommandInput commandInput) => !string.IsNullOrWhiteSpace(commandInput.CommandName);
+        public static bool IsCommandSpecified(this CommandInput commandInput) => commandInput.Arguments.Any();
 
         /// <summary>
         /// Gets whether debug directive was specified in the input.

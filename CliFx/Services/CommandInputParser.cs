@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using CliFx.Internal;
 using CliFx.Models;
 
@@ -33,7 +32,7 @@ namespace CliFx.Services
         /// <inheritdoc />
         public CommandInput ParseCommandInput(IReadOnlyList<string> commandLineArguments)
         {
-            var commandNameBuilder = new StringBuilder();
+            var arguments = new List<string>();
             var directives = new List<string>();
             var optionsDic = new Dictionary<string, List<string>>();
 
@@ -79,8 +78,7 @@ namespace CliFx.Services
                     }
                     else
                     {
-                        commandNameBuilder.AppendIfNotEmpty(' ');
-                        commandNameBuilder.Append(commandLineArgument);
+                        arguments.Add(commandLineArgument);
                     }
                 }
 
@@ -91,12 +89,11 @@ namespace CliFx.Services
                 }
             }
 
-            var commandName = commandNameBuilder.Length > 0 ? commandNameBuilder.ToString() : null;
             var options = optionsDic.Select(p => new CommandOptionInput(p.Key, p.Value)).ToArray();
 
             var environmentVariables = _environmentVariablesProvider.GetEnvironmentVariables();
 
-            return new CommandInput(commandName, directives, options, environmentVariables);
+            return new CommandInput(arguments, directives, options, environmentVariables);
         }
     }
 }

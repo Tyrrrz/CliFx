@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using CliFx.Exceptions;
-using CliFx.Internal;
 using CliFx.Models;
 using CliFx.Services;
 
@@ -74,7 +73,7 @@ namespace CliFx
                 return null;
 
             // Render command name
-            _console.Output.WriteLine($"Command name: {commandInput.CommandName}");
+            _console.Output.WriteLine($"Arguments: {string.Join(" ", commandInput.Arguments)}");
             _console.Output.WriteLine();
 
             // Render directives
@@ -129,27 +128,18 @@ namespace CliFx
             // Keep track whether there was an error in the input
             var isError = false;
 
-            // If target command isn't defined, find its contextual replacement
-            if (targetCommandSchema == null)
+            // Report error if no command matched the arguments
+            if (targetCommandSchema is null)
             {
-                // If command was specified, inform the user that it's not defined
+                // If a command was specified, inform the user that the command is not defined
                 if (commandInput.IsCommandSpecified())
                 {
                     _console.WithForegroundColor(ConsoleColor.Red,
-                        () => _console.Error.WriteLine($"Specified command [{commandInput.CommandName}] is not defined."));
-
+                        () => _console.Error.WriteLine($"No command could be matched for input [{string.Join(" ", commandInput.Arguments)}]"));
                     isError = true;
                 }
 
-                // Replace target command with closest parent of specified command
-                targetCommandSchema = availableCommandSchemas.FindParent(commandInput.CommandName);
-
-                // If there's no parent, replace with stub default command
-                if (targetCommandSchema == null)
-                {
-                    targetCommandSchema = CommandSchema.StubDefaultCommand;
-                    availableCommandSchemas = availableCommandSchemas.Concat(CommandSchema.StubDefaultCommand).ToArray();
-                }
+                targetCommandSchema = CommandSchema.StubDefaultCommand;
             }
 
             // Build help text source
@@ -189,7 +179,7 @@ namespace CliFx
                 var availableCommandSchemas = _commandSchemaResolver.GetCommandSchemas(_configuration.CommandTypes);
 
                 // Find command schema matching the name specified in the input
-                var targetCommandSchema = availableCommandSchemas.FindByName(commandInput.CommandName);
+                var targetCommandSchema = availableCommandSchemas.FindFromArguments(commandInput.Arguments);
 
                 // Chain handlers until the first one that produces an exit code
                 return
