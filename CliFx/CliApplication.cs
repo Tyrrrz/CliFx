@@ -152,13 +152,18 @@ namespace CliFx
             return isError ? -1 : 0;
         }
 
-        private async Task<int> HandleCommandExecutionAsync(CommandInput commandInput, CommandSchema targetCommandSchema)
+        private async Task<int> HandleCommandExecutionAsync(TargetCommandSchema targetCommandSchema)
         {
+            if (targetCommandSchema.Schema is null)
+            {
+                throw new ArgumentException("Cannot execute command without a schema.");
+            }
+
             // Create an instance of the command
-            var command = _commandFactory.CreateCommand(targetCommandSchema);
+            var command = _commandFactory.CreateCommand(targetCommandSchema.Schema);
 
             // Populate command with options according to its schema
-            _commandInitializer.InitializeCommand(command, targetCommandSchema, commandInput);
+            _commandInitializer.InitializeCommand(command, targetCommandSchema);
 
             // Execute command
             await command.ExecuteAsync(_console);
@@ -179,15 +184,15 @@ namespace CliFx
                 var availableCommandSchemas = _commandSchemaResolver.GetCommandSchemas(_configuration.CommandTypes);
 
                 // Find command schema matching the name specified in the input
-                var targetCommandSchema = availableCommandSchemas.FindFromArguments(commandInput.Arguments);
+                var targetCommandSchema = _commandSchemaResolver.GetTargetCommandSchema(availableCommandSchemas, commandInput);
 
                 // Chain handlers until the first one that produces an exit code
                 return
                     await HandleDebugDirectiveAsync(commandInput) ??
                     HandlePreviewDirective(commandInput) ??
                     HandleVersionOption(commandInput) ??
-                    HandleHelpOption(commandInput, availableCommandSchemas, targetCommandSchema) ??
-                    await HandleCommandExecutionAsync(commandInput, targetCommandSchema!);
+                    HandleHelpOption(commandInput, availableCommandSchemas, targetCommandSchema.Schema) ??
+                    await HandleCommandExecutionAsync(targetCommandSchema);
             }
             catch (Exception ex)
             {

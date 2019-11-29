@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using CliFx.Attributes;
 using CliFx.Exceptions;
 using CliFx.Internal;
@@ -117,6 +118,34 @@ namespace CliFx.Services
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// <inheritdoc />
+        /// </summary>
+        public TargetCommandSchema GetTargetCommandSchema(IReadOnlyList<CommandSchema> availableCommandSchemas, CommandInput commandInput)
+        {
+            // If no arguments are given, use the default command
+            CommandSchema targetSchema;
+            if (!commandInput.Arguments.Any())
+            {
+                targetSchema = availableCommandSchemas.FirstOrDefault(c => c.IsDefault());
+                return new TargetCommandSchema(targetSchema, new string[0], commandInput);
+            }
+
+            // Arguments can be part of the a command name as long as they are single words, i.e. no whitespace characters
+            var longestPossibleCommandName = string.Join(" ", commandInput.Arguments.TakeWhile(arg => !Regex.IsMatch(arg, @"\s")));
+
+            // Find the longest matching schema
+            var orderedSchemas = availableCommandSchemas.OrderByDescending(x => x.Name?.Length);
+            targetSchema = orderedSchemas.FirstOrDefault(c => longestPossibleCommandName.StartsWith(c.Name ?? string.Empty, StringComparison.Ordinal))
+                           ?? availableCommandSchemas.FirstOrDefault(c => c.IsDefault());
+
+            // Get remaining positional arguments
+            var commandArgumentsCount = targetSchema?.Name?.Split(' ').Length ?? 0;
+            var positionalArguments = commandInput.Arguments.Skip(commandArgumentsCount).ToList();
+
+            return new TargetCommandSchema(targetSchema, positionalArguments, commandInput);
         }
     }
 }

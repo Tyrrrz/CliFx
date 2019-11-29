@@ -25,25 +25,6 @@ namespace CliFx.Models
         }
 
         /// <summary>
-        /// Finds the most specific command that matches the given arguments.
-        /// </summary>
-        public static CommandSchema? FindFromArguments(this IReadOnlyList<CommandSchema> commandSchemas, IReadOnlyList<string> arguments)
-        {
-            // If no arguments are given, use the default command
-            if (!arguments.Any())
-                return commandSchemas.FirstOrDefault(c => c.IsDefault());
-
-            // Arguments can be part of the a command name as long as they are single words, i.e. no whitespace characters
-            var longestPossibleCommandName = string.Join(" ", arguments.TakeWhile(arg => !Regex.IsMatch(arg, @"\s")));
-
-            // Find the longest matching schema
-            var orderedSchemas = commandSchemas.OrderByDescending(x => x.Name?.Length);
-            var bestMatch = orderedSchemas.FirstOrDefault(c => longestPossibleCommandName.StartsWith(c.Name ?? string.Empty));
-
-            return bestMatch;
-        }
-
-        /// <summary>
         /// Finds parent command to the command that has specified name, or null if not found.
         /// </summary>
         public static CommandSchema? FindParent(this IReadOnlyList<CommandSchema> commandSchemas, string? commandName)

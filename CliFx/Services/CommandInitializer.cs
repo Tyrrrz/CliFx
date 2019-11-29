@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using CliFx.Exceptions;
 using CliFx.Internal;
 using CliFx.Models;
@@ -39,31 +40,36 @@ namespace CliFx.Services
         }
 
         /// <inheritdoc />
-        public void InitializeCommand(ICommand command, CommandSchema commandSchema, CommandInput commandInput)
+        public void InitializeCommand(ICommand command, TargetCommandSchema targetCommandSchema)
         {
+            if (targetCommandSchema.Schema is null)
+            {
+                throw new ArgumentException("Cannot initialize command without a schema.");
+            }
+
             // Keep track of unset required options to report an error at a later stage
-            var unsetRequiredOptions = commandSchema.Options.Where(o => o.IsRequired).ToList();
+            var unsetRequiredOptions = targetCommandSchema.Schema.Options.Where(o => o.IsRequired).ToList();
 
             //Set command options
-            foreach (var optionSchema in commandSchema.Options)
+            foreach (var optionSchema in targetCommandSchema.Schema.Options)
             {
                 // Ignore special options that are not backed by a property
                 if (optionSchema.Property == null)
                     continue;
 
                 //Find matching option input
-                var optionInput = commandInput.Options.FindByOptionSchema(optionSchema);
+                var optionInput = targetCommandSchema.CommandInput.Options.FindByOptionSchema(optionSchema);
 
                 //If no option input is available fall back to environment variable values
                 if (optionInput == null && !string.IsNullOrWhiteSpace(optionSchema.EnvironmentVariableName))
                 {
-                    var fallbackEnvironmentVariableExists = commandInput.EnvironmentVariables.ContainsKey(optionSchema.EnvironmentVariableName!);
+                    var fallbackEnvironmentVariableExists = targetCommandSchema.CommandInput.EnvironmentVariables.ContainsKey(optionSchema.EnvironmentVariableName!);
 
                     //If no environment variable is found or there is no valid value for this option skip it
-                    if (!fallbackEnvironmentVariableExists || string.IsNullOrWhiteSpace(commandInput.EnvironmentVariables[optionSchema.EnvironmentVariableName!]))
+                    if (!fallbackEnvironmentVariableExists || string.IsNullOrWhiteSpace(targetCommandSchema.CommandInput.EnvironmentVariables[optionSchema.EnvironmentVariableName!]))
                         continue;
 
-                    optionInput = _environmentVariablesParser.GetCommandOptionInputFromEnvironmentVariable(commandInput.EnvironmentVariables[optionSchema.EnvironmentVariableName!], optionSchema);
+                    optionInput = _environmentVariablesParser.GetCommandOptionInputFromEnvironmentVariable(targetCommandSchema.CommandInput.EnvironmentVariables[optionSchema.EnvironmentVariableName!], optionSchema);
                 }
 
                 //No fallback available and no option input was specified, skip option

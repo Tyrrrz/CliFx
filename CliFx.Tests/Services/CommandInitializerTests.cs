@@ -22,91 +22,109 @@ namespace CliFx.Tests.Services
         {
             yield return new TestCaseData(
                 new DivideCommand(),
-                GetCommandSchema(typeof(DivideCommand)),
-                new CommandInput(new[] { "div" }, new[]
-                {
-                    new CommandOptionInput("dividend", "13"),
-                    new CommandOptionInput("divisor", "8")
-                }),
+                new TargetCommandSchema(
+                    GetCommandSchema(typeof(DivideCommand)),
+                    new string[0],
+                    new CommandInput(new[] { "div" }, new[]
+                    {
+                        new CommandOptionInput("dividend", "13"),
+                        new CommandOptionInput("divisor", "8")
+                    })),
                 new DivideCommand { Dividend = 13, Divisor = 8 }
             );
 
             yield return new TestCaseData(
                 new DivideCommand(),
+                new TargetCommandSchema(
                 GetCommandSchema(typeof(DivideCommand)),
+                new string[0],
                 new CommandInput(new[] { "div" }, new[]
                 {
                     new CommandOptionInput("dividend", "13"),
                     new CommandOptionInput("d", "8")
-                }),
+                })),
                 new DivideCommand { Dividend = 13, Divisor = 8 }
             );
 
             yield return new TestCaseData(
                 new DivideCommand(),
+                new TargetCommandSchema(
                 GetCommandSchema(typeof(DivideCommand)),
+                new string[0],
                 new CommandInput(new[] { "div" }, new[]
                 {
                     new CommandOptionInput("D", "13"),
                     new CommandOptionInput("d", "8")
-                }),
+                })),
                 new DivideCommand { Dividend = 13, Divisor = 8 }
             );
 
             yield return new TestCaseData(
                 new ConcatCommand(),
+                new TargetCommandSchema(
                 GetCommandSchema(typeof(ConcatCommand)),
+                new string[0],
                 new CommandInput(new[] { "concat" }, new[]
                 {
                     new CommandOptionInput("i", new[] { "foo", " ", "bar" })
-                }),
+                })),
                 new ConcatCommand { Inputs = new[] { "foo", " ", "bar" } }
             );
 
             yield return new TestCaseData(
                 new ConcatCommand(),
+                new TargetCommandSchema(
                 GetCommandSchema(typeof(ConcatCommand)),
+                new string[0],
                 new CommandInput(new[] { "concat" }, new[]
                 {
                     new CommandOptionInput("i", new[] { "foo", "bar" }),
                     new CommandOptionInput("s", " ")
-                }),
+                })),
                 new ConcatCommand { Inputs = new[] { "foo", "bar" }, Separator = " " }
             );
 
             //Will read a value from environment variables because none is supplied via CommandInput
             yield return new TestCaseData(
                 new EnvironmentVariableCommand(),
+                new TargetCommandSchema(
                 GetCommandSchema(typeof(EnvironmentVariableCommand)),
-                new CommandInput(new string[0], new CommandOptionInput[0], EnvironmentVariablesProviderStub.EnvironmentVariables),
+                new string[0],
+                new CommandInput(new string[0], new CommandOptionInput[0], EnvironmentVariablesProviderStub.EnvironmentVariables)),
                 new EnvironmentVariableCommand { Option = "A" }
             );
 
             //Will read multiple values from environment variables because none is supplied via CommandInput
             yield return new TestCaseData(
                 new EnvironmentVariableWithMultipleValuesCommand(),
+                new TargetCommandSchema(
                 GetCommandSchema(typeof(EnvironmentVariableWithMultipleValuesCommand)),
-                new CommandInput(new string[0], new CommandOptionInput[0], EnvironmentVariablesProviderStub.EnvironmentVariables),
+                new string[0],
+                new CommandInput(new string[0], new CommandOptionInput[0], EnvironmentVariablesProviderStub.EnvironmentVariables)),
                 new EnvironmentVariableWithMultipleValuesCommand { Option = new[] { "A", "B", "C" } }
             );
 
             //Will not read a value from environment variables because one is supplied via CommandInput
             yield return new TestCaseData(
                 new EnvironmentVariableCommand(),
+                new TargetCommandSchema(
                 GetCommandSchema(typeof(EnvironmentVariableCommand)),
+                new string[0],
                 new CommandInput(new string[0], new[]
                     {
                         new CommandOptionInput("opt", new[] { "X" })
                     },
-                    EnvironmentVariablesProviderStub.EnvironmentVariables),
+                    EnvironmentVariablesProviderStub.EnvironmentVariables)),
                 new EnvironmentVariableCommand { Option = "X" }
             );
 
             //Will not split environment variable values because underlying property is not a collection
             yield return new TestCaseData(
                 new EnvironmentVariableWithoutCollectionPropertyCommand(),
+                new TargetCommandSchema(
                 GetCommandSchema(typeof(EnvironmentVariableWithoutCollectionPropertyCommand)),
-                new CommandInput(new string[0], new CommandOptionInput[0], EnvironmentVariablesProviderStub.EnvironmentVariables),
+                new string[0],
+                new CommandInput(new string[0], new CommandOptionInput[0], EnvironmentVariablesProviderStub.EnvironmentVariables)),
                 new EnvironmentVariableWithoutCollectionPropertyCommand { Option = $"A{Path.PathSeparator}B{Path.PathSeparator}C{Path.PathSeparator}" }
             );
         }
@@ -115,45 +133,53 @@ namespace CliFx.Tests.Services
         {
             yield return new TestCaseData(
                 new DivideCommand(),
+                new TargetCommandSchema(
                 GetCommandSchema(typeof(DivideCommand)),
+                new string[0],
                 new CommandInput(new[] { "div" })
-            );
+            ));
 
             yield return new TestCaseData(
                 new DivideCommand(),
+                new TargetCommandSchema(
                 GetCommandSchema(typeof(DivideCommand)),
+                new string[0],
                 new CommandInput(new[] { "div" }, new[]
                 {
                     new CommandOptionInput("D", "13")
                 })
-            );
+            ));
 
             yield return new TestCaseData(
                 new ConcatCommand(),
+                new TargetCommandSchema(
                 GetCommandSchema(typeof(ConcatCommand)),
+                new string[0],
                 new CommandInput(new[] { "concat" })
-            );
+            ));
 
             yield return new TestCaseData(
                 new ConcatCommand(),
+                new TargetCommandSchema(
                 GetCommandSchema(typeof(ConcatCommand)),
+                new string[0],
                 new CommandInput(new[] { "concat" }, new[]
                 {
                     new CommandOptionInput("s", "_")
                 })
-            );
+            ));
         }
 
         [Test]
         [TestCaseSource(nameof(GetTestCases_InitializeCommand))]
-        public void InitializeCommand_Test(ICommand command, CommandSchema commandSchema, CommandInput commandInput,
+        public void InitializeCommand_Test(ICommand command, TargetCommandSchema targetCommandSchema,
             ICommand expectedCommand)
         {
             // Arrange
             var initializer = new CommandInitializer();
 
             // Act
-            initializer.InitializeCommand(command, commandSchema, commandInput);
+            initializer.InitializeCommand(command, targetCommandSchema);
 
             // Assert
             command.Should().BeEquivalentTo(expectedCommand, o => o.RespectingRuntimeTypes());
@@ -161,13 +187,13 @@ namespace CliFx.Tests.Services
 
         [Test]
         [TestCaseSource(nameof(GetTestCases_InitializeCommand_Negative))]
-        public void InitializeCommand_Negative_Test(ICommand command, CommandSchema commandSchema, CommandInput commandInput)
+        public void InitializeCommand_Negative_Test(ICommand command, TargetCommandSchema targetCommandSchema)
         {
             // Arrange
             var initializer = new CommandInitializer();
 
             // Act & Assert
-            initializer.Invoking(i => i.InitializeCommand(command, commandSchema, commandInput))
+            initializer.Invoking(i => i.InitializeCommand(command, targetCommandSchema))
                 .Should().ThrowExactly<CliFxException>();
         }
     }
