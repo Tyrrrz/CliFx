@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -9,26 +10,51 @@ using CliFx.Models;
 namespace CliFx.Services
 {
     /// <summary>
-    /// Default implementation of <see cref="ICommandOptionInputConverter"/>.
+    /// Default implementation of <see cref="ICommandInputConverter"/>.
     /// </summary>
-    public partial class CommandOptionInputConverter : ICommandOptionInputConverter
+    public partial class CommandInputConverter : ICommandInputConverter
     {
         private readonly IFormatProvider _formatProvider;
 
         /// <summary>
-        /// Initializes an instance of <see cref="CommandOptionInputConverter"/>.
+        /// Initializes an instance of <see cref="CommandInputConverter"/>.
         /// </summary>
-        public CommandOptionInputConverter(IFormatProvider formatProvider)
+        public CommandInputConverter(IFormatProvider formatProvider)
         {
             _formatProvider = formatProvider;
         }
 
         /// <summary>
-        /// Initializes an instance of <see cref="CommandOptionInputConverter"/>.
+        /// Initializes an instance of <see cref="CommandInputConverter"/>.
         /// </summary>
-        public CommandOptionInputConverter()
+        public CommandInputConverter()
             : this(CultureInfo.InvariantCulture)
         {
+        }
+
+        private object? ConvertEnumerableValue(IReadOnlyList<string> values, Type enumerableUnderlyingType, Type targetType)
+        {
+            // Convert values to the underlying enumerable type and cast it to dynamic array
+            var convertedValues = values
+                .Select(v => ConvertValue(v, enumerableUnderlyingType))
+                .ToNonGenericArray(enumerableUnderlyingType);
+
+            // Get the type of produced array
+            var convertedValuesType = convertedValues.GetType();
+
+            // Try to assign the array (works for T[], IReadOnlyList<T>, IEnumerable<T>, etc)
+            if (targetType.IsAssignableFrom(convertedValuesType))
+                return convertedValues;
+
+            // Try to inject the array into the constructor (works for HashSet<T>, List<T>, etc)
+            var arrayConstructor = targetType.GetConstructor(new[] { convertedValuesType });
+            if (arrayConstructor != null)
+                return arrayConstructor.Invoke(new object[] { convertedValues });
+
+            // Throw if we can't find a way to convert the values
+            throw new CliFxException(
+                $"Can't convert a sequence of values [{values.JoinToString(", ")}] " +
+                $"to type [{targetType}].");
         }
 
         /// <summary>
@@ -118,17 +144,17 @@ namespace CliFx.Services
                 // Has a constructor that accepts a single string
                 var stringConstructor = GetStringConstructor(targetType);
                 if (stringConstructor != null)
-                    return stringConstructor.Invoke(new object[] {value});
+                    return stringConstructor.Invoke(new object[] { value });
 
                 // Has a static parse method that accepts a single string and a format provider
                 var parseMethodWithFormatProvider = GetStaticParseMethodWithFormatProvider(targetType);
                 if (parseMethodWithFormatProvider != null)
-                    return parseMethodWithFormatProvider.Invoke(null, new object[] {value, _formatProvider});
+                    return parseMethodWithFormatProvider.Invoke(null, new object[] { value, _formatProvider });
 
                 // Has a static parse method that accepts a single string
                 var parseMethod = GetStaticParseMethod(targetType);
                 if (parseMethod != null)
-                    return parseMethod.Invoke(null, new object[] {value});
+                    return parseMethod.Invoke(null, new object[] { value });
             }
             catch (Exception ex)
             {
@@ -138,6 +164,25 @@ namespace CliFx.Services
 
             // Throw if we can't find a way to convert the value
             throw new CliFxException($"Can't convert value [{value}] to type [{targetType}].");
+        }
+
+        /// <inheritdoc />
+        public virtual object? ConvertArgumentInput(IEnumerator<string> argumentEnumerator, Type targetType)
+        {
+            var enumerableUnderlyingType = targetType != typeof(string) ? targetType.GetEnumerableUnderlyingType() : null;
+            if (enumerableUnderlyingType is null)
+            {
+                var argument = argumentEnumerator.Current;
+                return ConvertValue(argument, targetType);
+            }
+
+            var arguments = new List<string>();
+            do
+            {
+                arguments.Add(argumentEnumerator.Current);
+            } while (argumentEnumerator.MoveNext());
+
+            return ConvertEnumerableValue(arguments, enumerableUnderlyingType, targetType);
         }
 
         /// <inheritdoc />
@@ -165,39 +210,19 @@ namespace CliFx.Services
             // Convert to an enumerable type
             else
             {
-                // Convert values to the underlying enumerable type and cast it to dynamic array
-                var convertedValues = optionInput.Values
-                    .Select(v => ConvertValue(v, enumerableUnderlyingType))
-                    .ToNonGenericArray(enumerableUnderlyingType);
-
-                // Get the type of produced array
-                var convertedValuesType = convertedValues.GetType();
-
-                // Try to assign the array (works for T[], IReadOnlyList<T>, IEnumerable<T>, etc)
-                if (targetType.IsAssignableFrom(convertedValuesType))
-                    return convertedValues;
-
-                // Try to inject the array into the constructor (works for HashSet<T>, List<T>, etc)
-                var arrayConstructor = targetType.GetConstructor(new[] {convertedValuesType});
-                if (arrayConstructor != null)
-                    return arrayConstructor.Invoke(new object[] {convertedValues});
-
-                // Throw if we can't find a way to convert the values
-                throw new CliFxException(
-                    $"Can't convert a sequence of values [{optionInput.Values.JoinToString(", ")}] " +
-                    $"to type [{targetType}].");
+                return ConvertEnumerableValue(optionInput.Values, enumerableUnderlyingType, targetType);
             }
         }
     }
 
-    public partial class CommandOptionInputConverter
+    public partial class CommandInputConverter
     {
-        private static ConstructorInfo GetStringConstructor(Type type) => type.GetConstructor(new[] {typeof(string)});
+        private static ConstructorInfo GetStringConstructor(Type type) => type.GetConstructor(new[] { typeof(string) });
 
         private static MethodInfo GetStaticParseMethod(Type type) =>
-            type.GetMethod("Parse", BindingFlags.Public | BindingFlags.Static, null, new[] {typeof(string)}, null);
+            type.GetMethod("Parse", BindingFlags.Public | BindingFlags.Static, null, new[] { typeof(string) }, null);
 
         private static MethodInfo GetStaticParseMethodWithFormatProvider(Type type) =>
-            type.GetMethod("Parse", BindingFlags.Public | BindingFlags.Static, null, new[] {typeof(string), typeof(IFormatProvider)}, null);
+            type.GetMethod("Parse", BindingFlags.Public | BindingFlags.Static, null, new[] { typeof(string), typeof(IFormatProvider) }, null);
     }
 }

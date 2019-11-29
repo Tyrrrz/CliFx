@@ -66,6 +66,45 @@ namespace CliFx.Services
             return result;
         }
 
+        private IReadOnlyList<CommandArgumentSchema> GetCommandArgumentSchemas(Type commandType)
+        {
+            var result = new List<CommandArgumentSchema>();
+
+            foreach (var property in commandType.GetProperties())
+            {
+                var attribute = property.GetCustomAttribute<CommandArgumentAttribute>();
+
+                // If an attribute is not set, then it's not an argument so we just skip it
+                if (attribute is null)
+                    continue;
+
+                // Build option schema
+                var argumentSchema = new CommandArgumentSchema(
+                    property,
+                    attribute.Name,
+                    attribute.IsRequired,
+                    attribute.Description,
+                    attribute.Order);
+
+                // Make sure there are no arguments with the same name
+                var existingArgumentWithSameName = result
+                    .Where(o => !string.IsNullOrWhiteSpace(o.Name))
+                    .FirstOrDefault(o => string.Equals(o.Name, argumentSchema.Name, StringComparison.OrdinalIgnoreCase));
+
+                if (existingArgumentWithSameName != null)
+                {
+                    throw new CliFxException(
+                        $"Command type [{commandType}] has arguments defined with the same name: " +
+                        $"[{existingArgumentWithSameName.Property}] and [{argumentSchema.Property}].");
+                }
+
+                // Add schema to list
+                result.Add(argumentSchema);
+            }
+
+            return result;
+        }
+
         /// <inheritdoc />
         public IReadOnlyList<CommandSchema> GetCommandSchemas(IReadOnlyList<Type> commandTypes)
         {
@@ -97,11 +136,15 @@ namespace CliFx.Services
                 // Get option schemas
                 var optionSchemas = GetCommandOptionSchemas(commandType);
 
+                // Get argument schemas
+                var argumentSchemas = GetCommandArgumentSchemas(commandType);
+
                 // Build command schema
                 var commandSchema = new CommandSchema(commandType,
                     attribute.Name,
                     attribute.Description,
-                    optionSchemas);
+                    optionSchemas,
+                    argumentSchemas);
 
                 // Make sure there are no other commands with the same name
                 var existingCommandWithSameName = result

@@ -31,14 +31,20 @@ namespace CliFx.Models
         public IReadOnlyList<CommandOptionSchema> Options { get; }
 
         /// <summary>
+        /// Command arguments.
+        /// </summary>
+        public IReadOnlyList<CommandArgumentSchema> Arguments { get; }
+
+        /// <summary>
         /// Initializes an instance of <see cref="CommandSchema"/>.
         /// </summary>
-        public CommandSchema(Type? type, string? name, string? description, IReadOnlyList<CommandOptionSchema> options)
+        public CommandSchema(Type? type, string? name, string? description, IReadOnlyList<CommandOptionSchema> options, IReadOnlyList<CommandArgumentSchema> arguments)
         {
             Type = type;
             Name = name;
             Description = description;
             Options = options;
+            Arguments = arguments;
         }
 
         /// <inheritdoc />
@@ -64,6 +70,6 @@ namespace CliFx.Models
     public partial class CommandSchema
     {
         internal static CommandSchema StubDefaultCommand { get; } =
-            new CommandSchema(null, null, null, new CommandOptionSchema[0]);
+            new CommandSchema(null, null, null, new CommandOptionSchema[0], new CommandArgumentSchema[0]);
     }
 }

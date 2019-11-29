@@ -25,7 +25,7 @@ namespace CliFx
         private string? _description;
         private IConsole? _console;
         private ICommandFactory? _commandFactory;
-        private ICommandOptionInputConverter? _commandOptionInputConverter;
+        private ICommandInputConverter? _commandInputConverter;
         private IEnvironmentVariablesProvider? _environmentVariablesProvider;
 
         /// <inheritdoc />
@@ -107,9 +107,9 @@ namespace CliFx
         }
 
         /// <inheritdoc />
-        public ICliApplicationBuilder UseCommandOptionInputConverter(ICommandOptionInputConverter converter)
+        public ICliApplicationBuilder UseCommandOptionInputConverter(ICommandInputConverter converter)
         {
-            _commandOptionInputConverter = converter;
+            _commandInputConverter = converter;
             return this;
         }
 
@@ -129,7 +129,7 @@ namespace CliFx
             _versionText ??= GetDefaultVersionText() ?? "v1.0";
             _console ??= new SystemConsole();
             _commandFactory ??= new CommandFactory();
-            _commandOptionInputConverter ??= new CommandOptionInputConverter();
+            _commandInputConverter ??= new CommandInputConverter();
             _environmentVariablesProvider ??= new EnvironmentVariablesProvider();
 
             // Project parameters to expected types
@@ -138,7 +138,7 @@ namespace CliFx
 
             return new CliApplication(metadata, configuration,
                 _console, new CommandInputParser(_environmentVariablesProvider), new CommandSchemaResolver(),
-                _commandFactory, new CommandInitializer(_commandOptionInputConverter, new EnvironmentVariablesParser()), new HelpTextRenderer());
+                _commandFactory, new CommandInitializer(_commandInputConverter, new EnvironmentVariablesParser()), new HelpTextRenderer());
         }
     }
 

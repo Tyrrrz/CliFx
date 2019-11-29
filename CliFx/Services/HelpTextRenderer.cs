@@ -19,7 +19,7 @@ namespace CliFx.Services
             var row = 0;
 
             // Get built-in option schemas (help and version)
-            var builtInOptionSchemas = new List<CommandOptionSchema> {CommandOptionSchema.HelpOption};
+            var builtInOptionSchemas = new List<CommandOptionSchema> { CommandOptionSchema.HelpOption };
             if (source.TargetCommandSchema.IsDefault())
                 builtInOptionSchemas.Add(CommandOptionSchema.VersionOption);
 
@@ -104,7 +104,7 @@ namespace CliFx.Services
                 // Description
                 if (!string.IsNullOrWhiteSpace(source.ApplicationMetadata.Description))
                 {
-                    Render(source.ApplicationMetadata.Description);
+                    Render(source.ApplicationMetadata.Description!);
                     RenderNewLine();
                 }
             }
@@ -122,7 +122,7 @@ namespace CliFx.Services
 
                 // Description
                 RenderIndent();
-                Render(source.TargetCommandSchema.Description);
+                Render(source.TargetCommandSchema.Description!);
                 RenderNewLine();
             }
 
@@ -142,7 +142,7 @@ namespace CliFx.Services
                 if (!string.IsNullOrWhiteSpace(source.TargetCommandSchema.Name))
                 {
                     Render(" ");
-                    RenderWithColor(source.TargetCommandSchema.Name, ConsoleColor.Cyan);
+                    RenderWithColor(source.TargetCommandSchema.Name!, ConsoleColor.Cyan);
                 }
 
                 // Child command
@@ -152,10 +152,61 @@ namespace CliFx.Services
                     RenderWithColor("[command]", ConsoleColor.Cyan);
                 }
 
+                // Arguments
+                foreach (var argumentSchema in source.TargetCommandSchema.Arguments)
+                {
+                    Render(" ");
+                    RenderWithColor(argumentSchema.ToString(), ConsoleColor.White);
+                }
+
                 // Options
                 Render(" ");
                 RenderWithColor("[options]", ConsoleColor.White);
                 RenderNewLine();
+            }
+
+            void RenderArguments()
+            {
+                // Do not render anything if the command has no arguments
+                if (source.TargetCommandSchema.Arguments.Count is 0)
+                    return;
+
+                // Margin
+                RenderMargin();
+
+                // Header
+                RenderHeader("Arguments");
+
+                // Order arguments
+                var orderedArgumentSchemas = source.TargetCommandSchema.Arguments
+                    .Ordered()
+                    .ToArray();
+
+                // Arguments
+                foreach (var argumentSchema in orderedArgumentSchemas)
+                {
+                    // Is required
+                    if (argumentSchema.IsRequired)
+                    {
+                        RenderWithColor("* ", ConsoleColor.Red);
+                    }
+                    else
+                    {
+                        RenderIndent();
+                    }
+
+                    // Short name
+                    RenderWithColor($"{argumentSchema.DisplayName}", ConsoleColor.White);
+
+                    // Description
+                    if (!string.IsNullOrWhiteSpace(argumentSchema.Description))
+                    {
+                        RenderColumnIndent();
+                        Render(argumentSchema.Description!);
+                    }
+
+                    RenderNewLine();
+                }
             }
 
             void RenderOptions()
@@ -207,7 +258,7 @@ namespace CliFx.Services
                     if (!string.IsNullOrWhiteSpace(optionSchema.Description))
                     {
                         RenderColumnIndent();
-                        Render(optionSchema.Description);
+                        Render(optionSchema.Description!);
                     }
 
                     RenderNewLine();
@@ -238,7 +289,7 @@ namespace CliFx.Services
                     if (!string.IsNullOrWhiteSpace(childCommandSchema.Description))
                     {
                         RenderColumnIndent();
-                        Render(childCommandSchema.Description);
+                        Render(childCommandSchema.Description!);
                     }
 
                     RenderNewLine();
@@ -275,6 +326,7 @@ namespace CliFx.Services
             RenderApplicationInfo();
             RenderDescription();
             RenderUsage();
+            RenderArguments();
             RenderOptions();
             RenderChildCommands();
         }
@@ -285,6 +337,6 @@ namespace CliFx.Services
         private static string? GetRelativeCommandName(CommandSchema commandSchema, CommandSchema parentCommandSchema) =>
             string.IsNullOrWhiteSpace(parentCommandSchema.Name) || string.IsNullOrWhiteSpace(commandSchema.Name)
                 ? commandSchema.Name
-                : commandSchema.Name.Substring(parentCommandSchema.Name.Length + 1);
+                : commandSchema.Name!.Substring(parentCommandSchema.Name!.Length + 1);
     }
 }

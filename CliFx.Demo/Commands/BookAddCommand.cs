@@ -14,7 +14,7 @@ namespace CliFx.Demo.Commands
     {
         private readonly LibraryService _libraryService;
 
-        [CommandOption("title", 't', IsRequired = true, Description = "Book title.")]
+        [CommandArgument(Name = "title", IsRequired = true, Description = "Book title.")]
         public string Title { get; set; }
 
         [CommandOption("author", 'a', IsRequired = true, Description = "Book author.")]

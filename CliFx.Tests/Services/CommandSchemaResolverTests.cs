@@ -25,7 +25,8 @@ namespace CliFx.Tests.Services
                                 "dividend", 'D', true, "The number to divide.", null),
                             new CommandOptionSchema(typeof(DivideCommand).GetProperty(nameof(DivideCommand.Divisor)),
                                 "divisor", 'd', true, "The number to divide by.", null)
-                        }),
+                        },
+                        new CommandArgumentSchema[0]),
                     new CommandSchema(typeof(ConcatCommand), "concat", "Concatenate strings.",
                         new[]
                         {
@@ -33,13 +34,15 @@ namespace CliFx.Tests.Services
                                 null, 'i', true, "Input strings.", null),
                             new CommandOptionSchema(typeof(ConcatCommand).GetProperty(nameof(ConcatCommand.Separator)),
                                 null, 's', false, "String separator.", null)
-                        }),
+                        },
+                        new CommandArgumentSchema[0]),
                     new CommandSchema(typeof(EnvironmentVariableCommand), null, "Reads option values from environment variables.",
                         new[]
                         {
                             new CommandOptionSchema(typeof(EnvironmentVariableCommand).GetProperty(nameof(EnvironmentVariableCommand.Option)),
                                 "opt", null, false, null, "ENV_SINGLE_VALUE")
-                        }
+                        },
+                        new CommandArgumentSchema[0]
                     )
                 }
             );
@@ -48,7 +51,7 @@ namespace CliFx.Tests.Services
                 new[] { typeof(HelloWorldDefaultCommand) },
                 new[]
                 {
-                    new CommandSchema(typeof(HelloWorldDefaultCommand), null, null, new CommandOptionSchema[0])
+                    new CommandSchema(typeof(HelloWorldDefaultCommand), null, null, new CommandOptionSchema[0], new CommandArgumentSchema[0])
                 }
             );
         }
