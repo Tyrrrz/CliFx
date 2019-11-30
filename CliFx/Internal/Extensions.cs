@@ -71,8 +71,7 @@ namespace CliFx.Internal
         public static IOrderedEnumerable<CommandArgumentSchema> Ordered(this IEnumerable<CommandArgumentSchema> source)
         {
             return source
-                .OrderBy(a => a.Order)
-                .ThenBy(a => a.Property.Name);
+                .OrderBy(a => a.Order);
         }
     }
 }

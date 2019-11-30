@@ -69,6 +69,7 @@ namespace CliFx.Services
         private IReadOnlyList<CommandArgumentSchema> GetCommandArgumentSchemas(Type commandType)
         {
             var result = new List<CommandArgumentSchema>();
+            var argumentOrders = new HashSet<int>();
 
             foreach (var property in commandType.GetProperties())
             {
@@ -96,6 +97,13 @@ namespace CliFx.Services
                     throw new CliFxException(
                         $"Command type [{commandType}] has arguments defined with the same name: " +
                         $"[{existingArgumentWithSameName.Property}] and [{argumentSchema.Property}].");
+                }
+
+                // Make sure that the order of all properties are distinct
+                if (!argumentOrders.Add(argumentSchema.Order))
+                {
+                    throw new CliFxException(
+                        $"Command type [{commandType}] has arguments defined with the same order [{argumentSchema.Order}].");
                 }
 
                 // Add schema to list
