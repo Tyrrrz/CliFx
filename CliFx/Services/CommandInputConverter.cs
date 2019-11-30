@@ -167,22 +167,21 @@ namespace CliFx.Services
         }
 
         /// <inheritdoc />
-        public virtual object? ConvertArgumentInput(IEnumerator<string> argumentEnumerator, Type targetType)
+        public virtual object? ConvertArgumentInput(IReadOnlyList<string> arguments, ref int currentIndex, Type targetType)
         {
             var enumerableUnderlyingType = targetType != typeof(string) ? targetType.GetEnumerableUnderlyingType() : null;
             if (enumerableUnderlyingType is null)
             {
-                var argument = argumentEnumerator.Current;
+                var argument = arguments[currentIndex];
+                currentIndex += 1;
                 return ConvertValue(argument, targetType);
             }
 
-            var arguments = new List<string>();
-            do
-            {
-                arguments.Add(argumentEnumerator.Current);
-            } while (argumentEnumerator.MoveNext());
+            // 
+            var argumentSequence = arguments.Skip(currentIndex).ToList();
+            currentIndex = arguments.Count;
 
-            return ConvertEnumerableValue(arguments, enumerableUnderlyingType, targetType);
+            return ConvertEnumerableValue(argumentSequence, enumerableUnderlyingType, targetType);
         }
 
         /// <inheritdoc />

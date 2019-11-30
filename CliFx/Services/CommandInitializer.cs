@@ -106,18 +106,17 @@ namespace CliFx.Services
                 .Where(o => o.IsRequired)
                 .ToList();
             var orderedArgumentSchemas = targetCommandSchema.Schema.Arguments.Ordered();
-
-            using var positionalArgumentEnumerator = targetCommandSchema.PositionalArgumentsInput.GetEnumerator();
+            var argumentIndex = 0;
 
             foreach (var argumentSchema in orderedArgumentSchemas)
             {
-                if (!positionalArgumentEnumerator.MoveNext())
+                if (argumentIndex >= targetCommandSchema.PositionalArgumentsInput.Count)
                 {
                     // No more positional arguments left - remaining argument properties stay unset
                     break;
                 }
 
-                var convertedValue = _commandInputConverter.ConvertArgumentInput(positionalArgumentEnumerator, argumentSchema.Property.PropertyType);
+                var convertedValue = _commandInputConverter.ConvertArgumentInput(targetCommandSchema.PositionalArgumentsInput, ref argumentIndex, argumentSchema.Property.PropertyType);
 
                 // Set value of underlying property
                 argumentSchema.Property.SetValue(command, convertedValue);
@@ -125,6 +124,12 @@ namespace CliFx.Services
                 // Mark this required argument as set
                 if (argumentSchema.IsRequired)
                     unsetRequiredArguments.Remove(argumentSchema);
+            }
+
+            // Throw if there are remaining input arguments
+            if (argumentIndex < targetCommandSchema.PositionalArgumentsInput.Count)
+            {
+                throw new CliFxException($"Could not map the following arguments to command name or positional arguments: {targetCommandSchema.PositionalArgumentsInput.Skip(argumentIndex).JoinToString(", ")}");
             }
 
             // Throw if any of the required arguments were not set

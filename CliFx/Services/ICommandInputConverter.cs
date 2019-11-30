@@ -17,6 +17,6 @@ namespace CliFx.Services
         /// <summary>
         /// Converts an argument to specified target type, using up arguments from the given enumerator.
         /// </summary>
-        object? ConvertArgumentInput(IEnumerator<string> argumentEnumerator, Type targetType);
+        object? ConvertArgumentInput(IReadOnlyList<string> arguments, ref int currentIndex, Type targetType);
     }
 }
