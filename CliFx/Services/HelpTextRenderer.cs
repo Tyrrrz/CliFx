@@ -156,7 +156,13 @@ namespace CliFx.Services
                 foreach (var argumentSchema in source.TargetCommandSchema.Arguments)
                 {
                     Render(" ");
-                    RenderWithColor(argumentSchema.ToString(), ConsoleColor.White);
+                    if (!argumentSchema.IsRequired)
+                        Render("[");
+
+                    Render($"<{argumentSchema.DisplayName}>");
+
+                    if (!argumentSchema.IsRequired)
+                        Render("]");
                 }
 
                 // Options
