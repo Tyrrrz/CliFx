@@ -3,7 +3,7 @@
 namespace CliFx.Attributes
 {
     /// <summary>
-    /// Annotates a property that defines a command option.
+    /// Annotates a property that defines a command argument.
     /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
     public class CommandArgumentAttribute : Attribute
@@ -19,7 +19,7 @@ namespace CliFx.Attributes
         public bool IsRequired { get; set; }
 
         /// <summary>
-        /// Option description, which is used in help text.
+        /// Argument description, which is used in help text.
         /// </summary>
         public string? Description { get; set; }
 

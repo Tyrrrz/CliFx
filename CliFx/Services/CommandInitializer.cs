@@ -127,10 +127,10 @@ namespace CliFx.Services
                     unsetRequiredArguments.Remove(argumentSchema);
             }
 
-            // Throw if any of the required options were not set
+            // Throw if any of the required arguments were not set
             if (unsetRequiredArguments.Any())
             {
-                throw new CliFxException($"One or more required options were not set: {unsetRequiredArguments.JoinToString(", ")}.");
+                throw new CliFxException($"One or more required arguments were not set: {unsetRequiredArguments.JoinToString(", ")}.");
             }
         }
 

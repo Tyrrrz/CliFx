@@ -168,7 +168,7 @@ namespace CliFx.Services
             void RenderArguments()
             {
                 // Do not render anything if the command has no arguments
-                if (source.TargetCommandSchema.Arguments.Count is 0)
+                if (source.TargetCommandSchema.Arguments.Count == 0)
                     return;
 
                 // Margin

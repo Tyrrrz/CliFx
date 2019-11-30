@@ -78,7 +78,7 @@ namespace CliFx.Services
                 if (attribute is null)
                     continue;
 
-                // Build option schema
+                // Build argument schema
                 var argumentSchema = new CommandArgumentSchema(
                     property,
                     attribute.Name,
@@ -163,9 +163,7 @@ namespace CliFx.Services
             return result;
         }
 
-        /// <summary>
         /// <inheritdoc />
-        /// </summary>
         public TargetCommandSchema GetTargetCommandSchema(IReadOnlyList<CommandSchema> availableCommandSchemas, CommandInput commandInput)
         {
             // If no arguments are given, use the default command
