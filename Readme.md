@@ -487,11 +487,3 @@ Given that there are probably a dozen libraries that help with building CLI appl
 ## Etymology
 
 CliFx is made out of "Cli" for "Command Line Interface" and "Fx" for "Framework". It's pronounced as "cliff ex".
-
-## Libraries used
-
-- [NUnit](https://github.com/nunit/nunit)
-- [FluentAssertions](https://github.com/fluentassertions/fluentassertions)
-- [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json)
-- [BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet)
-- [Coverlet](https://github.com/tonerdo/coverlet)
