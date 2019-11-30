@@ -24,12 +24,19 @@ namespace CliFx.Attributes
         public string? Description { get; set; }
 
         /// <summary>
-        /// The ordering of the argument. Lower values will appear before higher values. If no order is given, it will be placed last.
-        ///
+        /// The ordering of the argument. Lower values will appear before higher values.
         /// <remarks>
-        /// If two arguments have the same value for <see cref="Order"/>, they will be ordered according to their <see cref="Name"/> properties, or the property name if <see cref="Name"/> is not set.
+        /// Two arguments of the same command cannot have the same <see cref="Order"/>.
         /// </remarks>
         /// </summary>
-        public int Order { get; set; } = int.MaxValue;
+        public int Order { get; }
+
+        /// <summary>
+        /// Initializes an instance of <see cref="CommandArgumentAttribute"/> with a given order.
+        /// </summary>
+        public CommandArgumentAttribute(int order)
+        {
+            Order = order;
+        }
     }
 }
