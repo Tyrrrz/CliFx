@@ -151,8 +151,7 @@ namespace CliFx.Services
                 var commandSchema = new CommandSchema(commandType,
                     attribute.Name,
                     attribute.Description,
-                    optionSchemas,
-                    argumentSchemas);
+                    argumentSchemas, optionSchemas);
 
                 // Make sure there are no other commands with the same name
                 var existingCommandWithSameName = result

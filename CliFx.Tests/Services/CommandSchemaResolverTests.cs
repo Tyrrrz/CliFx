@@ -19,30 +19,29 @@ namespace CliFx.Tests.Services
                 new[]
                 {
                     new CommandSchema(typeof(DivideCommand), "div", "Divide one number by another.",
-                        new[]
+                        new CommandArgumentSchema[0], new[]
                         {
                             new CommandOptionSchema(typeof(DivideCommand).GetProperty(nameof(DivideCommand.Dividend)),
                                 "dividend", 'D', true, "The number to divide.", null),
                             new CommandOptionSchema(typeof(DivideCommand).GetProperty(nameof(DivideCommand.Divisor)),
                                 "divisor", 'd', true, "The number to divide by.", null)
-                        },
-                        new CommandArgumentSchema[0]),
+                        }),
                     new CommandSchema(typeof(ConcatCommand), "concat", "Concatenate strings.",
+                        new CommandArgumentSchema[0],
                         new[]
                         {
                             new CommandOptionSchema(typeof(ConcatCommand).GetProperty(nameof(ConcatCommand.Inputs)),
                                 null, 'i', true, "Input strings.", null),
                             new CommandOptionSchema(typeof(ConcatCommand).GetProperty(nameof(ConcatCommand.Separator)),
                                 null, 's', false, "String separator.", null)
-                        },
-                        new CommandArgumentSchema[0]),
+                        }),
                     new CommandSchema(typeof(EnvironmentVariableCommand), null, "Reads option values from environment variables.",
+                        new CommandArgumentSchema[0],
                         new[]
                         {
                             new CommandOptionSchema(typeof(EnvironmentVariableCommand).GetProperty(nameof(EnvironmentVariableCommand.Option)),
                                 "opt", null, false, null, "ENV_SINGLE_VALUE")
-                        },
-                        new CommandArgumentSchema[0]
+                        }
                     )
                 }
             );
@@ -51,7 +50,7 @@ namespace CliFx.Tests.Services
                 new[] { typeof(HelloWorldDefaultCommand) },
                 new[]
                 {
-                    new CommandSchema(typeof(HelloWorldDefaultCommand), null, null, new CommandOptionSchema[0], new CommandArgumentSchema[0])
+                    new CommandSchema(typeof(HelloWorldDefaultCommand), null, null, new CommandArgumentSchema[0], new CommandOptionSchema[0])
                 }
             );
         }
