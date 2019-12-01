@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace CliFx.Models
 {
     /// <summary>
     /// Defines the target command and the input required for initializing the command.
     /// </summary>
-    public class TargetCommandSchema
+    public class CommandCandidate
     {
         /// <summary>
         /// The command schema of the target command.
@@ -27,9 +23,9 @@ namespace CliFx.Models
         public CommandInput CommandInput { get; }
 
         /// <summary>
-        /// Initializes and instance of <see cref="TargetCommandSchema"/>
+        /// Initializes and instance of <see cref="CommandCandidate"/>
         /// </summary>
-        public TargetCommandSchema(CommandSchema? schema, IReadOnlyList<string> positionalArgumentsInput, CommandInput commandInput)
+        public CommandCandidate(CommandSchema? schema, IReadOnlyList<string> positionalArgumentsInput, CommandInput commandInput)
         {
             Schema = schema;
             PositionalArgumentsInput = positionalArgumentsInput;

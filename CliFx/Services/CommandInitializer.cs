@@ -40,36 +40,36 @@ namespace CliFx.Services
         {
         }
 
-        private void InitializeCommandOptions(ICommand command, TargetCommandSchema targetCommandSchema)
+        private void InitializeCommandOptions(ICommand command, CommandCandidate commandCandidate)
         {
-            if (targetCommandSchema.Schema is null)
+            if (commandCandidate.Schema is null)
             {
                 throw new ArgumentException("Cannot initialize command without a schema.");
             }
 
             // Keep track of unset required options to report an error at a later stage
-            var unsetRequiredOptions = targetCommandSchema.Schema.Options.Where(o => o.IsRequired).ToList();
+            var unsetRequiredOptions = commandCandidate.Schema.Options.Where(o => o.IsRequired).ToList();
 
             //Set command options
-            foreach (var optionSchema in targetCommandSchema.Schema.Options)
+            foreach (var optionSchema in commandCandidate.Schema.Options)
             {
                 // Ignore special options that are not backed by a property
                 if (optionSchema.Property == null)
                     continue;
 
                 //Find matching option input
-                var optionInput = targetCommandSchema.CommandInput.Options.FindByOptionSchema(optionSchema);
+                var optionInput = commandCandidate.CommandInput.Options.FindByOptionSchema(optionSchema);
 
                 //If no option input is available fall back to environment variable values
                 if (optionInput == null && !string.IsNullOrWhiteSpace(optionSchema.EnvironmentVariableName))
                 {
-                    var fallbackEnvironmentVariableExists = targetCommandSchema.CommandInput.EnvironmentVariables.ContainsKey(optionSchema.EnvironmentVariableName!);
+                    var fallbackEnvironmentVariableExists = commandCandidate.CommandInput.EnvironmentVariables.ContainsKey(optionSchema.EnvironmentVariableName!);
 
                     //If no environment variable is found or there is no valid value for this option skip it
-                    if (!fallbackEnvironmentVariableExists || string.IsNullOrWhiteSpace(targetCommandSchema.CommandInput.EnvironmentVariables[optionSchema.EnvironmentVariableName!]))
+                    if (!fallbackEnvironmentVariableExists || string.IsNullOrWhiteSpace(commandCandidate.CommandInput.EnvironmentVariables[optionSchema.EnvironmentVariableName!]))
                         continue;
 
-                    optionInput = _environmentVariablesParser.GetCommandOptionInputFromEnvironmentVariable(targetCommandSchema.CommandInput.EnvironmentVariables[optionSchema.EnvironmentVariableName!], optionSchema);
+                    optionInput = _environmentVariablesParser.GetCommandOptionInputFromEnvironmentVariable(commandCandidate.CommandInput.EnvironmentVariables[optionSchema.EnvironmentVariableName!], optionSchema);
                 }
 
                 //No fallback available and no option input was specified, skip option
@@ -94,29 +94,29 @@ namespace CliFx.Services
             }
         }
 
-        private void InitializeCommandArguments(ICommand command, TargetCommandSchema targetCommandSchema)
+        private void InitializeCommandArguments(ICommand command, CommandCandidate commandCandidate)
         {
-            if (targetCommandSchema.Schema is null)
+            if (commandCandidate.Schema is null)
             {
                 throw new ArgumentException("Cannot initialize command without a schema.");
             }
 
             // Keep track of unset required options to report an error at a later stage
-            var unsetRequiredArguments = targetCommandSchema.Schema.Arguments
+            var unsetRequiredArguments = commandCandidate.Schema.Arguments
                 .Where(o => o.IsRequired)
                 .ToList();
-            var orderedArgumentSchemas = targetCommandSchema.Schema.Arguments.Ordered();
+            var orderedArgumentSchemas = commandCandidate.Schema.Arguments.Ordered();
             var argumentIndex = 0;
 
             foreach (var argumentSchema in orderedArgumentSchemas)
             {
-                if (argumentIndex >= targetCommandSchema.PositionalArgumentsInput.Count)
+                if (argumentIndex >= commandCandidate.PositionalArgumentsInput.Count)
                 {
                     // No more positional arguments left - remaining argument properties stay unset
                     break;
                 }
 
-                var convertedValue = _commandInputConverter.ConvertArgumentInput(targetCommandSchema.PositionalArgumentsInput, ref argumentIndex, argumentSchema.Property.PropertyType);
+                var convertedValue = _commandInputConverter.ConvertArgumentInput(commandCandidate.PositionalArgumentsInput, ref argumentIndex, argumentSchema.Property.PropertyType);
 
                 // Set value of underlying property
                 argumentSchema.Property.SetValue(command, convertedValue);
@@ -127,9 +127,9 @@ namespace CliFx.Services
             }
 
             // Throw if there are remaining input arguments
-            if (argumentIndex < targetCommandSchema.PositionalArgumentsInput.Count)
+            if (argumentIndex < commandCandidate.PositionalArgumentsInput.Count)
             {
-                throw new CliFxException($"Could not map the following arguments to command name or positional arguments: {targetCommandSchema.PositionalArgumentsInput.Skip(argumentIndex).JoinToString(", ")}");
+                throw new CliFxException($"Could not map the following arguments to command name or positional arguments: {commandCandidate.PositionalArgumentsInput.Skip(argumentIndex).JoinToString(", ")}");
             }
 
             // Throw if any of the required arguments were not set
@@ -140,10 +140,10 @@ namespace CliFx.Services
         }
 
         /// <inheritdoc />
-        public void InitializeCommand(ICommand command, TargetCommandSchema targetCommandSchema)
+        public void InitializeCommand(ICommand command, CommandCandidate commandCandidate)
         {
-            InitializeCommandOptions(command, targetCommandSchema);
-            InitializeCommandArguments(command, targetCommandSchema);
+            InitializeCommandOptions(command, commandCandidate);
+            InitializeCommandArguments(command, commandCandidate);
         }
     }
 }

@@ -15,7 +15,7 @@ namespace CliFx.Models
         public PropertyInfo Property { get; }
 
         /// <summary>
-        /// Argument name used for help text. If not supplied, the property name will be used.
+        /// Argument name used for help text.
         /// </summary>
         public string? Name { get; }
 

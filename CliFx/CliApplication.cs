@@ -102,7 +102,7 @@ namespace CliFx
         private int? HandleVersionOption(CommandInput commandInput)
         {
             // Version should be rendered if it was requested on a default command
-            var shouldRenderVersion = !commandInput.IsCommandSpecified() && commandInput.IsVersionOptionSpecified();
+            var shouldRenderVersion = !commandInput.HasArguments() && commandInput.IsVersionOptionSpecified();
 
             // If shouldn't render version, pass execution to the next handler
             if (!shouldRenderVersion)
@@ -132,7 +132,7 @@ namespace CliFx
             if (targetCommandSchema is null)
             {
                 // If a command was specified, inform the user that the command is not defined
-                if (commandInput.IsCommandSpecified())
+                if (commandInput.HasArguments())
                 {
                     _console.WithForegroundColor(ConsoleColor.Red,
                         () => _console.Error.WriteLine($"No command could be matched for input [{string.Join(" ", commandInput.Arguments)}]"));
@@ -152,18 +152,18 @@ namespace CliFx
             return isError ? -1 : 0;
         }
 
-        private async Task<int> HandleCommandExecutionAsync(TargetCommandSchema targetCommandSchema)
+        private async Task<int> HandleCommandExecutionAsync(CommandCandidate commandCandidate)
         {
-            if (targetCommandSchema.Schema is null)
+            if (commandCandidate.Schema is null)
             {
                 throw new ArgumentException("Cannot execute command without a schema.");
             }
 
             // Create an instance of the command
-            var command = _commandFactory.CreateCommand(targetCommandSchema.Schema);
+            var command = _commandFactory.CreateCommand(commandCandidate.Schema);
 
             // Populate command with options and arguments according to its schema
-            _commandInitializer.InitializeCommand(command, targetCommandSchema);
+            _commandInitializer.InitializeCommand(command, commandCandidate);
 
             // Execute command
             await command.ExecuteAsync(_console);
