@@ -106,8 +106,21 @@ namespace CliFx.Services
                         $"Command type [{commandType}] has arguments defined with the same order [{argumentSchema.Order}].");
                 }
 
+
                 // Add schema to list
                 result.Add(argumentSchema);
+            }
+
+            if (result.Any(a => a.IsRequired) && result.Any(a => !a.IsRequired))
+            {
+                // Verify all required arguments appear before optional arguments
+                var highestOrderRequiredArgument = result.Where(a => a.IsRequired).Max(a => a.Order);
+                var lowestOrderOptionalArgument = result.Where(a => !a.IsRequired).Min(a => a.Order);
+                if (highestOrderRequiredArgument > lowestOrderOptionalArgument)
+                {
+                    throw new CliFxException(
+                        $"Command type [{commandType}] has required arguments that appear after optional arguments. Required arguments must appear before optional arguments.");
+                }
             }
 
             return result;
