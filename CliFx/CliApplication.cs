@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 using CliFx.Exceptions;
 using CliFx.Models;
@@ -115,11 +114,12 @@ namespace CliFx
             return 0;
         }
 
+        
         private int? HandleHelpOption(CommandInput commandInput,
-            IReadOnlyList<CommandSchema> availableCommandSchemas, CommandSchema? targetCommandSchema)
+            IReadOnlyList<CommandSchema> availableCommandSchemas, CommandCandidate? commandCandidate)
         {
             // Help should be rendered if it was requested, or when executing a command which isn't defined
-            var shouldRenderHelp = commandInput.IsHelpOptionSpecified() || targetCommandSchema == null;
+            var shouldRenderHelp = commandInput.IsHelpOptionSpecified() || commandCandidate == null;
 
             // If shouldn't render help, pass execution to the next handler
             if (!shouldRenderHelp)
@@ -129,7 +129,7 @@ namespace CliFx
             var isError = false;
 
             // Report error if no command matched the arguments
-            if (targetCommandSchema is null)
+            if (commandCandidate is null)
             {
                 // If a command was specified, inform the user that the command is not defined
                 if (commandInput.HasArguments())
@@ -139,11 +139,11 @@ namespace CliFx
                     isError = true;
                 }
 
-                targetCommandSchema = CommandSchema.StubDefaultCommand;
+                commandCandidate = new CommandCandidate(CommandSchema.StubDefaultCommand, new string[0], commandInput);
             }
 
             // Build help text source
-            var helpTextSource = new HelpTextSource(_metadata, availableCommandSchemas, targetCommandSchema);
+            var helpTextSource = new HelpTextSource(_metadata, availableCommandSchemas, commandCandidate.Schema);
 
             // Render help text
             _helpTextRenderer.RenderHelpText(_console, helpTextSource);
@@ -152,11 +152,11 @@ namespace CliFx
             return isError ? -1 : 0;
         }
 
-        private async Task<int> HandleCommandExecutionAsync(CommandCandidate commandCandidate)
+        private async Task<int> HandleCommandExecutionAsync(CommandCandidate? commandCandidate)
         {
-            if (commandCandidate.Schema is null)
+            if (commandCandidate is null)
             {
-                throw new ArgumentException("Cannot execute command without a schema.");
+                throw new ArgumentException("Cannot execute command because it was not found.");
             }
 
             // Create an instance of the command
@@ -184,15 +184,15 @@ namespace CliFx
                 var availableCommandSchemas = _commandSchemaResolver.GetCommandSchemas(_configuration.CommandTypes);
 
                 // Find command schema matching the name specified in the input
-                var targetCommandSchema = _commandSchemaResolver.GetTargetCommandSchema(availableCommandSchemas, commandInput);
+                var commandCandidate = _commandSchemaResolver.GetTargetCommandSchema(availableCommandSchemas, commandInput);
 
                 // Chain handlers until the first one that produces an exit code
                 return
                     await HandleDebugDirectiveAsync(commandInput) ??
                     HandlePreviewDirective(commandInput) ??
                     HandleVersionOption(commandInput) ??
-                    HandleHelpOption(commandInput, availableCommandSchemas, targetCommandSchema.Schema) ??
-                    await HandleCommandExecutionAsync(targetCommandSchema);
+                    HandleHelpOption(commandInput, availableCommandSchemas, commandCandidate) ??
+                    await HandleCommandExecutionAsync(commandCandidate);
             }
             catch (Exception ex)
             {

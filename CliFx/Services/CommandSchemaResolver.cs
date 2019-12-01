@@ -171,14 +171,14 @@ namespace CliFx.Services
         }
 
         /// <inheritdoc />
-        public CommandCandidate GetTargetCommandSchema(IReadOnlyList<CommandSchema> availableCommandSchemas, CommandInput commandInput)
+        public CommandCandidate? GetTargetCommandSchema(IReadOnlyList<CommandSchema> availableCommandSchemas, CommandInput commandInput)
         {
             // If no arguments are given, use the default command
             CommandSchema targetSchema;
             if (!commandInput.Arguments.Any())
             {
                 targetSchema = availableCommandSchemas.FirstOrDefault(c => c.IsDefault());
-                return new CommandCandidate(targetSchema, new string[0], commandInput);
+                return targetSchema is null ? null : new CommandCandidate(targetSchema, new string[0], commandInput);
             }
 
             // Arguments can be part of the a command name as long as they are single words, i.e. no whitespace characters
@@ -193,7 +193,7 @@ namespace CliFx.Services
             var commandArgumentsCount = targetSchema?.Name?.Split(' ').Length ?? 0;
             var positionalArguments = commandInput.Arguments.Skip(commandArgumentsCount).ToList();
 
-            return new CommandCandidate(targetSchema, positionalArguments, commandInput);
+            return targetSchema is null ? null : new CommandCandidate(targetSchema, positionalArguments, commandInput);
         }
     }
 }
