@@ -70,6 +70,8 @@ namespace CliFx.Services
         {
             var result = new List<CommandArgumentSchema>();
             var argumentOrders = new HashSet<int>();
+            int? highestOrderArgument = null;
+            int? enumerableArgumentOrder = null;
 
             foreach (var property in commandType.GetProperties())
             {
@@ -106,6 +108,39 @@ namespace CliFx.Services
                         $"Command type [{commandType}] has arguments defined with the same order [{argumentSchema.Order}].");
                 }
 
+                // Verify that the order is not higher than an enumerable argument found yet
+                if (argumentSchema.Order > enumerableArgumentOrder)
+                {
+                    throw new CliFxException(
+                        $"Command type [{commandType}] defines a sequence argument with lower order than another argument; sequence argument must have the highest order (appear last).");
+                }
+
+                // Set the highest found argument order if applicable
+                if (!highestOrderArgument.HasValue || argumentSchema.Order > highestOrderArgument)
+                {
+                    highestOrderArgument = argumentSchema.Order;
+                }
+
+                // If the argument is an enumerable type
+                if (argumentSchema.Property.PropertyType != typeof(string) && argumentSchema.Property.PropertyType.GetEnumerableUnderlyingType() != null)
+                {
+                    // Verify that no other enumerable type has been found
+                    if (enumerableArgumentOrder.HasValue)
+                    {
+                        throw new CliFxException(
+                            $"Command type [{commandType}] defines multiple sequence arguments; only one is permitted.");
+                    }
+
+                    // Remember the order of this property
+                    enumerableArgumentOrder = argumentSchema.Order;
+
+                    // Verify that no higher order arguments have yet been found
+                    if (enumerableArgumentOrder > highestOrderArgument)
+                    {
+                        throw new CliFxException(
+                            $"Command type [{commandType}] defines a sequence argument with lower order than another argument; sequence argument must have the highest order (appear last).");
+                    }
+                }
 
                 // Add schema to list
                 result.Add(argumentSchema);
