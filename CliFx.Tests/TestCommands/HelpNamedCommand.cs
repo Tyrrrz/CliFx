@@ -13,6 +13,6 @@ namespace CliFx.Tests.TestCommands
         [CommandOption("option-d", 'd', Description = "OptionD description.")]
         public string? OptionD { get; set; }
 
-        public Task ExecuteAsync(IConsole console) => Task.CompletedTask;
+        public ValueTask ExecuteAsync(IConsole console) => default;
     }
 }

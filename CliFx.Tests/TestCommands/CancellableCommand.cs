@@ -8,7 +8,7 @@ namespace CliFx.Tests.TestCommands
     [Command("cancel")]
     public class CancellableCommand : ICommand
     {
-        public async Task ExecuteAsync(IConsole console)
+        public async ValueTask ExecuteAsync(IConsole console)
         {
             await Task.Yield();
 

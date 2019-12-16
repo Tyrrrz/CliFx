@@ -43,7 +43,7 @@ namespace CliFx
             _helpTextRenderer = helpTextRenderer;
         }
 
-        private async Task<int?> HandleDebugDirectiveAsync(CommandInput commandInput)
+        private async ValueTask<int?> HandleDebugDirectiveAsync(CommandInput commandInput)
         {
             // Debug mode is enabled if it's allowed in the application and it was requested via corresponding directive
             var isDebugMode = _configuration.IsDebugModeAllowed && commandInput.IsDebugDirectiveSpecified();
@@ -162,7 +162,7 @@ namespace CliFx
             return isError ? -1 : 0;
         }
 
-        private async Task<int> HandleCommandExecutionAsync(CommandInput commandInput, CommandSchema targetCommandSchema)
+        private async ValueTask<int> HandleCommandExecutionAsync(CommandInput commandInput, CommandSchema targetCommandSchema)
         {
             // Create an instance of the command
             var command = _commandFactory.CreateCommand(targetCommandSchema);
@@ -178,7 +178,7 @@ namespace CliFx
         }
 
         /// <inheritdoc />
-        public async Task<int> RunAsync(IReadOnlyList<string> commandLineArguments)
+        public async ValueTask<int> RunAsync(IReadOnlyList<string> commandLineArguments)
         {
             try
             {

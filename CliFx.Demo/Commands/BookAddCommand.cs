@@ -31,7 +31,7 @@ namespace CliFx.Demo.Commands
             _libraryService = libraryService;
         }
 
-        public Task ExecuteAsync(IConsole console)
+        public ValueTask ExecuteAsync(IConsole console)
         {
             // To make the demo simpler, we will just generate random publish date and ISBN if they were not set
             if (Published == default)
@@ -48,7 +48,7 @@ namespace CliFx.Demo.Commands
             console.Output.WriteLine("Book added.");
             console.RenderBook(book);
 
-            return Task.CompletedTask;
+            return default;
         }
     }
 

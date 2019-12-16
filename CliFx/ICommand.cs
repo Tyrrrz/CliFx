@@ -12,6 +12,6 @@ namespace CliFx
         /// Executes command using specified implementation of <see cref="IConsole"/>.
         /// This method is called when the command is invoked by a user through command line interface.
         /// </summary>
-        Task ExecuteAsync(IConsole console);
+        ValueTask ExecuteAsync(IConsole console);
     }
 }

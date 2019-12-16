@@ -7,10 +7,10 @@ namespace CliFx.Tests.TestCommands
     [Command]
     public class HelloWorldDefaultCommand : ICommand
     {
-        public Task ExecuteAsync(IConsole console)
+        public ValueTask ExecuteAsync(IConsole console)
         {
             console.Output.WriteLine("Hello world.");
-            return Task.CompletedTask;
+            return default;
         }
     }
 }

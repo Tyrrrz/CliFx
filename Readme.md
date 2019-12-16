@@ -59,8 +59,8 @@ The following code will create and run default `CliApplication` that will resolv
 ```c#
 public static class Program
 {
-    public static Task<int> Main(string[] args) =>
-        new CliApplicationBuilder()
+    public static async Task<int> Main(string[] args) =>
+        await new CliApplicationBuilder()
             .AddCommandsFromThisAssembly()
             .Build()
             .RunAsync(args);
@@ -85,17 +85,17 @@ public class LogCommand : ICommand
     [CommandOption("base", 'b', Description = "Logarithm base.")]
     public double Base { get; set; } = 10;
 
-    public Task ExecuteAsync(IConsole console)
+    public ValueTask ExecuteAsync(IConsole console)
     {
         var result = Math.Log(Value, Base);
         console.Output.WriteLine(result);
 
-        return Task.CompletedTask;
+        return default;
     }
 }
 ```
 
-By implementing `ICommand` this class also provides `ExecuteAsync` method. This is the method that gets called when the user invokes the command. Its return type is `Task` in order to facilitate asynchronous execution, but if your command runs synchronously you can simply return `Task.CompletedTask`.
+By implementing `ICommand` this class also provides `ExecuteAsync` method. This is the method that gets called when the user invokes the command. Its return type is `ValueTask` in order to facilitate both synchronous and asynchronous execution. If your command always runs synchronously, simply return `default` at the end of the method.
 
 The `ExecuteAsync` method also takes an instance of `IConsole` as a parameter. You should use the `console` parameter in places where you would normally use `System.Console`, in order to make your command testable.
 
@@ -171,7 +171,7 @@ public class DivideCommand : ICommand
     [CommandOption("divisor", IsRequired = true)]
     public double Divisor { get; set; }
 
-    public Task ExecuteAsync(IConsole console)
+    public ValueTask ExecuteAsync(IConsole console)
     {
         if (Math.Abs(Divisor) < double.Epsilon)
         {
@@ -182,7 +182,7 @@ public class DivideCommand : ICommand
         var result = Dividend / Divisor;
         console.Output.WriteLine(result);
 
-        return Task.CompletedTask;
+        return default;
     }
 }
 ```
@@ -225,7 +225,7 @@ Cancelled or terminated app returns non-zero exit code.
 [Command("cancel")]
 public class CancellableCommand : ICommand
 {
-    public async Task ExecuteAsync(IConsole console)
+    public async ValueTask ExecuteAsync(IConsole console)
     {
         console.Output.WriteLine("Printed");
 
@@ -248,7 +248,7 @@ For example, here is how you would configure your application to use [`Microsoft
 ```c#
 public static class Program
 {
-    public static Task<int> Main(string[] args)
+    public static async Task<int> Main(string[] args)
     {
         var services = new ServiceCollection();
 
@@ -260,7 +260,7 @@ public static class Program
 
         var serviceProvider = services.BuildServiceProvider();
 
-        return new CliApplicationBuilder()
+        return await new CliApplicationBuilder()
             .AddCommandsFromThisAssembly()
             .UseCommandFactory(schema => (ICommand) serviceProvider.GetRequiredService(schema.Type))
             .Build()
@@ -285,7 +285,7 @@ public class UserAddCommand : ICommand
     [CommandOption("email", 'e')]
     public string Email { get; set; }
 
-    public Task ExecuteAsync(IConsole console)
+    public ValueTask ExecuteAsync(IConsole console)
     {
         var validationResult = new UserAddCommandValidator().Validate(this);
         if (!validationResult.IsValid)
@@ -358,13 +358,13 @@ public class ConcatCommand : ICommand
     [CommandOption("right")]
     public string Right { get; set; } = "world";
 
-    public Task ExecuteAsync(IConsole console)
+    public ValueTask ExecuteAsync(IConsole console)
     {
         console.Output.Write(Left);
         console.Output.Write(' ');
         console.Output.Write(Right);
 
-        return Task.CompletedTask;
+        return default;
     }
 }
 ```

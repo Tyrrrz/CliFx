@@ -14,10 +14,10 @@ namespace CliFx.Tests.TestCommands
         [CommandOption('s', Description = "String separator.")]
         public string Separator { get; set; } = ""; 
         
-        public Task ExecuteAsync(IConsole console)
+        public ValueTask ExecuteAsync(IConsole console)
         {
             console.Output.WriteLine(string.Join(Separator, Inputs));
-            return Task.CompletedTask;
+            return default;
         }
     }
 }

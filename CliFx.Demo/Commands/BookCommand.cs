@@ -20,7 +20,7 @@ namespace CliFx.Demo.Commands
             _libraryService = libraryService;
         }
 
-        public Task ExecuteAsync(IConsole console)
+        public ValueTask ExecuteAsync(IConsole console)
         {
             var book = _libraryService.GetBook(Title);
 
@@ -29,7 +29,7 @@ namespace CliFx.Demo.Commands
 
             console.RenderBook(book);
 
-            return Task.CompletedTask;
+            return default;
         }
     }
 }
