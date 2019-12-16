@@ -133,11 +133,16 @@ namespace CliFx.Services
             catch (Exception ex)
             {
                 // Wrap and rethrow exceptions that occur when trying to convert the value
-                throw new CliFxException($"Can't convert value [{value}] to type [{targetType}].", ex);
+                throw new CliFxException(
+                    $"Can't convert value [{value}] to type [{targetType}]. " +
+                    "Provided value probably doesn't match the expected format. " +
+                    $"Underlying exception message: {ex.Message}", ex);
             }
 
             // Throw if we can't find a way to convert the value
-            throw new CliFxException($"Can't convert value [{value}] to type [{targetType}].");
+            throw new CliFxException(
+                $"Can't find a way to convert user input to type [{targetType}]. " +
+                "This type is not among the list of types supported by this library.");
         }
 
         /// <inheritdoc />
@@ -192,12 +197,12 @@ namespace CliFx.Services
 
     public partial class CommandOptionInputConverter
     {
-        private static ConstructorInfo GetStringConstructor(Type type) => type.GetConstructor(new[] {typeof(string)});
+        private static ConstructorInfo? GetStringConstructor(Type type) => type.GetConstructor(new[] {typeof(string)});
 
-        private static MethodInfo GetStaticParseMethod(Type type) =>
+        private static MethodInfo? GetStaticParseMethod(Type type) =>
             type.GetMethod("Parse", BindingFlags.Public | BindingFlags.Static, null, new[] {typeof(string)}, null);
 
-        private static MethodInfo GetStaticParseMethodWithFormatProvider(Type type) =>
+        private static MethodInfo? GetStaticParseMethodWithFormatProvider(Type type) =>
             type.GetMethod("Parse", BindingFlags.Public | BindingFlags.Static, null, new[] {typeof(string), typeof(IFormatProvider)}, null);
     }
 }

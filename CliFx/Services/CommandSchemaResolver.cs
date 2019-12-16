@@ -42,8 +42,9 @@ namespace CliFx.Services
                 if (existingOptionWithSameName != null)
                 {
                     throw new CliFxException(
-                        $"Command type [{commandType}] has options defined with the same name: " +
-                        $"[{existingOptionWithSameName.Property}] and [{optionSchema.Property}].");
+                        $"Command type [{commandType}] has two options that have the same name ({optionSchema.Name}): " +
+                        $"[{existingOptionWithSameName.Property}] and [{optionSchema.Property}]. " +
+                        "All options in a command need to have unique names (case-insensitive).");
                 }
 
                 // Make sure there are no other options with the same short name
@@ -54,8 +55,9 @@ namespace CliFx.Services
                 if (existingOptionWithSameShortName != null)
                 {
                     throw new CliFxException(
-                        $"Command type [{commandType}] has options defined with the same short name: " +
-                        $"[{existingOptionWithSameShortName.Property}] and [{optionSchema.Property}].");
+                        $"Command type [{commandType}] has two options that have the same short name ({optionSchema.ShortName}): " +
+                        $"[{existingOptionWithSameShortName.Property}] and [{optionSchema.Property}]. " +
+                        "All options in a command need to have unique short names (case-sensitive).");
                 }
 
                 // Add schema to list
@@ -71,7 +73,9 @@ namespace CliFx.Services
             // Make sure there's at least one command defined
             if (!commandTypes.Any())
             {
-                throw new CliFxException("There are no commands defined.");
+                throw new CliFxException(
+                    "There are no commands defined. " +
+                    "An application needs to have at least one command to work.");
             }
 
             var result = new List<CommandSchema>();
@@ -81,7 +85,11 @@ namespace CliFx.Services
                 // Make sure command type implements ICommand.
                 if (!commandType.Implements(typeof(ICommand)))
                 {
-                    throw new CliFxException($"Command type [{commandType}] must implement {typeof(ICommand)}.");
+                    throw new CliFxException(
+                        $"Command type [{commandType}] needs to implement [{typeof(ICommand)}]."
+                        + Environment.NewLine + Environment.NewLine +
+                        $"public class {commandType.Name} : ICommand" + Environment.NewLine +
+                        "//                             ^-- implement interface");
                 }
 
                 // Get attribute
@@ -90,7 +98,11 @@ namespace CliFx.Services
                 // Make sure attribute is set
                 if (attribute == null)
                 {
-                    throw new CliFxException($"Command type [{commandType}] must be annotated with [{typeof(CommandAttribute)}].");
+                    throw new CliFxException(
+                        $"Command type [{commandType}] needs to be annotated with [{typeof(CommandAttribute)}]."
+                        + Environment.NewLine + Environment.NewLine +
+                        "[Command] // <-- add attribute" + Environment.NewLine +
+                        $"public class {commandType.Name} : ICommand");
                 }
 
                 // Get option schemas
@@ -109,7 +121,8 @@ namespace CliFx.Services
                 if (existingCommandWithSameName != null)
                 {
                     throw new CliFxException(
-                        $"Command type [{existingCommandWithSameName.Type}] has the same name as another command type [{commandType}].");
+                        $"Command type [{existingCommandWithSameName.Type}] has the same name as another command type [{commandType}]. " +
+                        "All commands need to have unique names (case-insensitive).");
                 }
 
                 // Add schema to list
