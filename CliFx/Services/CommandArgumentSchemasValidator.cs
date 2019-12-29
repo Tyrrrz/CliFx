@@ -18,6 +18,12 @@ namespace CliFx.Services
         /// <inheritdoc />
         public IEnumerable<ValidationError> ValidateArgumentSchemas(IReadOnlyCollection<CommandArgumentSchema> commandArgumentSchemas)
         {
+            if (commandArgumentSchemas.Count == 0)
+            {
+                // No validation needed
+                yield break;
+            }
+            
             // Make sure there are no arguments with the same name
             var duplicateNameGroups = commandArgumentSchemas
                 .Where(x => !string.IsNullOrWhiteSpace(x.Name))
@@ -57,7 +63,8 @@ namespace CliFx.Services
             }
             
             // Verify that all required arguments appear before optional arguments
-            if (commandArgumentSchemas.Where(x => x.IsRequired).Max(x => x.Order) > commandArgumentSchemas.Where(x => !x.IsRequired).Min(x => x.Order))
+            if (commandArgumentSchemas.Any(x => x.IsRequired) && commandArgumentSchemas.Any(x => !x.IsRequired) &&
+                commandArgumentSchemas.Where(x => x.IsRequired).Max(x => x.Order) > commandArgumentSchemas.Where(x => !x.IsRequired).Min(x => x.Order))
             {
                 yield return new ValidationError("One or more required arguments appear after optional arguments. Required arguments must appear before (i.e. have lower order than) optional arguments.");
             }
