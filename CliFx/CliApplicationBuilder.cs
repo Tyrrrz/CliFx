@@ -137,7 +137,7 @@ namespace CliFx
             var configuration = new ApplicationConfiguration(_commandTypes.ToArray(), _isDebugModeAllowed, _isPreviewModeAllowed);
 
             return new CliApplication(metadata, configuration,
-                _console, new CommandInputParser(_environmentVariablesProvider), new CommandSchemaResolver(),
+                _console, new CommandInputParser(_environmentVariablesProvider), new CommandSchemaResolver(new CommandArgumentSchemasValidator()),
                 _commandFactory, new CommandInitializer(_commandInputConverter, new EnvironmentVariablesParser()), new HelpTextRenderer());
         }
     }

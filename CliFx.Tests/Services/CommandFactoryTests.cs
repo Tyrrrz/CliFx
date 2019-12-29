@@ -13,7 +13,7 @@ namespace CliFx.Tests.Services
     public class CommandFactoryTests
     {
         private static CommandSchema GetCommandSchema(Type commandType) =>
-            new CommandSchemaResolver().GetCommandSchemas(new[] {commandType}).Single();
+            new CommandSchemaResolver(new CommandArgumentSchemasValidator()).GetCommandSchemas(new[] {commandType}).Single();
 
         private static IEnumerable<TestCaseData> GetTestCases_CreateCommand()
         {

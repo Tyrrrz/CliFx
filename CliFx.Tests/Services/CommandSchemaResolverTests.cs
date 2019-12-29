@@ -94,7 +94,7 @@ namespace CliFx.Tests.Services
             IReadOnlyList<CommandSchema> expectedCommandSchemas)
         {
             // Arrange
-            var commandSchemaResolver = new CommandSchemaResolver();
+            var commandSchemaResolver = new CommandSchemaResolver(new CommandArgumentSchemasValidator());
 
             // Act
             var commandSchemas = commandSchemaResolver.GetCommandSchemas(commandTypes);
@@ -108,7 +108,7 @@ namespace CliFx.Tests.Services
         public void GetCommandSchemas_Negative_Test(IReadOnlyList<Type> commandTypes)
         {
             // Arrange
-            var resolver = new CommandSchemaResolver();
+            var resolver = new CommandSchemaResolver(new CommandArgumentSchemasValidator());
 
             // Act & Assert
             resolver.Invoking(r => r.GetCommandSchemas(commandTypes))

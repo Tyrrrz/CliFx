@@ -15,6 +15,16 @@ namespace CliFx.Services
     /// </summary>
     public class CommandSchemaResolver : ICommandSchemaResolver
     {
+        private readonly ICommandArgumentSchemasValidator _commandArgumentSchemasValidator;
+
+        /// <summary>
+        /// Creates an instance of <see cref="CommandSchemaResolver"/>.
+        /// </summary>
+        public CommandSchemaResolver(ICommandArgumentSchemasValidator commandArgumentSchemasValidator)
+        {
+            _commandArgumentSchemasValidator = commandArgumentSchemasValidator;
+        }
+
         private IReadOnlyList<CommandOptionSchema> GetCommandOptionSchemas(Type commandType)
         {
             var result = new List<CommandOptionSchema>();
@@ -70,97 +80,20 @@ namespace CliFx.Services
 
         private IReadOnlyList<CommandArgumentSchema> GetCommandArgumentSchemas(Type commandType)
         {
-            var result = new List<CommandArgumentSchema>();
-            var argumentOrders = new HashSet<int>();
-            int? highestOrderArgument = null;
-            int? enumerableArgumentOrder = null;
+            var argumentSchemas = commandType.GetProperties()
+                .Select(p => new { Property = p, Attribute = p.GetCustomAttribute<CommandArgumentAttribute>() })
+                .Where(a => a.Attribute != null)
+                .Select(a => new CommandArgumentSchema(a.Property, a.Attribute.Name, a.Attribute.IsRequired, a.Attribute.Description, a.Attribute.Order))
+                .ToList();
 
-            foreach (var property in commandType.GetProperties())
+            var validationErrors = _commandArgumentSchemasValidator.ValidateArgumentSchemas(argumentSchemas).ToList();
+            if (validationErrors.Any())
             {
-                var attribute = property.GetCustomAttribute<CommandArgumentAttribute>();
-
-                // If an attribute is not set, then it's not an argument so we just skip it
-                if (attribute is null)
-                    continue;
-
-                // Build argument schema
-                var argumentSchema = new CommandArgumentSchema(
-                    property,
-                    attribute.Name,
-                    attribute.IsRequired,
-                    attribute.Description,
-                    attribute.Order);
-
-                // Make sure there are no arguments with the same name
-                var existingArgumentWithSameName = result
-                    .Where(o => !string.IsNullOrWhiteSpace(o.Name))
-                    .FirstOrDefault(o => string.Equals(o.Name, argumentSchema.Name, StringComparison.OrdinalIgnoreCase));
-
-                if (existingArgumentWithSameName != null)
-                {
-                    throw new CliFxException(
-                        $"Command type [{commandType}] has arguments defined with the same name: " +
-                        $"[{existingArgumentWithSameName.Property}] and [{argumentSchema.Property}].");
-                }
-
-                // Make sure that the order of all properties are distinct
-                if (!argumentOrders.Add(argumentSchema.Order))
-                {
-                    throw new CliFxException(
-                        $"Command type [{commandType}] has arguments defined with the same order [{argumentSchema.Order}].");
-                }
-
-                // Verify that the order is not higher than an enumerable argument found yet
-                if (argumentSchema.Order > enumerableArgumentOrder)
-                {
-                    throw new CliFxException(
-                        $"Command type [{commandType}] defines a sequence argument with lower order than another argument; sequence argument must have the highest order (appear last).");
-                }
-
-                // Set the highest found argument order if applicable
-                if (!highestOrderArgument.HasValue || argumentSchema.Order > highestOrderArgument)
-                {
-                    highestOrderArgument = argumentSchema.Order;
-                }
-
-                // If the argument is an enumerable type
-                if (argumentSchema.Property.PropertyType != typeof(string) && argumentSchema.Property.PropertyType.GetEnumerableUnderlyingType() != null)
-                {
-                    // Verify that no other enumerable type has been found
-                    if (enumerableArgumentOrder.HasValue)
-                    {
-                        throw new CliFxException(
-                            $"Command type [{commandType}] defines multiple sequence arguments; only one is permitted.");
-                    }
-
-                    // Remember the order of this property
-                    enumerableArgumentOrder = argumentSchema.Order;
-
-                    // Verify that no higher order arguments have yet been found
-                    if (enumerableArgumentOrder > highestOrderArgument)
-                    {
-                        throw new CliFxException(
-                            $"Command type [{commandType}] defines a sequence argument with lower order than another argument; sequence argument must have the highest order (appear last).");
-                    }
-                }
-
-                // Add schema to list
-                result.Add(argumentSchema);
+                throw new CliFxException($"Command type [{commandType}] has invalid argument configuration:\n" +
+                    $"{string.Join("\n", validationErrors.Select(v => v.Message))}");
             }
 
-            if (result.Any(a => a.IsRequired) && result.Any(a => !a.IsRequired))
-            {
-                // Verify all required arguments appear before optional arguments
-                var highestOrderRequiredArgument = result.Where(a => a.IsRequired).Max(a => a.Order);
-                var lowestOrderOptionalArgument = result.Where(a => !a.IsRequired).Min(a => a.Order);
-                if (highestOrderRequiredArgument > lowestOrderOptionalArgument)
-                {
-                    throw new CliFxException(
-                        $"Command type [{commandType}] has required arguments that appear after optional arguments. Required arguments must appear before optional arguments.");
-                }
-            }
-
-            return result;
+            return argumentSchemas;
         }
 
         /// <inheritdoc />

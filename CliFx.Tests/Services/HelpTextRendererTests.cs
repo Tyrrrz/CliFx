@@ -15,7 +15,7 @@ namespace CliFx.Tests.Services
     {
         private static HelpTextSource CreateHelpTextSource(IReadOnlyList<Type> availableCommandTypes, Type targetCommandType)
         {
-            var commandSchemaResolver = new CommandSchemaResolver();
+            var commandSchemaResolver = new CommandSchemaResolver(new CommandArgumentSchemasValidator());
 
             var applicationMetadata = new ApplicationMetadata("TestApp", "testapp", "1.0", null);
             var availableCommandSchemas = commandSchemaResolver.GetCommandSchemas(availableCommandTypes);
