@@ -114,7 +114,6 @@ namespace CliFx
             return 0;
         }
 
-        
         private int? HandleHelpOption(CommandInput commandInput,
             IReadOnlyList<CommandSchema> availableCommandSchemas, CommandCandidate? commandCandidate)
         {
@@ -152,7 +151,7 @@ namespace CliFx
             return isError ? -1 : 0;
         }
 
-        private async Task<int> HandleCommandExecutionAsync(CommandCandidate? commandCandidate)
+        private async ValueTask<int> HandleCommandExecutionAsync(CommandCandidate? commandCandidate)
         {
             if (commandCandidate is null)
             {
@@ -173,7 +172,7 @@ namespace CliFx
         }
 
         /// <inheritdoc />
-        public async Task<int> RunAsync(IReadOnlyList<string> commandLineArguments)
+        public async ValueTask<int> RunAsync(IReadOnlyList<string> commandLineArguments)
         {
             try
             {

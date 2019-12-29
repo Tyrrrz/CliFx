@@ -13,6 +13,6 @@ namespace CliFx.Tests.TestCommands
         [CommandOption("fruits")]
         public string? Oranges { get; set; }
         
-        public Task ExecuteAsync(IConsole console) => Task.CompletedTask;
+        public ValueTask ExecuteAsync(IConsole console) => default;
     }
 }

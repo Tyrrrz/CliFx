@@ -4,17 +4,17 @@ using CliFx.Benchmarks.Commands;
 
 namespace CliFx.Benchmarks
 {
-    [CoreJob]
+    [SimpleJob]
     [RankColumn]
     public class Benchmark
     {
         private static readonly string[] Arguments = {"--str", "hello world", "-i", "13", "-b"};
 
         [Benchmark(Description = "CliFx", Baseline = true)]
-        public Task<int> ExecuteWithCliFx() => new CliApplicationBuilder().AddCommand(typeof(CliFxCommand)).Build().RunAsync(Arguments);
+        public async ValueTask<int> ExecuteWithCliFx() => await new CliApplicationBuilder().AddCommand(typeof(CliFxCommand)).Build().RunAsync(Arguments);
 
         [Benchmark(Description = "System.CommandLine")]
-        public Task<int> ExecuteWithSystemCommandLine() => new SystemCommandLineCommand().ExecuteAsync(Arguments);
+        public async ValueTask<int> ExecuteWithSystemCommandLine() => await new SystemCommandLineCommand().ExecuteAsync(Arguments);
 
         [Benchmark(Description = "McMaster.Extensions.CommandLineUtils")]
         public int ExecuteWithMcMaster() => McMaster.Extensions.CommandLineUtils.CommandLineApplication.Execute<McMasterCommand>(Arguments);

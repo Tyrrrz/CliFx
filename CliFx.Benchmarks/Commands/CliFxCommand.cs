@@ -16,6 +16,6 @@ namespace CliFx.Benchmarks.Commands
         [CommandOption("bool", 'b')]
         public bool BoolOption { get; set; }
 
-        public Task ExecuteAsync(IConsole console) => Task.CompletedTask;
+        public ValueTask ExecuteAsync(IConsole console) => default;
     }
 }

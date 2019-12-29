@@ -11,6 +11,6 @@ namespace CliFx.Tests.TestCommands
 		[CommandOption("opt", EnvironmentVariableName = "ENV_MULTIPLE_VALUES")]
 		public IEnumerable<string>? Option { get; set; }
 
-		public Task ExecuteAsync(IConsole console) => Task.CompletedTask;
+		public ValueTask ExecuteAsync(IConsole console) => default;
 	}
 }
