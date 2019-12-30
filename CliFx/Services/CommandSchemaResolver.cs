@@ -184,7 +184,7 @@ namespace CliFx.Services
                            ?? availableCommandSchemas.FirstOrDefault(c => c.IsDefault());
 
             // Get remaining positional arguments
-            var commandArgumentsCount = targetSchema?.Name?.Split(' ').Length ?? 0;
+            var commandArgumentsCount = targetSchema?.Name?.Split(new []{ ' ' }, StringSplitOptions.RemoveEmptyEntries).Length ?? 0;
             var positionalArguments = commandInput.Arguments.Skip(commandArgumentsCount).ToList();
 
             return targetSchema is null ? null : new CommandCandidate(targetSchema, positionalArguments, commandInput);

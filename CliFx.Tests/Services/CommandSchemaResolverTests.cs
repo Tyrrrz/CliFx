@@ -64,28 +64,183 @@ namespace CliFx.Tests.Services
 
             yield return new TestCaseData(new object[]
             {
-                new[] {typeof(NonImplementedCommand)}
+                new[] { typeof(NonImplementedCommand) }
             });
 
             yield return new TestCaseData(new object[]
             {
-                new[] {typeof(NonAnnotatedCommand)}
+                new[] { typeof(NonAnnotatedCommand) }
             });
 
             yield return new TestCaseData(new object[]
             {
-                new[] {typeof(DuplicateOptionNamesCommand)}
+                new[] { typeof(DuplicateOptionNamesCommand) }
             });
 
             yield return new TestCaseData(new object[]
             {
-                new[] {typeof(DuplicateOptionShortNamesCommand)}
+                new[] { typeof(DuplicateOptionShortNamesCommand) }
             });
 
             yield return new TestCaseData(new object[]
             {
-                new[] {typeof(ExceptionCommand), typeof(CommandExceptionCommand)}
+                new[] { typeof(ExceptionCommand), typeof(CommandExceptionCommand) }
             });
+        }
+
+        private static IEnumerable<TestCaseData> GetTestCases_GetTargetCommandSchema_Positive()
+        {
+            yield return new TestCaseData(
+                new List<CommandSchema>
+                {
+                    new CommandSchema(null, "command1", null, null, null),
+                    new CommandSchema(null, "command2", null, null, null),
+                    new CommandSchema(null, "command3", null, null, null)
+                },
+                new CommandInput(new[] { "command1", "argument1", "argument2" }),
+                new[] { "argument1", "argument2" },
+                "command1"
+            );
+            yield return new TestCaseData(
+                new List<CommandSchema>
+                {
+                    new CommandSchema(null, "", null, null, null),
+                    new CommandSchema(null, "command1", null, null, null),
+                    new CommandSchema(null, "command2", null, null, null),
+                    new CommandSchema(null, "command3", null, null, null)
+                },
+                new CommandInput(new[] { "argument1", "argument2" }),
+                new[] { "argument1", "argument2" },
+                ""
+            );
+            yield return new TestCaseData(
+                new List<CommandSchema>
+                {
+                    new CommandSchema(null, "command1 subcommand1", null, null, null),
+                },
+                new CommandInput(new[] { "command1", "subcommand1", "argument1" }),
+                new[] { "argument1" },
+                "command1 subcommand1"
+            );
+            yield return new TestCaseData(
+                new List<CommandSchema>
+                {
+                    new CommandSchema(null, "", null, null, null),
+                    new CommandSchema(null, "a", null, null, null),
+                    new CommandSchema(null, "a b", null, null, null),
+                    new CommandSchema(null, "a b c", null, null, null),
+                    new CommandSchema(null, "b", null, null, null),
+                    new CommandSchema(null, "b c", null, null, null),
+                    new CommandSchema(null, "c", null, null, null),
+                },
+                new CommandInput(new[] { "a", "b", "d" }),
+                new[] { "d" },
+                "a b"
+            );
+            yield return new TestCaseData(
+                new List<CommandSchema>
+                {
+                    new CommandSchema(null, "", null, null, null),
+                    new CommandSchema(null, "a", null, null, null),
+                    new CommandSchema(null, "a b", null, null, null),
+                    new CommandSchema(null, "a b c", null, null, null),
+                    new CommandSchema(null, "b", null, null, null),
+                    new CommandSchema(null, "b c", null, null, null),
+                    new CommandSchema(null, "c", null, null, null),
+                },
+                new CommandInput(new[] { "a", "b", "c", "d" }),
+                new[] { "d" },
+                "a b c"
+            );
+            yield return new TestCaseData(
+                new List<CommandSchema>
+                {
+                    new CommandSchema(null, "", null, null, null),
+                    new CommandSchema(null, "a", null, null, null),
+                    new CommandSchema(null, "a b", null, null, null),
+                    new CommandSchema(null, "a b c", null, null, null),
+                    new CommandSchema(null, "b", null, null, null),
+                    new CommandSchema(null, "b c", null, null, null),
+                    new CommandSchema(null, "c", null, null, null),
+                },
+                new CommandInput(new[] { "b", "c" }),
+                new string[0],
+                "b c"
+            );
+            yield return new TestCaseData(
+                new List<CommandSchema>
+                {
+                    new CommandSchema(null, "", null, null, null),
+                    new CommandSchema(null, "a", null, null, null),
+                    new CommandSchema(null, "a b", null, null, null),
+                    new CommandSchema(null, "a b c", null, null, null),
+                    new CommandSchema(null, "b", null, null, null),
+                    new CommandSchema(null, "b c", null, null, null),
+                    new CommandSchema(null, "c", null, null, null),
+                },
+                new CommandInput(new[] { "d", "a", "b"}),
+                new[] { "d", "a", "b" },
+                ""
+            );
+            yield return new TestCaseData(
+                new List<CommandSchema>
+                {
+                    new CommandSchema(null, "", null, null, null),
+                    new CommandSchema(null, "a", null, null, null),
+                    new CommandSchema(null, "a b", null, null, null),
+                    new CommandSchema(null, "a b c", null, null, null),
+                    new CommandSchema(null, "b", null, null, null),
+                    new CommandSchema(null, "b c", null, null, null),
+                    new CommandSchema(null, "c", null, null, null),
+                },
+                new CommandInput(new[] { "a", "b c", "d" }),
+                new[] { "b c", "d" },
+                "a"
+            );
+            yield return new TestCaseData(
+                new List<CommandSchema>
+                {
+                    new CommandSchema(null, "", null, null, null),
+                    new CommandSchema(null, "a", null, null, null),
+                    new CommandSchema(null, "a b", null, null, null),
+                    new CommandSchema(null, "a b c", null, null, null),
+                    new CommandSchema(null, "b", null, null, null),
+                    new CommandSchema(null, "b c", null, null, null),
+                    new CommandSchema(null, "c", null, null, null),
+                },
+                new CommandInput(new[] { "a b", "c", "d" }),
+                new[] { "a b", "c", "d" },
+                ""
+            );
+        }
+
+        private static IEnumerable<TestCaseData> GetTestCases_GetTargetCommandSchema_Negative()
+        {
+            yield return new TestCaseData(
+                new List<CommandSchema>
+                {
+                    new CommandSchema(null, "command1", null, null, null),
+                    new CommandSchema(null, "command2", null, null, null),
+                    new CommandSchema(null, "command3", null, null, null),
+                },
+                new CommandInput(new[] { "command4", "argument1" })
+            );
+            yield return new TestCaseData(
+                new List<CommandSchema>
+                {
+                    new CommandSchema(null, "command1", null, null, null),
+                    new CommandSchema(null, "command2", null, null, null),
+                    new CommandSchema(null, "command3", null, null, null),
+                },
+                new CommandInput(new[] { "argument1" })
+            );
+            yield return new TestCaseData(
+                new List<CommandSchema>
+                {
+                    new CommandSchema(null, "command1 subcommand1", null, null, null),
+                },
+                new CommandInput(new[] { "command1", "argument1" })
+            );
         }
 
         [Test]
@@ -113,6 +268,39 @@ namespace CliFx.Tests.Services
             // Act & Assert
             resolver.Invoking(r => r.GetCommandSchemas(commandTypes))
                 .Should().ThrowExactly<CliFxException>();
+        }
+
+        [Test]
+        [TestCaseSource(nameof(GetTestCases_GetTargetCommandSchema_Positive))]
+        public void GetTargetCommandSchema_Positive_Test(IReadOnlyList<CommandSchema> availableCommandSchemas,
+            CommandInput commandInput,
+            IReadOnlyList<string> expectedPositionalArguments,
+            string expectedCommandSchemaName)
+        {
+            // Arrange
+            var resolver = new CommandSchemaResolver(new CommandArgumentSchemasValidator());
+
+            // Act
+            var commandCandidate = resolver.GetTargetCommandSchema(availableCommandSchemas, commandInput);
+
+            // Assert
+            commandCandidate.Should().NotBeNull();
+            commandCandidate.PositionalArgumentsInput.Should().BeEquivalentTo(expectedPositionalArguments);
+            commandCandidate.Schema.Name.Should().Be(expectedCommandSchemaName);
+        }
+
+        [Test]
+        [TestCaseSource(nameof(GetTestCases_GetTargetCommandSchema_Negative))]
+        public void GetTargetCommandSchema_Negative_Test(IReadOnlyList<CommandSchema> availableCommandSchemas, CommandInput commandInput)
+        {
+            // Arrange
+            var resolver = new CommandSchemaResolver(new CommandArgumentSchemasValidator());
+
+            // Act
+            var commandCandidate = resolver.GetTargetCommandSchema(availableCommandSchemas, commandInput);
+
+            // Assert
+            commandCandidate.Should().BeNull();
         }
     }
 }
