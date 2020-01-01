@@ -127,6 +127,24 @@ namespace CliFx.Tests.Services
                     new CommandInput(new string[0], new CommandOptionInput[0], EnvironmentVariablesProviderStub.EnvironmentVariables)),
                     new EnvironmentVariableWithoutCollectionPropertyCommand { Option = $"A{Path.PathSeparator}B{Path.PathSeparator}C{Path.PathSeparator}" }
                 );
+            
+            // Positional arguments
+            yield return new TestCaseData(
+                new ArgumentCommand(),
+                new CommandCandidate(
+                    GetCommandSchema(typeof(ArgumentCommand)),
+                    new [] { "abc", "123", "1", "2" },
+                    new CommandInput(new [] { "arg", "cmd", "abc", "123", "1", "2" }, new []{ new CommandOptionInput("o", "option value") }, new Dictionary<string, string>())),
+                new ArgumentCommand { FirstArgument = "abc", SecondArgument = 123, ThirdArguments = new List<int>{1, 2}, Option = "option value" }
+                );
+            yield return new TestCaseData(
+                new ArgumentCommand(),
+                new CommandCandidate(
+                    GetCommandSchema(typeof(ArgumentCommand)),
+                    new [] { "abc" },
+                    new CommandInput(new [] { "arg", "cmd", "abc" }, new []{ new CommandOptionInput("o", "option value") }, new Dictionary<string, string>())),
+                new ArgumentCommand { FirstArgument = "abc", Option = "option value" }
+                );
         }
 
         private static IEnumerable<TestCaseData> GetTestCases_InitializeCommand_Negative()
@@ -168,6 +186,33 @@ namespace CliFx.Tests.Services
                         new CommandOptionInput("s", "_")
                     })
                 ));
+            
+            // Missing required positional argument
+            yield return new TestCaseData(
+                new ArgumentCommand(),
+                new CommandCandidate(
+                    GetCommandSchema(typeof(ArgumentCommand)),
+                    new string[0],
+                    new CommandInput(new string[0], new []{ new CommandOptionInput("o", "option value") }, new Dictionary<string, string>()))
+                );
+            
+            // Incorrect data type in list
+            yield return new TestCaseData(
+                new ArgumentCommand(),
+                new CommandCandidate(
+                    GetCommandSchema(typeof(ArgumentCommand)),
+                    new []{ "abc", "123", "invalid" }, 
+                    new CommandInput(new [] { "arg", "cmd", "abc", "123", "invalid" }, new []{ new CommandOptionInput("o", "option value") }, new Dictionary<string, string>()))
+                );
+            
+            // Extraneous unused arguments
+            yield return new TestCaseData(
+                new SimpleArgumentCommand(),
+                new CommandCandidate(
+                    GetCommandSchema(typeof(SimpleArgumentCommand)),
+                    new []{ "abc", "123", "unused" }, 
+                    new CommandInput(new [] { "arg", "cmd2", "abc", "123", "unused" }, new []{ new CommandOptionInput("o", "option value") }, new Dictionary<string, string>()))
+                );
         }
 
         [Test]
