@@ -8,17 +8,17 @@ namespace CliFx.Services
     /// </summary>
     public class DelegateCommandFactory : ICommandFactory
     {
-        private readonly Func<CommandSchema, ICommand> _factoryMethod;
+        private readonly Func<ICommandSchema, ICommand> _factoryMethod;
 
         /// <summary>
         /// Initializes an instance of <see cref="DelegateCommandFactory"/>.
         /// </summary>
-        public DelegateCommandFactory(Func<CommandSchema, ICommand> factoryMethod)
+        public DelegateCommandFactory(Func<ICommandSchema, ICommand> factoryMethod)
         {
             _factoryMethod = factoryMethod;
         }
 
         /// <inheritdoc />
-        public ICommand CreateCommand(CommandSchema commandSchema) => _factoryMethod(commandSchema);
+        public ICommand CreateCommand(ICommandSchema commandSchema) => _factoryMethod(commandSchema);
     }
 }

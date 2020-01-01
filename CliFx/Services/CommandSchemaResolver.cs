@@ -97,7 +97,7 @@ namespace CliFx.Services
         }
 
         /// <inheritdoc />
-        public IReadOnlyList<CommandSchema> GetCommandSchemas(IReadOnlyList<Type> commandTypes)
+        public IReadOnlyList<ICommandSchema> GetCommandSchemas(IReadOnlyList<Type> commandTypes)
         {
             // Make sure there's at least one command defined
             if (!commandTypes.Any())
@@ -107,7 +107,7 @@ namespace CliFx.Services
                     "An application needs to have at least one command to work.");
             }
 
-            var result = new List<CommandSchema>();
+            var result = new List<ICommandSchema>();
 
             foreach (var commandType in commandTypes)
             {
@@ -165,10 +165,10 @@ namespace CliFx.Services
         }
 
         /// <inheritdoc />
-        public CommandCandidate? GetTargetCommandSchema(IReadOnlyList<CommandSchema> availableCommandSchemas, CommandInput commandInput)
+        public CommandCandidate? GetTargetCommandSchema(IReadOnlyList<ICommandSchema> availableCommandSchemas, CommandInput commandInput)
         {
             // If no arguments are given, use the default command
-            CommandSchema targetSchema;
+            ICommandSchema targetSchema;
             if (!commandInput.Arguments.Any())
             {
                 targetSchema = availableCommandSchemas.FirstOrDefault(c => c.IsDefault());

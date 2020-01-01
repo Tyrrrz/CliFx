@@ -12,20 +12,20 @@ namespace CliFx.Tests.Services
     [TestFixture]
     public class DelegateCommandFactoryTests
     {
-        private static CommandSchema GetCommandSchema(Type commandType) =>
+        private static ICommandSchema GetCommandSchema(Type commandType) =>
             new CommandSchemaResolver(new CommandArgumentSchemasValidator()).GetCommandSchemas(new[] {commandType}).Single();
 
         private static IEnumerable<TestCaseData> GetTestCases_CreateCommand()
         {
             yield return new TestCaseData(
-                new Func<CommandSchema, ICommand>(schema => (ICommand) Activator.CreateInstance(schema.Type!)!),
+                new Func<ICommandSchema, ICommand>(schema => (ICommand) Activator.CreateInstance(schema.Type)!),
                 GetCommandSchema(typeof(HelloWorldDefaultCommand))
             );
         }
 
         [Test]
         [TestCaseSource(nameof(GetTestCases_CreateCommand))]
-        public void CreateCommand_Test(Func<CommandSchema, ICommand> factoryMethod, CommandSchema commandSchema)
+        public void CreateCommand_Test(Func<ICommandSchema, ICommand> factoryMethod, ICommandSchema commandSchema)
         {
             // Arrange
             var factory = new DelegateCommandFactory(factoryMethod);

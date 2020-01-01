@@ -10,6 +10,6 @@ namespace CliFx.Services
         /// <summary>
         /// Initializes an instance of <see cref="ICommand"/> with specified schema.
         /// </summary>
-        ICommand CreateCommand(CommandSchema commandSchema);
+        ICommand CreateCommand(ICommandSchema commandSchema);
     }
 }

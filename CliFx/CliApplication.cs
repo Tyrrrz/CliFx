@@ -115,7 +115,7 @@ namespace CliFx
         }
 
         private int? HandleHelpOption(CommandInput commandInput,
-            IReadOnlyList<CommandSchema> availableCommandSchemas, CommandCandidate? commandCandidate)
+            IReadOnlyList<ICommandSchema> availableCommandSchemas, CommandCandidate? commandCandidate)
         {
             // Help should be rendered if it was requested, or when executing a command which isn't defined
             var shouldRenderHelp = commandInput.IsHelpOptionSpecified() || commandCandidate == null;
@@ -127,8 +127,10 @@ namespace CliFx
             // Keep track whether there was an error in the input
             var isError = false;
 
+            ICommandSchema? commandSchema = commandCandidate?.Schema;
+
             // Report error if no command matched the arguments
-            if (commandCandidate is null)
+            if (commandSchema is null)
             {
                 // If a command was specified, inform the user that the command is not defined
                 if (commandInput.HasArguments())
@@ -137,12 +139,10 @@ namespace CliFx
                         () => _console.Error.WriteLine($"No command could be matched for input [{string.Join(" ", commandInput.Arguments)}]"));
                     isError = true;
                 }
-
-                commandCandidate = new CommandCandidate(CommandSchema.StubDefaultCommand, new string[0], commandInput);
             }
 
             // Build help text source
-            var helpTextSource = new HelpTextSource(_metadata, availableCommandSchemas, commandCandidate.Schema);
+            var helpTextSource = new HelpTextSource(_metadata, availableCommandSchemas, commandSchema);
 
             // Render help text
             _helpTextRenderer.RenderHelpText(_console, helpTextSource);

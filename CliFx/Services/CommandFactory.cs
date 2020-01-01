@@ -9,6 +9,6 @@ namespace CliFx.Services
     public class CommandFactory : ICommandFactory
     {
         /// <inheritdoc />
-        public ICommand CreateCommand(CommandSchema commandSchema) => (ICommand) Activator.CreateInstance(commandSchema.Type);
+        public ICommand CreateCommand(ICommandSchema commandSchema) => (ICommand) Activator.CreateInstance(commandSchema.Type);
     }
 }

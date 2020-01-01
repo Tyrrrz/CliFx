@@ -42,7 +42,7 @@ namespace CliFx
         /// <summary>
         /// Configures application to use specified factory method for creating new instances of <see cref="ICommand"/>.
         /// </summary>
-        public static ICliApplicationBuilder UseCommandFactory(this ICliApplicationBuilder builder, Func<CommandSchema, ICommand> factoryMethod) =>
+        public static ICliApplicationBuilder UseCommandFactory(this ICliApplicationBuilder builder, Func<ICommandSchema, ICommand> factoryMethod) =>
             builder.UseCommandFactory(new DelegateCommandFactory(factoryMethod));
     }
 }

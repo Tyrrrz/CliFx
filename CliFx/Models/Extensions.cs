@@ -14,7 +14,7 @@ namespace CliFx.Models
         /// <summary>
         /// Finds a command that has specified name, or null if not found.
         /// </summary>
-        public static CommandSchema? FindByName(this IReadOnlyList<CommandSchema> commandSchemas, string? commandName)
+        public static ICommandSchema? FindByName(this IReadOnlyList<ICommandSchema> commandSchemas, string? commandName)
         {
             // If looking for default command, don't compare names directly
             // ...because null and empty are both valid names for default command
@@ -27,14 +27,14 @@ namespace CliFx.Models
         /// <summary>
         /// Finds parent command to the command that has specified name, or null if not found.
         /// </summary>
-        public static CommandSchema? FindParent(this IReadOnlyList<CommandSchema> commandSchemas, string? commandName)
+        public static ICommandSchema? FindParent(this IReadOnlyList<ICommandSchema> commandSchemas, string? commandName)
         {
             // If command has no name, it's the default command so it doesn't have a parent
             if (string.IsNullOrWhiteSpace(commandName))
                 return null;
 
             // Repeatedly cut off individual words from the name until we find a command with that name
-            var temp = commandName;
+            var temp = commandName!;
             while (temp.Contains(" "))
             {
                 temp = temp.SubstringUntilLast(" ");
@@ -126,6 +126,6 @@ namespace CliFx.Models
         /// <summary>
         /// Gets whether this command is the default command, i.e. without a name.
         /// </summary>
-        public static bool IsDefault(this CommandSchema commandSchema) => string.IsNullOrWhiteSpace(commandSchema.Name);
+        public static bool IsDefault(this ICommandSchema? commandSchema) => string.IsNullOrWhiteSpace(commandSchema?.Name);
     }
 }

@@ -10,6 +10,6 @@ namespace CliFx.Services
         /// <summary>
         /// Parse an environment variable value and converts it to a <see cref="CommandOptionInput"/> 
         /// </summary>
-        CommandOptionInput GetCommandOptionInputFromEnvironmentVariable(string environmentVariableValue, CommandOptionSchema targetOptionSchema);
+        CommandOptionInput GetCommandOptionInputFromEnvironmentVariable(string environmentVariableName, string environmentVariableValue, CommandOptionSchema targetOptionSchema);
     }
 }

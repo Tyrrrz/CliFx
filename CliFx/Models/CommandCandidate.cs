@@ -10,7 +10,7 @@ namespace CliFx.Models
         /// <summary>
         /// The command schema of the target command.
         /// </summary>
-        public CommandSchema Schema { get; }
+        public ICommandSchema Schema { get; }
 
         /// <summary>
         /// The positional arguments input for the command.
@@ -25,7 +25,7 @@ namespace CliFx.Models
         /// <summary>
         /// Initializes and instance of <see cref="CommandCandidate"/>
         /// </summary>
-        public CommandCandidate(CommandSchema schema, IReadOnlyList<string> positionalArgumentsInput, CommandInput commandInput)
+        public CommandCandidate(ICommandSchema schema, IReadOnlyList<string> positionalArgumentsInput, CommandInput commandInput)
         {
             Schema = schema;
             PositionalArgumentsInput = positionalArgumentsInput;

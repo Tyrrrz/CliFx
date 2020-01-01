@@ -15,7 +15,7 @@ namespace CliFx.Tests.Services
     [TestFixture]
     public class CommandInitializerTests
     {
-        private static CommandSchema GetCommandSchema(Type commandType) =>
+        private static ICommandSchema GetCommandSchema(Type commandType) =>
             new CommandSchemaResolver(new CommandArgumentSchemasValidator()).GetCommandSchemas(new[] { commandType }).Single();
 
         private static IEnumerable<TestCaseData> GetTestCases_InitializeCommand()

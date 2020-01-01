@@ -69,7 +69,7 @@ namespace CliFx.Services
                     if (!fallbackEnvironmentVariableExists || string.IsNullOrWhiteSpace(commandCandidate.CommandInput.EnvironmentVariables[optionSchema.EnvironmentVariableName!]))
                         continue;
 
-                    optionInput = _environmentVariablesParser.GetCommandOptionInputFromEnvironmentVariable(commandCandidate.CommandInput.EnvironmentVariables[optionSchema.EnvironmentVariableName!], optionSchema);
+                    optionInput = _environmentVariablesParser.GetCommandOptionInputFromEnvironmentVariable(optionSchema.EnvironmentVariableName!, commandCandidate.CommandInput.EnvironmentVariables[optionSchema.EnvironmentVariableName!], optionSchema);
                 }
 
                 //No fallback available and no option input was specified, skip option

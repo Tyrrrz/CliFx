@@ -15,19 +15,19 @@ namespace CliFx.Models
         /// <summary>
         /// Schemas of commands available in the application.
         /// </summary>
-        public IReadOnlyList<CommandSchema> AvailableCommandSchemas { get; }
+        public IReadOnlyList<ICommandSchema> AvailableCommandSchemas { get; }
 
         /// <summary>
         /// Schema of the command for which help text is to be generated.
         /// </summary>
-        public CommandSchema TargetCommandSchema { get; }
+        public ICommandSchema? TargetCommandSchema { get; }
 
         /// <summary>
         /// Initializes an instance of <see cref="HelpTextSource"/>.
         /// </summary>
         public HelpTextSource(ApplicationMetadata applicationMetadata,
-            IReadOnlyList<CommandSchema> availableCommandSchemas,
-            CommandSchema targetCommandSchema)
+            IReadOnlyList<ICommandSchema> availableCommandSchemas,
+            ICommandSchema? targetCommandSchema)
         {
             ApplicationMetadata = applicationMetadata;
             AvailableCommandSchemas = availableCommandSchemas;

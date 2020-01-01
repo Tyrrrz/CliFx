@@ -5,40 +5,28 @@ using CliFx.Internal;
 
 namespace CliFx.Models
 {
-    /// <summary>
-    /// Schema of a defined command.
-    /// </summary>
-    public partial class CommandSchema
+    /// <inheritdoc />
+    public partial class CommandSchema : ICommandSchema
     {
-        /// <summary>
-        /// Underlying type.
-        /// </summary>
-        public Type? Type { get; }
+        /// <inheritdoc />
+        public Type Type { get; }
 
-        /// <summary>
-        /// Command name.
-        /// </summary>
+        /// <inheritdoc />
         public string? Name { get; }
 
-        /// <summary>
-        /// Command description.
-        /// </summary>
+        /// <inheritdoc />
         public string? Description { get; }
 
-        /// <summary>
-        /// Command options.
-        /// </summary>
+        /// <inheritdoc />
         public IReadOnlyList<CommandOptionSchema> Options { get; }
 
-        /// <summary>
-        /// Command arguments.
-        /// </summary>
+        /// <inheritdoc />
         public IReadOnlyList<CommandArgumentSchema> Arguments { get; }
 
         /// <summary>
         /// Initializes an instance of <see cref="CommandSchema"/>.
         /// </summary>
-        public CommandSchema(Type type, string name, string description, IReadOnlyList<CommandArgumentSchema> arguments, IReadOnlyList<CommandOptionSchema> options)
+        public CommandSchema(Type type, string? name, string? description, IReadOnlyList<CommandArgumentSchema> arguments, IReadOnlyList<CommandOptionSchema> options)
         {
             Type = type;
             Name = name;
@@ -65,11 +53,5 @@ namespace CliFx.Models
 
             return buffer.ToString();
         }
-    }
-
-    public partial class CommandSchema
-    {
-        internal static CommandSchema StubDefaultCommand { get; } =
-            new CommandSchema(null, null, null, new CommandArgumentSchema[0], new CommandOptionSchema[0]);
     }
 }
