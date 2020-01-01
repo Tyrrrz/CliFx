@@ -85,6 +85,27 @@ namespace CliFx.Tests.Services
                     "-h|--help", "Shows help text."
                 }
             );
+            
+            yield return new TestCaseData(
+                CreateHelpTextSource(
+                    new[] {typeof(ArgumentCommand)},
+                    typeof(ArgumentCommand)),
+
+                new[]
+                {
+                    "Description",
+                    "Command using positional arguments",
+                    "Usage",
+                    "arg cmd", "<first>", "[<secondargument>]", "[<third list>]", "[options]",
+                    "Arguments",
+                    "* first",
+                    "secondargument",
+                    "third list", "A list of numbers",
+                    "Options",
+                    "-o|--option",
+                    "-h|--help", "Shows help text."
+                }
+            );
         }
 
         [Test]

@@ -37,7 +37,7 @@ namespace CliFx.Models
         /// <summary>
         /// The display name of the argument. Returns <see cref="Name"/> if specified, otherwise the name of the underlying property.
         /// </summary>
-        public string DisplayName => !string.IsNullOrWhiteSpace(Name) ? Name! : Property.PropertyType.Name.ToLower(CultureInfo.InvariantCulture);
+        public string DisplayName => !string.IsNullOrWhiteSpace(Name) ? Name! : Property.Name.ToLower(CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Initializes an instance of <see cref="CommandArgumentSchema"/>.
