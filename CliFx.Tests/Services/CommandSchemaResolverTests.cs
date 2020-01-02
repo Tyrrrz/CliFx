@@ -6,6 +6,7 @@ using CliFx.Exceptions;
 using CliFx.Models;
 using CliFx.Services;
 using CliFx.Tests.TestCommands;
+using NSubstitute;
 
 namespace CliFx.Tests.Services
 {
@@ -93,9 +94,9 @@ namespace CliFx.Tests.Services
             yield return new TestCaseData(
                 new []
                 {
-                    new CommandSchema(null, "command1", null, null, null),
-                    new CommandSchema(null, "command2", null, null, null),
-                    new CommandSchema(null, "command3", null, null, null)
+                    GetSchemaWithName("command1"),
+                    GetSchemaWithName("command2"),
+                    GetSchemaWithName("command3")
                 },
                 new CommandInput(new[] { "command1", "argument1", "argument2" }),
                 new[] { "argument1", "argument2" },
@@ -104,10 +105,10 @@ namespace CliFx.Tests.Services
             yield return new TestCaseData(
                 new []
                 {
-                    new CommandSchema(null, "", null, null, null),
-                    new CommandSchema(null, "command1", null, null, null),
-                    new CommandSchema(null, "command2", null, null, null),
-                    new CommandSchema(null, "command3", null, null, null)
+                    GetSchemaWithName(""),
+                    GetSchemaWithName("command1"),
+                    GetSchemaWithName("command2"),
+                    GetSchemaWithName("command3")
                 },
                 new CommandInput(new[] { "argument1", "argument2" }),
                 new[] { "argument1", "argument2" },
@@ -116,7 +117,7 @@ namespace CliFx.Tests.Services
             yield return new TestCaseData(
                 new []
                 {
-                    new CommandSchema(null, "command1 subcommand1", null, null, null),
+                    GetSchemaWithName("command1 subcommand1"),
                 },
                 new CommandInput(new[] { "command1", "subcommand1", "argument1" }),
                 new[] { "argument1" },
@@ -125,13 +126,13 @@ namespace CliFx.Tests.Services
             yield return new TestCaseData(
                 new []
                 {
-                    new CommandSchema(null, "", null, null, null),
-                    new CommandSchema(null, "a", null, null, null),
-                    new CommandSchema(null, "a b", null, null, null),
-                    new CommandSchema(null, "a b c", null, null, null),
-                    new CommandSchema(null, "b", null, null, null),
-                    new CommandSchema(null, "b c", null, null, null),
-                    new CommandSchema(null, "c", null, null, null),
+                    GetSchemaWithName(""),
+                    GetSchemaWithName("a"),
+                    GetSchemaWithName("a b"),
+                    GetSchemaWithName("a b c"),
+                    GetSchemaWithName("b"),
+                    GetSchemaWithName("b c"),
+                    GetSchemaWithName("c"),
                 },
                 new CommandInput(new[] { "a", "b", "d" }),
                 new[] { "d" },
@@ -140,13 +141,13 @@ namespace CliFx.Tests.Services
             yield return new TestCaseData(
                 new []
                 {
-                    new CommandSchema(null, "", null, null, null),
-                    new CommandSchema(null, "a", null, null, null),
-                    new CommandSchema(null, "a b", null, null, null),
-                    new CommandSchema(null, "a b c", null, null, null),
-                    new CommandSchema(null, "b", null, null, null),
-                    new CommandSchema(null, "b c", null, null, null),
-                    new CommandSchema(null, "c", null, null, null),
+                    GetSchemaWithName(""),
+                    GetSchemaWithName("a"),
+                    GetSchemaWithName("a b"),
+                    GetSchemaWithName("a b c"),
+                    GetSchemaWithName("b"),
+                    GetSchemaWithName("b c"),
+                    GetSchemaWithName("c"),
                 },
                 new CommandInput(new[] { "a", "b", "c", "d" }),
                 new[] { "d" },
@@ -155,13 +156,13 @@ namespace CliFx.Tests.Services
             yield return new TestCaseData(
                 new []
                 {
-                    new CommandSchema(null, "", null, null, null),
-                    new CommandSchema(null, "a", null, null, null),
-                    new CommandSchema(null, "a b", null, null, null),
-                    new CommandSchema(null, "a b c", null, null, null),
-                    new CommandSchema(null, "b", null, null, null),
-                    new CommandSchema(null, "b c", null, null, null),
-                    new CommandSchema(null, "c", null, null, null),
+                    GetSchemaWithName(""),
+                    GetSchemaWithName("a"),
+                    GetSchemaWithName("a b"),
+                    GetSchemaWithName("a b c"),
+                    GetSchemaWithName("b"),
+                    GetSchemaWithName("b c"),
+                    GetSchemaWithName("c"),
                 },
                 new CommandInput(new[] { "b", "c" }),
                 new string[0],
@@ -170,13 +171,13 @@ namespace CliFx.Tests.Services
             yield return new TestCaseData(
                 new []
                 {
-                    new CommandSchema(null, "", null, null, null),
-                    new CommandSchema(null, "a", null, null, null),
-                    new CommandSchema(null, "a b", null, null, null),
-                    new CommandSchema(null, "a b c", null, null, null),
-                    new CommandSchema(null, "b", null, null, null),
-                    new CommandSchema(null, "b c", null, null, null),
-                    new CommandSchema(null, "c", null, null, null),
+                    GetSchemaWithName(""),
+                    GetSchemaWithName("a"),
+                    GetSchemaWithName("a b"),
+                    GetSchemaWithName("a b c"),
+                    GetSchemaWithName("b"),
+                    GetSchemaWithName("b c"),
+                    GetSchemaWithName("c"),
                 },
                 new CommandInput(new[] { "d", "a", "b"}),
                 new[] { "d", "a", "b" },
@@ -185,13 +186,13 @@ namespace CliFx.Tests.Services
             yield return new TestCaseData(
                 new []
                 {
-                    new CommandSchema(null, "", null, null, null),
-                    new CommandSchema(null, "a", null, null, null),
-                    new CommandSchema(null, "a b", null, null, null),
-                    new CommandSchema(null, "a b c", null, null, null),
-                    new CommandSchema(null, "b", null, null, null),
-                    new CommandSchema(null, "b c", null, null, null),
-                    new CommandSchema(null, "c", null, null, null),
+                    GetSchemaWithName(""),
+                    GetSchemaWithName("a"),
+                    GetSchemaWithName("a b"),
+                    GetSchemaWithName("a b c"),
+                    GetSchemaWithName("b"),
+                    GetSchemaWithName("b c"),
+                    GetSchemaWithName("c"),
                 },
                 new CommandInput(new[] { "a", "b c", "d" }),
                 new[] { "b c", "d" },
@@ -200,13 +201,13 @@ namespace CliFx.Tests.Services
             yield return new TestCaseData(
                 new []
                 {
-                    new CommandSchema(null, "", null, null, null),
-                    new CommandSchema(null, "a", null, null, null),
-                    new CommandSchema(null, "a b", null, null, null),
-                    new CommandSchema(null, "a b c", null, null, null),
-                    new CommandSchema(null, "b", null, null, null),
-                    new CommandSchema(null, "b c", null, null, null),
-                    new CommandSchema(null, "c", null, null, null),
+                    GetSchemaWithName(""),
+                    GetSchemaWithName("a"),
+                    GetSchemaWithName("a b"),
+                    GetSchemaWithName("a b c"),
+                    GetSchemaWithName("b"),
+                    GetSchemaWithName("b c"),
+                    GetSchemaWithName("c"),
                 },
                 new CommandInput(new[] { "a b", "c", "d" }),
                 new[] { "a b", "c", "d" },
@@ -219,25 +220,25 @@ namespace CliFx.Tests.Services
             yield return new TestCaseData(
                 new []
                 {
-                    new CommandSchema(null, "command1", null, null, null),
-                    new CommandSchema(null, "command2", null, null, null),
-                    new CommandSchema(null, "command3", null, null, null),
+                    GetSchemaWithName("command1"),
+                    GetSchemaWithName("command2"),
+                    GetSchemaWithName("command3"),
                 },
                 new CommandInput(new[] { "command4", "argument1" })
             );
             yield return new TestCaseData(
                 new []
                 {
-                    new CommandSchema(null, "command1", null, null, null),
-                    new CommandSchema(null, "command2", null, null, null),
-                    new CommandSchema(null, "command3", null, null, null),
+                    GetSchemaWithName("command1"),
+                    GetSchemaWithName("command2"),
+                    GetSchemaWithName("command3"),
                 },
                 new CommandInput(new[] { "argument1" })
             );
             yield return new TestCaseData(
                 new []
                 {
-                    new CommandSchema(null, "command1 subcommand1", null, null, null),
+                    GetSchemaWithName("command1 subcommand1"),
                 },
                 new CommandInput(new[] { "command1", "argument1" })
             );
@@ -272,7 +273,7 @@ namespace CliFx.Tests.Services
 
         [Test]
         [TestCaseSource(nameof(GetTestCases_GetTargetCommandSchema_Positive))]
-        public void GetTargetCommandSchema_Positive_Test(IReadOnlyList<CommandSchema> availableCommandSchemas,
+        public void GetTargetCommandSchema_Positive_Test(IReadOnlyList<ICommandSchema> availableCommandSchemas,
             CommandInput commandInput,
             IReadOnlyList<string> expectedPositionalArguments,
             string expectedCommandSchemaName)
@@ -285,13 +286,13 @@ namespace CliFx.Tests.Services
 
             // Assert
             commandCandidate.Should().NotBeNull();
-            commandCandidate.PositionalArgumentsInput.Should().BeEquivalentTo(expectedPositionalArguments);
-            commandCandidate.Schema.Name.Should().Be(expectedCommandSchemaName);
+            commandCandidate!.PositionalArgumentsInput.Should().BeEquivalentTo(expectedPositionalArguments);
+            commandCandidate!.Schema.Name.Should().Be(expectedCommandSchemaName);
         }
 
         [Test]
         [TestCaseSource(nameof(GetTestCases_GetTargetCommandSchema_Negative))]
-        public void GetTargetCommandSchema_Negative_Test(IReadOnlyList<CommandSchema> availableCommandSchemas, CommandInput commandInput)
+        public void GetTargetCommandSchema_Negative_Test(IReadOnlyList<ICommandSchema> availableCommandSchemas, CommandInput commandInput)
         {
             // Arrange
             var resolver = new CommandSchemaResolver(new CommandArgumentSchemasValidator());
@@ -301,6 +302,13 @@ namespace CliFx.Tests.Services
 
             // Assert
             commandCandidate.Should().BeNull();
+        }
+
+        private static ICommandSchema GetSchemaWithName(string? name)
+        {
+            var schema = Substitute.For<ICommandSchema>();
+            schema.Name.Returns(name);
+            return schema;
         }
     }
 }

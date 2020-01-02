@@ -15,10 +15,10 @@ namespace CliFx.Tests.TestCommands
         public int? SecondArgument { get; set; }
         
         [CommandArgument(20, Description = "A list of numbers", Name = "third list")]
-        public IEnumerable<int> ThirdArguments { get; set; }
+        public IEnumerable<int>? ThirdArguments { get; set; }
         
         [CommandOption("option", 'o')]
-        public string Option { get; set; }
+        public string? Option { get; set; }
 
         public ValueTask ExecuteAsync(IConsole console) => default;
     }

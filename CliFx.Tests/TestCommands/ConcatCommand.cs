@@ -9,7 +9,7 @@ namespace CliFx.Tests.TestCommands
     public class ConcatCommand : ICommand
     {
         [CommandOption('i', IsRequired = true, Description = "Input strings.")]
-        public IReadOnlyList<string> Inputs { get; set; }
+        public IReadOnlyList<string> Inputs { get; set; } = new string[0];
 
         [CommandOption('s', Description = "String separator.")]
         public string Separator { get; set; } = ""; 

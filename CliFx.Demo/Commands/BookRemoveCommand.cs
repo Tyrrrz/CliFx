@@ -12,7 +12,7 @@ namespace CliFx.Demo.Commands
         private readonly LibraryService _libraryService;
 
         [CommandOption("title", 't', IsRequired = true, Description = "Book title.")]
-        public string Title { get; set; }
+        public string Title { get; set; } = "";
 
         public BookRemoveCommand(LibraryService libraryService)
         {

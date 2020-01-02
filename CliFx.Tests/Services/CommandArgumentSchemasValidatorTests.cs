@@ -99,8 +99,8 @@ namespace CliFx.Tests.Services
 
         private class TestCommand
         {
-            public IEnumerable<int> EnumerableProperty { get; set; }
-            public string StringProperty { get; set; }
+            public IEnumerable<int> EnumerableProperty { get; set; } = new int[0];
+            public string StringProperty { get; set; } = "";
         }
 
         public class ValidatorTest

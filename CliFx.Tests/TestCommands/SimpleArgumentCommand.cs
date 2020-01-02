@@ -12,9 +12,9 @@ namespace CliFx.Tests.TestCommands
         
         [CommandArgument(10)]
         public int? SecondArgument { get; set; }
-        
-        [CommandOption("option", 'o')]
-        public string Option { get; set; }
+
+        [CommandOption("option", 'o')] 
+        public string? Option { get; set; }
 
         public ValueTask ExecuteAsync(IConsole console) => default;
     }

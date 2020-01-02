@@ -15,10 +15,10 @@ namespace CliFx.Demo.Commands
         private readonly LibraryService _libraryService;
 
         [CommandArgument(0, Name = "title", IsRequired = true, Description = "Book title.")]
-        public string Title { get; set; }
+        public string Title { get; set; } = "";
 
         [CommandOption("author", 'a', IsRequired = true, Description = "Book author.")]
-        public string Author { get; set; }
+        public string Author { get; set; } = "";
 
         [CommandOption("published", 'p', Description = "Book publish date.")]
         public DateTimeOffset Published { get; set; }
