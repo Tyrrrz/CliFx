@@ -41,7 +41,7 @@ namespace CliFx
             _helpTextRenderer = helpTextRenderer;
         }
 
-        private async Task<int?> HandleDebugDirectiveAsync(CommandInput commandInput)
+        private async ValueTask<int?> HandleDebugDirectiveAsync(CommandInput commandInput)
         {
             // Debug mode is enabled if it's allowed in the application and it was requested via corresponding directive
             var isDebugMode = _configuration.IsDebugModeAllowed && commandInput.IsDebugDirectiveSpecified();
