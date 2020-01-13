@@ -12,7 +12,7 @@ using NUnit.Framework;
 namespace CliFx.Tests.Services
 {
     [TestFixture]
-    public class CommandOptionInputConverterTests
+    public class CommandInputConverterTests
     {
         private static IEnumerable<TestCaseData> GetTestCases_ConvertOptionInput()
         {
@@ -298,7 +298,7 @@ namespace CliFx.Tests.Services
             object expectedConvertedValue)
         {
             // Arrange
-            var converter = new CommandOptionInputConverter();
+            var converter = new CommandInputConverter();
 
             // Act
             var convertedValue = converter.ConvertOptionInput(optionInput, targetType);
@@ -313,7 +313,7 @@ namespace CliFx.Tests.Services
         public void ConvertOptionInput_Negative_Test(CommandOptionInput optionInput, Type targetType)
         {
             // Arrange
-            var converter = new CommandOptionInputConverter();
+            var converter = new CommandInputConverter();
 
             // Act & Assert
             converter.Invoking(c => c.ConvertOptionInput(optionInput, targetType))

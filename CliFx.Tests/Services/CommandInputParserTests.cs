@@ -158,13 +158,13 @@ namespace CliFx.Tests.Services
 
             yield return new TestCaseData(
                 new[] { "command" },
-                new CommandInput("command"),
+                new CommandInput(new []{ "command" }),
                 new EmptyEnvironmentVariablesProviderStub()
             );
 
             yield return new TestCaseData(
                 new[] { "command", "--option", "value" },
-                new CommandInput("command", new[]
+                new CommandInput(new []{ "command" }, new[]
                 {
                     new CommandOptionInput("option", "value")
                 }),
@@ -173,13 +173,13 @@ namespace CliFx.Tests.Services
 
             yield return new TestCaseData(
                 new[] { "long", "command", "name" },
-                new CommandInput("long command name"),
+                new CommandInput(new []{ "long", "command", "name"}),
                 new EmptyEnvironmentVariablesProviderStub()
             );
 
             yield return new TestCaseData(
                 new[] { "long", "command", "name", "--option", "value" },
-                new CommandInput("long command name", new[]
+                new CommandInput(new []{ "long", "command", "name" }, new[]
                 {
                     new CommandOptionInput("option", "value")
                 }),
@@ -188,7 +188,7 @@ namespace CliFx.Tests.Services
 
             yield return new TestCaseData(
                 new[] { "[debug]" },
-                new CommandInput(null,
+                new CommandInput(new string[0],
                     new[] { "debug" },
                     new CommandOptionInput[0]),
                 new EmptyEnvironmentVariablesProviderStub()
@@ -196,7 +196,7 @@ namespace CliFx.Tests.Services
 
             yield return new TestCaseData(
                 new[] { "[debug]", "[preview]" },
-                new CommandInput(null,
+                new CommandInput(new string[0],
                     new[] { "debug", "preview" },
                     new CommandOptionInput[0]),
                 new EmptyEnvironmentVariablesProviderStub()
@@ -204,7 +204,7 @@ namespace CliFx.Tests.Services
 
             yield return new TestCaseData(
                 new[] { "[debug]", "[preview]", "-o", "value" },
-                new CommandInput(null,
+                new CommandInput(new string[0],
                     new[] { "debug", "preview" },
                     new[]
                     {
@@ -215,7 +215,7 @@ namespace CliFx.Tests.Services
 
             yield return new TestCaseData(
                 new[] { "command", "[debug]", "[preview]", "-o", "value" },
-                new CommandInput("command",
+                new CommandInput(new []{"command"},
                     new[] { "debug", "preview" },
                     new[]
                     {
@@ -226,7 +226,7 @@ namespace CliFx.Tests.Services
 
             yield return new TestCaseData(
                 new[] { "command", "[debug]", "[preview]", "-o", "value" },
-                new CommandInput("command",
+                new CommandInput(new []{ "command"},
                     new[] { "debug", "preview" },
                     new[]
                     {

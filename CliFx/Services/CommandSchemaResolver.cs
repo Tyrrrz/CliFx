@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using CliFx.Attributes;
 using CliFx.Exceptions;
 using CliFx.Internal;
@@ -14,6 +15,16 @@ namespace CliFx.Services
     /// </summary>
     public class CommandSchemaResolver : ICommandSchemaResolver
     {
+        private readonly ICommandArgumentSchemasValidator _commandArgumentSchemasValidator;
+
+        /// <summary>
+        /// Creates an instance of <see cref="CommandSchemaResolver"/>.
+        /// </summary>
+        public CommandSchemaResolver(ICommandArgumentSchemasValidator commandArgumentSchemasValidator)
+        {
+            _commandArgumentSchemasValidator = commandArgumentSchemasValidator;
+        }
+
         private IReadOnlyList<CommandOptionSchema> GetCommandOptionSchemas(Type commandType)
         {
             var result = new List<CommandOptionSchema>();
@@ -67,6 +78,24 @@ namespace CliFx.Services
             return result;
         }
 
+        private IReadOnlyList<CommandArgumentSchema> GetCommandArgumentSchemas(Type commandType)
+        {
+            var argumentSchemas = commandType.GetProperties()
+                .Select(p => new { Property = p, Attribute = p.GetCustomAttribute<CommandArgumentAttribute>() })
+                .Where(a => a.Attribute != null)
+                .Select(a => new CommandArgumentSchema(a.Property, a.Attribute.Name, a.Attribute.IsRequired, a.Attribute.Description, a.Attribute.Order))
+                .ToList();
+
+            var validationErrors = _commandArgumentSchemasValidator.ValidateArgumentSchemas(argumentSchemas).ToList();
+            if (validationErrors.Any())
+            {
+                throw new CliFxException($"Command type [{commandType}] has invalid argument configuration:\n" +
+                    $"{string.Join("\n", validationErrors.Select(v => v.Message))}");
+            }
+
+            return argumentSchemas;
+        }
+
         /// <inheritdoc />
         public IReadOnlyList<CommandSchema> GetCommandSchemas(IReadOnlyList<Type> commandTypes)
         {
@@ -108,11 +137,14 @@ namespace CliFx.Services
                 // Get option schemas
                 var optionSchemas = GetCommandOptionSchemas(commandType);
 
+                // Get argument schemas
+                var argumentSchemas = GetCommandArgumentSchemas(commandType);
+
                 // Build command schema
                 var commandSchema = new CommandSchema(commandType,
                     attribute.Name,
                     attribute.Description,
-                    optionSchemas);
+                    argumentSchemas, optionSchemas);
 
                 // Make sure there are no other commands with the same name
                 var existingCommandWithSameName = result
@@ -130,6 +162,32 @@ namespace CliFx.Services
             }
 
             return result;
+        }
+
+        /// <inheritdoc />
+        public CommandCandidate? GetTargetCommandSchema(IReadOnlyList<CommandSchema> availableCommandSchemas, CommandInput commandInput)
+        {
+            // If no arguments are given, use the default command
+            CommandSchema targetSchema;
+            if (!commandInput.Arguments.Any())
+            {
+                targetSchema = availableCommandSchemas.FirstOrDefault(c => c.IsDefault());
+                return targetSchema is null ? null : new CommandCandidate(targetSchema, new string[0], commandInput);
+            }
+
+            // Arguments can be part of the a command name as long as they are single words, i.e. no whitespace characters
+            var longestPossibleCommandName = string.Join(" ", commandInput.Arguments.TakeWhile(arg => !Regex.IsMatch(arg, @"\s")));
+
+            // Find the longest matching schema
+            var orderedSchemas = availableCommandSchemas.OrderByDescending(x => x.Name?.Length);
+            targetSchema = orderedSchemas.FirstOrDefault(c => longestPossibleCommandName.StartsWith(c.Name ?? string.Empty, StringComparison.Ordinal))
+                           ?? availableCommandSchemas.FirstOrDefault(c => c.IsDefault());
+
+            // Get remaining positional arguments
+            var commandArgumentsCount = targetSchema?.Name?.Split(new []{ ' ' }, StringSplitOptions.RemoveEmptyEntries).Length ?? 0;
+            var positionalArguments = commandInput.Arguments.Skip(commandArgumentsCount).ToList();
+
+            return targetSchema is null ? null : new CommandCandidate(targetSchema, positionalArguments, commandInput);
         }
     }
 }

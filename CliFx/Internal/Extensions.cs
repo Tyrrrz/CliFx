@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using CliFx.Models;
 
 namespace CliFx.Internal
 {
@@ -66,5 +67,11 @@ namespace CliFx.Internal
 
         public static bool IsCollection(this Type type) =>
             type != typeof(string) && type.GetEnumerableUnderlyingType() != null;
+
+        public static IOrderedEnumerable<CommandArgumentSchema> Ordered(this IEnumerable<CommandArgumentSchema> source)
+        {
+            return source
+                .OrderBy(a => a.Order);
+        }
     }
 }

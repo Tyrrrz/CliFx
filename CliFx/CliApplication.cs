@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 using CliFx.Exceptions;
-using CliFx.Internal;
 using CliFx.Models;
 using CliFx.Services;
 
@@ -74,7 +72,7 @@ namespace CliFx
                 return null;
 
             // Render command name
-            _console.Output.WriteLine($"Command name: {commandInput.CommandName}");
+            _console.Output.WriteLine($"Arguments: {string.Join(" ", commandInput.Arguments)}");
             _console.Output.WriteLine();
 
             // Render directives
@@ -103,7 +101,7 @@ namespace CliFx
         private int? HandleVersionOption(CommandInput commandInput)
         {
             // Version should be rendered if it was requested on a default command
-            var shouldRenderVersion = !commandInput.IsCommandSpecified() && commandInput.IsVersionOptionSpecified();
+            var shouldRenderVersion = !commandInput.HasArguments() && commandInput.IsVersionOptionSpecified();
 
             // If shouldn't render version, pass execution to the next handler
             if (!shouldRenderVersion)
@@ -117,10 +115,10 @@ namespace CliFx
         }
 
         private int? HandleHelpOption(CommandInput commandInput,
-            IReadOnlyList<CommandSchema> availableCommandSchemas, CommandSchema? targetCommandSchema)
+            IReadOnlyList<CommandSchema> availableCommandSchemas, CommandCandidate? commandCandidate)
         {
             // Help should be rendered if it was requested, or when executing a command which isn't defined
-            var shouldRenderHelp = commandInput.IsHelpOptionSpecified() || targetCommandSchema == null;
+            var shouldRenderHelp = commandInput.IsHelpOptionSpecified() || commandCandidate == null;
 
             // If shouldn't render help, pass execution to the next handler
             if (!shouldRenderHelp)
@@ -129,31 +127,22 @@ namespace CliFx
             // Keep track whether there was an error in the input
             var isError = false;
 
-            // If target command isn't defined, find its contextual replacement
-            if (targetCommandSchema == null)
+            // Report error if no command matched the arguments
+            if (commandCandidate is null)
             {
-                // If command was specified, inform the user that it's not defined
-                if (commandInput.IsCommandSpecified())
+                // If a command was specified, inform the user that the command is not defined
+                if (commandInput.HasArguments())
                 {
                     _console.WithForegroundColor(ConsoleColor.Red,
-                        () => _console.Error.WriteLine($"Specified command [{commandInput.CommandName}] is not defined."));
-
+                        () => _console.Error.WriteLine($"No command could be matched for input [{string.Join(" ", commandInput.Arguments)}]"));
                     isError = true;
                 }
 
-                // Replace target command with closest parent of specified command
-                targetCommandSchema = availableCommandSchemas.FindParent(commandInput.CommandName);
-
-                // If there's no parent, replace with stub default command
-                if (targetCommandSchema == null)
-                {
-                    targetCommandSchema = CommandSchema.StubDefaultCommand;
-                    availableCommandSchemas = availableCommandSchemas.Concat(CommandSchema.StubDefaultCommand).ToArray();
-                }
+                commandCandidate = new CommandCandidate(CommandSchema.StubDefaultCommand, new string[0], commandInput);
             }
 
             // Build help text source
-            var helpTextSource = new HelpTextSource(_metadata, availableCommandSchemas, targetCommandSchema);
+            var helpTextSource = new HelpTextSource(_metadata, availableCommandSchemas, commandCandidate.Schema);
 
             // Render help text
             _helpTextRenderer.RenderHelpText(_console, helpTextSource);
@@ -162,13 +151,18 @@ namespace CliFx
             return isError ? -1 : 0;
         }
 
-        private async ValueTask<int> HandleCommandExecutionAsync(CommandInput commandInput, CommandSchema targetCommandSchema)
+        private async ValueTask<int> HandleCommandExecutionAsync(CommandCandidate? commandCandidate)
         {
-            // Create an instance of the command
-            var command = _commandFactory.CreateCommand(targetCommandSchema);
+            if (commandCandidate is null)
+            {
+                throw new ArgumentException("Cannot execute command because it was not found.");
+            }
 
-            // Populate command with options according to its schema
-            _commandInitializer.InitializeCommand(command, targetCommandSchema, commandInput);
+            // Create an instance of the command
+            var command = _commandFactory.CreateCommand(commandCandidate.Schema);
+
+            // Populate command with options and arguments according to its schema
+            _commandInitializer.InitializeCommand(command, commandCandidate);
 
             // Execute command
             await command.ExecuteAsync(_console);
@@ -189,15 +183,15 @@ namespace CliFx
                 var availableCommandSchemas = _commandSchemaResolver.GetCommandSchemas(_configuration.CommandTypes);
 
                 // Find command schema matching the name specified in the input
-                var targetCommandSchema = availableCommandSchemas.FindByName(commandInput.CommandName);
+                var commandCandidate = _commandSchemaResolver.GetTargetCommandSchema(availableCommandSchemas, commandInput);
 
                 // Chain handlers until the first one that produces an exit code
                 return
                     await HandleDebugDirectiveAsync(commandInput) ??
                     HandlePreviewDirective(commandInput) ??
                     HandleVersionOption(commandInput) ??
-                    HandleHelpOption(commandInput, availableCommandSchemas, targetCommandSchema) ??
-                    await HandleCommandExecutionAsync(commandInput, targetCommandSchema!);
+                    HandleHelpOption(commandInput, availableCommandSchemas, commandCandidate) ??
+                    await HandleCommandExecutionAsync(commandCandidate);
             }
             catch (Exception ex)
             {

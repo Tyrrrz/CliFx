@@ -15,7 +15,7 @@ namespace CliFx.Tests.Services
     {
         private static HelpTextSource CreateHelpTextSource(IReadOnlyList<Type> availableCommandTypes, Type targetCommandType)
         {
-            var commandSchemaResolver = new CommandSchemaResolver();
+            var commandSchemaResolver = new CommandSchemaResolver(new CommandArgumentSchemasValidator());
 
             var applicationMetadata = new ApplicationMetadata("TestApp", "testapp", "1.0", null);
             var availableCommandSchemas = commandSchemaResolver.GetCommandSchemas(availableCommandTypes);
@@ -82,6 +82,27 @@ namespace CliFx.Tests.Services
                     "cmd sub", "[options]",
                     "Options",
                     "-e|--option-e", "OptionE description.",
+                    "-h|--help", "Shows help text."
+                }
+            );
+            
+            yield return new TestCaseData(
+                CreateHelpTextSource(
+                    new[] {typeof(ArgumentCommand)},
+                    typeof(ArgumentCommand)),
+
+                new[]
+                {
+                    "Description",
+                    "Command using positional arguments",
+                    "Usage",
+                    "arg cmd", "<first>", "[<secondargument>]", "[<third list>]", "[options]",
+                    "Arguments",
+                    "* first",
+                    "secondargument",
+                    "third list", "A list of numbers",
+                    "Options",
+                    "-o|--option",
                     "-h|--help", "Shows help text."
                 }
             );

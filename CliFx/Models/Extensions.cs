@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace CliFx.Models
 {
@@ -90,7 +91,7 @@ namespace CliFx.Models
         /// <summary>
         /// Gets whether a command was specified in the input.
         /// </summary>
-        public static bool IsCommandSpecified(this CommandInput commandInput) => !string.IsNullOrWhiteSpace(commandInput.CommandName);
+        public static bool HasArguments(this CommandInput commandInput) => commandInput.Arguments.Any();
 
         /// <summary>
         /// Gets whether debug directive was specified in the input.
