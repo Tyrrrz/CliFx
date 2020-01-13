@@ -91,7 +91,7 @@ namespace CliFx.Tests.Services
         private static IEnumerable<TestCaseData> GetTestCases_GetTargetCommandSchema_Positive()
         {
             yield return new TestCaseData(
-                new List<CommandSchema>
+                new []
                 {
                     new CommandSchema(null, "command1", null, null, null),
                     new CommandSchema(null, "command2", null, null, null),
@@ -102,7 +102,7 @@ namespace CliFx.Tests.Services
                 "command1"
             );
             yield return new TestCaseData(
-                new List<CommandSchema>
+                new []
                 {
                     new CommandSchema(null, "", null, null, null),
                     new CommandSchema(null, "command1", null, null, null),
@@ -114,7 +114,7 @@ namespace CliFx.Tests.Services
                 ""
             );
             yield return new TestCaseData(
-                new List<CommandSchema>
+                new []
                 {
                     new CommandSchema(null, "command1 subcommand1", null, null, null),
                 },
@@ -123,7 +123,7 @@ namespace CliFx.Tests.Services
                 "command1 subcommand1"
             );
             yield return new TestCaseData(
-                new List<CommandSchema>
+                new []
                 {
                     new CommandSchema(null, "", null, null, null),
                     new CommandSchema(null, "a", null, null, null),
@@ -138,7 +138,7 @@ namespace CliFx.Tests.Services
                 "a b"
             );
             yield return new TestCaseData(
-                new List<CommandSchema>
+                new []
                 {
                     new CommandSchema(null, "", null, null, null),
                     new CommandSchema(null, "a", null, null, null),
@@ -153,7 +153,7 @@ namespace CliFx.Tests.Services
                 "a b c"
             );
             yield return new TestCaseData(
-                new List<CommandSchema>
+                new []
                 {
                     new CommandSchema(null, "", null, null, null),
                     new CommandSchema(null, "a", null, null, null),
@@ -168,7 +168,7 @@ namespace CliFx.Tests.Services
                 "b c"
             );
             yield return new TestCaseData(
-                new List<CommandSchema>
+                new []
                 {
                     new CommandSchema(null, "", null, null, null),
                     new CommandSchema(null, "a", null, null, null),
@@ -183,7 +183,7 @@ namespace CliFx.Tests.Services
                 ""
             );
             yield return new TestCaseData(
-                new List<CommandSchema>
+                new []
                 {
                     new CommandSchema(null, "", null, null, null),
                     new CommandSchema(null, "a", null, null, null),
@@ -198,7 +198,7 @@ namespace CliFx.Tests.Services
                 "a"
             );
             yield return new TestCaseData(
-                new List<CommandSchema>
+                new []
                 {
                     new CommandSchema(null, "", null, null, null),
                     new CommandSchema(null, "a", null, null, null),
@@ -217,7 +217,7 @@ namespace CliFx.Tests.Services
         private static IEnumerable<TestCaseData> GetTestCases_GetTargetCommandSchema_Negative()
         {
             yield return new TestCaseData(
-                new List<CommandSchema>
+                new []
                 {
                     new CommandSchema(null, "command1", null, null, null),
                     new CommandSchema(null, "command2", null, null, null),
@@ -226,7 +226,7 @@ namespace CliFx.Tests.Services
                 new CommandInput(new[] { "command4", "argument1" })
             );
             yield return new TestCaseData(
-                new List<CommandSchema>
+                new []
                 {
                     new CommandSchema(null, "command1", null, null, null),
                     new CommandSchema(null, "command2", null, null, null),
@@ -235,7 +235,7 @@ namespace CliFx.Tests.Services
                 new CommandInput(new[] { "argument1" })
             );
             yield return new TestCaseData(
-                new List<CommandSchema>
+                new []
                 {
                     new CommandSchema(null, "command1 subcommand1", null, null, null),
                 },
