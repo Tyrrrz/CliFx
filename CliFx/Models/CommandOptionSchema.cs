@@ -39,9 +39,15 @@ namespace CliFx.Models
         public string? EnvironmentVariableName { get; }
 
         /// <summary>
+        /// Optional sample value that will be used in help text for usage of required options. In case this property is not 
+        /// set for a required option option's name will be used as sample value.
+        /// </summary>
+        public string? SampleValue { get; set; }
+
+        /// <summary>
         /// Initializes an instance of <see cref="CommandOptionSchema"/>.
         /// </summary>
-        public CommandOptionSchema(PropertyInfo? property, string? name, char? shortName, bool isRequired, string? description, string? environmentVariableName)
+        public CommandOptionSchema(PropertyInfo? property, string? name, char? shortName, bool isRequired, string? description, string? environmentVariableName, string? sampleValue)
         {
             Property = property;
             Name = name;
@@ -49,6 +55,7 @@ namespace CliFx.Models
             IsRequired = isRequired;
             Description = description;
             EnvironmentVariableName = environmentVariableName;
+            SampleValue = sampleValue;
         }
 
         /// <inheritdoc />
@@ -80,9 +87,9 @@ namespace CliFx.Models
         // ...in CliApplication (when reading) and HelpTextRenderer (when writing).
 
         internal static CommandOptionSchema HelpOption { get; } =
-            new CommandOptionSchema(null, "help", 'h', false, "Shows help text.", null);
+            new CommandOptionSchema(null, "help", 'h', false, "Shows help text.", null, null);
 
         internal static CommandOptionSchema VersionOption { get; } =
-            new CommandOptionSchema(null, "version", null, false, "Shows version information.", null);
+            new CommandOptionSchema(null, "version", null, false, "Shows version information.", null, null);
     }
 }

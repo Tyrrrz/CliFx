@@ -106,6 +106,23 @@ namespace CliFx.Tests.Services
                     "-h|--help", "Shows help text."
                 }
             );
+
+            yield return new TestCaseData(
+                CreateHelpTextSource(
+                    new[] { typeof(SampleValueOptionCommand) },
+                    typeof(SampleValueOptionCommand)),
+
+                new[]
+                {
+                    "Description",
+                    "SampleValueOptionCommand description.",
+                    "Usage",
+                    "testapp sampleval", "-f option_f_value", "[options]",
+                    "Options",
+                    "-f|--option-f",
+                    "-h|--help", "Shows help text."
+                }
+            );
         }
 
         [Test]

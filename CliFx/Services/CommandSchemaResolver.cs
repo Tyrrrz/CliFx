@@ -43,7 +43,8 @@ namespace CliFx.Services
                     attribute.ShortName,
                     attribute.IsRequired,
                     attribute.Description,
-                    attribute.EnvironmentVariableName);
+                    attribute.EnvironmentVariableName,
+                    attribute.SampleValue);
 
                 // Make sure there are no other options with the same name
                 var existingOptionWithSameName = result

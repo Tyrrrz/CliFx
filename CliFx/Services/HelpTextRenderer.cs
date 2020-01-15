@@ -165,7 +165,17 @@ namespace CliFx.Services
                         Render("]");
                 }
 
-                // Options
+                // Required options
+                var requiredOptionSchemas = source.TargetCommandSchema.Options
+                    .Where(o => o.IsRequired)
+                    .ToArray();
+
+                foreach (var requiredOption in requiredOptionSchemas)
+                {
+                    Render($" -{requiredOption.ShortName} {requiredOption.SampleValue ?? requiredOption.Name}");
+                }
+
+                // Options placeholder
                 Render(" ");
                 RenderWithColor("[options]", ConsoleColor.White);
                 RenderNewLine();
