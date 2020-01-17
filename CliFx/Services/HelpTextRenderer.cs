@@ -176,8 +176,18 @@ namespace CliFx.Services
                 }
 
                 // Options placeholder
-                Render(" ");
-                RenderWithColor("[options]", ConsoleColor.White);
+                var notRequiredOrDefaultOptionCount = source.TargetCommandSchema.Options
+                    .Count(
+                        o => !o.IsRequired && 
+                        o.Name != CommandOptionSchema.HelpOption.Name &&
+                        o.Name != CommandOptionSchema.VersionOption.Name);
+
+                if (notRequiredOrDefaultOptionCount > 0)
+                {
+                    Render(" ");
+                    RenderWithColor("[options]", ConsoleColor.White); 
+                }
+
                 RenderNewLine();
             }
 
