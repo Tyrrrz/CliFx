@@ -125,7 +125,7 @@ namespace CliFx.Tests.Services
                     "Description",
                     "AllRequiredOptionsCommand description.",
                     "Usage",
-                    "testapp allrequired -f <value> -g <value>"
+                    "testapp allrequired --option-f <value> --option-g <value>"
                 },
 
                 new []
@@ -144,7 +144,7 @@ namespace CliFx.Tests.Services
                     "Description",
                     "SomeRequiredOptionsCommand description.",
                     "Usage",
-                    "testapp somerequired -f <value> [options]"
+                    "testapp somerequired --option-f <value> [options]"
                 },
 
                 new string[0]

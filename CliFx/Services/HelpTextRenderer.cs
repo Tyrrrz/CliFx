@@ -172,7 +172,7 @@ namespace CliFx.Services
 
                 foreach (var requiredOption in requiredOptionSchemas)
                 {
-                    Render($" -{requiredOption.ShortName} <value>");
+                    Render($" --{requiredOption.Name} <value>");
                 }
 
                 // Options placeholder
