@@ -55,14 +55,16 @@ namespace CliFx.Models
             if (!string.IsNullOrWhiteSpace(Name))
                 buffer.Append(Name);
 
-            foreach (var option in Options)
+            if (Options != null)
             {
-                buffer.AppendIfNotEmpty(' ');
-                buffer.Append('[');
-                buffer.Append(option);
-                buffer.Append(']');
+                foreach (var option in Options)
+                {
+                    buffer.AppendIfNotEmpty(' ');
+                    buffer.Append('[');
+                    buffer.Append(option);
+                    buffer.Append(']');
+                }
             }
-
             return buffer.ToString();
         }
     }

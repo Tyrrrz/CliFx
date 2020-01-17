@@ -45,7 +45,9 @@ namespace CliFx.Tests.Services
                     "Commands",
                     "cmd", "HelpNamedCommand description.",
                     "You can run", "to show help on a specific command."
-                }
+                },
+
+                new string[0]
             );
 
             yield return new TestCaseData(
@@ -66,7 +68,9 @@ namespace CliFx.Tests.Services
                     "Commands",
                     "sub", "HelpSubCommand description.",
                     "You can run", "to show help on a specific command."
-                }
+                },
+
+                new string[0]
             );
 
             yield return new TestCaseData(
@@ -83,7 +87,9 @@ namespace CliFx.Tests.Services
                     "Options",
                     "-e|--option-e", "OptionE description.",
                     "-h|--help", "Shows help text."
-                }
+                },
+
+                new string[0]
             );
             
             yield return new TestCaseData(
@@ -104,14 +110,52 @@ namespace CliFx.Tests.Services
                     "Options",
                     "-o|--option",
                     "-h|--help", "Shows help text."
+                },
+
+                new string[0]
+            );
+
+            yield return new TestCaseData(
+                CreateHelpTextSource(
+                    new[] { typeof(AllRequiredOptionsCommand) },
+                    typeof(AllRequiredOptionsCommand)),
+
+                new[]
+                {
+                    "Description",
+                    "AllRequiredOptionsCommand description.",
+                    "Usage",
+                    "testapp allrequired --option-f <value> --option-g <value>"
+                },
+
+                new []
+                {
+                    "[options]"
                 }
+            );
+
+            yield return new TestCaseData(
+                CreateHelpTextSource(
+                    new[] { typeof(SomeRequiredOptionsCommand) },
+                    typeof(SomeRequiredOptionsCommand)),
+
+                new[]
+                {
+                    "Description",
+                    "SomeRequiredOptionsCommand description.",
+                    "Usage",
+                    "testapp somerequired --option-f <value> [options]"
+                },
+
+                new string[0]
             );
         }
 
         [Test]
         [TestCaseSource(nameof(GetTestCases_RenderHelpText))]
         public void RenderHelpText_Test(HelpTextSource source,
-            IReadOnlyList<string> expectedSubstrings)
+            IReadOnlyList<string> expectedSubstrings,
+            IReadOnlyList<string> notExpectedSubstrings)
         {
             // Arrange
             using var stdout = new StringWriter();
@@ -124,6 +168,10 @@ namespace CliFx.Tests.Services
 
             // Assert
             stdout.ToString().Should().ContainAll(expectedSubstrings);
+            if (notExpectedSubstrings != null && notExpectedSubstrings.Any())
+            {
+                stdout.ToString().Should().NotContainAll(notExpectedSubstrings);
+            }
         }
     }
 }

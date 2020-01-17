@@ -165,9 +165,29 @@ namespace CliFx.Services
                         Render("]");
                 }
 
-                // Options
-                Render(" ");
-                RenderWithColor("[options]", ConsoleColor.White);
+                // Required options
+                var requiredOptionSchemas = source.TargetCommandSchema.Options
+                    .Where(o => o.IsRequired)
+                    .ToArray();
+
+                foreach (var requiredOption in requiredOptionSchemas)
+                {
+                    Render($" --{requiredOption.Name} <value>");
+                }
+
+                // Options placeholder
+                var notRequiredOrDefaultOptionCount = source.TargetCommandSchema.Options
+                    .Count(
+                        o => !o.IsRequired && 
+                        o.Name != CommandOptionSchema.HelpOption.Name &&
+                        o.Name != CommandOptionSchema.VersionOption.Name);
+
+                if (notRequiredOrDefaultOptionCount > 0)
+                {
+                    Render(" ");
+                    RenderWithColor("[options]", ConsoleColor.White); 
+                }
+
                 RenderNewLine();
             }
 
