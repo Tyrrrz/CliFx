@@ -15,40 +15,32 @@ namespace CliFx.Tests.Services
         private static IEnumerable<TestCaseData> GetTestCases_GetCommandSchemas()
         {
             yield return new TestCaseData(
-                new[] { typeof(DivideCommand), typeof(ConcatCommand), typeof(EnvironmentVariableCommand), typeof(SampleValueOptionCommand) },
+                new[] { typeof(DivideCommand), typeof(ConcatCommand), typeof(EnvironmentVariableCommand) },
                 new[]
                 {
                     new CommandSchema(typeof(DivideCommand), "div", "Divide one number by another.",
                         new CommandArgumentSchema[0], new[]
                         {
                             new CommandOptionSchema(typeof(DivideCommand).GetProperty(nameof(DivideCommand.Dividend)),
-                                "dividend", 'D', true, "The number to divide.", null, null),
+                                "dividend", 'D', true, "The number to divide.", null),
                             new CommandOptionSchema(typeof(DivideCommand).GetProperty(nameof(DivideCommand.Divisor)),
-                                "divisor", 'd', true, "The number to divide by.", null, null)
+                                "divisor", 'd', true, "The number to divide by.", null)
                         }),
                     new CommandSchema(typeof(ConcatCommand), "concat", "Concatenate strings.",
                         new CommandArgumentSchema[0],
                         new[]
                         {
                             new CommandOptionSchema(typeof(ConcatCommand).GetProperty(nameof(ConcatCommand.Inputs)),
-                                null, 'i', true, "Input strings.", null, null),
+                                null, 'i', true, "Input strings.", null),
                             new CommandOptionSchema(typeof(ConcatCommand).GetProperty(nameof(ConcatCommand.Separator)),
-                                null, 's', false, "String separator.", null, null)
+                                null, 's', false, "String separator.", null)
                         }),
                     new CommandSchema(typeof(EnvironmentVariableCommand), null, "Reads option values from environment variables.",
                         new CommandArgumentSchema[0],
                         new[]
                         {
                             new CommandOptionSchema(typeof(EnvironmentVariableCommand).GetProperty(nameof(EnvironmentVariableCommand.Option)),
-                                "opt", null, false, null, "ENV_SINGLE_VALUE", null)
-                        }
-                    ),
-                    new CommandSchema(typeof(SampleValueOptionCommand), "sampleval", "SampleValueOptionCommand description.",
-                        new CommandArgumentSchema[0],
-                        new []
-                        {
-                            new CommandOptionSchema(typeof(SampleValueOptionCommand).GetProperty(nameof(SampleValueOptionCommand.OptionF)),
-                                "option-f", 'f', true, "OptionF description.", null, "option_f_value")
+                                "opt", null, false, null, "ENV_SINGLE_VALUE")
                         }
                     )
                 }

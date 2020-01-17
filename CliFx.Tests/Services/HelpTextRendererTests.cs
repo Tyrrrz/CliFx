@@ -109,15 +109,15 @@ namespace CliFx.Tests.Services
 
             yield return new TestCaseData(
                 CreateHelpTextSource(
-                    new[] { typeof(SampleValueOptionCommand) },
-                    typeof(SampleValueOptionCommand)),
+                    new[] { typeof(AllRequiredOptionsCommand) },
+                    typeof(AllRequiredOptionsCommand)),
 
                 new[]
                 {
                     "Description",
-                    "SampleValueOptionCommand description.",
+                    "AllRequiredOptionsCommand description.",
                     "Usage",
-                    "testapp sampleval", "-f option_f_value", "[options]",
+                    "testapp allrequired -f <value> -g <value>",
                     "Options",
                     "-f|--option-f",
                     "-h|--help", "Shows help text."

@@ -36,12 +36,6 @@ namespace CliFx.Attributes
         public string? EnvironmentVariableName { get; set; }
 
         /// <summary>
-        /// Optional sample value that will be used in help text for usage of required options. In case this property is not 
-        /// set for a required option option's name will be used as sample value.
-        /// </summary>
-        public string? SampleValue { get; set; }
-
-        /// <summary>
         /// Initializes an instance of <see cref="CommandOptionAttribute"/>.
         /// </summary>
         private CommandOptionAttribute(string? name, char? shortName)
