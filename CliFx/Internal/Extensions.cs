@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using CliFx.Models;
 
 namespace CliFx.Internal
 {
@@ -50,7 +49,7 @@ namespace CliFx.Internal
 
             return type.GetInterfaces()
                 .Select(GetEnumerableUnderlyingType)
-                .Where(t => t != default)
+                .Where(t => t != null)
                 .OrderByDescending(t => t != typeof(object)) // prioritize more specific types
                 .FirstOrDefault();
         }
@@ -63,15 +62,6 @@ namespace CliFx.Internal
             sourceAsCollection.CopyTo(array, 0);
 
             return array;
-        }
-
-        public static bool IsCollection(this Type type) =>
-            type != typeof(string) && type.GetEnumerableUnderlyingType() != null;
-
-        public static IOrderedEnumerable<CommandArgumentSchema> Ordered(this IEnumerable<CommandArgumentSchema> source)
-        {
-            return source
-                .OrderBy(a => a.Order);
         }
     }
 }

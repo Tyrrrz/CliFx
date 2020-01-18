@@ -1,48 +1,42 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using CliFx.Models;
-using CliFx.Services;
 
 namespace CliFx
 {
     /// <summary>
-    /// Extensions for <see cref="CliFx"/>.
+    /// Extensions for <see cref="Services"/>
     /// </summary>
     public static class Extensions
     {
         /// <summary>
-        /// Adds multiple commands to the application.
+        /// Sets console foreground color, executes specified action, and sets the color back to the original value.
         /// </summary>
-        public static ICliApplicationBuilder AddCommands(this ICliApplicationBuilder builder, IReadOnlyList<Type> commandTypes)
+        public static void WithForegroundColor(this IConsole console, ConsoleColor foregroundColor, Action action)
         {
-            foreach (var commandType in commandTypes)
-                builder.AddCommand(commandType);
+            var lastColor = console.ForegroundColor;
+            console.ForegroundColor = foregroundColor;
 
-            return builder;
+            action();
+
+            console.ForegroundColor = lastColor;
         }
 
         /// <summary>
-        /// Adds commands from specified assemblies to the application.
+        /// Sets console background color, executes specified action, and sets the color back to the original value.
         /// </summary>
-        public static ICliApplicationBuilder AddCommandsFrom(this ICliApplicationBuilder builder, IReadOnlyList<Assembly> commandAssemblies)
+        public static void WithBackgroundColor(this IConsole console, ConsoleColor backgroundColor, Action action)
         {
-            foreach (var commandAssembly in commandAssemblies)
-                builder.AddCommandsFrom(commandAssembly);
+            var lastColor = console.BackgroundColor;
+            console.BackgroundColor = backgroundColor;
 
-            return builder;
+            action();
+
+            console.BackgroundColor = lastColor;
         }
 
         /// <summary>
-        /// Adds commands from calling assembly to the application.
+        /// Sets console foreground and background colors, executes specified action, and sets the colors back to the original values.
         /// </summary>
-        public static ICliApplicationBuilder AddCommandsFromThisAssembly(this ICliApplicationBuilder builder) =>
-            builder.AddCommandsFrom(Assembly.GetCallingAssembly());
-
-        /// <summary>
-        /// Configures application to use specified factory method for creating new instances of <see cref="ICommand"/>.
-        /// </summary>
-        public static ICliApplicationBuilder UseCommandFactory(this ICliApplicationBuilder builder, Func<CommandSchema, ICommand> factoryMethod) =>
-            builder.UseCommandFactory(new DelegateCommandFactory(factoryMethod));
+        public static void WithColors(this IConsole console, ConsoleColor foregroundColor, ConsoleColor backgroundColor, Action action) =>
+            console.WithForegroundColor(foregroundColor, () => console.WithBackgroundColor(backgroundColor, action));
     }
 }

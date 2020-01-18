@@ -2,7 +2,6 @@
 using System;
 using System.IO;
 using CliFx.Services;
-using CliFx.Tests.Stubs;
 using CliFx.Tests.TestCommands;
 
 namespace CliFx.Tests
@@ -11,7 +10,7 @@ namespace CliFx.Tests
     public class CliApplicationBuilderTests
     {
         // Make sure all builder methods work
-        [Test]
+        [Test(Description = "All builder methods return without exceptions")]
         public void All_Smoke_Test()
         {
             // Arrange
@@ -32,13 +31,10 @@ namespace CliFx.Tests
                 .UseDescription("test")
                 .UseConsole(new VirtualConsole(TextWriter.Null))
                 .UseCommandFactory(schema => (ICommand) Activator.CreateInstance(schema.Type!)!)
-                .UseCommandOptionInputConverter(new CommandInputConverter())
-                .UseEnvironmentVariablesProvider(new EnvironmentVariablesProviderStub())
                 .Build();
         }
 
-        // Make sure builder can produce an application with no parameters specified
-        [Test]
+        [Test(Description = "Builder can produce an application when no parameters were specified")]
         public void Build_Test()
         {
             // Arrange

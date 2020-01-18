@@ -1,5 +1,4 @@
 ﻿using System;
-using CliFx.Services;
 
 namespace CliFx.Utilities
 {

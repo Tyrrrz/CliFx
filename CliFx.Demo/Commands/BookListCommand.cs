@@ -2,7 +2,6 @@
 using CliFx.Attributes;
 using CliFx.Demo.Internal;
 using CliFx.Demo.Services;
-using CliFx.Services;
 
 namespace CliFx.Demo.Commands
 {

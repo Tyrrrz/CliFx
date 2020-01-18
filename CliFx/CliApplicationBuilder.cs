@@ -3,17 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using CliFx.Attributes;
-using CliFx.Internal;
-using CliFx.Models;
-using CliFx.Services;
+using CliFx.Domain;
 
 namespace CliFx
 {
     /// <summary>
-    /// Default implementation of <see cref="ICliApplicationBuilder"/>.
+    /// Builds an instance of <see cref="CliApplication"/>.
     /// </summary>
-    public partial class CliApplicationBuilder : ICliApplicationBuilder
+    public partial class CliApplicationBuilder
     {
         private readonly HashSet<Type> _commandTypes = new HashSet<Type>();
 
@@ -24,121 +21,155 @@ namespace CliFx
         private string? _versionText;
         private string? _description;
         private IConsole? _console;
-        private ICommandFactory? _commandFactory;
-        private ICommandInputConverter? _commandInputConverter;
-        private IEnvironmentVariablesProvider? _environmentVariablesProvider;
+        private ITypeActivator? _typeActivator;
 
-        /// <inheritdoc />
-        public ICliApplicationBuilder AddCommand(Type commandType)
+        /// <summary>
+        /// Adds a command of specified type to the application.
+        /// </summary>
+        public CliApplicationBuilder AddCommand(Type commandType)
         {
             _commandTypes.Add(commandType);
 
             return this;
         }
 
-        /// <inheritdoc />
-        public ICliApplicationBuilder AddCommandsFrom(Assembly commandAssembly)
+        /// <summary>
+        /// Adds multiple commands to the application.
+        /// </summary>
+        public CliApplicationBuilder AddCommands(IEnumerable<Type> commandTypes)
         {
-            var commandTypes = commandAssembly.ExportedTypes
-                .Where(t => t.Implements(typeof(ICommand)))
-                .Where(t => t.IsDefined(typeof(CommandAttribute)))
-                .Where(t => !t.IsAbstract && !t.IsInterface);
-
             foreach (var commandType in commandTypes)
                 AddCommand(commandType);
 
             return this;
         }
 
-        /// <inheritdoc />
-        public ICliApplicationBuilder AllowDebugMode(bool isAllowed = true)
+        /// <summary>
+        /// Adds commands from specified assembly to the application.
+        /// </summary>
+        public CliApplicationBuilder AddCommandsFrom(Assembly commandAssembly)
+        {
+            foreach (var commandType in commandAssembly.ExportedTypes.Where(CommandSchema.IsCommandType))
+                AddCommand(commandType);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Adds commands from specified assemblies to the application.
+        /// </summary>
+        public CliApplicationBuilder AddCommandsFrom(IEnumerable<Assembly> commandAssemblies)
+        {
+            foreach (var commandAssembly in commandAssemblies)
+                AddCommandsFrom(commandAssembly);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Adds commands from calling assembly to the application.
+        /// </summary>
+        public CliApplicationBuilder AddCommandsFromThisAssembly() => AddCommandsFrom(Assembly.GetCallingAssembly());
+
+        /// <summary>
+        /// Specifies whether debug mode (enabled with [debug] directive) is allowed in the application.
+        /// </summary>
+        public CliApplicationBuilder AllowDebugMode(bool isAllowed = true)
         {
             _isDebugModeAllowed = isAllowed;
             return this;
         }
 
-        /// <inheritdoc />
-        public ICliApplicationBuilder AllowPreviewMode(bool isAllowed = true)
+        /// <summary>
+        /// Specifies whether preview mode (enabled with [preview] directive) is allowed in the application.
+        /// </summary>
+        public CliApplicationBuilder AllowPreviewMode(bool isAllowed = true)
         {
             _isPreviewModeAllowed = isAllowed;
             return this;
         }
 
-        /// <inheritdoc />
-        public ICliApplicationBuilder UseTitle(string title)
+        /// <summary>
+        /// Sets application title, which appears in the help text.
+        /// </summary>
+        public CliApplicationBuilder UseTitle(string title)
         {
             _title = title;
             return this;
         }
 
-        /// <inheritdoc />
-        public ICliApplicationBuilder UseExecutableName(string executableName)
+        /// <summary>
+        /// Sets application executable name, which appears in the help text.
+        /// </summary>
+        public CliApplicationBuilder UseExecutableName(string executableName)
         {
             _executableName = executableName;
             return this;
         }
 
-        /// <inheritdoc />
-        public ICliApplicationBuilder UseVersionText(string versionText)
+        /// <summary>
+        /// Sets application version text, which appears in the help text and when the user requests version information.
+        /// </summary>
+        public CliApplicationBuilder UseVersionText(string versionText)
         {
             _versionText = versionText;
             return this;
         }
 
-        /// <inheritdoc />
-        public ICliApplicationBuilder UseDescription(string? description)
+        /// <summary>
+        /// Sets application description, which appears in the help text.
+        /// </summary>
+        public CliApplicationBuilder UseDescription(string? description)
         {
             _description = description;
             return this;
         }
 
-        /// <inheritdoc />
-        public ICliApplicationBuilder UseConsole(IConsole console)
+        /// <summary>
+        /// Configures application to use specified implementation of <see cref="IConsole"/>.
+        /// </summary>
+        public CliApplicationBuilder UseConsole(IConsole console)
         {
             _console = console;
             return this;
         }
 
-        /// <inheritdoc />
-        public ICliApplicationBuilder UseCommandFactory(ICommandFactory factory)
+        /// <summary>
+        /// Configures application to use specified implementation of <see cref="ITypeActivator"/>.
+        /// </summary>
+        public CliApplicationBuilder UseTypeActivator(ITypeActivator typeActivator)
         {
-            _commandFactory = factory;
+            _typeActivator = typeActivator;
             return this;
         }
 
-        /// <inheritdoc />
-        public ICliApplicationBuilder UseCommandOptionInputConverter(ICommandInputConverter converter)
-        {
-            _commandInputConverter = converter;
-            return this;
-        }
+        /// <summary>
+        /// Configures application to use specified factory method.
+        /// </summary>
+        public CliApplicationBuilder UseTypeActivator(Func<Type, object> typeActivator) =>
+            UseTypeActivator(new DelegateTypeActivator(typeActivator));
 
-        /// <inheritdoc />
-        public ICliApplicationBuilder UseEnvironmentVariablesProvider(IEnvironmentVariablesProvider environmentVariablesProvider)
-        {
-            _environmentVariablesProvider = environmentVariablesProvider;
-            return this;
-        }
-
-        /// <inheritdoc />
-        public ICliApplication Build()
+        /// <summary>
+        /// Creates an instance of <see cref="CliApplication"/> using configured parameters.
+        /// Default values are used in place of parameters that were not specified.
+        /// </summary>
+        public CliApplication Build()
         {
             // Use defaults for required parameters that were not configured
             _title ??= GetDefaultTitle() ?? "App";
             _executableName ??= GetDefaultExecutableName() ?? "app";
             _versionText ??= GetDefaultVersionText() ?? "v1.0";
             _console ??= new SystemConsole();
-            _commandFactory ??= new CommandFactory();
-            _commandInputConverter ??= new CommandInputConverter();
-            _environmentVariablesProvider ??= new EnvironmentVariablesProvider();
+            _typeActivator ??= new DefaultTypeActivator();
 
             // Project parameters to expected types
             var metadata = new ApplicationMetadata(_title, _executableName, _versionText, _description);
             var configuration = new ApplicationConfiguration(_commandTypes.ToArray(), _isDebugModeAllowed, _isPreviewModeAllowed);
 
-            return new CliApplication(metadata, configuration,
-                _console, new CommandInputParser(_environmentVariablesProvider), new CommandSchemaResolver(new CommandArgumentSchemasValidator()),
-                _commandFactory, new CommandInitializer(_commandInputConverter, new EnvironmentVariablesParser()), new HelpTextRenderer());
+            return new CliApplication(
+                metadata, configuration,
+                _console, _typeActivator
+            );
         }
     }
 
@@ -166,5 +197,25 @@ namespace CliFx
         }
 
         private static string GetDefaultVersionText() => EntryAssembly != null ? $"v{EntryAssembly.GetName().Version}" : "";
+    }
+
+    public partial class CliApplicationBuilder
+    {
+        private class DefaultTypeActivator : ITypeActivator
+        {
+            public object CreateInstance(Type type) => Activator.CreateInstance(type);
+        }
+
+        private class DelegateTypeActivator : ITypeActivator
+        {
+            private readonly Func<Type, object> _delegate;
+
+            public DelegateTypeActivator(Func<Type, object> @delegate)
+            {
+                _delegate = @delegate;
+            }
+
+            public object CreateInstance(Type type) => _delegate(type);
+        }
     }
 }

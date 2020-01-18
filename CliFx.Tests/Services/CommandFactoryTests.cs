@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using CliFx.Models;
+﻿using System.Collections.Generic;
+using CliFx.Domain;
 using CliFx.Services;
 using CliFx.Tests.TestCommands;
 using FluentAssertions;
@@ -12,12 +10,10 @@ namespace CliFx.Tests.Services
     [TestFixture]
     public class CommandFactoryTests
     {
-        private static CommandSchema GetCommandSchema(Type commandType) =>
-            new CommandSchemaResolver(new CommandArgumentSchemasValidator()).GetCommandSchemas(new[] {commandType}).Single();
 
         private static IEnumerable<TestCaseData> GetTestCases_CreateCommand()
         {
-            yield return new TestCaseData(GetCommandSchema(typeof(HelloWorldDefaultCommand)));
+            yield return new TestCaseData(SchemaLogic.ResolveCommandSchema(typeof(HelloWorldDefaultCommand)));
         }
 
         [Test]

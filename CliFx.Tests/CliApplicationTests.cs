@@ -6,7 +6,6 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using CliFx.Services;
-using CliFx.Tests.Stubs;
 using CliFx.Tests.TestCommands;
 
 namespace CliFx.Tests
@@ -175,17 +174,22 @@ namespace CliFx.Tests
             await using var stdoutStream = new StringWriter();
 
             var console = new VirtualConsole(stdoutStream);
-            var environmentVariablesProvider = new EnvironmentVariablesProviderStub();
+
+            var envVars = new Dictionary<string, string>
+            {
+                ["ENV_SINGLE_VALUE"] = "A",
+                ["ENV_MULTIPLE_VALUES"] = $"A{Path.PathSeparator}B{Path.PathSeparator}C{Path.PathSeparator}",
+                ["ENV_ESCAPED_MULTIPLE_VALUES"] = $"\"A{Path.PathSeparator}B{Path.PathSeparator}C{Path.PathSeparator}\""
+            };
 
             var application = new CliApplicationBuilder()
                 .AddCommands(commandTypes)
                 .UseVersionText(TestVersionText)
                 .UseConsole(console)
-                .UseEnvironmentVariablesProvider(environmentVariablesProvider)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(commandLineArguments);
+            var exitCode = await application.RunAsync(commandLineArguments, envVars);
             var stdOut = stdoutStream.ToString().Trim();
 
             // Assert
@@ -206,17 +210,22 @@ namespace CliFx.Tests
             await using var stderrStream = new StringWriter();
 
             var console = new VirtualConsole(TextWriter.Null, stderrStream);
-            var environmentVariablesProvider = new EnvironmentVariablesProviderStub();
+
+            var envVars = new Dictionary<string, string>
+            {
+                ["ENV_SINGLE_VALUE"] = "A",
+                ["ENV_MULTIPLE_VALUES"] = $"A{Path.PathSeparator}B{Path.PathSeparator}C{Path.PathSeparator}",
+                ["ENV_ESCAPED_MULTIPLE_VALUES"] = $"\"A{Path.PathSeparator}B{Path.PathSeparator}C{Path.PathSeparator}\""
+            };
 
             var application = new CliApplicationBuilder()
                 .AddCommands(commandTypes)
                 .UseVersionText(TestVersionText)
-                .UseEnvironmentVariablesProvider(environmentVariablesProvider)
                 .UseConsole(console)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(commandLineArguments);
+            var exitCode = await application.RunAsync(commandLineArguments, envVars);
             var stderr = stderrStream.ToString().Trim();
 
             // Assert
@@ -244,10 +253,11 @@ namespace CliFx.Tests
                 .AddCommand(typeof(CancellableCommand))
                 .UseConsole(console)
                 .Build();
+
             var args = new[] {"cancel"};
 
             // Act
-            var runTask = application.RunAsync(args);
+            var runTask = application.RunAsync(args, new Dictionary<string, string>());
             cancellationTokenSource.Cancel();
             var exitCode = await runTask.ConfigureAwait(false);
             var stdOut = stdoutStream.ToString().Trim();

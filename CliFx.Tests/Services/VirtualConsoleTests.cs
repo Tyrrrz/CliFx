@@ -9,8 +9,7 @@ namespace CliFx.Tests.Services
     [TestFixture]
     public class VirtualConsoleTests
     {
-        // Make sure console uses specified streams and doesn't leak to System.Console
-        [Test]
+        [Test(Description = "Virtual console doesn't leak to system console")]
         public void All_Smoke_Test()
         {
             // Arrange

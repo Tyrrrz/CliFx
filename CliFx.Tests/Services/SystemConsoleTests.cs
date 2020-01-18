@@ -14,9 +14,8 @@ namespace CliFx.Tests.Services
             // Reset console color so it doesn't carry on into next tests
             Console.ResetColor();
         }
-        
-        // Make sure console correctly wraps around System.Console
-        [Test]
+
+        [Test(Description = "Synchronized with system console")]
         public void All_Smoke_Test()
         {
             // Arrange

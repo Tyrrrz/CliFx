@@ -8,7 +8,7 @@ namespace CliFx.Demo
 {
     public static class Program
     {
-        private static IServiceProvider ConfigureServices()
+        private static IServiceProvider GetServiceProvider()
         {
             // We use Microsoft.Extensions.DependencyInjection for injecting dependencies in commands
             var services = new ServiceCollection();
@@ -25,15 +25,11 @@ namespace CliFx.Demo
             return services.BuildServiceProvider();
         }
 
-        public static async Task<int> Main(string[] args)
-        {
-            var serviceProvider = ConfigureServices();
-
-            return await new CliApplicationBuilder()
+        public static async Task<int> Main() =>
+            await new CliApplicationBuilder()
                 .AddCommandsFromThisAssembly()
-                .UseCommandFactory(schema => (ICommand) serviceProvider.GetRequiredService(schema.Type))
+                .UseTypeActivator(GetServiceProvider().GetService)
                 .Build()
-                .RunAsync(args);
-        }
+                .RunAsync();
     }
 }

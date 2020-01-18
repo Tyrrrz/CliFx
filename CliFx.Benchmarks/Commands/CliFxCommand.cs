@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using CliFx.Attributes;
-using CliFx.Services;
 
 namespace CliFx.Benchmarks.Commands
 {

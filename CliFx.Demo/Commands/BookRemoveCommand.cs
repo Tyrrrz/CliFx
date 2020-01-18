@@ -2,7 +2,6 @@
 using CliFx.Attributes;
 using CliFx.Demo.Services;
 using CliFx.Exceptions;
-using CliFx.Services;
 
 namespace CliFx.Demo.Commands
 {
@@ -11,8 +10,8 @@ namespace CliFx.Demo.Commands
     {
         private readonly LibraryService _libraryService;
 
-        [CommandOption("title", 't', IsRequired = true, Description = "Book title.")]
-        public string Title { get; set; }
+        [CommandParameter(0, Name = "title", Description = "Book title.")]
+        public string Title { get; set; } = "";
 
         public BookRemoveCommand(LibraryService libraryService)
         {
