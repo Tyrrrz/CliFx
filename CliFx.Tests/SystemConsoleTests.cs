@@ -1,9 +1,8 @@
 ﻿using System;
-using CliFx.Services;
 using FluentAssertions;
 using NUnit.Framework;
 
-namespace CliFx.Tests.Services
+namespace CliFx.Tests
 {
     [TestFixture]
     public class SystemConsoleTests
@@ -15,8 +14,8 @@ namespace CliFx.Tests.Services
             Console.ResetColor();
         }
 
-        [Test(Description = "Synchronized with system console")]
-        public void All_Smoke_Test()
+        [Test(Description = "Must be in sync with system console")]
+        public void Smoke_Test()
         {
             // Arrange
             var console = new SystemConsole();

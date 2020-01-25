@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using CliFx.Services;
 using CliFx.Tests.TestCommands;
 
 namespace CliFx.Tests
@@ -20,102 +19,119 @@ namespace CliFx.Tests
             yield return new TestCaseData(
                 new[] {typeof(HelloWorldDefaultCommand)},
                 new string[0],
+                new Dictionary<string, string>(),
                 "Hello world."
             );
 
             yield return new TestCaseData(
                 new[] {typeof(ConcatCommand)},
                 new[] {"concat", "-i", "foo", "-i", "bar", "-s", " "},
+                new Dictionary<string, string>(),
                 "foo bar"
             );
 
             yield return new TestCaseData(
                 new[] {typeof(ConcatCommand)},
                 new[] {"concat", "-i", "one", "two", "three", "-s", ", "},
+                new Dictionary<string, string>(),
                 "one, two, three"
             );
 
             yield return new TestCaseData(
                 new[] {typeof(DivideCommand)},
                 new[] {"div", "-D", "24", "-d", "8"},
+                new Dictionary<string, string>(),
                 "3"
             );
 
             yield return new TestCaseData(
                 new[] {typeof(HelloWorldDefaultCommand)},
                 new[] {"--version"},
+                new Dictionary<string, string>(),
                 TestVersionText
             );
 
             yield return new TestCaseData(
                 new[] {typeof(ConcatCommand)},
                 new[] {"--version"},
+                new Dictionary<string, string>(),
                 TestVersionText
             );
 
             yield return new TestCaseData(
                 new[] {typeof(HelloWorldDefaultCommand)},
                 new[] {"-h"},
+                new Dictionary<string, string>(),
                 null
             );
 
             yield return new TestCaseData(
                 new[] {typeof(HelloWorldDefaultCommand)},
                 new[] {"--help"},
+                new Dictionary<string, string>(),
                 null
             );
 
             yield return new TestCaseData(
                 new[] {typeof(ConcatCommand)},
                 new string[0],
+                new Dictionary<string, string>(),
                 null
             );
 
             yield return new TestCaseData(
                 new[] {typeof(ConcatCommand)},
                 new[] {"-h"},
+                new Dictionary<string, string>(),
                 null
             );
 
             yield return new TestCaseData(
                 new[] {typeof(ConcatCommand)},
                 new[] {"--help"},
+                new Dictionary<string, string>(),
                 null
             );
 
             yield return new TestCaseData(
                 new[] {typeof(ConcatCommand)},
                 new[] {"concat", "-h"},
+                new Dictionary<string, string>(),
                 null
             );
 
             yield return new TestCaseData(
                 new[] {typeof(ExceptionCommand)},
                 new[] {"exc", "-h"},
+                new Dictionary<string, string>(),
                 null
             );
 
             yield return new TestCaseData(
                 new[] {typeof(CommandExceptionCommand)},
                 new[] {"exc", "-h"},
+                new Dictionary<string, string>(),
                 null
             );
 
             yield return new TestCaseData(
                 new[] {typeof(ConcatCommand)},
                 new[] {"[preview]"},
+                new Dictionary<string, string>(),
                 null
             );
 
             yield return new TestCaseData(
                 new[] {typeof(ExceptionCommand)},
                 new[] {"exc", "[preview]"},
+                new Dictionary<string, string>(),
                 null
             );
 
             yield return new TestCaseData(
                 new[] {typeof(ConcatCommand)},
                 new[] {"concat", "[preview]", "-o", "value"},
+                new Dictionary<string, string>(),
                 null
             );
         }
@@ -125,62 +141,64 @@ namespace CliFx.Tests
             yield return new TestCaseData(
                 new Type[0],
                 new string[0],
+                new Dictionary<string, string>(),
                 null, null
             );
 
             yield return new TestCaseData(
                 new[] {typeof(ConcatCommand)},
                 new[] {"non-existing"},
+                new Dictionary<string, string>(),
                 null, null
             );
 
             yield return new TestCaseData(
                 new[] {typeof(ExceptionCommand)},
                 new[] {"exc"},
+                new Dictionary<string, string>(),
                 null, null
             );
 
             yield return new TestCaseData(
                 new[] {typeof(CommandExceptionCommand)},
                 new[] {"exc"},
+                new Dictionary<string, string>(),
                 null, null
             );
 
             yield return new TestCaseData(
                 new[] {typeof(CommandExceptionCommand)},
                 new[] {"exc"},
+                new Dictionary<string, string>(),
                 null, null
             );
 
             yield return new TestCaseData(
                 new[] {typeof(CommandExceptionCommand)},
                 new[] {"exc", "-m", "foo bar"},
+                new Dictionary<string, string>(),
                 "foo bar", null
             );
 
             yield return new TestCaseData(
                 new[] {typeof(CommandExceptionCommand)},
                 new[] {"exc", "-m", "foo bar", "-c", "666"},
+                new Dictionary<string, string>(),
                 "foo bar", 666
             );
         }
 
         [Test]
         [TestCaseSource(nameof(GetTestCases_RunAsync))]
-        public async Task RunAsync_Test(IReadOnlyList<Type> commandTypes, IReadOnlyList<string> commandLineArguments,
+        public async Task RunAsync_Test(
+            IReadOnlyList<Type> commandTypes,
+            IReadOnlyList<string> commandLineArguments,
+            IReadOnlyDictionary<string, string> environmentVariables,
             string? expectedStdOut = null)
         {
             // Arrange
             await using var stdoutStream = new StringWriter();
-
             var console = new VirtualConsole(stdoutStream);
-
-            var envVars = new Dictionary<string, string>
-            {
-                ["ENV_SINGLE_VALUE"] = "A",
-                ["ENV_MULTIPLE_VALUES"] = $"A{Path.PathSeparator}B{Path.PathSeparator}C{Path.PathSeparator}",
-                ["ENV_ESCAPED_MULTIPLE_VALUES"] = $"\"A{Path.PathSeparator}B{Path.PathSeparator}C{Path.PathSeparator}\""
-            };
 
             var application = new CliApplicationBuilder()
                 .AddCommands(commandTypes)
@@ -189,7 +207,7 @@ namespace CliFx.Tests
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(commandLineArguments, envVars);
+            var exitCode = await application.RunAsync(commandLineArguments, environmentVariables);
             var stdOut = stdoutStream.ToString().Trim();
 
             // Assert
@@ -203,20 +221,16 @@ namespace CliFx.Tests
 
         [Test]
         [TestCaseSource(nameof(GetTestCases_RunAsync_Negative))]
-        public async Task RunAsync_Negative_Test(IReadOnlyList<Type> commandTypes, IReadOnlyList<string> commandLineArguments,
-            string? expectedStdErr = null, int? expectedExitCode = null)
+        public async Task RunAsync_Negative_Test(
+            IReadOnlyList<Type> commandTypes,
+            IReadOnlyList<string> commandLineArguments,
+            IReadOnlyDictionary<string, string> environmentVariables,
+            string? expectedStdErr = null,
+            int? expectedExitCode = null)
         {
             // Arrange
             await using var stderrStream = new StringWriter();
-
             var console = new VirtualConsole(TextWriter.Null, stderrStream);
-
-            var envVars = new Dictionary<string, string>
-            {
-                ["ENV_SINGLE_VALUE"] = "A",
-                ["ENV_MULTIPLE_VALUES"] = $"A{Path.PathSeparator}B{Path.PathSeparator}C{Path.PathSeparator}",
-                ["ENV_ESCAPED_MULTIPLE_VALUES"] = $"\"A{Path.PathSeparator}B{Path.PathSeparator}C{Path.PathSeparator}\""
-            };
 
             var application = new CliApplicationBuilder()
                 .AddCommands(commandTypes)
@@ -225,7 +239,7 @@ namespace CliFx.Tests
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(commandLineArguments, envVars);
+            var exitCode = await application.RunAsync(commandLineArguments, environmentVariables);
             var stderr = stderrStream.ToString().Trim();
 
             // Assert
@@ -246,7 +260,6 @@ namespace CliFx.Tests
             // Arrange
             using var cancellationTokenSource = new CancellationTokenSource();
             await using var stdoutStream = new StringWriter();
-
             var console = new VirtualConsole(stdoutStream, cancellationTokenSource.Token);
 
             var application = new CliApplicationBuilder()
@@ -257,14 +270,13 @@ namespace CliFx.Tests
             var args = new[] {"cancel"};
 
             // Act
-            var runTask = application.RunAsync(args, new Dictionary<string, string>());
-            cancellationTokenSource.Cancel();
-            var exitCode = await runTask.ConfigureAwait(false);
+            cancellationTokenSource.CancelAfter(TimeSpan.FromSeconds(0.2));
+            var exitCode = await application.RunAsync(args, new Dictionary<string, string>());
             var stdOut = stdoutStream.ToString().Trim();
 
             // Assert
-            exitCode.Should().Be(-2146233029);
-            stdOut.Should().Be("Printed");
+            exitCode.Should().NotBe(0);
+            stdOut.Should().BeEmpty();
         }
     }
 }

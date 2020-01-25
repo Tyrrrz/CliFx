@@ -1,16 +1,15 @@
 ﻿using System;
 using System.IO;
-using CliFx.Services;
 using FluentAssertions;
 using NUnit.Framework;
 
-namespace CliFx.Tests.Services
+namespace CliFx.Tests
 {
     [TestFixture]
     public class VirtualConsoleTests
     {
-        [Test(Description = "Virtual console doesn't leak to system console")]
-        public void All_Smoke_Test()
+        [Test(Description = "Must not leak to system console")]
+        public void Smoke_Test()
         {
             // Arrange
             using var stdin = new StringReader("hello world");

@@ -155,21 +155,16 @@ namespace CliFx
         /// </summary>
         public CliApplication Build()
         {
-            // Use defaults for required parameters that were not configured
             _title ??= GetDefaultTitle() ?? "App";
             _executableName ??= GetDefaultExecutableName() ?? "app";
             _versionText ??= GetDefaultVersionText() ?? "v1.0";
             _console ??= new SystemConsole();
             _typeActivator ??= new DefaultTypeActivator();
 
-            // Project parameters to expected types
             var metadata = new ApplicationMetadata(_title, _executableName, _versionText, _description);
             var configuration = new ApplicationConfiguration(_commandTypes.ToArray(), _isDebugModeAllowed, _isPreviewModeAllowed);
 
-            return new CliApplication(
-                metadata, configuration,
-                _console, _typeActivator
-            );
+            return new CliApplication(metadata, configuration, _console, _typeActivator);
         }
     }
 
@@ -197,25 +192,5 @@ namespace CliFx
         }
 
         private static string GetDefaultVersionText() => EntryAssembly != null ? $"v{EntryAssembly.GetName().Version}" : "";
-    }
-
-    public partial class CliApplicationBuilder
-    {
-        private class DefaultTypeActivator : ITypeActivator
-        {
-            public object CreateInstance(Type type) => Activator.CreateInstance(type);
-        }
-
-        private class DelegateTypeActivator : ITypeActivator
-        {
-            private readonly Func<Type, object> _delegate;
-
-            public DelegateTypeActivator(Func<Type, object> @delegate)
-            {
-                _delegate = @delegate;
-            }
-
-            public object CreateInstance(Type type) => _delegate(type);
-        }
     }
 }

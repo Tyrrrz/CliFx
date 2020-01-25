@@ -16,7 +16,6 @@ namespace CliFx
     {
         private readonly ApplicationMetadata _metadata;
         private readonly ApplicationConfiguration _configuration;
-
         private readonly IConsole _console;
         private readonly ITypeActivator _typeActivator;
 
@@ -29,7 +28,6 @@ namespace CliFx
         {
             _metadata = metadata;
             _configuration = configuration;
-
             _console = console;
             _typeActivator = typeActivator;
         }

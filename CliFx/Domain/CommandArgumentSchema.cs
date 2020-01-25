@@ -29,13 +29,13 @@ namespace CliFx.Domain
 
         public void Project(ICommand target, string value)
         {
-            var convertedValue = ConvertRaw(value, Property.PropertyType);
+            var convertedValue = Convert(value, Property.PropertyType);
             Property.SetValue(target, convertedValue);
         }
 
         public void Project(ICommand target, IReadOnlyList<string> values)
         {
-            var convertedValue = ConvertRaw(values, Property.PropertyType);
+            var convertedValue = Convert(values, Property.PropertyType);
             Property.SetValue(target, convertedValue);
         }
     }
@@ -79,7 +79,7 @@ namespace CliFx.Domain
                 BindingFlags.Public | BindingFlags.Static,
                 null, new[] {typeof(string), typeof(IFormatProvider)}, null);
 
-        private static object ConvertRaw(string value, Type targetType)
+        private static object Convert(string value, Type targetType)
         {
             // Primitive
             var primitiveConverter = PrimitiveConverters.GetValueOrDefault(targetType);
@@ -94,7 +94,7 @@ namespace CliFx.Domain
             var nullableUnderlyingType = targetType.GetNullableUnderlyingType();
             if (nullableUnderlyingType != null)
                 return !string.IsNullOrWhiteSpace(value)
-                    ? ConvertRaw(value, nullableUnderlyingType)
+                    ? Convert(value, nullableUnderlyingType)
                     : null;
 
             // String-constructable
@@ -117,12 +117,12 @@ namespace CliFx.Domain
                 "This type is not among the list of types supported by this library.");
         }
 
-        private static object ConvertRaw(IReadOnlyList<string> values, Type targetType)
+        private static object Convert(IReadOnlyList<string> values, Type targetType)
         {
             var targetEnumerableType = targetType.GetEnumerableUnderlyingType();
 
             var convertedValues = values
-                .Select(v => ConvertRaw(v, targetEnumerableType))
+                .Select(v => Convert(v, targetEnumerableType))
                 .ToNonGenericArray(targetEnumerableType);
 
             var convertedValuesType = convertedValues.GetType();

@@ -1,7 +1,6 @@
 ﻿using System.Globalization;
 using System.IO;
 using System.Linq;
-using CliFx.Services;
 using CliFx.Utilities;
 using FluentAssertions;
 using NUnit.Framework;

@@ -33,6 +33,29 @@ namespace CliFx.Domain
             Arguments = arguments;
             Options = options;
         }
+
+        public CommandLineInput(
+            IReadOnlyList<string> arguments,
+            IReadOnlyList<CommandOptionInput> options)
+            : this(new string[0], arguments, options)
+        {
+        }
+
+        public CommandLineInput(IReadOnlyList<string> arguments)
+            : this(arguments, new CommandOptionInput[0])
+        {
+        }
+
+        public CommandLineInput(IReadOnlyList<CommandOptionInput> options)
+            : this(new string[0], options)
+        {
+        }
+    }
+
+    internal partial class CommandLineInput
+    {
+        public static CommandLineInput Empty { get; } =
+            new CommandLineInput(new string[0], new string[0], new CommandOptionInput[0]);
     }
 
     internal partial class CommandLineInput

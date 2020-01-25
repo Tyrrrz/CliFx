@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using CliFx.Attributes;
@@ -30,12 +31,21 @@ namespace CliFx.Domain
             IsRequired = isRequired;
         }
 
-        public bool MatchesName(string name) => string.Equals(name, Name, StringComparison.OrdinalIgnoreCase);
+        public bool MatchesName(string name) =>
+            !string.IsNullOrWhiteSpace(Name) &&
+            string.Equals(Name, name, StringComparison.OrdinalIgnoreCase);
 
-        public bool MatchesShortName(char shortName) => shortName == ShortName;
+        public bool MatchesShortName(char shortName) =>
+            ShortName != null &&
+            ShortName == shortName;
+
+        public bool MatchesNameOrShortName(string alias) =>
+            MatchesName(alias) ||
+            alias.Length == 1 && MatchesShortName(alias.Single());
 
         public bool MatchesEnvironmentVariableName(string environmentVariableName) =>
-            string.Equals(environmentVariableName, EnvironmentVariableName, StringComparison.OrdinalIgnoreCase);
+            !string.IsNullOrWhiteSpace(EnvironmentVariableName) &&
+            string.Equals(EnvironmentVariableName, environmentVariableName, StringComparison.OrdinalIgnoreCase);
 
         public override string ToString()
         {

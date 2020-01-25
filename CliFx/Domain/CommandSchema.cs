@@ -65,9 +65,7 @@ namespace CliFx.Domain
             foreach (var option in Options)
             {
                 var optionValues = optionInputs
-                    .Where(o => o.Alias.Length > 1
-                        ? option.MatchesName(o.Alias)
-                        : option.MatchesShortName(o.Alias.Single()))
+                    .Where(o => option.MatchesNameOrShortName(o.Alias))
                     .SelectMany(o => o.Values)
                     .ToArray();
 

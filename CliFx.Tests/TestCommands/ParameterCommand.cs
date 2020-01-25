@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using CliFx.Attributes;
-using CliFx.Services;
 
 namespace CliFx.Tests.TestCommands
 {
     [Command("arg cmd", Description = "Command using positional arguments")]
-    public class ArgumentCommand : ICommand
+    public class ParameterCommand : ICommand
     {
         [CommandParameter(0, Name = "first")]
         public string? FirstArgument { get; set; }
