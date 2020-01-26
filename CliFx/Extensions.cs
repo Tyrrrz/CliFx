@@ -3,7 +3,7 @@
 namespace CliFx
 {
     /// <summary>
-    /// Extensions for <see cref="Services"/>
+    /// Extensions for <see cref="CliFx"/>
     /// </summary>
     public static class Extensions
     {

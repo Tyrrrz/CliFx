@@ -14,7 +14,7 @@ namespace CliFx.Domain
 
         public string? Description { get; }
 
-        public bool IsScalar => GetEnumerableArgumentUnderlyingType() != null;
+        public bool IsScalar => GetEnumerableArgumentUnderlyingType() == null;
 
         protected CommandArgumentSchema(PropertyInfo property, string? description)
         {
@@ -27,7 +27,7 @@ namespace CliFx.Domain
                 ? Property.PropertyType.GetEnumerableUnderlyingType()
                 : null;
 
-        public void Project(ICommand target, string value)
+        public void Project(ICommand target, string? value)
         {
             var convertedValue = Convert(value, Property.PropertyType);
             Property.SetValue(target, convertedValue);
@@ -49,6 +49,7 @@ namespace CliFx.Domain
             {
                 [typeof(object)] = v => v,
                 [typeof(string)] = v => v,
+                [typeof(bool)] = v => string.IsNullOrWhiteSpace(v) || bool.Parse(v),
                 [typeof(char)] = v => v.Single(),
                 [typeof(sbyte)] = v => sbyte.Parse(v, ConversionFormatProvider),
                 [typeof(byte)] = v => byte.Parse(v, ConversionFormatProvider),
@@ -79,7 +80,7 @@ namespace CliFx.Domain
                 BindingFlags.Public | BindingFlags.Static,
                 null, new[] {typeof(string), typeof(IFormatProvider)}, null);
 
-        private static object Convert(string value, Type targetType)
+        private static object Convert(string? value, Type targetType)
         {
             // Primitive
             var primitiveConverter = PrimitiveConverters.GetValueOrDefault(targetType);
@@ -127,7 +128,7 @@ namespace CliFx.Domain
 
             var convertedValuesType = convertedValues.GetType();
 
-            if (targetEnumerableType.IsAssignableFrom(convertedValuesType))
+            if (targetType.IsAssignableFrom(convertedValuesType))
                 return convertedValues;
 
             var arrayConstructor = targetType.GetConstructor(new[] {convertedValuesType});

@@ -403,35 +403,35 @@ namespace CliFx.Tests.Domain
                 typeof(AllSupportedTypesCommand),
                 new[] {$"--{nameof(AllSupportedTypesCommand.Enumerable)}", "value1", "value3"},
                 new Dictionary<string, string>(),
-                new AllSupportedTypesCommand {Enumerable = new[] {"value1", "value2"}}
+                new AllSupportedTypesCommand {Enumerable = new[] {"value1", "value3"}}
             );
 
             yield return new TestCaseData(
                 typeof(AllSupportedTypesCommand),
                 new[] {$"--{nameof(AllSupportedTypesCommand.StringEnumerable)}", "value1", "value3"},
                 new Dictionary<string, string>(),
-                new AllSupportedTypesCommand {StringEnumerable = new[] {"value1", "value2"}}
+                new AllSupportedTypesCommand {StringEnumerable = new[] {"value1", "value3"}}
             );
 
             yield return new TestCaseData(
                 typeof(AllSupportedTypesCommand),
                 new[] {$"--{nameof(AllSupportedTypesCommand.StringReadOnlyList)}", "value1", "value3"},
                 new Dictionary<string, string>(),
-                new AllSupportedTypesCommand {StringReadOnlyList = new[] {"value1", "value2"}}
+                new AllSupportedTypesCommand {StringReadOnlyList = new[] {"value1", "value3"}}
             );
 
             yield return new TestCaseData(
                 typeof(AllSupportedTypesCommand),
                 new[] {$"--{nameof(AllSupportedTypesCommand.StringList)}", "value1", "value3"},
                 new Dictionary<string, string>(),
-                new AllSupportedTypesCommand {StringList = new List<string> {"value1", "value2"}}
+                new AllSupportedTypesCommand {StringList = new List<string> {"value1", "value3"}}
             );
 
             yield return new TestCaseData(
                 typeof(AllSupportedTypesCommand),
                 new[] {$"--{nameof(AllSupportedTypesCommand.StringHashSet)}", "value1", "value3"},
                 new Dictionary<string, string>(),
-                new AllSupportedTypesCommand {StringHashSet = new HashSet<string> {"value1", "value2"}}
+                new AllSupportedTypesCommand {StringHashSet = new HashSet<string> {"value1", "value3"}}
             );
 
             yield return new TestCaseData(
@@ -525,7 +525,7 @@ namespace CliFx.Tests.Domain
 
             yield return new TestCaseData(
                 typeof(ParameterCommand),
-                new[] {"abc", "123", "1", "2", "-o", "option value"},
+                new[] {"param", "cmd", "abc", "123", "1", "2", "-o", "option value"},
                 new Dictionary<string, string>(),
                 new ParameterCommand
                     {FirstArgument = "abc", SecondArgument = 123, ThirdArguments = new List<int> {1, 2}, Option = "option value"}
@@ -621,7 +621,7 @@ namespace CliFx.Tests.Domain
             var command = applicationSchema.TryInitializeCommand(commandLineInput, environmentVariables, typeActivator);
 
             // Assert
-            command.Should().NotBeEquivalentTo(expectedResult);
+            command.Should().BeEquivalentTo(expectedResult, o => o.RespectingRuntimeTypes());
         }
 
         [TestCaseSource(nameof(GetTestCases_TryInitialize_Negative))]

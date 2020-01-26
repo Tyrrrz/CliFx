@@ -40,7 +40,7 @@ namespace CliFx.Domain
             IReadOnlyDictionary<string, string> environmentVariables,
             ITypeActivator activator)
         {
-            for (var i = input.Arguments.Count - 1; i >= 0; i--)
+            for (var i = input.Arguments.Count; i >= 0; i--)
             {
                 var potentialCommandName = string.Join(" ", input.Arguments.Take(i));
 
@@ -50,9 +50,20 @@ namespace CliFx.Domain
                 {
                     var target = (ICommand) activator.CreateInstance(matchingCommandSchema.Type);
 
-                    var parameterInputs = input.Arguments.Skip(i + 1).ToArray();
+                    var parameterInputs = input.Arguments.Skip(i).ToArray();
                     matchingCommandSchema.Project(target, parameterInputs, input.Options, environmentVariables);
+
+                    return target;
                 }
+            }
+
+            var commandSchema = Commands.FirstOrDefault(c => c.IsDefault);
+            if (commandSchema != null)
+            {
+                var target = (ICommand) activator.CreateInstance(commandSchema.Type);
+                commandSchema.Project(target, input.Arguments, input.Options, environmentVariables);
+
+                return target;
             }
 
             return null;

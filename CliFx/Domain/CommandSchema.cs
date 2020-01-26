@@ -62,17 +62,20 @@ namespace CliFx.Domain
             nonScalarParameter?.Project(target, nonScalarParameterValues);
 
             // Options
-            foreach (var option in Options)
+            foreach (var optionInput in optionInputs)
             {
-                var optionValues = optionInputs
-                    .Where(o => option.MatchesNameOrShortName(o.Alias))
-                    .SelectMany(o => o.Values)
-                    .ToArray();
+                var option = Options.FirstOrDefault(o => o.MatchesNameOrShortName(optionInput.Alias));
 
                 // TODO: check required
                 // TODO: env vars
 
-                option.Project(target, optionValues);
+                if (option != null)
+                {
+                    if (option.IsScalar)
+                        option.Project(target, optionInput.Values.SingleOrDefault());
+                    else
+                        option.Project(target, optionInput.Values);
+                }
             }
         }
 

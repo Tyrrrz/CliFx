@@ -4,7 +4,7 @@ using CliFx.Attributes;
 
 namespace CliFx.Tests.TestCommands
 {
-    [Command("arg cmd", Description = "Command using positional arguments")]
+    [Command("param cmd", Description = "Command using positional parameters")]
     public class ParameterCommand : ICommand
     {
         [CommandParameter(0, Name = "first")]
