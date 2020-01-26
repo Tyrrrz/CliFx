@@ -17,7 +17,6 @@ namespace CliFx.Tests
             );
         }
 
-        [Test]
         [TestCaseSource(nameof(GetTestCases_CreateCommand))]
         public void CreateCommand_Test(Func<Type, object> activatorFunc, Type type)
         {

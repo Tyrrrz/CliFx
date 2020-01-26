@@ -5,7 +5,7 @@ using CliFx.Attributes;
 namespace CliFx.Tests.TestCommands
 {
     [Command]
-    public class MultipleNonScalarParametersCommand
+    public class MultipleNonScalarParametersCommand : ICommand
     {
         [CommandParameter(0)]
         public IReadOnlyList<string>? ParameterA { get; set; }

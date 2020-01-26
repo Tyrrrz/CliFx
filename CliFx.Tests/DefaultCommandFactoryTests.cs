@@ -14,7 +14,6 @@ namespace CliFx.Tests
             yield return new TestCaseData(typeof(HelloWorldDefaultCommand));
         }
 
-        [Test]
         [TestCaseSource(nameof(GetTestCases_CreateInstance))]
         public void CreateInstance_Test(Type type)
         {

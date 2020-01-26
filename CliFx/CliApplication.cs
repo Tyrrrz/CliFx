@@ -12,7 +12,7 @@ namespace CliFx
     /// <summary>
     /// Command line application facade.
     /// </summary>
-    public class CliApplication
+    public partial class CliApplication
     {
         private readonly ApplicationMetadata _metadata;
         private readonly ApplicationConfiguration _configuration;
@@ -32,43 +32,34 @@ namespace CliFx
             _typeActivator = typeActivator;
         }
 
-        private async ValueTask<int?> HandleDebugDirectiveAsync(CommandLineInput commandInput)
+        private async ValueTask<int?> HandleDebugDirectiveAsync(CommandLineInput commandLineInput)
         {
-            // Debug mode is enabled if it's allowed in the application and it was requested via corresponding directive
-            var isDebugMode = _configuration.IsDebugModeAllowed && commandInput.IsDebugDirectiveSpecified;
-
-            // If not in debug mode, pass execution to the next handler
+            var isDebugMode = _configuration.IsDebugModeAllowed && commandLineInput.IsDebugDirectiveSpecified;
             if (!isDebugMode)
                 return null;
 
-            // Inform user which process they need to attach debugger to
             _console.WithForegroundColor(ConsoleColor.Green,
                 () => _console.Output.WriteLine($"Attach debugger to PID {Process.GetCurrentProcess().Id} to continue."));
 
-            // Wait until debugger is attached
             while (!Debugger.IsAttached)
                 await Task.Delay(100);
 
-            // Debug directive never short-circuits
             return null;
         }
 
-        private int? HandlePreviewDirective(CommandLineInput commandInput)
+        private int? HandlePreviewDirective(CommandLineInput commandLineInput)
         {
-            // Preview mode is enabled if it's allowed in the application and it was requested via corresponding directive
-            var isPreviewMode = _configuration.IsPreviewModeAllowed && commandInput.IsPreviewDirectiveSpecified;
-
-            // If not in preview mode, pass execution to the next handler
+            var isPreviewMode = _configuration.IsPreviewModeAllowed && commandLineInput.IsPreviewDirectiveSpecified;
             if (!isPreviewMode)
                 return null;
 
             // Render command name
-            _console.Output.WriteLine($"Arguments: {string.Join(" ", commandInput.Arguments)}");
+            _console.Output.WriteLine($"Arguments: {string.Join(" ", commandLineInput.Arguments)}");
             _console.Output.WriteLine();
 
             // Render directives
             _console.Output.WriteLine("Directives:");
-            foreach (var directive in commandInput.Directives)
+            foreach (var directive in commandLineInput.Directives)
             {
                 _console.Output.Write(" ");
                 _console.Output.WriteLine(directive);
@@ -79,29 +70,54 @@ namespace CliFx
 
             // Render options
             _console.Output.WriteLine("Options:");
-            foreach (var option in commandInput.Options)
+            foreach (var option in commandLineInput.Options)
             {
                 _console.Output.Write(" ");
                 _console.Output.WriteLine(option);
             }
 
-            // Short-circuit with exit code 0
             return 0;
         }
 
-        private int? HandleVersionOption(CommandLineInput commandInput)
+        private int? HandleVersionOption(CommandLineInput commandLineInput)
         {
-            // Version should be rendered if it was requested on a default command
-            var shouldRenderVersion = !commandInput.Arguments.Any() && commandInput.IsVersionOptionSpecified;
-
-            // If shouldn't render version, pass execution to the next handler
+            var shouldRenderVersion = !commandLineInput.Arguments.Any() && commandLineInput.IsVersionOptionSpecified;
             if (!shouldRenderVersion)
                 return null;
 
-            // Render version text
             _console.Output.WriteLine(_metadata.VersionText);
 
-            // Short-circuit with exit code 0
+            return 0;
+        }
+
+        private int? HandleHelpOption(
+            ApplicationSchema applicationSchema,
+            CommandLineInput commandLineInput)
+        {
+            var shouldRenderHelp =
+                commandLineInput.IsHelpOptionSpecified ||
+                !applicationSchema.Commands.Any(c => c.IsDefault) && !commandLineInput.Arguments.Any() && !commandLineInput.Options.Any();
+
+            if (!shouldRenderHelp)
+                return null;
+
+            var commandSchema =
+                applicationSchema.TryFindCommandSchema(commandLineInput) ??
+                new CommandSchema(null!, null, null, new CommandParameterSchema[0], new CommandOptionSchema[0]);
+
+            RenderHelp(applicationSchema, commandSchema);
+
+            return 0;
+        }
+
+        private async ValueTask<int> HandleCommandExecutionAsync(
+            ApplicationSchema applicationSchema,
+            CommandLineInput commandLineInput,
+            IReadOnlyDictionary<string, string> environmentVariables)
+        {
+            var command = applicationSchema.InitializeCommand(commandLineInput, environmentVariables, _typeActivator);
+            await command.ExecuteAsync(_console);
+
             return 0;
         }
 
@@ -117,11 +133,12 @@ namespace CliFx
                 var applicationSchema = ApplicationSchema.Resolve(_configuration.CommandTypes);
                 var commandLineInput = CommandLineInput.Parse(commandLineArguments);
 
-                var command = applicationSchema.TryInitializeCommand(commandLineInput, environmentVariables, _typeActivator);
-
-                await command.ExecuteAsync(_console);
-
-                return 0;
+                return
+                    await HandleDebugDirectiveAsync(commandLineInput) ??
+                    HandlePreviewDirective(commandLineInput) ??
+                    HandleVersionOption(commandLineInput) ??
+                    HandleHelpOption(applicationSchema, commandLineInput) ??
+                    await HandleCommandExecutionAsync(applicationSchema, commandLineInput, environmentVariables);
             }
             catch (Exception ex)
             {

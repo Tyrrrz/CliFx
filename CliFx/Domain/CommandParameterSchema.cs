@@ -10,10 +10,9 @@ namespace CliFx.Domain
 
         public string? Name { get; }
 
-        public string DisplayName =>
-            !string.IsNullOrWhiteSpace(Name)
-                ? Name
-                : Property.Name.ToLowerInvariant();
+        public string DisplayName => !string.IsNullOrWhiteSpace(Name)
+            ? Name
+            : Property.Name.ToUpperInvariant();
 
         public CommandParameterSchema(PropertyInfo property, int order, string? name, string? description)
             : base(property, description)
@@ -27,9 +26,9 @@ namespace CliFx.Domain
             var buffer = new StringBuilder();
 
             buffer
-                .Append("<")
+                .Append('<')
                 .Append(DisplayName)
-                .Append(">");
+                .Append('>');
 
             return buffer.ToString();
         }

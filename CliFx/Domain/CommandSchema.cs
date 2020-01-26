@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using CliFx.Attributes;
+using CliFx.Exceptions;
 using CliFx.Internal;
 
 namespace CliFx.Domain
@@ -14,13 +16,13 @@ namespace CliFx.Domain
 
         public string? Name { get; }
 
+        public bool IsDefault => string.IsNullOrWhiteSpace(Name);
+
         public string? Description { get; }
 
         public IReadOnlyList<CommandParameterSchema> Parameters { get; }
 
         public IReadOnlyList<CommandOptionSchema> Options { get; }
-
-        public bool IsDefault => string.IsNullOrWhiteSpace(Name);
 
         public CommandSchema(
             Type type,
@@ -38,11 +40,7 @@ namespace CliFx.Domain
 
         public bool MatchesName(string name) => string.Equals(name, Name, StringComparison.OrdinalIgnoreCase);
 
-        public void Project(
-            ICommand target,
-            IReadOnlyList<string> parameterInputs,
-            IReadOnlyList<CommandOptionInput> optionInputs,
-            IReadOnlyDictionary<string, string> environmentVariables)
+        private void InjectParameters(ICommand command, IReadOnlyList<string> parameterInputs)
         {
             // Scalar parameters
             var scalarParameters = Parameters
@@ -51,32 +49,85 @@ namespace CliFx.Domain
                 .ToArray();
 
             for (var i = 0; i < scalarParameters.Length; i++)
-                scalarParameters[i].Project(target, parameterInputs[i]);
+            {
+                var scalarParameter = scalarParameters[i];
+
+                var scalarParameterInput = i < parameterInputs.Count
+                    ? parameterInputs[i]
+                    : throw new CliFxException($"Missing value for parameter <{scalarParameter.DisplayName}>.");
+
+                scalarParameter.Inject(command, scalarParameterInput);
+            }
 
             // Non-scalar parameter (only one is allowed)
             var nonScalarParameter = Parameters
                 .OrderBy(p => p.Order)
                 .FirstOrDefault(p => !p.IsScalar);
 
-            var nonScalarParameterValues = parameterInputs.Skip(scalarParameters.Length).ToArray();
-            nonScalarParameter?.Project(target, nonScalarParameterValues);
+            if (nonScalarParameter != null)
+            {
+                var nonScalarParameterInputs = parameterInputs.Skip(scalarParameters.Length).ToArray();
+                nonScalarParameter.Inject(command, nonScalarParameterInputs);
+            }
+        }
 
-            // Options
+        private void InjectOptions(
+            ICommand command,
+            IReadOnlyList<CommandOptionInput> optionInputs,
+            IReadOnlyDictionary<string, string> environmentVariables)
+        {
+            // Keep track of required options so that we can raise an error if any of them are not set
+            var unsetRequiredOptions = Options.Where(o => o.IsRequired).ToList();
+
+            // Environment variables
+            foreach (var environmentVariable in environmentVariables)
+            {
+                var option = Options.FirstOrDefault(o => o.MatchesEnvironmentVariableName(environmentVariable.Key));
+
+                if (option != null)
+                {
+                    var values = option.IsScalar
+                        ? new[] {environmentVariable.Value}
+                        : environmentVariable.Value.Split(Path.PathSeparator);
+
+                    option.Inject(command, values);
+                    unsetRequiredOptions.Remove(option);
+                }
+            }
+
+            // Direct input
             foreach (var optionInput in optionInputs)
             {
                 var option = Options.FirstOrDefault(o => o.MatchesNameOrShortName(optionInput.Alias));
 
-                // TODO: check required
-                // TODO: env vars
-
                 if (option != null)
                 {
-                    if (option.IsScalar)
-                        option.Project(target, optionInput.Values.SingleOrDefault());
-                    else
-                        option.Project(target, optionInput.Values);
+                    option.Inject(command, optionInput.Values);
+                    unsetRequiredOptions.Remove(option);
                 }
             }
+
+            if (unsetRequiredOptions.Any())
+            {
+                throw new CliFxException(new StringBuilder()
+                    .AppendLine("Missing values for some of the required options:")
+                    .AppendBulletList(unsetRequiredOptions.Select(o => o.DisplayName))
+                    .ToString());
+            }
+        }
+
+        public ICommand Create(
+            ITypeActivator activator,
+            IReadOnlyList<string> parameterInputs,
+            IReadOnlyList<CommandOptionInput> optionInputs,
+            IReadOnlyDictionary<string, string> environmentVariables)
+        {
+            var command = (ICommand) activator.CreateInstance(Type);
+
+            InjectParameters(command, parameterInputs);
+            InjectOptions(command, optionInputs, environmentVariables);
+
+            return command;
         }
 
         public override string ToString()
@@ -86,16 +137,18 @@ namespace CliFx.Domain
             if (!string.IsNullOrWhiteSpace(Name))
                 buffer.Append(Name);
 
-            if (Options != null)
+            foreach (var parameter in Parameters)
             {
-                foreach (var option in Options)
-                {
-                    buffer.AppendIfNotEmpty(' ');
-                    buffer.Append('[');
-                    buffer.Append(option);
-                    buffer.Append(']');
-                }
+                buffer.AppendIfNotEmpty(' ');
+                buffer.Append(parameter);
             }
+
+            foreach (var option in Options)
+            {
+                buffer.AppendIfNotEmpty(' ');
+                buffer.Append(option);
+            }
+
             return buffer.ToString();
         }
     }
@@ -114,8 +167,6 @@ namespace CliFx.Domain
                 return null;
 
             var attribute = type.GetCustomAttribute<CommandAttribute>();
-            if (attribute == null)
-                return null;
 
             var parameters = type.GetProperties()
                 .Select(CommandParameterSchema.TryResolve)
@@ -129,8 +180,8 @@ namespace CliFx.Domain
 
             return new CommandSchema(
                 type,
-                attribute.Name,
-                attribute.Description,
+                attribute?.Name,
+                attribute?.Description,
                 parameters,
                 options
             );

@@ -12,6 +12,7 @@ namespace CliFx.Tests
     [TestFixture]
     public class CliApplicationTests
     {
+        private const string TestAppName = "TestApp";
         private const string TestVersionText = "v1.0";
 
         private static IEnumerable<TestCaseData> GetTestCases_RunAsync()
@@ -56,20 +57,6 @@ namespace CliFx.Tests
                 new[] {"--version"},
                 new Dictionary<string, string>(),
                 TestVersionText
-            );
-
-            yield return new TestCaseData(
-                new[] {typeof(HelloWorldDefaultCommand)},
-                new[] {"-h"},
-                new Dictionary<string, string>(),
-                null
-            );
-
-            yield return new TestCaseData(
-                new[] {typeof(HelloWorldDefaultCommand)},
-                new[] {"--help"},
-                new Dictionary<string, string>(),
-                null
             );
 
             yield return new TestCaseData(
@@ -188,7 +175,115 @@ namespace CliFx.Tests
             );
         }
 
-        [Test]
+        private static IEnumerable<TestCaseData> GetTestCases_RunAsync_Help()
+        {
+            yield return new TestCaseData(
+                new[] {typeof(HelpDefaultCommand), typeof(HelpNamedCommand), typeof(HelpSubCommand)},
+                new[] {"--help"},
+                new[]
+                {
+                    "Description",
+                    "HelpDefaultCommand description.",
+                    "Usage",
+                    "[command]", "[options]",
+                    "Options",
+                    "-a|--option-a", "OptionA description.",
+                    "-b|--option-b", "OptionB description.",
+                    "-h|--help", "Shows help text.",
+                    "--version", "Shows version information.",
+                    "Commands",
+                    "cmd", "HelpNamedCommand description.",
+                    "You can run", "to show help on a specific command."
+                },
+                null
+            );
+
+            yield return new TestCaseData(
+                new[] {typeof(HelpDefaultCommand), typeof(HelpNamedCommand), typeof(HelpSubCommand)},
+                new[] {"cmd", "--help"},
+                new[]
+                {
+                    "Description",
+                    "HelpNamedCommand description.",
+                    "Usage",
+                    "cmd", "[command]", "[options]",
+                    "Options",
+                    "-c|--option-c", "OptionC description.",
+                    "-d|--option-d", "OptionD description.",
+                    "-h|--help", "Shows help text.",
+                    "Commands",
+                    "sub", "HelpSubCommand description.",
+                    "You can run", "to show help on a specific command."
+                },
+                null
+            );
+
+            yield return new TestCaseData(
+                new[] {typeof(HelpDefaultCommand), typeof(HelpNamedCommand), typeof(HelpSubCommand)},
+                new[] {"cmd", "sub", "--help"},
+                new[]
+                {
+                    "Description",
+                    "HelpSubCommand description.",
+                    "Usage",
+                    "cmd sub", "[options]",
+                    "Options",
+                    "-e|--option-e", "OptionE description.",
+                    "-h|--help", "Shows help text."
+                },
+                null
+            );
+
+            yield return new TestCaseData(
+                new[] {typeof(ParameterCommand)},
+                new[] {"param", "cmd", "--help"},
+                new[]
+                {
+                    "Description",
+                    "Command using positional parameters",
+                    "Usage",
+                    "param cmd", "<first>", "<PARAMETERB>", "<third list>", "[options]",
+                    "Arguments",
+                    "* first",
+                    "* PARAMETERB",
+                    "* third list", "A list of numbers",
+                    "Options",
+                    "-o|--option",
+                    "-h|--help", "Shows help text."
+                },
+                null
+            );
+
+            yield return new TestCaseData(
+                new[] {typeof(AllRequiredOptionsCommand)},
+                new[] {"allrequired", "--help"},
+                new[]
+                {
+                    "Description",
+                    "AllRequiredOptionsCommand description.",
+                    "Usage",
+                    "TestApp allrequired --option-f <value> --option-g <value>"
+                },
+                new[]
+                {
+                    "[options]"
+                }
+            );
+
+            yield return new TestCaseData(
+                new[] {typeof(SomeRequiredOptionsCommand)},
+                new[] {"somerequired", "--help"},
+                new[]
+                {
+                    "Description",
+                    "SomeRequiredOptionsCommand description.",
+                    "Usage",
+                    "TestApp somerequired --option-f <value> [options]"
+                },
+                null
+            );
+        }
+
         [TestCaseSource(nameof(GetTestCases_RunAsync))]
         public async Task RunAsync_Test(
             IReadOnlyList<Type> commandTypes,
@@ -202,6 +297,8 @@ namespace CliFx.Tests
 
             var application = new CliApplicationBuilder()
                 .AddCommands(commandTypes)
+                .UseTitle(TestAppName)
+                .UseExecutableName(TestAppName)
                 .UseVersionText(TestVersionText)
                 .UseConsole(console)
                 .Build();
@@ -216,9 +313,10 @@ namespace CliFx.Tests
 
             if (expectedStdOut != null)
                 stdOut.Should().Be(expectedStdOut);
+
+            Console.WriteLine(stdOut);
         }
 
-        [Test]
         [TestCaseSource(nameof(GetTestCases_RunAsync_Negative))]
         public async Task RunAsync_Negative_Test(
             IReadOnlyList<Type> commandTypes,
@@ -233,6 +331,8 @@ namespace CliFx.Tests
 
             var application = new CliApplicationBuilder()
                 .AddCommands(commandTypes)
+                .UseTitle(TestAppName)
+                .UseExecutableName(TestAppName)
                 .UseVersionText(TestVersionText)
                 .UseConsole(console)
                 .Build();
@@ -250,6 +350,46 @@ namespace CliFx.Tests
 
             if (expectedStdErr != null)
                 stderr.Should().Be(expectedStdErr);
+
+            Console.WriteLine(stderr);
+        }
+
+        [TestCaseSource(nameof(GetTestCases_RunAsync_Help))]
+        public async Task RunAsync_Help_Test(
+            IReadOnlyList<Type> commandTypes,
+            IReadOnlyList<string> commandLineArguments,
+            IReadOnlyList<string>? expectedSubstrings = null,
+            IReadOnlyList<string>? unexpectedSubstrings = null)
+        {
+            // Arrange
+            await using var stdOutStream = new StringWriter();
+            var console = new VirtualConsole(stdOutStream);
+
+            var application = new CliApplicationBuilder()
+                .AddCommands(commandTypes)
+                .UseTitle(TestAppName)
+                .UseExecutableName(TestAppName)
+                .UseVersionText(TestVersionText)
+                .UseConsole(console)
+                .Build();
+
+            var environmentVariables = new Dictionary<string, string>();
+
+            // Act
+            var exitCode = await application.RunAsync(commandLineArguments, environmentVariables);
+            var stdOut = stdOutStream.ToString().Trim();
+
+            // Assert
+            exitCode.Should().Be(0);
+            stdOut.Should().NotBeNullOrWhiteSpace();
+
+            if (expectedSubstrings != null)
+                stdOut.Should().ContainAll(expectedSubstrings);
+
+            if (unexpectedSubstrings != null)
+                stdOut.Should().NotContainAny(unexpectedSubstrings);
+
+            Console.WriteLine(stdOut);
         }
 
         [Test]
@@ -280,6 +420,8 @@ namespace CliFx.Tests
             exitCode.Should().NotBe(0);
             stdOut.Should().BeNullOrWhiteSpace();
             stdErr.Should().NotBeNullOrWhiteSpace();
+
+            Console.WriteLine(stdErr);
         }
     }
 }
