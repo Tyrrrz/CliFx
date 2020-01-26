@@ -3,7 +3,7 @@
 namespace CliFx
 {
     /// <summary>
-    /// Type activator that uses specified delegate to instantiate objects.
+    /// Type activator that uses the specified delegate to instantiate objects.
     /// </summary>
     public class DelegateTypeActivator : ITypeActivator
     {
@@ -12,10 +12,7 @@ namespace CliFx
         /// <summary>
         /// Initializes an instance of <see cref="DelegateTypeActivator"/>.
         /// </summary>
-        public DelegateTypeActivator(Func<Type, object> func)
-        {
-            _func = func;
-        }
+        public DelegateTypeActivator(Func<Type, object> func) => _func = func;
 
         /// <inheritdoc />
         public object CreateInstance(Type type) => _func(type);

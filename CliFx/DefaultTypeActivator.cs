@@ -10,7 +10,7 @@ namespace CliFx
         /// <inheritdoc />
         public object CreateInstance(Type type)
         {
-            // TODO: better error on fail
+            // TODO: better error on fail with instructions how to set up custom activator
             return Activator.CreateInstance(type);
         }
     }

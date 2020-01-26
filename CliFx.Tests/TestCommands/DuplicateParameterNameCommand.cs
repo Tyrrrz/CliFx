@@ -4,13 +4,13 @@ using CliFx.Attributes;
 namespace CliFx.Tests.TestCommands
 {
     [Command]
-    public class DuplicateArgumentNameCommand : ICommand
+    public class DuplicateParameterNameCommand : ICommand
     {
         [CommandParameter(0, Name = "Duplicate")]
-        public string? ArgumentA { get; set; }
+        public string? ParameterA { get; set; }
 
         [CommandParameter(1, Name = "Duplicate")]
-        public string? ArgumentB { get; set; }
+        public string? ParameterB { get; set; }
 
         public ValueTask ExecuteAsync(IConsole console) => default;
     }

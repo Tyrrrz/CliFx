@@ -8,10 +8,10 @@ namespace CliFx.Tests.TestCommands
     public class NonLastNonScalarParameterCommand : ICommand
     {
         [CommandParameter(0)]
-        public IReadOnlyList<string>? ArgumentA { get; set; }
+        public IReadOnlyList<string>? ParameterA { get; set; }
 
         [CommandParameter(1)]
-        public string? ArgumentB { get; set; }
+        public string? ParameterB { get; set; }
 
         public ValueTask ExecuteAsync(IConsole console) => default;
     }

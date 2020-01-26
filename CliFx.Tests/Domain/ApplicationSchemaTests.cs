@@ -528,7 +528,12 @@ namespace CliFx.Tests.Domain
                 new[] {"param", "cmd", "abc", "123", "1", "2", "-o", "option value"},
                 new Dictionary<string, string>(),
                 new ParameterCommand
-                    {FirstArgument = "abc", SecondArgument = 123, ThirdArguments = new List<int> {1, 2}, Option = "option value"}
+                {
+                    ParameterA = "abc",
+                    ParameterB = 123,
+                    ParameterC = new[] {1, 2},
+                    OptionA = "option value"
+                }
             );
 
             // TODO: cover all type conversions
@@ -586,19 +591,19 @@ namespace CliFx.Tests.Domain
 
             yield return new TestCaseData(
                 typeof(ParameterCommand),
-                new[] {"-o", "option value"},
+                new[] {"param", "cmd", "-o", "option value"},
                 new Dictionary<string, string>()
             );
 
             yield return new TestCaseData(
                 typeof(ParameterCommand),
-                new[] {"abc", "123", "invalid", "-o", "option value"},
+                new[] {"param", "cmd", "abc", "123", "invalid", "-o", "option value"},
                 new Dictionary<string, string>()
             );
 
             yield return new TestCaseData(
-                typeof(ParameterCommand),
-                new[] {"abc", "123", "unused", "-o", "option value"},
+                typeof(SimpleParameterCommand),
+                new[] {"param", "cmd2", "abc", "123", "unused", "-o", "option value"},
                 new Dictionary<string, string>()
             );
 

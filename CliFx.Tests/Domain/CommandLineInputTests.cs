@@ -156,13 +156,13 @@ namespace CliFx.Tests.Domain
             );
 
             yield return new TestCaseData(
-                new[] {"long", "command", "name"},
-                new CommandLineInput(new[] {"long", "command", "name"})
+                new[] {"cmd", "arg2", "arg3"},
+                new CommandLineInput(new[] {"cmd", "arg2", "arg3"})
             );
 
             yield return new TestCaseData(
-                new[] {"long", "command", "name", "--option", "value"},
-                new CommandLineInput(new[] {"long", "command", "name"}, new[]
+                new[] {"cmd", "arg2", "arg3", "--option", "value"},
+                new CommandLineInput(new[] {"cmd", "arg2", "arg3"}, new[]
                 {
                     new CommandOptionInput("option", "value")
                 })

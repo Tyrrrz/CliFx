@@ -32,7 +32,7 @@ namespace CliFx.Tests
                 .Build();
         }
 
-        [Test(Description = "Builder must produce an application when no parameters were specified")]
+        [Test(Description = "Builder must be able to produce an application when no parameters are specified")]
         public void Build_Test()
         {
             // Arrange

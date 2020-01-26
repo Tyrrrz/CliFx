@@ -7,10 +7,10 @@ namespace CliFx.Tests.TestCommands
     public class DuplicateParameterOrderCommand : ICommand
     {
         [CommandParameter(13)]
-        public string? ArgumentA { get; set; }
+        public string? ParameterA { get; set; }
 
         [CommandParameter(13)]
-        public string? ArgumentB { get; set; }
+        public string? ParameterB { get; set; }
 
         public ValueTask ExecuteAsync(IConsole console) => default;
     }

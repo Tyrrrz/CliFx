@@ -147,7 +147,7 @@ namespace CliFx
 
         /// <summary>
         /// Runs the application with specified command line arguments and returns the exit code.
-        /// Environment variables are resolved with <see cref="Environment.GetEnvironmentVariables()"/>.
+        /// Environment variables are retrieved automatically.
         /// </summary>
         public async ValueTask<int> RunAsync(IReadOnlyList<string> commandLineArguments)
         {
@@ -160,8 +160,7 @@ namespace CliFx
 
         /// <summary>
         /// Runs the application and returns the exit code.
-        /// Command line arguments are resolved with <see cref="Environment.GetCommandLineArgs()"/>.
-        /// Environment variables are resolved with <see cref="Environment.GetEnvironmentVariables()"/>.
+        /// Command line arguments and environment variables are retrieved automatically.
         /// </summary>
         public async ValueTask<int> RunAsync()
         {

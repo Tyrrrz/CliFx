@@ -56,8 +56,8 @@ namespace CliFx
 
         /// <summary>
         /// Provides a token that signals when application cancellation is requested.
-        /// When working with system console, the cancellation happens when the user issues an interrupt signal (Ctrl+C).
         /// Subsequent calls return the same token.
+        /// When working with system console, the user can request cancellation by issuing an interrupt signal (Ctrl+C).
         /// </summary>
         CancellationToken GetCancellationToken();
     }

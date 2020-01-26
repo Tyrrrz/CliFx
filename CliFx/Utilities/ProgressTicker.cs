@@ -33,12 +33,12 @@ namespace CliFx.Utilities
 
         /// <summary>
         /// Erases previous output and renders new progress to the console.
-        /// If console's stdout is redirected, this method returns without doing anything.
+        /// If stdout is redirected, this method returns without doing anything.
         /// </summary>
         public void Report(double progress)
         {
             // We don't do anything if stdout is redirected to avoid polluting output
-            //...when there's no active console window.
+            // when there's no active console window.
             if (!_console.IsOutputRedirected)
             {
                 EraseLastOutput();

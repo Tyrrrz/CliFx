@@ -10,7 +10,7 @@ namespace CliFx.Tests
         [TearDown]
         public void TearDown()
         {
-            // Reset console color so it doesn't carry on into next tests
+            // Reset console color so it doesn't carry on into the next tests
             Console.ResetColor();
         }
 

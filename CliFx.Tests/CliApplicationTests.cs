@@ -267,16 +267,17 @@ namespace CliFx.Tests
                 .UseConsole(console)
                 .Build();
 
-            var args = new[] {"cancel"};
+            var commandLineArguments = new[] {"cancel"};
+            var environmentVariables = new Dictionary<string, string>();
 
             // Act
             cancellationTokenSource.CancelAfter(TimeSpan.FromSeconds(0.2));
-            var exitCode = await application.RunAsync(args, new Dictionary<string, string>());
+            var exitCode = await application.RunAsync(commandLineArguments, environmentVariables);
             var stdOut = stdoutStream.ToString().Trim();
 
             // Assert
             exitCode.Should().NotBe(0);
-            stdOut.Should().BeEmpty();
+            stdOut.Should().BeNullOrWhiteSpace();
         }
     }
 }

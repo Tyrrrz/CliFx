@@ -8,16 +8,16 @@ namespace CliFx.Tests.TestCommands
     public class ParameterCommand : ICommand
     {
         [CommandParameter(0, Name = "first")]
-        public string? FirstArgument { get; set; }
+        public string? ParameterA { get; set; }
 
         [CommandParameter(10)]
-        public int? SecondArgument { get; set; }
+        public int? ParameterB { get; set; }
 
         [CommandParameter(20, Description = "A list of numbers", Name = "third list")]
-        public IEnumerable<int> ThirdArguments { get; set; }
+        public IEnumerable<int> ParameterC { get; set; }
 
         [CommandOption("option", 'o')]
-        public string Option { get; set; }
+        public string OptionA { get; set; }
 
         public ValueTask ExecuteAsync(IConsole console) => default;
     }

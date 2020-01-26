@@ -11,12 +11,14 @@ namespace CliFx.Attributes
         /// <summary>
         /// Option name.
         /// Either <see cref="Name"/> or <see cref="ShortName"/> must be set.
+        /// All options in a command must have different names (comparison is not case-sensitive).
         /// </summary>
         public string? Name { get; }
 
         /// <summary>
         /// Option short name.
         /// Either <see cref="Name"/> or <see cref="ShortName"/> must be set.
+        /// All options in a command must have different short names (comparison is case-sensitive).
         /// </summary>
         public char? ShortName { get; }
 
@@ -31,7 +33,7 @@ namespace CliFx.Attributes
         public string? Description { get; set; }
 
         /// <summary>
-        /// Optional environment variable name that will be used as fallback value if no option value is specified.
+        /// Environment variable that will be used as fallback if no option value is specified.
         /// </summary>
         public string? EnvironmentVariableName { get; set; }
 

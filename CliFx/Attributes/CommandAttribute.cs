@@ -10,7 +10,9 @@ namespace CliFx.Attributes
     {
         /// <summary>
         /// Command name.
-        /// This can be null if this is the default command.
+        /// If the name is not set, the command is treated as a default command, i.e. the one that gets executed when the user
+        /// does not specify a command name in the arguments.
+        /// All commands in an application must have different names. Likewise, only one command without a name is allowed.
         /// </summary>
         public string? Name { get; }
 

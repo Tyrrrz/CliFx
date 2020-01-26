@@ -3,14 +3,15 @@
 namespace CliFx
 {
     /// <summary>
-    /// Point of interaction between a user and command line interface.
+    /// Entry point in a command line application.
     /// </summary>
     public interface ICommand
     {
         /// <summary>
-        /// Executes command using specified implementation of <see cref="IConsole"/>.
-        /// This method is called when the command is invoked by a user through command line interface.
+        /// Executes the command using the specified implementation of <see cref="IConsole"/>.
+        /// This is the method that's called when the command is invoked by a user through command line interface.
         /// </summary>
+        /// <remarks>If the execution of the command is not asynchronous, simply end the method with <code>return default;</code></remarks>
         ValueTask ExecuteAsync(IConsole console);
     }
 }

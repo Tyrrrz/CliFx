@@ -45,7 +45,7 @@ namespace CliFx
         }
 
         /// <summary>
-        /// Adds commands from specified assembly to the application.
+        /// Adds commands from the specified assembly to the application.
         /// </summary>
         public CliApplicationBuilder AddCommandsFrom(Assembly commandAssembly)
         {
@@ -56,7 +56,7 @@ namespace CliFx
         }
 
         /// <summary>
-        /// Adds commands from specified assemblies to the application.
+        /// Adds commands from the specified assemblies to the application.
         /// </summary>
         public CliApplicationBuilder AddCommandsFrom(IEnumerable<Assembly> commandAssemblies)
         {
@@ -67,7 +67,7 @@ namespace CliFx
         }
 
         /// <summary>
-        /// Adds commands from calling assembly to the application.
+        /// Adds commands from the calling assembly to the application.
         /// </summary>
         public CliApplicationBuilder AddCommandsFromThisAssembly() => AddCommandsFrom(Assembly.GetCallingAssembly());
 
@@ -126,7 +126,7 @@ namespace CliFx
         }
 
         /// <summary>
-        /// Configures application to use specified implementation of <see cref="IConsole"/>.
+        /// Configures the application to use the specified implementation of <see cref="IConsole"/>.
         /// </summary>
         public CliApplicationBuilder UseConsole(IConsole console)
         {
@@ -135,7 +135,7 @@ namespace CliFx
         }
 
         /// <summary>
-        /// Configures application to use specified implementation of <see cref="ITypeActivator"/>.
+        /// Configures the application to use the specified implementation of <see cref="ITypeActivator"/>.
         /// </summary>
         public CliApplicationBuilder UseTypeActivator(ITypeActivator typeActivator)
         {
@@ -144,7 +144,7 @@ namespace CliFx
         }
 
         /// <summary>
-        /// Configures application to use specified factory method.
+        /// Configures the application to use the specified function for activating types.
         /// </summary>
         public CliApplicationBuilder UseTypeActivator(Func<Type, object> typeActivator) =>
             UseTypeActivator(new DelegateTypeActivator(typeActivator));
@@ -175,9 +175,9 @@ namespace CliFx
         // Entry assembly is null in tests
         private static Assembly EntryAssembly => LazyEntryAssembly.Value;
 
-        private static string GetDefaultTitle() => EntryAssembly?.GetName().Name ?? "";
+        private static string? GetDefaultTitle() => EntryAssembly?.GetName().Name;
 
-        private static string GetDefaultExecutableName()
+        private static string? GetDefaultExecutableName()
         {
             var entryAssemblyLocation = EntryAssembly?.Location;
 
@@ -191,6 +191,9 @@ namespace CliFx
             return Path.GetFileNameWithoutExtension(entryAssemblyLocation);
         }
 
-        private static string GetDefaultVersionText() => EntryAssembly != null ? $"v{EntryAssembly.GetName().Version}" : "";
+        private static string? GetDefaultVersionText() =>
+            EntryAssembly != null
+                ? $"v{EntryAssembly.GetName().Version}"
+                : null;
     }
 }
