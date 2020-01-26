@@ -129,16 +129,12 @@ namespace CliFx
                 // Doing this also gets rid of the annoying Windows troubleshooting dialog that shows up on unhandled exceptions.
 
                 // Prefer showing message without stack trace on exceptions coming from CliFx or on CommandException
-                if (!string.IsNullOrWhiteSpace(ex.Message) && (ex is CliFxException || ex is CommandException))
-                {
-                    _console.WithForegroundColor(ConsoleColor.Red, () => _console.Error.WriteLine(ex.Message));
-                }
-                else
-                {
-                    _console.WithForegroundColor(ConsoleColor.Red, () => _console.Error.WriteLine(ex));
-                }
+                var errorMessage = !string.IsNullOrWhiteSpace(ex.Message) && (ex is CliFxException || ex is CommandException)
+                    ? ex.Message
+                    : ex.ToString();
 
-                // Return exit code if it was specified via CommandException
+                _console.WithForegroundColor(ConsoleColor.Red, () => _console.Error.WriteLine(errorMessage));
+
                 return ex is CommandException commandException
                     ? commandException.ExitCode
                     : ex.HResult;

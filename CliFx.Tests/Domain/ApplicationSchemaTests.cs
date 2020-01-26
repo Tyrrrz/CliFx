@@ -17,7 +17,12 @@ namespace CliFx.Tests.Domain
         private static IEnumerable<TestCaseData> GetTestCases_Resolve()
         {
             yield return new TestCaseData(
-                new[] { typeof(DivideCommand), typeof(ConcatCommand), typeof(EnvironmentVariableCommand) },
+                new[]
+                {
+                    typeof(DivideCommand),
+                    typeof(ConcatCommand),
+                    typeof(EnvironmentVariableCommand)
+                },
                 new[]
                 {
                     new CommandSchema(typeof(DivideCommand), "div", "Divide one number by another.",
@@ -49,10 +54,12 @@ namespace CliFx.Tests.Domain
             );
 
             yield return new TestCaseData(
-                new[] { typeof(HelloWorldDefaultCommand) },
+                new[] {typeof(HelloWorldDefaultCommand)},
                 new[]
                 {
-                    new CommandSchema(typeof(HelloWorldDefaultCommand), null, null, new CommandParameterSchema[0], new CommandOptionSchema[0])
+                    new CommandSchema(typeof(HelloWorldDefaultCommand), null, null,
+                        new CommandParameterSchema[0],
+                        new CommandOptionSchema[0])
                 }
             );
         }
@@ -144,197 +151,309 @@ namespace CliFx.Tests.Domain
         private static IEnumerable<TestCaseData> GetTestCases_TryInitialize()
         {
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.Object)}", "value"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.Object), "value")
+                    }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand {Object = "value"}
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.String)}", "value"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.String), "value")
+                    }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand {String = "value"}
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.Bool)}", "true"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.Bool), "true")
+                    }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand {Bool = true}
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.Bool)}", "false"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.Bool), "false")
+                    }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand {Bool = false}
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.Bool)}"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.Bool))
+                    }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand {Bool = true}
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.Char)}", "a"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.Char), "a")
+                    }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand {Char = 'a'}
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.Sbyte)}", "15"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.Sbyte), "15")
+                    }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand {Sbyte = 15}
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.Byte)}", "15"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.Byte), "15")
+                    }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand {Byte = 15}
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.Short)}", "15"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.Short), "15")
+                    }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand {Short = 15}
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.Ushort)}", "15"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.Ushort), "15")
+                    }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand {Ushort = 15}
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.Int)}", "15"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.Int), "15")
+                    }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand {Int = 15}
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.Long)}", "15"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.Long), "15")
+                    }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand {Long = 15}
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.Float)}", "123.45"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.Float), "123.45")
+                    }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand {Float = 123.45f}
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.Double)}", "123.45"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.Double), "123.45")
+                    }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand {Double = 123.45}
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.Decimal)}", "123.45"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.Decimal), "123.45")
+                    }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand {Decimal = 123.45m}
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.DateTime)}", "28 Apr 1995"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.DateTime), "28 Apr 1995")
+                    }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand {DateTime = new DateTime(1995, 04, 28)}
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.DateTimeOffset)}", "28 Apr 1995"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.DateTimeOffset), "28 Apr 1995")
+                    }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand {DateTimeOffset = new DateTime(1995, 04, 28)}
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.TimeSpan)}", "00:14:59"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.TimeSpan), "00:14:59")
+                    }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand {TimeSpan = new TimeSpan(00, 14, 59)}
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.TestEnum)}", "value2"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.TestEnum), "value2")
+                    }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand {TestEnum = TestEnum.Value2}
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.IntNullable)}", "666"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.IntNullable), "666")
+                    }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand {IntNullable = 666}
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.IntNullable)}"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.IntNullable))
+                    }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand {IntNullable = null}
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.TestEnumNullable)}", "value3"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.TestEnumNullable), "value3")
+                    }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand {TestEnumNullable = TestEnum.Value3}
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.TestEnumNullable)}"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.TestEnumNullable))
+                    }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand {TestEnumNullable = null}
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.TimeSpanNullable)}", "01:00:00"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.TimeSpanNullable), "01:00:00")
+                    }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand {TimeSpanNullable = new TimeSpan(01, 00, 00)}
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.TimeSpanNullable)}"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.TimeSpanNullable))
+                    }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand {TimeSpanNullable = null}
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.TestStringConstructable)}", "value"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.TestStringConstructable), "value")
+                    }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand {TestStringConstructable = new TestStringConstructable("value")}
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.TestStringParseable)}", "value"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.TestStringParseable), "value")
+                    }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand {TestStringParseable = TestStringParseable.Parse("value")}
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.TestStringParseableWithFormatProvider)}", "value"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.TestStringParseableWithFormatProvider), "value")
+                    }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand
                 {
@@ -344,54 +463,82 @@ namespace CliFx.Tests.Domain
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.ObjectArray)}", "value1", "value2"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.ObjectArray), new[] {"value1", "value2"})
+                    }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand {ObjectArray = new object[] {"value1", "value2"}}
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.StringArray)}", "value1", "value2"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.StringArray), new[] {"value1", "value2"})
+                    }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand {StringArray = new[] {"value1", "value2"}}
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.StringArray)}"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.StringArray))
+                    }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand {StringArray = new string[0]}
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.IntArray)}", "47", "69"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.IntArray), new[] {"47", "69"})
+                    }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand {IntArray = new[] {47, 69}}
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.TestEnumArray)}", "value1", "value3"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.TestEnumArray), new[] {"value1", "value3"})
+                    }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand {TestEnumArray = new[] {TestEnum.Value1, TestEnum.Value3}}
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.IntNullableArray)}", "1337", "2441"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.IntNullableArray), new[] {"1337", "2441"})
+                    }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand {IntNullableArray = new int?[] {1337, 2441}}
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.TestStringConstructableArray)}", "value1", "value2"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.TestStringConstructableArray), new[] {"value1", "value2"})
+                    }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand
                 {
-                    TestStringConstructableArray = new []
+                    TestStringConstructableArray = new[]
                     {
                         new TestStringConstructable("value1"),
                         new TestStringConstructable("value2")
@@ -400,92 +547,124 @@ namespace CliFx.Tests.Domain
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.Enumerable)}", "value1", "value3"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.Enumerable), new[] {"value1", "value3"})
+                    }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand {Enumerable = new[] {"value1", "value3"}}
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.StringEnumerable)}", "value1", "value3"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.StringEnumerable), new[] {"value1", "value3"})
+                    }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand {StringEnumerable = new[] {"value1", "value3"}}
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.StringReadOnlyList)}", "value1", "value3"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.StringReadOnlyList), new[] {"value1", "value3"})
+                    }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand {StringReadOnlyList = new[] {"value1", "value3"}}
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.StringList)}", "value1", "value3"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.StringList), new[] {"value1", "value3"})
+                    }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand {StringList = new List<string> {"value1", "value3"}}
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.StringHashSet)}", "value1", "value3"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.StringHashSet), new[] {"value1", "value3"})
+                    }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand {StringHashSet = new HashSet<string> {"value1", "value3"}}
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.Ulong)}", "15"},
-                new Dictionary<string, string>(),
-                new AllSupportedTypesCommand {Ulong = 15}
-            );
-
-            yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.Uint)}", "15"},
-                new Dictionary<string, string>(),
-                new AllSupportedTypesCommand {Uint = 15}
-            );
-
-            yield return new TestCaseData(
-                typeof(DivideCommand),
-                new[] {"div", "--dividend", "13", "--divisor", "8"},
+                new[] {typeof(DivideCommand)},
+                new CommandLineInput(
+                    new[] {"div"},
+                    new[]
+                    {
+                        new CommandOptionInput("dividend", "13"),
+                        new CommandOptionInput("divisor", "8"),
+                    }),
                 new Dictionary<string, string>(),
                 new DivideCommand {Dividend = 13, Divisor = 8}
             );
 
             yield return new TestCaseData(
-                typeof(DivideCommand),
-                new[] {"div", "-D", "13", "-d", "8"},
+                new[] {typeof(DivideCommand)},
+                new CommandLineInput(
+                    new[] {"div"},
+                    new[]
+                    {
+                        new CommandOptionInput("D", "13"),
+                        new CommandOptionInput("d", "8"),
+                    }),
                 new Dictionary<string, string>(),
                 new DivideCommand {Dividend = 13, Divisor = 8}
             );
 
             yield return new TestCaseData(
-                typeof(DivideCommand),
-                new[] {"div", "--dividend", "13", "-d", "8"},
+                new[] {typeof(DivideCommand)},
+                new CommandLineInput(
+                    new[] {"div"},
+                    new[]
+                    {
+                        new CommandOptionInput("dividend", "13"),
+                        new CommandOptionInput("d", "8"),
+                    }),
                 new Dictionary<string, string>(),
                 new DivideCommand {Dividend = 13, Divisor = 8}
             );
 
             yield return new TestCaseData(
-                typeof(ConcatCommand),
-                new[] {"concat", "-i", "foo", " ", "bar"},
+                new[] {typeof(ConcatCommand)},
+                new CommandLineInput(
+                    new[] {"concat"},
+                    new[] {new CommandOptionInput("i", new[] {"foo", " ", "bar"}),}),
                 new Dictionary<string, string>(),
                 new ConcatCommand {Inputs = new[] {"foo", " ", "bar"}}
             );
 
             yield return new TestCaseData(
-                typeof(ConcatCommand),
-                new[] {"concat", "-i", "foo", "bar", "-s", " "},
+                new[] {typeof(ConcatCommand)},
+                new CommandLineInput(
+                    new[] {"concat"},
+                    new[]
+                    {
+                        new CommandOptionInput("i", new[] {"foo", "bar"}),
+                        new CommandOptionInput("s", " "),
+                    }),
                 new Dictionary<string, string>(),
-                new ConcatCommand { Inputs = new[] { "foo", "bar" }, Separator = " " }
+                new ConcatCommand {Inputs = new[] {"foo", "bar"}, Separator = " "}
             );
 
             yield return new TestCaseData(
-                typeof(EnvironmentVariableCommand),
-                new string[0],
+                new[] {typeof(EnvironmentVariableCommand)},
+                CommandLineInput.Empty,
                 new Dictionary<string, string>
                 {
                     ["ENV_SINGLE_VALUE"] = "A"
@@ -494,8 +673,8 @@ namespace CliFx.Tests.Domain
             );
 
             yield return new TestCaseData(
-                typeof(EnvironmentVariableWithMultipleValuesCommand),
-                new string[0],
+                new[] {typeof(EnvironmentVariableWithMultipleValuesCommand)},
+                CommandLineInput.Empty,
                 new Dictionary<string, string>
                 {
                     ["ENV_MULTIPLE_VALUES"] = string.Join(Path.PathSeparator, "A", "B", "C")
@@ -504,8 +683,8 @@ namespace CliFx.Tests.Domain
             );
 
             yield return new TestCaseData(
-                typeof(EnvironmentVariableCommand),
-                new[] {"--opt", "X"},
+                new[] {typeof(EnvironmentVariableCommand)},
+                new CommandLineInput(new[] {"--opt", "X"}),
                 new Dictionary<string, string>
                 {
                     ["ENV_SINGLE_VALUE"] = "A"
@@ -514,8 +693,8 @@ namespace CliFx.Tests.Domain
             );
 
             yield return new TestCaseData(
-                typeof(EnvironmentVariableWithoutCollectionPropertyCommand),
-                new string[0],
+                new[] {typeof(EnvironmentVariableWithoutCollectionPropertyCommand)},
+                CommandLineInput.Empty,
                 new Dictionary<string, string>
                 {
                     ["ENV_MULTIPLE_VALUES"] = string.Join(Path.PathSeparator, "A", "B", "C")
@@ -524,8 +703,10 @@ namespace CliFx.Tests.Domain
             );
 
             yield return new TestCaseData(
-                typeof(ParameterCommand),
-                new[] {"param", "cmd", "abc", "123", "1", "2", "-o", "option value"},
+                new[] {typeof(ParameterCommand)},
+                new CommandLineInput(
+                    new[] {"param", "cmd", "abc", "123", "1", "2"},
+                    new[] {new CommandOptionInput("o", "option value")}),
                 new Dictionary<string, string>(),
                 new ParameterCommand
                 {
@@ -542,68 +723,78 @@ namespace CliFx.Tests.Domain
         private static IEnumerable<TestCaseData> GetTestCases_TryInitialize_Negative()
         {
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.Int)}", "1234.5"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[] {new CommandOptionInput(nameof(AllSupportedTypesCommand.Int), "1234.5")}),
                 new Dictionary<string, string>()
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.Int)}", "123", "456"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[] {new CommandOptionInput(nameof(AllSupportedTypesCommand.Int), new[] {"123", "456"})}),
                 new Dictionary<string, string>()
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.Int)}"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[] {new CommandOptionInput(nameof(AllSupportedTypesCommand.Int))}),
                 new Dictionary<string, string>()
             );
 
             yield return new TestCaseData(
-                typeof(AllSupportedTypesCommand),
-                new[] {$"--{nameof(AllSupportedTypesCommand.NonConvertible)}", "123"},
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[] {new CommandOptionInput(nameof(AllSupportedTypesCommand.NonConvertible), "123")}),
                 new Dictionary<string, string>()
             );
 
             yield return new TestCaseData(
-                typeof(DivideCommand),
-                new[] {"div"},
+                new[] {typeof(DivideCommand)},
+                new CommandLineInput(new[] {"div"}),
                 new Dictionary<string, string>()
             );
 
             yield return new TestCaseData(
-                typeof(DivideCommand),
-                new[] {"div", "-D", "13"},
+                new[] {typeof(DivideCommand)},
+                new CommandLineInput(new[] {"div", "-D", "13"}),
                 new Dictionary<string, string>()
             );
 
             yield return new TestCaseData(
-                typeof(DivideCommand),
-                new[] {"concat"},
+                new[] {typeof(DivideCommand)},
+                new CommandLineInput(new[] {"concat"}),
                 new Dictionary<string, string>()
             );
 
             yield return new TestCaseData(
-                typeof(DivideCommand),
-                new[] {"concat", "-s", "_"},
+                new[] {typeof(DivideCommand)},
+                new CommandLineInput(new[] {"concat", "-s", "_"}),
                 new Dictionary<string, string>()
             );
 
             yield return new TestCaseData(
-                typeof(ParameterCommand),
-                new[] {"param", "cmd", "-o", "option value"},
+                new[] {typeof(ParameterCommand)},
+                new CommandLineInput(
+                    new[] {"param", "cmd"},
+                    new[] {new CommandOptionInput("o", "option value")}),
                 new Dictionary<string, string>()
             );
 
             yield return new TestCaseData(
-                typeof(ParameterCommand),
-                new[] {"param", "cmd", "abc", "123", "invalid", "-o", "option value"},
+                new[] {typeof(ParameterCommand)},
+                new CommandLineInput(
+                    new[] {"param", "cmd", "abc", "123", "invalid"},
+                    new[] {new CommandOptionInput("o", "option value")}),
                 new Dictionary<string, string>()
             );
 
             yield return new TestCaseData(
-                typeof(SimpleParameterCommand),
-                new[] {"param", "cmd2", "abc", "123", "unused", "-o", "option value"},
+                new[] {typeof(SimpleParameterCommand)},
+                new CommandLineInput(
+                    new[] {"param", "cmd2", "abc", "123", "unused"},
+                    new[] {new CommandOptionInput("o", "option value")}),
                 new Dictionary<string, string>()
             );
 
@@ -612,14 +803,13 @@ namespace CliFx.Tests.Domain
 
         [TestCaseSource(nameof(GetTestCases_TryInitialize))]
         public void TryInitialize_Test(
-            Type commandType,
-            IReadOnlyList<string> commandLineArguments,
+            IReadOnlyList<Type> commandTypes,
+            CommandLineInput commandLineInput,
             IReadOnlyDictionary<string, string> environmentVariables,
             ICommand expectedResult)
         {
             // Arrange
-            var commandLineInput = CommandLineInput.Parse(commandLineArguments);
-            var applicationSchema = ApplicationSchema.Resolve(commandType);
+            var applicationSchema = ApplicationSchema.Resolve(commandTypes);
             var typeActivator = new DefaultTypeActivator();
 
             // Act
@@ -631,13 +821,12 @@ namespace CliFx.Tests.Domain
 
         [TestCaseSource(nameof(GetTestCases_TryInitialize_Negative))]
         public void TryInitialize_Negative_Test(
-            Type commandType,
-            IReadOnlyList<string> commandLineArguments,
+            IReadOnlyList<Type> commandTypes,
+            CommandLineInput commandLineInput,
             IReadOnlyDictionary<string, string> environmentVariables)
         {
             // Arrange
-            var commandLineInput = CommandLineInput.Parse(commandLineArguments);
-            var applicationSchema = ApplicationSchema.Resolve(commandType);
+            var applicationSchema = ApplicationSchema.Resolve(commandTypes);
             var typeActivator = new DefaultTypeActivator();
 
             // Act

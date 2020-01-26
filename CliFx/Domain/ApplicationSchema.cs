@@ -206,8 +206,5 @@ namespace CliFx.Domain
 
             return new ApplicationSchema(commands);
         }
-
-        public static ApplicationSchema Resolve(params Type[] commandTypes) =>
-            Resolve((IReadOnlyList<Type>) commandTypes);
     }
 }
