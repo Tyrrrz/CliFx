@@ -174,7 +174,7 @@ namespace CliFx
                     return;
 
                 RenderMargin();
-                RenderHeader("Arguments");
+                RenderHeader("Parameters");
 
                 var parameters = command.Parameters
                     .OrderBy(p => p.Order)
