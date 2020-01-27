@@ -258,7 +258,7 @@ namespace CliFx.Tests
                     "Command using positional parameters",
                     "Usage",
                     TestAppName, "param cmd", "<first>", "<PARAMETERB>", "<third list>", "[options]",
-                    "Arguments",
+                    "Parameters",
                     "* first",
                     "* PARAMETERB",
                     "* third list", "A list of numbers",
