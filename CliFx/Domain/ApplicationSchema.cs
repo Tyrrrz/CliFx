@@ -19,6 +19,7 @@ namespace CliFx.Domain
 
         public CommandSchema? TryFindParentCommand(string? childCommandName)
         {
+            // Default command has no parent
             if (string.IsNullOrWhiteSpace(childCommandName))
                 return null;
 
@@ -27,10 +28,10 @@ namespace CliFx.Domain
             for (var i = route.Length - 1; i >= 1; i--)
             {
                 var potentialParentCommandName = string.Join(" ", route.Take(i));
-                var matchingCommand = Commands.FirstOrDefault(c => c.MatchesName(potentialParentCommandName));
+                var matchingParentCommand = Commands.FirstOrDefault(c => c.MatchesName(potentialParentCommandName));
 
-                if (matchingCommand != null)
-                    return matchingCommand;
+                if (matchingParentCommand != null)
+                    return matchingParentCommand;
             }
 
             // If there's no parent - fall back to default command
@@ -38,51 +39,49 @@ namespace CliFx.Domain
         }
 
         public IReadOnlyList<CommandSchema> GetChildCommands(string? parentCommandName) =>
-            Commands.Where(c => TryFindParentCommand(c.Name)?.MatchesName(parentCommandName) == true).ToArray();
+            !string.IsNullOrWhiteSpace(parentCommandName) || Commands.Any(c => c.IsDefault)
+                ? Commands.Where(c => TryFindParentCommand(c.Name)?.MatchesName(parentCommandName) == true).ToArray()
+                : Commands.Where(c => !string.IsNullOrWhiteSpace(c.Name) && TryFindParentCommand(c.Name) == null).ToArray();
 
-        public CommandSchema? TryFindCommandSchema(CommandLineInput input)
+        private CommandSchema? TryFindCommand(CommandLineInput commandLineInput, out int argumentOffset)
         {
-            for (var i = input.Arguments.Count; i >= 0; i--)
+            // Try to find the command that contains the most of the input arguments in its name
+            for (var i = commandLineInput.Arguments.Count; i >= 0; i--)
             {
-                var potentialCommandName = string.Join(" ", input.Arguments.Take(i));
-                var matchingCommandSchema = Commands.FirstOrDefault(c => c.MatchesName(potentialCommandName));
+                var potentialCommandName = string.Join(" ", commandLineInput.Arguments.Take(i));
+                var matchingCommand = Commands.FirstOrDefault(c => c.MatchesName(potentialCommandName));
 
-                if (matchingCommandSchema != null)
-                    return matchingCommandSchema;
-            }
-
-            return Commands.FirstOrDefault(c => c.IsDefault);
-        }
-
-        public ICommand InitializeCommand(
-            CommandLineInput input,
-            IReadOnlyDictionary<string, string> environmentVariables,
-            ITypeActivator activator)
-        {
-            // Try to find a command whose name matches the longest part of arguments
-            for (var i = input.Arguments.Count; i >= 0; i--)
-            {
-                var potentialCommandName = string.Join(" ", input.Arguments.Take(i));
-                var matchingCommandSchema = Commands.FirstOrDefault(c => c.MatchesName(potentialCommandName));
-
-                if (matchingCommandSchema != null)
+                if (matchingCommand != null)
                 {
-                    // Take the remainder of arguments as parameters
-                    var parameterInputs = input.Arguments.Skip(i).ToArray();
-
-                    return matchingCommandSchema.Create(activator, parameterInputs, input.Options, environmentVariables);
+                    argumentOffset = i;
+                    return matchingCommand;
                 }
             }
 
-            // If none of the commands matches, fall back to default command
-            var commandSchema = Commands.FirstOrDefault(c => c.IsDefault);
-            if (commandSchema != null)
+            argumentOffset = 0;
+            return Commands.FirstOrDefault(c => c.IsDefault);
+        }
+
+        public CommandSchema? TryFindCommand(CommandLineInput commandLineInput) =>
+            TryFindCommand(commandLineInput, out _);
+
+        public ICommand InitializeEntryPoint(
+            CommandLineInput commandLineInput,
+            IReadOnlyDictionary<string, string> environmentVariables,
+            ITypeActivator activator)
+        {
+            var command = TryFindCommand(commandLineInput, out var argumentOffset);
+            if (command == null)
             {
-                return commandSchema.Create(activator, input.Arguments, input.Options, environmentVariables);
+                throw new CliFxException(
+                    $"Can't find a command that matches arguments [{string.Join(" ", commandLineInput.Arguments)}].");
             }
 
-            throw new CliFxException(
-                $"Can't find a command that matches arguments [{string.Join(" ", input.Arguments)}].");
+            var parameterInputs = argumentOffset == 0
+                ? commandLineInput.Arguments
+                : commandLineInput.Arguments.Skip(argumentOffset).ToArray();
+
+            return command.CreateInstance(parameterInputs, commandLineInput.Options, environmentVariables, activator);
         }
     }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using CliFx.Internal;
 
 namespace CliFx.Domain
@@ -17,12 +18,11 @@ namespace CliFx.Domain
 
         public bool IsPreviewDirectiveSpecified => Directives.Contains("preview", StringComparer.OrdinalIgnoreCase);
 
-        public bool IsHelpOptionSpecified => Options.Any(o =>
-            string.Equals(o.Alias, "help", StringComparison.OrdinalIgnoreCase) ||
-            string.Equals(o.Alias, "h", StringComparison.OrdinalIgnoreCase));
+        public bool IsHelpOptionSpecified =>
+            Options.Any(o => CommandOptionSchema.HelpOption.MatchesNameOrShortName(o.Alias));
 
-        public bool IsVersionOptionSpecified => Options.Any(o =>
-            string.Equals(o.Alias, "version", StringComparison.OrdinalIgnoreCase));
+        public bool IsVersionOptionSpecified =>
+            Options.Any(o => CommandOptionSchema.VersionOption.MatchesNameOrShortName(o.Alias));
 
         public CommandLineInput(
             IReadOnlyList<string> directives,
@@ -50,17 +50,38 @@ namespace CliFx.Domain
             : this(new string[0], options)
         {
         }
+
+        public override string ToString()
+        {
+            var buffer = new StringBuilder();
+
+            foreach (var directive in Directives)
+            {
+                buffer.AppendIfNotEmpty(' ');
+                buffer
+                    .Append('[')
+                    .Append(directive)
+                    .Append(']');
+            }
+
+            foreach (var argument in Arguments)
+            {
+                buffer.AppendIfNotEmpty(' ');
+                buffer.Append(argument);
+            }
+
+            foreach (var option in Options)
+            {
+                buffer.AppendIfNotEmpty(' ');
+                buffer.Append(option);
+            }
+
+            return buffer.ToString();
+        }
     }
 
     internal partial class CommandLineInput
     {
-        public static CommandLineInput Empty { get; } =
-            new CommandLineInput(new string[0], new string[0], new CommandOptionInput[0]);
-    }
-
-    internal partial class CommandLineInput
-    {
-        // TODO: refactor
         public static CommandLineInput Parse(IReadOnlyList<string> commandLineArguments)
         {
             var directives = new List<string>();
@@ -70,59 +91,89 @@ namespace CliFx.Domain
             // Option aliases and values are parsed in pairs so we need to keep track of last alias
             var lastOptionAlias = "";
 
-            foreach (var cmdArg in commandLineArguments)
+            bool TryParseDirective(string argument)
             {
-                // Encountered option name
-                if (cmdArg.StartsWith("--", StringComparison.OrdinalIgnoreCase))
+                if (!string.IsNullOrWhiteSpace(lastOptionAlias))
+                    return false;
+
+                if (!argument.StartsWith("[", StringComparison.OrdinalIgnoreCase) ||
+                    !argument.EndsWith("]", StringComparison.OrdinalIgnoreCase))
+                    return false;
+
+                var directive = argument.Substring(1, argument.Length - 2);
+                directives.Add(directive);
+
+                return true;
+            }
+
+            bool TryParseArgument(string argument)
+            {
+                if (!string.IsNullOrWhiteSpace(lastOptionAlias))
+                    return false;
+
+                arguments.Add(argument);
+
+                return true;
+            }
+
+            bool TryParseOptionName(string argument)
+            {
+                if (!argument.StartsWith("--", StringComparison.OrdinalIgnoreCase))
+                    return false;
+
+                lastOptionAlias = argument.Substring(2);
+
+                if (!optionsDic.ContainsKey(lastOptionAlias))
+                    optionsDic[lastOptionAlias] = new List<string>();
+
+                return true;
+            }
+
+            bool TryParseOptionShortName(string argument)
+            {
+                if (!argument.StartsWith("-", StringComparison.OrdinalIgnoreCase))
+                    return false;
+
+                foreach (var c in argument.Substring(1))
                 {
-                    // Extract option alias
-                    lastOptionAlias = cmdArg.Substring(2);
+                    lastOptionAlias = c.AsString();
 
                     if (!optionsDic.ContainsKey(lastOptionAlias))
                         optionsDic[lastOptionAlias] = new List<string>();
                 }
 
-                // Encountered short option name or multiple short option names
-                else if (cmdArg.StartsWith("-", StringComparison.OrdinalIgnoreCase))
-                {
-                    // Handle stacked options
-                    foreach (var c in cmdArg.Substring(1))
-                    {
-                        // Extract option alias
-                        lastOptionAlias = c.AsString();
+                return true;
+            }
 
-                        if (!optionsDic.ContainsKey(lastOptionAlias))
-                            optionsDic[lastOptionAlias] = new List<string>();
-                    }
-                }
+            bool TryParseOptionValue(string argument)
+            {
+                if (string.IsNullOrWhiteSpace(lastOptionAlias))
+                    return false;
 
-                // Encountered directive or (part of) command name
-                else if (string.IsNullOrWhiteSpace(lastOptionAlias))
-                {
-                    if (cmdArg.StartsWith("[", StringComparison.OrdinalIgnoreCase) &&
-                        cmdArg.EndsWith("]", StringComparison.OrdinalIgnoreCase))
-                    {
-                        // Extract directive
-                        var directive = cmdArg.Substring(1, cmdArg.Length - 2);
+                optionsDic[lastOptionAlias].Add(argument);
 
-                        directives.Add(directive);
-                    }
-                    else
-                    {
-                        arguments.Add(cmdArg);
-                    }
-                }
+                return true;
+            }
 
-                // Encountered option value
-                else if (!string.IsNullOrWhiteSpace(lastOptionAlias))
-                {
-                    optionsDic[lastOptionAlias].Add(cmdArg);
-                }
+            foreach (var argument in commandLineArguments)
+            {
+                var _ =
+                    TryParseOptionName(argument) ||
+                    TryParseOptionShortName(argument) ||
+                    TryParseDirective(argument) ||
+                    TryParseArgument(argument) ||
+                    TryParseOptionValue(argument);
             }
 
             var options = optionsDic.Select(p => new CommandOptionInput(p.Key, p.Value)).ToArray();
 
             return new CommandLineInput(directives, arguments, options);
         }
+    }
+
+    internal partial class CommandLineInput
+    {
+        public static CommandLineInput Empty { get; } =
+            new CommandLineInput(new string[0], new string[0], new CommandOptionInput[0]);
     }
 }

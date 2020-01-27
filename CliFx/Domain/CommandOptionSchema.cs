@@ -93,4 +93,13 @@ namespace CliFx.Domain
             );
         }
     }
+
+    internal partial class CommandOptionSchema
+    {
+        public static CommandOptionSchema HelpOption { get; } =
+            new CommandOptionSchema(null!, "help", 'h', null, false, "Shows help text.");
+
+        public static CommandOptionSchema VersionOption { get; } =
+            new CommandOptionSchema(null!, "version", null, null, false, "Shows version information.");
+    }
 }

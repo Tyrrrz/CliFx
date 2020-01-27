@@ -54,6 +54,26 @@ namespace CliFx.Tests.Domain
             );
 
             yield return new TestCaseData(
+                new[] {typeof(SimpleParameterCommand)},
+                new[]
+                {
+                    new CommandSchema(typeof(SimpleParameterCommand), "param cmd2", "Command using positional parameters",
+                        new[]
+                        {
+                            new CommandParameterSchema(typeof(SimpleParameterCommand).GetProperty(nameof(SimpleParameterCommand.ParameterA)),
+                                0, "first", null),
+                            new CommandParameterSchema(typeof(SimpleParameterCommand).GetProperty(nameof(SimpleParameterCommand.ParameterB)),
+                                10, null, null)
+                        },
+                        new[]
+                        {
+                            new CommandOptionSchema(typeof(SimpleParameterCommand).GetProperty(nameof(SimpleParameterCommand.OptionA)),
+                                "option", 'o', null, false, null)
+                        })
+                }
+            );
+
+            yield return new TestCaseData(
                 new[] {typeof(HelloWorldDefaultCommand)},
                 new[]
                 {
@@ -154,7 +174,7 @@ namespace CliFx.Tests.Domain
 
     internal partial class ApplicationSchemaTests
     {
-        private static IEnumerable<TestCaseData> GetTestCases_InitializeCommand()
+        private static IEnumerable<TestCaseData> GetTestCases_InitializeEntryPoint()
         {
             yield return new TestCaseData(
                 new[] {typeof(AllSupportedTypesCommand)},
@@ -282,10 +302,32 @@ namespace CliFx.Tests.Domain
                 new CommandLineInput(
                     new[]
                     {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.Uint), "15")
+                    }),
+                new Dictionary<string, string>(),
+                new AllSupportedTypesCommand {Uint = 15}
+            );
+
+            yield return new TestCaseData(
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
                         new CommandOptionInput(nameof(AllSupportedTypesCommand.Long), "15")
                     }),
                 new Dictionary<string, string>(),
                 new AllSupportedTypesCommand {Long = 15}
+            );
+
+            yield return new TestCaseData(
+                new[] {typeof(AllSupportedTypesCommand)},
+                new CommandLineInput(
+                    new[]
+                    {
+                        new CommandOptionInput(nameof(AllSupportedTypesCommand.Ulong), "15")
+                    }),
+                new Dictionary<string, string>(),
+                new AllSupportedTypesCommand {Ulong = 15}
             );
 
             yield return new TestCaseData(
@@ -722,11 +764,9 @@ namespace CliFx.Tests.Domain
                     OptionA = "option value"
                 }
             );
-
-            // TODO: cover all type conversions
         }
 
-        private static IEnumerable<TestCaseData> GetTestCases_InitializeCommand_Negative()
+        private static IEnumerable<TestCaseData> GetTestCases_InitializeEntryPoint_Negative()
         {
             yield return new TestCaseData(
                 new[] {typeof(AllSupportedTypesCommand)},
@@ -804,11 +844,15 @@ namespace CliFx.Tests.Domain
                 new Dictionary<string, string>()
             );
 
-            // TODO: env vars
+            yield return new TestCaseData(
+                new[] {typeof(BrokenEnumerableCommand)},
+                new CommandLineInput(new[] {"value1", "value2"}),
+                new Dictionary<string, string>()
+            );
         }
 
-        [TestCaseSource(nameof(GetTestCases_InitializeCommand))]
-        public void InitializeCommand_Test(
+        [TestCaseSource(nameof(GetTestCases_InitializeEntryPoint))]
+        public void InitializeEntryPoint_Test(
             IReadOnlyList<Type> commandTypes,
             CommandLineInput commandLineInput,
             IReadOnlyDictionary<string, string> environmentVariables,
@@ -819,14 +863,14 @@ namespace CliFx.Tests.Domain
             var typeActivator = new DefaultTypeActivator();
 
             // Act
-            var command = applicationSchema.InitializeCommand(commandLineInput, environmentVariables, typeActivator);
+            var command = applicationSchema.InitializeEntryPoint(commandLineInput, environmentVariables, typeActivator);
 
             // Assert
             command.Should().BeEquivalentTo(expectedResult, o => o.RespectingRuntimeTypes());
         }
 
-        [TestCaseSource(nameof(GetTestCases_InitializeCommand_Negative))]
-        public void InitializeCommand_Negative_Test(
+        [TestCaseSource(nameof(GetTestCases_InitializeEntryPoint_Negative))]
+        public void InitializeEntryPoint_Negative_Test(
             IReadOnlyList<Type> commandTypes,
             CommandLineInput commandLineInput,
             IReadOnlyDictionary<string, string> environmentVariables)
@@ -837,7 +881,7 @@ namespace CliFx.Tests.Domain
 
             // Act & Assert
             var ex = Assert.Throws<CliFxException>(() =>
-                applicationSchema.InitializeCommand(commandLineInput, environmentVariables, typeActivator));
+                applicationSchema.InitializeEntryPoint(commandLineInput, environmentVariables, typeActivator));
             Console.WriteLine(ex.Message);
         }
     }

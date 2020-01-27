@@ -38,8 +38,8 @@ namespace CliFx
             if (!isDebugMode)
                 return null;
 
-            _console.WithForegroundColor(ConsoleColor.Green,
-                () => _console.Output.WriteLine($"Attach debugger to PID {Process.GetCurrentProcess().Id} to continue."));
+            _console.WithForegroundColor(ConsoleColor.Green, () =>
+                _console.Output.WriteLine($"Attach debugger to PID {Process.GetCurrentProcess().Id} to continue."));
 
             while (!Debugger.IsAttached)
                 await Task.Delay(100);
@@ -81,6 +81,7 @@ namespace CliFx
 
         private int? HandleVersionOption(CommandLineInput commandLineInput)
         {
+            // Version option is available only on the default command (i.e. when arguments are not specified)
             var shouldRenderVersion = !commandLineInput.Arguments.Any() && commandLineInput.IsVersionOptionSpecified;
             if (!shouldRenderVersion)
                 return null;
@@ -94,6 +95,7 @@ namespace CliFx
             ApplicationSchema applicationSchema,
             CommandLineInput commandLineInput)
         {
+            // Help is rendered either when it's requested or when the user provides no arguments and there is no default command
             var shouldRenderHelp =
                 commandLineInput.IsHelpOptionSpecified ||
                 !applicationSchema.Commands.Any(c => c.IsDefault) && !commandLineInput.Arguments.Any() && !commandLineInput.Options.Any();
@@ -101,9 +103,10 @@ namespace CliFx
             if (!shouldRenderHelp)
                 return null;
 
+            // Get the command schema that matches the input or use a dummy default command as a fallback
             var commandSchema =
-                applicationSchema.TryFindCommandSchema(commandLineInput) ??
-                new CommandSchema(null!, null, null, new CommandParameterSchema[0], new CommandOptionSchema[0]);
+                applicationSchema.TryFindCommand(commandLineInput) ??
+                CommandSchema.StubDefaultCommand;
 
             RenderHelp(applicationSchema, commandSchema);
 
@@ -115,8 +118,9 @@ namespace CliFx
             CommandLineInput commandLineInput,
             IReadOnlyDictionary<string, string> environmentVariables)
         {
-            var command = applicationSchema.InitializeCommand(commandLineInput, environmentVariables, _typeActivator);
-            await command.ExecuteAsync(_console);
+            await applicationSchema
+                .InitializeEntryPoint(commandLineInput, environmentVariables, _typeActivator)
+                .ExecuteAsync(_console);
 
             return 0;
         }

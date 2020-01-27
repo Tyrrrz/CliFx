@@ -182,10 +182,11 @@ namespace CliFx.Tests
                 new[] {"--help"},
                 new[]
                 {
+                    TestVersionText,
                     "Description",
                     "HelpDefaultCommand description.",
                     "Usage",
-                    "[command]", "[options]",
+                    TestAppName, "[command]", "[options]",
                     "Options",
                     "-a|--option-a", "OptionA description.",
                     "-b|--option-b", "OptionB description.",
@@ -194,8 +195,24 @@ namespace CliFx.Tests
                     "Commands",
                     "cmd", "HelpNamedCommand description.",
                     "You can run", "to show help on a specific command."
-                },
-                null
+                }
+            );
+
+            yield return new TestCaseData(
+                new[] {typeof(HelpSubCommand)},
+                new[] {"--help"},
+                new[]
+                {
+                    TestVersionText,
+                    "Usage",
+                    TestAppName, "[command]",
+                    "Options",
+                    "-h|--help", "Shows help text.",
+                    "--version", "Shows version information.",
+                    "Commands",
+                    "cmd sub", "HelpSubCommand description.",
+                    "You can run", "to show help on a specific command."
+                }
             );
 
             yield return new TestCaseData(
@@ -206,7 +223,7 @@ namespace CliFx.Tests
                     "Description",
                     "HelpNamedCommand description.",
                     "Usage",
-                    "cmd", "[command]", "[options]",
+                    TestAppName, "cmd", "[command]", "[options]",
                     "Options",
                     "-c|--option-c", "OptionC description.",
                     "-d|--option-d", "OptionD description.",
@@ -214,8 +231,7 @@ namespace CliFx.Tests
                     "Commands",
                     "sub", "HelpSubCommand description.",
                     "You can run", "to show help on a specific command."
-                },
-                null
+                }
             );
 
             yield return new TestCaseData(
@@ -226,12 +242,11 @@ namespace CliFx.Tests
                     "Description",
                     "HelpSubCommand description.",
                     "Usage",
-                    "cmd sub", "[options]",
+                    TestAppName, "cmd sub", "[options]",
                     "Options",
                     "-e|--option-e", "OptionE description.",
                     "-h|--help", "Shows help text."
-                },
-                null
+                }
             );
 
             yield return new TestCaseData(
@@ -242,7 +257,7 @@ namespace CliFx.Tests
                     "Description",
                     "Command using positional parameters",
                     "Usage",
-                    "param cmd", "<first>", "<PARAMETERB>", "<third list>", "[options]",
+                    TestAppName, "param cmd", "<first>", "<PARAMETERB>", "<third list>", "[options]",
                     "Arguments",
                     "* first",
                     "* PARAMETERB",
@@ -250,8 +265,7 @@ namespace CliFx.Tests
                     "Options",
                     "-o|--option",
                     "-h|--help", "Shows help text."
-                },
-                null
+                }
             );
 
             yield return new TestCaseData(
@@ -262,11 +276,7 @@ namespace CliFx.Tests
                     "Description",
                     "AllRequiredOptionsCommand description.",
                     "Usage",
-                    "TestApp allrequired --option-f <value> --option-g <value>"
-                },
-                new[]
-                {
-                    "[options]"
+                    TestAppName, "allrequired --option-f <value> --option-g <value>"
                 }
             );
 
@@ -278,9 +288,8 @@ namespace CliFx.Tests
                     "Description",
                     "SomeRequiredOptionsCommand description.",
                     "Usage",
-                    "TestApp somerequired --option-f <value> [options]"
-                },
-                null
+                    TestAppName, "somerequired --option-f <value> [options]"
+                }
             );
         }
 
@@ -358,8 +367,7 @@ namespace CliFx.Tests
         public async Task RunAsync_Help_Test(
             IReadOnlyList<Type> commandTypes,
             IReadOnlyList<string> commandLineArguments,
-            IReadOnlyList<string>? expectedSubstrings = null,
-            IReadOnlyList<string>? unexpectedSubstrings = null)
+            IReadOnlyList<string>? expectedSubstrings = null)
         {
             // Arrange
             await using var stdOutStream = new StringWriter();
@@ -385,9 +393,6 @@ namespace CliFx.Tests
 
             if (expectedSubstrings != null)
                 stdOut.Should().ContainAll(expectedSubstrings);
-
-            if (unexpectedSubstrings != null)
-                stdOut.Should().NotContainAny(unexpectedSubstrings);
 
             Console.WriteLine(stdOut);
         }

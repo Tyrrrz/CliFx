@@ -26,7 +26,7 @@ namespace CliFx.Tests.TestCommands
         public sbyte Sbyte { get; set; }
 
         [CommandOption(nameof(Byte))]
-        public sbyte Byte { get; set; }
+        public byte Byte { get; set; }
 
         [CommandOption(nameof(Short))]
         public short Short { get; set; }

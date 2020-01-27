@@ -116,11 +116,11 @@ namespace CliFx.Domain
             }
         }
 
-        public ICommand Create(
-            ITypeActivator activator,
+        public ICommand CreateInstance(
             IReadOnlyList<string> parameterInputs,
             IReadOnlyList<CommandOptionInput> optionInputs,
-            IReadOnlyDictionary<string, string> environmentVariables)
+            IReadOnlyDictionary<string, string> environmentVariables,
+            ITypeActivator activator)
         {
             var command = (ICommand) activator.CreateInstance(Type);
 
@@ -186,5 +186,11 @@ namespace CliFx.Domain
                 options
             );
         }
+    }
+
+    internal partial class CommandSchema
+    {
+        public static CommandSchema StubDefaultCommand { get; } =
+            new CommandSchema(null!, null, null, new CommandParameterSchema[0], new CommandOptionSchema[0]);
     }
 }

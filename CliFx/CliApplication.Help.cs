@@ -7,16 +7,12 @@ namespace CliFx
 {
     public partial class CliApplication
     {
-        private void RenderHelp(ApplicationSchema applicationSchema, CommandSchema commandSchema)
+        private void RenderHelp(ApplicationSchema applicationSchema, CommandSchema command)
         {
-            // Track position
             var column = 0;
             var row = 0;
 
-            // Get child commands
-            var childCommands = applicationSchema.GetChildCommands(commandSchema.Name);
-
-            // Define helper functions
+            var childCommands = applicationSchema.GetChildCommands(command.Name);
 
             bool IsEmpty() => column == 0 && row == 0;
 
@@ -80,7 +76,7 @@ namespace CliFx
 
             void RenderApplicationInfo()
             {
-                if (!commandSchema.IsDefault)
+                if (!command.IsDefault)
                     return;
 
                 // Title and version
@@ -99,27 +95,20 @@ namespace CliFx
 
             void RenderDescription()
             {
-                if (string.IsNullOrWhiteSpace(commandSchema.Description))
+                if (string.IsNullOrWhiteSpace(command.Description))
                     return;
 
-                // Margin
                 RenderMargin();
-
-                // Header
                 RenderHeader("Description");
 
-                // Description
                 RenderIndent();
-                Render(commandSchema.Description!);
+                Render(command.Description);
                 RenderNewLine();
             }
 
             void RenderUsage()
             {
-                // Margin
                 RenderMargin();
-
-                // Header
                 RenderHeader("Usage");
 
                 // Exe name
@@ -127,40 +116,50 @@ namespace CliFx
                 Render(_metadata.ExecutableName);
 
                 // Command name
-                if (!string.IsNullOrWhiteSpace(commandSchema.Name))
+                if (!string.IsNullOrWhiteSpace(command.Name))
                 {
                     Render(" ");
-                    RenderWithColor(commandSchema.Name!, ConsoleColor.Cyan);
+                    RenderWithColor(command.Name, ConsoleColor.Cyan);
                 }
 
-                // Child command
+                // Child command placeholder
                 if (childCommands.Any())
                 {
                     Render(" ");
                     RenderWithColor("[command]", ConsoleColor.Cyan);
                 }
 
-                // Arguments
-                foreach (var parameter in commandSchema.Parameters)
+                // Parameters
+                foreach (var parameter in command.Parameters)
                 {
                     Render(" ");
                     Render($"<{parameter.DisplayName}>");
                 }
 
                 // Required options
-                var requiredOptionSchemas = commandSchema.Options
+                var requiredOptionSchemas = command.Options
                     .Where(o => o.IsRequired)
                     .ToArray();
 
-                foreach (var requiredOption in requiredOptionSchemas)
+                foreach (var option in requiredOptionSchemas)
                 {
-                    Render($" --{requiredOption.Name} <value>");
+                    Render(" ");
+                    if (!string.IsNullOrWhiteSpace(option.Name))
+                    {
+                        RenderWithColor($"--{option.Name}", ConsoleColor.White);
+                        Render(" ");
+                        Render("<value>");
+                    }
+                    else
+                    {
+                        RenderWithColor($"-{option.ShortName} <value>", ConsoleColor.White);
+                        Render(" ");
+                        Render("<value>");
+                    }
                 }
 
                 // Options placeholder
-                var notRequiredOrDefaultOptionCount = commandSchema.Options.Count(o => !o.IsRequired);
-
-                if (notRequiredOrDefaultOptionCount > 0)
+                if (command.Options.Count != requiredOptionSchemas.Length)
                 {
                     Render(" ");
                     RenderWithColor("[options]", ConsoleColor.White);
@@ -171,35 +170,26 @@ namespace CliFx
 
             void RenderParameters()
             {
-                // Do not render anything if the command has no parameters
-                if (!commandSchema.Parameters.Any())
+                if (!command.Parameters.Any())
                     return;
 
-                // Margin
                 RenderMargin();
-
-                // Header
                 RenderHeader("Arguments");
 
-                // Order parameters
-                var orderedArgumentSchemas = commandSchema.Parameters
+                var parameters = command.Parameters
                     .OrderBy(p => p.Order)
                     .ToArray();
 
-                // Arguments
-                foreach (var argumentSchema in orderedArgumentSchemas)
+                foreach (var parameter in parameters)
                 {
-                    // Is required
                     RenderWithColor("* ", ConsoleColor.Red);
-
-                    // Short name
-                    RenderWithColor($"{argumentSchema.DisplayName}", ConsoleColor.White);
+                    RenderWithColor($"{parameter.DisplayName}", ConsoleColor.White);
 
                     // Description
-                    if (!string.IsNullOrWhiteSpace(argumentSchema.Description))
+                    if (!string.IsNullOrWhiteSpace(parameter.Description))
                     {
                         RenderColumnIndent();
-                        Render(argumentSchema.Description!);
+                        Render(parameter.Description);
                     }
 
                     RenderNewLine();
@@ -208,27 +198,21 @@ namespace CliFx
 
             void RenderOptions()
             {
-                // Margin
                 RenderMargin();
-
-                // Header
                 RenderHeader("Options");
 
-                // Order options and append built-in options
-                var allOptionSchemas = commandSchema.Options
+                var options = command.Options
                     .OrderByDescending(o => o.IsRequired)
                     .ToList();
 
-                allOptionSchemas.Add(new CommandOptionSchema(null!, "help", 'h', null, false, "Shows help text."));
+                // Add built-in options
+                options.Add(CommandOptionSchema.HelpOption);
+                if (command.IsDefault)
+                    options.Add(CommandOptionSchema.VersionOption);
 
-                if (commandSchema.IsDefault)
-                    allOptionSchemas.Add(new CommandOptionSchema(null!, "version", null, null, false, "Shows version information."));
-
-                // Options
-                foreach (var optionSchema in allOptionSchemas)
+                foreach (var option in options)
                 {
-                    // Is required
-                    if (optionSchema.IsRequired)
+                    if (option.IsRequired)
                     {
                         RenderWithColor("* ", ConsoleColor.Red);
                     }
@@ -238,28 +222,28 @@ namespace CliFx
                     }
 
                     // Short name
-                    if (optionSchema.ShortName != null)
+                    if (option.ShortName != null)
                     {
-                        RenderWithColor($"-{optionSchema.ShortName}", ConsoleColor.White);
+                        RenderWithColor($"-{option.ShortName}", ConsoleColor.White);
                     }
 
                     // Delimiter
-                    if (!string.IsNullOrWhiteSpace(optionSchema.Name) && optionSchema.ShortName != null)
+                    if (!string.IsNullOrWhiteSpace(option.Name) && option.ShortName != null)
                     {
                         Render("|");
                     }
 
                     // Name
-                    if (!string.IsNullOrWhiteSpace(optionSchema.Name))
+                    if (!string.IsNullOrWhiteSpace(option.Name))
                     {
-                        RenderWithColor($"--{optionSchema.Name}", ConsoleColor.White);
+                        RenderWithColor($"--{option.Name}", ConsoleColor.White);
                     }
 
                     // Description
-                    if (!string.IsNullOrWhiteSpace(optionSchema.Description))
+                    if (!string.IsNullOrWhiteSpace(option.Description))
                     {
                         RenderColumnIndent();
-                        Render(optionSchema.Description!);
+                        Render(option.Description);
                     }
 
                     RenderNewLine();
@@ -271,45 +255,40 @@ namespace CliFx
                 if (!childCommands.Any())
                     return;
 
-                // Margin
                 RenderMargin();
-
-                // Header
                 RenderHeader("Commands");
 
-                // Child commands
-                foreach (var childCommandSchema in childCommands)
+                foreach (var childCommand in childCommands)
                 {
                     var relativeCommandName =
-                        string.IsNullOrWhiteSpace(childCommandSchema.Name) || string.IsNullOrWhiteSpace(commandSchema.Name)
-                            ? childCommandSchema.Name
-                            : childCommandSchema.Name.Substring(commandSchema.Name.Length + 1);
+                        string.IsNullOrWhiteSpace(childCommand.Name) || string.IsNullOrWhiteSpace(command.Name)
+                            ? childCommand.Name
+                            : childCommand.Name.Substring(command.Name.Length + 1);
 
                     // Name
                     RenderIndent();
                     RenderWithColor(relativeCommandName, ConsoleColor.Cyan);
 
                     // Description
-                    if (!string.IsNullOrWhiteSpace(childCommandSchema.Description))
+                    if (!string.IsNullOrWhiteSpace(childCommand.Description))
                     {
                         RenderColumnIndent();
-                        Render(childCommandSchema.Description!);
+                        Render(childCommand.Description);
                     }
 
                     RenderNewLine();
                 }
 
-                // Margin
                 RenderMargin();
 
                 // Child command help tip
                 Render("You can run `");
                 Render(_metadata.ExecutableName);
 
-                if (!string.IsNullOrWhiteSpace(commandSchema.Name))
+                if (!string.IsNullOrWhiteSpace(command.Name))
                 {
                     Render(" ");
-                    RenderWithColor(commandSchema.Name, ConsoleColor.Cyan);
+                    RenderWithColor(command.Name, ConsoleColor.Cyan);
                 }
 
                 Render(" ");
@@ -323,10 +302,7 @@ namespace CliFx
                 RenderNewLine();
             }
 
-            // Reset color just in case
             _console.ResetColor();
-
-            // Render everything
             RenderApplicationInfo();
             RenderDescription();
             RenderUsage();
