@@ -27,7 +27,7 @@ namespace CliFx.Benchmarks
 
         [Benchmark(Description = "CommandLineParser")]
         public void ExecuteWithCommandLineParser() =>
-            new CommandLine.Parser()
+            new Parser()
                 .ParseArguments(Arguments, typeof(CommandLineParserCommand))
                 .WithParsed<CommandLineParserCommand>(c => c.Execute());
 
@@ -38,5 +38,9 @@ namespace CliFx.Benchmarks
         [Benchmark(Description = "Clipr")]
         public void ExecuteWithClipr() =>
             clipr.CliParser.Parse<CliprCommand>(Arguments).Execute();
+
+        [Benchmark(Description = "Cocona")]
+        public void ExecuteWithCocona() =>
+            Cocona.CoconaApp.Run<CoconaCommand>(Arguments);
     }
 }
