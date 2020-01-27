@@ -13,7 +13,7 @@ namespace CliFx.Tests.TestCommands
         public int? ParameterB { get; set; }
 
         [CommandOption("option", 'o')]
-        public string OptionA { get; set; }
+        public string? OptionA { get; set; }
 
         public ValueTask ExecuteAsync(IConsole console) => default;
     }

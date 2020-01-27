@@ -14,10 +14,10 @@ namespace CliFx.Tests.TestCommands
         public int? ParameterB { get; set; }
 
         [CommandParameter(20, Description = "A list of numbers", Name = "third list")]
-        public IEnumerable<int> ParameterC { get; set; }
+        public IEnumerable<int>? ParameterC { get; set; }
 
         [CommandOption("option", 'o')]
-        public string OptionA { get; set; }
+        public string? OptionA { get; set; }
 
         public ValueTask ExecuteAsync(IConsole console) => default;
     }

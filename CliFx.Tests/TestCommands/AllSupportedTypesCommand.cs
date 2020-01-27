@@ -11,10 +11,10 @@ namespace CliFx.Tests.TestCommands
     public class AllSupportedTypesCommand : ICommand
     {
         [CommandOption(nameof(Object))]
-        public object Object { get; set; } = 42;
+        public object? Object { get; set; } = 42;
 
         [CommandOption(nameof(String))]
-        public string String { get; set; } = "foo bar";
+        public string? String { get; set; } = "foo bar";
 
         [CommandOption(nameof(Bool))]
         public bool Bool { get; set; }
@@ -77,50 +77,49 @@ namespace CliFx.Tests.TestCommands
         public TimeSpan? TimeSpanNullable { get; set; }
 
         [CommandOption(nameof(TestStringConstructable))]
-        public TestStringConstructable TestStringConstructable { get; set; }
+        public TestStringConstructable? TestStringConstructable { get; set; }
 
         [CommandOption(nameof(TestStringParseable))]
-        public TestStringParseable TestStringParseable { get; set; }
+        public TestStringParseable? TestStringParseable { get; set; }
 
         [CommandOption(nameof(TestStringParseableWithFormatProvider))]
-        public TestStringParseableWithFormatProvider TestStringParseableWithFormatProvider { get; set; }
+        public TestStringParseableWithFormatProvider? TestStringParseableWithFormatProvider { get; set; }
 
         [CommandOption(nameof(ObjectArray))]
-        public object[] ObjectArray { get; set; }
+        public object[]? ObjectArray { get; set; }
 
         [CommandOption(nameof(StringArray))]
-        public string[] StringArray { get; set; }
+        public string[]? StringArray { get; set; }
 
         [CommandOption(nameof(IntArray))]
-        public int[] IntArray { get; set; }
+        public int[]? IntArray { get; set; }
 
         [CommandOption(nameof(TestEnumArray))]
-        public TestEnum[] TestEnumArray { get; set; }
+        public TestEnum[]? TestEnumArray { get; set; }
 
         [CommandOption(nameof(IntNullableArray))]
-        public int?[] IntNullableArray { get; set; }
-
+        public int?[]? IntNullableArray { get; set; }
 
         [CommandOption(nameof(TestStringConstructableArray))]
-        public TestStringConstructable[] TestStringConstructableArray { get; set; }
+        public TestStringConstructable[]? TestStringConstructableArray { get; set; }
 
         [CommandOption(nameof(Enumerable))]
-        public IEnumerable Enumerable { get; set; }
+        public IEnumerable? Enumerable { get; set; }
 
         [CommandOption(nameof(StringEnumerable))]
-        public IEnumerable<string> StringEnumerable { get; set; }
+        public IEnumerable<string>? StringEnumerable { get; set; }
 
         [CommandOption(nameof(StringReadOnlyList))]
-        public IReadOnlyList<string> StringReadOnlyList { get; set; }
+        public IReadOnlyList<string>? StringReadOnlyList { get; set; }
 
         [CommandOption(nameof(StringList))]
-        public List<string> StringList { get; set; }
+        public List<string>? StringList { get; set; }
 
         [CommandOption(nameof(StringHashSet))]
-        public HashSet<string> StringHashSet { get; set; }
+        public HashSet<string>? StringHashSet { get; set; }
 
         [CommandOption(nameof(NonConvertible))]
-        public TestNonStringParseable NonConvertible { get; set; }
+        public TestNonStringParseable? NonConvertible { get; set; }
 
         public ValueTask ExecuteAsync(IConsole console) => default;
     }
