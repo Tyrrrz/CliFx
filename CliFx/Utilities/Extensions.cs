@@ -1,6 +1,4 @@
-﻿using CliFx.Services;
-
-namespace CliFx.Utilities
+﻿namespace CliFx.Utilities
 {
     /// <summary>
     /// Extensions for <see cref="Utilities"/>.

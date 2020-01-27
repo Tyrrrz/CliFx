@@ -12,6 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Changelog.md = Changelog.md
 		License.txt = License.txt
 		Readme.md = Readme.md
+		CliFx.props = CliFx.props
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CliFx.Benchmarks", "CliFx.Benchmarks\CliFx.Benchmarks.csproj", "{8ACD6DC2-D768-4850-9223-5B7C83A78513}"

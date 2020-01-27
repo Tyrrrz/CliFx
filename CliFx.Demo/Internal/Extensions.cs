@@ -1,6 +1,5 @@
 ﻿using System;
 using CliFx.Demo.Models;
-using CliFx.Services;
 
 namespace CliFx.Demo.Internal
 {

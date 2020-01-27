@@ -5,7 +5,6 @@ using CliFx.Demo.Internal;
 using CliFx.Demo.Models;
 using CliFx.Demo.Services;
 using CliFx.Exceptions;
-using CliFx.Services;
 
 namespace CliFx.Demo.Commands
 {
@@ -14,17 +13,17 @@ namespace CliFx.Demo.Commands
     {
         private readonly LibraryService _libraryService;
 
-        [CommandArgument(0, Name = "title", IsRequired = true, Description = "Book title.")]
-        public string Title { get; set; }
+        [CommandParameter(0, Name = "title", Description = "Book title.")]
+        public string Title { get; set; } = "";
 
         [CommandOption("author", 'a', IsRequired = true, Description = "Book author.")]
-        public string Author { get; set; }
+        public string Author { get; set; } = "";
 
         [CommandOption("published", 'p', Description = "Book publish date.")]
-        public DateTimeOffset Published { get; set; }
+        public DateTimeOffset Published { get; set; } = CreateRandomDate();
 
         [CommandOption("isbn", 'n', Description = "Book ISBN.")]
-        public Isbn? Isbn { get; set; }
+        public Isbn Isbn { get; set; } = CreateRandomIsbn();
 
         public BookAddCommand(LibraryService libraryService)
         {
@@ -33,12 +32,6 @@ namespace CliFx.Demo.Commands
 
         public ValueTask ExecuteAsync(IConsole console)
         {
-            // To make the demo simpler, we will just generate random publish date and ISBN if they were not set
-            if (Published == default)
-                Published = CreateRandomDate();
-            if (Isbn == default)
-                Isbn = CreateRandomIsbn();
-
             if (_libraryService.GetBook(Title) != null)
                 throw new CommandException("Book already exists.", 1);
 
@@ -65,7 +58,7 @@ namespace CliFx.Demo.Commands
             Random.Next(1, 59),
             TimeSpan.Zero);
 
-        public static Isbn CreateRandomIsbn() => new Isbn(
+        private static Isbn CreateRandomIsbn() => new Isbn(
             Random.Next(0, 999),
             Random.Next(0, 99),
             Random.Next(0, 99999),

@@ -22,7 +22,9 @@ namespace CliFx.Exceptions
         public CommandException(string? message, Exception? innerException, int exitCode = DefaultExitCode)
             : base(message, innerException)
         {
-            ExitCode = exitCode != 0 ? exitCode : throw new ArgumentException("Exit code cannot be zero because that signifies success.");
+            ExitCode = exitCode != 0
+                ? exitCode
+                : throw new ArgumentException("Exit code must not be zero in order to signify failure.");
         }
 
         /// <summary>

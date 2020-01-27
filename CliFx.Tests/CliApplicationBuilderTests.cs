@@ -1,8 +1,6 @@
 ﻿using NUnit.Framework;
 using System;
 using System.IO;
-using CliFx.Services;
-using CliFx.Tests.Stubs;
 using CliFx.Tests.TestCommands;
 
 namespace CliFx.Tests
@@ -10,9 +8,8 @@ namespace CliFx.Tests
     [TestFixture]
     public class CliApplicationBuilderTests
     {
-        // Make sure all builder methods work
-        [Test]
-        public void All_Smoke_Test()
+        [Test(Description = "All builder methods must return without exceptions")]
+        public void Smoke_Test()
         {
             // Arrange
             var builder = new CliApplicationBuilder();
@@ -31,14 +28,11 @@ namespace CliFx.Tests
                 .UseVersionText("test")
                 .UseDescription("test")
                 .UseConsole(new VirtualConsole(TextWriter.Null))
-                .UseCommandFactory(schema => (ICommand) Activator.CreateInstance(schema.Type!)!)
-                .UseCommandOptionInputConverter(new CommandInputConverter())
-                .UseEnvironmentVariablesProvider(new EnvironmentVariablesProviderStub())
+                .UseTypeActivator(Activator.CreateInstance)
                 .Build();
         }
 
-        // Make sure builder can produce an application with no parameters specified
-        [Test]
+        [Test(Description = "Builder must be able to produce an application when no parameters are specified")]
         public void Build_Test()
         {
             // Arrange

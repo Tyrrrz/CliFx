@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using CliFx.Attributes;
-using CliFx.Services;
 
 namespace CliFx.Tests.TestCommands
 {

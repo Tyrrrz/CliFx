@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using CliFx.Models;
 
 namespace CliFx.Internal
 {
@@ -13,24 +12,19 @@ namespace CliFx.Internal
 
         public static string AsString(this char c) => c.Repeat(1);
 
-        public static string JoinToString<T>(this IEnumerable<T> source, string separator) => string.Join(separator, source);
-
-        public static string SubstringUntilLast(this string s, string sub,
-            StringComparison comparison = StringComparison.Ordinal)
-        {
-            var index = s.LastIndexOf(sub, comparison);
-            return index < 0 ? s : s.Substring(0, index);
-        }
-
         public static StringBuilder AppendIfNotEmpty(this StringBuilder builder, char value) =>
             builder.Length > 0 ? builder.Append(value) : builder;
 
-        public static IEnumerable<T> Concat<T>(this IEnumerable<T> source, T value)
+        public static StringBuilder AppendBulletList<T>(this StringBuilder builder, IEnumerable<T> items)
         {
-            foreach (var i in source)
-                yield return i;
+            foreach (var item in items)
+            {
+                builder.Append("- ");
+                builder.Append(item);
+                builder.AppendLine();
+            }
 
-            yield return value;
+            return builder;
         }
 
         public static bool Implements(this Type type, Type interfaceType) => type.GetInterfaces().Contains(interfaceType);
@@ -50,7 +44,7 @@ namespace CliFx.Internal
 
             return type.GetInterfaces()
                 .Select(GetEnumerableUnderlyingType)
-                .Where(t => t != default)
+                .Where(t => t != null)
                 .OrderByDescending(t => t != typeof(object)) // prioritize more specific types
                 .FirstOrDefault();
         }
@@ -63,15 +57,6 @@ namespace CliFx.Internal
             sourceAsCollection.CopyTo(array, 0);
 
             return array;
-        }
-
-        public static bool IsCollection(this Type type) =>
-            type != typeof(string) && type.GetEnumerableUnderlyingType() != null;
-
-        public static IOrderedEnumerable<CommandArgumentSchema> Ordered(this IEnumerable<CommandArgumentSchema> source)
-        {
-            return source
-                .OrderBy(a => a.Order);
         }
     }
 }
