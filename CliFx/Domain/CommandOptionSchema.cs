@@ -36,7 +36,7 @@ namespace CliFx.Domain
             IsRequired = isRequired;
         }
 
-        public bool MatchesName(string name) =>
+        public bool MatchesName(string? name) =>
             !string.IsNullOrWhiteSpace(Name) &&
             string.Equals(Name, name, StringComparison.OrdinalIgnoreCase);
 

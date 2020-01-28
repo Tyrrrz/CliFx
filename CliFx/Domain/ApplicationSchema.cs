@@ -43,7 +43,8 @@ namespace CliFx.Domain
                 ? Commands.Where(c => TryFindParentCommand(c.Name)?.MatchesName(parentCommandName) == true).ToArray()
                 : Commands.Where(c => !string.IsNullOrWhiteSpace(c.Name) && TryFindParentCommand(c.Name) == null).ToArray();
 
-        private CommandSchema? TryFindCommand(CommandLineInput commandLineInput, out int argumentOffset)
+        // TODO: this out parameter is not a really nice design
+        public CommandSchema? TryFindCommand(CommandLineInput commandLineInput, out int argumentOffset)
         {
             // Try to find the command that contains the most of the input arguments in its name
             for (var i = commandLineInput.Arguments.Count; i >= 0; i--)

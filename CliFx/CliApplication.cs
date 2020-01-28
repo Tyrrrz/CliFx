@@ -47,34 +47,50 @@ namespace CliFx
             return null;
         }
 
-        private int? HandlePreviewDirective(CommandLineInput commandLineInput)
+        private int? HandlePreviewDirective(ApplicationSchema applicationSchema, CommandLineInput commandLineInput)
         {
             var isPreviewMode = _configuration.IsPreviewModeAllowed && commandLineInput.IsPreviewDirectiveSpecified;
             if (!isPreviewMode)
                 return null;
 
-            // Render command name
-            _console.Output.WriteLine($"Arguments: {string.Join(" ", commandLineInput.Arguments)}");
-            _console.Output.WriteLine();
+            var commandSchema = applicationSchema.TryFindCommand(commandLineInput, out var argumentOffset);
 
-            // Render directives
-            _console.Output.WriteLine("Directives:");
-            foreach (var directive in commandLineInput.Directives)
+            _console.Output.WriteLine("Parser preview:");
+
+            // Command name
+            if (commandSchema != null && argumentOffset > 0)
             {
-                _console.Output.Write(" ");
-                _console.Output.WriteLine(directive);
+                _console.WithForegroundColor(ConsoleColor.Cyan, () =>
+                    _console.Output.Write(commandSchema.Name));
+
+                _console.Output.Write(' ');
             }
 
-            // Margin
-            _console.Output.WriteLine();
+            // Parameters
+            foreach (var parameter in commandLineInput.Arguments.Skip(argumentOffset))
+            {
+                _console.Output.Write('<');
 
-            // Render options
-            _console.Output.WriteLine("Options:");
+                _console.WithForegroundColor(ConsoleColor.White, () =>
+                    _console.Output.Write(parameter));
+
+                _console.Output.Write('>');
+                _console.Output.Write(' ');
+            }
+
+            // Options
             foreach (var option in commandLineInput.Options)
             {
-                _console.Output.Write(" ");
-                _console.Output.WriteLine(option);
+                _console.Output.Write('[');
+
+                _console.WithForegroundColor(ConsoleColor.White, () =>
+                    _console.Output.Write(option));
+
+                _console.Output.Write(']');
+                _console.Output.Write(' ');
             }
+
+            _console.Output.WriteLine();
 
             return 0;
         }
@@ -91,9 +107,7 @@ namespace CliFx
             return 0;
         }
 
-        private int? HandleHelpOption(
-            ApplicationSchema applicationSchema,
-            CommandLineInput commandLineInput)
+        private int? HandleHelpOption(ApplicationSchema applicationSchema, CommandLineInput commandLineInput)
         {
             // Help is rendered either when it's requested or when the user provides no arguments and there is no default command
             var shouldRenderHelp =
@@ -139,7 +153,7 @@ namespace CliFx
 
                 return
                     await HandleDebugDirectiveAsync(commandLineInput) ??
-                    HandlePreviewDirective(commandLineInput) ??
+                    HandlePreviewDirective(applicationSchema, commandLineInput) ??
                     HandleVersionOption(commandLineInput) ??
                     HandleHelpOption(applicationSchema, commandLineInput) ??
                     await HandleCommandExecutionAsync(applicationSchema, commandLineInput, environmentVariables);

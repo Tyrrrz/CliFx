@@ -38,7 +38,7 @@ namespace CliFx.Domain
             Parameters = parameters;
         }
 
-        public bool MatchesName(string name) => string.Equals(name, Name, StringComparison.OrdinalIgnoreCase);
+        public bool MatchesName(string? name) => string.Equals(name, Name, StringComparison.OrdinalIgnoreCase);
 
         private void InjectParameters(ICommand command, IReadOnlyList<string> parameterInputs)
         {

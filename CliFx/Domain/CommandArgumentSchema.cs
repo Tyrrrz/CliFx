@@ -65,7 +65,7 @@ namespace CliFx.Domain
         private static readonly IFormatProvider ConversionFormatProvider = CultureInfo.InvariantCulture;
 
         private static readonly IReadOnlyDictionary<Type, Func<string, object>> PrimitiveConverters =
-            new Dictionary<Type, Func<string, object>>
+            new Dictionary<Type, Func<string?, object>>
             {
                 [typeof(object)] = v => v,
                 [typeof(string)] = v => v,
