@@ -47,14 +47,13 @@ namespace CliFx
 
             void RenderColumnIndent(int spaces = 20, int margin = 2)
             {
-                if (column + margin >= spaces)
+                if (column + margin < spaces)
                 {
-                    RenderNewLine();
-                    RenderIndent(spaces);
+                    RenderIndent(spaces - column);
                 }
                 else
                 {
-                    RenderIndent(spaces - column);
+                    Render(" ");
                 }
             }
 
@@ -185,10 +184,11 @@ namespace CliFx
                     RenderWithColor("* ", ConsoleColor.Red);
                     RenderWithColor($"{parameter.DisplayName}", ConsoleColor.White);
 
+                    RenderColumnIndent();
+
                     // Description
                     if (!string.IsNullOrWhiteSpace(parameter.Description))
                     {
-                        RenderColumnIndent();
                         Render(parameter.Description);
                     }
 
@@ -239,11 +239,20 @@ namespace CliFx
                         RenderWithColor($"--{option.Name}", ConsoleColor.White);
                     }
 
+                    RenderColumnIndent();
+
                     // Description
                     if (!string.IsNullOrWhiteSpace(option.Description))
                     {
-                        RenderColumnIndent();
                         Render(option.Description);
+                        Render(" ");
+                    }
+
+                    // Environment variable
+                    if (!string.IsNullOrWhiteSpace(option.EnvironmentVariableName))
+                    {
+                        Render($"(Environment variable: {option.EnvironmentVariableName}).");
+                        Render(" ");
                     }
 
                     RenderNewLine();

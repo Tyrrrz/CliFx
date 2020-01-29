@@ -593,6 +593,36 @@ for (var i = 0.0; i <= 1; i += 0.01)
     progressTicker.Report(i);
 ```
 
+### Environment variables
+
+An option can be configured to use the value of a specific environment variable as a fallback.
+
+```c#
+[Command]
+public class AuthCommand : ICommand
+{
+    [CommandOption("token", IsRequired = true, EnvironmentVariableName = "AUTH_TOKEN")]
+    public string AuthToken { get; set; }
+
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(AuthToken);
+
+        return default;
+    }
+}
+```
+
+```sh
+> $env:AUTH_TOKEN="test"
+
+> myapp.exe
+
+test
+```
+
+Environment variables can be used as fallback for options of enumerable types too. In this case, the value of the variable will be split by `Path.PathSeparator` (which is `;` on Windows, `:` on Linux).
+
 ## Benchmarks
 
 Here's how CliFx's execution overhead compares to that of other libraries.

@@ -291,6 +291,15 @@ namespace CliFx.Tests
                     TestAppName, "somerequired --option-f <value> [options]"
                 }
             );
+
+            yield return new TestCaseData(
+                new[] {typeof(EnvironmentVariableCommand)},
+                new[] {"--help"},
+                new[]
+                {
+                    "Environment variable:", "ENV_SINGLE_VALUE"
+                }
+            );
         }
 
         [TestCaseSource(nameof(GetTestCases_RunAsync))]
