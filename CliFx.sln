@@ -19,6 +19,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CliFx.Benchmarks", "CliFx.B
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CliFx.Demo", "CliFx.Demo\CliFx.Demo.csproj", "{AAB6844C-BF71-448F-A11B-89AEE459AB15}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CliFx.Tests.Dummy", "CliFx.Tests.Dummy\CliFx.Tests.Dummy.csproj", "{F717347D-8656-44DA-A4A2-BE515E8C4655}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,6 +79,18 @@ Global
 		{AAB6844C-BF71-448F-A11B-89AEE459AB15}.Release|x64.Build.0 = Release|Any CPU
 		{AAB6844C-BF71-448F-A11B-89AEE459AB15}.Release|x86.ActiveCfg = Release|Any CPU
 		{AAB6844C-BF71-448F-A11B-89AEE459AB15}.Release|x86.Build.0 = Release|Any CPU
+		{F717347D-8656-44DA-A4A2-BE515E8C4655}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F717347D-8656-44DA-A4A2-BE515E8C4655}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F717347D-8656-44DA-A4A2-BE515E8C4655}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F717347D-8656-44DA-A4A2-BE515E8C4655}.Debug|x64.Build.0 = Debug|Any CPU
+		{F717347D-8656-44DA-A4A2-BE515E8C4655}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F717347D-8656-44DA-A4A2-BE515E8C4655}.Debug|x86.Build.0 = Debug|Any CPU
+		{F717347D-8656-44DA-A4A2-BE515E8C4655}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F717347D-8656-44DA-A4A2-BE515E8C4655}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F717347D-8656-44DA-A4A2-BE515E8C4655}.Release|x64.ActiveCfg = Release|Any CPU
+		{F717347D-8656-44DA-A4A2-BE515E8C4655}.Release|x64.Build.0 = Release|Any CPU
+		{F717347D-8656-44DA-A4A2-BE515E8C4655}.Release|x86.ActiveCfg = Release|Any CPU
+		{F717347D-8656-44DA-A4A2-BE515E8C4655}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

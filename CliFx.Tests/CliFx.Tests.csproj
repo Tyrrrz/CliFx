@@ -11,6 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CliWrap" Version="2.5.0" />
     <PackageReference Include="FluentAssertions" Version="5.10.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
     <PackageReference Include="NUnit" Version="3.12.0" />
@@ -19,7 +20,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CliFx.Tests.Dummy\CliFx.Tests.Dummy.csproj" />
     <ProjectReference Include="..\CliFx\CliFx.csproj" />
   </ItemGroup>
+
+  <Target Name="Copy dummy's runtime config" AfterTargets="AfterBuild">
+    <Copy SourceFiles="../CliFx.Tests.Dummy/bin/$(Configuration)/$(TargetFramework)/CliFx.Tests.Dummy.runtimeconfig.json" DestinationFiles="$(OutputPath)CliFx.Tests.Dummy.runtimeconfig.json" />
+  </Target>
 
 </Project>
