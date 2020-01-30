@@ -36,6 +36,7 @@ An important property of CliFx, when compared to some other libraries, is that i
 
 - [Quick start](#quick-start)
 - [Binding arguments](#binding-arguments)
+- [Argument syntax](#argument-syntax)
 - [Value conversion](#value-conversion)
 - [Multiple commands](#multiple-commands)
 - [Reporting errors](#reporting-errors)
@@ -207,6 +208,30 @@ Differences between parameters and options:
 - Both parameters and options can take multiple values, but such a parameter must be last in order to avoid ambiguity. Options are not limited in this aspect.
 
 As a general guideline, prefer to use parameters for required inputs that the command can't work without. Use options for non-required inputs, or when the command has too many required inputs, or when specifying the option name explicitly provides a better user experience.
+
+### Argument syntax
+
+This library supports an argument syntax which is based on the POSIX standard. To be fair, nobody really knows what the standard is about and very few tools actually follow it as they're supposed to, so for the purpose of having dashes and spaces, CliFx is using the "standard command line syntax".
+
+In more detail, the following examples are all valid:
+
+- `myapp --foo bar` sets option `"foo"` to value `"bar"`
+- `myapp -f bar` sets option `'f'` to value `"bar"`
+- `myapp --switch` sets option `"switch"` without value
+- `myapp -s` sets option `'s'` without value
+- `myapp -abc` sets options `'a'`, `'b'` and `'c'` without value
+- `myapp -xqf bar` sets options `'x'` and `'q'` without value, and option `'f'` to value `"bar"`
+- `myapp -i file1.txt file2.txt` sets option `'i'` to a sequence of values `"file1.txt"` and `"file2.txt"`
+- `myapp -i file1.txt -i file2.txt` sets option `'i'` to a sequence of values `"file1.txt"` and `"file2.txt"`
+- `myapp jar new -o cookie` sets option `'o'` to value `"cookie"` and retains two unbound arguments `"jar"` and `"new"`
+
+Note that CliFx purposely employs a context-free parser when consuming command line arguments. That means that every input is parsed the same way.
+
+This also means that `myapp -i file1.txt file2.txt` will _always_ be parsed as an option with multiple values, even if the underlying bound property is not enumerable. For the same reason, unseparated arguments such as `myapp -ofile` will be treated as five distinct options `'o'`, `'f'`, `'i'`, `'l'`, `'e'`, instead of `'o'` being set to `"file"`.
+
+When it comes to command name and parameters, they must appear in a strict order, before any options. The parser can't distinguish between arguments that make up a part of the command name and arguments that belong to command parameters, which is why the non-option arguments are bound at a later stage. It is done by trying to find a command that matches the longest sequence of arguments starting from the first, binding any remaining arguments to positional parameters.
+
+The above design may seem like a deficiency, but it actually provides value in the fact that it's deterministic -- given a set of command line arguments, the semantics behind them always remain the same. This leads to a more consistent experience for both you as a developer, as well as for the users of your application.
 
 ### Value conversion
 
