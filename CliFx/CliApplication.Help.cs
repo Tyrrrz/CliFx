@@ -62,14 +62,9 @@ namespace CliFx
                 _console.WithForegroundColor(foregroundColor, () => Render(text));
             }
 
-            void RenderWithColors(string text, ConsoleColor foregroundColor, ConsoleColor backgroundColor)
-            {
-                _console.WithColors(foregroundColor, backgroundColor, () => Render(text));
-            }
-
             void RenderHeader(string text)
             {
-                RenderWithColors(text, ConsoleColor.Black, ConsoleColor.DarkGray);
+                RenderWithColor(text, ConsoleColor.Magenta);
                 RenderNewLine();
             }
 
