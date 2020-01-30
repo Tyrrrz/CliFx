@@ -257,7 +257,7 @@ namespace CliFx.Tests
                     "Description",
                     "Command using positional parameters",
                     "Usage",
-                    TestAppName, "param cmd", "<first>", "<parameterb>", "<third list>", "[options]",
+                    TestAppName, "param cmd", "<first>", "<parameterb>", "<third list...>", "[options]",
                     "Parameters",
                     "* first",
                     "* parameterb",
@@ -298,6 +298,16 @@ namespace CliFx.Tests
                 new[]
                 {
                     "Environment variable:", "ENV_SINGLE_VALUE"
+                }
+            );
+
+            yield return new TestCaseData(
+                new[] {typeof(ConcatCommand)},
+                new[] {"concat", "--help"},
+                new[]
+                {
+                    "Usage",
+                    TestAppName, "concat", "-i", "<values...>", "[options]",
                 }
             );
         }

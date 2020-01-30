@@ -132,7 +132,9 @@ namespace CliFx
                 foreach (var parameter in command.Parameters)
                 {
                     Render(" ");
-                    Render($"<{parameter.DisplayName}>");
+                    Render(parameter.IsScalar
+                        ? $"<{parameter.DisplayName}>"
+                        : $"<{parameter.DisplayName}...>");
                 }
 
                 // Required options
@@ -147,13 +149,17 @@ namespace CliFx
                     {
                         RenderWithColor($"--{option.Name}", ConsoleColor.White);
                         Render(" ");
-                        Render("<value>");
+                        Render(option.IsScalar
+                            ? "<value>"
+                            : "<values...>");
                     }
                     else
                     {
-                        RenderWithColor($"-{option.ShortName} <value>", ConsoleColor.White);
+                        RenderWithColor($"-{option.ShortName}", ConsoleColor.White);
                         Render(" ");
-                        Render("<value>");
+                        Render(option.IsScalar
+                            ? "<value>"
+                            : "<values...>");
                     }
                 }
 
