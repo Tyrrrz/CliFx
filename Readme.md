@@ -21,9 +21,9 @@ An important property of CliFx, when compared to some other libraries, is that i
 - Configuration via attributes
 - Handles conversions to various types, including custom types
 - Supports multi-level command hierarchies
-- Allows command cancellation
+- Allows graceful command cancellation
 - Prints errors and routes exit codes on exceptions
-- Provides colorful auto-generated help text
+- Provides comprehensive and colorful auto-generated help text
 - Highly testable and easy to debug
 - Targets .NET Framework 4.5+ and .NET Standard 2.0+
 - No external dependencies
@@ -33,6 +33,18 @@ An important property of CliFx, when compared to some other libraries, is that i
 ![help screen](.screenshots/help.png)
 
 ## Usage
+
+- [Quick start](#quick-start)
+- [Binding arguments](#binding-arguments)
+- [Value conversion](#value-conversion)
+- [Multiple commands](#multiple-commands)
+- [Reporting errors](#reporting-errors)
+- [Graceful cancellation](#graceful-cancellation)
+- [Dependency injection](#dependency-injection)
+- [Testing](#testing)
+- [Debug and preview mode](#debug-and-preview-mode)
+- [Reporting progress](#reporting-progress)
+- [Environment variables](#environment-variables)
 
 ### Quick start
 
@@ -392,7 +404,7 @@ Division by zero is not supported.
 Exit code was 1337
 ```
 
-### Cancellation
+### Graceful cancellation
 
 It is possible to gracefully cancel execution of a command and preform any necessary cleanup. By default an app gets forcefully killed when it receives an interrupt signal (Ctrl+C or Ctrl+Break), but you can easily override this behavior.
 
@@ -441,29 +453,11 @@ public static class Program
 
         return await new CliApplicationBuilder()
             .AddCommandsFromThisAssembly()
-            .UseTypeActivator(t => serviceProvider.GetService(t))
+            .UseTypeActivator(serviceProvider.GetService)
             .Build()
             .RunAsync();
     }
 }
-```
-
-### Resolve commands from other assemblies
-
-In most cases, your commands will be defined in your main assembly which is where CliFx will look if you initialize the application using the following code.
-
-```c#
-var app = new CliApplicationBuilder().AddCommandsFromThisAssembly().Build();
-```
-
-If you want to configure your application to resolve specific commands or commands from another assembly you can use `AddCommand` and `AddCommandsFrom` methods for that.
-
-```c#
-var app = new CliApplicationBuilder()
-    .AddCommand(typeof(CommandA)) // include CommandA specifically
-    .AddCommand(typeof(CommandB)) // include CommandB specifically
-    .AddCommandsFrom(typeof(CommandC).Assembly) // include all commands from assembly that contains CommandC
-    .Build();
 ```
 
 ### Testing
@@ -578,7 +572,7 @@ var app = new CliApplicationBuilder()
     .Build();
 ```
 
-### Report progress
+### Reporting progress
 
 CliFx comes with a simple utility for reporting progress to the console, `ProgressTicker`, which renders progress in-place on every tick.
 
