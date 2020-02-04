@@ -1,6 +1,8 @@
 ﻿using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Order;
+using BenchmarkDotNet.Running;
 using CliFx.Benchmarks.Commands;
 using CommandLine;
 
@@ -9,7 +11,7 @@ namespace CliFx.Benchmarks
     [SimpleJob]
     [RankColumn]
     [Orderer(SummaryOrderPolicy.FastestToSlowest)]
-    public class Benchmark
+    public class Benchmarks
     {
         private static readonly string[] Arguments = {"--str", "hello world", "-i", "13", "-b"};
 
@@ -42,5 +44,8 @@ namespace CliFx.Benchmarks
         [Benchmark(Description = "Cocona")]
         public void ExecuteWithCocona() =>
             Cocona.CoconaApp.Run<CoconaCommand>(Arguments);
+
+        public static void Main() =>
+            BenchmarkRunner.Run<Benchmarks>(DefaultConfig.Instance.With(ConfigOptions.DisableOptimizationsValidator));
     }
 }
