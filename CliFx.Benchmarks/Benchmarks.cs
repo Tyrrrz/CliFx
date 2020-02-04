@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Order;
@@ -17,7 +18,7 @@ namespace CliFx.Benchmarks
 
         [Benchmark(Description = "CliFx", Baseline = true)]
         public async ValueTask<int> ExecuteWithCliFx() =>
-            await new CliApplicationBuilder().AddCommand(typeof(CliFxCommand)).Build().RunAsync(Arguments);
+            await new CliApplicationBuilder().AddCommand(typeof(CliFxCommand)).Build().RunAsync(Arguments, new Dictionary<string, string>());
 
         [Benchmark(Description = "System.CommandLine")]
         public async Task<int> ExecuteWithSystemCommandLine() =>
