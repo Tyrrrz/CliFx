@@ -424,9 +424,9 @@ public class DivideCommand : ICommand
 Division by zero is not supported.
 
 
-> echo Exit code was %errorlevel%
+> $LastExitCode
 
-Exit code was 1337
+1337
 ```
 
 ### Graceful cancellation
