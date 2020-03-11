@@ -320,8 +320,7 @@ namespace CliFx.Tests
             string? expectedStdOut = null)
         {
             // Arrange
-            await using var stdOutStream = new StringWriter();
-            var console = new VirtualConsole(stdOutStream);
+            using var console = new VirtualConsole();
 
             var application = new CliApplicationBuilder()
                 .AddCommands(commandTypes)
@@ -333,7 +332,7 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(commandLineArguments, environmentVariables);
-            var stdOut = stdOutStream.ToString().Trim();
+            var stdOut = console.ReadOutputString().Trim();
 
             // Assert
             exitCode.Should().Be(0);
@@ -354,8 +353,7 @@ namespace CliFx.Tests
             int? expectedExitCode = null)
         {
             // Arrange
-            await using var stdErrStream = new StringWriter();
-            var console = new VirtualConsole(TextWriter.Null, stdErrStream);
+            using var console = new VirtualConsole();
 
             var application = new CliApplicationBuilder()
                 .AddCommands(commandTypes)
@@ -367,19 +365,19 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(commandLineArguments, environmentVariables);
-            var stderr = stdErrStream.ToString().Trim();
+            var stdErr = console.ReadErrorString().Trim();
 
             // Assert
             exitCode.Should().NotBe(0);
-            stderr.Should().NotBeNullOrWhiteSpace();
+            stdErr.Should().NotBeNullOrWhiteSpace();
 
             if (expectedExitCode != null)
                 exitCode.Should().Be(expectedExitCode);
 
             if (expectedStdErr != null)
-                stderr.Should().Be(expectedStdErr);
+                stdErr.Should().Be(expectedStdErr);
 
-            Console.WriteLine(stderr);
+            Console.WriteLine(stdErr);
         }
 
         [TestCaseSource(nameof(GetTestCases_RunAsync_Help))]
@@ -389,8 +387,7 @@ namespace CliFx.Tests
             IReadOnlyList<string>? expectedSubstrings = null)
         {
             // Arrange
-            await using var stdOutStream = new StringWriter();
-            var console = new VirtualConsole(stdOutStream);
+            using var console = new VirtualConsole();
 
             var application = new CliApplicationBuilder()
                 .AddCommands(commandTypes)
@@ -404,7 +401,7 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(commandLineArguments, environmentVariables);
-            var stdOut = stdOutStream.ToString().Trim();
+            var stdOut = console.ReadOutputString().Trim();
 
             // Assert
             exitCode.Should().Be(0);
@@ -420,11 +417,7 @@ namespace CliFx.Tests
         public async Task RunAsync_Cancellation_Test()
         {
             // Arrange
-            using var cancellationTokenSource = new CancellationTokenSource();
-
-            await using var stdOutStream = new StringWriter();
-            await using var stdErrStream = new StringWriter();
-            var console = new VirtualConsole(stdOutStream, stdErrStream, cancellationTokenSource.Token);
+            using var console = new VirtualConsole();
 
             var application = new CliApplicationBuilder()
                 .AddCommand(typeof(CancellableCommand))
@@ -435,10 +428,11 @@ namespace CliFx.Tests
             var environmentVariables = new Dictionary<string, string>();
 
             // Act
-            cancellationTokenSource.CancelAfter(TimeSpan.FromSeconds(0.2));
+            console.CancelAfter(TimeSpan.FromSeconds(0.2));
+
             var exitCode = await application.RunAsync(commandLineArguments, environmentVariables);
-            var stdOut = stdOutStream.ToString().Trim();
-            var stdErr = stdErrStream.ToString().Trim();
+            var stdOut = console.ReadOutputString().Trim();
+            var stdErr = console.ReadErrorString().Trim();
 
             // Assert
             exitCode.Should().NotBe(0);

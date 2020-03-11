@@ -1,6 +1,5 @@
 ﻿using NUnit.Framework;
 using System;
-using System.IO;
 using CliFx.Tests.TestCommands;
 
 namespace CliFx.Tests
@@ -27,7 +26,7 @@ namespace CliFx.Tests
                 .UseExecutableName("test")
                 .UseVersionText("test")
                 .UseDescription("test")
-                .UseConsole(new VirtualConsole(TextWriter.Null))
+                .UseConsole(new VirtualConsole())
                 .UseTypeActivator(Activator.CreateInstance)
                 .Build();
         }

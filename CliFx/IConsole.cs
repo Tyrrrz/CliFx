@@ -12,7 +12,7 @@ namespace CliFx
         /// <summary>
         /// Input stream (stdin).
         /// </summary>
-        TextReader Input { get; }
+        StreamReader Input { get; }
 
         /// <summary>
         /// Whether the input stream is redirected.
@@ -22,7 +22,7 @@ namespace CliFx
         /// <summary>
         /// Output stream (stdout).
         /// </summary>
-        TextWriter Output { get; }
+        StreamWriter Output { get; }
 
         /// <summary>
         /// Whether the output stream is redirected.
@@ -32,7 +32,7 @@ namespace CliFx
         /// <summary>
         /// Error stream (stderr).
         /// </summary>
-        TextWriter Error { get; }
+        StreamWriter Error { get; }
 
         /// <summary>
         /// Whether the error stream is redirected.

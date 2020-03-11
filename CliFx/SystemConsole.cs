@@ -12,19 +12,19 @@ namespace CliFx
         private CancellationTokenSource? _cancellationTokenSource;
 
         /// <inheritdoc />
-        public TextReader Input => Console.In;
+        public StreamReader Input { get; }
 
         /// <inheritdoc />
         public bool IsInputRedirected => Console.IsInputRedirected;
 
         /// <inheritdoc />
-        public TextWriter Output => Console.Out;
+        public StreamWriter Output { get; }
 
         /// <inheritdoc />
         public bool IsOutputRedirected => Console.IsOutputRedirected;
 
         /// <inheritdoc />
-        public TextWriter Error => Console.Error;
+        public StreamWriter Error { get; }
 
         /// <inheritdoc />
         public bool IsErrorRedirected => Console.IsErrorRedirected;
@@ -41,6 +41,16 @@ namespace CliFx
         {
             get => Console.BackgroundColor;
             set => Console.BackgroundColor = value;
+        }
+
+        /// <summary>
+        /// Initializes an instance of <see cref="SystemConsole"/>.
+        /// </summary>
+        public SystemConsole()
+        {
+            Input = new StreamReader(Console.OpenStandardInput(), Console.InputEncoding, false);
+            Output = new StreamWriter(Console.OpenStandardOutput(), Console.OutputEncoding) {AutoFlush = true};
+            Error = new StreamWriter(Console.OpenStandardError(), Console.OutputEncoding) {AutoFlush = true};
         }
 
         /// <inheritdoc />
