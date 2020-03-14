@@ -10,20 +10,14 @@ namespace CliFx.Domain
 
         public IReadOnlyList<string> Values { get; }
 
+        public bool IsHelpOption => CommandOptionSchema.HelpOption.MatchesNameOrShortName(Alias);
+
+        public bool IsVersionOption => CommandOptionSchema.VersionOption.MatchesNameOrShortName(Alias);
+
         public CommandOptionInput(string alias, IReadOnlyList<string> values)
         {
             Alias = alias;
             Values = values;
-        }
-
-        public CommandOptionInput(string alias, string value)
-            : this(alias, new[] {value})
-        {
-        }
-
-        public CommandOptionInput(string alias)
-            : this(alias, new string[0])
-        {
         }
 
         public override string ToString()

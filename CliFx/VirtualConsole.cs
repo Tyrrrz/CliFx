@@ -41,7 +41,11 @@ namespace CliFx
         /// <summary>
         /// Writes raw data to input stream.
         /// </summary>
-        public void WriteInputData(byte[] data) => _inputStream.Write(data, 0, data.Length);
+        public void WriteInputData(byte[] data)
+        {
+            _inputStream.Write(data, 0, data.Length);
+            _inputStream.Flush();
+        }
 
         /// <summary>
         /// Writes text to input stream.

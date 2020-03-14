@@ -1,13 +1,21 @@
 ﻿using System;
 using System.Linq;
-using CliFx.Domain;
 using CliFx.Internal;
 
-namespace CliFx
+namespace CliFx.Domain
 {
-    public partial class CliApplication
+    internal class HelpTextWriter
     {
-        private void RenderHelp(ApplicationSchema applicationSchema, CommandSchema command)
+        private readonly ApplicationMetadata _metadata;
+        private readonly IConsole _console;
+
+        public HelpTextWriter(ApplicationMetadata metadata, IConsole console)
+        {
+            _metadata = metadata;
+            _console = console;
+        }
+
+        public void Write(ApplicationSchema applicationSchema, CommandSchema command)
         {
             var column = 0;
             var row = 0;

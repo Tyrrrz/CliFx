@@ -1,15 +1,14 @@
 ﻿using System.Linq;
 using CliFx.Utilities;
 using FluentAssertions;
-using NUnit.Framework;
+using Xunit;
 
-namespace CliFx.Tests.Utilities
+namespace CliFx.Tests
 {
-    [TestFixture]
-    public class ProgressTickerTests
+    public class UtilitiesSpecs
     {
-        [Test]
-        public void Report_Test()
+        [Fact]
+        public void Progress_ticker_can_be_used_to_report_progress_to_console()
         {
             // Arrange
             using var console = new VirtualConsole(false);
@@ -26,8 +25,8 @@ namespace CliFx.Tests.Utilities
             console.ReadOutputString().Should().ContainAll(progressStringValues);
         }
 
-        [Test]
-        public void Report_Redirected_Test()
+        [Fact]
+        public void Progress_ticker_does_not_write_to_console_if_output_is_redirected()
         {
             // Arrange
             using var console = new VirtualConsole();

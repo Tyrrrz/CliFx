@@ -2,8 +2,8 @@
 {
     public enum TestEnum
     {
-        Value1,
-        Value2,
-        Value3
+        Value1 = 1,
+        Value2 = 2,
+        Value3 = 3
     }
 }

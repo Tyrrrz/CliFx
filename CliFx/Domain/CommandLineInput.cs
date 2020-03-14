@@ -8,47 +8,28 @@ namespace CliFx.Domain
 {
     internal partial class CommandLineInput
     {
-        public IReadOnlyList<string> Directives { get; }
+        public IReadOnlyList<CommandDirectiveInput> Directives { get; }
 
-        public IReadOnlyList<string> Arguments { get; }
+        public IReadOnlyList<CommandUnboundArgumentInput> UnboundArguments { get; }
 
         public IReadOnlyList<CommandOptionInput> Options { get; }
 
-        public bool IsDebugDirectiveSpecified => Directives.Contains("debug", StringComparer.OrdinalIgnoreCase);
+        public bool IsDebugDirectiveSpecified => Directives.Any(d => d.IsDebugDirective);
 
-        public bool IsPreviewDirectiveSpecified => Directives.Contains("preview", StringComparer.OrdinalIgnoreCase);
+        public bool IsPreviewDirectiveSpecified => Directives.Any(d => d.IsPreviewDirective);
 
-        public bool IsHelpOptionSpecified =>
-            Options.Any(o => CommandOptionSchema.HelpOption.MatchesNameOrShortName(o.Alias));
+        public bool IsHelpOptionSpecified => Options.Any(o => o.IsHelpOption);
 
-        public bool IsVersionOptionSpecified =>
-            Options.Any(o => CommandOptionSchema.VersionOption.MatchesNameOrShortName(o.Alias));
+        public bool IsVersionOptionSpecified => Options.Any(o => o.IsVersionOption);
 
         public CommandLineInput(
-            IReadOnlyList<string> directives,
-            IReadOnlyList<string> arguments,
+            IReadOnlyList<CommandDirectiveInput> directives,
+            IReadOnlyList<CommandUnboundArgumentInput> unboundArguments,
             IReadOnlyList<CommandOptionInput> options)
         {
             Directives = directives;
-            Arguments = arguments;
+            UnboundArguments = unboundArguments;
             Options = options;
-        }
-
-        public CommandLineInput(
-            IReadOnlyList<string> arguments,
-            IReadOnlyList<CommandOptionInput> options)
-            : this(new string[0], arguments, options)
-        {
-        }
-
-        public CommandLineInput(IReadOnlyList<string> arguments)
-            : this(arguments, new CommandOptionInput[0])
-        {
-        }
-
-        public CommandLineInput(IReadOnlyList<CommandOptionInput> options)
-            : this(new string[0], options)
-        {
         }
 
         public override string ToString()
@@ -58,13 +39,10 @@ namespace CliFx.Domain
             foreach (var directive in Directives)
             {
                 buffer.AppendIfNotEmpty(' ');
-                buffer
-                    .Append('[')
-                    .Append(directive)
-                    .Append(']');
+                buffer.Append(directive);
             }
 
-            foreach (var argument in Arguments)
+            foreach (var argument in UnboundArguments)
             {
                 buffer.AppendIfNotEmpty(' ');
                 buffer.Append(argument);
@@ -84,16 +62,14 @@ namespace CliFx.Domain
     {
         public static CommandLineInput Parse(IReadOnlyList<string> commandLineArguments)
         {
-            var directives = new List<string>();
-            var arguments = new List<string>();
-            var optionsDic = new Dictionary<string, List<string>>();
+            var builder = new CommandLineInputBuilder();
 
-            // Option aliases and values are parsed in pairs so we need to keep track of last alias
-            var lastOptionAlias = "";
+            var currentOptionAlias = "";
+            var currentOptionValues = new List<string>();
 
             bool TryParseDirective(string argument)
             {
-                if (!string.IsNullOrWhiteSpace(lastOptionAlias))
+                if (!string.IsNullOrWhiteSpace(currentOptionAlias))
                     return false;
 
                 if (!argument.StartsWith("[", StringComparison.OrdinalIgnoreCase) ||
@@ -101,17 +77,17 @@ namespace CliFx.Domain
                     return false;
 
                 var directive = argument.Substring(1, argument.Length - 2);
-                directives.Add(directive);
+                builder.AddDirective(directive);
 
                 return true;
             }
 
             bool TryParseArgument(string argument)
             {
-                if (!string.IsNullOrWhiteSpace(lastOptionAlias))
+                if (!string.IsNullOrWhiteSpace(currentOptionAlias))
                     return false;
 
-                arguments.Add(argument);
+                builder.AddUnboundArgument(argument);
 
                 return true;
             }
@@ -121,10 +97,11 @@ namespace CliFx.Domain
                 if (!argument.StartsWith("--", StringComparison.OrdinalIgnoreCase))
                     return false;
 
-                lastOptionAlias = argument.Substring(2);
+                if (!string.IsNullOrWhiteSpace(currentOptionAlias))
+                    builder.AddOption(currentOptionAlias, currentOptionValues);
 
-                if (!optionsDic.ContainsKey(lastOptionAlias))
-                    optionsDic[lastOptionAlias] = new List<string>();
+                currentOptionAlias = argument.Substring(2);
+                currentOptionValues = new List<string>();
 
                 return true;
             }
@@ -136,10 +113,11 @@ namespace CliFx.Domain
 
                 foreach (var c in argument.Substring(1))
                 {
-                    lastOptionAlias = c.AsString();
+                    if (!string.IsNullOrWhiteSpace(currentOptionAlias))
+                        builder.AddOption(currentOptionAlias, currentOptionValues);
 
-                    if (!optionsDic.ContainsKey(lastOptionAlias))
-                        optionsDic[lastOptionAlias] = new List<string>();
+                    currentOptionAlias = c.AsString();
+                    currentOptionValues = new List<string>();
                 }
 
                 return true;
@@ -147,10 +125,10 @@ namespace CliFx.Domain
 
             bool TryParseOptionValue(string argument)
             {
-                if (string.IsNullOrWhiteSpace(lastOptionAlias))
+                if (string.IsNullOrWhiteSpace(currentOptionAlias))
                     return false;
 
-                optionsDic[lastOptionAlias].Add(argument);
+                currentOptionValues.Add(argument);
 
                 return true;
             }
@@ -165,15 +143,21 @@ namespace CliFx.Domain
                     TryParseOptionValue(argument);
             }
 
-            var options = optionsDic.Select(p => new CommandOptionInput(p.Key, p.Value)).ToArray();
+            if (!string.IsNullOrWhiteSpace(currentOptionAlias))
+                builder.AddOption(currentOptionAlias, currentOptionValues);
 
-            return new CommandLineInput(directives, arguments, options);
+            return builder.Build();
         }
     }
 
     internal partial class CommandLineInput
     {
-        public static CommandLineInput Empty { get; } =
-            new CommandLineInput(new string[0], new string[0], new CommandOptionInput[0]);
+        private static IReadOnlyList<CommandDirectiveInput> EmptyDirectives { get; } = new CommandDirectiveInput[0];
+
+        private static IReadOnlyList<CommandUnboundArgumentInput> EmptyUnboundArguments { get; } = new CommandUnboundArgumentInput[0];
+
+        private static IReadOnlyList<CommandOptionInput> EmptyOptions { get; } = new CommandOptionInput[0];
+
+        public static CommandLineInput Empty { get; } = new CommandLineInput(EmptyDirectives, EmptyUnboundArguments, EmptyOptions);
     }
 }

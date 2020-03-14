@@ -8,7 +8,7 @@ namespace CliFx.Tests.TestCommands
     {
         public ValueTask ExecuteAsync(IConsole console)
         {
-            console.Output.WriteLine("Hello world.");
+            console.Output.WriteLine("Hello world!");
             return default;
         }
     }

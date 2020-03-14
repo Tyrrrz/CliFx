@@ -1,4 +1,6 @@
-﻿#if NET45 || NETSTANDARD2_0
+﻿// ReSharper disable CheckNamespace
+
+#if NET45 || NETSTANDARD2_0
 using System.Collections.Generic;
 using System.Text;
 

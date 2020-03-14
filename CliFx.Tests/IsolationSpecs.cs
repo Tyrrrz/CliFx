@@ -1,31 +1,40 @@
 ﻿using System;
 using FluentAssertions;
-using NUnit.Framework;
+using Xunit;
 
 namespace CliFx.Tests
 {
-    [TestFixture]
-    public class VirtualConsoleTests
+    public class VirtualConsoleSpecs
     {
-        [Test(Description = "Must not leak to system console")]
-        public void Smoke_Test()
+        [Fact]
+        public void Fake_implementation_of_console_can_be_used_to_execute_commands_in_isolation()
         {
             // Arrange
             using var console = new VirtualConsole();
-            console.WriteInputString("hello world");
 
             // Act
+            console.WriteInputString("input");
+            var consumedInput = console.Input.ReadToEnd();
+
+            console.Output.Write("output");
+            var printedOutput = console.ReadOutputString();
+
+            console.Error.Write("error");
+            var printedError = console.ReadErrorString();
+
             console.ResetColor();
             console.ForegroundColor = ConsoleColor.DarkMagenta;
             console.BackgroundColor = ConsoleColor.DarkMagenta;
 
             // Assert
+            consumedInput.Should().Be("input");
+            printedOutput.Should().Be("output");
+            printedError.Should().Be("error");
+
             console.Input.Should().NotBeSameAs(Console.In);
-            console.IsInputRedirected.Should().BeTrue();
             console.Output.Should().NotBeSameAs(Console.Out);
-            console.IsOutputRedirected.Should().BeTrue();
             console.Error.Should().NotBeSameAs(Console.Error);
-            console.IsErrorRedirected.Should().BeTrue();
+
             console.ForegroundColor.Should().NotBe(Console.ForegroundColor);
             console.BackgroundColor.Should().NotBe(Console.BackgroundColor);
         }
