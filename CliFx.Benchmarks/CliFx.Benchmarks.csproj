@@ -9,9 +9,9 @@
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.12.0" />
     <PackageReference Include="clipr" Version="1.6.1" />
-    <PackageReference Include="Cocona" Version="1.0.0" />
+    <PackageReference Include="Cocona" Version="1.3.0" />
     <PackageReference Include="CommandLineParser" Version="2.7.82" />
-    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.5.0" />
+    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.6.0" />
     <PackageReference Include="PowerArgs" Version="3.6.0" />
     <PackageReference Include="System.CommandLine.Experimental" Version="0.3.0-alpha.19317.1" />
   </ItemGroup>

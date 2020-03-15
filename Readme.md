@@ -657,13 +657,13 @@ Frequency=3124994 Hz, Resolution=320.0006 ns, Timer=TSC
 
 |                               Method |        Mean |     Error |     StdDev | Ratio | RatioSD | Rank |
 |------------------------------------- |------------:|----------:|-----------:|------:|--------:|-----:|
-|                    CommandLineParser |    24.75 us |  0.167 us |   0.156 us |  0.61 |    0.01 |    1 |
-|                                CliFx |    40.67 us |  0.623 us |   0.583 us |  1.00 |    0.00 |    2 |
-|                                Clipr |   160.35 us |  2.544 us |   2.379 us |  3.94 |    0.08 |    3 |
-| McMaster.Extensions.CommandLineUtils |   170.98 us |  2.289 us |   2.141 us |  4.20 |    0.06 |    4 |
-|                   System.CommandLine |   171.36 us |  1.799 us |   1.683 us |  4.21 |    0.07 |    4 |
-|                            PowerArgs |   310.47 us |  2.551 us |   2.386 us |  7.64 |    0.14 |    5 |
-|                               Cocona | 1,977.44 us | 53.485 us | 156.862 us | 49.61 |    3.87 |    6 |
+|                    CommandLineParser |    24.79 us |  0.166 us |   0.155 us |  0.49 |    0.00 |    1 |
+|                                CliFx |    50.27 us |  0.248 us |   0.232 us |  1.00 |    0.00 |    2 |
+|                                Clipr |   160.22 us |  0.817 us |   0.764 us |  3.19 |    0.02 |    3 |
+| McMaster.Extensions.CommandLineUtils |   166.45 us |  1.111 us |   1.039 us |  3.31 |    0.03 |    4 |
+|                   System.CommandLine |   170.27 us |  0.599 us |   0.560 us |  3.39 |    0.02 |    5 |
+|                            PowerArgs |   306.12 us |  1.495 us |   1.398 us |  6.09 |    0.03 |    6 |
+|                               Cocona | 1,856.07 us | 48.727 us | 141.367 us | 37.88 |    2.60 |    7 |
 
 ## Etymology
 
