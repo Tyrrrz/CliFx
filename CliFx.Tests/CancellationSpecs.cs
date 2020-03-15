@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
@@ -12,7 +14,10 @@ namespace CliFx.Tests
         public async Task Command_can_perform_additional_cleanup_if_cancellation_is_requested()
         {
             // Arrange
-            using var console = new VirtualConsole();
+            using var cts = new CancellationTokenSource();
+
+            await using var stdOut = new MemoryStream();
+            var console = new VirtualConsole(output: stdOut, cancellationToken: cts.Token);
 
             var application = new CliApplicationBuilder()
                 .AddCommand(typeof(CancellableCommand))
@@ -20,14 +25,17 @@ namespace CliFx.Tests
                 .Build();
 
             // Act
-            console.CancelAfter(TimeSpan.FromSeconds(0.2));
+            cts.CancelAfter(TimeSpan.FromSeconds(0.2));
 
-            var exitCode = await application.RunAsync(new[] {"cancel"}, new Dictionary<string, string>());
-            var stdOut = console.ReadOutputString().TrimEnd();
+            var exitCode = await application.RunAsync(
+                new[] {"cancel"},
+                new Dictionary<string, string>());
+
+            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
 
             // Assert
             exitCode.Should().NotBe(0);
-            stdOut.Should().Be("Cancellation requested");
+            stdOutData.Should().Be("Cancellation requested");
         }
     }
 }

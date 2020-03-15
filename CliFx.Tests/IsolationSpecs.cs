@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
 
@@ -10,26 +12,31 @@ namespace CliFx.Tests
         public void Fake_implementation_of_console_can_be_used_to_execute_commands_in_isolation()
         {
             // Arrange
-            using var console = new VirtualConsole();
+            using var stdIn = new MemoryStream(Console.InputEncoding.GetBytes("input"));
+            using var stdOut = new MemoryStream();
+            using var stdErr = new MemoryStream();
+
+            var console = new VirtualConsole(
+                input: stdIn,
+                output: stdOut,
+                error: stdErr);
 
             // Act
-            console.WriteInputString("input");
-            var consumedInput = console.Input.ReadToEnd();
-
             console.Output.Write("output");
-            var printedOutput = console.ReadOutputString();
-
             console.Error.Write("error");
-            var printedError = console.ReadErrorString();
+
+            var stdInData = console.Input.ReadToEnd();
+            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray());
+            var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray());
 
             console.ResetColor();
             console.ForegroundColor = ConsoleColor.DarkMagenta;
             console.BackgroundColor = ConsoleColor.DarkMagenta;
 
             // Assert
-            consumedInput.Should().Be("input");
-            printedOutput.Should().Be("output");
-            printedError.Should().Be("error");
+            stdInData.Should().Be("input");
+            stdOutData.Should().Be("output");
+            stdErrData.Should().Be("error");
 
             console.Input.Should().NotBeSameAs(Console.In);
             console.Output.Should().NotBeSameAs(Console.Out);

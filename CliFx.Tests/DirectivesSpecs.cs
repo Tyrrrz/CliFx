@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
@@ -11,7 +12,8 @@ namespace CliFx.Tests
         public async Task Preview_directive_can_be_enabled_to_print_provided_arguments_as_they_were_parsed()
         {
             // Arrange
-            using var console = new VirtualConsole();
+            await using var stdOut = new MemoryStream();
+            var console = new VirtualConsole(output: stdOut);
 
             var application = new CliApplicationBuilder()
                 .AddCommand(typeof(NamedCommand))
@@ -20,12 +22,15 @@ namespace CliFx.Tests
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[] {"[preview]", "cmd", "param", "-abc", "--option", "foo"}, new Dictionary<string, string>());
-            var stdOut = console.ReadOutputString().TrimEnd();
+            var exitCode = await application.RunAsync(
+                new[] {"[preview]", "cmd", "param", "-abc", "--option", "foo"},
+                new Dictionary<string, string>());
+
+            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
 
             // Assert
             exitCode.Should().Be(0);
-            stdOut.Should().ContainAll("cmd", "<param>", "[-a]", "[-b]", "[-c]", "[--option foo]");
+            stdOutData.Should().ContainAll("cmd", "<param>", "[-a]", "[-b]", "[-c]", "[--option foo]");
         }
     }
 }

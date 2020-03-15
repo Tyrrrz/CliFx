@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using CliFx.Domain;
 using CliFx.Exceptions;
 using FluentAssertions;
@@ -36,7 +37,7 @@ namespace CliFx.Tests
                 .UseExecutableName("test")
                 .UseVersionText("test")
                 .UseDescription("test")
-                .UseConsole(new VirtualConsole())
+                .UseConsole(new VirtualConsole(Stream.Null))
                 .UseTypeActivator(Activator.CreateInstance)
                 .Build();
 
