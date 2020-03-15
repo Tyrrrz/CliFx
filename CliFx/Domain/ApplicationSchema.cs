@@ -47,9 +47,9 @@ namespace CliFx.Domain
         public CommandSchema? TryFindCommand(CommandLineInput commandLineInput, out int argumentOffset)
         {
             // Try to find the command that contains the most of the input arguments in its name
-            for (var i = commandLineInput.Arguments.Count; i >= 0; i--)
+            for (var i = commandLineInput.UnboundArguments.Count; i >= 0; i--)
             {
-                var potentialCommandName = string.Join(" ", commandLineInput.Arguments.Take(i));
+                var potentialCommandName = string.Join(" ", commandLineInput.UnboundArguments.Take(i));
                 var matchingCommand = Commands.FirstOrDefault(c => c.MatchesName(potentialCommandName));
 
                 if (matchingCommand != null)
@@ -75,15 +75,25 @@ namespace CliFx.Domain
             if (command == null)
             {
                 throw new CliFxException(
-                    $"Can't find a command that matches arguments [{string.Join(" ", commandLineInput.Arguments)}].");
+                    $"Can't find a command that matches arguments [{string.Join(" ", commandLineInput.UnboundArguments)}].");
             }
 
-            var parameterInputs = argumentOffset == 0
-                ? commandLineInput.Arguments
-                : commandLineInput.Arguments.Skip(argumentOffset).ToArray();
+            var parameterValues = argumentOffset == 0
+                ? commandLineInput.UnboundArguments.Select(a => a.Value).ToArray()
+                : commandLineInput.UnboundArguments.Skip(argumentOffset).Select(a => a.Value).ToArray();
 
-            return command.CreateInstance(parameterInputs, commandLineInput.Options, environmentVariables, activator);
+            return command.CreateInstance(parameterValues, commandLineInput.Options, environmentVariables, activator);
         }
+
+        public ICommand InitializeEntryPoint(
+            CommandLineInput commandLineInput,
+            IReadOnlyDictionary<string, string> environmentVariables) =>
+            InitializeEntryPoint(commandLineInput, environmentVariables, new DefaultTypeActivator());
+
+        public ICommand InitializeEntryPoint(CommandLineInput commandLineInput) =>
+            InitializeEntryPoint(commandLineInput, new Dictionary<string, string>());
+
+        public override string ToString() => string.Join(Environment.NewLine, Commands);
     }
 
     internal partial class ApplicationSchema

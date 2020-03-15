@@ -12,12 +12,14 @@ namespace CliFx
     /// <summary>
     /// Command line application facade.
     /// </summary>
-    public partial class CliApplication
+    public class CliApplication
     {
         private readonly ApplicationMetadata _metadata;
         private readonly ApplicationConfiguration _configuration;
         private readonly IConsole _console;
         private readonly ITypeActivator _typeActivator;
+
+        private readonly HelpTextWriter _helpTextWriter;
 
         /// <summary>
         /// Initializes an instance of <see cref="CliApplication"/>.
@@ -30,6 +32,8 @@ namespace CliFx
             _configuration = configuration;
             _console = console;
             _typeActivator = typeActivator;
+
+            _helpTextWriter = new HelpTextWriter(metadata, console);
         }
 
         private async ValueTask<int?> HandleDebugDirectiveAsync(CommandLineInput commandLineInput)
@@ -67,7 +71,7 @@ namespace CliFx
             }
 
             // Parameters
-            foreach (var parameter in commandLineInput.Arguments.Skip(argumentOffset))
+            foreach (var parameter in commandLineInput.UnboundArguments.Skip(argumentOffset))
             {
                 _console.Output.Write('<');
 
@@ -98,7 +102,7 @@ namespace CliFx
         private int? HandleVersionOption(CommandLineInput commandLineInput)
         {
             // Version option is available only on the default command (i.e. when arguments are not specified)
-            var shouldRenderVersion = !commandLineInput.Arguments.Any() && commandLineInput.IsVersionOptionSpecified;
+            var shouldRenderVersion = !commandLineInput.UnboundArguments.Any() && commandLineInput.IsVersionOptionSpecified;
             if (!shouldRenderVersion)
                 return null;
 
@@ -112,7 +116,7 @@ namespace CliFx
             // Help is rendered either when it's requested or when the user provides no arguments and there is no default command
             var shouldRenderHelp =
                 commandLineInput.IsHelpOptionSpecified ||
-                !applicationSchema.Commands.Any(c => c.IsDefault) && !commandLineInput.Arguments.Any() && !commandLineInput.Options.Any();
+                !applicationSchema.Commands.Any(c => c.IsDefault) && !commandLineInput.UnboundArguments.Any() && !commandLineInput.Options.Any();
 
             if (!shouldRenderHelp)
                 return null;
@@ -122,7 +126,7 @@ namespace CliFx
                 applicationSchema.TryFindCommand(commandLineInput) ??
                 CommandSchema.StubDefaultCommand;
 
-            RenderHelp(applicationSchema, commandSchema);
+            _helpTextWriter.Write(applicationSchema, commandSchema);
 
             return 0;
         }

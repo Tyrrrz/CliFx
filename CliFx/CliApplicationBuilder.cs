@@ -46,7 +46,7 @@ namespace CliFx
 
         /// <summary>
         /// Adds commands from the specified assembly to the application.
-        /// Only the public types are added.
+        /// Only adds public valid command types.
         /// </summary>
         public CliApplicationBuilder AddCommandsFrom(Assembly commandAssembly)
         {
@@ -58,7 +58,7 @@ namespace CliFx
 
         /// <summary>
         /// Adds commands from the specified assemblies to the application.
-        /// Only the public types are added.
+        /// Only adds public valid command types.
         /// </summary>
         public CliApplicationBuilder AddCommandsFrom(IEnumerable<Assembly> commandAssemblies)
         {
@@ -70,7 +70,7 @@ namespace CliFx
 
         /// <summary>
         /// Adds commands from the calling assembly to the application.
-        /// Only the public types are added.
+        /// Only adds public valid command types.
         /// </summary>
         public CliApplicationBuilder AddCommandsFromThisAssembly() => AddCommandsFrom(Assembly.GetCallingAssembly());
 

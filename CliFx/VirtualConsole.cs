@@ -9,78 +9,10 @@ namespace CliFx
     /// Does not leak to system console in any way.
     /// Use this class as a substitute for system console when running tests.
     /// </summary>
-    public partial class VirtualConsole
-    {
-        private readonly MemoryStream _inputStream = new MemoryStream();
-        private readonly MemoryStream _outputStream = new MemoryStream();
-        private readonly MemoryStream _errorStream = new MemoryStream();
-        private readonly CancellationTokenSource _cts = new CancellationTokenSource();
-
-        /// <summary>
-        /// Initializes an instance of <see cref="VirtualConsole"/>.
-        /// </summary>
-        public VirtualConsole(bool isRedirected)
-        {
-            Input = new StreamReader(_inputStream, Console.InputEncoding, false);
-            Output = new StreamWriter(_outputStream, Console.OutputEncoding) {AutoFlush = true};
-            Error = new StreamWriter(_errorStream, Console.OutputEncoding) {AutoFlush = true};
-
-            IsInputRedirected = isRedirected;
-            IsOutputRedirected = isRedirected;
-            IsErrorRedirected = isRedirected;
-        }
-
-        /// <summary>
-        /// Initializes an instance of <see cref="VirtualConsole"/>.
-        /// </summary>
-        public VirtualConsole()
-            : this(true)
-        {
-        }
-
-        /// <summary>
-        /// Writes raw data to input stream.
-        /// </summary>
-        public void WriteInputData(byte[] data) => _inputStream.Write(data, 0, data.Length);
-
-        /// <summary>
-        /// Writes text to input stream.
-        /// </summary>
-        public void WriteInputString(string str) => WriteInputData(Input.CurrentEncoding.GetBytes(str));
-
-        /// <summary>
-        /// Reads all data written to output stream thus far.
-        /// </summary>
-        public byte[] ReadOutputData() => _outputStream.ToArray();
-
-        /// <summary>
-        /// Reads all text written to output stream thus far.
-        /// </summary>
-        public string ReadOutputString() => Output.Encoding.GetString(ReadOutputData());
-
-        /// <summary>
-        /// Reads all data written to error stream thus far.
-        /// </summary>
-        public byte[] ReadErrorData() => _errorStream.ToArray();
-
-        /// <summary>
-        /// Reads all text written to error stream thus far.
-        /// </summary>
-        public string ReadErrorString() => Error.Encoding.GetString(ReadErrorData());
-
-        /// <summary>
-        /// Sends an interrupt signal.
-        /// </summary>
-        public void Cancel() => _cts.Cancel();
-
-        /// <summary>
-        /// Sends an interrupt signal after a delay.
-        /// </summary>
-        public void CancelAfter(TimeSpan delay) => _cts.CancelAfter(delay);
-    }
-
     public partial class VirtualConsole : IConsole
     {
+        private readonly CancellationToken _cancellationToken;
+
         /// <inheritdoc />
         public StreamReader Input { get; }
 
@@ -113,21 +45,55 @@ namespace CliFx
         }
 
         /// <inheritdoc />
-        public CancellationToken GetCancellationToken() => _cts.Token;
+        public CancellationToken GetCancellationToken() => _cancellationToken;
+
+        /// <summary>
+        /// Initializes an instance of <see cref="VirtualConsole"/>.
+        /// Use named parameters to specify the streams you want to override.
+        /// </summary>
+        public VirtualConsole(
+            StreamReader? input = null, bool isInputRedirected = true,
+            StreamWriter? output = null, bool isOutputRedirected = true,
+            StreamWriter? error = null, bool isErrorRedirected = true,
+            CancellationToken cancellationToken = default)
+        {
+            Input = input ?? StreamReader.Null;
+            IsInputRedirected = isInputRedirected;
+            Output = output ?? StreamWriter.Null;
+            IsOutputRedirected = isOutputRedirected;
+            Error = error ?? StreamWriter.Null;
+            IsErrorRedirected = isErrorRedirected;
+            _cancellationToken = cancellationToken;
+        }
+
+        /// <summary>
+        /// Initializes an instance of <see cref="VirtualConsole"/>.
+        /// Use named parameters to specify the streams you want to override.
+        /// </summary>
+        public VirtualConsole(
+            Stream? input = null, bool isInputRedirected = true,
+            Stream? output = null, bool isOutputRedirected = true,
+            Stream? error = null, bool isErrorRedirected = true,
+            CancellationToken cancellationToken = default)
+            : this(
+                WrapInput(input), isInputRedirected,
+                WrapOutput(output), isOutputRedirected,
+                WrapOutput(error), isErrorRedirected,
+                cancellationToken)
+        {
+        }
     }
 
-    public partial class VirtualConsole : IDisposable
+    public partial class VirtualConsole
     {
-        /// <inheritdoc />
-        public void Dispose()
-        {
-            _inputStream.Dispose();
-            _outputStream.Dispose();
-            _errorStream.Dispose();
-            _cts.Dispose();
-            Input.Dispose();
-            Output.Dispose();
-            Error.Dispose();
-        }
+        private static StreamReader WrapInput(Stream? stream) =>
+            stream != null
+                ? new StreamReader(stream, Console.InputEncoding, false)
+                : StreamReader.Null;
+
+        private static StreamWriter WrapOutput(Stream? stream) =>
+            stream != null
+                ? new StreamWriter(stream, Console.OutputEncoding) {AutoFlush = true}
+                : StreamWriter.Null;
     }
 }

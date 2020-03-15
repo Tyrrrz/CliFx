@@ -11,12 +11,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CliWrap" Version="2.5.0" />
-    <PackageReference Include="FluentAssertions" Version="5.10.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
-    <PackageReference Include="NUnit" Version="3.12.0" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.16.1" />
+    <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CliWrap" Version="3.0.0" />
+    <PackageReference Include="FluentAssertions" Version="5.10.2" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
     <PackageReference Include="coverlet.msbuild" Version="2.8.0" PrivateAssets="all" />
+    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,8 +28,12 @@
     <ProjectReference Include="..\CliFx\CliFx.csproj" />
   </ItemGroup>
 
-  <Target Name="Copy dummy's runtime config" AfterTargets="AfterBuild">
-    <Copy SourceFiles="../CliFx.Tests.Dummy/bin/$(Configuration)/$(TargetFramework)/CliFx.Tests.Dummy.runtimeconfig.json" DestinationFiles="$(OutputPath)CliFx.Tests.Dummy.runtimeconfig.json" />
-  </Target>
+  <ItemGroup>
+    <None Include="../CliFx.Tests.Dummy/bin/$(Configuration)/$(TargetFramework)/CliFx.Tests.Dummy.runtimeconfig.json">
+      <Link>CliFx.Tests.Dummy.runtimeconfig.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>False</Visible>
+    </None>
+  </ItemGroup>
 
 </Project>
