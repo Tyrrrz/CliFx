@@ -79,6 +79,14 @@ namespace CliFx.Tests
 
             new object[]
             {
+                new[] {"--option", "same value"},
+                new CommandLineInputBuilder()
+                    .AddOption("option", "same value")
+                    .Build()
+            },
+
+            new object[]
+            {
                 new[] {"--option1", "--option2"},
                 new CommandLineInputBuilder()
                     .AddOption("option1")
@@ -148,6 +156,14 @@ namespace CliFx.Tests
                 new[] {"-o", "value1", "value2"},
                 new CommandLineInputBuilder()
                     .AddOption("o", "value1", "value2")
+                    .Build()
+            },
+
+            new object[]
+            {
+                new[] {"-o", "same value"},
+                new CommandLineInputBuilder()
+                    .AddOption("o", "same value")
                     .Build()
             },
 

@@ -128,8 +128,17 @@ namespace CliFx.Tests
         [Command]
         private class CustomEnumerableCommand : ICommand
         {
-            [CommandParameter(0)]
-            public CustomEnumerable<string>? Test { get; set; }
+            [CommandOption(nameof(Option))]
+            public CustomEnumerable<string>? Option { get; set; }
+
+            public ValueTask ExecuteAsync(IConsole console) => default;
+        }
+
+        [Command]
+        private class NonStringParseableCommand : ICommand
+        {
+            [CommandOption(nameof(Option))]
+            public NonStringParseable? Option { get; set; }
 
             public ValueTask ExecuteAsync(IConsole console) => default;
         }

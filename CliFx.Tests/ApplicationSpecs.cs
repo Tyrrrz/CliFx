@@ -190,6 +190,8 @@ namespace CliFx.Tests
                             "Option description")
                     })
             }));
+
+            schema.ToString().Should().NotBeNullOrWhiteSpace(); // this is only for coverage, I'm sorry
         }
     }
 }

@@ -917,7 +917,49 @@ namespace CliFx.Tests
             var schema = ApplicationSchema.Resolve(new[] {typeof(CustomEnumerableCommand)});
 
             var input = new CommandLineInputBuilder()
-                .AddOption(nameof(CustomEnumerableCommand.Test), "foo", "bar")
+                .AddOption(nameof(CustomEnumerableCommand.Option), "foo", "bar")
+                .Build();
+
+            // Act & assert
+            Assert.Throws<CliFxException>(() => schema.InitializeEntryPoint(input));
+        }
+
+        [Fact]
+        public void Property_of_non_nullable_type_can_only_be_bound_if_the_argument_value_is_set()
+        {
+            // Arrange
+            var schema = ApplicationSchema.Resolve(new[] {typeof(AllSupportedTypesCommand)});
+
+            var input = new CommandLineInputBuilder()
+                .AddOption(nameof(AllSupportedTypesCommand.Int))
+                .Build();
+
+            // Act & assert
+            Assert.Throws<CliFxException>(() => schema.InitializeEntryPoint(input));
+        }
+
+        [Fact]
+        public void Property_must_have_a_type_supported_by_the_framework_in_order_to_be_bound()
+        {
+            // Arrange
+            var schema = ApplicationSchema.Resolve(new[] {typeof(NonStringParseableCommand)});
+
+            var input = new CommandLineInputBuilder()
+                .AddOption(nameof(NonStringParseableCommand.Option), "foo", "bar")
+                .Build();
+
+            // Act & assert
+            Assert.Throws<CliFxException>(() => schema.InitializeEntryPoint(input));
+        }
+
+        [Fact]
+        public void Property_must_have_a_type_that_implements_IEnumerable_in_order_to_be_bound_from_multiple_argument_values()
+        {
+            // Arrange
+            var schema = ApplicationSchema.Resolve(new[] {typeof(AllSupportedTypesCommand)});
+
+            var input = new CommandLineInputBuilder()
+                .AddOption(nameof(AllSupportedTypesCommand.Int), "1", "2", "3")
                 .Build();
 
             // Act & assert
