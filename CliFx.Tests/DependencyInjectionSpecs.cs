@@ -7,7 +7,7 @@ namespace CliFx.Tests
     public partial class DependencyInjectionSpecs
     {
         [Fact]
-        public void Default_type_activator_can_initialize_an_object_if_it_has_a_parameterless_constructor()
+        public void Default_type_activator_can_initialize_a_command_if_it_has_a_parameterless_constructor()
         {
             // Arrange
             var activator = new DefaultTypeActivator();
@@ -20,7 +20,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public void Default_type_activator_cannot_initialize_an_object_if_it_does_not_have_a_parameterless_constructor()
+        public void Default_type_activator_cannot_initialize_a_command_if_it_does_not_have_a_parameterless_constructor()
         {
             // Arrange
             var activator = new DefaultTypeActivator();
@@ -31,7 +31,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public void Delegate_type_activator_can_initialize_an_object_using_a_custom_function()
+        public void Delegate_type_activator_can_initialize_a_command_using_a_custom_function()
         {
             // Arrange
             var activator = new DelegateTypeActivator(_ =>

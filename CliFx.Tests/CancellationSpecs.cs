@@ -9,7 +9,7 @@ namespace CliFx.Tests
     public partial class CancellationSpecs
     {
         [Fact]
-        public async Task If_the_execution_is_cancelled_then_the_application_terminates_immediately_with_a_non_zero_exit_code()
+        public async Task Command_can_perform_additional_cleanup_if_cancellation_is_requested()
         {
             // Arrange
             using var console = new VirtualConsole();
@@ -27,7 +27,7 @@ namespace CliFx.Tests
 
             // Assert
             exitCode.Should().NotBe(0);
-            stdOut.Should().BeNullOrWhiteSpace();
+            stdOut.Should().Be("Cancellation requested");
         }
     }
 }

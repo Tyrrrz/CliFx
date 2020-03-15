@@ -1,7 +1,6 @@
 ﻿using System;
 using CliFx.Domain;
 using CliFx.Exceptions;
-using CliFx.Tests.TestCommands;
 using FluentAssertions;
 using Xunit;
 
@@ -26,10 +25,10 @@ namespace CliFx.Tests
         {
             // Act
             var app = new CliApplicationBuilder()
-                .AddCommand(typeof(HelloWorldDefaultCommand))
-                .AddCommandsFrom(typeof(HelloWorldDefaultCommand).Assembly)
-                .AddCommands(new[] {typeof(HelloWorldDefaultCommand)})
-                .AddCommandsFrom(new[] {typeof(HelloWorldDefaultCommand).Assembly})
+                .AddCommand(typeof(ValidCommand))
+                .AddCommandsFrom(typeof(ValidCommand).Assembly)
+                .AddCommands(new[] {typeof(ValidCommand)})
+                .AddCommandsFrom(new[] {typeof(ValidCommand).Assembly})
                 .AddCommandsFromThisAssembly()
                 .AllowDebugMode()
                 .AllowPreviewMode()
@@ -56,7 +55,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public void Commands_must_implement_the_command_interface()
+        public void Commands_must_implement_the_corresponding_interface()
         {
             // Arrange
             var commandTypes = new[] {typeof(NonImplementedCommand)};
@@ -153,6 +152,43 @@ namespace CliFx.Tests
 
             // Act & assert
             Assert.Throws<CliFxException>(() => ApplicationSchema.Resolve(commandTypes));
+        }
+
+        [Fact]
+        public void Command_options_and_parameters_must_be_annotated_by_corresponding_attributes()
+        {
+            // Arrange
+            var commandTypes = new[] {typeof(HiddenPropertiesCommand)};
+
+            // Act
+            var schema = ApplicationSchema.Resolve(commandTypes);
+
+            // Assert
+            schema.Should().BeEquivalentTo(new ApplicationSchema(new[]
+            {
+                new CommandSchema(
+                    typeof(HiddenPropertiesCommand),
+                    "hidden",
+                    "Description",
+                    new[]
+                    {
+                        new CommandParameterSchema(
+                            typeof(HiddenPropertiesCommand).GetProperty(nameof(HiddenPropertiesCommand.Parameter)),
+                            13,
+                            "param",
+                            "Param description")
+                    },
+                    new[]
+                    {
+                        new CommandOptionSchema(
+                            typeof(HiddenPropertiesCommand).GetProperty(nameof(HiddenPropertiesCommand.Option)),
+                            "option",
+                            'o',
+                            "ENV",
+                            false,
+                            "Option description")
+                    })
+            }));
         }
     }
 }

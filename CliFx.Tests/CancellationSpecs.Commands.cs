@@ -11,8 +11,16 @@ namespace CliFx.Tests
         {
             public async ValueTask ExecuteAsync(IConsole console)
             {
-                await Task.Delay(TimeSpan.FromSeconds(3), console.GetCancellationToken());
-                console.Output.WriteLine("Never printed");
+                try
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(3), console.GetCancellationToken());
+                    console.Output.WriteLine("Never printed");
+                }
+                catch (OperationCanceledException)
+                {
+                    console.Output.WriteLine("Cancellation requested");
+                    throw;
+                }
             }
         }
     }

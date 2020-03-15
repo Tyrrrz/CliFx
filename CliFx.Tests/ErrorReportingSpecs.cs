@@ -8,7 +8,7 @@ namespace CliFx.Tests
     public partial class ErrorReportingSpecs
     {
         [Fact]
-        public async Task If_the_executed_command_throws_a_generic_exception_then_the_message_and_stack_trace_is_printed()
+        public async Task Command_may_throw_a_generic_exception_which_exits_and_prints_full_error_details()
         {
             // Arrange
             using var console = new VirtualConsole();
@@ -29,7 +29,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task If_the_executed_command_throws_a_command_exception_then_only_the_message_is_printed_and_specified_exit_code_is_returned()
+        public async Task Command_may_throw_a_specialized_exception_which_exits_with_custom_code_and_prints_minimal_error_details()
         {
             // Arrange
             using var console = new VirtualConsole();
@@ -49,7 +49,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task If_the_executed_command_throws_a_command_exception_that_does_not_have_a_message_then_the_stack_trace_is_printed()
+        public async Task Command_may_throw_a_specialized_exception_without_error_message_which_exits_and_prints_full_error_details()
         {
             // Arrange
             using var console = new VirtualConsole();

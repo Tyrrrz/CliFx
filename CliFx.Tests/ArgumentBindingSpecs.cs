@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Globalization;
 using CliFx.Domain;
-using CliFx.Tests.TestCustomTypes;
+using CliFx.Exceptions;
 using FluentAssertions;
 using Xunit;
 
 namespace CliFx.Tests
 {
-    public partial class ArgumentConversionSpecs
+    public partial class ArgumentBindingSpecs
     {
         [Fact]
         public void Property_of_type_object_is_bound_directly_from_the_argument_value()
@@ -677,7 +677,7 @@ namespace CliFx.Tests
             var schema = ApplicationSchema.Resolve(new[] {typeof(AllSupportedTypesCommand)});
 
             var input = new CommandLineInputBuilder()
-                .AddOption(nameof(AllSupportedTypesCommand.TestEnum), "value2")
+                .AddOption(nameof(AllSupportedTypesCommand.CustomEnum), "value2")
                 .Build();
 
             // Act
@@ -686,7 +686,7 @@ namespace CliFx.Tests
             // Assert
             command.Should().BeEquivalentTo(new AllSupportedTypesCommand
             {
-                TestEnum = TestEnum.Value2
+                CustomEnum = CustomEnum.Value2
             });
         }
 
@@ -697,7 +697,7 @@ namespace CliFx.Tests
             var schema = ApplicationSchema.Resolve(new[] {typeof(AllSupportedTypesCommand)});
 
             var input = new CommandLineInputBuilder()
-                .AddOption(nameof(AllSupportedTypesCommand.TestEnum), "2")
+                .AddOption(nameof(AllSupportedTypesCommand.CustomEnum), "2")
                 .Build();
 
             // Act
@@ -706,7 +706,7 @@ namespace CliFx.Tests
             // Assert
             command.Should().BeEquivalentTo(new AllSupportedTypesCommand
             {
-                TestEnum = TestEnum.Value2
+                CustomEnum = CustomEnum.Value2
             });
         }
 
@@ -717,7 +717,7 @@ namespace CliFx.Tests
             var schema = ApplicationSchema.Resolve(new[] {typeof(AllSupportedTypesCommand)});
 
             var input = new CommandLineInputBuilder()
-                .AddOption(nameof(AllSupportedTypesCommand.TestEnumNullable), "value3")
+                .AddOption(nameof(AllSupportedTypesCommand.CustomEnumNullable), "value3")
                 .Build();
 
             // Act
@@ -726,7 +726,7 @@ namespace CliFx.Tests
             // Assert
             command.Should().BeEquivalentTo(new AllSupportedTypesCommand
             {
-                TestEnumNullable = TestEnum.Value3
+                CustomEnumNullable = CustomEnum.Value3
             });
         }
 
@@ -737,7 +737,7 @@ namespace CliFx.Tests
             var schema = ApplicationSchema.Resolve(new[] {typeof(AllSupportedTypesCommand)});
 
             var input = new CommandLineInputBuilder()
-                .AddOption(nameof(AllSupportedTypesCommand.TestEnumNullable), "3")
+                .AddOption(nameof(AllSupportedTypesCommand.CustomEnumNullable), "3")
                 .Build();
 
             // Act
@@ -746,7 +746,7 @@ namespace CliFx.Tests
             // Assert
             command.Should().BeEquivalentTo(new AllSupportedTypesCommand
             {
-                TestEnumNullable = TestEnum.Value3
+                CustomEnumNullable = CustomEnum.Value3
             });
         }
 
@@ -757,7 +757,7 @@ namespace CliFx.Tests
             var schema = ApplicationSchema.Resolve(new[] {typeof(AllSupportedTypesCommand)});
 
             var input = new CommandLineInputBuilder()
-                .AddOption(nameof(AllSupportedTypesCommand.TestEnumNullable))
+                .AddOption(nameof(AllSupportedTypesCommand.CustomEnumNullable))
                 .Build();
 
             // Act
@@ -766,7 +766,7 @@ namespace CliFx.Tests
             // Assert
             command.Should().BeEquivalentTo(new AllSupportedTypesCommand
             {
-                TestEnumNullable = null
+                CustomEnumNullable = null
             });
         }
 
@@ -777,7 +777,7 @@ namespace CliFx.Tests
             var schema = ApplicationSchema.Resolve(new[] {typeof(AllSupportedTypesCommand)});
 
             var input = new CommandLineInputBuilder()
-                .AddOption(nameof(AllSupportedTypesCommand.TestEnumArray), "value1", "value3")
+                .AddOption(nameof(AllSupportedTypesCommand.CustomEnumArray), "value1", "value3")
                 .Build();
 
             // Act
@@ -786,7 +786,7 @@ namespace CliFx.Tests
             // Assert
             command.Should().BeEquivalentTo(new AllSupportedTypesCommand
             {
-                TestEnumArray = new[] {TestEnum.Value1, TestEnum.Value3}
+                CustomEnumArray = new[] {CustomEnum.Value1, CustomEnum.Value3}
             });
         }
 
@@ -797,7 +797,7 @@ namespace CliFx.Tests
             var schema = ApplicationSchema.Resolve(new[] {typeof(AllSupportedTypesCommand)});
 
             var input = new CommandLineInputBuilder()
-                .AddOption(nameof(AllSupportedTypesCommand.TestEnumArray), "1", "3")
+                .AddOption(nameof(AllSupportedTypesCommand.CustomEnumArray), "1", "3")
                 .Build();
 
             // Act
@@ -806,7 +806,7 @@ namespace CliFx.Tests
             // Assert
             command.Should().BeEquivalentTo(new AllSupportedTypesCommand
             {
-                TestEnumArray = new[] {TestEnum.Value1, TestEnum.Value3}
+                CustomEnumArray = new[] {CustomEnum.Value1, CustomEnum.Value3}
             });
         }
 
@@ -817,7 +817,7 @@ namespace CliFx.Tests
             var schema = ApplicationSchema.Resolve(new[] {typeof(AllSupportedTypesCommand)});
 
             var input = new CommandLineInputBuilder()
-                .AddOption(nameof(AllSupportedTypesCommand.TestEnumArray), "value1", "3")
+                .AddOption(nameof(AllSupportedTypesCommand.CustomEnumArray), "value1", "3")
                 .Build();
 
             // Act
@@ -826,7 +826,7 @@ namespace CliFx.Tests
             // Assert
             command.Should().BeEquivalentTo(new AllSupportedTypesCommand
             {
-                TestEnumArray = new[] {TestEnum.Value1, TestEnum.Value3}
+                CustomEnumArray = new[] {CustomEnum.Value1, CustomEnum.Value3}
             });
         }
 
@@ -846,7 +846,7 @@ namespace CliFx.Tests
             // Assert
             command.Should().BeEquivalentTo(new AllSupportedTypesCommand
             {
-                TestStringConstructable = new TestStringConstructable("foobar")
+                TestStringConstructable = new StringConstructable("foobar")
             });
         }
 
@@ -866,7 +866,7 @@ namespace CliFx.Tests
             // Assert
             command.Should().BeEquivalentTo(new AllSupportedTypesCommand
             {
-                TestStringConstructableArray = new[] {new TestStringConstructable("foo"), new TestStringConstructable("bar") }
+                TestStringConstructableArray = new[] {new StringConstructable("foo"), new StringConstructable("bar") }
             });
         }
 
@@ -886,7 +886,7 @@ namespace CliFx.Tests
             // Assert
             command.Should().BeEquivalentTo(new AllSupportedTypesCommand
             {
-                TestStringParseable = TestStringParseable.Parse("foobar")
+                TestStringParseable = StringParseable.Parse("foobar")
             });
         }
 
@@ -906,8 +906,22 @@ namespace CliFx.Tests
             // Assert
             command.Should().BeEquivalentTo(new AllSupportedTypesCommand
             {
-                TestStringParseableWithFormatProvider = TestStringParseableWithFormatProvider.Parse("foobar", CultureInfo.InvariantCulture)
+                TestStringParseableWithFormatProvider = StringParseableWithFormatProvider.Parse("foobar", CultureInfo.InvariantCulture)
             });
+        }
+
+        [Fact]
+        public void Property_of_custom_type_that_implements_IEnumerable_can_only_be_bound_if_that_type_has_a_constructor_accepting_an_array()
+        {
+            // Arrange
+            var schema = ApplicationSchema.Resolve(new[] {typeof(CustomEnumerableCommand)});
+
+            var input = new CommandLineInputBuilder()
+                .AddOption(nameof(CustomEnumerableCommand.Test), "foo", "bar")
+                .Build();
+
+            // Act & assert
+            Assert.Throws<CliFxException>(() => schema.InitializeEntryPoint(input));
         }
     }
 }

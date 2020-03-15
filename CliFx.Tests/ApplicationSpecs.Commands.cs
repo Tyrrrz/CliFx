@@ -111,5 +111,27 @@ namespace CliFx.Tests
 
             public ValueTask ExecuteAsync(IConsole console) => default;
         }
+
+        [Command]
+        private class ValidCommand : ICommand
+        {
+            public ValueTask ExecuteAsync(IConsole console) => default;
+        }
+
+        [Command("hidden", Description = "Description")]
+        private class HiddenPropertiesCommand : ICommand
+        {
+            [CommandParameter(13, Name = "param", Description = "Param description")]
+            public string? Parameter { get; set; }
+
+            [CommandOption("option", 'o', Description = "Option description", EnvironmentVariableName = "ENV")]
+            public string? Option { get; set; }
+
+            public string? HiddenA { get; set; }
+
+            public bool? HiddenB { get; set; }
+
+            public ValueTask ExecuteAsync(IConsole console) => default;
+        }
     }
 }

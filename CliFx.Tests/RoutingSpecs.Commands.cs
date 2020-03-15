@@ -1,0 +1,51 @@
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using CliFx.Attributes;
+
+namespace CliFx.Tests
+{
+    public partial class RoutingSpecs
+    {
+        [Command]
+        private class DefaultCommand : ICommand
+        {
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                console.Output.WriteLine("Hello world!");
+                return default;
+            }
+        }
+
+        [Command("concat", Description = "Concatenate strings.")]
+        private class ConcatCommand : ICommand
+        {
+            [CommandOption('i', IsRequired = true, Description = "Input strings.")]
+            public IReadOnlyList<string> Inputs { get; set; }
+
+            [CommandOption('s', Description = "String separator.")]
+            public string Separator { get; set; } = "";
+
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                console.Output.WriteLine(string.Join(Separator, Inputs));
+                return default;
+            }
+        }
+
+        [Command("div", Description = "Divide one number by another.")]
+        private class DivideCommand : ICommand
+        {
+            [CommandOption("dividend", 'D', IsRequired = true, Description = "The number to divide.")]
+            public double Dividend { get; set; }
+
+            [CommandOption("divisor", 'd', IsRequired = true, Description = "The number to divide by.")]
+            public double Divisor { get; set; }
+
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                console.Output.WriteLine(Dividend / Divisor);
+                return default;
+            }
+        }
+    }
+}

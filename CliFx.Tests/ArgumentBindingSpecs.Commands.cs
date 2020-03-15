@@ -3,11 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using CliFx.Attributes;
-using CliFx.Tests.TestCustomTypes;
 
 namespace CliFx.Tests
 {
-    public partial class ArgumentConversionSpecs
+    public partial class ArgumentBindingSpecs
     {
         [Command]
         private class AllSupportedTypesCommand : ICommand
@@ -66,26 +65,26 @@ namespace CliFx.Tests
             [CommandOption(nameof(TimeSpan))]
             public TimeSpan TimeSpan { get; set; }
 
-            [CommandOption(nameof(TestEnum))]
-            public TestEnum TestEnum { get; set; }
+            [CommandOption(nameof(CustomEnum))]
+            public CustomEnum CustomEnum { get; set; }
 
             [CommandOption(nameof(IntNullable))]
             public int? IntNullable { get; set; }
 
-            [CommandOption(nameof(TestEnumNullable))]
-            public TestEnum? TestEnumNullable { get; set; }
+            [CommandOption(nameof(CustomEnumNullable))]
+            public CustomEnum? CustomEnumNullable { get; set; }
 
             [CommandOption(nameof(TimeSpanNullable))]
             public TimeSpan? TimeSpanNullable { get; set; }
 
             [CommandOption(nameof(TestStringConstructable))]
-            public TestStringConstructable? TestStringConstructable { get; set; }
+            public StringConstructable? TestStringConstructable { get; set; }
 
             [CommandOption(nameof(TestStringParseable))]
-            public TestStringParseable? TestStringParseable { get; set; }
+            public StringParseable? TestStringParseable { get; set; }
 
             [CommandOption(nameof(TestStringParseableWithFormatProvider))]
-            public TestStringParseableWithFormatProvider? TestStringParseableWithFormatProvider { get; set; }
+            public StringParseableWithFormatProvider? TestStringParseableWithFormatProvider { get; set; }
 
             [CommandOption(nameof(ObjectArray))]
             public object[]? ObjectArray { get; set; }
@@ -96,14 +95,14 @@ namespace CliFx.Tests
             [CommandOption(nameof(IntArray))]
             public int[]? IntArray { get; set; }
 
-            [CommandOption(nameof(TestEnumArray))]
-            public TestEnum[]? TestEnumArray { get; set; }
+            [CommandOption(nameof(CustomEnumArray))]
+            public CustomEnum[]? CustomEnumArray { get; set; }
 
             [CommandOption(nameof(IntNullableArray))]
             public int?[]? IntNullableArray { get; set; }
 
             [CommandOption(nameof(TestStringConstructableArray))]
-            public TestStringConstructable[]? TestStringConstructableArray { get; set; }
+            public StringConstructable[]? TestStringConstructableArray { get; set; }
 
             [CommandOption(nameof(Enumerable))]
             public IEnumerable? Enumerable { get; set; }
@@ -121,7 +120,16 @@ namespace CliFx.Tests
             public HashSet<string>? StringHashSet { get; set; }
 
             [CommandOption(nameof(NonConvertible))]
-            public TestNonStringParseable? NonConvertible { get; set; }
+            public NonStringParseable? NonConvertible { get; set; }
+
+            public ValueTask ExecuteAsync(IConsole console) => default;
+        }
+
+        [Command]
+        private class CustomEnumerableCommand : ICommand
+        {
+            [CommandParameter(0)]
+            public CustomEnumerable<string>? Test { get; set; }
 
             public ValueTask ExecuteAsync(IConsole console) => default;
         }
