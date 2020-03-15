@@ -92,6 +92,8 @@ namespace CliFx.Domain
 
         public ICommand InitializeEntryPoint(CommandLineInput commandLineInput) =>
             InitializeEntryPoint(commandLineInput, new Dictionary<string, string>());
+
+        public override string ToString() => string.Join(Environment.NewLine, Commands);
     }
 
     internal partial class ApplicationSchema

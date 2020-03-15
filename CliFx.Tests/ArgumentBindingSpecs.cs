@@ -911,13 +911,66 @@ namespace CliFx.Tests
         }
 
         [Fact]
+        public void Property_annotated_as_a_required_option_must_always_be_bound_to_some_value()
+        {
+            // Arrange
+            var schema = ApplicationSchema.Resolve(new[] {typeof(RequiredOptionCommand)});
+
+            var input = new CommandLineInputBuilder()
+                .AddOption(nameof(RequiredOptionCommand.OptionA), "foo")
+                .Build();
+
+            // Act & assert
+            Assert.Throws<CliFxException>(() => schema.InitializeEntryPoint(input));
+        }
+
+        [Fact]
+        public void Property_annotated_as_parameter_is_bound_directly_from_argument_value_according_to_the_order()
+        {
+            // Arrange
+            var schema = ApplicationSchema.Resolve(new[] {typeof(ParametersCommand)});
+
+            var input = new CommandLineInputBuilder()
+                .AddUnboundArgument("foo")
+                .AddUnboundArgument("bar")
+                .AddUnboundArgument("hello")
+                .AddUnboundArgument("world")
+                .Build();
+
+            // Act
+            var command = schema.InitializeEntryPoint(input);
+
+            // Assert
+            command.Should().BeEquivalentTo(new ParametersCommand
+            {
+                ParameterA = "foo",
+                ParameterB = "bar",
+                ParameterC = new[] {"hello", "world"}
+            });
+        }
+
+        [Fact]
+        public void Property_annotated_as_parameter_must_always_be_bound_to_some_value()
+        {
+            // Arrange
+            var schema = ApplicationSchema.Resolve(new[] {typeof(ParametersCommand)});
+
+            var input = new CommandLineInputBuilder()
+                .AddUnboundArgument("foo")
+                .Build();
+
+            // Act & assert
+            Assert.Throws<CliFxException>(() => schema.InitializeEntryPoint(input));
+        }
+
+        [Fact]
         public void Property_of_custom_type_that_implements_IEnumerable_can_only_be_bound_if_that_type_has_a_constructor_accepting_an_array()
         {
             // Arrange
-            var schema = ApplicationSchema.Resolve(new[] {typeof(CustomEnumerableCommand)});
+            var schema = ApplicationSchema.Resolve(new[] {typeof(UnsupportedEnumerablePropertyTypeCommand)});
 
             var input = new CommandLineInputBuilder()
-                .AddOption(nameof(CustomEnumerableCommand.Option), "foo", "bar")
+                .AddOption(nameof(UnsupportedEnumerablePropertyTypeCommand.Option), "foo", "bar")
                 .Build();
 
             // Act & assert
@@ -942,10 +995,10 @@ namespace CliFx.Tests
         public void Property_must_have_a_type_supported_by_the_framework_in_order_to_be_bound()
         {
             // Arrange
-            var schema = ApplicationSchema.Resolve(new[] {typeof(NonStringParseableCommand)});
+            var schema = ApplicationSchema.Resolve(new[] {typeof(UnsupportedPropertyTypeCommand)});
 
             var input = new CommandLineInputBuilder()
-                .AddOption(nameof(NonStringParseableCommand.Option), "foo", "bar")
+                .AddOption(nameof(UnsupportedPropertyTypeCommand.Option), "foo")
                 .Build();
 
             // Act & assert

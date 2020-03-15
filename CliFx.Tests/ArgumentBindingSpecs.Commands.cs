@@ -119,26 +119,50 @@ namespace CliFx.Tests
             [CommandOption(nameof(StringHashSet))]
             public HashSet<string>? StringHashSet { get; set; }
 
-            [CommandOption(nameof(NonConvertible))]
-            public NonStringParseable? NonConvertible { get; set; }
+            public ValueTask ExecuteAsync(IConsole console) => default;
+        }
+
+        [Command]
+        private class RequiredOptionCommand : ICommand
+        {
+            [CommandOption(nameof(OptionA))]
+            public string? OptionA { get; set; }
+
+            [CommandOption(nameof(OptionB), IsRequired = true)]
+            public string? OptionB { get; set; }
 
             public ValueTask ExecuteAsync(IConsole console) => default;
         }
 
         [Command]
-        private class CustomEnumerableCommand : ICommand
+        private class ParametersCommand : ICommand
+        {
+            [CommandParameter(0)]
+            public string? ParameterA { get; set; }
+
+            [CommandParameter(1)]
+            public string? ParameterB { get; set; }
+
+            [CommandParameter(2)]
+            public IReadOnlyList<string>? ParameterC { get; set; }
+
+            public ValueTask ExecuteAsync(IConsole console) => default;
+        }
+
+        [Command]
+        private class UnsupportedPropertyTypeCommand : ICommand
+        {
+            [CommandOption(nameof(Option))]
+            public DummyType? Option { get; set; }
+
+            public ValueTask ExecuteAsync(IConsole console) => default;
+        }
+
+        [Command]
+        private class UnsupportedEnumerablePropertyTypeCommand : ICommand
         {
             [CommandOption(nameof(Option))]
             public CustomEnumerable<string>? Option { get; set; }
-
-            public ValueTask ExecuteAsync(IConsole console) => default;
-        }
-
-        [Command]
-        private class NonStringParseableCommand : ICommand
-        {
-            [CommandOption(nameof(Option))]
-            public NonStringParseable? Option { get; set; }
 
             public ValueTask ExecuteAsync(IConsole console) => default;
         }

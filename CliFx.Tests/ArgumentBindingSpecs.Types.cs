@@ -48,14 +48,8 @@ namespace CliFx.Tests
                 new StringParseableWithFormatProvider(value + " " + formatProvider);
         }
 
-        private class NonStringParseable
+        private class DummyType
         {
-            public int Value { get; }
-
-            public NonStringParseable(int value)
-            {
-                Value = value;
-            }
         }
 
         public class CustomEnumerable<T> : IEnumerable<T>

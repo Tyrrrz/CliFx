@@ -1,13 +1,32 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using CliWrap;
+using CliWrap.Buffered;
 using FluentAssertions;
 using Xunit;
 
 namespace CliFx.Tests
 {
-    public class VirtualConsoleSpecs
+    public class ConsoleSpecs
     {
+        [Fact]
+        public async Task Real_implementation_of_console_maps_directly_to_system_console()
+        {
+            // Arrange
+            var command = "Hello world" | Cli.Wrap("dotnet")
+                .WithArguments(a => a
+                    .Add(Dummy.Program.Location)
+                    .Add("console-test"));
+
+            // Act
+            var result = await command.ExecuteBufferedAsync();
+
+            // Assert
+            result.StandardOutput.TrimEnd().Should().Be("Hello world");
+            result.StandardError.TrimEnd().Should().Be("Hello world");
+        }
+
         [Fact]
         public void Fake_implementation_of_console_can_be_used_to_execute_commands_in_isolation()
         {
