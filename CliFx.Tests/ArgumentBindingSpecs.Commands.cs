@@ -123,6 +123,15 @@ namespace CliFx.Tests
         }
 
         [Command]
+        private class ArrayOptionCommand : ICommand
+        {
+            [CommandOption("option", 'o')]
+            public IReadOnlyList<string>? Option { get; set; }
+
+            public ValueTask ExecuteAsync(IConsole console) => default;
+        }
+
+        [Command]
         private class RequiredOptionCommand : ICommand
         {
             [CommandOption(nameof(OptionA))]

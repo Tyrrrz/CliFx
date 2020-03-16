@@ -911,6 +911,28 @@ namespace CliFx.Tests
         }
 
         [Fact]
+        public void Property_annotated_as_an_option_can_be_bound_from_multiple_values_even_if_the_inputs_use_mixed_naming()
+        {
+            // Arrange
+            var schema = ApplicationSchema.Resolve(new[] {typeof(ArrayOptionCommand)});
+
+            var input = new CommandLineInputBuilder()
+                .AddOption("option", "foo")
+                .AddOption("o", "bar")
+                .AddOption("option", "baz")
+                .Build();
+
+            // Act
+            var command = schema.InitializeEntryPoint(input);
+
+            // Assert
+            command.Should().BeEquivalentTo(new ArrayOptionCommand
+            {
+                Option = new[] {"foo", "bar", "baz"}
+            });
+        }
+
+        [Fact]
         public void Property_annotated_as_a_required_option_must_always_be_bound_to_some_value()
         {
             // Arrange

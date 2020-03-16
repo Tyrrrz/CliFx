@@ -93,7 +93,7 @@ namespace CliFx.Domain
             // All inputs must be bound
             var remainingOptionInputs = optionInputs.ToList();
 
-            // Keep track of required options so that we can raise an error if any of them are not set
+            // All required options must be set
             var unsetRequiredOptions = Options.Where(o => o.IsRequired).ToList();
 
             // Environment variables
@@ -112,15 +112,21 @@ namespace CliFx.Domain
                 }
             }
 
+            // TODO: refactor this part? I wrote this while sick
             // Direct input
-            foreach (var optionInput in optionInputs)
+            foreach (var option in Options)
             {
-                var option = Options.FirstOrDefault(o => o.MatchesNameOrShortName(optionInput.Alias));
+                var inputs = optionInputs
+                    .Where(i => option.MatchesNameOrShortName(i.Alias))
+                    .ToArray();
 
-                if (option != null)
+                if (inputs.Any())
                 {
-                    option.Inject(command, optionInput.Values);
-                    remainingOptionInputs.Remove(optionInput);
+                    option.Inject(command, inputs.SelectMany(i => i.Values).ToArray());
+
+                    foreach (var input in inputs)
+                        remainingOptionInputs.Remove(input);
+
                     unsetRequiredOptions.Remove(option);
                 }
             }
@@ -139,7 +145,7 @@ namespace CliFx.Domain
             {
                 throw new CliFxException(new StringBuilder()
                     .AppendLine("Unrecognized options provided:")
-                    .AppendBulletList(remainingOptionInputs.Select(o => o.Alias))
+                    .AppendBulletList(remainingOptionInputs.Select(o => o.Alias).Distinct())
                     .ToString());
             }
         }
