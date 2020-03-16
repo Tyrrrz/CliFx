@@ -42,6 +42,9 @@ namespace CliFx.Domain
 
         private void InjectParameters(ICommand command, IReadOnlyList<string> parameterInputs)
         {
+            // All inputs must be bound
+            var remainingParameterInputs = parameterInputs.ToList();
+
             // Scalar parameters
             var scalarParameters = Parameters
                 .OrderBy(p => p.Order)
@@ -57,6 +60,7 @@ namespace CliFx.Domain
                     : throw new CliFxException($"Missing value for parameter <{scalarParameter.DisplayName}>.");
 
                 scalarParameter.Inject(command, scalarParameterInput);
+                remainingParameterInputs.Remove(scalarParameterInput);
             }
 
             // Non-scalar parameter (only one is allowed)
@@ -68,6 +72,16 @@ namespace CliFx.Domain
             {
                 var nonScalarParameterInputs = parameterInputs.Skip(scalarParameters.Length).ToArray();
                 nonScalarParameter.Inject(command, nonScalarParameterInputs);
+                remainingParameterInputs.Clear();
+            }
+
+            // Ensure all inputs were bound
+            if (remainingParameterInputs.Any())
+            {
+                throw new CliFxException(new StringBuilder()
+                    .AppendLine("Unrecognized parameters provided:")
+                    .AppendBulletList(remainingParameterInputs)
+                    .ToString());
             }
         }
 
@@ -76,6 +90,9 @@ namespace CliFx.Domain
             IReadOnlyList<CommandOptionInput> optionInputs,
             IReadOnlyDictionary<string, string> environmentVariables)
         {
+            // All inputs must be bound
+            var remainingOptionInputs = optionInputs.ToList();
+
             // Keep track of required options so that we can raise an error if any of them are not set
             var unsetRequiredOptions = Options.Where(o => o.IsRequired).ToList();
 
@@ -103,15 +120,26 @@ namespace CliFx.Domain
                 if (option != null)
                 {
                     option.Inject(command, optionInput.Values);
+                    remainingOptionInputs.Remove(optionInput);
                     unsetRequiredOptions.Remove(option);
                 }
             }
 
+            // Ensure all required options were set
             if (unsetRequiredOptions.Any())
             {
                 throw new CliFxException(new StringBuilder()
                     .AppendLine("Missing values for some of the required options:")
                     .AppendBulletList(unsetRequiredOptions.Select(o => o.DisplayName))
+                    .ToString());
+            }
+
+            // Ensure all inputs were bound
+            if (remainingOptionInputs.Any())
+            {
+                throw new CliFxException(new StringBuilder()
+                    .AppendLine("Unrecognized options provided:")
+                    .AppendBulletList(remainingOptionInputs.Select(o => o.Alias))
                     .ToString());
             }
         }

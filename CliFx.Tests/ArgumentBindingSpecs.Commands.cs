@@ -166,5 +166,17 @@ namespace CliFx.Tests
 
             public ValueTask ExecuteAsync(IConsole console) => default;
         }
+
+        [Command]
+        private class NoParameterCommand : ICommand
+        {
+            [CommandOption(nameof(OptionA))]
+            public string? OptionA { get; set; }
+
+            [CommandOption(nameof(OptionB))]
+            public string? OptionB { get; set; }
+
+            public ValueTask ExecuteAsync(IConsole console) => default;
+        }
     }
 }

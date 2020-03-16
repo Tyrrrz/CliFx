@@ -1018,5 +1018,37 @@ namespace CliFx.Tests
             // Act & assert
             Assert.Throws<CliFxException>(() => schema.InitializeEntryPoint(input));
         }
+
+        [Fact]
+        public void All_provided_option_arguments_must_be_bound_to_corresponding_properties()
+        {
+            // Arrange
+            var schema = ApplicationSchema.Resolve(new[] {typeof(AllSupportedTypesCommand)});
+
+            var input = new CommandLineInputBuilder()
+                .AddOption("not-a-real-option", "boom")
+                .AddOption("fake-option", "poof")
+                .Build();
+
+            // Act & assert
+            Assert.Throws<CliFxException>(() => schema.InitializeEntryPoint(input));
+        }
+
+        [Fact]
+        public void All_provided_parameter_arguments_must_be_bound_to_corresponding_properties()
+        {
+            // Arrange
+            var schema = ApplicationSchema.Resolve(new[] {typeof(NoParameterCommand)});
+
+            var input = new CommandLineInputBuilder()
+                .AddUnboundArgument("boom")
+                .AddUnboundArgument("poof")
+                .AddOption(nameof(NoParameterCommand.OptionA), "foo")
+                .AddOption(nameof(NoParameterCommand.OptionB), "bar")
+                .Build();
+
+            // Act & assert
+            Assert.Throws<CliFxException>(() => schema.InitializeEntryPoint(input));
+        }
     }
 }
