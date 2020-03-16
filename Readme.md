@@ -21,6 +21,7 @@ An important property of CliFx, when compared to some other libraries, is that i
 - Configuration via attributes
 - Handles conversions to various types, including custom types
 - Supports multi-level command hierarchies
+- Exposes raw input, output, error streams to handle binary data
 - Allows graceful command cancellation
 - Prints errors and routes exit codes on exceptions
 - Provides comprehensive and colorful auto-generated help text
@@ -521,8 +522,8 @@ By substituting `IConsole` you can write your test cases like this:
 public async Task ConcatCommand_Test()
 {
     // Arrange
-    using var stdout = new StringWriter();
-    var console = new VirtualConsole(stdout);
+    await using var stdOut = new MemoryStream();
+    var console = new VirtualConsole(output: stdOut);
 
     var command = new ConcatCommand
     {
@@ -532,9 +533,10 @@ public async Task ConcatCommand_Test()
 
     // Act
     await command.ExecuteAsync(console);
+    var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray());
 
     // Assert
-    Assert.That(stdout.ToString(), Is.EqualTo("foo bar"));
+    Assert.That(stdOutData, Is.EqualTo("foo bar"));
 }
 ```
 
@@ -545,8 +547,8 @@ And if you want, you can also test the whole application in a similar fashion:
 public async Task ConcatCommand_Test()
 {
     // Arrange
-    using var stdout = new StringWriter();
-    var console = new VirtualConsole(stdout);
+    await using var stdOut = new MemoryStream();
+    var console = new VirtualConsole(output: stdOut);
 
     var app = new CliApplicationBuilder()
         .AddCommand(typeof(ConcatCommand))
@@ -558,13 +560,14 @@ public async Task ConcatCommand_Test()
 
     // Act
     await app.RunAsync(args, envVars);
+    var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray());
 
     // Assert
-    Assert.That(stdout.ToString(), Is.EqualTo("foo bar"));
+    Assert.That(stdOutData, Is.EqualTo("foo bar"));
 }
 ```
 
-Generally, the first approach is more preferable as it's less verbose and lets you test a specific command in complete isolation.
+Note that CliFx applications have access to underlying binary streams that allows them to write binary data directly. By using the approach outlined above, we're making the assumption that the application is only expected to produce text output.
 
 ### Debug and preview mode
 
