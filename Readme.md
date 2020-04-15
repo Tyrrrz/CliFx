@@ -35,18 +35,26 @@ An important property of CliFx, when compared to some other libraries, is that i
 
 ## Usage
 
-- [Quick start](#quick-start)
-- [Binding arguments](#binding-arguments)
-- [Argument syntax](#argument-syntax)
-- [Value conversion](#value-conversion)
-- [Multiple commands](#multiple-commands)
-- [Reporting errors](#reporting-errors)
-- [Graceful cancellation](#graceful-cancellation)
-- [Dependency injection](#dependency-injection)
-- [Testing](#testing)
-- [Debug and preview mode](#debug-and-preview-mode)
-- [Reporting progress](#reporting-progress)
-- [Environment variables](#environment-variables)
+- [CliFx](#clifx)
+  - [Download](#download)
+  - [Features](#features)
+  - [Screenshots](#screenshots)
+  - [Usage](#usage)
+    - [Quick start](#quick-start)
+    - [Binding arguments](#binding-arguments)
+    - [Argument syntax](#argument-syntax)
+    - [Value conversion](#value-conversion)
+    - [Multiple commands](#multiple-commands)
+    - [Reporting errors](#reporting-errors)
+        - [Customizing Error Reporting](#customizing-error-reporting)
+    - [Graceful cancellation](#graceful-cancellation)
+    - [Dependency injection](#dependency-injection)
+    - [Testing](#testing)
+    - [Debug and preview mode](#debug-and-preview-mode)
+    - [Reporting progress](#reporting-progress)
+    - [Environment variables](#environment-variables)
+  - [Benchmarks](#benchmarks)
+  - [Etymology](#etymology)
 
 ### Quick start
 
@@ -428,6 +436,35 @@ Division by zero is not supported.
 > $LastExitCode
 
 1337
+```
+
+##### Customizing Error Reporting
+
+You can use the `CommandErrorDisplayOptions` flags enum for some basic customization of error reporting. For example, you can tell `CliFx` to show the command's help text upon an error like this:
+
+```c#
+[Command]
+public class ExampleCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        throw new CommandException(errorDisplayOptions: CommandErrorDisplayOptions.HelpText);
+    }
+}
+```
+
+To display an error message before the help text, throw the `CommandException` like this:
+
+```c#
+[Command]
+public class ExampleCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        throw new CommandException("My custom error message.",
+           CommandErrorDisplayOptions.ExceptionMessage | CommandErrorDisplayOptions.HelpText);
+    }
+}
 ```
 
 ### Graceful cancellation
