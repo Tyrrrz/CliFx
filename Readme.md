@@ -467,7 +467,7 @@ public class ExampleCommand : ICommand
 }
 ```
 
-If you don't want `CliFx` to display any errors upon throwing an exception, simply set the `CommandErrorDisplayOptions.NoError` flag in the exception like this:
+If you don't want `CliFx` to display any errors upon throwing an exception, simply set the `CommandErrorDisplayOptions.None` flag in the exception like this:
 
 ```c#
 [Command]
