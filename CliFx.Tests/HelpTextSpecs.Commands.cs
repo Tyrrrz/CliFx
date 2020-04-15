@@ -117,9 +117,7 @@ namespace CliFx.Tests
         [Command("cmd sub")]
         private class ShowErrorMessageThenHelpTextOnCommandExceptionSubCommand : ICommand
         {
-            public ValueTask ExecuteAsync(IConsole console) =>
-                throw new CommandException("Error message.",
-                    CommandErrorDisplayOptions.ExceptionMessage | CommandErrorDisplayOptions.HelpText);
+            public ValueTask ExecuteAsync(IConsole console) => default;
         }
     }
 }
