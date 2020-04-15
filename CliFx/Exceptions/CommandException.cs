@@ -12,6 +12,11 @@ namespace CliFx.Exceptions
         private const int DefaultExitCode = -100;
 
         /// <summary>
+        /// How to display 
+        /// </summary>
+        public CommandErrorDisplayOptions ErrorDisplayOptions { get; }
+
+        /// <summary>
         /// Process exit code.
         /// </summary>
         public int ExitCode { get; }
@@ -19,9 +24,11 @@ namespace CliFx.Exceptions
         /// <summary>
         /// Initializes an instance of <see cref="CommandException"/>.
         /// </summary>
-        public CommandException(string? message, Exception? innerException, int exitCode = DefaultExitCode)
-            : base(message, innerException)
+        public CommandException(string? message, Exception? innerException, int exitCode = DefaultExitCode,
+            CommandErrorDisplayOptions errorDisplayOptions = CommandErrorDisplayOptions.ExceptionMessage)
+                : base(message, innerException)
         {
+            ErrorDisplayOptions = errorDisplayOptions;
             ExitCode = exitCode != 0
                 ? exitCode
                 : throw new ArgumentException("Exit code must not be zero in order to signify failure.");
@@ -30,9 +37,10 @@ namespace CliFx.Exceptions
         /// <summary>
         /// Initializes an instance of <see cref="CommandException"/>.
         /// </summary>
-        public CommandException(string? message, int exitCode = DefaultExitCode)
-            : this(message, null, exitCode)
-        {
+        public CommandException(string? message, int exitCode = DefaultExitCode, 
+            CommandErrorDisplayOptions errorDisplayOptions = CommandErrorDisplayOptions.ExceptionMessage)
+                : this(message, null, exitCode, errorDisplayOptions)
+        {            
         }
 
         /// <summary>

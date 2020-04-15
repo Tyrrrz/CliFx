@@ -144,6 +144,36 @@ namespace CliFx
         }
 
         /// <summary>
+        /// Handle <see cref="CommandException"/> differently from the rest because we want to
+        /// display it different based on the <see cref="CommandErrorDisplayOptions"/> associated
+        /// with the error.
+        /// </summary>
+        private int HandleCommandException(IReadOnlyList<string> commandLineArguments, CommandException commandException)
+        {
+            var commandErrorDisplayOptions = commandException.ErrorDisplayOptions;
+
+            if (commandErrorDisplayOptions.HasFlag(CommandErrorDisplayOptions.None))
+            {
+                return commandException.ExitCode;
+            }
+
+            if (commandErrorDisplayOptions.HasFlag(CommandErrorDisplayOptions.ExceptionMessage))
+            {
+                var errorMessage = commandException.Message;
+                _console.WithForegroundColor(ConsoleColor.Red, () => _console.Error.WriteLine(errorMessage));
+            }
+
+            if (commandErrorDisplayOptions.HasFlag(CommandErrorDisplayOptions.HelpText))
+            {
+                var applicationSchema = ApplicationSchema.Resolve(_configuration.CommandTypes);
+                var commandLineInput = CommandLineInput.Parse(commandLineArguments);
+                HandleHelpOption(applicationSchema, commandLineInput);
+            }
+
+            return commandException.ExitCode;
+        }
+
+        /// <summary>
         /// Runs the application with specified command line arguments and environment variables, and returns the exit code.
         /// </summary>
         public async ValueTask<int> RunAsync(
@@ -162,21 +192,24 @@ namespace CliFx
                     HandleHelpOption(applicationSchema, commandLineInput) ??
                     await HandleCommandExecutionAsync(applicationSchema, commandLineInput, environmentVariables);
             }
-            catch (Exception ex)
+            catch (CommandException ce)
             {
                 // We want to catch exceptions in order to print errors and return correct exit codes.
                 // Doing this also gets rid of the annoying Windows troubleshooting dialog that shows up on unhandled exceptions.
-
-                // Prefer showing message without stack trace on exceptions coming from CliFx or on CommandException
-                var errorMessage = !string.IsNullOrWhiteSpace(ex.Message) && (ex is CliFxException || ex is CommandException)
-                    ? ex.Message
-                    : ex.ToString();
-
-                _console.WithForegroundColor(ConsoleColor.Red, () => _console.Error.WriteLine(errorMessage));
-
-                return ex is CommandException commandException
-                    ? commandException.ExitCode
-                    : ex.HResult;
+                var exitCode = HandleCommandException(commandLineArguments, ce);
+                return ce.ExitCode;
+            }
+            catch (CliFxException cfe)
+            {
+                // Prefer showing message without stack trace on CliFxExceptions.
+                _console.WithForegroundColor(ConsoleColor.Red, () => _console.Error.WriteLine(cfe.Message));
+                return cfe.HResult;
+            }
+            catch (Exception ex)
+            {
+                // For all other errors, we just write the entire thing to stderr.
+                _console.WithForegroundColor(ConsoleColor.Red, () => _console.Error.WriteLine(ex.ToString()));
+                return ex.HResult;
             }
         }
 
