@@ -46,9 +46,29 @@ namespace CliFx.Exceptions
         /// <summary>
         /// Initializes an instance of <see cref="CommandException"/>.
         /// </summary>
+        public CommandException(string? message, 
+            CommandErrorDisplayOptions errorDisplayOptions = CommandErrorDisplayOptions.ExceptionMessage, 
+            int exitCode = DefaultExitCode)
+                : this(message, null, exitCode, errorDisplayOptions)
+        {
+        }
+
+        /// <summary>
+        /// Initializes an instance of <see cref="CommandException"/>.
+        /// </summary>
+        public CommandException(
+            CommandErrorDisplayOptions errorDisplayOptions = CommandErrorDisplayOptions.ExceptionMessage,
+            int exitCode = DefaultExitCode)
+                : this(null, exitCode, errorDisplayOptions)
+        {
+        }
+
+        /// <summary>
+        /// Initializes an instance of <see cref="CommandException"/>.
+        /// </summary>
         public CommandException(int exitCode = DefaultExitCode)
             : this(null, exitCode)
         {
-        }
+        }        
     }
 }

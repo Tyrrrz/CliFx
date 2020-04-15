@@ -167,7 +167,9 @@ namespace CliFx
             {
                 var applicationSchema = ApplicationSchema.Resolve(_configuration.CommandTypes);
                 var commandLineInput = CommandLineInput.Parse(commandLineArguments);
-                HandleHelpOption(applicationSchema, commandLineInput);
+                var commandSchema = applicationSchema.TryFindCommand(commandLineInput) ??
+                    CommandSchema.StubDefaultCommand;
+                _helpTextWriter.Write(applicationSchema, commandSchema);
             }
 
             return commandException.ExitCode;

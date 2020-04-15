@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using CliFx.Attributes;
+using CliFx.Exceptions;
 
 namespace CliFx.Tests
 {
@@ -91,6 +92,34 @@ namespace CliFx.Tests
             public string? OptionB { get; set; }
 
             public ValueTask ExecuteAsync(IConsole console) => default;
+        }
+
+        [Command("cmd")]
+        private class ShowHelpTextOnCommandExceptionCommand : ICommand
+        {
+            public ValueTask ExecuteAsync(IConsole console) => throw new CommandException(CommandErrorDisplayOptions.HelpText);
+        }
+
+        [Command("cmd sub")]
+        private class ShowHelpTextOnCommandExceptionSubCommand : ICommand
+        {
+            public ValueTask ExecuteAsync(IConsole console) => default;
+        }
+
+        [Command("cmd")]
+        private class ShowErrorMessageThenHelpTextOnCommandExceptionCommand : ICommand
+        {
+            public ValueTask ExecuteAsync(IConsole console) => 
+                throw new CommandException("Error message.",
+                    CommandErrorDisplayOptions.ExceptionMessage | CommandErrorDisplayOptions.HelpText);
+        }
+
+        [Command("cmd sub")]
+        private class ShowErrorMessageThenHelpTextOnCommandExceptionSubCommand : ICommand
+        {
+            public ValueTask ExecuteAsync(IConsole console) =>
+                throw new CommandException("Error message.",
+                    CommandErrorDisplayOptions.ExceptionMessage | CommandErrorDisplayOptions.HelpText);
         }
     }
 }

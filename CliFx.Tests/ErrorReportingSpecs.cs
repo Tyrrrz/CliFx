@@ -80,5 +80,29 @@ namespace CliFx.Tests
             exitCode.Should().NotBe(0);
             stdErrData.Should().NotBeEmpty();
         }
+
+        [Fact]
+        public async Task Command_may_throw_a_specialized_exception_and_show_no_error_messages_nor_error_details()
+        {
+            // Arrange
+            await using var stdErr = new MemoryStream();
+            var console = new VirtualConsole(error: stdErr);
+
+            var application = new CliApplicationBuilder()
+                .AddCommand(typeof(NoErrorOutputExceptionCommand))
+                .UseConsole(console)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(
+                new[] { "exc", "-m", "Kaput" },
+                new Dictionary<string, string>());
+
+            var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray()).TrimEnd();
+
+            // Assert
+            exitCode.Should().NotBe(0);
+            stdErrData.Should().BeEmpty();
+        }
     }
 }

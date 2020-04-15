@@ -10,21 +10,20 @@ namespace CliFx.Exceptions
     [Flags]
     public enum CommandErrorDisplayOptions
     {
-        
+        /// <summary>
+        /// Do not display anything.
+        /// </summary>
+        None = 1,
+
         /// <summary>
         /// Show the exception message.
         /// </summary>
-        ExceptionMessage = 1,
+        ExceptionMessage = 2,
 
         /// <summary>
         /// Show only the help text associated with this command.
         /// As if the user entered the -h/--help option.
         /// </summary>
-        HelpText = 2,
-
-        /// <summary>
-        /// Do not display anything.
-        /// </summary>
-        None = 4,
+        HelpText = 4,        
     }
 }
