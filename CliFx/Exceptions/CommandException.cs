@@ -12,7 +12,7 @@ namespace CliFx.Exceptions
         private const int DefaultExitCode = -100;
 
         /// <summary>
-        /// How to display 
+        /// Gets the error display options for this exception.
         /// </summary>
         public CommandErrorDisplayOptions ErrorDisplayOptions { get; }
 
