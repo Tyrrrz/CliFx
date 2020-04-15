@@ -467,6 +467,19 @@ public class ExampleCommand : ICommand
 }
 ```
 
+If you don't want `CliFx` to display any errors upon throwing an exception, simply set the `CommandErrorDisplayOptions.NoError` flag in the exception like this:
+
+```c#
+[Command]
+public class ExampleCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        throw new CommandException(errorDisplayOptions: CommandErrorDisplayOptions.None);
+    }
+}
+```
+
 ### Graceful cancellation
 
 It is possible to gracefully cancel execution of a command and preform any necessary cleanup. By default an app gets forcefully killed when it receives an interrupt signal (Ctrl+C or Ctrl+Break), but you can easily override this behavior.
