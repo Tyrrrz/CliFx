@@ -933,13 +933,27 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public void Property_annotated_as_a_required_option_must_always_be_bound_to_some_value()
+        public void Property_annotated_as_a_required_option_must_always_be_set()
         {
             // Arrange
             var schema = ApplicationSchema.Resolve(new[] {typeof(RequiredOptionCommand)});
 
             var input = new CommandLineInputBuilder()
                 .AddOption(nameof(RequiredOptionCommand.OptionA), "foo")
+                .Build();
+
+            // Act & assert
+            Assert.Throws<CliFxException>(() => schema.InitializeEntryPoint(input));
+        }
+
+        [Fact]
+        public void Property_annotated_as_a_required_option_must_always_be_bound_to_some_value()
+        {
+            // Arrange
+            var schema = ApplicationSchema.Resolve(new[] {typeof(RequiredOptionCommand)});
+
+            var input = new CommandLineInputBuilder()
+                .AddOption(nameof(RequiredOptionCommand.OptionB))
                 .Build();
 
             // Act & assert

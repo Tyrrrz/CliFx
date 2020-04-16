@@ -1,18 +1,20 @@
 ﻿// ReSharper disable CheckNamespace
 
-#if NET45 || NETSTANDARD2_0
-using System.Collections.Generic;
-using System.Text;
+// Polyfills to bridge the missing APIs in older versions of the framework/standard.
 
-namespace CliFx.Internal
+#if NETSTANDARD2_0 || NET45
+namespace System.Collections.Generic
 {
-    internal static class Polyfills
+    internal static class Extensions
     {
-        public static TValue GetValueOrDefault<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> self, TKey key) =>
-            self.TryGetValue(key, out var value) ? value : default;
+        public static void Deconstruct<TKey, TValue>(this KeyValuePair<TKey, TValue> pair, out TKey key, out TValue value)
+        {
+            key = pair.Key;
+            value = pair.Value;
+        }
 
-        public static StringBuilder AppendJoin<T>(this StringBuilder self, string separator, IEnumerable<T> items) =>
-            self.Append(string.Join(separator, items));
+        public static TValue GetValueOrDefault<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dic, TKey key) =>
+            dic.TryGetValue(key, out var result) ? result! : default!;
     }
 }
 #endif

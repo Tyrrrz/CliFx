@@ -97,15 +97,15 @@ namespace CliFx.Domain
             var unsetRequiredOptions = Options.Where(o => o.IsRequired).ToList();
 
             // Environment variables
-            foreach (var environmentVariable in environmentVariables)
+            foreach (var (name, value) in environmentVariables)
             {
-                var option = Options.FirstOrDefault(o => o.MatchesEnvironmentVariableName(environmentVariable.Key));
+                var option = Options.FirstOrDefault(o => o.MatchesEnvironmentVariableName(name));
 
                 if (option != null)
                 {
                     var values = option.IsScalar
-                        ? new[] {environmentVariable.Value}
-                        : environmentVariable.Value.Split(Path.PathSeparator);
+                        ? new[] {value}
+                        : value.Split(Path.PathSeparator);
 
                     option.Inject(command, values);
                     unsetRequiredOptions.Remove(option);
@@ -122,12 +122,14 @@ namespace CliFx.Domain
 
                 if (inputs.Any())
                 {
-                    option.Inject(command, inputs.SelectMany(i => i.Values).ToArray());
+                    var inputValues = inputs.SelectMany(i => i.Values).ToArray();
+                    option.Inject(command, inputValues);
 
                     foreach (var input in inputs)
                         remainingOptionInputs.Remove(input);
 
-                    unsetRequiredOptions.Remove(option);
+                    if (inputValues.Any())
+                        unsetRequiredOptions.Remove(option);
                 }
             }
 
