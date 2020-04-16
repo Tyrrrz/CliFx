@@ -126,6 +126,26 @@ namespace CliFx.Tests
         }
 
         [Fact]
+        public void Command_options_must_have_names_that_are_not_empty()
+        {
+            // Arrange
+            var commandTypes = new[] {typeof(EmptyOptionNameCommand)};
+
+            // Act & assert
+            Assert.Throws<CliFxException>(() => ApplicationSchema.Resolve(commandTypes));
+        }
+
+        [Fact]
+        public void Command_options_must_have_names_that_are_longer_than_one_character()
+        {
+            // Arrange
+            var commandTypes = new[] {typeof(SingleCharacterOptionNameCommand)};
+
+            // Act & assert
+            Assert.Throws<CliFxException>(() => ApplicationSchema.Resolve(commandTypes));
+        }
+
+        [Fact]
         public void Command_options_must_have_unique_names()
         {
             // Arrange

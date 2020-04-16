@@ -163,6 +163,35 @@ namespace CliFx.Domain
 
         private static void ValidateOptions(CommandSchema command)
         {
+            var emptyNameGroup = command.Options
+                .Where(o => o.ShortName == null && string.IsNullOrWhiteSpace(o.Name))
+                .ToArray();
+
+            if (emptyNameGroup.Any())
+            {
+                throw new CliFxException(new StringBuilder()
+                    .AppendLine($"Command {command.Type.FullName} contains one or more options that have empty names:")
+                    .AppendBulletList(emptyNameGroup.Select(o => o.Property.Name))
+                    .AppendLine()
+                    .Append("Options in a command must all have at least a name or a short name.")
+                    .ToString());
+            }
+
+            var invalidNameGroup = command.Options
+                .Where(o => !string.IsNullOrWhiteSpace(o.Name))
+                .Where(o => o.Name.Length <= 1)
+                .ToArray();
+
+            if (invalidNameGroup.Any())
+            {
+                throw new CliFxException(new StringBuilder()
+                    .AppendLine($"Command {command.Type.FullName} contains one or more options that have names that are too short:")
+                    .AppendBulletList(invalidNameGroup.Select(o => o.Property.Name))
+                    .AppendLine()
+                    .Append("Options in a command must all have names that are longer than a single character.")
+                    .ToString());
+            }
+
             var duplicateNameGroup = command.Options
                 .Where(o => !string.IsNullOrWhiteSpace(o.Name))
                 .GroupBy(o => o.Name, StringComparer.OrdinalIgnoreCase)
