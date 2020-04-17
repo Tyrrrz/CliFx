@@ -154,6 +154,8 @@ namespace CliFx
 
             if (commandErrorDisplayOptions.HasFlag(CommandErrorDisplayOptions.None))
             {
+				// Return early because we don't want to print anything if
+				// the display option is set to 'None'.
                 return commandException.ExitCode;
             }
 
@@ -199,7 +201,7 @@ namespace CliFx
                 // We want to catch exceptions in order to print errors and return correct exit codes.
                 // Doing this also gets rid of the annoying Windows troubleshooting dialog that shows up on unhandled exceptions.
                 var exitCode = HandleCommandException(commandLineArguments, ce);
-                return ce.ExitCode;
+                return exitCode;
             }
             catch (CliFxException cfe)
             {
