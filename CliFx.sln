@@ -10,16 +10,20 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3AAE8166-BB8E-49DA-844C-3A0EE6BD40A0}"
 	ProjectSection(SolutionItems) = preProject
 		Changelog.md = Changelog.md
+		CliFx.props = CliFx.props
 		License.txt = License.txt
 		Readme.md = Readme.md
-		CliFx.props = CliFx.props
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CliFx.Benchmarks", "CliFx.Benchmarks\CliFx.Benchmarks.csproj", "{8ACD6DC2-D768-4850-9223-5B7C83A78513}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CliFx.Demo", "CliFx.Demo\CliFx.Demo.csproj", "{AAB6844C-BF71-448F-A11B-89AEE459AB15}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CliFx.Tests.Dummy", "CliFx.Tests.Dummy\CliFx.Tests.Dummy.csproj", "{F717347D-8656-44DA-A4A2-BE515E8C4655}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CliFx.Tests.Dummy", "CliFx.Tests.Dummy\CliFx.Tests.Dummy.csproj", "{F717347D-8656-44DA-A4A2-BE515E8C4655}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CliFx.Analyzers", "CliFx.Analyzers\CliFx.Analyzers.csproj", "{F8460D69-F8CF-405C-A6ED-BED02A21DB42}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CliFx.Analyzers.Tests", "CliFx.Analyzers.Tests\CliFx.Analyzers.Tests.csproj", "{49878E75-2097-4C79-9151-B98A28FBB973}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -91,6 +95,30 @@ Global
 		{F717347D-8656-44DA-A4A2-BE515E8C4655}.Release|x64.Build.0 = Release|Any CPU
 		{F717347D-8656-44DA-A4A2-BE515E8C4655}.Release|x86.ActiveCfg = Release|Any CPU
 		{F717347D-8656-44DA-A4A2-BE515E8C4655}.Release|x86.Build.0 = Release|Any CPU
+		{F8460D69-F8CF-405C-A6ED-BED02A21DB42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8460D69-F8CF-405C-A6ED-BED02A21DB42}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8460D69-F8CF-405C-A6ED-BED02A21DB42}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F8460D69-F8CF-405C-A6ED-BED02A21DB42}.Debug|x64.Build.0 = Debug|Any CPU
+		{F8460D69-F8CF-405C-A6ED-BED02A21DB42}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F8460D69-F8CF-405C-A6ED-BED02A21DB42}.Debug|x86.Build.0 = Debug|Any CPU
+		{F8460D69-F8CF-405C-A6ED-BED02A21DB42}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8460D69-F8CF-405C-A6ED-BED02A21DB42}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8460D69-F8CF-405C-A6ED-BED02A21DB42}.Release|x64.ActiveCfg = Release|Any CPU
+		{F8460D69-F8CF-405C-A6ED-BED02A21DB42}.Release|x64.Build.0 = Release|Any CPU
+		{F8460D69-F8CF-405C-A6ED-BED02A21DB42}.Release|x86.ActiveCfg = Release|Any CPU
+		{F8460D69-F8CF-405C-A6ED-BED02A21DB42}.Release|x86.Build.0 = Release|Any CPU
+		{49878E75-2097-4C79-9151-B98A28FBB973}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49878E75-2097-4C79-9151-B98A28FBB973}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49878E75-2097-4C79-9151-B98A28FBB973}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{49878E75-2097-4C79-9151-B98A28FBB973}.Debug|x64.Build.0 = Debug|Any CPU
+		{49878E75-2097-4C79-9151-B98A28FBB973}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{49878E75-2097-4C79-9151-B98A28FBB973}.Debug|x86.Build.0 = Debug|Any CPU
+		{49878E75-2097-4C79-9151-B98A28FBB973}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49878E75-2097-4C79-9151-B98A28FBB973}.Release|Any CPU.Build.0 = Release|Any CPU
+		{49878E75-2097-4C79-9151-B98A28FBB973}.Release|x64.ActiveCfg = Release|Any CPU
+		{49878E75-2097-4C79-9151-B98A28FBB973}.Release|x64.Build.0 = Release|Any CPU
+		{49878E75-2097-4C79-9151-B98A28FBB973}.Release|x86.ActiveCfg = Release|Any CPU
+		{49878E75-2097-4C79-9151-B98A28FBB973}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
