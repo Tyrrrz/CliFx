@@ -43,7 +43,7 @@ namespace CliFx.Tests
                 .UseVersionText("test")
                 .UseDescription("test")
                 .UseConsole(new VirtualConsole(Stream.Null))
-                .UseTypeActivator(Activator.CreateInstance)
+                .UseTypeActivator(Activator.CreateInstance!)
                 .Build();
 
             // Assert
@@ -212,7 +212,7 @@ namespace CliFx.Tests
                     new[]
                     {
                         new CommandParameterSchema(
-                            typeof(HiddenPropertiesCommand).GetProperty(nameof(HiddenPropertiesCommand.Parameter)),
+                            typeof(HiddenPropertiesCommand).GetProperty(nameof(HiddenPropertiesCommand.Parameter))!,
                             13,
                             "param",
                             "Param description")
@@ -220,7 +220,7 @@ namespace CliFx.Tests
                     new[]
                     {
                         new CommandOptionSchema(
-                            typeof(HiddenPropertiesCommand).GetProperty(nameof(HiddenPropertiesCommand.Option)),
+                            typeof(HiddenPropertiesCommand).GetProperty(nameof(HiddenPropertiesCommand.Option))!,
                             "option",
                             'o',
                             "ENV",

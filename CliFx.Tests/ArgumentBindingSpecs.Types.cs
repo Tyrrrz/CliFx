@@ -17,20 +17,14 @@ namespace CliFx.Tests
         {
             public string Value { get; }
 
-            public StringConstructable(string value)
-            {
-                Value = value;
-            }
+            public StringConstructable(string value) => Value = value;
         }
 
         private class StringParseable
         {
             public string Value { get; }
 
-            private StringParseable(string value)
-            {
-                Value = value;
-            }
+            private StringParseable(string value) => Value = value;
 
             public static StringParseable Parse(string value) => new StringParseable(value);
         }
@@ -39,10 +33,7 @@ namespace CliFx.Tests
         {
             public string Value { get; }
 
-            private StringParseableWithFormatProvider(string value)
-            {
-                Value = value;
-            }
+            private StringParseableWithFormatProvider(string value) => Value = value;
 
             public static StringParseableWithFormatProvider Parse(string value, IFormatProvider formatProvider) =>
                 new StringParseableWithFormatProvider(value + " " + formatProvider);
@@ -54,9 +45,7 @@ namespace CliFx.Tests
 
         public class CustomEnumerable<T> : IEnumerable<T>
         {
-            private readonly T[] _arr = new T[0];
-
-            public IEnumerator<T> GetEnumerator() => ((IEnumerable<T>) _arr).GetEnumerator();
+            public IEnumerator<T> GetEnumerator() => ((IEnumerable<T>) Array.Empty<T>()).GetEnumerator();
 
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
