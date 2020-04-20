@@ -210,8 +210,8 @@ namespace CliFx.Domain
                 type,
                 attribute?.Name,
                 attribute?.Description,
-                parameters,
-                options
+                parameters!,
+                options!
             );
         }
     }
