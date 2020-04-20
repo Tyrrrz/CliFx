@@ -15,18 +15,6 @@ namespace CliFx.Internal
         public static StringBuilder AppendIfNotEmpty(this StringBuilder builder, char value) =>
             builder.Length > 0 ? builder.Append(value) : builder;
 
-        public static StringBuilder AppendBulletList<T>(this StringBuilder builder, IEnumerable<T> items)
-        {
-            foreach (var item in items)
-            {
-                builder.Append("- ");
-                builder.Append(item);
-                builder.AppendLine();
-            }
-
-            return builder;
-        }
-
         public static bool Implements(this Type type, Type interfaceType) => type.GetInterfaces().Contains(interfaceType);
 
         public static Type? GetNullableUnderlyingType(this Type type) => Nullable.GetUnderlyingType(type);

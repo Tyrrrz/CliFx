@@ -3,7 +3,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using CliFx.Attributes;
-using CliFx.Internal;
 
 namespace CliFx.Domain
 {
@@ -13,9 +12,9 @@ namespace CliFx.Domain
 
         public char? ShortName { get; }
 
-        public string DisplayName => !string.IsNullOrWhiteSpace(Name)
-            ? Name
-            : ShortName?.AsString()!;
+        public override string DisplayName => !string.IsNullOrWhiteSpace(Name)
+            ? $"--{Name}"
+            : $"-{ShortName}";
 
         public string? EnvironmentVariableName { get; }
 

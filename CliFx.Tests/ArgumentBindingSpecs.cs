@@ -5,11 +5,16 @@ using CliFx.Domain;
 using CliFx.Exceptions;
 using FluentAssertions;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace CliFx.Tests
 {
     public partial class ArgumentBindingSpecs
     {
+        private readonly ITestOutputHelper _output;
+
+        public ArgumentBindingSpecs(ITestOutputHelper output) => _output = output;
+
         [Fact]
         public void Property_of_type_object_is_bound_directly_from_the_argument_value()
         {
@@ -943,7 +948,8 @@ namespace CliFx.Tests
                 .Build();
 
             // Act & assert
-            Assert.Throws<CliFxException>(() => schema.InitializeEntryPoint(input));
+            var ex = Assert.Throws<CliFxException>(() => schema.InitializeEntryPoint(input));
+            _output.WriteLine(ex.Message);
         }
 
         [Fact]
@@ -957,7 +963,8 @@ namespace CliFx.Tests
                 .Build();
 
             // Act & assert
-            Assert.Throws<CliFxException>(() => schema.InitializeEntryPoint(input));
+            var ex = Assert.Throws<CliFxException>(() => schema.InitializeEntryPoint(input));
+            _output.WriteLine(ex.Message);
         }
 
         [Fact]
@@ -996,7 +1003,8 @@ namespace CliFx.Tests
                 .Build();
 
             // Act & assert
-            Assert.Throws<CliFxException>(() => schema.InitializeEntryPoint(input));
+            var ex = Assert.Throws<CliFxException>(() => schema.InitializeEntryPoint(input));
+            _output.WriteLine(ex.Message);
         }
 
         [Fact]
@@ -1010,7 +1018,8 @@ namespace CliFx.Tests
                 .Build();
 
             // Act & assert
-            Assert.Throws<CliFxException>(() => schema.InitializeEntryPoint(input));
+            var ex = Assert.Throws<CliFxException>(() => schema.InitializeEntryPoint(input));
+            _output.WriteLine(ex.Message);
         }
 
         [Fact]
@@ -1024,7 +1033,8 @@ namespace CliFx.Tests
                 .Build();
 
             // Act & assert
-            Assert.Throws<CliFxException>(() => schema.InitializeEntryPoint(input));
+            var ex = Assert.Throws<CliFxException>(() => schema.InitializeEntryPoint(input));
+            _output.WriteLine(ex.Message);
         }
 
         [Fact]
@@ -1038,7 +1048,8 @@ namespace CliFx.Tests
                 .Build();
 
             // Act & assert
-            Assert.Throws<CliFxException>(() => schema.InitializeEntryPoint(input));
+            var ex = Assert.Throws<CliFxException>(() => schema.InitializeEntryPoint(input));
+            _output.WriteLine(ex.Message);
         }
 
         [Fact]
@@ -1052,7 +1063,8 @@ namespace CliFx.Tests
                 .Build();
 
             // Act & assert
-            Assert.Throws<CliFxException>(() => schema.InitializeEntryPoint(input));
+            var ex = Assert.Throws<CliFxException>(() => schema.InitializeEntryPoint(input));
+            _output.WriteLine(ex.Message);
         }
 
         [Fact]
@@ -1067,7 +1079,8 @@ namespace CliFx.Tests
                 .Build();
 
             // Act & assert
-            Assert.Throws<CliFxException>(() => schema.InitializeEntryPoint(input));
+            var ex = Assert.Throws<CliFxException>(() => schema.InitializeEntryPoint(input));
+            _output.WriteLine(ex.Message);
         }
 
         [Fact]
@@ -1084,7 +1097,8 @@ namespace CliFx.Tests
                 .Build();
 
             // Act & assert
-            Assert.Throws<CliFxException>(() => schema.InitializeEntryPoint(input));
+            var ex = Assert.Throws<CliFxException>(() => schema.InitializeEntryPoint(input));
+            _output.WriteLine(ex.Message);
         }
     }
 }

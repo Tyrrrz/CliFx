@@ -173,10 +173,10 @@ namespace CliFx
 
     public partial class CliApplicationBuilder
     {
-        private static readonly Lazy<Assembly> LazyEntryAssembly = new Lazy<Assembly>(Assembly.GetEntryAssembly);
+        private static readonly Lazy<Assembly?> LazyEntryAssembly = new Lazy<Assembly?>(Assembly.GetEntryAssembly);
 
         // Entry assembly is null in tests
-        private static Assembly EntryAssembly => LazyEntryAssembly.Value;
+        private static Assembly? EntryAssembly => LazyEntryAssembly.Value;
 
         private static string? GetDefaultTitle() => EntryAssembly?.GetName().Name;
 
@@ -184,14 +184,12 @@ namespace CliFx
         {
             var entryAssemblyLocation = EntryAssembly?.Location;
 
-            // If it's a .dll assembly, prepend 'dotnet' and keep the file extension
-            if (string.Equals(Path.GetExtension(entryAssemblyLocation), ".dll", StringComparison.OrdinalIgnoreCase))
-            {
-                return "dotnet " + Path.GetFileName(entryAssemblyLocation);
-            }
+            // The assembly can be an executable or a dll, depending on how it was packaged
+            var isDll = string.Equals(Path.GetExtension(entryAssemblyLocation), ".dll", StringComparison.OrdinalIgnoreCase);
 
-            // Otherwise just use assembly file name without extension
-            return Path.GetFileNameWithoutExtension(entryAssemblyLocation);
+            return isDll
+                ? "dotnet " + Path.GetFileName(entryAssemblyLocation)
+                : Path.GetFileNameWithoutExtension(entryAssemblyLocation);
         }
 
         private static string? GetDefaultVersionText() =>

@@ -40,7 +40,7 @@ namespace CliFx.Domain
 
         public bool MatchesName(string? name) => string.Equals(name, Name, StringComparison.OrdinalIgnoreCase);
 
-        private void InjectParameters(ICommand command, IReadOnlyList<string> parameterInputs)
+        private void InjectParameters(ICommand command, IReadOnlyList<CommandUnboundArgumentInput> parameterInputs)
         {
             // All inputs must be bound
             var remainingParameterInputs = parameterInputs.ToList();
@@ -57,9 +57,9 @@ namespace CliFx.Domain
 
                 var scalarParameterInput = i < parameterInputs.Count
                     ? parameterInputs[i]
-                    : throw new CliFxException($"Missing value for parameter <{scalarParameter.DisplayName}>.");
+                    : throw CliFxException.ParameterNotSet(scalarParameter);
 
-                scalarParameter.Inject(command, scalarParameterInput);
+                scalarParameter.Inject(command, scalarParameterInput.Value);
                 remainingParameterInputs.Remove(scalarParameterInput);
             }
 
@@ -70,18 +70,16 @@ namespace CliFx.Domain
 
             if (nonScalarParameter != null)
             {
-                var nonScalarParameterInputs = parameterInputs.Skip(scalarParameters.Length).ToArray();
-                nonScalarParameter.Inject(command, nonScalarParameterInputs);
+                var nonScalarParameterValues = parameterInputs.Skip(scalarParameters.Length).Select(i => i.Value).ToArray();
+
+                nonScalarParameter.Inject(command, nonScalarParameterValues);
                 remainingParameterInputs.Clear();
             }
 
             // Ensure all inputs were bound
             if (remainingParameterInputs.Any())
             {
-                throw new CliFxException(new StringBuilder()
-                    .AppendLine("Unrecognized parameters provided:")
-                    .AppendBulletList(remainingParameterInputs)
-                    .ToString());
+                throw CliFxException.UnrecognizedParametersProvided(remainingParameterInputs);
             }
         }
 
@@ -136,24 +134,18 @@ namespace CliFx.Domain
             // Ensure all required options were set
             if (unsetRequiredOptions.Any())
             {
-                throw new CliFxException(new StringBuilder()
-                    .AppendLine("Missing values for some of the required options:")
-                    .AppendBulletList(unsetRequiredOptions.Select(o => o.DisplayName))
-                    .ToString());
+                throw CliFxException.RequiredOptionsNotSet(unsetRequiredOptions);
             }
 
             // Ensure all inputs were bound
             if (remainingOptionInputs.Any())
             {
-                throw new CliFxException(new StringBuilder()
-                    .AppendLine("Unrecognized options provided:")
-                    .AppendBulletList(remainingOptionInputs.Select(o => o.Alias).Distinct())
-                    .ToString());
+                throw CliFxException.UnrecognizedOptionsProvided(remainingOptionInputs);
             }
         }
 
         public ICommand CreateInstance(
-            IReadOnlyList<string> parameterInputs,
+            IReadOnlyList<CommandUnboundArgumentInput> parameterInputs,
             IReadOnlyList<CommandOptionInput> optionInputs,
             IReadOnlyDictionary<string, string> environmentVariables,
             ITypeActivator activator)

@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using CliFx.Attributes;
 using CliFx.Exceptions;
-using CliFx.Internal;
 
 namespace CliFx.Domain
 {
@@ -71,18 +68,14 @@ namespace CliFx.Domain
             IReadOnlyDictionary<string, string> environmentVariables,
             ITypeActivator activator)
         {
-            var command = TryFindCommand(commandLineInput, out var argumentOffset);
-            if (command == null)
-            {
-                throw new CliFxException(
-                    $"Can't find a command that matches arguments [{string.Join(" ", commandLineInput.UnboundArguments)}].");
-            }
+            var command = TryFindCommand(commandLineInput, out var argumentOffset) ??
+                          throw CliFxException.CannotFindMatchingCommand(commandLineInput);
 
-            var parameterValues = argumentOffset == 0
-                ? commandLineInput.UnboundArguments.Select(a => a.Value).ToArray()
-                : commandLineInput.UnboundArguments.Skip(argumentOffset).Select(a => a.Value).ToArray();
+            var parameterInputs = argumentOffset == 0
+                ? commandLineInput.UnboundArguments.ToArray()
+                : commandLineInput.UnboundArguments.Skip(argumentOffset).ToArray();
 
-            return command.CreateInstance(parameterValues, commandLineInput.Options, environmentVariables, activator);
+            return command.CreateInstance(parameterInputs, commandLineInput.Options, environmentVariables, activator);
         }
 
         public ICommand InitializeEntryPoint(
@@ -106,28 +99,23 @@ namespace CliFx.Domain
 
             if (duplicateOrderGroup != null)
             {
-                throw new CliFxException(new StringBuilder()
-                    .AppendLine($"Command {command.Type.FullName} contains two or more parameters that have the same order ({duplicateOrderGroup.Key}):")
-                    .AppendBulletList(duplicateOrderGroup.Select(o => o.Property.Name))
-                    .AppendLine()
-                    .Append("Parameters in a command must all have unique order.")
-                    .ToString());
+                throw CliFxException.CommandParametersDuplicateOrder(
+                    command,
+                    duplicateOrderGroup.Key,
+                    duplicateOrderGroup.ToArray());
             }
 
             var duplicateNameGroup = command.Parameters
                 .Where(a => !string.IsNullOrWhiteSpace(a.Name))
-                .GroupBy(a => a.Name, StringComparer.OrdinalIgnoreCase)
+                .GroupBy(a => a.Name!, StringComparer.OrdinalIgnoreCase)
                 .FirstOrDefault(g => g.Count() > 1);
 
             if (duplicateNameGroup != null)
             {
-                throw new CliFxException(new StringBuilder()
-                    .AppendLine($"Command {command.Type.FullName} contains two or more parameters that have the same name ({duplicateNameGroup.Key}):")
-                    .AppendBulletList(duplicateNameGroup.Select(o => o.Property.Name))
-                    .AppendLine()
-                    .Append("Parameters in a command must all have unique names.").Append(" ")
-                    .Append("Comparison is NOT case-sensitive.")
-                    .ToString());
+                throw CliFxException.CommandParametersDuplicateName(
+                    command,
+                    duplicateNameGroup.Key,
+                    duplicateNameGroup.ToArray());
             }
 
             var nonScalarParameters = command.Parameters
@@ -136,13 +124,9 @@ namespace CliFx.Domain
 
             if (nonScalarParameters.Length > 1)
             {
-                throw new CliFxException(new StringBuilder()
-                    .AppendLine($"Command [{command.Type.FullName}] contains two or more parameters of an enumerable type:")
-                    .AppendBulletList(nonScalarParameters.Select(o => o.Property.Name))
-                    .AppendLine()
-                    .AppendLine("There can only be one parameter of an enumerable type in a command.")
-                    .Append("Note, the string type is not considered enumerable in this context.")
-                    .ToString());
+                throw CliFxException.CommandParametersTooManyNonScalar(
+                    command,
+                    nonScalarParameters);
             }
 
             var nonLastNonScalarParameter = command.Parameters
@@ -152,92 +136,74 @@ namespace CliFx.Domain
 
             if (nonLastNonScalarParameter != null)
             {
-                throw new CliFxException(new StringBuilder()
-                    .AppendLine($"Command {command.Type.FullName} contains a parameter of an enumerable type which doesn't appear last in order:")
-                    .AppendLine($"- {nonLastNonScalarParameter.Property.Name}")
-                    .AppendLine()
-                    .Append("Parameter of an enumerable type must always come last to avoid ambiguity.")
-                    .ToString());
+                throw CliFxException.CommandParametersNonLastNonScalar(
+                    command,
+                    nonLastNonScalarParameter);
             }
         }
 
         private static void ValidateOptions(CommandSchema command)
         {
-            var emptyNameGroup = command.Options
+            var noNameGroup = command.Options
                 .Where(o => o.ShortName == null && string.IsNullOrWhiteSpace(o.Name))
                 .ToArray();
 
-            if (emptyNameGroup.Any())
+            if (noNameGroup.Any())
             {
-                throw new CliFxException(new StringBuilder()
-                    .AppendLine($"Command {command.Type.FullName} contains one or more options that have empty names:")
-                    .AppendBulletList(emptyNameGroup.Select(o => o.Property.Name))
-                    .AppendLine()
-                    .Append("Options in a command must all have at least a name or a short name.")
-                    .ToString());
+                throw CliFxException.CommandOptionsNoName(
+                    command,
+                    noNameGroup.ToArray());
             }
 
-            var invalidNameGroup = command.Options
+            var invalidLengthNameGroup = command.Options
                 .Where(o => !string.IsNullOrWhiteSpace(o.Name))
-                .Where(o => o.Name.Length <= 1)
+                .Where(o => o.Name!.Length <= 1)
                 .ToArray();
 
-            if (invalidNameGroup.Any())
+            if (invalidLengthNameGroup.Any())
             {
-                throw new CliFxException(new StringBuilder()
-                    .AppendLine($"Command {command.Type.FullName} contains one or more options that have names that are too short:")
-                    .AppendBulletList(invalidNameGroup.Select(o => o.Property.Name))
-                    .AppendLine()
-                    .Append("Options in a command must all have names that are longer than a single character.")
-                    .ToString());
+                throw CliFxException.CommandOptionsInvalidLengthName(
+                    command,
+                    invalidLengthNameGroup);
             }
 
             var duplicateNameGroup = command.Options
                 .Where(o => !string.IsNullOrWhiteSpace(o.Name))
-                .GroupBy(o => o.Name, StringComparer.OrdinalIgnoreCase)
+                .GroupBy(o => o.Name!, StringComparer.OrdinalIgnoreCase)
                 .FirstOrDefault(g => g.Count() > 1);
 
             if (duplicateNameGroup != null)
             {
-                throw new CliFxException(new StringBuilder()
-                    .AppendLine($"Command {command.Type.FullName} contains two or more options that have the same name ({duplicateNameGroup.Key}):")
-                    .AppendBulletList(duplicateNameGroup.Select(o => o.Property.Name))
-                    .AppendLine()
-                    .Append("Options in a command must all have unique names.").Append(" ")
-                    .Append("Comparison is NOT case-sensitive.")
-                    .ToString());
+                throw CliFxException.CommandOptionsDuplicateName(
+                    command,
+                    duplicateNameGroup.Key,
+                    duplicateNameGroup.ToArray());
             }
 
             var duplicateShortNameGroup = command.Options
                 .Where(o => o.ShortName != null)
-                .GroupBy(o => o.ShortName)
+                .GroupBy(o => o.ShortName!.Value)
                 .FirstOrDefault(g => g.Count() > 1);
 
             if (duplicateShortNameGroup != null)
             {
-                throw new CliFxException(new StringBuilder()
-                    .AppendLine($"Command {command.Type.FullName} contains two or more options that have the same short name ({duplicateShortNameGroup.Key}):")
-                    .AppendBulletList(duplicateShortNameGroup.Select(o => o.Property.Name))
-                    .AppendLine()
-                    .Append("Options in a command must all have unique short names.").Append(" ")
-                    .Append("Comparison is case-sensitive.")
-                    .ToString());
+                throw CliFxException.CommandOptionsDuplicateShortName(
+                    command,
+                    duplicateShortNameGroup.Key,
+                    duplicateShortNameGroup.ToArray());
             }
 
             var duplicateEnvironmentVariableNameGroup = command.Options
                 .Where(o => !string.IsNullOrWhiteSpace(o.EnvironmentVariableName))
-                .GroupBy(o => o.EnvironmentVariableName, StringComparer.OrdinalIgnoreCase)
+                .GroupBy(o => o.EnvironmentVariableName!, StringComparer.OrdinalIgnoreCase)
                 .FirstOrDefault(g => g.Count() > 1);
 
             if (duplicateEnvironmentVariableNameGroup != null)
             {
-                throw new CliFxException(new StringBuilder()
-                    .AppendLine($"Command {command.Type.FullName} contains two or more options that have the same environment variable name ({duplicateEnvironmentVariableNameGroup.Key}):")
-                    .AppendBulletList(duplicateEnvironmentVariableNameGroup.Select(o => o.Property.Name))
-                    .AppendLine()
-                    .Append("Options in a command must all have unique environment variable names.").Append(" ")
-                    .Append("Comparison is NOT case-sensitive.")
-                    .ToString());
+                throw CliFxException.CommandOptionsDuplicateEnvironmentVariableName(
+                    command,
+                    duplicateEnvironmentVariableNameGroup.Key,
+                    duplicateEnvironmentVariableNameGroup.ToArray());
             }
         }
 
@@ -245,7 +211,7 @@ namespace CliFx.Domain
         {
             if (!commands.Any())
             {
-                throw new CliFxException("There are no commands configured for this application.");
+                throw CliFxException.CommandsNotRegistered();
             }
 
             var duplicateNameGroup = commands
@@ -254,13 +220,12 @@ namespace CliFx.Domain
 
             if (duplicateNameGroup != null)
             {
-                throw new CliFxException(new StringBuilder()
-                    .AppendLine($"Application contains two or more commands that have the same name ({duplicateNameGroup.Key}):")
-                    .AppendBulletList(duplicateNameGroup.Select(o => o.Type.FullName))
-                    .AppendLine()
-                    .Append("Commands must all have unique names. Likewise, there must not be more than one command without a name.").Append(" ")
-                    .Append("Comparison is NOT case-sensitive.")
-                    .ToString());
+                if (!string.IsNullOrWhiteSpace(duplicateNameGroup.Key))
+                    throw CliFxException.CommandsDuplicateName(
+                        duplicateNameGroup.Key,
+                        duplicateNameGroup.ToArray());
+
+                throw CliFxException.CommandsTooManyDefaults(duplicateNameGroup.ToArray());
             }
         }
 
@@ -270,17 +235,8 @@ namespace CliFx.Domain
 
             foreach (var commandType in commandTypes)
             {
-                var command = CommandSchema.TryResolve(commandType);
-                if (command == null)
-                {
-                    throw new CliFxException(new StringBuilder()
-                        .Append($"Command {commandType.FullName} is not a valid command type.").Append(" ")
-                        .AppendLine("In order to be a valid command type it must:")
-                        .AppendLine($" - Be annotated with {typeof(CommandAttribute).FullName}")
-                        .AppendLine($" - Implement {typeof(ICommand).FullName}")
-                        .AppendLine(" - Not be an abstract class")
-                        .ToString());
-                }
+                var command = CommandSchema.TryResolve(commandType) ??
+                              throw CliFxException.InvalidCommandType(commandType);
 
                 ValidateParameters(command);
                 ValidateOptions(command);

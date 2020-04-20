@@ -10,9 +10,10 @@ namespace CliFx.Domain
 
         public string? Name { get; }
 
-        public string DisplayName => !string.IsNullOrWhiteSpace(Name)
-            ? Name
-            : Property.Name.ToLowerInvariant();
+        public override string DisplayName =>
+            !string.IsNullOrWhiteSpace(Name)
+                ? Name
+                : Property.Name.ToLowerInvariant();
 
         public CommandParameterSchema(PropertyInfo property, int order, string? name, string? description)
             : base(property, description)

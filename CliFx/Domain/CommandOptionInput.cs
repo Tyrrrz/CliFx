@@ -8,6 +8,11 @@ namespace CliFx.Domain
     {
         public string Alias { get; }
 
+        public string DisplayAlias =>
+            Alias.Length > 1
+                ? $"--{Alias}"
+                : $"-{Alias}";
+
         public IReadOnlyList<string> Values { get; }
 
         public bool IsHelpOption => CommandOptionSchema.HelpOption.MatchesNameOrShortName(Alias);
@@ -24,8 +29,7 @@ namespace CliFx.Domain
         {
             var buffer = new StringBuilder();
 
-            buffer.Append(Alias.Length > 1 ? "--" : "-");
-            buffer.Append(Alias);
+            buffer.Append(DisplayAlias);
 
             foreach (var value in Values)
             {
