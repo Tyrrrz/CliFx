@@ -8,7 +8,7 @@ using CliFx.Exceptions;
 
 namespace CliFx.Demo.Commands
 {
-    //[Command("book add", Description = "Add a book to the library.")]
+    [Command("book add", Description = "Add a book to the library.")]
     public partial class BookAddCommand : ICommand
     {
         private readonly LibraryService _libraryService;
@@ -32,7 +32,6 @@ namespace CliFx.Demo.Commands
 
         public ValueTask ExecuteAsync(IConsole console)
         {
-            Console.WriteLine("test");
             if (_libraryService.GetBook(Title) != null)
                 throw new CommandException("Book already exists.", 1);
 
