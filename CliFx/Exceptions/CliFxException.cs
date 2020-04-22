@@ -9,7 +9,7 @@ namespace CliFx.Exceptions
     /// <summary>
     /// Domain exception thrown within CliFx.
     /// </summary>
-    public partial class CliFxException : Exception
+    public partial class CliFxException : BaseCliFxException
     {
         /// <summary>
         /// Initializes an instance of <see cref="CliFxException"/>.
