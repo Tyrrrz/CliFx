@@ -279,9 +279,9 @@ namespace CliFx.Domain
                 foreach (var childCommand in childCommands)
                 {
                     var relativeCommandName =
-                        string.IsNullOrWhiteSpace(childCommand.Name) || string.IsNullOrWhiteSpace(command.Name)
-                            ? childCommand.Name
-                            : childCommand.Name.Substring(command.Name.Length + 1);
+                        !string.IsNullOrWhiteSpace(command.Name)
+                            ? childCommand.Name!.Substring(command.Name.Length + 1)
+                            : childCommand.Name!;
 
                     // Name
                     RenderIndent();

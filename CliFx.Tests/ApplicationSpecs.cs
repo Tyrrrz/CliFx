@@ -4,11 +4,16 @@ using CliFx.Domain;
 using CliFx.Exceptions;
 using FluentAssertions;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace CliFx.Tests
 {
     public partial class ApplicationSpecs
     {
+        private readonly ITestOutputHelper _output;
+
+        public ApplicationSpecs(ITestOutputHelper output) => _output = output;
+
         [Fact]
         public void Application_can_be_created_with_a_default_configuration()
         {
@@ -38,7 +43,7 @@ namespace CliFx.Tests
                 .UseVersionText("test")
                 .UseDescription("test")
                 .UseConsole(new VirtualConsole(Stream.Null))
-                .UseTypeActivator(Activator.CreateInstance)
+                .UseTypeActivator(Activator.CreateInstance!)
                 .Build();
 
             // Assert
@@ -52,7 +57,8 @@ namespace CliFx.Tests
             var commandTypes = Array.Empty<Type>();
 
             // Act & assert
-            Assert.Throws<CliFxException>(() => ApplicationSchema.Resolve(commandTypes));
+            var ex = Assert.Throws<CliFxException>(() => ApplicationSchema.Resolve(commandTypes));
+            _output.WriteLine(ex.Message);
         }
 
         [Fact]
@@ -62,7 +68,8 @@ namespace CliFx.Tests
             var commandTypes = new[] {typeof(NonImplementedCommand)};
 
             // Act & assert
-            Assert.Throws<CliFxException>(() => ApplicationSchema.Resolve(commandTypes));
+            var ex = Assert.Throws<CliFxException>(() => ApplicationSchema.Resolve(commandTypes));
+            _output.WriteLine(ex.Message);
         }
 
         [Fact]
@@ -72,7 +79,8 @@ namespace CliFx.Tests
             var commandTypes = new[] {typeof(NonAnnotatedCommand)};
 
             // Act & assert
-            Assert.Throws<CliFxException>(() => ApplicationSchema.Resolve(commandTypes));
+            var ex = Assert.Throws<CliFxException>(() => ApplicationSchema.Resolve(commandTypes));
+            _output.WriteLine(ex.Message);
         }
 
         [Fact]
@@ -82,7 +90,8 @@ namespace CliFx.Tests
             var commandTypes = new[] {typeof(DuplicateNameCommandA), typeof(DuplicateNameCommandB)};
 
             // Act & assert
-            Assert.Throws<CliFxException>(() => ApplicationSchema.Resolve(commandTypes));
+            var ex = Assert.Throws<CliFxException>(() => ApplicationSchema.Resolve(commandTypes));
+            _output.WriteLine(ex.Message);
         }
 
         [Fact]
@@ -92,7 +101,8 @@ namespace CliFx.Tests
             var commandTypes = new[] {typeof(DuplicateParameterOrderCommand)};
 
             // Act & assert
-            Assert.Throws<CliFxException>(() => ApplicationSchema.Resolve(commandTypes));
+            var ex = Assert.Throws<CliFxException>(() => ApplicationSchema.Resolve(commandTypes));
+            _output.WriteLine(ex.Message);
         }
 
         [Fact]
@@ -102,7 +112,8 @@ namespace CliFx.Tests
             var commandTypes = new[] {typeof(DuplicateParameterNameCommand)};
 
             // Act & assert
-            Assert.Throws<CliFxException>(() => ApplicationSchema.Resolve(commandTypes));
+            var ex = Assert.Throws<CliFxException>(() => ApplicationSchema.Resolve(commandTypes));
+            _output.WriteLine(ex.Message);
         }
 
         [Fact]
@@ -112,7 +123,8 @@ namespace CliFx.Tests
             var commandTypes = new[] {typeof(MultipleNonScalarParametersCommand)};
 
             // Act & assert
-            Assert.Throws<CliFxException>(() => ApplicationSchema.Resolve(commandTypes));
+            var ex = Assert.Throws<CliFxException>(() => ApplicationSchema.Resolve(commandTypes));
+            _output.WriteLine(ex.Message);
         }
 
         [Fact]
@@ -122,7 +134,30 @@ namespace CliFx.Tests
             var commandTypes = new[] {typeof(NonLastNonScalarParameterCommand)};
 
             // Act & assert
-            Assert.Throws<CliFxException>(() => ApplicationSchema.Resolve(commandTypes));
+            var ex = Assert.Throws<CliFxException>(() => ApplicationSchema.Resolve(commandTypes));
+            _output.WriteLine(ex.Message);
+        }
+
+        [Fact]
+        public void Command_options_must_have_names_that_are_not_empty()
+        {
+            // Arrange
+            var commandTypes = new[] {typeof(EmptyOptionNameCommand)};
+
+            // Act & assert
+            var ex = Assert.Throws<CliFxException>(() => ApplicationSchema.Resolve(commandTypes));
+            _output.WriteLine(ex.Message);
+        }
+
+        [Fact]
+        public void Command_options_must_have_names_that_are_longer_than_one_character()
+        {
+            // Arrange
+            var commandTypes = new[] {typeof(SingleCharacterOptionNameCommand)};
+
+            // Act & assert
+            var ex = Assert.Throws<CliFxException>(() => ApplicationSchema.Resolve(commandTypes));
+            _output.WriteLine(ex.Message);
         }
 
         [Fact]
@@ -132,7 +167,8 @@ namespace CliFx.Tests
             var commandTypes = new[] {typeof(DuplicateOptionNamesCommand)};
 
             // Act & assert
-            Assert.Throws<CliFxException>(() => ApplicationSchema.Resolve(commandTypes));
+            var ex = Assert.Throws<CliFxException>(() => ApplicationSchema.Resolve(commandTypes));
+            _output.WriteLine(ex.Message);
         }
 
         [Fact]
@@ -142,7 +178,8 @@ namespace CliFx.Tests
             var commandTypes = new[] {typeof(DuplicateOptionShortNamesCommand)};
 
             // Act & assert
-            Assert.Throws<CliFxException>(() => ApplicationSchema.Resolve(commandTypes));
+            var ex = Assert.Throws<CliFxException>(() => ApplicationSchema.Resolve(commandTypes));
+            _output.WriteLine(ex.Message);
         }
 
         [Fact]
@@ -152,7 +189,8 @@ namespace CliFx.Tests
             var commandTypes = new[] {typeof(DuplicateOptionEnvironmentVariableNamesCommand)};
 
             // Act & assert
-            Assert.Throws<CliFxException>(() => ApplicationSchema.Resolve(commandTypes));
+            var ex = Assert.Throws<CliFxException>(() => ApplicationSchema.Resolve(commandTypes));
+            _output.WriteLine(ex.Message);
         }
 
         [Fact]
@@ -174,7 +212,7 @@ namespace CliFx.Tests
                     new[]
                     {
                         new CommandParameterSchema(
-                            typeof(HiddenPropertiesCommand).GetProperty(nameof(HiddenPropertiesCommand.Parameter)),
+                            typeof(HiddenPropertiesCommand).GetProperty(nameof(HiddenPropertiesCommand.Parameter))!,
                             13,
                             "param",
                             "Param description")
@@ -182,7 +220,7 @@ namespace CliFx.Tests
                     new[]
                     {
                         new CommandOptionSchema(
-                            typeof(HiddenPropertiesCommand).GetProperty(nameof(HiddenPropertiesCommand.Option)),
+                            typeof(HiddenPropertiesCommand).GetProperty(nameof(HiddenPropertiesCommand.Option))!,
                             "option",
                             'o',
                             "ENV",

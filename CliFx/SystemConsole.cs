@@ -7,7 +7,7 @@ namespace CliFx
     /// <summary>
     /// Implementation of <see cref="IConsole"/> that wraps the default system console.
     /// </summary>
-    public class SystemConsole : IConsole
+    public partial class SystemConsole : IConsole
     {
         private CancellationTokenSource? _cancellationTokenSource;
 
@@ -48,9 +48,9 @@ namespace CliFx
         /// </summary>
         public SystemConsole()
         {
-            Input = new StreamReader(Console.OpenStandardInput(), Console.InputEncoding, false);
-            Output = new StreamWriter(Console.OpenStandardOutput(), Console.OutputEncoding) {AutoFlush = true};
-            Error = new StreamWriter(Console.OpenStandardError(), Console.OutputEncoding) {AutoFlush = true};
+            Input = WrapInput(Console.OpenStandardInput());
+            Output = WrapOutput(Console.OpenStandardOutput());
+            Error = WrapOutput(Console.OpenStandardError());
         }
 
         /// <inheritdoc />
@@ -76,5 +76,18 @@ namespace CliFx
 
             return (_cancellationTokenSource = cts).Token;
         }
+    }
+
+    public partial class SystemConsole
+    {
+        private static StreamReader WrapInput(Stream? stream) =>
+            stream != null
+                ? new StreamReader(stream, Console.InputEncoding, false)
+                : StreamReader.Null;
+
+        private static StreamWriter WrapOutput(Stream? stream) =>
+            stream != null
+                ? new StreamWriter(stream, Console.OutputEncoding) {AutoFlush = true}
+                : StreamWriter.Null;
     }
 }

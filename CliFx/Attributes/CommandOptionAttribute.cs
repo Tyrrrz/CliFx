@@ -9,14 +9,14 @@ namespace CliFx.Attributes
     public class CommandOptionAttribute : Attribute
     {
         /// <summary>
-        /// Option name.
+        /// Option name (must be longer than a single character).
         /// Either <see cref="Name"/> or <see cref="ShortName"/> must be set.
         /// All options in a command must have different names (comparison is not case-sensitive).
         /// </summary>
         public string? Name { get; }
 
         /// <summary>
-        /// Option short name.
+        /// Option short name (single character).
         /// Either <see cref="Name"/> or <see cref="ShortName"/> must be set.
         /// All options in a command must have different short names (comparison is case-sensitive).
         /// </summary>

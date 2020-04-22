@@ -77,6 +77,24 @@ namespace CliFx.Tests
         }
 
         [Command]
+        private class EmptyOptionNameCommand : ICommand
+        {
+            [CommandOption("")]
+            public string? Apples { get; set; }
+
+            public ValueTask ExecuteAsync(IConsole console) => default;
+        }
+
+        [Command]
+        private class SingleCharacterOptionNameCommand : ICommand
+        {
+            [CommandOption("a")]
+            public string? Apples { get; set; }
+
+            public ValueTask ExecuteAsync(IConsole console) => default;
+        }
+
+        [Command]
         private class DuplicateOptionNamesCommand : ICommand
         {
             [CommandOption("fruits")]

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using CliFx.Attributes;
 
@@ -20,7 +21,7 @@ namespace CliFx.Tests
         private class ConcatCommand : ICommand
         {
             [CommandOption('i', IsRequired = true, Description = "Input strings.")]
-            public IReadOnlyList<string> Inputs { get; set; }
+            public IReadOnlyList<string> Inputs { get; set; } = Array.Empty<string>();
 
             [CommandOption('s', Description = "String separator.")]
             public string Separator { get; set; } = "";
@@ -36,10 +37,10 @@ namespace CliFx.Tests
         private class DivideCommand : ICommand
         {
             [CommandOption("dividend", 'D', IsRequired = true, Description = "The number to divide.")]
-            public double Dividend { get; set; }
+            public double Dividend { get; set; } = 0;
 
             [CommandOption("divisor", 'd', IsRequired = true, Description = "The number to divide by.")]
-            public double Divisor { get; set; }
+            public double Divisor { get; set; } = 0;
 
             public ValueTask ExecuteAsync(IConsole console)
             {
