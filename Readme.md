@@ -440,7 +440,7 @@ Division by zero is not supported.
 
 ##### Customizing Error Reporting
 
-You can use the `CommandErrorDisplayOptions` flags enum for some basic customization of error reporting. For example, you can tell `CliFx` to show the command's help text upon an error like this:
+You can use the `showHelp` parameter to choose whether to show the help text after handling an exception. For example, you can tell `CliFx` to show the command's help text upon an error like this:
 
 ```c#
 [Command]
@@ -448,7 +448,7 @@ public class ExampleCommand : ICommand
 {
     public ValueTask ExecuteAsync(IConsole console)
     {
-        throw new CommandException(errorDisplayOptions: CommandErrorDisplayOptions.HelpText);
+        throw new CommandException(showHelp: true);
     }
 }
 ```
@@ -461,21 +461,7 @@ public class ExampleCommand : ICommand
 {
     public ValueTask ExecuteAsync(IConsole console)
     {
-        throw new CommandException("My custom error message.",
-           CommandErrorDisplayOptions.ExceptionMessage | CommandErrorDisplayOptions.HelpText);
-    }
-}
-```
-
-If you don't want `CliFx` to display any errors upon throwing an exception, simply set the `CommandErrorDisplayOptions.None` flag in the exception like this:
-
-```c#
-[Command]
-public class ExampleCommand : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        throw new CommandException(errorDisplayOptions: CommandErrorDisplayOptions.None);
+        throw new CommandException("My custom error message.", showHelp: true);
     }
 }
 ```
