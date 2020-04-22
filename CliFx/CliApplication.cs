@@ -144,26 +144,20 @@ namespace CliFx
         }
 
         /// <summary>
-        /// Handle <see cref="CommandException"/> differently from the rest because we want to
-        /// display it different based on the <see cref="CommandErrorDisplayOptions"/> associated
-        /// with the error.
+        /// Handle <see cref="CommandException"/>s differently from the rest because we want to
+        /// display it different based on whether we are showing the help text or not.
         /// </summary>
         private int HandleCommandException(IReadOnlyList<string> commandLineArguments, CommandException commandException)
         {
-            var commandErrorDisplayOptions = commandException.ErrorDisplayOptions;
+            var showHelp = commandException.ShowHelp;
 
-            if (commandErrorDisplayOptions.HasFlag(CommandErrorDisplayOptions.None))
-            {
-                return commandException.ExitCode;
-            }
+            var errorMessage = commandException.HasMessage
+                ? commandException.Message
+                : commandException.ToString();
+               
+            _console.WithForegroundColor(ConsoleColor.Red, () => _console.Error.WriteLine(errorMessage));            
 
-            if (commandErrorDisplayOptions.HasFlag(CommandErrorDisplayOptions.ExceptionMessage))
-            {
-                var errorMessage = commandException.Message;
-                _console.WithForegroundColor(ConsoleColor.Red, () => _console.Error.WriteLine(errorMessage));
-            }
-
-            if (commandErrorDisplayOptions.HasFlag(CommandErrorDisplayOptions.HelpText))
+            if (showHelp)
             {
                 var applicationSchema = ApplicationSchema.Resolve(_configuration.CommandTypes);
                 var commandLineInput = CommandLineInput.Parse(commandLineArguments);
@@ -173,6 +167,24 @@ namespace CliFx
             }
 
             return commandException.ExitCode;
+        }
+
+        /// <summary>
+        /// Handles <see cref="CliFxException"/>s by printing its error message if it has a value.
+        /// Otherwise, it prints the full stack trace from the exception.
+        /// </summary>
+        /// <param name="cliFxException">The exception to handle.</param>
+        /// <returns>The exception's HResult.</returns>
+        private int HandleCliFxException(CliFxException cliFxException)
+        {
+            // Prefer showing message without stack trace on CliFxExceptions.
+            var errorMessage = cliFxException.HasMessage
+                ? cliFxException.Message
+                : cliFxException.ToString();
+
+            _console.WithForegroundColor(ConsoleColor.Red, () => _console.Error.WriteLine(errorMessage));
+
+            return cliFxException.HResult;
         }
 
         /// <summary>
@@ -203,9 +215,8 @@ namespace CliFx
             }
             catch (CliFxException cfe)
             {
-                // Prefer showing message without stack trace on CliFxExceptions.
-                _console.WithForegroundColor(ConsoleColor.Red, () => _console.Error.WriteLine(cfe.Message));
-                return cfe.HResult;
+                var hResult = HandleCliFxException(cfe);
+                return hResult;
             }
             catch (Exception ex)
             {

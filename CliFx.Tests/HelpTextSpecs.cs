@@ -241,67 +241,6 @@ namespace CliFx.Tests
                 "* -a|--option-a", "Environment variable:", "ENV_OPT_A",
                 "-b|--option-b", "Environment variable:", "ENV_OPT_B"
             );
-        }
-
-        [Fact]
-        public async Task Help_text_can_be_requested_by_throwing_command_exception_with_show_help_text_flag_set()
-        {
-            // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
-
-            var application = new CliApplicationBuilder()
-                .AddCommand(typeof(ShowHelpTextOnCommandExceptionCommand))
-                .AddCommand(typeof(ShowHelpTextOnCommandExceptionSubCommand))
-                .UseConsole(console)
-                .Build();
-
-            // Act
-            await application.RunAsync(new[] {"cmd"});
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-
-            // Assert
-            stdOutData.Should().ContainAll(
-                "Usage",
-                "[command]",
-                "Options",
-                "-h|--help", "Shows help text.",
-                "Commands",
-                "sub",
-                "You can run", "to show help on a specific command."
-            );
-        }
-
-        [Fact]
-        public async Task Help_text_can_be_requested_after_error_message_by_throwing_command_exception_with_show_help_text_flag_set()
-        {
-            // Arrange
-            await using var stdOut = new MemoryStream();
-            await using var stdErr = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut, error: stdErr);
-
-            var application = new CliApplicationBuilder()
-                .AddCommand(typeof(ShowErrorMessageThenHelpTextOnCommandExceptionCommand))
-                .AddCommand(typeof(ShowErrorMessageThenHelpTextOnCommandExceptionSubCommand))
-                .UseConsole(console)
-                .Build();
-
-            // Act
-            await application.RunAsync(new[] { "cmd" });
-            var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray()).TrimEnd();
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-
-            // Assert
-            stdErrData.Should().Be("Error message.");            
-            stdOutData.Should().ContainAll(
-                "Usage",
-                "[command]",
-                "Options",
-                "-h|--help", "Shows help text.",
-                "Commands",
-                "sub",
-                "You can run", "to show help on a specific command."
-            );
-        }
+        }        
     }
 }

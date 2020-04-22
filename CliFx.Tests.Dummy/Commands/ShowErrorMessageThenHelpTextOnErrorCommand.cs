@@ -11,11 +11,10 @@ namespace CliFx.Tests.Dummy.Commands
         "I don't do anything except provide a route to my subcommands. " +
         "If you use just me, I print an error message then the help text " +
         "to remind you of my subcommands.")]
-    public class ShowErrorMessageThenHelpTextOnErrorCommand : ICommand
+    public class ShowErrorMessageThenHelpTextOnCommandExceptionCommand : ICommand
     {
         public async ValueTask ExecuteAsync(IConsole console) =>
             throw new CommandException("It is an error to use me without a subcommand. " +
-                "Please refer to the help text below for guidance.", 
-                CommandErrorDisplayOptions.ExceptionMessage | CommandErrorDisplayOptions.HelpText);
+                "Please refer to the help text below for guidance.", showHelp: true);
     }
 }
