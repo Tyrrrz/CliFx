@@ -12,9 +12,7 @@ namespace CliFx.Tests.Dummy.Commands
         "If you use just me, I print the help text to remind you of my subcommands.")]
     public class ShowHelpTextOnCommandExceptionCommand : ICommand
     {
-        public async ValueTask ExecuteAsync(IConsole console) {
-            var ex = new CommandException(null, showHelp: false);
-            throw ex;
-        }
+        public async ValueTask ExecuteAsync(IConsole console) =>
+            throw new CommandException(null, showHelp: false);
     }
 }
