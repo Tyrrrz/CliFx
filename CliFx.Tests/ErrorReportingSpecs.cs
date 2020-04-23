@@ -33,7 +33,6 @@ namespace CliFx.Tests
                 "System.Exception:",
                 "Kaput", "at", 
                 "CliFx.Tests");
-            stdErrData.Length.Should().BeGreaterThan("Kaput".Length);
         }
 
         [Fact]

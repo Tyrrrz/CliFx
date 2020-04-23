@@ -13,7 +13,7 @@ namespace CliFx.Tests.Dummy.Commands
         "to remind you of my subcommands.")]
     public class ShowErrorMessageThenHelpTextOnCommandExceptionCommand : ICommand
     {
-        public async ValueTask ExecuteAsync(IConsole console) =>
+        public ValueTask ExecuteAsync(IConsole console) =>
             throw new CommandException("It is an error to use me without a subcommand. " +
                 "Please refer to the help text below for guidance.", showHelp: true);
     }

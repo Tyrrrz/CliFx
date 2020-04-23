@@ -339,4 +339,3 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
-/CliFx.Tests.Dummy/Properties/launchSettings.json

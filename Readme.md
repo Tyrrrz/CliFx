@@ -35,26 +35,18 @@ An important property of CliFx, when compared to some other libraries, is that i
 
 ## Usage
 
-- [CliFx](#clifx)
-  - [Download](#download)
-  - [Features](#features)
-  - [Screenshots](#screenshots)
-  - [Usage](#usage)
-    - [Quick start](#quick-start)
-    - [Binding arguments](#binding-arguments)
-    - [Argument syntax](#argument-syntax)
-    - [Value conversion](#value-conversion)
-    - [Multiple commands](#multiple-commands)
-    - [Reporting errors](#reporting-errors)
-        - [Customizing Error Reporting](#customizing-error-reporting)
-    - [Graceful cancellation](#graceful-cancellation)
-    - [Dependency injection](#dependency-injection)
-    - [Testing](#testing)
-    - [Debug and preview mode](#debug-and-preview-mode)
-    - [Reporting progress](#reporting-progress)
-    - [Environment variables](#environment-variables)
-  - [Benchmarks](#benchmarks)
-  - [Etymology](#etymology)
+- [Quick start](#quick-start)
+- [Binding arguments](#binding-arguments)
+- [Argument syntax](#argument-syntax)
+- [Value conversion](#value-conversion)
+- [Multiple commands](#multiple-commands)
+- [Reporting errors](#reporting-errors)
+- [Graceful cancellation](#graceful-cancellation)
+- [Dependency injection](#dependency-injection)
+- [Testing](#testing)
+- [Debug and preview mode](#debug-and-preview-mode)
+- [Reporting progress](#reporting-progress)
+- [Environment variables](#environment-variables)
 
 ### Quick start
 
@@ -438,9 +430,7 @@ Division by zero is not supported.
 1337
 ```
 
-##### Customizing Error Reporting
-
-You can use the `showHelp` parameter to choose whether to show the help text after handling an exception. For example, you can tell `CliFx` to show the command's help text upon an error like this:
+You can use the `showHelp` parameter to choose whether to show the help text after handling an exception. For example, you can tell CliFx to show `ExampleCommand`'s help text upon an error like this:
 
 ```c#
 [Command]

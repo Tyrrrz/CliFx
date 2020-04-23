@@ -241,6 +241,6 @@ namespace CliFx.Tests
                 "* -a|--option-a", "Environment variable:", "ENV_OPT_A",
                 "-b|--option-b", "Environment variable:", "ENV_OPT_B"
             );
-        }        
+        }
     }
 }
