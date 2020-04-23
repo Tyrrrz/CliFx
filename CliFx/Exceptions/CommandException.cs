@@ -7,7 +7,7 @@ namespace CliFx.Exceptions
     /// Use this exception if you want to report an error that occured during execution of a command.
     /// This exception also allows specifying exit code which will be returned to the calling process.
     /// </summary>
-    public class CommandException : Exception
+    public class CommandException : BaseCliFxException
     {
         private const int DefaultExitCode = -100;
 
@@ -19,8 +19,9 @@ namespace CliFx.Exceptions
         /// <summary>
         /// Initializes an instance of <see cref="CommandException"/>.
         /// </summary>
-        public CommandException(string? message, Exception? innerException, int exitCode = DefaultExitCode)
-            : base(message, innerException)
+        public CommandException(string? message, Exception? innerException, 
+            int exitCode = DefaultExitCode, bool showHelp = false)
+                : base(message, innerException, showHelp)
         {
             ExitCode = exitCode != 0
                 ? exitCode
@@ -30,16 +31,16 @@ namespace CliFx.Exceptions
         /// <summary>
         /// Initializes an instance of <see cref="CommandException"/>.
         /// </summary>
-        public CommandException(string? message, int exitCode = DefaultExitCode)
-            : this(message, null, exitCode)
+        public CommandException(string? message, int exitCode = DefaultExitCode, bool showHelp = false)
+                : this(message, null, exitCode, showHelp)
         {
         }
 
         /// <summary>
         /// Initializes an instance of <see cref="CommandException"/>.
         /// </summary>
-        public CommandException(int exitCode = DefaultExitCode)
-            : this(null, exitCode)
+        public CommandException(int exitCode = DefaultExitCode, bool showHelp = false)
+            : this(null, exitCode, showHelp)
         {
         }
     }

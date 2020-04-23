@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using CliFx.Attributes;
+using CliFx.Exceptions;
 
 namespace CliFx.Tests
 {

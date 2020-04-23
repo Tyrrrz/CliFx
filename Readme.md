@@ -430,6 +430,32 @@ Division by zero is not supported.
 1337
 ```
 
+You can use the `showHelp` parameter to choose whether to show the help text after handling an exception. For example, you can tell CliFx to show `ExampleCommand`'s help text upon an error like this:
+
+```c#
+[Command]
+public class ExampleCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        throw new CommandException(showHelp: true);
+    }
+}
+```
+
+To display an error message before the help text, throw the `CommandException` like this:
+
+```c#
+[Command]
+public class ExampleCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        throw new CommandException("My custom error message.", showHelp: true);
+    }
+}
+```
+
 ### Graceful cancellation
 
 It is possible to gracefully cancel execution of a command and preform any necessary cleanup. By default an app gets forcefully killed when it receives an interrupt signal (Ctrl+C or Ctrl+Break), but you can easily override this behavior.
