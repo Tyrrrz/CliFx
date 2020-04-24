@@ -275,7 +275,7 @@ To fix this, ensure that all options have different fallback environment variabl
 Can't find a command that matches the following arguments:
 {string.Join(" ", input.UnboundArguments.Select(a => a.Value))}";
 
-            return new CliFxException(message.Trim());
+            return new CliFxException(message.Trim(), showHelp: true);
         }
 
         internal static CliFxException CannotConvertMultipleValuesToNonScalar(
@@ -290,7 +290,7 @@ Can't find a command that matches the following arguments:
 {argumentDisplayText} expects a single value, but provided with multiple:
 {string.Join(", ", values.Select(v => $"'{v}'"))}";
 
-            return new CliFxException(message.Trim());
+            return new CliFxException(message.Trim(), showHelp: true);
         }
 
         internal static CliFxException CannotConvertToType(
@@ -307,7 +307,7 @@ Can't find a command that matches the following arguments:
 Can't convert value '{value ?? "<null>"}' to type '{type.FullName}' for {argumentDisplayText}.
 {innerException?.Message ?? "This type is not supported."}";
 
-            return new CliFxException(message.Trim(), innerException);
+            return new CliFxException(message.Trim(), innerException, showHelp: true);
         }
 
         internal static CliFxException CannotConvertNonScalar(
@@ -325,7 +325,7 @@ Can't convert provided values to type '{type.FullName}' for {argumentDisplayText
 
 Target type is not assignable from array and doesn't have a public constructor that takes an array.";
 
-            return new CliFxException(message.Trim());
+            return new CliFxException(message.Trim(), showHelp: true);
         }
 
         internal static CliFxException ParameterNotSet(CommandParameterSchema parameter)
@@ -333,7 +333,7 @@ Target type is not assignable from array and doesn't have a public constructor t
             var message = $@"
 Missing value for parameter <{parameter.DisplayName}>.";
 
-            return new CliFxException(message.Trim());
+            return new CliFxException(message.Trim(), showHelp: true);
         }
 
         internal static CliFxException RequiredOptionsNotSet(IReadOnlyList<CommandOptionSchema> options)
@@ -342,7 +342,7 @@ Missing value for parameter <{parameter.DisplayName}>.";
 Missing values for one or more required options:
 {string.Join(Environment.NewLine, options.Select(o => o.DisplayName))}";
 
-            return new CliFxException(message.Trim());
+            return new CliFxException(message.Trim(), showHelp: true);
         }
 
         internal static CliFxException UnrecognizedParametersProvided(IReadOnlyList<CommandUnboundArgumentInput> inputs)
@@ -351,7 +351,7 @@ Missing values for one or more required options:
 Unrecognized parameters provided:
 {string.Join(Environment.NewLine, inputs.Select(i => $"<{i.Value}>"))}";
 
-            return new CliFxException(message.Trim());
+            return new CliFxException(message.Trim(), showHelp: true);
         }
 
         internal static CliFxException UnrecognizedOptionsProvided(IReadOnlyList<CommandOptionInput> inputs)
@@ -360,7 +360,7 @@ Unrecognized parameters provided:
 Unrecognized options provided:
 {string.Join(Environment.NewLine, inputs.Select(i => i.DisplayAlias))}";
 
-            return new CliFxException(message.Trim());
+            return new CliFxException(message.Trim(), showHelp: true);
         }
     }
 }
