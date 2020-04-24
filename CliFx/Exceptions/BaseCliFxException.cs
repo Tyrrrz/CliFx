@@ -23,6 +23,11 @@ namespace CliFx.Exceptions
         public bool HasMessage { get; }
 
         /// <summary>
+        /// Returns an exit code associated with this exception.
+        /// </summary>
+        public virtual int ExitCode => HResult;
+
+        /// <summary>
         /// Initializes an instance of <see cref="BaseCliFxException"/>.
         /// </summary>
         protected BaseCliFxException(string? message, bool showHelp = false)

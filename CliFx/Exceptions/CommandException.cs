@@ -14,7 +14,7 @@ namespace CliFx.Exceptions
         /// <summary>
         /// Process exit code.
         /// </summary>
-        public int ExitCode { get; }
+        public override int ExitCode { get; }
 
         /// <summary>
         /// Initializes an instance of <see cref="CommandException"/>.
