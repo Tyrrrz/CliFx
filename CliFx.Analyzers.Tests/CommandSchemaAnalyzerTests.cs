@@ -15,7 +15,7 @@ namespace CliFx.Analyzers.Tests
             {
                 new AnalyzerTestCase(
                     "Command implements interface and has attribute",
-                    Descriptor.CliFx0002,
+                    DiagnosticDescriptors.CliFx0002,
 
                     // language=cs
                     @"
@@ -31,7 +31,7 @@ public class MyCommand : ICommand
             {
                 new AnalyzerTestCase(
                     "Command implements interface and has attribute",
-                    Descriptor.CliFx0003,
+                    DiagnosticDescriptors.CliFx0003,
 
                     // language=cs
                     @"
@@ -47,12 +47,56 @@ public class MyCommand : ICommand
             {
                 new AnalyzerTestCase(
                     "Command is an abstract type",
-                    Descriptor.CliFx0002,
+                    DiagnosticDescriptors.CliFx0002,
 
                     // language=cs
                     @"
 public abstract class MyCommand : ICommand
 {
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}"
+                )
+            };
+
+            yield return new object[]
+            {
+                new AnalyzerTestCase(
+                    "Parameters with unique order",
+                    DiagnosticDescriptors.CliFx0004,
+
+                    // language=cs
+                    @"
+[Command]
+public class MyCommand : ICommand
+{
+    [CommandParameter(13)]
+    public string? ParamA { get; set; }
+    
+    [CommandParameter(15)]
+    public string? ParamB { get; set; }
+
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}"
+                )
+            };
+
+            yield return new object[]
+            {
+                new AnalyzerTestCase(
+                    "Parameters with unique names",
+                    DiagnosticDescriptors.CliFx0005,
+
+                    // language=cs
+                    @"
+[Command]
+public class MyCommand : ICommand
+{
+    [CommandParameter(13, Name = ""foo"")]
+    public string? ParamA { get; set; }
+    
+    [CommandParameter(15, Name = ""bar"")]
+    public string? ParamB { get; set; }
+
     public ValueTask ExecuteAsync(IConsole console) => default;
 }"
                 )
@@ -65,7 +109,7 @@ public abstract class MyCommand : ICommand
             {
                 new AnalyzerTestCase(
                     "Command is missing the attribute",
-                    Descriptor.CliFx0002,
+                    DiagnosticDescriptors.CliFx0002,
 
                     // language=cs
                     @"
@@ -80,7 +124,7 @@ public class MyCommand : ICommand
             {
                 new AnalyzerTestCase(
                     "Command doesn't implement the interface",
-                    Descriptor.CliFx0003,
+                    DiagnosticDescriptors.CliFx0003,
 
                     // language=cs
                     @"
@@ -91,16 +135,60 @@ public class MyCommand
 }"
                 )
             };
+
+            yield return new object[]
+            {
+                new AnalyzerTestCase(
+                    "Parameters with duplicate order",
+                    DiagnosticDescriptors.CliFx0004,
+
+                    // language=cs
+                    @"
+[Command]
+public class MyCommand : ICommand
+{
+    [CommandParameter(13)]
+    public string? ParamA { get; set; }
+    
+    [CommandParameter(13)]
+    public string? ParamB { get; set; }
+
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}"
+                )
+            };
+
+            yield return new object[]
+            {
+                new AnalyzerTestCase(
+                    "Parameters with duplicate names",
+                    DiagnosticDescriptors.CliFx0005,
+
+                    // language=cs
+                    @"
+[Command]
+public class MyCommand : ICommand
+{
+    [CommandParameter(13, Name = ""foo"")]
+    public string? ParamA { get; set; }
+    
+    [CommandParameter(15, Name = ""foo"")]
+    public string? ParamB { get; set; }
+
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}"
+                )
+            };
         }
 
         [Theory]
         [MemberData(nameof(GetValidCases))]
         public void Valid(AnalyzerTestCase testCase) =>
-            AssertAnalyzer.ValidCode(Analyzer, testCase);
+            AnalyzerAssert.ValidCode(Analyzer, testCase);
 
         [Theory]
         [MemberData(nameof(GetInvalidCases))]
         public void Invalid(AnalyzerTestCase testCase) =>
-            AssertAnalyzer.InvalidCode(Analyzer, testCase);
+            AnalyzerAssert.InvalidCode(Analyzer, testCase);
     }
 }

@@ -11,7 +11,7 @@ namespace CliFx.Analyzers
     public class ConsoleUsageAnalyzer : DiagnosticAnalyzer
     {
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-            ImmutableArray.Create(Descriptor.CliFx0001);
+            ImmutableArray.Create(DiagnosticDescriptors.CliFx0001);
 
         private static void CheckSystemConsoleUsage(SyntaxNodeAnalysisContext context)
         {
@@ -50,7 +50,7 @@ namespace CliFx.Analyzers
             if (!isConsoleInterfaceAvailable)
                 return;
 
-            context.ReportDiagnostic(Diagnostic.Create(Descriptor.CliFx0001, invocationSyntax.GetLocation()));
+            context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.CliFx0001, invocationSyntax.GetLocation()));
         }
 
         public override void Initialize(AnalysisContext context)

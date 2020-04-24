@@ -8,7 +8,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace CliFx.Analyzers.Tests.Internal
 {
-    internal static class AssertAnalyzer
+    internal static class AnalyzerAssert
     {
         private static IReadOnlyList<MetadataReference> DefaultMetadataReferences { get; } = new[]
         {

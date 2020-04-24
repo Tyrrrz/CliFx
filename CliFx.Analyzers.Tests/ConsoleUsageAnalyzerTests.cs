@@ -15,7 +15,7 @@ namespace CliFx.Analyzers.Tests
             {
                 new AnalyzerTestCase(
                     "Using console abstraction",
-                    Descriptor.CliFx0001,
+                    DiagnosticDescriptors.CliFx0001,
 
                     // language=cs
                     @"
@@ -35,7 +35,7 @@ public class MyCommand : ICommand
             {
                 new AnalyzerTestCase(
                     "Method doesn't have console abstraction available",
-                    Descriptor.CliFx0001,
+                    DiagnosticDescriptors.CliFx0001,
 
                     // language=cs
                     @"
@@ -56,7 +56,7 @@ public class MyCommand : ICommand
             {
                 new AnalyzerTestCase(
                     "Not using available console abstraction in the ExecuteAsync method",
-                    Descriptor.CliFx0001,
+                    DiagnosticDescriptors.CliFx0001,
 
                     // language=cs
                     @"
@@ -76,7 +76,7 @@ public class MyCommand : ICommand
             {
                 new AnalyzerTestCase(
                     "Not using available console abstraction in the ExecuteAsync method (nested)",
-                    Descriptor.CliFx0001,
+                    DiagnosticDescriptors.CliFx0001,
 
                     // language=cs
                     @"
@@ -96,7 +96,7 @@ public class MyCommand : ICommand
             {
                 new AnalyzerTestCase(
                     "Not using available console abstraction in another method",
-                    Descriptor.CliFx0001,
+                    DiagnosticDescriptors.CliFx0001,
 
                     // language=cs
                     @"
@@ -114,11 +114,11 @@ public class MyCommand : ICommand
         [Theory]
         [MemberData(nameof(GetValidCases))]
         public void Valid(AnalyzerTestCase testCase) =>
-            AssertAnalyzer.ValidCode(Analyzer, testCase);
+            AnalyzerAssert.ValidCode(Analyzer, testCase);
 
         [Theory]
         [MemberData(nameof(GetInvalidCases))]
         public void Invalid(AnalyzerTestCase testCase) =>
-            AssertAnalyzer.InvalidCode(Analyzer, testCase);
+            AnalyzerAssert.InvalidCode(Analyzer, testCase);
     }
 }

@@ -1,4 +1,6 @@
-﻿using System.Collections.Immutable;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -8,8 +10,72 @@ namespace CliFx.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class CommandSchemaAnalyzer : DiagnosticAnalyzer
     {
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-            ImmutableArray.Create(Descriptor.CliFx0002, Descriptor.CliFx0003);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
+            DiagnosticDescriptors.CliFx0002,
+            DiagnosticDescriptors.CliFx0003,
+            DiagnosticDescriptors.CliFx0004,
+            DiagnosticDescriptors.CliFx0005
+        );
+
+        private static void CheckCommandParameterProperties(
+            SymbolAnalysisContext context,
+            IReadOnlyList<IPropertySymbol> properties)
+        {
+            var parameters = properties
+                .Select(p =>
+                {
+                    var attribute = p
+                        .GetAttributes()
+                        .First(a => KnownSymbols.IsCommandParameterAttribute(a.AttributeClass));
+
+                    var order = attribute
+                        .ConstructorArguments
+                        .Select(a => a.Value)
+                        .FirstOrDefault() as int?;
+
+                    var name = attribute
+                        .NamedArguments
+                        .Where(a => a.Key == "Name")
+                        .Select(a => a.Value.Value)
+                        .FirstOrDefault() as string;
+
+                    return new
+                    {
+                        Property = p,
+                        Order = order,
+                        Name = name
+                    };
+                })
+                .ToArray();
+
+            // Duplicate order
+            var duplicateOrderParameters = parameters
+                .Where(p => p.Order != null)
+                .GroupBy(p => p.Order)
+                .Where(g => g.Count() > 1)
+                .SelectMany(g => g.AsEnumerable())
+                .ToArray();
+
+            foreach (var parameter in duplicateOrderParameters)
+            {
+                context.ReportDiagnostic(
+                    Diagnostic.Create(DiagnosticDescriptors.CliFx0004, parameter.Property.Locations.First()));
+            }
+
+            // Duplicate name
+            var duplicateNameParameters = parameters
+                .Where(p => !string.IsNullOrWhiteSpace(p.Name))
+                .GroupBy(p => p.Name, StringComparer.OrdinalIgnoreCase)
+                .Where(g => g.Count() > 1)
+                .SelectMany(g => g.AsEnumerable())
+                .ToArray();
+
+            foreach (var parameter in duplicateNameParameters)
+            {
+                context.ReportDiagnostic(
+                    Diagnostic.Create(DiagnosticDescriptors.CliFx0005, parameter.Property.Locations.First()));
+            }
+        }
 
         private static void CheckCommandType(SymbolAnalysisContext context)
         {
@@ -32,12 +98,38 @@ namespace CliFx.Analyzers
                 .Select(a => a.AttributeClass)
                 .Any(KnownSymbols.IsCommandAttribute);
 
-            if (!implementsCommandInterface ^ !hasCommandAttribute)
+            var isValidCommandType =
+                // implement interface
+                implementsCommandInterface && (
+                    // and either abstract class or interface
+                    namedTypeSymbol.TypeKind == TypeKind.Interface || namedTypeSymbol.IsAbstract ||
+                    // or has attribute
+                    hasCommandAttribute
+                );
+
+            if (!isValidCommandType)
             {
-                context.ReportDiagnostic(!implementsCommandInterface
-                    ? Diagnostic.Create(Descriptor.CliFx0003, namedTypeSymbol.Locations.First())
-                    : Diagnostic.Create(Descriptor.CliFx0002, namedTypeSymbol.Locations.First()));
+                if (!implementsCommandInterface)
+                    context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.CliFx0003, namedTypeSymbol.Locations.First()));
+
+                if (!hasCommandAttribute)
+                    context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.CliFx0002, namedTypeSymbol.Locations.First()));
+
+                return;
             }
+
+            // Get parameter properties
+            var parameterProperties = namedTypeSymbol
+                .GetMembers()
+                .Where(m => m.Kind == SymbolKind.Property)
+                .OfType<IPropertySymbol>()
+                .Where(p => p
+                    .GetAttributes()
+                    .Select(a => a.AttributeClass)
+                    .Any(KnownSymbols.IsCommandParameterAttribute))
+                .ToArray();
+
+            CheckCommandParameterProperties(context, parameterProperties);
         }
 
         public override void Initialize(AnalysisContext context)
