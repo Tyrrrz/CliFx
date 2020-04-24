@@ -13,14 +13,24 @@ namespace CliFx.Analyzers
 
         private static void CheckCommandType(SymbolAnalysisContext context)
         {
+            // Named type: MyCommand
             if (!(context.Symbol is INamedTypeSymbol namedTypeSymbol))
                 return;
 
-            if (namedTypeSymbol.IsAbstract)
+            // Only instantiable classes
+            if (namedTypeSymbol.TypeKind != TypeKind.Class || namedTypeSymbol.IsAbstract)
                 return;
 
-            var implementsCommandInterface = namedTypeSymbol.AllInterfaces.Any(KnownSymbols.IsCommandInterface);
-            var hasCommandAttribute = namedTypeSymbol.GetAttributes().Select(a => a.AttributeClass).Any(KnownSymbols.IsCommandAttribute);
+            // Implements ICommand?
+            var implementsCommandInterface = namedTypeSymbol
+                .AllInterfaces
+                .Any(KnownSymbols.IsCommandInterface);
+
+            // Has CommandAttribute?
+            var hasCommandAttribute = namedTypeSymbol
+                .GetAttributes()
+                .Select(a => a.AttributeClass)
+                .Any(KnownSymbols.IsCommandAttribute);
 
             if (!implementsCommandInterface ^ !hasCommandAttribute)
             {

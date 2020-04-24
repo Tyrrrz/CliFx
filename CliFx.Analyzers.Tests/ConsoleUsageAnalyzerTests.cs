@@ -1,22 +1,24 @@
 ﻿using System.Collections.Generic;
-using Microsoft.CodeAnalysis;
+using CliFx.Analyzers.Tests.Internal;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Xunit;
 
 namespace CliFx.Analyzers.Tests
 {
-    public class ConsoleUsageAnalyzerTests : AnalyzerTestsBase
+    public class ConsoleUsageAnalyzerTests
     {
         private static DiagnosticAnalyzer Analyzer { get; } = new ConsoleUsageAnalyzer();
 
-        public static  IEnumerable<object[]> GetValidCodes()
+        public static IEnumerable<object[]> GetValidCases()
         {
             yield return new object[]
             {
-                Descriptor.CliFx0001,
+                new AnalyzerTestCase(
+                    "Using console abstraction",
+                    Descriptor.CliFx0001,
 
-                // language=cs
-                @"
+                    // language=cs
+                    @"
 [Command]
 public class MyCommand : ICommand
 {
@@ -26,14 +28,17 @@ public class MyCommand : ICommand
         return default;
     }
 }"
+                )
             };
 
             yield return new object[]
             {
-                Descriptor.CliFx0001,
+                new AnalyzerTestCase(
+                    "Method doesn't have console abstraction available",
+                    Descriptor.CliFx0001,
 
-                // language=cs
-                @"
+                    // language=cs
+                    @"
 [Command]
 public class MyCommand : ICommand
 {
@@ -41,17 +46,20 @@ public class MyCommand : ICommand
 
     public ValueTask ExecuteAsync(IConsole console) => default;
 }"
+                )
             };
         }
 
-        public static IEnumerable<object[]> GetInvalidCodes()
+        public static IEnumerable<object[]> GetInvalidCases()
         {
             yield return new object[]
             {
-                Descriptor.CliFx0001,
+                new AnalyzerTestCase(
+                    "Not using available console abstraction in the ExecuteAsync method",
+                    Descriptor.CliFx0001,
 
-                // language=cs
-                @"
+                    // language=cs
+                    @"
 [Command]
 public class MyCommand : ICommand
 {
@@ -61,17 +69,56 @@ public class MyCommand : ICommand
         return default;
     }
 }"
+                )
+            };
+
+            yield return new object[]
+            {
+                new AnalyzerTestCase(
+                    "Not using available console abstraction in the ExecuteAsync method (nested)",
+                    Descriptor.CliFx0001,
+
+                    // language=cs
+                    @"
+[Command]
+public class MyCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        Console.Error.WriteLine(""Hello world"");
+        return default;
+    }
+}"
+                )
+            };
+
+            yield return new object[]
+            {
+                new AnalyzerTestCase(
+                    "Not using available console abstraction in another method",
+                    Descriptor.CliFx0001,
+
+                    // language=cs
+                    @"
+[Command]
+public class MyCommand : ICommand
+{
+    public void SomeOtherMethod(IConsole console) => Console.WriteLine(""Test"");
+
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}"
+                )
             };
         }
 
         [Theory]
-        [MemberData(nameof(GetValidCodes))]
-        public void Positive(DiagnosticDescriptor diagnostic, string code) =>
-            AssertCodeValid(Analyzer, diagnostic, code);
+        [MemberData(nameof(GetValidCases))]
+        public void Valid(AnalyzerTestCase testCase) =>
+            AssertAnalyzer.ValidCode(Analyzer, testCase);
 
         [Theory]
-        [MemberData(nameof(GetInvalidCodes))]
-        public void Negative(DiagnosticDescriptor diagnostic, string code) =>
-            AssertCodeInvalid(Analyzer, diagnostic, code);
+        [MemberData(nameof(GetInvalidCases))]
+        public void Invalid(AnalyzerTestCase testCase) =>
+            AssertAnalyzer.InvalidCode(Analyzer, testCase);
     }
 }

@@ -1,91 +1,106 @@
 ﻿using System.Collections.Generic;
-using Microsoft.CodeAnalysis;
+using CliFx.Analyzers.Tests.Internal;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Xunit;
 
 namespace CliFx.Analyzers.Tests
 {
-    public class CommandSchemaAnalyzerTests : AnalyzerTestsBase
+    public class CommandSchemaAnalyzerTests
     {
         private static DiagnosticAnalyzer Analyzer { get; } = new CommandSchemaAnalyzer();
 
-        public static  IEnumerable<object[]> GetValidCodes()
+        public static IEnumerable<object[]> GetValidCases()
         {
             yield return new object[]
             {
-                Descriptor.CliFx0002,
+                new AnalyzerTestCase(
+                    "Command implements interface and has attribute",
+                    Descriptor.CliFx0002,
 
-                // language=cs
-                @"
+                    // language=cs
+                    @"
 [Command]
 public class MyCommand : ICommand
 {
     public ValueTask ExecuteAsync(IConsole console) => default;
 }"
+                )
             };
 
             yield return new object[]
             {
-                Descriptor.CliFx0003,
+                new AnalyzerTestCase(
+                    "Command implements interface and has attribute",
+                    Descriptor.CliFx0003,
 
-                // language=cs
-                @"
+                    // language=cs
+                    @"
 [Command]
 public class MyCommand : ICommand
 {
     public ValueTask ExecuteAsync(IConsole console) => default;
 }"
+                )
             };
 
             yield return new object[]
             {
-                Descriptor.CliFx0002,
+                new AnalyzerTestCase(
+                    "Command is an abstract type",
+                    Descriptor.CliFx0002,
 
-                // language=cs
-                @"
+                    // language=cs
+                    @"
 public abstract class MyCommand : ICommand
 {
     public ValueTask ExecuteAsync(IConsole console) => default;
 }"
+                )
             };
         }
 
-        public static IEnumerable<object[]> GetInvalidCodes()
+        public static IEnumerable<object[]> GetInvalidCases()
         {
             yield return new object[]
             {
-                Descriptor.CliFx0002,
+                new AnalyzerTestCase(
+                    "Command is missing the attribute",
+                    Descriptor.CliFx0002,
 
-                // language=cs
-                @"
+                    // language=cs
+                    @"
 public class MyCommand : ICommand
 {
     public ValueTask ExecuteAsync(IConsole console) => default;
 }"
+                )
             };
 
             yield return new object[]
             {
-                Descriptor.CliFx0003,
+                new AnalyzerTestCase(
+                    "Command doesn't implement the interface",
+                    Descriptor.CliFx0003,
 
-                // language=cs
-                @"
+                    // language=cs
+                    @"
 [Command]
 public class MyCommand
 {
     public ValueTask ExecuteAsync(IConsole console) => default;
 }"
+                )
             };
         }
 
         [Theory]
-        [MemberData(nameof(GetValidCodes))]
-        public void Positive(DiagnosticDescriptor diagnostic, string code) =>
-            AssertCodeValid(Analyzer, diagnostic, code);
+        [MemberData(nameof(GetValidCases))]
+        public void Valid(AnalyzerTestCase testCase) =>
+            AssertAnalyzer.ValidCode(Analyzer, testCase);
 
         [Theory]
-        [MemberData(nameof(GetInvalidCodes))]
-        public void Negative(DiagnosticDescriptor diagnostic, string code) =>
-            AssertCodeInvalid(Analyzer, diagnostic, code);
+        [MemberData(nameof(GetInvalidCases))]
+        public void Invalid(AnalyzerTestCase testCase) =>
+            AssertAnalyzer.InvalidCode(Analyzer, testCase);
     }
 }

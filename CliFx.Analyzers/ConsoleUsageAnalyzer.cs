@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Linq;
-using CliFx.Analyzers.Internal;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -17,19 +15,31 @@ namespace CliFx.Analyzers
 
         private static void CheckSystemConsoleUsage(SyntaxNodeAnalysisContext context)
         {
+            // Invocation: Console.Error.WriteLine(...)
             if (!(context.Node is InvocationExpressionSyntax invocationSyntax))
                 return;
 
-            if (!(context.SemanticModel.GetSymbolInfo(invocationSyntax).Symbol is IMethodSymbol methodSymbol))
+            // Type identifier: Console
+            var typeIdentifierSyntax = invocationSyntax
+                .DescendantNodes()
+                .OfType<IdentifierNameSyntax>()
+                .FirstOrDefault();
+
+            if (typeIdentifierSyntax == null)
                 return;
 
-            var isSystemConsoleMethodCalled =
-                KnownSymbols.IsSystemConsole(methodSymbol.ContainingType);
-
-            if (!isSystemConsoleMethodCalled)
+            // Type: System.Console
+            if (!(context.SemanticModel.GetSymbolInfo(typeIdentifierSyntax).Symbol is INamedTypeSymbol namedTypeSymbol))
                 return;
 
-            var isConsoleInterfaceAvailable = invocationSyntax.GetAncestors()
+            // Is it System.Console?
+            var isSystemConsole = KnownSymbols.IsSystemConsole(namedTypeSymbol);
+            if (!isSystemConsole)
+                return;
+
+            // Is IConsole available in the context as a viable alternative?
+            var isConsoleInterfaceAvailable = invocationSyntax
+                .Ancestors()
                 .OfType<MethodDeclarationSyntax>()
                 .SelectMany(m => m.ParameterList.Parameters)
                 .Select(p => p.Type)

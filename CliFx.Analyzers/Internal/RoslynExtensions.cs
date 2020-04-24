@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 
 namespace CliFx.Analyzers.Internal
@@ -9,14 +8,7 @@ namespace CliFx.Analyzers.Internal
         public static bool DisplayNameMatches(this ISymbol symbol, string name) =>
             string.Equals(symbol.ToDisplayString(), name, StringComparison.Ordinal);
 
-        public static IEnumerable<SyntaxNode> GetAncestors(this SyntaxNode syntaxNode)
-        {
-            var current = syntaxNode;
-            while (current != null)
-            {
-                yield return current;
-                current = current.Parent;
-            }
-        }
+        public static bool DisplayNameStartsWith(this ISymbol symbol, string name) =>
+            symbol.ToDisplayString().StartsWith(name, StringComparison.Ordinal);
     }
 }
