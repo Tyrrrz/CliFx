@@ -109,10 +109,13 @@ namespace CliFx.Analyzers
 
             if (!isValidCommandType)
             {
-                if (!implementsCommandInterface)
+                // See if this was meant to be a command type (either interface or attribute present)
+                var isAlmostValidCommandType = implementsCommandInterface ^ hasCommandAttribute;
+
+                if (isAlmostValidCommandType && !implementsCommandInterface)
                     context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.CliFx0003, namedTypeSymbol.Locations.First()));
 
-                if (!hasCommandAttribute)
+                if (isAlmostValidCommandType && !hasCommandAttribute)
                     context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.CliFx0002, namedTypeSymbol.Locations.First()));
 
                 return;

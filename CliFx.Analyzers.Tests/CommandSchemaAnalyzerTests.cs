@@ -14,6 +14,36 @@ namespace CliFx.Analyzers.Tests
             yield return new object[]
             {
                 new AnalyzerTestCase(
+                    "Non-command type",
+                    DiagnosticDescriptors.CliFx0002,
+
+                    // language=cs
+                    @"
+public class Foo
+{
+    public int Bar { get; set; } = 5;
+}"
+                )
+            };
+
+            yield return new object[]
+            {
+                new AnalyzerTestCase(
+                    "Non-command type",
+                    DiagnosticDescriptors.CliFx0003,
+
+                    // language=cs
+                    @"
+public class Foo
+{
+    public int Bar { get; set; } = 5;
+}"
+                )
+            };
+
+            yield return new object[]
+            {
+                new AnalyzerTestCase(
                     "Command implements interface and has attribute",
                     DiagnosticDescriptors.CliFx0002,
 
