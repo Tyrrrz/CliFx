@@ -5,9 +5,6 @@ namespace CliFx.Analyzers
 {
     public static class KnownSymbols
     {
-        public static bool IsSystemNullable(ISymbol symbol) =>
-            symbol.DisplayNameMatches("System.Nullable<T>");
-
         public static bool IsSystemString(ISymbol symbol) =>
             symbol.DisplayNameMatches("string") ||
             symbol.DisplayNameMatches("System.String");
@@ -15,9 +12,6 @@ namespace CliFx.Analyzers
         public static bool IsSystemChar(ISymbol symbol) =>
             symbol.DisplayNameMatches("char") ||
             symbol.DisplayNameMatches("System.Char");
-
-        public static bool IsSystemCharNullable(ISymbol symbol) =>
-            IsSystemNullable(symbol);
 
         public static bool IsSystemCollectionsGenericIEnumerable(ISymbol symbol) =>
             symbol.DisplayNameMatches("System.Collections.Generic.IEnumerable<T>");

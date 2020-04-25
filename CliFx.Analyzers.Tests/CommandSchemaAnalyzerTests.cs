@@ -182,6 +182,72 @@ public class MyCommand : ICommand
 }"
                 )
             };
+
+            yield return new object[]
+            {
+                new AnalyzerTestCase(
+                    "Options with unique names",
+                    Analyzer.SupportedDiagnostics,
+
+                    // language=cs
+                    @"
+[Command]
+public class MyCommand : ICommand
+{
+    [CommandOption(""foo"")]
+    public string ParamA { get; set; }
+    
+    [CommandOption(""bar"")]
+    public string ParamB { get; set; }
+
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}"
+                )
+            };
+
+            yield return new object[]
+            {
+                new AnalyzerTestCase(
+                    "Options with unique short names",
+                    Analyzer.SupportedDiagnostics,
+
+                    // language=cs
+                    @"
+[Command]
+public class MyCommand : ICommand
+{
+    [CommandOption('f')]
+    public string ParamA { get; set; }
+    
+    [CommandOption('x')]
+    public string ParamB { get; set; }
+
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}"
+                )
+            };
+
+            yield return new object[]
+            {
+                new AnalyzerTestCase(
+                    "Options with unique environment variable names",
+                    Analyzer.SupportedDiagnostics,
+
+                    // language=cs
+                    @"
+[Command]
+public class MyCommand : ICommand
+{
+    [CommandOption('a', EnvironmentVariableName = ""env_var_a"")]
+    public string ParamA { get; set; }
+    
+    [CommandOption('b', EnvironmentVariableName = ""env_var_b"")]
+    public string ParamB { get; set; }
+
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}"
+                )
+            };
         }
 
         public static IEnumerable<object[]> GetInvalidCases()
@@ -337,6 +403,72 @@ public class MyCommand : ICommand
 {
     [CommandOption(""a"")]
     public string Param { get; set; }
+
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}"
+                )
+            };
+
+            yield return new object[]
+            {
+                new AnalyzerTestCase(
+                    "Options with duplicate names",
+                    DiagnosticDescriptors.CliFx0043,
+
+                    // language=cs
+                    @"
+[Command]
+public class MyCommand : ICommand
+{
+    [CommandOption(""foo"")]
+    public string ParamA { get; set; }
+    
+    [CommandOption(""foo"")]
+    public string ParamB { get; set; }
+
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}"
+                )
+            };
+
+            yield return new object[]
+            {
+                new AnalyzerTestCase(
+                    "Options with duplicate short names",
+                    DiagnosticDescriptors.CliFx0044,
+
+                    // language=cs
+                    @"
+[Command]
+public class MyCommand : ICommand
+{
+    [CommandOption('f')]
+    public string ParamA { get; set; }
+    
+    [CommandOption('f')]
+    public string ParamB { get; set; }
+
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}"
+                )
+            };
+
+            yield return new object[]
+            {
+                new AnalyzerTestCase(
+                    "Options with duplicate environment variable names",
+                    DiagnosticDescriptors.CliFx0045,
+
+                    // language=cs
+                    @"
+[Command]
+public class MyCommand : ICommand
+{
+    [CommandOption('a', EnvironmentVariableName = ""env_var"")]
+    public string ParamA { get; set; }
+    
+    [CommandOption('b', EnvironmentVariableName = ""env_var"")]
+    public string ParamB { get; set; }
 
     public ValueTask ExecuteAsync(IConsole console) => default;
 }"

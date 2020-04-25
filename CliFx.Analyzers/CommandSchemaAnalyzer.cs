@@ -137,11 +137,18 @@ namespace CliFx.Analyzers
                         .Select(a => a.Value)
                         .FirstOrDefault() as char?;
 
+                    var envVarName = attribute
+                        .NamedArguments
+                        .Where(a => a.Key == "EnvironmentVariableName")
+                        .Select(a => a.Value.Value)
+                        .FirstOrDefault() as string;
+
                     return new
                     {
                         Property = p,
                         Name = name,
-                        ShortName = shortName
+                        ShortName = shortName,
+                        EnvironmentVariableName = envVarName
                     };
                 })
                 .ToArray();
@@ -167,6 +174,48 @@ namespace CliFx.Analyzers
                 context.ReportDiagnostic(
                     Diagnostic.Create(DiagnosticDescriptors.CliFx0042, option.Property.Locations.First()));
             }
+
+            // Duplicate name
+            var duplicateNameOptions = options
+                .Where(p => !string.IsNullOrWhiteSpace(p.Name))
+                .GroupBy(p => p.Name, StringComparer.OrdinalIgnoreCase)
+                .Where(g => g.Count() > 1)
+                .SelectMany(g => g.AsEnumerable())
+                .ToArray();
+
+            foreach (var option in duplicateNameOptions)
+            {
+                context.ReportDiagnostic(
+                    Diagnostic.Create(DiagnosticDescriptors.CliFx0043, option.Property.Locations.First()));
+            }
+
+            // Duplicate name
+            var duplicateShortNameOptions = options
+                .Where(p => p.ShortName != null)
+                .GroupBy(p => p.ShortName)
+                .Where(g => g.Count() > 1)
+                .SelectMany(g => g.AsEnumerable())
+                .ToArray();
+
+            foreach (var option in duplicateShortNameOptions)
+            {
+                context.ReportDiagnostic(
+                    Diagnostic.Create(DiagnosticDescriptors.CliFx0044, option.Property.Locations.First()));
+            }
+
+            // Duplicate environment variable name
+            var duplicateEnvironmentVariableNameOptions = options
+                .Where(p => !string.IsNullOrWhiteSpace(p.EnvironmentVariableName))
+                .GroupBy(p => p.EnvironmentVariableName, StringComparer.OrdinalIgnoreCase)
+                .Where(g => g.Count() > 1)
+                .SelectMany(g => g.AsEnumerable())
+                .ToArray();
+
+            foreach (var option in duplicateEnvironmentVariableNameOptions)
+            {
+                context.ReportDiagnostic(
+                    Diagnostic.Create(DiagnosticDescriptors.CliFx0045, option.Property.Locations.First()));
+            }
         }
 
         private static void CheckCommandType(SymbolAnalysisContext context)
@@ -175,8 +224,8 @@ namespace CliFx.Analyzers
             if (!(context.Symbol is INamedTypeSymbol namedTypeSymbol))
                 return;
 
-            // Only instantiable classes
-            if (namedTypeSymbol.TypeKind != TypeKind.Class || namedTypeSymbol.IsAbstract)
+            // Only classes
+            if (namedTypeSymbol.TypeKind != TypeKind.Class)
                 return;
 
             // Implements ICommand?
@@ -191,12 +240,10 @@ namespace CliFx.Analyzers
                 .Any(KnownSymbols.IsCommandAttribute);
 
             var isValidCommandType =
-                // implement interface
+                // implements interface
                 implementsCommandInterface && (
-                    // and either abstract class or interface
-                    namedTypeSymbol.TypeKind == TypeKind.Interface || namedTypeSymbol.IsAbstract ||
-                    // or has attribute
-                    hasCommandAttribute
+                    // and either abstract class or has attribute
+                    namedTypeSymbol.IsAbstract || hasCommandAttribute
                 );
 
             if (!isValidCommandType)
