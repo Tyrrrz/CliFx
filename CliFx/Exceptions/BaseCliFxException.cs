@@ -9,6 +9,11 @@ namespace CliFx.Exceptions
     public abstract class BaseCliFxException : Exception
     {
         /// <summary>
+        /// Represents the default exit code assigned to exceptions in CliFx.
+        /// </summary>
+        protected const int DefaultExitCode = -100;
+
+        /// <summary>
         /// Whether to show the help text after handling this exception.
         /// </summary>
         public bool ShowHelp { get; }
@@ -25,22 +30,25 @@ namespace CliFx.Exceptions
         /// <summary>
         /// Returns an exit code associated with this exception.
         /// </summary>
-        public virtual int ExitCode => HResult;
+        public int ExitCode { get; }
 
         /// <summary>
         /// Initializes an instance of <see cref="BaseCliFxException"/>.
         /// </summary>
-        protected BaseCliFxException(string? message, bool showHelp = false)
-            : this(message, null, showHelp)
-        {
+        protected BaseCliFxException(string? message, int exitCode = DefaultExitCode, bool showHelp = false)
+            : this(message, null, exitCode, showHelp)
+        {            
         }
 
         /// <summary>
         /// Initializes an instance of <see cref="BaseCliFxException"/>.
         /// </summary>
-        protected BaseCliFxException(string? message, Exception? innerException, bool showHelp = false)
+        protected BaseCliFxException(string? message, Exception? innerException, int exitCode = DefaultExitCode, bool showHelp = false)
             : base(message, innerException)
         {
+            ExitCode = exitCode != 0
+                ? exitCode
+                : throw new ArgumentException("Exit code must not be zero in order to signify failure.");
             HasMessage = string.IsNullOrWhiteSpace(message) ? false : true;
             ShowHelp = showHelp;
         }

@@ -15,7 +15,7 @@ namespace CliFx.Exceptions
         /// Initializes an instance of <see cref="CliFxException"/>.
         /// </summary>
         public CliFxException(string? message, bool showHelp = false) 
-            : base(message, showHelp)
+            : base(message, showHelp: showHelp)
         {
         }
 
@@ -23,7 +23,7 @@ namespace CliFx.Exceptions
         /// Initializes an instance of <see cref="CliFxException"/>.
         /// </summary>
         public CliFxException(string? message, Exception? innerException, bool showHelp = false) 
-            : base(message, innerException, showHelp)
+            : base(message, innerException, showHelp: showHelp)
         {
         }
     }

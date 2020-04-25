@@ -9,23 +9,14 @@ namespace CliFx.Exceptions
     /// </summary>
     public class CommandException : BaseCliFxException
     {
-        private const int DefaultExitCode = -100;
-
-        /// <summary>
-        /// Process exit code.
-        /// </summary>
-        public override int ExitCode { get; }
-
         /// <summary>
         /// Initializes an instance of <see cref="CommandException"/>.
         /// </summary>
         public CommandException(string? message, Exception? innerException, 
             int exitCode = DefaultExitCode, bool showHelp = false)
-                : base(message, innerException, showHelp)
+                : base(message, innerException, exitCode, showHelp)
         {
-            ExitCode = exitCode != 0
-                ? exitCode
-                : throw new ArgumentException("Exit code must not be zero in order to signify failure.");
+            
         }
 
         /// <summary>

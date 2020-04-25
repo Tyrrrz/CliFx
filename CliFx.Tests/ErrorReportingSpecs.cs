@@ -169,8 +169,46 @@ namespace CliFx.Tests
 
             // Assert
             exitCode.Should().NotBe(0);
-            stdErrData.Should().Contain("Kaput");
-            stdErrData.Length.Should().BeGreaterThan("Kaput".Length);
+            stdErrData.Should().ContainAll(
+                "System.Exception:",
+                "Kaput", "at",
+                "CliFx.Tests");
+        }
+
+        [Fact]
+        public async Task Command_shows_help_text_on_exceptions_related_to_invalid_user_input()
+        {
+            // Arrange
+            await using var stdOut = new MemoryStream();
+            await using var stdErr = new MemoryStream();
+            var console = new VirtualConsole(output: stdOut, error: stdErr);
+
+            var application = new CliApplicationBuilder()
+                .AddCommand(typeof(InvalidUserInputCommand))
+                .UseConsole(console)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(
+                new[] { "not-a-valid-command", "-r", "foo" },
+                new Dictionary<string, string>());
+
+            var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray()).TrimEnd();
+            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
+
+            // Assert
+            exitCode.Should().NotBe(0);
+            stdErrData.Should().ContainAll(
+                "Can't find a command that matches the following arguments:", 
+                "not-a-valid-command");
+            stdOutData.Should().ContainAll(
+                "Usage",
+                "[command]",
+                "Options",
+                "-h|--help", "Shows help text.",
+                "Commands",
+                "inv",
+                "You can run", "to show help on a specific command.");
         }
     }
 }
