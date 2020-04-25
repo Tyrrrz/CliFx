@@ -11,8 +11,8 @@ namespace CliFx.Analyzers
     public class CommandSchemaAnalyzer : DiagnosticAnalyzer
     {
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            DiagnosticDescriptors.CliFx0002,
             DiagnosticDescriptors.CliFx0003,
+            DiagnosticDescriptors.CliFx0002,
             DiagnosticDescriptors.CliFx0004,
             DiagnosticDescriptors.CliFx0005
         );
@@ -113,15 +113,15 @@ namespace CliFx.Analyzers
                 var isAlmostValidCommandType = implementsCommandInterface ^ hasCommandAttribute;
 
                 if (isAlmostValidCommandType && !implementsCommandInterface)
-                    context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.CliFx0003, namedTypeSymbol.Locations.First()));
+                    context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.CliFx0002, namedTypeSymbol.Locations.First()));
 
                 if (isAlmostValidCommandType && !hasCommandAttribute)
-                    context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.CliFx0002, namedTypeSymbol.Locations.First()));
+                    context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.CliFx0003, namedTypeSymbol.Locations.First()));
 
                 return;
             }
 
-            // Get parameter properties
+            // Check parameters
             var parameterProperties = namedTypeSymbol
                 .GetMembers()
                 .Where(m => m.Kind == SymbolKind.Property)

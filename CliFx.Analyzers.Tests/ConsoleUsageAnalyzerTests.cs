@@ -15,7 +15,7 @@ namespace CliFx.Analyzers.Tests
             {
                 new AnalyzerTestCase(
                     "Using console abstraction",
-                    DiagnosticDescriptors.CliFx0001,
+                    DiagnosticDescriptors.CliFx0100,
 
                     // language=cs
                     @"
@@ -34,8 +34,8 @@ public class MyCommand : ICommand
             yield return new object[]
             {
                 new AnalyzerTestCase(
-                    "Method doesn't have console abstraction available",
-                    DiagnosticDescriptors.CliFx0001,
+                    "Console abstraction is not available in scope",
+                    DiagnosticDescriptors.CliFx0100,
 
                     // language=cs
                     @"
@@ -56,7 +56,7 @@ public class MyCommand : ICommand
             {
                 new AnalyzerTestCase(
                     "Not using available console abstraction in the ExecuteAsync method",
-                    DiagnosticDescriptors.CliFx0001,
+                    DiagnosticDescriptors.CliFx0100,
 
                     // language=cs
                     @"
@@ -75,8 +75,8 @@ public class MyCommand : ICommand
             yield return new object[]
             {
                 new AnalyzerTestCase(
-                    "Not using available console abstraction in the ExecuteAsync method (nested)",
-                    DiagnosticDescriptors.CliFx0001,
+                    "Not using available console abstraction in the ExecuteAsync method when writing stderr",
+                    DiagnosticDescriptors.CliFx0100,
 
                     // language=cs
                     @"
@@ -95,8 +95,28 @@ public class MyCommand : ICommand
             yield return new object[]
             {
                 new AnalyzerTestCase(
+                    "Not using available console abstraction while referencing System.Console by full name",
+                    DiagnosticDescriptors.CliFx0100,
+
+                    // language=cs
+                    @"
+[Command]
+public class MyCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        System.Console.Error.WriteLine(""Hello world"");
+        return default;
+    }
+}"
+                )
+            };
+
+            yield return new object[]
+            {
+                new AnalyzerTestCase(
                     "Not using available console abstraction in another method",
-                    DiagnosticDescriptors.CliFx0001,
+                    DiagnosticDescriptors.CliFx0100,
 
                     // language=cs
                     @"
@@ -114,11 +134,11 @@ public class MyCommand : ICommand
         [Theory]
         [MemberData(nameof(GetValidCases))]
         public void Valid(AnalyzerTestCase testCase) =>
-            AnalyzerAssert.ValidCode(Analyzer, testCase);
+            Analyzer.Should().NotProduceDiagnostics(testCase);
 
         [Theory]
         [MemberData(nameof(GetInvalidCases))]
         public void Invalid(AnalyzerTestCase testCase) =>
-            AnalyzerAssert.InvalidCode(Analyzer, testCase);
+            Analyzer.Should().ProduceDiagnostics(testCase);
     }
 }

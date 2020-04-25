@@ -15,21 +15,6 @@ namespace CliFx.Analyzers.Tests
             {
                 new AnalyzerTestCase(
                     "Non-command type",
-                    DiagnosticDescriptors.CliFx0002,
-
-                    // language=cs
-                    @"
-public class Foo
-{
-    public int Bar { get; set; } = 5;
-}"
-                )
-            };
-
-            yield return new object[]
-            {
-                new AnalyzerTestCase(
-                    "Non-command type",
                     DiagnosticDescriptors.CliFx0003,
 
                     // language=cs
@@ -44,8 +29,23 @@ public class Foo
             yield return new object[]
             {
                 new AnalyzerTestCase(
-                    "Command implements interface and has attribute",
+                    "Non-command type",
                     DiagnosticDescriptors.CliFx0002,
+
+                    // language=cs
+                    @"
+public class Foo
+{
+    public int Bar { get; set; } = 5;
+}"
+                )
+            };
+
+            yield return new object[]
+            {
+                new AnalyzerTestCase(
+                    "Command implements interface and has attribute",
+                    DiagnosticDescriptors.CliFx0003,
 
                     // language=cs
                     @"
@@ -61,7 +61,7 @@ public class MyCommand : ICommand
             {
                 new AnalyzerTestCase(
                     "Command implements interface and has attribute",
-                    DiagnosticDescriptors.CliFx0003,
+                    DiagnosticDescriptors.CliFx0002,
 
                     // language=cs
                     @"
@@ -77,7 +77,7 @@ public class MyCommand : ICommand
             {
                 new AnalyzerTestCase(
                     "Command is an abstract type",
-                    DiagnosticDescriptors.CliFx0002,
+                    DiagnosticDescriptors.CliFx0003,
 
                     // language=cs
                     @"
@@ -139,7 +139,7 @@ public class MyCommand : ICommand
             {
                 new AnalyzerTestCase(
                     "Command is missing the attribute",
-                    DiagnosticDescriptors.CliFx0002,
+                    DiagnosticDescriptors.CliFx0003,
 
                     // language=cs
                     @"
@@ -154,7 +154,7 @@ public class MyCommand : ICommand
             {
                 new AnalyzerTestCase(
                     "Command doesn't implement the interface",
-                    DiagnosticDescriptors.CliFx0003,
+                    DiagnosticDescriptors.CliFx0002,
 
                     // language=cs
                     @"
@@ -214,11 +214,11 @@ public class MyCommand : ICommand
         [Theory]
         [MemberData(nameof(GetValidCases))]
         public void Valid(AnalyzerTestCase testCase) =>
-            AnalyzerAssert.ValidCode(Analyzer, testCase);
+            Analyzer.Should().NotProduceDiagnostics(testCase);
 
         [Theory]
         [MemberData(nameof(GetInvalidCases))]
         public void Invalid(AnalyzerTestCase testCase) =>
-            AnalyzerAssert.InvalidCode(Analyzer, testCase);
+            Analyzer.Should().ProduceDiagnostics(testCase);
     }
 }

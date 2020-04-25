@@ -10,34 +10,50 @@ namespace CliFx.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class ConsoleUsageAnalyzer : DiagnosticAnalyzer
     {
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-            ImmutableArray.Create(DiagnosticDescriptors.CliFx0001);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
+            DiagnosticDescriptors.CliFx0100
+        );
+
+        private static bool IsSystemConsoleInvocation(
+            SyntaxNodeAnalysisContext context,
+            InvocationExpressionSyntax invocationSyntax)
+        {
+            // Get the method member access (Console.WriteLine or Console.Error.WriteLine)
+            if (!(invocationSyntax.Expression is MemberAccessExpressionSyntax memberAccessSyntax))
+                return false;
+
+            // Get the semantic model for the invoked method
+            if (!(context.SemanticModel.GetSymbolInfo(memberAccessSyntax).Symbol is IMethodSymbol methodSymbol))
+                return false;
+
+            // Check if contained within System.Console
+            if (KnownSymbols.IsSystemConsole(methodSymbol.ContainingType))
+                return true;
+
+            // In case with Console.Error.WriteLine that wouldn't work, we need to check parent member access too
+            if (!(memberAccessSyntax.Expression is MemberAccessExpressionSyntax parentMemberAccessSyntax))
+                return false;
+
+            // Get the semantic model for the parent member
+            if (!(context.SemanticModel.GetSymbolInfo(parentMemberAccessSyntax).Symbol is IPropertySymbol propertySymbol))
+                return false;
+
+            // Check if contained within System.Console
+            if (KnownSymbols.IsSystemConsole(propertySymbol.ContainingType))
+                return true;
+
+            return false;
+        }
 
         private static void CheckSystemConsoleUsage(SyntaxNodeAnalysisContext context)
         {
-            // Invocation: Console.Error.WriteLine(...)
             if (!(context.Node is InvocationExpressionSyntax invocationSyntax))
                 return;
 
-            // Type identifier: Console
-            var typeIdentifierSyntax = invocationSyntax
-                .DescendantNodes()
-                .OfType<IdentifierNameSyntax>()
-                .FirstOrDefault();
-
-            if (typeIdentifierSyntax == null)
+            if (!IsSystemConsoleInvocation(context, invocationSyntax))
                 return;
 
-            // Type: System.Console
-            if (!(context.SemanticModel.GetSymbolInfo(typeIdentifierSyntax).Symbol is INamedTypeSymbol namedTypeSymbol))
-                return;
-
-            // Is it System.Console?
-            var isSystemConsole = KnownSymbols.IsSystemConsole(namedTypeSymbol);
-            if (!isSystemConsole)
-                return;
-
-            // Is IConsole available in the context as a viable alternative?
+            // Check if IConsole is available in the scope as a viable alternative
             var isConsoleInterfaceAvailable = invocationSyntax
                 .Ancestors()
                 .OfType<MethodDeclarationSyntax>()
@@ -50,7 +66,7 @@ namespace CliFx.Analyzers
             if (!isConsoleInterfaceAvailable)
                 return;
 
-            context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.CliFx0001, invocationSyntax.GetLocation()));
+            context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.CliFx0100, invocationSyntax.GetLocation()));
         }
 
         public override void Initialize(AnalysisContext context)
