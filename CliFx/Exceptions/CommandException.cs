@@ -7,7 +7,7 @@ namespace CliFx.Exceptions
     /// Use this exception if you want to report an error that occured during execution of a command.
     /// This exception also allows specifying exit code which will be returned to the calling process.
     /// </summary>
-    public class CommandException : BaseCliFxException
+    public class CommandException : CliFxException
     {
         /// <summary>
         /// Initializes an instance of <see cref="CommandException"/>.

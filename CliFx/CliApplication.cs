@@ -147,7 +147,7 @@ namespace CliFx
         /// Handle <see cref="CommandException"/>s differently from the rest because we want to
         /// display it different based on whether we are showing the help text or not.
         /// </summary>
-        private int HandleBaseCliFxException(IReadOnlyList<string> commandLineArguments, BaseCliFxException cfe)
+        private int HandleCliFxException(IReadOnlyList<string> commandLineArguments, CliFxException cfe)
         {
             var showHelp = cfe.ShowHelp;
 
@@ -188,11 +188,11 @@ namespace CliFx
                     HandleHelpOption(applicationSchema, commandLineInput) ??
                     await HandleCommandExecutionAsync(applicationSchema, commandLineInput, environmentVariables);
             }
-            catch (BaseCliFxException cfe)
+            catch (CliFxException cfe)
             {
                 // We want to catch exceptions in order to print errors and return correct exit codes.
                 // Doing this also gets rid of the annoying Windows troubleshooting dialog that shows up on unhandled exceptions.
-                var exitCode = HandleBaseCliFxException(commandLineArguments, cfe);
+                var exitCode = HandleCliFxException(commandLineArguments, cfe);
                 return exitCode;
             }
             catch (Exception ex)
