@@ -6,73 +6,73 @@ namespace CliFx.Analyzers
     {
         public static readonly DiagnosticDescriptor CliFx0001 =
             new DiagnosticDescriptor(nameof(CliFx0001),
-                "Command type must implement an interface",
-                "Ensure the type implements 'CliFx.ICommand' in order for it to be a valid command.",
+                "Type must implement the 'CliFx.ICommand' interface in order to be a valid command.",
+                "Type must implement the 'CliFx.ICommand' interface in order to be a valid command.",
                 "Usage", DiagnosticSeverity.Warning, true);
 
         public static readonly DiagnosticDescriptor CliFx0002 =
             new DiagnosticDescriptor(nameof(CliFx0002),
-                "Command type must be annotated by an attribute",
-                "Annotate the type with 'CliFx.Attributes.CommandAttribute' in order for it to be a valid command.",
+                "Type must be annotated with the 'CliFx.Attributes.CommandAttribute' in order to be a valid command.",
+                "Type must be annotated with the 'CliFx.Attributes.CommandAttribute' in order to be a valid command.",
                 "Usage", DiagnosticSeverity.Warning, true);
 
         public static readonly DiagnosticDescriptor CliFx0021 =
             new DiagnosticDescriptor(nameof(CliFx0021),
-                "Command parameters must have unique order",
-                "Ensure that have command parameters have different order specified.",
+                "Parameter order must be unique within its command.",
+                "Parameter order must be unique within its command.",
                 "Usage", DiagnosticSeverity.Warning, true);
 
         public static readonly DiagnosticDescriptor CliFx0022 =
             new DiagnosticDescriptor(nameof(CliFx0022),
-                "Command parameters must have unique names",
-                "Ensure that have command parameters have different names specified.",
+                "Parameter order must have unique name within its command.",
+                "Parameter order must have unique name within its command.",
                 "Usage", DiagnosticSeverity.Warning, true);
 
         public static readonly DiagnosticDescriptor CliFx0023 =
             new DiagnosticDescriptor(nameof(CliFx0023),
-                "Only one non-scalar parameter is allowed",
-                "TODO.",
+                "Only one non-scalar parameter per command is allowed.",
+                "Only one non-scalar parameter per command is allowed.",
                 "Usage", DiagnosticSeverity.Warning, true);
 
         public static readonly DiagnosticDescriptor CliFx0024 =
             new DiagnosticDescriptor(nameof(CliFx0024),
-                "Non-scalar parameter must be last in order",
-                "TODO.",
+                "Non-scalar parameter must be last in order.",
+                "Non-scalar parameter must be last in order.",
                 "Usage", DiagnosticSeverity.Warning, true);
 
         public static readonly DiagnosticDescriptor CliFx0041 =
             new DiagnosticDescriptor(nameof(CliFx0041),
-                "Options must have a non-empty name",
-                "TODO.",
+                "Option must have a name or short name specified.",
+                "Option must have a name or short name specified.",
                 "Usage", DiagnosticSeverity.Warning, true);
 
         public static readonly DiagnosticDescriptor CliFx0042 =
             new DiagnosticDescriptor(nameof(CliFx0042),
-                "Options must have a name of 2 or more characters",
-                "TODO.",
+                "Option name must be at least 2 characters long.",
+                "Option name must be at least 2 characters long.",
                 "Usage", DiagnosticSeverity.Warning, true);
 
         public static readonly DiagnosticDescriptor CliFx0043 =
             new DiagnosticDescriptor(nameof(CliFx0043),
-                "Options must have unique names",
-                "TODO.",
+                "Option name must be unique within its command.",
+                "Option name must be unique within its command.",
                 "Usage", DiagnosticSeverity.Warning, true);
 
         public static readonly DiagnosticDescriptor CliFx0044 =
             new DiagnosticDescriptor(nameof(CliFx0044),
-                "Options must have unique short names",
-                "TODO.",
+                "Option short name must be unique within its command.",
+                "Option short name must be unique within its command.",
                 "Usage", DiagnosticSeverity.Warning, true);
 
         public static readonly DiagnosticDescriptor CliFx0045 =
             new DiagnosticDescriptor(nameof(CliFx0045),
-                "Options must have unique environment variable names",
-                "TODO.",
+                "Option environment variable name must be unique within its command.",
+                "Option environment variable name must be unique within its command.",
                 "Usage", DiagnosticSeverity.Warning, true);
 
         public static readonly DiagnosticDescriptor CliFx0100 =
             new DiagnosticDescriptor(nameof(CliFx0100),
-                "Avoid using System.Console in commands",
+                "Avoid using System.Console in commands.",
                 "Use the provided IConsole abstraction instead of System.Console to ensure that the command can be tested in isolation.",
                 "Usage", DiagnosticSeverity.Warning, true);
     }
