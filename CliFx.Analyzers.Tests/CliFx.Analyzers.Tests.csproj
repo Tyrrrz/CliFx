@@ -10,10 +10,10 @@
   <ItemGroup>
     <PackageReference Include="Gu.Roslyn.Asserts" Version="3.3.0" />
     <PackageReference Include="GitHubActionsTestLogger" Version="1.0.0" />
+    <PackageReference Include="FluentAssertions" Version="5.10.2" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
     <PackageReference Include="xunit" Version="2.4.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
-    <PackageReference Include="FluentAssertions" Version="5.10.2" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.4.0" />
   </ItemGroup>
 

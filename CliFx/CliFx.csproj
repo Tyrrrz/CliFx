@@ -2,7 +2,7 @@
   <Import Project="../CliFx.props" />
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1;netstandard2.0;net461</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;netstandard2.0</TargetFrameworks>
     <Authors>$(Company)</Authors>
     <Description>Declarative framework for CLI applications</Description>
     <PackageTags>command line executable interface framework parser arguments net core</PackageTags>
@@ -10,17 +10,15 @@
     <PackageReleaseNotes>https://github.com/Tyrrrz/CliFx/blob/master/Changelog.md</PackageReleaseNotes>
     <PackageIcon>favicon.png</PackageIcon>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <PublishRepositoryUrl>True</PublishRepositoryUrl>
     <EmbedUntrackedSources>True</EmbedUntrackedSources>
     <IncludeSymbols>True</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
   </PropertyGroup>
 
   <!-- Disable nullability warnings on older frameworks because there is no nullability info for BCL -->
-  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'net461'">
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <Nullable>annotations</Nullable>
   </PropertyGroup>
 
@@ -30,16 +28,16 @@
     <PackageReference Include="Nullable" Version="1.2.1" PrivateAssets="all" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'net461'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.3" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="../favicon.png" Pack="True" PackagePath="" />
+    <ProjectReference Include="..\CliFx.Analyzers\CliFx.Analyzers.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CliFx.Analyzers\CliFx.Analyzers.csproj" ReferenceOutputAssembly="true" IncludeAssets="CliFx.Analyzers.dll" />
+    <None Include="../favicon.png" Pack="True" PackagePath="" />
   </ItemGroup>
 
   <ItemGroup>
@@ -50,12 +48,5 @@
       <_Parameter1>$(AssemblyName).Analyzers</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
-
-  <!-- Hack for https://github.com/nuget/home/issues/3891#issuecomment-377319939 -->
-  <Target DependsOnTargets="ResolveReferences" Name="CopyProjectReferencesToPackage">
-    <ItemGroup>
-      <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths->WithMetadataValue('ReferenceSourceTarget', 'ProjectReference'))"/>
-    </ItemGroup>
-  </Target>
 
 </Project>
