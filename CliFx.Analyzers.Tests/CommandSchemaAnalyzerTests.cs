@@ -144,6 +144,44 @@ public class MyCommand : ICommand
 }"
                 )
             };
+
+            yield return new object[]
+            {
+                new AnalyzerTestCase(
+                    "Option with a proper name",
+                    Analyzer.SupportedDiagnostics,
+
+                    // language=cs
+                    @"
+[Command]
+public class MyCommand : ICommand
+{
+    [CommandOption(""foo"")]
+    public string Param { get; set; }
+
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}"
+                )
+            };
+
+            yield return new object[]
+            {
+                new AnalyzerTestCase(
+                    "Option with a proper name and short name",
+                    Analyzer.SupportedDiagnostics,
+
+                    // language=cs
+                    @"
+[Command]
+public class MyCommand : ICommand
+{
+    [CommandOption(""foo"", 'f')]
+    public string Param { get; set; }
+
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}"
+                )
+            };
         }
 
         public static IEnumerable<object[]> GetInvalidCases()
@@ -152,7 +190,7 @@ public class MyCommand : ICommand
             {
                 new AnalyzerTestCase(
                     "Command is missing the attribute",
-                    DiagnosticDescriptors.CliFx0003,
+                    DiagnosticDescriptors.CliFx0002,
 
                     // language=cs
                     @"
@@ -167,7 +205,7 @@ public class MyCommand : ICommand
             {
                 new AnalyzerTestCase(
                     "Command doesn't implement the interface",
-                    DiagnosticDescriptors.CliFx0002,
+                    DiagnosticDescriptors.CliFx0001,
 
                     // language=cs
                     @"
@@ -183,7 +221,7 @@ public class MyCommand
             {
                 new AnalyzerTestCase(
                     "Parameters with duplicate order",
-                    DiagnosticDescriptors.CliFx0004,
+                    DiagnosticDescriptors.CliFx0021,
 
                     // language=cs
                     @"
@@ -205,7 +243,7 @@ public class MyCommand : ICommand
             {
                 new AnalyzerTestCase(
                     "Parameters with duplicate names",
-                    DiagnosticDescriptors.CliFx0005,
+                    DiagnosticDescriptors.CliFx0022,
 
                     // language=cs
                     @"
@@ -227,7 +265,7 @@ public class MyCommand : ICommand
             {
                 new AnalyzerTestCase(
                     "Multiple non-scalar parameters",
-                    DiagnosticDescriptors.CliFx0006,
+                    DiagnosticDescriptors.CliFx0023,
 
                     // language=cs
                     @"
@@ -249,7 +287,7 @@ public class MyCommand : ICommand
             {
                 new AnalyzerTestCase(
                     "Non-last non-scalar parameter",
-                    DiagnosticDescriptors.CliFx0007,
+                    DiagnosticDescriptors.CliFx0024,
 
                     // language=cs
                     @"
@@ -261,6 +299,44 @@ public class MyCommand : ICommand
     
     [CommandParameter(2)]
     public string ParamB { get; set; }
+
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}"
+                )
+            };
+
+            yield return new object[]
+            {
+                new AnalyzerTestCase(
+                    "Option with an empty name",
+                    DiagnosticDescriptors.CliFx0041,
+
+                    // language=cs
+                    @"
+[Command]
+public class MyCommand : ICommand
+{
+    [CommandOption("""")]
+    public string Param { get; set; }
+
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}"
+                )
+            };
+
+            yield return new object[]
+            {
+                new AnalyzerTestCase(
+                    "Option with a name which is too short",
+                    DiagnosticDescriptors.CliFx0042,
+
+                    // language=cs
+                    @"
+[Command]
+public class MyCommand : ICommand
+{
+    [CommandOption(""a"")]
+    public string Param { get; set; }
 
     public ValueTask ExecuteAsync(IConsole console) => default;
 }"

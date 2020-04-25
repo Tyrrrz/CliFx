@@ -11,12 +11,17 @@ namespace CliFx.Analyzers
     public class CommandSchemaAnalyzer : DiagnosticAnalyzer
     {
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            DiagnosticDescriptors.CliFx0003,
+            DiagnosticDescriptors.CliFx0001,
             DiagnosticDescriptors.CliFx0002,
-            DiagnosticDescriptors.CliFx0004,
-            DiagnosticDescriptors.CliFx0005,
-            DiagnosticDescriptors.CliFx0006,
-            DiagnosticDescriptors.CliFx0007
+            DiagnosticDescriptors.CliFx0021,
+            DiagnosticDescriptors.CliFx0022,
+            DiagnosticDescriptors.CliFx0023,
+            DiagnosticDescriptors.CliFx0024,
+            DiagnosticDescriptors.CliFx0041,
+            DiagnosticDescriptors.CliFx0042,
+            DiagnosticDescriptors.CliFx0043,
+            DiagnosticDescriptors.CliFx0044,
+            DiagnosticDescriptors.CliFx0045
         );
 
         private static bool IsScalarType(ITypeSymbol typeSymbol) =>
@@ -65,7 +70,7 @@ namespace CliFx.Analyzers
             foreach (var parameter in duplicateOrderParameters)
             {
                 context.ReportDiagnostic(
-                    Diagnostic.Create(DiagnosticDescriptors.CliFx0004, parameter.Property.Locations.First()));
+                    Diagnostic.Create(DiagnosticDescriptors.CliFx0021, parameter.Property.Locations.First()));
             }
 
             // Duplicate name
@@ -79,7 +84,7 @@ namespace CliFx.Analyzers
             foreach (var parameter in duplicateNameParameters)
             {
                 context.ReportDiagnostic(
-                    Diagnostic.Create(DiagnosticDescriptors.CliFx0005, parameter.Property.Locations.First()));
+                    Diagnostic.Create(DiagnosticDescriptors.CliFx0022, parameter.Property.Locations.First()));
             }
 
             // Multiple non-scalar
@@ -92,7 +97,7 @@ namespace CliFx.Analyzers
                 foreach (var parameter in nonScalarParameters)
                 {
                     context.ReportDiagnostic(
-                        Diagnostic.Create(DiagnosticDescriptors.CliFx0006, parameter.Property.Locations.First()));
+                        Diagnostic.Create(DiagnosticDescriptors.CliFx0023, parameter.Property.Locations.First()));
                 }
             }
 
@@ -105,7 +110,62 @@ namespace CliFx.Analyzers
             if (nonLastNonScalarParameter != null)
             {
                 context.ReportDiagnostic(
-                    Diagnostic.Create(DiagnosticDescriptors.CliFx0007, nonLastNonScalarParameter.Property.Locations.First()));
+                    Diagnostic.Create(DiagnosticDescriptors.CliFx0024, nonLastNonScalarParameter.Property.Locations.First()));
+            }
+        }
+
+        private static void CheckCommandOptionProperties(
+            SymbolAnalysisContext context,
+            IReadOnlyList<IPropertySymbol> properties)
+        {
+            var options = properties
+                .Select(p =>
+                {
+                    var attribute = p
+                        .GetAttributes()
+                        .First(a => KnownSymbols.IsCommandOptionAttribute(a.AttributeClass));
+
+                    var name = attribute
+                        .ConstructorArguments
+                        .Where(a => KnownSymbols.IsSystemString(a.Type))
+                        .Select(a => a.Value)
+                        .FirstOrDefault() as string;
+
+                    var shortName = attribute
+                        .ConstructorArguments
+                        .Where(a => KnownSymbols.IsSystemChar(a.Type))
+                        .Select(a => a.Value)
+                        .FirstOrDefault() as char?;
+
+                    return new
+                    {
+                        Property = p,
+                        Name = name,
+                        ShortName = shortName
+                    };
+                })
+                .ToArray();
+
+            // No name
+            var noNameOptions = options
+                .Where(o => string.IsNullOrWhiteSpace(o.Name) && o.ShortName == null)
+                .ToArray();
+
+            foreach (var option in noNameOptions)
+            {
+                context.ReportDiagnostic(
+                    Diagnostic.Create(DiagnosticDescriptors.CliFx0041, option.Property.Locations.First()));
+            }
+
+            // Too short name
+            var invalidNameLengthOptions = options
+                .Where(o => !string.IsNullOrWhiteSpace(o.Name) && o.Name.Length <= 1)
+                .ToArray();
+
+            foreach (var option in invalidNameLengthOptions)
+            {
+                context.ReportDiagnostic(
+                    Diagnostic.Create(DiagnosticDescriptors.CliFx0042, option.Property.Locations.First()));
             }
         }
 
@@ -145,19 +205,21 @@ namespace CliFx.Analyzers
                 var isAlmostValidCommandType = implementsCommandInterface ^ hasCommandAttribute;
 
                 if (isAlmostValidCommandType && !implementsCommandInterface)
-                    context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.CliFx0002, namedTypeSymbol.Locations.First()));
+                    context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.CliFx0001, namedTypeSymbol.Locations.First()));
 
                 if (isAlmostValidCommandType && !hasCommandAttribute)
-                    context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.CliFx0003, namedTypeSymbol.Locations.First()));
+                    context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.CliFx0002, namedTypeSymbol.Locations.First()));
 
                 return;
             }
 
-            // Check parameters
-            var parameterProperties = namedTypeSymbol
+            var properties = namedTypeSymbol
                 .GetMembers()
                 .Where(m => m.Kind == SymbolKind.Property)
-                .OfType<IPropertySymbol>()
+                .OfType<IPropertySymbol>().ToArray();
+
+            // Check parameters
+            var parameterProperties = properties
                 .Where(p => p
                     .GetAttributes()
                     .Select(a => a.AttributeClass)
@@ -165,6 +227,17 @@ namespace CliFx.Analyzers
                 .ToArray();
 
             CheckCommandParameterProperties(context, parameterProperties);
+
+            // Check options
+            var optionsProperties = properties
+                .Where(p => p
+                    .GetAttributes()
+                    .Select(a => a.AttributeClass)
+                    .Any(KnownSymbols.IsCommandOptionAttribute))
+                .ToArray();
+
+            CheckCommandParameterProperties(context, parameterProperties);
+            CheckCommandOptionProperties(context, optionsProperties);
         }
 
         public override void Initialize(AnalysisContext context)
