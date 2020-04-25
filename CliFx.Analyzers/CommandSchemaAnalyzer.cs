@@ -14,8 +14,14 @@ namespace CliFx.Analyzers
             DiagnosticDescriptors.CliFx0003,
             DiagnosticDescriptors.CliFx0002,
             DiagnosticDescriptors.CliFx0004,
-            DiagnosticDescriptors.CliFx0005
+            DiagnosticDescriptors.CliFx0005,
+            DiagnosticDescriptors.CliFx0006,
+            DiagnosticDescriptors.CliFx0007
         );
+
+        private static bool IsScalarType(ITypeSymbol typeSymbol) =>
+            KnownSymbols.IsSystemString(typeSymbol) ||
+            !typeSymbol.AllInterfaces.Select(i => i.ConstructedFrom).Any(KnownSymbols.IsSystemCollectionsGenericIEnumerable);
 
         private static void CheckCommandParameterProperties(
             SymbolAnalysisContext context,
@@ -74,6 +80,32 @@ namespace CliFx.Analyzers
             {
                 context.ReportDiagnostic(
                     Diagnostic.Create(DiagnosticDescriptors.CliFx0005, parameter.Property.Locations.First()));
+            }
+
+            // Multiple non-scalar
+            var nonScalarParameters = parameters
+                .Where(p => !IsScalarType(p.Property.Type))
+                .ToArray();
+
+            if (nonScalarParameters.Length > 1)
+            {
+                foreach (var parameter in nonScalarParameters)
+                {
+                    context.ReportDiagnostic(
+                        Diagnostic.Create(DiagnosticDescriptors.CliFx0006, parameter.Property.Locations.First()));
+                }
+            }
+
+            // Non-last non-scalar
+            var nonLastNonScalarParameter = parameters
+                .OrderByDescending(a => a.Order)
+                .Skip(1)
+                .LastOrDefault(p => !IsScalarType(p.Property.Type));
+
+            if (nonLastNonScalarParameter != null)
+            {
+                context.ReportDiagnostic(
+                    Diagnostic.Create(DiagnosticDescriptors.CliFx0007, nonLastNonScalarParameter.Property.Locations.First()));
             }
         }
 

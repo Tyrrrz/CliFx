@@ -28,6 +28,18 @@ namespace CliFx.Analyzers
                 "Ensure that have command parameters have different names specified.",
                 "Usage", DiagnosticSeverity.Warning, true);
 
+        public static readonly DiagnosticDescriptor CliFx0006 =
+            new DiagnosticDescriptor(nameof(CliFx0006),
+                "Only one non-scalar parameter is allowed",
+                "TODO.",
+                "Usage", DiagnosticSeverity.Warning, true);
+
+        public static readonly DiagnosticDescriptor CliFx0007 =
+            new DiagnosticDescriptor(nameof(CliFx0007),
+                "Non-scalar parameter must be last in order",
+                "TODO.",
+                "Usage", DiagnosticSeverity.Warning, true);
+
         public static readonly DiagnosticDescriptor CliFx0100 =
             new DiagnosticDescriptor(nameof(CliFx0100),
                 "Avoid using System.Console in commands",

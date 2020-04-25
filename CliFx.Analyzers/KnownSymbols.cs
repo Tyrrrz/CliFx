@@ -8,6 +8,13 @@ namespace CliFx.Analyzers
         public static bool IsSystemConsole(ISymbol symbol) =>
             symbol.DisplayNameMatches("System.Console");
 
+        public static bool IsSystemString(ISymbol symbol) =>
+            symbol.DisplayNameMatches("string") ||
+            symbol.DisplayNameMatches("System.String");
+
+        public static bool IsSystemCollectionsGenericIEnumerable(ISymbol symbol) =>
+            symbol.DisplayNameMatches("System.Collections.Generic.IEnumerable<T>");
+
         public static bool IsConsoleInterface(ISymbol symbol) =>
             symbol.DisplayNameMatches("CliFx.IConsole");
 

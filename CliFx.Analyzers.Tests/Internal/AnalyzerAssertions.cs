@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
 using FluentAssertions.Execution;
 using FluentAssertions.Primitives;
 using Gu.Roslyn.Asserts;
@@ -30,7 +28,7 @@ namespace CliFx.Analyzers.Tests.Internal
             var expectedIds = diagnostics.Select(d => d.Id).Distinct().OrderBy(d => d).ToArray();
             var producedIds = producedDiagnostics.Select(d => d.Id).Distinct().OrderBy(d => d).ToArray();
 
-            var result = expectedIds.SequenceEqual(producedIds);
+            var result = expectedIds.Intersect(producedIds).Count() == expectedIds.Length;
 
             Execute.Assertion.ForCondition(result).FailWith($@"
 Expected and produced diagnostics do not match.
@@ -67,22 +65,15 @@ Produced: {string.Join(", ", producedIds)}
 
     internal partial class AnalyzerAssertions
     {
-        private static IReadOnlyList<MetadataReference> DefaultMetadataReferences { get; } = new[]
-        {
-            MetadataReference.CreateFromFile(Assembly.Load("netstandard, Version=2.1.0.0").Location),
-            MetadataReference.CreateFromFile(Assembly.Load("System.Runtime, Version=4.2.2.0").Location),
-            MetadataReference.CreateFromFile(Assembly.Load("System.Runtime.Extensions, Version=4.2.2.0").Location),
-            MetadataReference.CreateFromFile(typeof(string).Assembly.Location),
-            MetadataReference.CreateFromFile(typeof(Console).Assembly.Location),
-            MetadataReference.CreateFromFile(typeof(ValueTask).Assembly.Location),
-            MetadataReference.CreateFromFile(typeof(CliApplication).Assembly.Location)
-        };
+        private static IReadOnlyList<MetadataReference> DefaultMetadataReferences { get; } =
+            MetadataReferences.Transitive(typeof(CliApplication).Assembly).ToArray();
 
         private static string WrapCodeWithUsingDirectives(string code)
         {
             var usingDirectives = new[]
             {
                 "using System;",
+                "using System.Collections.Generic;",
                 "using System.Threading.Tasks;",
                 "using CliFx;",
                 "using CliFx.Attributes;",

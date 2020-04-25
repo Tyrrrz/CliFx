@@ -15,7 +15,7 @@ namespace CliFx.Analyzers.Tests
             {
                 new AnalyzerTestCase(
                     "Using console abstraction",
-                    DiagnosticDescriptors.CliFx0100,
+                    Analyzer.SupportedDiagnostics,
 
                     // language=cs
                     @"
@@ -35,7 +35,7 @@ public class MyCommand : ICommand
             {
                 new AnalyzerTestCase(
                     "Console abstraction is not available in scope",
-                    DiagnosticDescriptors.CliFx0100,
+                    Analyzer.SupportedDiagnostics,
 
                     // language=cs
                     @"
@@ -56,7 +56,7 @@ public class MyCommand : ICommand
             {
                 new AnalyzerTestCase(
                     "Not using available console abstraction in the ExecuteAsync method",
-                    DiagnosticDescriptors.CliFx0100,
+                    Analyzer.SupportedDiagnostics,
 
                     // language=cs
                     @"
@@ -76,7 +76,7 @@ public class MyCommand : ICommand
             {
                 new AnalyzerTestCase(
                     "Not using available console abstraction in the ExecuteAsync method when writing stderr",
-                    DiagnosticDescriptors.CliFx0100,
+                    Analyzer.SupportedDiagnostics,
 
                     // language=cs
                     @"
@@ -96,7 +96,7 @@ public class MyCommand : ICommand
             {
                 new AnalyzerTestCase(
                     "Not using available console abstraction while referencing System.Console by full name",
-                    DiagnosticDescriptors.CliFx0100,
+                    Analyzer.SupportedDiagnostics,
 
                     // language=cs
                     @"
