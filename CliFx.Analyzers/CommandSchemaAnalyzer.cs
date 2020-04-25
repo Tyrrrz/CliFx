@@ -283,7 +283,6 @@ namespace CliFx.Analyzers
                     .Any(KnownSymbols.IsCommandOptionAttribute))
                 .ToArray();
 
-            CheckCommandParameterProperties(context, parameterProperties);
             CheckCommandOptionProperties(context, optionsProperties);
         }
 
