@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CliFx\CliFx.csproj" />
+    <ProjectReference Include="..\CliFx.Analyzers\CliFx.Analyzers.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
   </ItemGroup>
 
 </Project>

@@ -2,19 +2,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace CliFx.Internal
 {
-    internal static class Extensions
+    internal static class TypeExtensions
     {
-        public static string Repeat(this char c, int count) => new string(c, count);
-
-        public static string AsString(this char c) => c.Repeat(1);
-
-        public static StringBuilder AppendIfNotEmpty(this StringBuilder builder, char value) =>
-            builder.Length > 0 ? builder.Append(value) : builder;
-
         public static bool Implements(this Type type, Type interfaceType) => type.GetInterfaces().Contains(interfaceType);
 
         public static Type? GetNullableUnderlyingType(this Type type) => Nullable.GetUnderlyingType(type);

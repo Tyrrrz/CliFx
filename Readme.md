@@ -26,6 +26,7 @@ An important property of CliFx, when compared to some other libraries, is that i
 - Prints errors and routes exit codes on exceptions
 - Provides comprehensive and colorful auto-generated help text
 - Highly testable and easy to debug
+- Comes with built-in analyzers to help catch common mistakes
 - Targets .NET Framework 4.5+ and .NET Standard 2.0+
 - No external dependencies
 

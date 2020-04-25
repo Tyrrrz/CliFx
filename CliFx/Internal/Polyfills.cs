@@ -2,7 +2,7 @@
 
 // Polyfills to bridge the missing APIs in older versions of the framework/standard.
 
-#if NETSTANDARD2_0 || NET45
+#if NETSTANDARD2_0
 namespace System.Collections.Generic
 {
     internal static class Extensions
