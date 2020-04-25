@@ -61,5 +61,17 @@ namespace CliFx.Tests
 
             public ValueTask ExecuteAsync(IConsole console) => throw new CommandException(null);
         }
+
+        [Command("inv")]
+        private class InvalidUserInputCommand : ICommand
+        {
+            [CommandOption("required", 'r')]
+            public string? RequiredOption { get; }
+
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                throw new NotImplementedException();
+            }
+        }
     }
 }

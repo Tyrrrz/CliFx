@@ -9,22 +9,51 @@ namespace CliFx.Exceptions
     /// <summary>
     /// Domain exception thrown within CliFx.
     /// </summary>
-    public partial class CliFxException : BaseCliFxException
+    public partial class CliFxException : Exception
     {
+        /// <summary>
+        /// Represents the default exit code assigned to exceptions in CliFx.
+        /// </summary>
+        protected const int DefaultExitCode = -100;
+
+        /// <summary>
+        /// Whether to show the help text after handling this exception.
+        /// </summary>
+        public bool ShowHelp { get; }
+
+        /// <summary>
+        /// Whether this exception was constructed with a message.
+        /// </summary>
+        /// <remarks>
+        /// We cannot check against the 'Message' property because it will always return 
+        /// a default message if it was constructed with a null value or is currently null.
+        /// </remarks>
+        public bool HasMessage { get; }
+
+        /// <summary>
+        /// Returns an exit code associated with this exception.
+        /// </summary>
+        public int ExitCode { get; }
+
         /// <summary>
         /// Initializes an instance of <see cref="CliFxException"/>.
         /// </summary>
         public CliFxException(string? message, bool showHelp = false) 
-            : base(message, showHelp)
+            : this(message, null, showHelp: showHelp)
         {
         }
 
         /// <summary>
         /// Initializes an instance of <see cref="CliFxException"/>.
         /// </summary>
-        public CliFxException(string? message, Exception? innerException, bool showHelp = false) 
-            : base(message, innerException, showHelp)
+        public CliFxException(string? message, Exception? innerException, int exitCode = DefaultExitCode, bool showHelp = false)
+            : base(message, innerException)
         {
+            ExitCode = exitCode != 0
+                ? exitCode
+                : throw new ArgumentException("Exit code must not be zero in order to signify failure.");
+            HasMessage = string.IsNullOrWhiteSpace(message) ? false : true;
+            ShowHelp = showHelp;
         }
     }
 
@@ -275,7 +304,7 @@ To fix this, ensure that all options have different fallback environment variabl
 Can't find a command that matches the following arguments:
 {string.Join(" ", input.UnboundArguments.Select(a => a.Value))}";
 
-            return new CliFxException(message.Trim());
+            return new CliFxException(message.Trim(), showHelp: true);
         }
 
         internal static CliFxException CannotConvertMultipleValuesToNonScalar(
@@ -290,7 +319,7 @@ Can't find a command that matches the following arguments:
 {argumentDisplayText} expects a single value, but provided with multiple:
 {string.Join(", ", values.Select(v => $"'{v}'"))}";
 
-            return new CliFxException(message.Trim());
+            return new CliFxException(message.Trim(), showHelp: true);
         }
 
         internal static CliFxException CannotConvertToType(
@@ -307,7 +336,7 @@ Can't find a command that matches the following arguments:
 Can't convert value '{value ?? "<null>"}' to type '{type.FullName}' for {argumentDisplayText}.
 {innerException?.Message ?? "This type is not supported."}";
 
-            return new CliFxException(message.Trim(), innerException);
+            return new CliFxException(message.Trim(), innerException, showHelp: true);
         }
 
         internal static CliFxException CannotConvertNonScalar(
@@ -325,7 +354,7 @@ Can't convert provided values to type '{type.FullName}' for {argumentDisplayText
 
 Target type is not assignable from array and doesn't have a public constructor that takes an array.";
 
-            return new CliFxException(message.Trim());
+            return new CliFxException(message.Trim(), showHelp: true);
         }
 
         internal static CliFxException ParameterNotSet(CommandParameterSchema parameter)
@@ -333,7 +362,7 @@ Target type is not assignable from array and doesn't have a public constructor t
             var message = $@"
 Missing value for parameter <{parameter.DisplayName}>.";
 
-            return new CliFxException(message.Trim());
+            return new CliFxException(message.Trim(), showHelp: true);
         }
 
         internal static CliFxException RequiredOptionsNotSet(IReadOnlyList<CommandOptionSchema> options)
@@ -342,7 +371,7 @@ Missing value for parameter <{parameter.DisplayName}>.";
 Missing values for one or more required options:
 {string.Join(Environment.NewLine, options.Select(o => o.DisplayName))}";
 
-            return new CliFxException(message.Trim());
+            return new CliFxException(message.Trim(), showHelp: true);
         }
 
         internal static CliFxException UnrecognizedParametersProvided(IReadOnlyList<CommandUnboundArgumentInput> inputs)
@@ -351,7 +380,7 @@ Missing values for one or more required options:
 Unrecognized parameters provided:
 {string.Join(Environment.NewLine, inputs.Select(i => $"<{i.Value}>"))}";
 
-            return new CliFxException(message.Trim());
+            return new CliFxException(message.Trim(), showHelp: true);
         }
 
         internal static CliFxException UnrecognizedOptionsProvided(IReadOnlyList<CommandOptionInput> inputs)
@@ -360,7 +389,7 @@ Unrecognized parameters provided:
 Unrecognized options provided:
 {string.Join(Environment.NewLine, inputs.Select(i => i.DisplayAlias))}";
 
-            return new CliFxException(message.Trim());
+            return new CliFxException(message.Trim(), showHelp: true);
         }
     }
 }
