@@ -212,12 +212,8 @@ namespace CliFx.Domain
 
                 var options = command.Options
                     .OrderByDescending(o => o.IsRequired)
-                    .ToList();
-
-                // Add built-in options
-                options.Add(CommandOptionSchema.HelpOption);
-                if (command.IsDefault)
-                    options.Add(CommandOptionSchema.VersionOption);
+                    .Concat(command.GetBuiltInOptions())
+                    .ToArray();
 
                 foreach (var option in options)
                 {

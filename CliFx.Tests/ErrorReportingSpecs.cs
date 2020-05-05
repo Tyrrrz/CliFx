@@ -3,11 +3,16 @@ using System.IO;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace CliFx.Tests
 {
     public partial class ErrorReportingSpecs
     {
+        private readonly ITestOutputHelper _output;
+
+        public ErrorReportingSpecs(ITestOutputHelper output) => _output = output;
+
         [Fact]
         public async Task Command_may_throw_a_generic_exception_which_exits_and_prints_error_message_and_stack_trace()
         {
@@ -31,8 +36,10 @@ namespace CliFx.Tests
             exitCode.Should().NotBe(0);
             stdErrData.Should().ContainAll(
                 "System.Exception:",
-                "Kaput", "at", 
+                "Kaput", "at",
                 "CliFx.Tests");
+
+            _output.WriteLine(stdErrData);
         }
 
         [Fact]
@@ -57,6 +64,8 @@ namespace CliFx.Tests
             // Assert
             exitCode.Should().Be(69);
             stdErrData.Should().Be("Kaput");
+
+            _output.WriteLine(stdErrData);
         }
 
         [Fact]
@@ -81,6 +90,8 @@ namespace CliFx.Tests
             // Assert
             exitCode.Should().NotBe(0);
             stdErrData.Should().NotBeEmpty();
+
+            _output.WriteLine(stdErrData);
         }
 
         [Fact]
@@ -99,7 +110,7 @@ namespace CliFx.Tests
                 .Build();
 
             // Act
-            await application.RunAsync(new[] { "exc" });
+            await application.RunAsync(new[] {"exc"});
             var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
             var stdErrData = console.Output.Encoding.GetString(stdErr.ToArray()).TrimEnd();
 
@@ -114,6 +125,9 @@ namespace CliFx.Tests
                 "sub",
                 "You can run", "to show help on a specific command."
             );
+
+            _output.WriteLine(stdOutData);
+            _output.WriteLine(stdErrData);
         }
 
         [Fact]
@@ -131,7 +145,7 @@ namespace CliFx.Tests
                 .Build();
 
             // Act
-            await application.RunAsync(new[] { "exc" });
+            await application.RunAsync(new[] {"exc"});
             var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray()).TrimEnd();
             var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
 
@@ -146,6 +160,9 @@ namespace CliFx.Tests
                 "sub",
                 "You can run", "to show help on a specific command."
             );
+
+            _output.WriteLine(stdOutData);
+            _output.WriteLine(stdErrData);
         }
 
         [Fact]
@@ -162,7 +179,7 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(
-                new[] { "exc", "-m", "Kaput" },
+                new[] {"exc", "-m", "Kaput"},
                 new Dictionary<string, string>());
 
             var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray()).TrimEnd();
@@ -173,6 +190,8 @@ namespace CliFx.Tests
                 "System.Exception:",
                 "Kaput", "at",
                 "CliFx.Tests");
+
+            _output.WriteLine(stdErrData);
         }
 
         [Fact]
@@ -190,7 +209,7 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(
-                new[] { "not-a-valid-command", "-r", "foo" },
+                new[] {"not-a-valid-command", "-r", "foo"},
                 new Dictionary<string, string>());
 
             var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray()).TrimEnd();
@@ -199,8 +218,9 @@ namespace CliFx.Tests
             // Assert
             exitCode.Should().NotBe(0);
             stdErrData.Should().ContainAll(
-                "Can't find a command that matches the following arguments:", 
-                "not-a-valid-command");
+                "Can't find a command that matches the following arguments:",
+                "not-a-valid-command"
+            );
             stdOutData.Should().ContainAll(
                 "Usage",
                 "[command]",
@@ -208,7 +228,11 @@ namespace CliFx.Tests
                 "-h|--help", "Shows help text.",
                 "Commands",
                 "inv",
-                "You can run", "to show help on a specific command.");
+                "You can run", "to show help on a specific command."
+            );
+
+            _output.WriteLine(stdOutData);
+            _output.WriteLine(stdErrData);
         }
     }
 }

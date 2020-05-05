@@ -51,7 +51,6 @@
     <ProjectReference Include="..\CliFx.Analyzers\CliFx.Analyzers.csproj" ReferenceOutputAssembly="true" IncludeAssets="CliFx.Analyzers.dll" />
   </ItemGroup>
 
-
   <Target Name="CopyAnalyzerToPackage">
     <ItemGroup>
       <TfmSpecificPackageFile Include="$(OutDir)/CliFx.Analyzers.dll" PackagePath="analyzers/dotnet/cs" BuildAction="none" />

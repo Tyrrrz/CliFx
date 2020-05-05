@@ -25,7 +25,7 @@ namespace CliFx.Exceptions
         /// Whether this exception was constructed with a message.
         /// </summary>
         /// <remarks>
-        /// We cannot check against the 'Message' property because it will always return 
+        /// We cannot check against the 'Message' property because it will always return
         /// a default message if it was constructed with a null value or is currently null.
         /// </remarks>
         public bool HasMessage { get; }
@@ -38,7 +38,7 @@ namespace CliFx.Exceptions
         /// <summary>
         /// Initializes an instance of <see cref="CliFxException"/>.
         /// </summary>
-        public CliFxException(string? message, bool showHelp = false) 
+        public CliFxException(string? message, bool showHelp = false)
             : this(message, null, showHelp: showHelp)
         {
         }
@@ -217,7 +217,7 @@ If that's not possible, consider converting the parameter into an option, to avo
         {
             var message = $@"
 Command '{command.Type.FullName}' is invalid because it contains one or more options without a name:
-{string.Join(Environment.NewLine, invalidOptions.Select(p => p.Property.Name))}
+{string.Join(Environment.NewLine, invalidOptions.Select(o => o.Property.Name))}
 
 Options must have either a name or a short name or both, because that's what identifies them.
 
@@ -232,7 +232,7 @@ To fix this, ensure all options have their names or short names set to some valu
         {
             var message = $@"
 Command '{command.Type.FullName}' is invalid because it contains one or more options whose names are too short:
-{string.Join(Environment.NewLine, invalidOptions.Select(p => $"{p.Property.Name} ('{p.DisplayName}')"))}
+{string.Join(Environment.NewLine, invalidOptions.Select(o => $"{o.Property.Name} ('{o.DisplayName}')"))}
 
 Option names must be at least 2 characters long to avoid confusion with short names.
 If you intended to set the short name instead, use the corresponding attribute overload.
@@ -249,7 +249,7 @@ To fix this, ensure all option names are at least 2 characters long.";
         {
             var message = $@"
 Command '{command.Type.FullName}' is invalid because it contains {invalidOptions.Count} options with the same name ('{name}'):
-{string.Join(Environment.NewLine, invalidOptions.Select(p => p.Property.Name))}
+{string.Join(Environment.NewLine, invalidOptions.Select(o => o.Property.Name))}
 
 Options must have unique names, because that's what identifies them.
 Names are not case-sensitive.
@@ -266,7 +266,7 @@ To fix this, ensure that all options have different names.";
         {
             var message = $@"
 Command '{command.Type.FullName}' is invalid because it contains {invalidOptions.Count} options with the same short name ('{shortName}'):
-{string.Join(Environment.NewLine, invalidOptions.Select(p => p.Property.Name))}
+{string.Join(Environment.NewLine, invalidOptions.Select(o => o.Property.Name))}
 
 Options must have unique short names, because that's what identifies them.
 Short names are case-sensitive (i.e. 'a' and 'A' are different short names).
@@ -283,7 +283,7 @@ To fix this, ensure that all options have different short names.";
         {
             var message = $@"
 Command '{command.Type.FullName}' is invalid because it contains {invalidOptions.Count} options with the same fallback environment variable name ('{environmentVariableName}'):
-{string.Join(Environment.NewLine, invalidOptions.Select(p => p.Property.Name))}
+{string.Join(Environment.NewLine, invalidOptions.Select(o => o.Property.Name))}
 
 Options cannot share the same environment variable as a fallback.
 Environment variable names are not case-sensitive.

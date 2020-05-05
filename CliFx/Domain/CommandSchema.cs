@@ -40,6 +40,21 @@ namespace CliFx.Domain
 
         public bool MatchesName(string? name) => string.Equals(name, Name, StringComparison.OrdinalIgnoreCase);
 
+        public IReadOnlyList<CommandOptionSchema> GetBuiltInOptions()
+        {
+            var result = new List<CommandOptionSchema>(2);
+
+            var helpOption = CommandOptionSchema.HelpOption;
+            var versionOption = CommandOptionSchema.VersionOption;
+
+            result.Add(helpOption);
+
+            if (IsDefault)
+                result.Add(versionOption);
+
+            return result;
+        }
+
         private void InjectParameters(ICommand command, IReadOnlyList<CommandUnboundArgumentInput> parameterInputs)
         {
             // All inputs must be bound

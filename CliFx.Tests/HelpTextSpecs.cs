@@ -2,11 +2,16 @@
 using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace CliFx.Tests
 {
     public partial class HelpTextSpecs
     {
+        private readonly ITestOutputHelper _output;
+
+        public HelpTextSpecs(ITestOutputHelper output) => _output = output;
+
         [Fact]
         public async Task Version_information_can_be_requested_by_providing_the_version_option_without_other_arguments()
         {
@@ -29,6 +34,8 @@ namespace CliFx.Tests
             // Assert
             exitCode.Should().Be(0);
             stdOutData.Should().Be("v6.9");
+
+            _output.WriteLine(stdOutData);
         }
 
         [Fact]
@@ -68,6 +75,8 @@ namespace CliFx.Tests
                 "cmd", "NamedCommand description.",
                 "You can run", "to show help on a specific command."
             );
+
+            _output.WriteLine(stdOutData);
         }
 
         [Fact]
@@ -104,6 +113,8 @@ namespace CliFx.Tests
                 "sub", "SubCommand description.",
                 "You can run", "to show help on a specific command."
             );
+
+            _output.WriteLine(stdOutData);
         }
 
         [Fact]
@@ -137,6 +148,8 @@ namespace CliFx.Tests
                 "-e|--option-e", "OptionE description.",
                 "-h|--help", "Shows help text."
             );
+
+            _output.WriteLine(stdOutData);
         }
 
         [Fact]
@@ -167,6 +180,8 @@ namespace CliFx.Tests
                 "cmd", "NamedCommand description.",
                 "You can run", "to show help on a specific command."
             );
+
+            _output.WriteLine(stdOutData);
         }
 
         [Fact]
@@ -190,6 +205,8 @@ namespace CliFx.Tests
                 "Usage",
                 "cmd-with-params", "<first>", "<parameterb>", "<third list...>", "[options]"
             );
+
+            _output.WriteLine(stdOutData);
         }
 
         [Fact]
@@ -217,6 +234,8 @@ namespace CliFx.Tests
                 "* -g|--option-g",
                 "-h|--option-h"
             );
+
+            _output.WriteLine(stdOutData);
         }
 
         [Fact]
@@ -241,6 +260,8 @@ namespace CliFx.Tests
                 "* -a|--option-a", "Environment variable:", "ENV_OPT_A",
                 "-b|--option-b", "Environment variable:", "ENV_OPT_B"
             );
+
+            _output.WriteLine(stdOutData);
         }
     }
 }

@@ -39,9 +39,13 @@ namespace CliFx.Domain
             !string.IsNullOrWhiteSpace(Name) &&
             string.Equals(Name, name, StringComparison.OrdinalIgnoreCase);
 
-        public bool MatchesShortName(char shortName) =>
+        public bool MatchesShortName(char? shortName) =>
             ShortName != null &&
             ShortName == shortName;
+
+        public bool MatchesNameOrShortName(string? name, char? shortName) =>
+            MatchesName(name) ||
+            MatchesShortName(shortName);
 
         public bool MatchesNameOrShortName(string alias) =>
             MatchesName(alias) ||
