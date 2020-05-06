@@ -239,6 +239,36 @@ namespace CliFx.Tests
         }
 
         [Fact]
+        public async Task Help_text_shows_usage_format_which_lists_all_valid_values_for_enum_options()
+        {
+            // Arrange
+            await using var stdOut = new MemoryStream();
+            var console = new VirtualConsole(output: stdOut);
+
+            var application = new CliApplicationBuilder()
+                .AddCommand(typeof(EnumOptionsCommand))
+                .UseConsole(console)
+                .Build();
+
+            // Act
+            await application.RunAsync(new[] { "cmd-with-enum-opts", "--help" });
+            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
+
+            // Assert
+            stdOutData.Should().ContainAll(
+                "Usage",
+                "cmd-with-enum-opts", "[options]",
+                "Options",
+                "* --value", "Enum option.", "Valid values: value1, value2, value3.",
+                "--empty"
+            );
+            // Make sure we're not rendering anything for empty enums.
+            stdOutData.Should().NotContain("--empty           Valid values:");
+
+            _output.WriteLine(stdOutData);
+        }
+
+        [Fact]
         public async Task Help_text_lists_environment_variable_names_for_options_that_have_them_defined()
         {
             // Arrange
