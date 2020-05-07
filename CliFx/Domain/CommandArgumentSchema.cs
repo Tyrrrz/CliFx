@@ -29,25 +29,30 @@ namespace CliFx.Domain
                 yield break;
             }
 
-            // Handle nullable values.
-            // If the property is nullable, 'underlyingType' will be not null.
-            var underlyingType = Nullable.GetUnderlyingType(propertyType);
-            if (underlyingType is object && propertyType.IsValueType)
+            // If 'propertyType' is nullable, this will return a non-null value.
+            var underlyingType = propertyType.GetNullableUnderlyingType();
+
+            // If 'propertyType' is nullable, 'underlying' type will be not null.
+            if (underlyingType is object)
             {
-                yield return "null";
-                // Reassign here so that we don't have to check for null again later,
-                // and can just work with the underlying type directly.
-                propertyType = underlyingType;
+                // Handle nullable num.
+                if (underlyingType.IsEnum)
+                {
+                    yield return "null";
+                    // Reasign so we can do the 'foreach' over the enum values 
+                    // only once at the end of the method.
+                    propertyType = underlyingType;
+                }
             }
 
+            // Handle non-nullable enums or nullable enums that were "unwrapped".
             if (propertyType.IsEnum)
             {
-                // Cast to object so that we can use linq methods on the Array.                
                 foreach (var value in Enum.GetValues(propertyType))
                 {
                     yield return value.ToString();
                 }
-            }
+            }            
         }
 
         protected CommandArgumentSchema(PropertyInfo property, string? description)
