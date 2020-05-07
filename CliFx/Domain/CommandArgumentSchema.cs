@@ -20,7 +20,6 @@ namespace CliFx.Domain
 
         public IEnumerable<string> GetValidValues()
         {
-
             var propertyType = Property?.PropertyType;
 
             // Property can actually be null here due to damn it operator in lines 103 and 106,
@@ -31,11 +30,13 @@ namespace CliFx.Domain
             }
 
             // Handle nullable values.
-            // If the property is nullable, this will return a non-null value.
+            // If the property is nullable, 'underlyingType' will be not null.
             var underlyingType = Nullable.GetUnderlyingType(propertyType);
             if (underlyingType is object && propertyType.IsValueType)
             {
                 yield return "null";
+                // Reassign here so that we don't have to check for null again later,
+                // and can just work with the underlying type directly.
                 propertyType = underlyingType;
             }
 
