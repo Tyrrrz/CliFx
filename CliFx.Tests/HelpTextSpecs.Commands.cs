@@ -87,13 +87,11 @@ namespace CliFx.Tests
         {
             public enum ValuesEnum { Value1, Value2, Value3 };
 
-            public enum EmptyEnum { };
-
             [CommandOption("value", Description = "Enum option.", IsRequired = true)]
             public ValuesEnum Value { get; set; } = ValuesEnum.Value1;
 
-            [CommandOption("empty")]
-            public EmptyEnum Empty { get; set; }
+            [CommandOption("nullable-value", Description = "Nullable enum option.")]
+            public ValuesEnum? NullableValue { get; set; }
 
             public ValueTask ExecuteAsync(IConsole console) => default;
         }

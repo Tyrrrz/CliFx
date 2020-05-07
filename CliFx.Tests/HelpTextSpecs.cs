@@ -259,11 +259,9 @@ namespace CliFx.Tests
                 "Usage",
                 "cmd-with-enum-opts", "[options]",
                 "Options",
-                "* --value", "Enum option.", "Valid values: value1, value2, value3.",
-                "--empty"
+                "* --value", "Enum option.", "Valid values: Value1, Value2, Value3.",
+                "--nullable-value", "Nullable enum option.", "Valid values: null, Value1, Value2, Value3."
             );
-            // Make sure we're not rendering anything for empty enums.
-            stdOutData.Should().NotContain("--empty           Valid values:");
 
             _output.WriteLine(stdOutData);
         }

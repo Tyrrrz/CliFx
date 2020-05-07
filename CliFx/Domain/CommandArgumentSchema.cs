@@ -18,6 +18,37 @@ namespace CliFx.Domain
 
         public bool IsScalar => TryGetEnumerableArgumentUnderlyingType() == null;
 
+        public IEnumerable<string> GetValidValues()
+        {
+
+            var propertyType = Property?.PropertyType;
+
+            // Property can actually be null here due to damn it operator in lines 103 and 106,
+            // so we have to check for now. In such case, let's end early.
+            if (propertyType is null)
+            {
+                yield break;
+            }
+
+            // Handle nullable values.
+            // If the property is nullable, this will return a non-null value.
+            var underlyingType = Nullable.GetUnderlyingType(propertyType);
+            if (underlyingType is object && propertyType.IsValueType)
+            {
+                yield return "null";
+                propertyType = underlyingType;
+            }
+
+            if (propertyType.IsEnum)
+            {
+                // Cast to object so that we can use linq methods on the Array.                
+                foreach (var value in Enum.GetValues(propertyType))
+                {
+                    yield return value.ToString();
+                }
+            }
+        }
+
         protected CommandArgumentSchema(PropertyInfo property, string? description)
         {
             Property = property;
@@ -52,17 +83,17 @@ namespace CliFx.Domain
                 // String-constructable
                 var stringConstructor = GetStringConstructor(targetType);
                 if (stringConstructor != null)
-                    return stringConstructor.Invoke(new object[] {value!});
+                    return stringConstructor.Invoke(new object[] { value! });
 
                 // String-parseable (with format provider)
                 var parseMethodWithFormatProvider = GetStaticParseMethodWithFormatProvider(targetType);
                 if (parseMethodWithFormatProvider != null)
-                    return parseMethodWithFormatProvider.Invoke(null, new object[] {value!, ConversionFormatProvider});
+                    return parseMethodWithFormatProvider.Invoke(null, new object[] { value!, ConversionFormatProvider });
 
                 // String-parseable (without format provider)
                 var parseMethod = GetStaticParseMethod(targetType);
                 if (parseMethod != null)
-                    return parseMethod.Invoke(null, new object[] {value!});
+                    return parseMethod.Invoke(null, new object[] { value! });
             }
             catch (Exception ex)
             {
@@ -85,9 +116,9 @@ namespace CliFx.Domain
                 return array;
 
             // Constructable from an array
-            var arrayConstructor = targetEnumerableType.GetConstructor(new[] {arrayType});
+            var arrayConstructor = targetEnumerableType.GetConstructor(new[] { arrayType });
             if (arrayConstructor != null)
-                return arrayConstructor.Invoke(new object[] {array});
+                return arrayConstructor.Invoke(new object[] { array });
 
             throw CliFxException.CannotConvertNonScalar(this, values, targetEnumerableType);
         }
@@ -115,7 +146,7 @@ namespace CliFx.Domain
             Property.SetValue(command, Convert(values));
 
         public void Inject(ICommand command, params string[] values) =>
-            Inject(command, (IReadOnlyList<string>) values);
+            Inject(command, (IReadOnlyList<string>)values);
     }
 
     internal partial class CommandArgumentSchema
@@ -146,16 +177,16 @@ namespace CliFx.Domain
             };
 
         private static ConstructorInfo? GetStringConstructor(Type type) =>
-            type.GetConstructor(new[] {typeof(string)});
+            type.GetConstructor(new[] { typeof(string) });
 
         private static MethodInfo? GetStaticParseMethod(Type type) =>
             type.GetMethod("Parse",
                 BindingFlags.Public | BindingFlags.Static,
-                null, new[] {typeof(string)}, null);
+                null, new[] { typeof(string) }, null);
 
         private static MethodInfo? GetStaticParseMethodWithFormatProvider(Type type) =>
             type.GetMethod("Parse",
                 BindingFlags.Public | BindingFlags.Static,
-                null, new[] {typeof(string), typeof(IFormatProvider)}, null);
+                null, new[] { typeof(string), typeof(IFormatProvider) }, null);
     }
 }
