@@ -260,7 +260,7 @@ namespace CliFx.Tests
                 "cmd-with-enum-opts", "[options]",
                 "Options",
                 "* --value", "Enum option.", "Valid values: Value1, Value2, Value3.",
-                "--nullable-value", "Nullable enum option.", "Valid values: null, Value1, Value2, Value3."
+                "--nullable-value", "Nullable enum option.", "Valid values: Value1, Value2, Value3."
             );
 
             _output.WriteLine(stdOutData);
