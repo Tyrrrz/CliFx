@@ -32,8 +32,9 @@ namespace CliFx.Domain
         {
             var propertyType = Property?.PropertyType;
 
-            // Property can actually be null here due to damn it operator in lines 103 and 106,
-            // so we have to check for now. In such case, let's end early.
+            // Property can actually be null here due to damn it operators 
+            // in CommandOptionSchema lines 103 and 106, so we have to check 
+            // for now. In such case that it is null, let's end early.
             if (propertyType is null)
             {
                 yield break;
