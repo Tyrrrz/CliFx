@@ -199,6 +199,15 @@ namespace CliFx.Domain
                     if (!string.IsNullOrWhiteSpace(parameter.Description))
                     {
                         Render(parameter.Description);
+                        Render(" ");
+                    }
+
+                    // Valid values
+                    var validValues = parameter.GetValidValues();
+                    if (validValues.Any())
+                    {
+                        Render($"Valid values: {string.Join(", ", validValues)}.");
+                        Render(" ");
                     }
 
                     RenderNewLine();
@@ -246,12 +255,14 @@ namespace CliFx.Domain
 
                     RenderColumnIndent();
 
+                    // Description
                     if (!string.IsNullOrWhiteSpace(option.Description))
                     {
                         Render(option.Description);
                         Render(" ");
                     }
 
+                    // Valid values
                     var validValues = option.GetValidValues();
                     if (validValues.Any())
                     {
