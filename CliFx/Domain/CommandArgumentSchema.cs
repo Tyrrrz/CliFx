@@ -10,6 +10,7 @@ namespace CliFx.Domain
 {
     internal abstract partial class CommandArgumentSchema
     {
+        private IReadOnlyList<string>? _validValues;
         public PropertyInfo Property { get; }
 
         public string? Description { get; }
@@ -18,10 +19,50 @@ namespace CliFx.Domain
 
         public bool IsScalar => TryGetEnumerableArgumentUnderlyingType() == null;
 
+        public IReadOnlyList<string> GetValidValues() => _validValues ??
+            (_validValues = EnumerateValidValues().ToList().AsReadOnly());
+
         protected CommandArgumentSchema(PropertyInfo property, string? description)
         {
             Property = property;
             Description = description;
+        }
+
+        private IEnumerable<string> EnumerateValidValues()
+        {
+            var propertyType = Property?.PropertyType;
+
+            // Property can actually be null here due to damn it operators 
+            // in CommandOptionSchema lines 103 and 106, so we have to check 
+            // for now. In such case that it is null, let's end early.
+            if (propertyType is null)
+            {
+                yield break;
+            }
+
+            // If 'propertyType' is nullable, this will return a non-null value.
+            var underlyingType = propertyType.GetNullableUnderlyingType();
+
+            // If 'propertyType' is nullable, 'underlying' type will be not null.
+            if (underlyingType is object)
+            {
+                // Handle nullable num.
+                if (underlyingType.IsEnum)
+                {
+                    // Reasign so we can do the 'foreach' over the enum values 
+                    // only once at the end of the method.
+                    propertyType = underlyingType;
+                }
+            }
+
+            // Handle non-nullable enums or nullable enums that were "unwrapped".
+            if (propertyType.IsEnum)
+            {
+                foreach (var value in Enum.GetValues(propertyType))
+                {
+                    yield return value.ToString();
+                }
+            }
         }
 
         private Type? TryGetEnumerableArgumentUnderlyingType() =>
@@ -115,7 +156,7 @@ namespace CliFx.Domain
             Property.SetValue(command, Convert(values));
 
         public void Inject(ICommand command, params string[] values) =>
-            Inject(command, (IReadOnlyList<string>) values);
+            Inject(command, (IReadOnlyList<string>)values);
     }
 
     internal partial class CommandArgumentSchema

@@ -82,6 +82,20 @@ namespace CliFx.Tests
             public ValueTask ExecuteAsync(IConsole console) => default;
         }
 
+        [Command("cmd-with-enum-opts")]
+        private class EnumOptionsCommand : ICommand
+        {
+            public enum ValuesEnum { Value1, Value2, Value3 };
+
+            [CommandOption("value", Description = "Enum option.", IsRequired = true)]
+            public ValuesEnum Value { get; set; } = ValuesEnum.Value1;
+
+            [CommandOption("nullable-value", Description = "Nullable enum option.")]
+            public ValuesEnum? NullableValue { get; set; }
+
+            public ValueTask ExecuteAsync(IConsole console) => default;
+        }
+
         [Command("cmd-with-env-vars")]
         private class EnvironmentVariableCommand : ICommand
         {

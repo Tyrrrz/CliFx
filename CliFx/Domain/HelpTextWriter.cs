@@ -246,18 +246,25 @@ namespace CliFx.Domain
 
                     RenderColumnIndent();
 
-                    // Description
                     if (!string.IsNullOrWhiteSpace(option.Description))
                     {
                         Render(option.Description);
                         Render(" ");
                     }
 
+                    var validValues = option.GetValidValues();
+                    if (validValues.Any())
+                    {
+                        Render($"Valid values: {string.Join(", ", validValues)}.");
+                        Render(" ");
+                    }
+
+                    // TODO: Render default value here.
+
                     // Environment variable
                     if (!string.IsNullOrWhiteSpace(option.EnvironmentVariableName))
                     {
-                        Render($"(Environment variable: {option.EnvironmentVariableName}).");
-                        Render(" ");
+                        Render($"(Environment variable: {option.EnvironmentVariableName})");                        
                     }
 
                     RenderNewLine();
