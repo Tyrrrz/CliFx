@@ -82,18 +82,19 @@ namespace CliFx.Tests
             public ValueTask ExecuteAsync(IConsole console) => default;
         }
 
-        [Command("cmd-with-enum-opts")]
-        private class EnumOptionsCommand : ICommand
+        [Command("cmd-with-enum-args")]
+        private class EnumArgumentsCommand : ICommand
         {
-            public enum ValuesEnum { Value1, Value2, Value3 };
+            public enum TestEnum { Value1, Value2, Value3 };
 
-            public enum EmptyEnum { };
+            [CommandParameter(0, Name = "value", Description = "Enum parameter.")]
+            public TestEnum ParamA { get; set; }
 
             [CommandOption("value", Description = "Enum option.", IsRequired = true)]
-            public ValuesEnum Value { get; set; } = ValuesEnum.Value1;
+            public TestEnum OptionA { get; set; } = TestEnum.Value1;
 
-            [CommandOption("empty")]
-            public EmptyEnum Empty { get; set; }
+            [CommandOption("nullable-value", Description = "Nullable enum option.")]
+            public TestEnum? OptionB { get; set; }
 
             public ValueTask ExecuteAsync(IConsole console) => default;
         }

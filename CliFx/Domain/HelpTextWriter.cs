@@ -61,7 +61,7 @@ namespace CliFx.Domain
                 }
                 else
                 {
-                    Render(" ");
+                    RenderIndent(margin);
                 }
             }
 
@@ -199,6 +199,15 @@ namespace CliFx.Domain
                     if (!string.IsNullOrWhiteSpace(parameter.Description))
                     {
                         Render(parameter.Description);
+                        Render(" ");
+                    }
+
+                    // Valid values
+                    var validValues = parameter.GetValidValues();
+                    if (validValues.Any())
+                    {
+                        Render($"Valid values: {string.Join(", ", validValues)}.");
+                        Render(" ");
                     }
 
                     RenderNewLine();
@@ -246,45 +255,30 @@ namespace CliFx.Domain
 
                     RenderColumnIndent();
 
-                    RenderOptionDescription(option);                    
+                    // Description
+                    if (!string.IsNullOrWhiteSpace(option.Description))
+                    {
+                        Render(option.Description);
+                        Render(" ");
+                    }
+
+                    // Valid values
+                    var validValues = option.GetValidValues();
+                    if (validValues.Any())
+                    {
+                        Render($"Valid values: {string.Join(", ", validValues)}.");
+                        Render(" ");
+                    }
+
+                    // TODO: Render default value here.
+
+                    // Environment variable
+                    if (!string.IsNullOrWhiteSpace(option.EnvironmentVariableName))
+                    {
+                        Render($"Environment variable: {option.EnvironmentVariableName}");
+                    }
 
                     RenderNewLine();
-                }
-            }
-
-            void RenderOptionDescription(CommandOptionSchema option)
-            {
-                // Description
-                if (!string.IsNullOrWhiteSpace(option.Description))
-                {
-                    Render(option.Description);
-
-                    // Valid values for enum types.
-                    // Property can actually be null here due to damn it operator in CommandArgumentSchema.cs:103,106.
-                    var propertyType = option.Property?.PropertyType;
-
-                    if (propertyType is object && propertyType.IsEnum)
-                    {
-                        // Cast to object so that we can use linq methods on the Array.
-                        var values = Enum.GetValues(propertyType)
-                            .Cast<object>()
-                            .Select(v => v.ToString().ToLowerInvariant());
-
-                        // Only render valid values if the enum is not empty.
-                        var validValues = values.Any()
-                            ? $" Valid values: {string.Join(", ", values)}."
-                            : "";
-                        Render(validValues);
-                    }
-                }                
-
-                // TODO: Render default value here.
-
-                // Environment variable
-                if (!string.IsNullOrWhiteSpace(option.EnvironmentVariableName))
-                {
-                    Render($"(Environment variable: {option.EnvironmentVariableName})");
-                    Render(" ");
                 }
             }
 

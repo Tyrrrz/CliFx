@@ -116,6 +116,24 @@ namespace CliFx.Domain
 
         public void Inject(ICommand command, params string[] values) =>
             Inject(command, (IReadOnlyList<string>) values);
+
+        public IReadOnlyList<string> GetValidValues()
+        {
+            var result = new List<string>();
+
+            // Some arguments may have this as null due to a hack that enables built-in options
+            if (Property == null)
+                return result;
+
+            var underlyingPropertyType =
+                Property.PropertyType.GetNullableUnderlyingType() ?? Property.PropertyType;
+
+            // Enum
+            if (underlyingPropertyType.IsEnum)
+                result.AddRange(Enum.GetNames(underlyingPropertyType));
+
+            return result;
+        }
     }
 
     internal partial class CommandArgumentSchema

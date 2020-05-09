@@ -43,10 +43,6 @@ namespace CliFx.Domain
             ShortName != null &&
             ShortName == shortName;
 
-        public bool MatchesNameOrShortName(string? name, char? shortName) =>
-            MatchesName(name) ||
-            MatchesShortName(shortName);
-
         public bool MatchesNameOrShortName(string alias) =>
             MatchesName(alias) ||
             alias.Length == 1 && MatchesShortName(alias.Single());
