@@ -431,7 +431,7 @@ Division by zero is not supported.
 1337
 ```
 
-You can use the `showHelp` parameter to choose whether to show the help text after handling an exception. For example, you can tell CliFx to show `ExampleCommand`'s help text upon an error like this:
+You can also specify the `showHelp` parameter to instruct whether to show the help text after printing the error:
 
 ```c#
 [Command]
@@ -439,20 +439,7 @@ public class ExampleCommand : ICommand
 {
     public ValueTask ExecuteAsync(IConsole console)
     {
-        throw new CommandException(showHelp: true);
-    }
-}
-```
-
-To display an error message before the help text, throw the `CommandException` like this:
-
-```c#
-[Command]
-public class ExampleCommand : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        throw new CommandException("My custom error message.", showHelp: true);
+        throw new CommandException("Something went wrong.", showHelp: true);
     }
 }
 ```
