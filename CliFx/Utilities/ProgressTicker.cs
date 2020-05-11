@@ -9,26 +9,29 @@ namespace CliFx.Utilities
     {
         private readonly IConsole _console;
 
-        private string _lastOutput = "";
+        private int? _originalCursorLeft;
+        private int? _originalCursorTop;
 
         /// <summary>
         /// Initializes an instance of <see cref="ProgressTicker"/>.
         /// </summary>
-        public ProgressTicker(IConsole console)
-        {
-            _console = console;
-        }
-
-        private void EraseLastOutput()
-        {
-            for (var i = 0; i < _lastOutput.Length; i++)
-                _console.Output.Write('\b');
-        }
+        public ProgressTicker(IConsole console) => _console = console;
 
         private void RenderProgress(double progress)
         {
-            _lastOutput = progress.ToString("P2", _console.Output.FormatProvider);
-            _console.Output.Write(_lastOutput);
+            if (_originalCursorLeft != null && _originalCursorTop != null)
+            {
+                _console.CursorLeft = _originalCursorLeft.Value;
+                _console.CursorTop = _originalCursorTop.Value;
+            }
+            else
+            {
+                _originalCursorLeft = _console.CursorLeft;
+                _originalCursorTop = _console.CursorTop;
+            }
+
+            var str = progress.ToString("P2", _console.Output.FormatProvider);
+            _console.Output.Write(str);
         }
 
         /// <summary>
@@ -41,7 +44,6 @@ namespace CliFx.Utilities
             // when there's no active console window.
             if (!_console.IsOutputRedirected)
             {
-                EraseLastOutput();
                 RenderProgress(progress);
             }
         }

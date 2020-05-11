@@ -55,6 +55,16 @@ namespace CliFx
         void ResetColor();
 
         /// <summary>
+        /// Cursor left offset.
+        /// </summary>
+        int CursorLeft { get; set; }
+
+        /// <summary>
+        /// Cursor top offset.
+        /// </summary>
+        int CursorTop { get; set; }
+
+        /// <summary>
         /// Provides a token that signals when application cancellation is requested.
         /// Subsequent calls return the same token.
         /// When working with system console, the user can request cancellation by issuing an interrupt signal (Ctrl+C).
