@@ -52,7 +52,7 @@ namespace CliFx.Exceptions
             ExitCode = exitCode != 0
                 ? exitCode
                 : throw new ArgumentException("Exit code must not be zero in order to signify failure.");
-            HasMessage = string.IsNullOrWhiteSpace(message) ? false : true;
+            HasMessage = !string.IsNullOrWhiteSpace(message);
             ShowHelp = showHelp;
         }
     }
@@ -96,8 +96,7 @@ In order to be a valid command type, it must:
 - Implement {typeof(ICommand).FullName}
 - Be annotated with {typeof(CommandAttribute).FullName}
 
-To fix this, ensure that the command adheres to these constraints.
-If you're experiencing problems, please refer to readme for a quickstart example.";
+If you're experiencing problems, please refer to the readme for a quickstart example.";
 
             return new CliFxException(message.Trim());
         }
@@ -108,7 +107,7 @@ If you're experiencing problems, please refer to readme for a quickstart example
 There are no commands configured in the application.
 
 To fix this, ensure that at least one command is added through one of the methods on {nameof(CliApplicationBuilder)}.
-If you're experiencing problems, please refer to readme for a quickstart example.";
+If you're experiencing problems, please refer to the readme for a quickstart example.";
 
             return new CliFxException(message.Trim());
         }
@@ -121,9 +120,7 @@ Application configuration is invalid because there are {invalidCommands.Count} d
 {string.Join(Environment.NewLine, invalidCommands.Select(p => p.Type.FullName))}
 
 There can only be one default command (i.e. command with no name) in an application.
-Other commands must have unique non-empty names that identify them.
-
-To fix this, ensure that all extra commands have different names.";
+Other commands must have unique non-empty names that identify them.";
 
             return new CliFxException(message.Trim());
         }
@@ -136,10 +133,8 @@ To fix this, ensure that all extra commands have different names.";
 Application configuration is invalid because there are {invalidCommands.Count} commands with the same name ('{name}'):
 {string.Join(Environment.NewLine, invalidCommands.Select(p => p.Type.FullName))}
 
-Commands must have unique names, because that's what identifies them.
-Names are not case-sensitive.
-
-To fix this, ensure that all commands have different names.";
+Commands must have unique names.
+Names are not case-sensitive.";
 
             return new CliFxException(message.Trim());
         }
@@ -153,9 +148,7 @@ To fix this, ensure that all commands have different names.";
 Command '{command.Type.FullName}' is invalid because it contains {invalidParameters.Count} parameters with the same order ({order}):
 {string.Join(Environment.NewLine, invalidParameters.Select(p => p.Property.Name))}
 
-Parameters must have unique order, because that's what identifies them.
-
-To fix this, ensure that all parameters have different order.";
+Parameters must have unique order.";
 
             return new CliFxException(message.Trim());
         }
@@ -170,9 +163,7 @@ Command '{command.Type.FullName}' is invalid because it contains {invalidParamet
 {string.Join(Environment.NewLine, invalidParameters.Select(p => p.Property.Name))}
 
 Parameters must have unique names to avoid potential confusion in the help text.
-Names are not case-sensitive.
-
-To fix this, ensure that all parameters have different names.";
+Names are not case-sensitive.";
 
             return new CliFxException(message.Trim());
         }
@@ -188,8 +179,7 @@ Command '{command.Type.FullName}' is invalid because it contains {invalidParamet
 Non-scalar parameter is such that is bound from more than one value (e.g. array or a complex object).
 Only one parameter in a command may be non-scalar and it must be the last one in order.
 
-To fix this, ensure there's only a single non-scalar parameter.
-If that's not possible, consider converting one or more of the parameters into options, to avoid this limitation.";
+If it's not feasible to fit into these constraints, consider using options instead as they don't have these limitations.";
 
             return new CliFxException(message.Trim());
         }
@@ -205,8 +195,7 @@ Command '{command.Type.FullName}' is invalid because it contains a non-scalar pa
 Non-scalar parameter is such that is bound from more than one value (e.g. array or a complex object).
 Only one parameter in a command may be non-scalar and it must be the last one in order.
 
-To fix this, ensure that the non-scalar parameter is last in order.
-If that's not possible, consider converting the parameter into an option, to avoid this limitation.";
+If it's not feasible to fit into these constraints, consider using options instead as they don't have these limitations.";
 
             return new CliFxException(message.Trim());
         }
@@ -219,9 +208,7 @@ If that's not possible, consider converting the parameter into an option, to avo
 Command '{command.Type.FullName}' is invalid because it contains one or more options without a name:
 {string.Join(Environment.NewLine, invalidOptions.Select(o => o.Property.Name))}
 
-Options must have either a name or a short name or both, because that's what identifies them.
-
-To fix this, ensure all options have their names or short names set to some values.";
+Options must have either a name or a short name or both.";
 
             return new CliFxException(message.Trim());
         }
@@ -235,9 +222,7 @@ Command '{command.Type.FullName}' is invalid because it contains one or more opt
 {string.Join(Environment.NewLine, invalidOptions.Select(o => $"{o.Property.Name} ('{o.DisplayName}')"))}
 
 Option names must be at least 2 characters long to avoid confusion with short names.
-If you intended to set the short name instead, use the corresponding attribute overload.
-
-To fix this, ensure all option names are at least 2 characters long.";
+If you intended to set the short name instead, use the attribute overload that accepts a char.";
 
             return new CliFxException(message.Trim());
         }
@@ -268,10 +253,8 @@ To fix this, ensure that all options have different names.";
 Command '{command.Type.FullName}' is invalid because it contains {invalidOptions.Count} options with the same short name ('{shortName}'):
 {string.Join(Environment.NewLine, invalidOptions.Select(o => o.Property.Name))}
 
-Options must have unique short names, because that's what identifies them.
-Short names are case-sensitive (i.e. 'a' and 'A' are different short names).
-
-To fix this, ensure that all options have different short names.";
+Options must have unique short names.
+Short names are case-sensitive (i.e. 'a' and 'A' are different short names).";
 
             return new CliFxException(message.Trim());
         }
@@ -286,9 +269,7 @@ Command '{command.Type.FullName}' is invalid because it contains {invalidOptions
 {string.Join(Environment.NewLine, invalidOptions.Select(o => o.Property.Name))}
 
 Options cannot share the same environment variable as a fallback.
-Environment variable names are not case-sensitive.
-
-To fix this, ensure that all options have different fallback environment variables.";
+Environment variable names are not case-sensitive.";
 
             return new CliFxException(message.Trim());
         }
