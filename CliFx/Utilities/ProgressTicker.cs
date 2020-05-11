@@ -48,4 +48,15 @@ namespace CliFx.Utilities
             }
         }
     }
+
+    /// <summary>
+    /// Extensions for <see cref="ProgressTicker"/>.
+    /// </summary>
+    public static class ProgressTickerExtensions
+    {
+        /// <summary>
+        /// Creates a <see cref="ProgressTicker"/> bound to this console.
+        /// </summary>
+        public static ProgressTicker CreateProgressTicker(this IConsole console) => new ProgressTicker(console);
+    }
 }
