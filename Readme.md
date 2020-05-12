@@ -51,6 +51,8 @@ An important property of CliFx, when compared to some other libraries, is that i
 
 ### Quick start
 
+![quick start animated](https://i.imgur.com/uouNh2u.gif)
+
 To turn your application into a command line interface you need to change your program's `Main` method so that it delegates execution to `CliApplication`.
 
 The following code will create and run a default `CliApplication` that will resolve commands defined in the calling assembly. Using fluent interface provided by `CliApplicationBuilder` you can easily configure different aspects of your application.
