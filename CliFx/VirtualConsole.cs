@@ -45,6 +45,12 @@ namespace CliFx
         }
 
         /// <inheritdoc />
+        public int CursorLeft { get; set; }
+
+        /// <inheritdoc />
+        public int CursorTop { get; set; }
+
+        /// <inheritdoc />
         public CancellationToken GetCancellationToken() => _cancellationToken;
 
         /// <summary>

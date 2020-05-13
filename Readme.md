@@ -27,7 +27,7 @@ An important property of CliFx, when compared to some other libraries, is that i
 - Provides comprehensive and colorful auto-generated help text
 - Highly testable and easy to debug
 - Comes with built-in analyzers to help catch common mistakes
-- Targets .NET Framework 4.5+ and .NET Standard 2.0+
+- Targets .NET Standard 2.0+
 - No external dependencies
 
 ## Screenshots
@@ -50,6 +50,8 @@ An important property of CliFx, when compared to some other libraries, is that i
 - [Environment variables](#environment-variables)
 
 ### Quick start
+
+![quick start animated](https://i.imgur.com/uouNh2u.gif)
 
 To turn your application into a command line interface you need to change your program's `Main` method so that it delegates execution to `CliApplication`.
 
@@ -431,7 +433,7 @@ Division by zero is not supported.
 1337
 ```
 
-You can use the `showHelp` parameter to choose whether to show the help text after handling an exception. For example, you can tell CliFx to show `ExampleCommand`'s help text upon an error like this:
+You can also specify the `showHelp` parameter to instruct whether to show the help text after printing the error:
 
 ```c#
 [Command]
@@ -439,20 +441,7 @@ public class ExampleCommand : ICommand
 {
     public ValueTask ExecuteAsync(IConsole console)
     {
-        throw new CommandException(showHelp: true);
-    }
-}
-```
-
-To display an error message before the help text, throw the `CommandException` like this:
-
-```c#
-[Command]
-public class ExampleCommand : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        throw new CommandException("My custom error message.", showHelp: true);
+        throw new CommandException("Something went wrong.", showHelp: true);
     }
 }
 ```

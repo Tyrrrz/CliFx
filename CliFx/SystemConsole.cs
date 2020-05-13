@@ -57,6 +57,20 @@ namespace CliFx
         public void ResetColor() => Console.ResetColor();
 
         /// <inheritdoc />
+        public int CursorLeft
+        {
+            get => Console.CursorLeft;
+            set => Console.CursorLeft = value;
+        }
+
+        /// <inheritdoc />
+        public int CursorTop
+        {
+            get => Console.CursorTop;
+            set => Console.CursorTop = value;
+        }
+
+        /// <inheritdoc />
         public CancellationToken GetCancellationToken()
         {
             if (_cancellationTokenSource != null)
