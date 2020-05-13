@@ -99,6 +99,29 @@ namespace CliFx.Tests
             public ValueTask ExecuteAsync(IConsole console) => default;
         }
 
+        [Command("cmd-with-defaults")]
+        private class DefaultArgumentsCommand : ICommand
+        {
+            public enum TestEnum { Value1, Value2, Value3 };
+
+            [CommandOption("option1", Description = "Integer option with default value.")]
+            public int Option1 { get; set; } = 1337;
+
+            [CommandOption("option2", Description = "Boolean option with default value.")]
+            public bool Option2 { get; set; } = true;
+
+            [CommandOption("option3", Description = "Double option with default value.")]
+            public double Option3 { get; set; } = 420.1337;
+
+            [CommandOption("option4", Description = "Unsigned long option with default value.")]
+            public ulong Option4 { get; set; } = 80082;
+
+            [CommandOption("option5", Description = "Character option with default value.")]
+            public char Option5 { get; set; } = 't';
+
+            public ValueTask ExecuteAsync(IConsole console) => default;
+        }
+
         [Command("cmd-with-env-vars")]
         private class EnvironmentVariableCommand : ICommand
         {

@@ -10,5 +10,7 @@ namespace CliFx.Internal
 
         public static StringBuilder AppendIfNotEmpty(this StringBuilder builder, char value) =>
             builder.Length > 0 ? builder.Append(value) : builder;
+
+        public static bool IsEmptyOrWhiteSpace(this string s) => s is object && string.IsNullOrWhiteSpace(s);
     }
 }

@@ -134,6 +134,34 @@ namespace CliFx.Domain
 
             return result;
         }
+
+        public string? GetDefaultValue(object? instance)
+        { 
+            if (Property is null || instance is null)
+            {
+                return null;
+            }
+
+            var instanceType = instance.GetType();
+            var commandType = Property?.DeclaringType;
+
+            if (instanceType != commandType)
+            {
+                throw new ArgumentException($"Argument {nameof(instance)} of type {instanceType} " +
+                    $"must be the same as this command's type {nameof(commandType)}.");
+            }
+
+            var propertyName = Property?.Name;
+            string? defaultValue = null;
+
+            if (!string.IsNullOrWhiteSpace(propertyName))
+            {
+                var instanceProperty = instance.GetType().GetProperty(propertyName);
+                defaultValue = instanceProperty.GetValue(instance)?.ToString();
+            }
+
+            return defaultValue;
+        }
     }
 
     internal partial class CommandArgumentSchema

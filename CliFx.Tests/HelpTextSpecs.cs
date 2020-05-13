@@ -269,6 +269,36 @@ namespace CliFx.Tests
         }
 
         [Fact]
+        public async Task Help_text_shows_usage_format_which_lists_all_default_values_for_non_required_options()
+        {
+            // Arrange
+            await using var stdOut = new MemoryStream();
+            var console = new VirtualConsole(output: stdOut);
+
+            var application = new CliApplicationBuilder()
+                .AddCommand(typeof(DefaultArgumentsCommand))
+                .UseConsole(console)
+                .Build();
+
+            // Act
+            await application.RunAsync(new[] { "cmd-with-defaults", "--help" });
+            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
+
+            // Assert
+            stdOutData.Should().ContainAll(
+                "Usage",
+                "cmd-with-enum-args", "[options]",
+                "Parameters",
+                "value", "Valid values: Value1, Value2, Value3.",
+                "Options",
+                "* --value", "Enum option.", "Valid values: Value1, Value2, Value3.",
+                "--nullable-value", "Nullable enum option.", "Valid values: Value1, Value2, Value3."
+            );
+
+            _output.WriteLine(stdOutData);
+        }
+
+        [Fact]
         public async Task Help_text_lists_environment_variable_names_for_options_that_have_them_defined()
         {
             // Arrange
