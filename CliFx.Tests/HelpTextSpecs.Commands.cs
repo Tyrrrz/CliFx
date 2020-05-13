@@ -169,11 +169,13 @@ namespace CliFx.Tests
             [CommandOption(nameof(Decimal))]
             public decimal Decimal { get; set; } = 1337.420M;
 
+            // Standardizing on the US culture for the test so that our unit tests are consistent across cultures.
             [CommandOption(nameof(DateTime))]
-            public DateTime DateTime { get; set; } = DateTime.Parse("Apr 20, 2020", CultureInfo.InvariantCulture);
+            public DateTime DateTime { get; set; } = DateTime.Parse("Apr 20, 2020", CultureInfo.GetCultureInfo("en-US"));
 
+            // Standardizing on the US culture for the test so that our unit tests are consistent across cultures.
             [CommandOption(nameof(DateTimeOffset))]
-            public DateTimeOffset DateTimeOffset { get; set; } = DateTimeOffset.Parse("05/01/2008 +1:00", CultureInfo.InvariantCulture);
+            public DateTimeOffset DateTimeOffset { get; set; } = DateTimeOffset.Parse("05/01/2008 +1:00", CultureInfo.GetCultureInfo("en-US"));
 
             [CommandOption(nameof(TimeSpan))]
             public TimeSpan TimeSpan { get; set; } = TimeSpan.FromMinutes(123);
