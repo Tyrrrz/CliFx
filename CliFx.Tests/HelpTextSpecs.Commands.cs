@@ -124,6 +124,12 @@ namespace CliFx.Tests
             [CommandOption(nameof(String))]
             public string? String { get; set; } = "foo";
 
+            [CommandOption(nameof(EmptyString))]
+            public string EmptyString { get; set; } = "";
+
+            [CommandOption(nameof(WhiteSpaceString))]
+            public string WhiteSpaceString { get; set; } = " ";
+
             [CommandOption(nameof(Bool))]
             public bool Bool { get; set; } = true;
 

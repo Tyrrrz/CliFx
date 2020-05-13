@@ -317,6 +317,8 @@ namespace CliFx.Tests
                 "Options",
                 "--Object",             "(Default: 42)",
                 "--String",             "(Default: foo)",
+                "--EmptyString",        "(Default: \"\"",
+                "--WhiteSpaceString",   "(Default: \" \"",
                 "--Bool",               "(Default: True)",
                 "--Char",               "(Default: t)",
                 "--Sbyte",              "(Default: -3)",

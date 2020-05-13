@@ -287,12 +287,6 @@ namespace CliFx.Domain
                         // Don't print the default value if it's null.
                         if (defaultValue is object)
                         {
-                            // If the default value is empty or whitespace, surround it in quotes
-                            // so the user can tell what they're looking at.
-                            if (defaultValue.IsEmptyOrWhiteSpace())
-                            {
-                                defaultValue = $"\"{defaultValue}\"";
-                            }
                             Render($"(Default: {defaultValue})");
                             Render(" ");
                         }
