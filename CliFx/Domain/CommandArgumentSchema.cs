@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -202,7 +203,24 @@ namespace CliFx.Domain
             if (!string.IsNullOrWhiteSpace(propertyName))
             {
                 var instanceProperty = instance.GetType().GetProperty(propertyName);
-                defaultValue = instanceProperty.GetValue(instance)?.ToString();
+                var value = instanceProperty.GetValue(instance);
+                if (value.OverridesToStringMethod())
+                {
+                    defaultValue = value.ToString();
+                }
+                else if (value.IsEnumerable())
+                {
+                    var values = (IEnumerable)value;
+                    var list = new List<string>();
+                    foreach (var val in values)
+                    {
+                        if (val is object)
+                        {
+                            list.Add(val.ToString());
+                        }
+                    }
+                    defaultValue = string.Join(" ", list);
+                }
             }
 
             return defaultValue;

@@ -131,10 +131,10 @@ namespace CliFx.Tests
             public char Char { get; set; } = 't';
 
             [CommandOption(nameof(Sbyte))]
-            public sbyte Sbyte { get; set; } = -0x11;
+            public sbyte Sbyte { get; set; } = -0b11;
 
             [CommandOption(nameof(Byte))]
-            public byte Byte { get; set; } = 0x11;
+            public byte Byte { get; set; } = 0b11;
 
             [CommandOption(nameof(Short))]
             public short Short { get; set; } = -1234;
@@ -201,7 +201,7 @@ namespace CliFx.Tests
             [CommandOption(nameof(IntNullableArray))]
             public int?[]? IntNullableArray { get; set; } = new int?[] { 2, 3, 4, null, 5 };
 
-            [CommandOption(nameof(Enumerable))]
+            [CommandOption(nameof(EnumerableNullable))]
             public IEnumerable? EnumerableNullable { get; set; } = Enumerable.Repeat("foo", 3);
 
             [CommandOption(nameof(StringEnumerable))]

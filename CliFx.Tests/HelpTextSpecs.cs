@@ -326,7 +326,7 @@ namespace CliFx.Tests
                 "--Int",                "(Default: 1337)",
                 "--Uint",               "(Default: 2345)",
                 "--Long",               "(Default: -1234567)",
-                "--ULong",              "(Default: 12345678)",
+                "--Ulong",              "(Default: 12345678)",
                 "--Float",              "(Default: 123.4567)",
                 "--Double",             "(Default: 420.1337)",
                 "--Decimal",            "(Default: 1337.420)",
