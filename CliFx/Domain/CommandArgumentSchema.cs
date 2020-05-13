@@ -116,52 +116,6 @@ namespace CliFx.Domain
 
         public void Inject(ICommand command, params string[] values) =>
             Inject(command, (IReadOnlyList<string>) values);
-
-        public IReadOnlyList<string> GetValidValues()
-        {
-            var result = new List<string>();
-
-            // Some arguments may have this as null due to a hack that enables built-in options
-            if (Property == null)
-                return result;
-
-            var underlyingPropertyType =
-                Property.PropertyType.GetNullableUnderlyingType() ?? Property.PropertyType;
-
-            // Enum
-            if (underlyingPropertyType.IsEnum)
-                result.AddRange(Enum.GetNames(underlyingPropertyType));
-
-            return result;
-        }
-
-        public string? GetDefaultValue(object? instance)
-        { 
-            if (Property is null || instance is null)
-            {
-                return null;
-            }
-
-            var instanceType = instance.GetType();
-            var commandType = Property?.DeclaringType;
-
-            if (instanceType != commandType)
-            {
-                throw new ArgumentException($"Argument {nameof(instance)} of type {instanceType} " +
-                    $"must be the same as this command's type {nameof(commandType)}.");
-            }
-
-            var propertyName = Property?.Name;
-            string? defaultValue = null;
-
-            if (!string.IsNullOrWhiteSpace(propertyName))
-            {
-                var instanceProperty = instance.GetType().GetProperty(propertyName);
-                defaultValue = instanceProperty.GetValue(instance)?.ToString();
-            }
-
-            return defaultValue;
-        }
     }
 
     internal partial class CommandArgumentSchema
@@ -203,5 +157,55 @@ namespace CliFx.Domain
             type.GetMethod("Parse",
                 BindingFlags.Public | BindingFlags.Static,
                 null, new[] {typeof(string), typeof(IFormatProvider)}, null);
+    }
+
+    // Default and valid value handling.
+    internal partial class CommandArgumentSchema
+    {
+        public IReadOnlyList<string> GetValidValues()
+        {
+            var result = new List<string>();
+
+            // Some arguments may have this as null due to a hack that enables built-in options
+            if (Property == null)
+                return result;
+
+            var underlyingPropertyType =
+                Property.PropertyType.GetNullableUnderlyingType() ?? Property.PropertyType;
+
+            // Enum
+            if (underlyingPropertyType.IsEnum)
+                result.AddRange(Enum.GetNames(underlyingPropertyType));
+
+            return result;
+        }
+
+        public string? GetDefaultValue(object? instance)
+        {
+            if (Property is null || instance is null)
+            {
+                return null;
+            }
+
+            var instanceType = instance.GetType();
+            var commandType = Property?.DeclaringType;
+
+            if (instanceType != commandType)
+            {
+                throw new ArgumentException($"Argument {nameof(instance)} of type {instanceType} " +
+                    $"must be the same as this command's type {nameof(commandType)}.");
+            }
+
+            var propertyName = Property?.Name;
+            string? defaultValue = null;
+
+            if (!string.IsNullOrWhiteSpace(propertyName))
+            {
+                var instanceProperty = instance.GetType().GetProperty(propertyName);
+                defaultValue = instanceProperty.GetValue(instance)?.ToString();
+            }
+
+            return defaultValue;
+        }
     }
 }

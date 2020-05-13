@@ -1,4 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using CliFx.Attributes;
 using CliFx.Exceptions;
@@ -99,29 +103,6 @@ namespace CliFx.Tests
             public ValueTask ExecuteAsync(IConsole console) => default;
         }
 
-        [Command("cmd-with-defaults")]
-        private class DefaultArgumentsCommand : ICommand
-        {
-            public enum TestEnum { Value1, Value2, Value3 };
-
-            [CommandOption("option1", Description = "Integer option with default value.")]
-            public int Option1 { get; set; } = 1337;
-
-            [CommandOption("option2", Description = "Boolean option with default value.")]
-            public bool Option2 { get; set; } = true;
-
-            [CommandOption("option3", Description = "Double option with default value.")]
-            public double Option3 { get; set; } = 420.1337;
-
-            [CommandOption("option4", Description = "Unsigned long option with default value.")]
-            public ulong Option4 { get; set; } = 80082;
-
-            [CommandOption("option5", Description = "Character option with default value.")]
-            public char Option5 { get; set; } = 't';
-
-            public ValueTask ExecuteAsync(IConsole console) => default;
-        }
-
         [Command("cmd-with-env-vars")]
         private class EnvironmentVariableCommand : ICommand
         {
@@ -130,6 +111,110 @@ namespace CliFx.Tests
 
             [CommandOption("option-b", 'b', EnvironmentVariableName = "ENV_OPT_B")]
             public string? OptionB { get; set; }
+
+            public ValueTask ExecuteAsync(IConsole console) => default;
+        }
+
+        [Command("cmd-with-defaults")]
+        private class DefaultArgumentsCommand : ICommand
+        {
+            [CommandOption(nameof(Object))]
+            public object? Object { get; set; } = 42;
+
+            [CommandOption(nameof(String))]
+            public string? String { get; set; } = "foo";
+
+            [CommandOption(nameof(Bool))]
+            public bool Bool { get; set; } = true;
+
+            [CommandOption(nameof(Char))]
+            public char Char { get; set; } = 't';
+
+            [CommandOption(nameof(Sbyte))]
+            public sbyte Sbyte { get; set; } = -0x11;
+
+            [CommandOption(nameof(Byte))]
+            public byte Byte { get; set; } = 0x11;
+
+            [CommandOption(nameof(Short))]
+            public short Short { get; set; } = -1234;
+
+            [CommandOption(nameof(Ushort))]
+            public short Ushort { get; set; } = 1234;
+
+            [CommandOption(nameof(Int))]
+            public int Int { get; set; } = 1337;
+
+            [CommandOption(nameof(Uint))]
+            public uint Uint { get; set; } = 2345;
+
+            [CommandOption(nameof(Long))]
+            public long Long { get; set; } = -1234567;
+
+            [CommandOption(nameof(Ulong))]
+            public ulong Ulong { get; set; } = 12345678;
+
+            [CommandOption(nameof(Float))]
+            public float Float { get; set; } = 123.4567F;
+
+            [CommandOption(nameof(Double))]
+            public double Double { get; set; } = 420.1337;
+
+            [CommandOption(nameof(Decimal))]
+            public decimal Decimal { get; set; } = 1337.420M;
+
+            [CommandOption(nameof(DateTime))]
+            public DateTime DateTime { get; set; } = DateTime.Parse("Apr 20, 2020", CultureInfo.InvariantCulture);
+
+            [CommandOption(nameof(DateTimeOffset))]
+            public DateTimeOffset DateTimeOffset { get; set; } = DateTimeOffset.Parse("05/01/2008 +1:00", CultureInfo.InvariantCulture);
+
+            [CommandOption(nameof(TimeSpan))]
+            public TimeSpan TimeSpan { get; set; } = TimeSpan.FromMinutes(123);
+
+            public enum TestEnum { Value1, Value2, Value3 };
+
+            [CommandOption(nameof(CustomEnum))]
+            public TestEnum CustomEnum { get; set; } = TestEnum.Value2;
+
+            [CommandOption(nameof(IntNullable))]
+            public int? IntNullable { get; set; } = 1337;
+
+            [CommandOption(nameof(CustomEnumNullable))]
+            public TestEnum? CustomEnumNullable { get; set; } = TestEnum.Value2;
+
+            [CommandOption(nameof(TimeSpanNullable))]
+            public TimeSpan? TimeSpanNullable { get; set; } = TimeSpan.FromMinutes(234);
+
+            [CommandOption(nameof(ObjectArray))]
+            public object[]? ObjectArray { get; set; } = new object[] { "123", 4, 3.14 };
+
+            [CommandOption(nameof(StringArray))]
+            public string[]? StringArray { get; set; } = new[] { "foo", "bar", "baz" };
+
+            [CommandOption(nameof(IntArray))]
+            public int[]? IntArray { get; set; } = new[] { 1, 2, 3 };
+
+            [CommandOption(nameof(CustomEnumArray))]
+            public TestEnum[]? CustomEnumArray { get; set; } = new[] { TestEnum.Value1, TestEnum.Value3 };
+
+            [CommandOption(nameof(IntNullableArray))]
+            public int?[]? IntNullableArray { get; set; } = new int?[] { 2, 3, 4, null, 5 };
+
+            [CommandOption(nameof(Enumerable))]
+            public IEnumerable? EnumerableNullable { get; set; } = Enumerable.Repeat("foo", 3);
+
+            [CommandOption(nameof(StringEnumerable))]
+            public IEnumerable<string>? StringEnumerable { get; set; } = Enumerable.Repeat("bar", 3);
+
+            [CommandOption(nameof(StringReadOnlyList))]
+            public IReadOnlyList<string>? StringReadOnlyList { get; set; } = new List<string>() { "foo", "bar", "baz" }.AsReadOnly();
+
+            [CommandOption(nameof(StringList))]
+            public List<string>? StringList { get; set; } = new List<string>() { "foo", "bar", "baz" };
+
+            [CommandOption(nameof(StringHashSet))]
+            public HashSet<string>? StringHashSet { get; set; } = new HashSet<string>() { "foo", "bar", "baz" };
 
             public ValueTask ExecuteAsync(IConsole console) => default;
         }
