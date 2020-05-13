@@ -39,8 +39,8 @@ namespace CliFx.Internal
             return array;
         }
 
-        public static bool OverridesToStringMethod<T>(this T obj) => obj?.ToString() != obj?.GetType().ToString();
+        public static bool OverridesToStringMethod(this object obj) => obj?.ToString() != obj?.GetType().ToString();
 
-        public static bool IsEnumerable<T>(this T obj) => obj?.GetType().GetEnumerableUnderlyingType() is object;
+        public static bool IsEnumerable(this object? obj) => obj?.GetType().GetEnumerableUnderlyingType() is object;
     }
 }

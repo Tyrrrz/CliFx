@@ -12,5 +12,8 @@ namespace CliFx.Internal
             builder.Length > 0 ? builder.Append(value) : builder;
 
         public static bool IsEmptyOrWhiteSpace(this string s) => s is object && string.IsNullOrWhiteSpace(s);
+
+        public static string WrapWithQuotesIfEmptyOrWhiteSpace(this string s) =>
+            s.IsEmptyOrWhiteSpace() ? $"\"{s}\"" : s;
     }
 }

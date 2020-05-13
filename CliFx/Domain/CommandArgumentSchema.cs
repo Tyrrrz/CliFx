@@ -206,7 +206,7 @@ namespace CliFx.Domain
                 var value = instanceProperty.GetValue(instance);
                 if (value.OverridesToStringMethod())
                 {
-                    defaultValue = FormatDefaultString(value.ToString());
+                    defaultValue = value.ToString().WrapWithQuotesIfEmptyOrWhiteSpace();
                 }
                 else if (value.IsEnumerable())
                 {
@@ -216,7 +216,7 @@ namespace CliFx.Domain
                     {
                         if (val is object)
                         {
-                            var finalVal = FormatDefaultString(val.ToString());
+                            var finalVal = val.ToString().WrapWithQuotesIfEmptyOrWhiteSpace();
                             
                             list.Add(finalVal);
                         }
@@ -227,8 +227,5 @@ namespace CliFx.Domain
 
             return defaultValue;
         }
-
-        private static string FormatDefaultString(string value) =>
-            value.IsEmptyOrWhiteSpace() ? $"\"{value}\"" : value;
     }
 }
