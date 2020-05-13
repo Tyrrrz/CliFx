@@ -55,10 +55,58 @@ namespace CliFx
         void ResetColor();
 
         /// <summary>
+        /// Cursor left offset.
+        /// </summary>
+        int CursorLeft { get; set; }
+
+        /// <summary>
+        /// Cursor top offset.
+        /// </summary>
+        int CursorTop { get; set; }
+
+        /// <summary>
         /// Provides a token that signals when application cancellation is requested.
         /// Subsequent calls return the same token.
         /// When working with system console, the user can request cancellation by issuing an interrupt signal (Ctrl+C).
         /// </summary>
         CancellationToken GetCancellationToken();
+    }
+
+    /// <summary>
+    /// Extensions for <see cref="IConsole"/>.
+    /// </summary>
+    public static class ConsoleExtensions
+    {
+        /// <summary>
+        /// Sets console foreground color, executes specified action, and sets the color back to the original value.
+        /// </summary>
+        public static void WithForegroundColor(this IConsole console, ConsoleColor foregroundColor, Action action)
+        {
+            var lastColor = console.ForegroundColor;
+            console.ForegroundColor = foregroundColor;
+
+            action();
+
+            console.ForegroundColor = lastColor;
+        }
+
+        /// <summary>
+        /// Sets console background color, executes specified action, and sets the color back to the original value.
+        /// </summary>
+        public static void WithBackgroundColor(this IConsole console, ConsoleColor backgroundColor, Action action)
+        {
+            var lastColor = console.BackgroundColor;
+            console.BackgroundColor = backgroundColor;
+
+            action();
+
+            console.BackgroundColor = lastColor;
+        }
+
+        /// <summary>
+        /// Sets console foreground and background colors, executes specified action, and sets the colors back to the original values.
+        /// </summary>
+        public static void WithColors(this IConsole console, ConsoleColor foregroundColor, ConsoleColor backgroundColor, Action action) =>
+            console.WithForegroundColor(foregroundColor, () => console.WithBackgroundColor(backgroundColor, action));
     }
 }

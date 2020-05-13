@@ -3,11 +3,16 @@ using System.Linq;
 using CliFx.Utilities;
 using FluentAssertions;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace CliFx.Tests
 {
     public class UtilitiesSpecs
     {
+        private readonly ITestOutputHelper _output;
+
+        public UtilitiesSpecs(ITestOutputHelper output) => _output = output;
+
         [Fact]
         public void Progress_ticker_can_be_used_to_report_progress_to_console()
         {
@@ -28,6 +33,8 @@ namespace CliFx.Tests
 
             // Assert
             stdOutData.Should().ContainAll(progressStringValues);
+
+            _output.WriteLine(stdOutData);
         }
 
         [Fact]
@@ -49,6 +56,8 @@ namespace CliFx.Tests
 
             // Assert
             stdOutData.Should().BeEmpty();
+
+            _output.WriteLine(stdOutData);
         }
     }
 }
