@@ -208,17 +208,14 @@ namespace CliFx.Domain
                 {
                     defaultValue = value.ToString().WrapWithQuotesIfEmptyOrWhiteSpace();
                 }
-                else if (value.IsEnumerable())
+                else if (value is IEnumerable values)
                 {
-                    var values = (IEnumerable)value;
                     var list = new List<string>();
                     foreach (var val in values)
                     {
                         if (val is object)
-                        {
-                            var finalVal = val.ToString().WrapWithQuotesIfEmptyOrWhiteSpace();
-                            
-                            list.Add(finalVal);
+                        {                 
+                            list.Add(val.ToString().WrapWithQuotesIfEmptyOrWhiteSpace());
                         }
                     }
                     defaultValue = string.Join(" ", list);
