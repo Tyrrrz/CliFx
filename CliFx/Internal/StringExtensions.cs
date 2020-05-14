@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System;
+using System.Globalization;
+using System.Text;
 
 namespace CliFx.Internal
 {
@@ -15,5 +17,7 @@ namespace CliFx.Internal
 
         public static string WrapWithQuotesIfEmptyOrWhiteSpace(this string s) =>
             s.IsEmptyOrWhiteSpace() ? $"\"{s}\"" : s;
+
+        public static string ToCulturedString(this object obj, CultureInfo culture) => Convert.ToString(obj, culture);
     }
 }

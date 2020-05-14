@@ -199,6 +199,7 @@ namespace CliFx.Domain
 
             var propertyName = Property?.Name;
             string? defaultValue = null;
+            var culture = CultureInfo.CurrentCulture;
 
             if (!string.IsNullOrWhiteSpace(propertyName))
             {
@@ -206,7 +207,7 @@ namespace CliFx.Domain
                 var value = instanceProperty.GetValue(instance);
                 if (value.OverridesToStringMethod())
                 {
-                    defaultValue = value.ToString().WrapWithQuotesIfEmptyOrWhiteSpace();
+                    defaultValue = value.ToCulturedString(culture).WrapWithQuotesIfEmptyOrWhiteSpace();
                 }
                 else if (value is IEnumerable values)
                 {
@@ -215,7 +216,7 @@ namespace CliFx.Domain
                     {
                         if (val is object)
                         {                 
-                            list.Add(val.ToString().WrapWithQuotesIfEmptyOrWhiteSpace());
+                            list.Add(val.ToCulturedString(culture).WrapWithQuotesIfEmptyOrWhiteSpace());
                         }
                     }
                     defaultValue = string.Join(" ", list);

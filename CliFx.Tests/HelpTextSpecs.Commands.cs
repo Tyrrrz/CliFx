@@ -118,6 +118,10 @@ namespace CliFx.Tests
         [Command("cmd-with-defaults")]
         private class DefaultArgumentsCommand : ICommand
         {
+            // Standardize accross a culture on our tests so our unit tests are consistent
+            // regardless of the machine they're being run on.
+            public static CultureInfo Culture { get; } = CultureInfo.CurrentCulture;
+
             [CommandOption(nameof(Object))]
             public object? Object { get; set; } = 42;
 
@@ -171,11 +175,11 @@ namespace CliFx.Tests
 
             // Standardizing on the US culture for the test so that our unit tests are consistent across cultures.
             [CommandOption(nameof(DateTime))]
-            public DateTime DateTime { get; set; } = DateTime.Parse("Apr 20, 2020", CultureInfo.GetCultureInfo("en-US"));
+            public DateTime DateTime { get; set; } = DateTime.Parse("Apr 20, 2020", Culture);
 
             // Standardizing on the US culture for the test so that our unit tests are consistent across cultures.
             [CommandOption(nameof(DateTimeOffset))]
-            public DateTimeOffset DateTimeOffset { get; set; } = DateTimeOffset.Parse("05/01/2008 +1:00", CultureInfo.GetCultureInfo("en-US"));
+            public DateTimeOffset DateTimeOffset { get; set; } = DateTimeOffset.Parse("05/01/2008 +1:00", Culture);
 
             [CommandOption(nameof(TimeSpan))]
             public TimeSpan TimeSpan { get; set; } = TimeSpan.FromMinutes(123);

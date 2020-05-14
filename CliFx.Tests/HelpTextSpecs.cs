@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.Globalization;
+using System.IO;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
@@ -306,9 +308,13 @@ namespace CliFx.Tests
                 .UseConsole(console)
                 .Build();
 
+            // Standardize accross a culture on our tests so our unit tests are consistent
+            // regardless of the machine they're being run on.
+            var culture = DefaultArgumentsCommand.Culture;
+
             // Act
             await application.RunAsync(new[] { "cmd-with-defaults", "--help" });
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
+            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();            
 
             // Assert
             stdOutData.Should().ContainAll(
@@ -332,8 +338,8 @@ namespace CliFx.Tests
                 "--Float",              "(Default: 123.4567)",
                 "--Double",             "(Default: 420.1337)",
                 "--Decimal",            "(Default: 1337.420)",
-                "--DateTime",           "(Default: 04/20/2020 00:00:00)",
-                "--DateTimeOffset",     "(Default: 05/01/2008 00:00:00 +01:00)",
+                "--DateTime",          $"(Default: {DateTime.Parse("Apr 20, 2020", culture).ToString(culture)}",
+                "--DateTimeOffset",    $"(Default: {DateTimeOffset.Parse("05/01/2008 +1:00", culture).ToString(culture)}",
                 "--TimeSpan",           "(Default: 02:03:00)",
                 "--IntNullable",        "(Default: 1337)",
                 "--CustomEnumNullable", "(Default: Value2)",
