@@ -276,7 +276,7 @@ namespace CliFx.Domain
                     // Environment variable
                     if (!string.IsNullOrWhiteSpace(option.EnvironmentVariableName))
                     {
-                        Render($"Environment variable: {option.EnvironmentVariableName}");
+                        Render($"(Environment variable: {option.EnvironmentVariableName})");
                         Render(" ");
                     }
 
