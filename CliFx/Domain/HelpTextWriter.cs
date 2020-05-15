@@ -220,7 +220,7 @@ namespace CliFx.Domain
                 RenderHeader("Options");
 
                 // Instantiate a temporary instance of the command so we can get default values from it.
-                var tempInstance = command.Type is null ? null : Activator.CreateInstance(command.Type);
+                ICommand? tempInstance = command.Type is null ? null : Activator.CreateInstance(command.Type) as ICommand;
 
                 var options = command.Options
                     .OrderByDescending(o => o.IsRequired)

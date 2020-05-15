@@ -181,20 +181,11 @@ namespace CliFx.Domain
             return result;
         }
 
-        public string? GetDefaultValue(object? instance)
+        public string? GetDefaultValue(ICommand? instance)
         {
             if (Property is null || instance is null)
             {
                 return null;
-            }
-
-            var instanceType = instance.GetType();
-            var commandType = Property?.DeclaringType;
-
-            if (instanceType != commandType)
-            {
-                throw new ArgumentException($"Argument {nameof(instance)} of type {instanceType} " +
-                    $"must be the same as this command's type {nameof(commandType)}.");
             }
 
             var propertyName = Property?.Name;
@@ -211,15 +202,12 @@ namespace CliFx.Domain
                 }
                 else if (value is IEnumerable values)
                 {
-                    var list = new List<string>();
-                    foreach (var val in values)
-                    {
-                        if (val is object)
-                        {                 
-                            list.Add(val.ToCulturedString(culture).WrapWithQuotesIfEmptyOrWhiteSpace());
-                        }
-                    }
-                    defaultValue = string.Join(" ", list);
+                    // Cast to IEnumerable<object> so we can use LINQ on it.
+                    var objects = values.Cast<object>();
+                    defaultValue = 
+                        string.Join(" ", objects.Where(v => v != null)
+                            .Select(v => v.ToCulturedString(culture)
+                                .WrapWithQuotesIfEmptyOrWhiteSpace()));
                 }
             }
 

@@ -310,7 +310,7 @@ namespace CliFx.Tests
 
             // Standardize accross a culture on our tests so our unit tests are consistent
             // regardless of the machine they're being run on.
-            var culture = DefaultArgumentsCommand.Culture;
+            //var culture = DefaultArgumentsCommand.Culture;
 
             // Act
             await application.RunAsync(new[] { "cmd-with-defaults", "--help" });
@@ -338,8 +338,8 @@ namespace CliFx.Tests
                 "--Float",              "(Default: 123.4567)",
                 "--Double",             "(Default: 420.1337)",
                 "--Decimal",            "(Default: 1337.420)",
-                "--DateTime",          $"(Default: {DateTime.Parse("Apr 20, 2020", culture).ToString(culture)}",
-                "--DateTimeOffset",    $"(Default: {DateTimeOffset.Parse("05/01/2008 +1:00", culture).ToString(culture)}",
+                "--DateTime",          $"(Default: {new DateTime(2020, 4, 20)}",
+                "--DateTimeOffset",    $"(Default: {new DateTimeOffset(2008, 5, 1, 0, 0, 0, new TimeSpan(0, 1, 0, 0, 0))}",
                 "--TimeSpan",           "(Default: 02:03:00)",
                 "--IntNullable",        "(Default: 1337)",
                 "--CustomEnumNullable", "(Default: Value2)",
@@ -352,8 +352,7 @@ namespace CliFx.Tests
                 "--EnumerableNullable", "(Default: foo foo foo)",
                 "--StringEnumerable",   "(Default: bar bar bar)",
                 "--StringReadOnlyList", "(Default: foo bar baz)",
-                "--StringList",         "(Default: foo bar baz)",
-                "--StringHashSet",      "(Default: foo bar baz)"
+                "--StringList",         "(Default: foo bar baz)"
             );
 
             _output.WriteLine(stdOutData);

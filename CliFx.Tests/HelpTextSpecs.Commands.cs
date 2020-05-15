@@ -118,10 +118,6 @@ namespace CliFx.Tests
         [Command("cmd-with-defaults")]
         private class DefaultArgumentsCommand : ICommand
         {
-            // Standardize accross a culture on our tests so our unit tests are consistent
-            // regardless of the machine they're being run on.
-            public static CultureInfo Culture { get; } = CultureInfo.CurrentCulture;
-
             [CommandOption(nameof(Object))]
             public object? Object { get; set; } = 42;
 
@@ -173,13 +169,12 @@ namespace CliFx.Tests
             [CommandOption(nameof(Decimal))]
             public decimal Decimal { get; set; } = 1337.420M;
 
-            // Standardizing on the US culture for the test so that our unit tests are consistent across cultures.
             [CommandOption(nameof(DateTime))]
-            public DateTime DateTime { get; set; } = DateTime.Parse("Apr 20, 2020", Culture);
-
-            // Standardizing on the US culture for the test so that our unit tests are consistent across cultures.
+            public DateTime DateTime { get; set; } = new DateTime(2020, 4, 20);
+            
             [CommandOption(nameof(DateTimeOffset))]
-            public DateTimeOffset DateTimeOffset { get; set; } = DateTimeOffset.Parse("05/01/2008 +1:00", Culture);
+            public DateTimeOffset DateTimeOffset { get; set; } = 
+                new DateTimeOffset(2008, 5, 1, 0, 0, 0, new TimeSpan(0, 1, 0, 0, 0));
 
             [CommandOption(nameof(TimeSpan))]
             public TimeSpan TimeSpan { get; set; } = TimeSpan.FromMinutes(123);
@@ -220,13 +215,10 @@ namespace CliFx.Tests
             public IEnumerable<string>? StringEnumerable { get; set; } = Enumerable.Repeat("bar", 3);
 
             [CommandOption(nameof(StringReadOnlyList))]
-            public IReadOnlyList<string>? StringReadOnlyList { get; set; } = new List<string>() { "foo", "bar", "baz" }.AsReadOnly();
+            public IReadOnlyList<string>? StringReadOnlyList { get; set; } = new[] { "foo", "bar", "baz" };
 
             [CommandOption(nameof(StringList))]
             public List<string>? StringList { get; set; } = new List<string>() { "foo", "bar", "baz" };
-
-            [CommandOption(nameof(StringHashSet))]
-            public HashSet<string>? StringHashSet { get; set; } = new HashSet<string>() { "foo", "bar", "baz" };
 
             public ValueTask ExecuteAsync(IConsole console) => default;
         }
