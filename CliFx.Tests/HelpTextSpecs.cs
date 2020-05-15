@@ -308,10 +308,6 @@ namespace CliFx.Tests
                 .UseConsole(console)
                 .Build();
 
-            // Standardize accross a culture on our tests so our unit tests are consistent
-            // regardless of the machine they're being run on.
-            //var culture = DefaultArgumentsCommand.Culture;
-
             // Act
             await application.RunAsync(new[] { "cmd-with-defaults", "--help" });
             var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();            

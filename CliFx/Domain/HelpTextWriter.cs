@@ -284,7 +284,7 @@ namespace CliFx.Domain
                     if (!option.IsRequired)
                     {
                         var defaultValue = option.GetDefaultValue(tempInstance);
-                        // Don't print the default value if it's null.
+                        // If 'defaultValue' is null, it means there's no default value.
                         if (defaultValue is object)
                         {
                             Render($"(Default: {defaultValue})");

@@ -163,6 +163,10 @@ namespace CliFx.Domain
     // Default and valid value handling.
     internal partial class CommandArgumentSchema
     {
+        /// <summary>
+        /// Retrieves the valid values of this command argument.
+        /// </summary>
+        /// <returns>A string collection of this command's valid values.</returns>
         public IReadOnlyList<string> GetValidValues()
         {
             var result = new List<string>();
@@ -181,6 +185,18 @@ namespace CliFx.Domain
             return result;
         }
 
+        /// <summary>
+        /// Gets the default value of this command argument.
+        /// Returns null if there's no default value.
+        /// </summary>
+        /// <param name="instance">A dummy instance of the command 
+        /// this command argument belongs to.</param>
+        /// <returns>The string representation of the default value. 
+        /// If there's no default value, it returns null.</returns>
+        /// <remarks>
+        /// We need a dummy instance in order to implement this because
+        /// we cannot retrieve it from a PropertyInfo.
+        /// </remarks>
         public string? GetDefaultValue(ICommand? instance)
         {
             if (Property is null || instance is null)
@@ -190,22 +206,30 @@ namespace CliFx.Domain
 
             var propertyName = Property?.Name;
             string? defaultValue = null;
+            // Get the current culture so that the default value string
+            // matches the user's culture for cultured information like
+            // DateTimes and TimeSpans.
             var culture = CultureInfo.CurrentCulture;
 
             if (!string.IsNullOrWhiteSpace(propertyName))
             {
                 var instanceProperty = instance.GetType().GetProperty(propertyName);
                 var value = instanceProperty.GetValue(instance);
+
                 if (value.OverridesToStringMethod())
                 {
-                    defaultValue = value.ToCulturedString(culture).WrapWithQuotesIfEmptyOrWhiteSpace();
+                    // Wrap empty or whitespace strings in quotes so that they're not
+                    // just an ugly blank in the output.
+                    defaultValue = value.ToCulturedString(culture)
+                        .WrapWithQuotesIfEmptyOrWhiteSpace();
                 }
                 else if (value is IEnumerable values)
                 {
-                    // Cast to IEnumerable<object> so we can use LINQ on it.
-                    var objects = values.Cast<object>();
+                    // Cast 'values' to IEnumerable<object> so we can use LINQ on it.
                     defaultValue = 
-                        string.Join(" ", objects.Where(v => v != null)
+                        string.Join(" ", 
+                            values.Cast<object>()
+                            .Where(v => v != null)
                             .Select(v => v.ToCulturedString(culture)
                                 .WrapWithQuotesIfEmptyOrWhiteSpace()));
                 }
