@@ -38,5 +38,7 @@ namespace CliFx.Internal
 
             return array;
         }
+
+        public static bool OverridesToStringMethod(this object obj) => obj?.ToString() != obj?.GetType().ToString();
     }
 }

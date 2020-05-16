@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.Globalization;
+using System.IO;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
@@ -267,7 +269,7 @@ namespace CliFx.Tests
 
             _output.WriteLine(stdOutData);
         }
-
+        
         [Fact]
         public async Task Help_text_lists_environment_variable_names_for_options_that_have_them_defined()
         {
@@ -289,6 +291,64 @@ namespace CliFx.Tests
                 "Options",
                 "* -a|--option-a", "Environment variable:", "ENV_OPT_A",
                 "-b|--option-b", "Environment variable:", "ENV_OPT_B"
+            );
+
+            _output.WriteLine(stdOutData);
+        }
+
+        [Fact]
+        public async Task Help_text_shows_usage_format_which_lists_all_default_values_for_non_required_options()
+        {
+            // Arrange
+            await using var stdOut = new MemoryStream();
+            var console = new VirtualConsole(output: stdOut);
+
+            var application = new CliApplicationBuilder()
+                .AddCommand(typeof(DefaultArgumentsCommand))
+                .UseConsole(console)
+                .Build();
+
+            // Act
+            await application.RunAsync(new[] { "cmd-with-defaults", "--help" });
+            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();            
+
+            // Assert
+            stdOutData.Should().ContainAll(
+                "Usage",
+                "cmd-with-defaults", "[options]",
+                "Options",
+                "--Object",             "(Default: 42)",
+                "--String",             "(Default: foo)",
+                "--EmptyString",        "(Default: \"\"",
+                "--WhiteSpaceString",   "(Default: \" \"",
+                "--Bool",               "(Default: True)",
+                "--Char",               "(Default: t)",
+                "--Sbyte",              "(Default: -3)",
+                "--Byte",               "(Default: 3)",
+                "--Short",              "(Default: -1234)",
+                "--Ushort",             "(Default: 1234)",
+                "--Int",                "(Default: 1337)",
+                "--Uint",               "(Default: 2345)",
+                "--Long",               "(Default: -1234567)",
+                "--Ulong",              "(Default: 12345678)",
+                "--Float",              "(Default: 123.4567)",
+                "--Double",             "(Default: 420.1337)",
+                "--Decimal",            "(Default: 1337.420)",
+                "--DateTime",          $"(Default: {new DateTime(2020, 4, 20)}",
+                "--DateTimeOffset",    $"(Default: {new DateTimeOffset(2008, 5, 1, 0, 0, 0, new TimeSpan(0, 1, 0, 0, 0))}",
+                "--TimeSpan",           "(Default: 02:03:00)",
+                "--IntNullable",        "(Default: 1337)",
+                "--CustomEnumNullable", "(Default: Value2)",
+                "--TimeSpanNullable",   "(Default: 03:54:00)",
+                "--ObjectArray",        "(Default: 123 4 3.14)",
+                "--StringArray",        "(Default: foo bar baz)",
+                "--IntArray",           "(Default: 1 2 3)",
+                "--CustomEnumArray",    "(Default: Value1 Value3)",
+                "--IntNullableArray",   "(Default: 2 3 4 5)",
+                "--EnumerableNullable", "(Default: foo foo foo)",
+                "--StringEnumerable",   "(Default: bar bar bar)",
+                "--StringReadOnlyList", "(Default: foo bar baz)",
+                "--StringList",         "(Default: foo bar baz)"
             );
 
             _output.WriteLine(stdOutData);

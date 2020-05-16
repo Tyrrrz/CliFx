@@ -219,6 +219,9 @@ namespace CliFx.Domain
                 RenderMargin();
                 RenderHeader("Options");
 
+                // Instantiate a temporary instance of the command so we can get default values from it.
+                ICommand? tempInstance = command.Type is null ? null : Activator.CreateInstance(command.Type) as ICommand;
+
                 var options = command.Options
                     .OrderByDescending(o => o.IsRequired)
                     .Concat(command.GetBuiltInOptions())
@@ -270,12 +273,23 @@ namespace CliFx.Domain
                         Render(" ");
                     }
 
-                    // TODO: Render default value here.
-
                     // Environment variable
                     if (!string.IsNullOrWhiteSpace(option.EnvironmentVariableName))
                     {
-                        Render($"Environment variable: {option.EnvironmentVariableName}");
+                        Render($"(Environment variable: {option.EnvironmentVariableName})");
+                        Render(" ");
+                    }
+
+                    // Default value
+                    if (!option.IsRequired)
+                    {
+                        var defaultValue = option.GetDefaultValue(tempInstance);
+                        // If 'defaultValue' is null, it means there's no default value.
+                        if (defaultValue is object)
+                        {
+                            Render($"(Default: {defaultValue})");
+                            Render(" ");
+                        }
                     }
 
                     RenderNewLine();

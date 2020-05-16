@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -116,24 +117,6 @@ namespace CliFx.Domain
 
         public void Inject(ICommand command, params string[] values) =>
             Inject(command, (IReadOnlyList<string>) values);
-
-        public IReadOnlyList<string> GetValidValues()
-        {
-            var result = new List<string>();
-
-            // Some arguments may have this as null due to a hack that enables built-in options
-            if (Property == null)
-                return result;
-
-            var underlyingPropertyType =
-                Property.PropertyType.GetNullableUnderlyingType() ?? Property.PropertyType;
-
-            // Enum
-            if (underlyingPropertyType.IsEnum)
-                result.AddRange(Enum.GetNames(underlyingPropertyType));
-
-            return result;
-        }
     }
 
     internal partial class CommandArgumentSchema
@@ -175,5 +158,84 @@ namespace CliFx.Domain
             type.GetMethod("Parse",
                 BindingFlags.Public | BindingFlags.Static,
                 null, new[] {typeof(string), typeof(IFormatProvider)}, null);
+    }
+
+    // Default and valid value handling.
+    internal partial class CommandArgumentSchema
+    {
+        /// <summary>
+        /// Retrieves the valid values of this command argument.
+        /// </summary>
+        /// <returns>A string collection of this command's valid values.</returns>
+        public IReadOnlyList<string> GetValidValues()
+        {
+            var result = new List<string>();
+
+            // Some arguments may have this as null due to a hack that enables built-in options
+            if (Property == null)
+                return result;
+
+            var underlyingPropertyType =
+                Property.PropertyType.GetNullableUnderlyingType() ?? Property.PropertyType;
+
+            // Enum
+            if (underlyingPropertyType.IsEnum)
+                result.AddRange(Enum.GetNames(underlyingPropertyType));
+
+            return result;
+        }
+
+        /// <summary>
+        /// Gets the default value of this command argument.
+        /// Returns null if there's no default value.
+        /// </summary>
+        /// <param name="instance">A dummy instance of the command 
+        /// this command argument belongs to.</param>
+        /// <returns>The string representation of the default value. 
+        /// If there's no default value, it returns null.</returns>
+        /// <remarks>
+        /// We need a dummy instance in order to implement this because
+        /// we cannot retrieve it from a PropertyInfo.
+        /// </remarks>
+        public string? GetDefaultValue(ICommand? instance)
+        {
+            if (Property is null || instance is null)
+            {
+                return null;
+            }
+
+            var propertyName = Property?.Name;
+            string? defaultValue = null;
+            // Get the current culture so that the default value string
+            // matches the user's culture for cultured information like
+            // DateTimes and TimeSpans.
+            var culture = CultureInfo.CurrentCulture;
+
+            if (!string.IsNullOrWhiteSpace(propertyName))
+            {
+                var instanceProperty = instance.GetType().GetProperty(propertyName);
+                var value = instanceProperty.GetValue(instance);
+
+                if (value.OverridesToStringMethod())
+                {
+                    // Wrap empty or whitespace strings in quotes so that they're not
+                    // just an ugly blank in the output.
+                    defaultValue = value.ToCulturedString(culture)
+                        .WrapWithQuotesIfEmptyOrWhiteSpace();
+                }
+                else if (value is IEnumerable values)
+                {
+                    // Cast 'values' to IEnumerable<object> so we can use LINQ on it.
+                    defaultValue = 
+                        string.Join(" ", 
+                            values.Cast<object>()
+                            .Where(v => v != null)
+                            .Select(v => v.ToCulturedString(culture)
+                                .WrapWithQuotesIfEmptyOrWhiteSpace()));
+                }
+            }
+
+            return defaultValue;
+        }
     }
 }
