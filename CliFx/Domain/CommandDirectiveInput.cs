@@ -10,10 +10,7 @@ namespace CliFx.Domain
 
         public bool IsPreviewDirective => string.Equals(Name, "preview", StringComparison.OrdinalIgnoreCase);
 
-        public CommandDirectiveInput(string name)
-        {
-            Name = name;
-        }
+        public CommandDirectiveInput(string name) => Name = name;
 
         public override string ToString() => $"[{Name}]";
     }

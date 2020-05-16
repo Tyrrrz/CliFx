@@ -15,8 +15,6 @@ namespace CliFx.Domain
 
         public string? Description { get; }
 
-        public abstract string DisplayName { get; }
-
         public bool IsScalar => TryGetEnumerableArgumentUnderlyingType() == null;
 
         protected CommandArgumentSchema(PropertyInfo property, string? description)
@@ -51,17 +49,17 @@ namespace CliFx.Domain
                         : null;
 
                 // String-constructable
-                var stringConstructor = GetStringConstructor(targetType);
+                var stringConstructor = targetType.GetConstructor(new[] {typeof(string)});
                 if (stringConstructor != null)
                     return stringConstructor.Invoke(new object[] {value!});
 
                 // String-parseable (with format provider)
-                var parseMethodWithFormatProvider = GetStaticParseMethodWithFormatProvider(targetType);
+                var parseMethodWithFormatProvider = targetType.GetStaticParseMethod(true);
                 if (parseMethodWithFormatProvider != null)
-                    return parseMethodWithFormatProvider.Invoke(null, new object[] {value!, ConversionFormatProvider});
+                    return parseMethodWithFormatProvider.Invoke(null, new object[] {value!, FormatProvider});
 
                 // String-parseable (without format provider)
-                var parseMethod = GetStaticParseMethod(targetType);
+                var parseMethod = targetType.GetStaticParseMethod();
                 if (parseMethod != null)
                     return parseMethod.Invoke(null, new object[] {value!});
             }
@@ -117,11 +115,62 @@ namespace CliFx.Domain
 
         public void Inject(ICommand command, params string[] values) =>
             Inject(command, (IReadOnlyList<string>) values);
+
+        public IReadOnlyList<string> GetValidValues()
+        {
+            var result = new List<string>();
+
+            // Some arguments may have this as null due to a hack that enables built-in options
+            // TODO fix this
+            if (Property == null)
+                return result;
+
+            var underlyingType =
+                Property.PropertyType.GetNullableUnderlyingType() ?? Property.PropertyType;
+
+            // Enum
+            if (underlyingType.IsEnum)
+                result.AddRange(Enum.GetNames(underlyingType));
+
+            return result;
+        }
+
+        public string? TryGetDefaultValue(ICommand instance)
+        {
+            // Some arguments may have this as null due to a hack that enables built-in options
+            // TODO fix this
+            if (Property == null)
+                return null;
+
+            var rawDefaultValue = Property.GetValue(instance);
+
+            if (!(rawDefaultValue is string) && rawDefaultValue is IEnumerable rawDefaultValues)
+            {
+                var elementType = rawDefaultValues.GetType().GetEnumerableUnderlyingType() ?? typeof(object);
+
+                return elementType.IsToStringOverriden()
+                    ? rawDefaultValues
+                        .Cast<object?>()
+                        .Where(o => o != null)
+                        .Select(o => o!.ToFormattableString(FormatProvider).Quote())
+                        .JoinToString(" ")
+                    : null;
+            }
+
+            if (rawDefaultValue != null && !Equals(rawDefaultValue, rawDefaultValue.GetType().GetDefaultValue()))
+            {
+                return rawDefaultValue.GetType().IsToStringOverriden()
+                    ? rawDefaultValue.ToFormattableString(FormatProvider).Quote()
+                    : null;
+            }
+
+            return null;
+        }
     }
 
     internal partial class CommandArgumentSchema
     {
-        private static readonly IFormatProvider ConversionFormatProvider = CultureInfo.InvariantCulture;
+        private static readonly IFormatProvider FormatProvider = CultureInfo.InvariantCulture;
 
         private static readonly IReadOnlyDictionary<Type, Func<string?, object?>> PrimitiveConverters =
             new Dictionary<Type, Func<string?, object?>>
@@ -130,112 +179,20 @@ namespace CliFx.Domain
                 [typeof(string)] = v => v,
                 [typeof(bool)] = v => string.IsNullOrWhiteSpace(v) || bool.Parse(v),
                 [typeof(char)] = v => v.Single(),
-                [typeof(sbyte)] = v => sbyte.Parse(v, ConversionFormatProvider),
-                [typeof(byte)] = v => byte.Parse(v, ConversionFormatProvider),
-                [typeof(short)] = v => short.Parse(v, ConversionFormatProvider),
-                [typeof(ushort)] = v => ushort.Parse(v, ConversionFormatProvider),
-                [typeof(int)] = v => int.Parse(v, ConversionFormatProvider),
-                [typeof(uint)] = v => uint.Parse(v, ConversionFormatProvider),
-                [typeof(long)] = v => long.Parse(v, ConversionFormatProvider),
-                [typeof(ulong)] = v => ulong.Parse(v, ConversionFormatProvider),
-                [typeof(float)] = v => float.Parse(v, ConversionFormatProvider),
-                [typeof(double)] = v => double.Parse(v, ConversionFormatProvider),
-                [typeof(decimal)] = v => decimal.Parse(v, ConversionFormatProvider),
-                [typeof(DateTime)] = v => DateTime.Parse(v, ConversionFormatProvider),
-                [typeof(DateTimeOffset)] = v => DateTimeOffset.Parse(v, ConversionFormatProvider),
-                [typeof(TimeSpan)] = v => TimeSpan.Parse(v, ConversionFormatProvider),
+                [typeof(sbyte)] = v => sbyte.Parse(v, FormatProvider),
+                [typeof(byte)] = v => byte.Parse(v, FormatProvider),
+                [typeof(short)] = v => short.Parse(v, FormatProvider),
+                [typeof(ushort)] = v => ushort.Parse(v, FormatProvider),
+                [typeof(int)] = v => int.Parse(v, FormatProvider),
+                [typeof(uint)] = v => uint.Parse(v, FormatProvider),
+                [typeof(long)] = v => long.Parse(v, FormatProvider),
+                [typeof(ulong)] = v => ulong.Parse(v, FormatProvider),
+                [typeof(float)] = v => float.Parse(v, FormatProvider),
+                [typeof(double)] = v => double.Parse(v, FormatProvider),
+                [typeof(decimal)] = v => decimal.Parse(v, FormatProvider),
+                [typeof(DateTime)] = v => DateTime.Parse(v, FormatProvider),
+                [typeof(DateTimeOffset)] = v => DateTimeOffset.Parse(v, FormatProvider),
+                [typeof(TimeSpan)] = v => TimeSpan.Parse(v, FormatProvider),
             };
-
-        private static ConstructorInfo? GetStringConstructor(Type type) =>
-            type.GetConstructor(new[] {typeof(string)});
-
-        private static MethodInfo? GetStaticParseMethod(Type type) =>
-            type.GetMethod("Parse",
-                BindingFlags.Public | BindingFlags.Static,
-                null, new[] {typeof(string)}, null);
-
-        private static MethodInfo? GetStaticParseMethodWithFormatProvider(Type type) =>
-            type.GetMethod("Parse",
-                BindingFlags.Public | BindingFlags.Static,
-                null, new[] {typeof(string), typeof(IFormatProvider)}, null);
-    }
-
-    // Default and valid value handling.
-    internal partial class CommandArgumentSchema
-    {
-        /// <summary>
-        /// Retrieves the valid values of this command argument.
-        /// </summary>
-        /// <returns>A string collection of this command's valid values.</returns>
-        public IReadOnlyList<string> GetValidValues()
-        {
-            var result = new List<string>();
-
-            // Some arguments may have this as null due to a hack that enables built-in options
-            if (Property == null)
-                return result;
-
-            var underlyingPropertyType =
-                Property.PropertyType.GetNullableUnderlyingType() ?? Property.PropertyType;
-
-            // Enum
-            if (underlyingPropertyType.IsEnum)
-                result.AddRange(Enum.GetNames(underlyingPropertyType));
-
-            return result;
-        }
-
-        /// <summary>
-        /// Gets the default value of this command argument.
-        /// Returns null if there's no default value.
-        /// </summary>
-        /// <param name="instance">A dummy instance of the command 
-        /// this command argument belongs to.</param>
-        /// <returns>The string representation of the default value. 
-        /// If there's no default value, it returns null.</returns>
-        /// <remarks>
-        /// We need a dummy instance in order to implement this because
-        /// we cannot retrieve it from a PropertyInfo.
-        /// </remarks>
-        public string? GetDefaultValue(ICommand? instance)
-        {
-            if (Property is null || instance is null)
-            {
-                return null;
-            }
-
-            var propertyName = Property?.Name;
-            string? defaultValue = null;
-            // Get the current culture so that the default value string
-            // matches the user's culture for cultured information like
-            // DateTimes and TimeSpans.
-            var culture = CultureInfo.CurrentCulture;
-
-            if (!string.IsNullOrWhiteSpace(propertyName))
-            {
-                var instanceProperty = instance.GetType().GetProperty(propertyName);
-                var value = instanceProperty.GetValue(instance);
-
-                if (value.OverridesToStringMethod())
-                {
-                    // Wrap empty or whitespace strings in quotes so that they're not
-                    // just an ugly blank in the output.
-                    defaultValue = value.ToCulturedString(culture)
-                        .WrapWithQuotesIfEmptyOrWhiteSpace();
-                }
-                else if (value is IEnumerable values)
-                {
-                    // Cast 'values' to IEnumerable<object> so we can use LINQ on it.
-                    defaultValue = 
-                        string.Join(" ", 
-                            values.Cast<object>()
-                            .Where(v => v != null)
-                            .Select(v => v.ToCulturedString(culture)
-                                .WrapWithQuotesIfEmptyOrWhiteSpace()));
-                }
-            }
-
-            return defaultValue;
-        }
     }
 }

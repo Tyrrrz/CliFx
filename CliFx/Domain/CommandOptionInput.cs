@@ -8,10 +8,9 @@ namespace CliFx.Domain
     {
         public string Alias { get; }
 
-        public string DisplayAlias =>
-            Alias.Length > 1
-                ? $"--{Alias}"
-                : $"-{Alias}";
+        public string RawAlias => Alias.Length > 1
+            ? $"--{Alias}"
+            : $"-{Alias}";
 
         public IReadOnlyList<string> Values { get; }
 
@@ -29,7 +28,7 @@ namespace CliFx.Domain
         {
             var buffer = new StringBuilder();
 
-            buffer.Append(DisplayAlias);
+            buffer.Append(RawAlias);
 
             foreach (var value in Values)
             {

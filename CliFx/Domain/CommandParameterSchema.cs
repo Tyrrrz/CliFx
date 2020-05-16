@@ -8,31 +8,30 @@ namespace CliFx.Domain
     {
         public int Order { get; }
 
-        public string? Name { get; }
+        public string Name { get; }
 
-        public override string DisplayName =>
-            !string.IsNullOrWhiteSpace(Name)
-                ? Name
-                : Property.Name.ToLowerInvariant();
-
-        public CommandParameterSchema(PropertyInfo property, int order, string? name, string? description)
+        public CommandParameterSchema(PropertyInfo property, int order, string name, string? description)
             : base(property, description)
         {
             Order = order;
             Name = name;
         }
 
-        public override string ToString()
+        public string GetUserFacingDisplayString()
         {
             var buffer = new StringBuilder();
 
             buffer
                 .Append('<')
-                .Append(DisplayName)
+                .Append(Name)
                 .Append('>');
 
             return buffer.ToString();
         }
+
+        public string GetInternalDisplayString() => $"{Property.Name} ([{Order}] {GetUserFacingDisplayString()})";
+
+        public override string ToString() => GetInternalDisplayString();
     }
 
     internal partial class CommandParameterSchema
@@ -43,10 +42,12 @@ namespace CliFx.Domain
             if (attribute == null)
                 return null;
 
+            var name = attribute.Name ?? property.Name.ToLowerInvariant();
+
             return new CommandParameterSchema(
                 property,
                 attribute.Order,
-                attribute.Name,
+                name,
                 attribute.Description
             );
         }

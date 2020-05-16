@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Globalization;
+using System.Collections.Generic;
 using System.Text;
 
 namespace CliFx.Internal
@@ -10,14 +10,17 @@ namespace CliFx.Internal
 
         public static string AsString(this char c) => c.Repeat(1);
 
+        public static string Quote(this string str) => $"\"{str}\"";
+
+        public static string JoinToString<T>(this IEnumerable<T> source, string separator) => string.Join(separator, source);
+
         public static StringBuilder AppendIfNotEmpty(this StringBuilder builder, char value) =>
             builder.Length > 0 ? builder.Append(value) : builder;
 
-        public static bool IsEmptyOrWhiteSpace(this string s) => s is object && string.IsNullOrWhiteSpace(s);
-
-        public static string WrapWithQuotesIfEmptyOrWhiteSpace(this string s) =>
-            s.IsEmptyOrWhiteSpace() ? $"\"{s}\"" : s;
-
-        public static string ToCulturedString(this object obj, CultureInfo culture) => Convert.ToString(obj, culture);
+        public static string ToFormattableString(this object obj,
+            IFormatProvider? formatProvider = null, string? format = null) =>
+            obj is IFormattable formattable
+                ? formattable.ToString(format, formatProvider)
+                : obj.ToString();
     }
 }

@@ -18,6 +18,6 @@ namespace CliFx
 
         /// <inheritdoc />
         public object CreateInstance(Type type) =>
-            _func(type) ?? throw CliFxException.DelegateActivatorReceivedNull(type);
+            _func(type) ?? throw CliFxException.DelegateActivatorReturnedNull(type);
     }
 }

@@ -12,10 +12,6 @@ namespace CliFx.Domain
 
         public char? ShortName { get; }
 
-        public override string DisplayName => !string.IsNullOrWhiteSpace(Name)
-            ? $"--{Name}"
-            : $"-{ShortName}";
-
         public string? EnvironmentVariableName { get; }
 
         public bool IsRequired { get; }
@@ -51,27 +47,35 @@ namespace CliFx.Domain
             !string.IsNullOrWhiteSpace(EnvironmentVariableName) &&
             string.Equals(EnvironmentVariableName, environmentVariableName, StringComparison.OrdinalIgnoreCase);
 
-        public override string ToString()
+        public string GetUserFacingDisplayString()
         {
             var buffer = new StringBuilder();
 
             if (!string.IsNullOrWhiteSpace(Name))
             {
-                buffer.Append("--");
-                buffer.Append(Name);
+                buffer
+                    .Append("--")
+                    .Append(Name);
             }
 
             if (!string.IsNullOrWhiteSpace(Name) && ShortName != null)
+            {
                 buffer.Append('|');
+            }
 
             if (ShortName != null)
             {
-                buffer.Append('-');
-                buffer.Append(ShortName);
+                buffer
+                    .Append('-')
+                    .Append(ShortName);
             }
 
             return buffer.ToString();
         }
+
+        public string GetInternalDisplayString() => $"{Property.Name} ('{GetUserFacingDisplayString()}')";
+
+        public override string ToString() => GetInternalDisplayString();
     }
 
     internal partial class CommandOptionSchema

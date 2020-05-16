@@ -12,18 +12,17 @@ namespace CliFx.Exceptions
         /// <summary>
         /// Initializes an instance of <see cref="CommandException"/>.
         /// </summary>
-        public CommandException(string? message, Exception? innerException, 
+        public CommandException(string? message, Exception? innerException,
             int exitCode = DefaultExitCode, bool showHelp = false)
-                : base(message, innerException, exitCode, showHelp)
+            : base(message, innerException, exitCode, showHelp)
         {
-            
         }
 
         /// <summary>
         /// Initializes an instance of <see cref="CommandException"/>.
         /// </summary>
         public CommandException(string? message, int exitCode = DefaultExitCode, bool showHelp = false)
-                : this(message, null, exitCode, showHelp)
+            : this(message, null, exitCode, showHelp)
         {
         }
 

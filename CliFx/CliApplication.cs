@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CliFx.Domain;
 using CliFx.Exceptions;
+using CliFx.Internal;
 
 namespace CliFx
 {
@@ -33,7 +34,7 @@ namespace CliFx
             _console = console;
             _typeActivator = typeActivator;
 
-            _helpTextWriter = new HelpTextWriter(metadata, console);
+            _helpTextWriter = new HelpTextWriter(metadata, console, typeActivator);
         }
 
         private async ValueTask<int?> HandleDebugDirectiveAsync(CommandLineInput commandLineInput)
@@ -42,8 +43,10 @@ namespace CliFx
             if (!isDebugMode)
                 return null;
 
+            var processId = ProcessEx.GetCurrentProcessId();
+
             _console.WithForegroundColor(ConsoleColor.Green, () =>
-                _console.Output.WriteLine($"Attach debugger to PID {Process.GetCurrentProcess().Id} to continue."));
+                _console.Output.WriteLine($"Attach debugger to PID {processId} to continue."));
 
             while (!Debugger.IsAttached)
                 await Task.Delay(100);
@@ -124,7 +127,7 @@ namespace CliFx
             // Get the command schema that matches the input or use a dummy default command as a fallback
             var commandSchema =
                 applicationSchema.TryFindCommand(commandLineInput) ??
-                CommandSchema.StubDefaultCommand;
+                CommandSchema.StubDefaultCommand.Schema;
 
             _helpTextWriter.Write(applicationSchema, commandSchema);
 
@@ -143,30 +146,26 @@ namespace CliFx
             return 0;
         }
 
-        /// <summary>
-        /// Handle <see cref="CommandException"/>s differently from the rest because we want to
-        /// display it different based on whether we are showing the help text or not.
-        /// </summary>
-        private int HandleCliFxException(IReadOnlyList<string> commandLineArguments, CliFxException cfe)
+        private int HandleCliFxException(IReadOnlyList<string> commandLineArguments, CliFxException ex)
         {
-            var showHelp = cfe.ShowHelp;
+            var showHelp = ex.ShowHelp;
 
-            var errorMessage = cfe.HasMessage
-                ? cfe.Message
-                : cfe.ToString();
-               
-            _console.WithForegroundColor(ConsoleColor.Red, () => _console.Error.WriteLine(errorMessage));            
+            var errorMessage = ex.HasMessage
+                ? ex.Message
+                : ex.ToString();
+
+            _console.WithForegroundColor(ConsoleColor.Red, () => _console.Error.WriteLine(errorMessage));
 
             if (showHelp)
             {
                 var applicationSchema = ApplicationSchema.Resolve(_configuration.CommandTypes);
                 var commandLineInput = CommandLineInput.Parse(commandLineArguments);
                 var commandSchema = applicationSchema.TryFindCommand(commandLineInput) ??
-                    CommandSchema.StubDefaultCommand;
+                    CommandSchema.StubDefaultCommand.Schema;
                 _helpTextWriter.Write(applicationSchema, commandSchema);
             }
 
-            return cfe.ExitCode;
+            return ex.ExitCode;
         }
 
         /// <summary>
@@ -188,16 +187,15 @@ namespace CliFx
                     HandleHelpOption(applicationSchema, commandLineInput) ??
                     await HandleCommandExecutionAsync(applicationSchema, commandLineInput, environmentVariables);
             }
-            catch (CliFxException cfe)
+            catch (CliFxException ex)
             {
-                // We want to catch exceptions in order to print errors and return correct exit codes.
-                // Doing this also gets rid of the annoying Windows troubleshooting dialog that shows up on unhandled exceptions.
-                var exitCode = HandleCliFxException(commandLineArguments, cfe);
-                return exitCode;
+                // Some exceptions may specify exit code or request help
+                return HandleCliFxException(commandLineArguments, ex);
             }
             catch (Exception ex)
             {
-                // For all other errors, we just write the entire thing to stderr.
+                // We want to catch all exceptions in order to print errors and return correct exit codes.
+                // Doing this also gets rid of the annoying Windows troubleshooting dialog that shows up on unhandled exceptions.
                 _console.WithForegroundColor(ConsoleColor.Red, () => _console.Error.WriteLine(ex.ToString()));
                 return ex.HResult;
             }

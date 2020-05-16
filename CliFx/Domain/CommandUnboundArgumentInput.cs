@@ -4,10 +4,7 @@
     {
         public string Value { get; }
 
-        public CommandUnboundArgumentInput(string value)
-        {
-            Value = value;
-        }
+        public CommandUnboundArgumentInput(string value) => Value = value;
 
         public override string ToString() => Value;
     }

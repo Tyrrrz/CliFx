@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CliFx.Internal;
 
@@ -8,353 +9,342 @@ namespace CliFx.Domain
     {
         private readonly ApplicationMetadata _metadata;
         private readonly IConsole _console;
+        private readonly ITypeActivator _typeActivator;
 
-        public HelpTextWriter(ApplicationMetadata metadata, IConsole console)
+        private int _column;
+        private int _row;
+
+        private bool IsEmpty => _column == 0 && _row == 0;
+
+        public HelpTextWriter(ApplicationMetadata metadata, IConsole console, ITypeActivator typeActivator)
         {
             _metadata = metadata;
             _console = console;
+            _typeActivator = typeActivator;
         }
 
-        public void Write(ApplicationSchema applicationSchema, CommandSchema command)
+        private void Write(char value)
         {
-            var column = 0;
-            var row = 0;
+            _console.Output.Write(value);
+            _column++;
+        }
 
-            var childCommands = applicationSchema.GetChildCommands(command.Name);
+        private void Write(string value)
+        {
+            _console.Output.Write(value);
+            _column += value.Length;
+        }
 
-            bool IsEmpty() => column == 0 && row == 0;
+        private void Write(ConsoleColor foregroundColor, string value)
+        {
+            _console.WithForegroundColor(foregroundColor, () => Write(value));
+        }
 
-            void Render(string text)
+        private void WriteLine()
+        {
+            _console.Output.WriteLine();
+            _column = 0;
+            _row++;
+        }
+
+        private void WriteVerticalMargin(int size = 1)
+        {
+            if (IsEmpty)
+                return;
+
+            for (var i = 0; i < size; i++)
+                WriteLine();
+        }
+
+        private void WriteHorizontalMargin(int size = 2)
+        {
+            if (IsEmpty)
+                return;
+
+            for (var i = 0; i < size; i++)
+                Write(' ');
+        }
+
+        private void WriteHorizontalColumnMargin(int columnSize = 20, int offsetSize = 2)
+        {
+            if (_column + offsetSize < columnSize)
+                WriteHorizontalMargin(columnSize - _column);
+            else
+                WriteHorizontalMargin(offsetSize);
+        }
+
+        private void WriteHeader(string text)
+        {
+            Write(ConsoleColor.Magenta, text);
+            WriteLine();
+        }
+
+        private void WriteApplicationInfo(CommandSchema commandSchema)
+        {
+            if (!commandSchema.IsDefault)
+                return;
+
+            // Title and version
+            Write(ConsoleColor.Yellow, _metadata.Title);
+            Write(' ');
+            Write(ConsoleColor.Yellow, _metadata.VersionText);
+            WriteLine();
+
+            // Description
+            if (!string.IsNullOrWhiteSpace(_metadata.Description))
             {
-                _console.Output.Write(text);
+                WriteHorizontalMargin();
+                Write(_metadata.Description);
+                WriteLine();
+            }
+        }
 
-                column += text.Length;
+        private void WriteCommandDescription(CommandSchema commandSchema)
+        {
+            if (string.IsNullOrWhiteSpace(commandSchema.Description))
+                return;
+
+            WriteVerticalMargin();
+            WriteHeader("Description");
+
+            WriteHorizontalMargin();
+            Write(commandSchema.Description);
+            WriteLine();
+        }
+
+        private void WriteCommandUsage(
+            CommandSchema commandSchema,
+            IReadOnlyList<CommandSchema> childCommandSchemas)
+        {
+            WriteVerticalMargin();
+            WriteHeader("Usage");
+
+            // Exe name
+            WriteHorizontalMargin();
+            Write(_metadata.ExecutableName);
+
+            // Command name
+            if (!string.IsNullOrWhiteSpace(commandSchema.Name))
+            {
+                Write(' ');
+                Write(ConsoleColor.Cyan, commandSchema.Name);
             }
 
-            void RenderNewLine()
+            // Child command placeholder
+            if (childCommandSchemas.Any())
             {
-                _console.Output.WriteLine();
-
-                column = 0;
-                row++;
+                Write(' ');
+                Write(ConsoleColor.Cyan, "[command]");
             }
 
-            void RenderMargin(int lines = 1)
+            // Parameters
+            foreach (var parameterSchema in commandSchema.Parameters)
             {
-                if (!IsEmpty())
+                Write(' ');
+                Write(parameterSchema.IsScalar
+                    ? $"<{parameterSchema.Name}>"
+                    : $"<{parameterSchema.Name}...>"
+                );
+            }
+
+            // Required options
+            foreach (var optionSchema in commandSchema.Options.Where(o => o.IsRequired))
+            {
+                Write(' ');
+                Write(ConsoleColor.White, !string.IsNullOrWhiteSpace(optionSchema.Name)
+                    ? $"--{optionSchema.Name}"
+                    : $"-{optionSchema.ShortName}"
+                );
+
+                Write(' ');
+                Write(optionSchema.IsScalar
+                    ? "<value>"
+                    : "<values...>"
+                );
+            }
+
+            // Options placeholder
+            Write(' ');
+            Write(ConsoleColor.White, "[options]");
+
+            WriteLine();
+        }
+
+        private void WriteCommandParameters(CommandSchema commandSchema)
+        {
+            if (!commandSchema.Parameters.Any())
+                return;
+
+            WriteVerticalMargin();
+            WriteHeader("Parameters");
+
+            foreach (var parameterSchema in commandSchema.Parameters.OrderBy(p => p.Order))
+            {
+                Write(ConsoleColor.Red, "* ");
+                Write(ConsoleColor.White, $"{parameterSchema.Name}");
+
+                WriteHorizontalColumnMargin();
+
+                // Description
+                if (!string.IsNullOrWhiteSpace(parameterSchema.Description))
                 {
-                    for (var i = 0; i < lines; i++)
-                        RenderNewLine();
+                    Write(parameterSchema.Description);
+                    Write(' ');
                 }
-            }
 
-            void RenderIndent(int spaces = 2)
-            {
-                Render(' '.Repeat(spaces));
-            }
-
-            void RenderColumnIndent(int spaces = 20, int margin = 2)
-            {
-                if (column + margin < spaces)
+                // Valid values
+                var validValues = parameterSchema.GetValidValues();
+                if (validValues.Any())
                 {
-                    RenderIndent(spaces - column);
+                    Write($"Valid values: {string.Join(", ", validValues)}.");
+                }
+
+                WriteLine();
+            }
+        }
+
+        private void WriteCommandOptions(CommandSchema commandSchema, ICommand command)
+        {
+            WriteVerticalMargin();
+            WriteHeader("Options");
+
+            var actualOptionSchemas = commandSchema.Options
+                .OrderByDescending(o => o.IsRequired)
+                .Concat(commandSchema.GetBuiltInOptions());
+
+            foreach (var optionSchema in actualOptionSchemas)
+            {
+                if (optionSchema.IsRequired)
+                {
+                    Write(ConsoleColor.Red, "* ");
                 }
                 else
                 {
-                    RenderIndent(margin);
+                    WriteHorizontalMargin();
                 }
-            }
 
-            void RenderWithColor(string text, ConsoleColor foregroundColor)
-            {
-                _console.WithForegroundColor(foregroundColor, () => Render(text));
-            }
+                // Short name
+                if (optionSchema.ShortName != null)
+                {
+                    Write(ConsoleColor.White, $"-{optionSchema.ShortName}");
+                }
 
-            void RenderHeader(string text)
-            {
-                RenderWithColor(text, ConsoleColor.Magenta);
-                RenderNewLine();
-            }
+                // Delimiter
+                if (!string.IsNullOrWhiteSpace(optionSchema.Name) && optionSchema.ShortName != null)
+                {
+                    Write('|');
+                }
 
-            void RenderApplicationInfo()
-            {
-                if (!command.IsDefault)
-                    return;
+                // Name
+                if (!string.IsNullOrWhiteSpace(optionSchema.Name))
+                {
+                    Write(ConsoleColor.White, $"--{optionSchema.Name}");
+                }
 
-                // Title and version
-                RenderWithColor(_metadata.Title, ConsoleColor.Yellow);
-                Render(" ");
-                RenderWithColor(_metadata.VersionText, ConsoleColor.Yellow);
-                RenderNewLine();
+                WriteHorizontalColumnMargin();
 
                 // Description
-                if (!string.IsNullOrWhiteSpace(_metadata.Description))
+                if (!string.IsNullOrWhiteSpace(optionSchema.Description))
                 {
-                    Render(_metadata.Description);
-                    RenderNewLine();
+                    Write(optionSchema.Description);
+                    Write(' ');
                 }
-            }
 
-            void RenderDescription()
+                // Valid values
+                var validValues = optionSchema.GetValidValues();
+                if (validValues.Any())
+                {
+                    Write($"Valid values: {validValues.Select(v => v.Quote()).JoinToString(", ")}.");
+                    Write(' ');
+                }
+
+                // Environment variable
+                if (!string.IsNullOrWhiteSpace(optionSchema.EnvironmentVariableName))
+                {
+                    Write($"Environment variable: \"{optionSchema.EnvironmentVariableName}\".");
+                    Write(' ');
+                }
+
+                // Default value
+                if (!optionSchema.IsRequired)
+                {
+                    // TODO: move quoting logic here?
+                    var defaultValue = optionSchema.TryGetDefaultValue(command);
+                    if (defaultValue != null)
+                    {
+                        Write($"Default: {defaultValue}.");
+                    }
+                }
+
+                WriteLine();
+            }
+        }
+
+        private void WriteCommandChildren(
+            CommandSchema commandSchema,
+            IReadOnlyList<CommandSchema> childCommandSchemas)
+        {
+            if (!childCommandSchemas.Any())
+                return;
+
+            WriteVerticalMargin();
+            WriteHeader("Commands");
+
+            foreach (var childCommandSchema in childCommandSchemas)
             {
-                if (string.IsNullOrWhiteSpace(command.Description))
-                    return;
+                var relativeCommandName = !string.IsNullOrWhiteSpace(commandSchema.Name)
+                    ? childCommandSchema.Name!.Substring(commandSchema.Name.Length + 1)
+                    : childCommandSchema.Name!;
 
-                RenderMargin();
-                RenderHeader("Description");
+                // Name
+                WriteHorizontalMargin();
+                Write(ConsoleColor.Cyan, relativeCommandName);
 
-                RenderIndent();
-                Render(command.Description);
-                RenderNewLine();
+                // Description
+                if (!string.IsNullOrWhiteSpace(childCommandSchema.Description))
+                {
+                    WriteHorizontalColumnMargin();
+                    Write(childCommandSchema.Description);
+                }
+
+                WriteLine();
             }
 
-            void RenderUsage()
+            // Child command help tip
+            WriteVerticalMargin();
+            Write("You can run `");
+            Write(_metadata.ExecutableName);
+
+            if (!string.IsNullOrWhiteSpace(commandSchema.Name))
             {
-                RenderMargin();
-                RenderHeader("Usage");
-
-                // Exe name
-                RenderIndent();
-                Render(_metadata.ExecutableName);
-
-                // Command name
-                if (!string.IsNullOrWhiteSpace(command.Name))
-                {
-                    Render(" ");
-                    RenderWithColor(command.Name, ConsoleColor.Cyan);
-                }
-
-                // Child command placeholder
-                if (childCommands.Any())
-                {
-                    Render(" ");
-                    RenderWithColor("[command]", ConsoleColor.Cyan);
-                }
-
-                // Parameters
-                foreach (var parameter in command.Parameters)
-                {
-                    Render(" ");
-                    Render(parameter.IsScalar
-                        ? $"<{parameter.DisplayName}>"
-                        : $"<{parameter.DisplayName}...>");
-                }
-
-                // Required options
-                var requiredOptionSchemas = command.Options
-                    .Where(o => o.IsRequired)
-                    .ToArray();
-
-                foreach (var option in requiredOptionSchemas)
-                {
-                    Render(" ");
-                    if (!string.IsNullOrWhiteSpace(option.Name))
-                    {
-                        RenderWithColor($"--{option.Name}", ConsoleColor.White);
-                        Render(" ");
-                        Render(option.IsScalar
-                            ? "<value>"
-                            : "<values...>");
-                    }
-                    else
-                    {
-                        RenderWithColor($"-{option.ShortName}", ConsoleColor.White);
-                        Render(" ");
-                        Render(option.IsScalar
-                            ? "<value>"
-                            : "<values...>");
-                    }
-                }
-
-                // Options placeholder
-                if (command.Options.Count != requiredOptionSchemas.Length)
-                {
-                    Render(" ");
-                    RenderWithColor("[options]", ConsoleColor.White);
-                }
-
-                RenderNewLine();
+                Write(' ');
+                Write(ConsoleColor.Cyan, commandSchema.Name);
             }
 
-            void RenderParameters()
-            {
-                if (!command.Parameters.Any())
-                    return;
+            Write(' ');
+            Write(ConsoleColor.Cyan, "[command]");
 
-                RenderMargin();
-                RenderHeader("Parameters");
+            Write(' ');
+            Write(ConsoleColor.White, "--help");
 
-                var parameters = command.Parameters
-                    .OrderBy(p => p.Order)
-                    .ToArray();
+            Write("` to show help on a specific command.");
 
-                foreach (var parameter in parameters)
-                {
-                    RenderWithColor("* ", ConsoleColor.Red);
-                    RenderWithColor($"{parameter.DisplayName}", ConsoleColor.White);
+            WriteLine();
+        }
 
-                    RenderColumnIndent();
-
-                    // Description
-                    if (!string.IsNullOrWhiteSpace(parameter.Description))
-                    {
-                        Render(parameter.Description);
-                        Render(" ");
-                    }
-
-                    // Valid values
-                    var validValues = parameter.GetValidValues();
-                    if (validValues.Any())
-                    {
-                        Render($"Valid values: {string.Join(", ", validValues)}.");
-                        Render(" ");
-                    }
-
-                    RenderNewLine();
-                }
-            }
-
-            void RenderOptions()
-            {
-                RenderMargin();
-                RenderHeader("Options");
-
-                // Instantiate a temporary instance of the command so we can get default values from it.
-                ICommand? tempInstance = command.Type is null ? null : Activator.CreateInstance(command.Type) as ICommand;
-
-                var options = command.Options
-                    .OrderByDescending(o => o.IsRequired)
-                    .Concat(command.GetBuiltInOptions())
-                    .ToArray();
-
-                foreach (var option in options)
-                {
-                    if (option.IsRequired)
-                    {
-                        RenderWithColor("* ", ConsoleColor.Red);
-                    }
-                    else
-                    {
-                        RenderIndent();
-                    }
-
-                    // Short name
-                    if (option.ShortName != null)
-                    {
-                        RenderWithColor($"-{option.ShortName}", ConsoleColor.White);
-                    }
-
-                    // Delimiter
-                    if (!string.IsNullOrWhiteSpace(option.Name) && option.ShortName != null)
-                    {
-                        Render("|");
-                    }
-
-                    // Name
-                    if (!string.IsNullOrWhiteSpace(option.Name))
-                    {
-                        RenderWithColor($"--{option.Name}", ConsoleColor.White);
-                    }
-
-                    RenderColumnIndent();
-
-                    // Description
-                    if (!string.IsNullOrWhiteSpace(option.Description))
-                    {
-                        Render(option.Description);
-                        Render(" ");
-                    }
-
-                    // Valid values
-                    var validValues = option.GetValidValues();
-                    if (validValues.Any())
-                    {
-                        Render($"Valid values: {string.Join(", ", validValues)}.");
-                        Render(" ");
-                    }
-
-                    // Environment variable
-                    if (!string.IsNullOrWhiteSpace(option.EnvironmentVariableName))
-                    {
-                        Render($"(Environment variable: {option.EnvironmentVariableName})");
-                        Render(" ");
-                    }
-
-                    // Default value
-                    if (!option.IsRequired)
-                    {
-                        var defaultValue = option.GetDefaultValue(tempInstance);
-                        // If 'defaultValue' is null, it means there's no default value.
-                        if (defaultValue is object)
-                        {
-                            Render($"(Default: {defaultValue})");
-                            Render(" ");
-                        }
-                    }
-
-                    RenderNewLine();
-                }
-            }
-
-            void RenderChildCommands()
-            {
-                if (!childCommands.Any())
-                    return;
-
-                RenderMargin();
-                RenderHeader("Commands");
-
-                foreach (var childCommand in childCommands)
-                {
-                    var relativeCommandName =
-                        !string.IsNullOrWhiteSpace(command.Name)
-                            ? childCommand.Name!.Substring(command.Name.Length + 1)
-                            : childCommand.Name!;
-
-                    // Name
-                    RenderIndent();
-                    RenderWithColor(relativeCommandName, ConsoleColor.Cyan);
-
-                    // Description
-                    if (!string.IsNullOrWhiteSpace(childCommand.Description))
-                    {
-                        RenderColumnIndent();
-                        Render(childCommand.Description);
-                    }
-
-                    RenderNewLine();
-                }
-
-                RenderMargin();
-
-                // Child command help tip
-                Render("You can run `");
-                Render(_metadata.ExecutableName);
-
-                if (!string.IsNullOrWhiteSpace(command.Name))
-                {
-                    Render(" ");
-                    RenderWithColor(command.Name, ConsoleColor.Cyan);
-                }
-
-                Render(" ");
-                RenderWithColor("[command]", ConsoleColor.Cyan);
-
-                Render(" ");
-                RenderWithColor("--help", ConsoleColor.White);
-
-                Render("` to show help on a specific command.");
-
-                RenderNewLine();
-            }
+        public void Write(ApplicationSchema applicationSchema, CommandSchema commandSchema)
+        {
+            var childCommandSchemas = applicationSchema.GetChildCommands(commandSchema.Name);
+            var command = (ICommand) _typeActivator.CreateInstance(commandSchema.Type);
 
             _console.ResetColor();
-            RenderApplicationInfo();
-            RenderDescription();
-            RenderUsage();
-            RenderParameters();
-            RenderOptions();
-            RenderChildCommands();
+
+            WriteApplicationInfo(commandSchema);
+            WriteCommandDescription(commandSchema);
+            WriteCommandUsage(commandSchema, childCommandSchemas);
+            WriteCommandParameters(commandSchema);
+            WriteCommandOptions(commandSchema, command);
+            WriteCommandChildren(commandSchema, childCommandSchemas);
         }
     }
 }

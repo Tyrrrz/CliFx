@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
+using System.Threading.Tasks;
 using CliFx.Attributes;
 using CliFx.Exceptions;
 using CliFx.Internal;
@@ -173,27 +173,11 @@ namespace CliFx.Domain
             return command;
         }
 
-        public override string ToString()
-        {
-            var buffer = new StringBuilder();
+        public string GetUserFacingDisplayString() => Name ?? "";
 
-            if (!string.IsNullOrWhiteSpace(Name))
-                buffer.Append(Name);
+        public string GetInternalDisplayString() => $"{Type.FullName} ('{GetUserFacingDisplayString()}')";
 
-            foreach (var parameter in Parameters)
-            {
-                buffer.AppendIfNotEmpty(' ');
-                buffer.Append(parameter);
-            }
-
-            foreach (var option in Options)
-            {
-                buffer.AppendIfNotEmpty(' ');
-                buffer.Append(option);
-            }
-
-            return buffer.ToString();
-        }
+        public override string ToString() => GetInternalDisplayString();
     }
 
     internal partial class CommandSchema
@@ -233,7 +217,13 @@ namespace CliFx.Domain
 
     internal partial class CommandSchema
     {
-        public static CommandSchema StubDefaultCommand { get; } =
-            new CommandSchema(null!, null, null, new CommandParameterSchema[0], new CommandOptionSchema[0]);
+        // TODO: won't work with dep injection
+        [Command]
+        public class StubDefaultCommand : ICommand
+        {
+            public ValueTask ExecuteAsync(IConsole console) => default;
+
+            public static CommandSchema Schema { get; } = TryResolve(typeof(StubDefaultCommand))!;
+        }
     }
 }

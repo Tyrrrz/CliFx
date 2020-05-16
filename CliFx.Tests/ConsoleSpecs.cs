@@ -51,6 +51,8 @@ namespace CliFx.Tests
             console.ResetColor();
             console.ForegroundColor = ConsoleColor.DarkMagenta;
             console.BackgroundColor = ConsoleColor.DarkMagenta;
+            console.CursorLeft = 42;
+            console.CursorTop = 24;
 
             // Assert
             stdInData.Should().Be("input");
