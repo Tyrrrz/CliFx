@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using CliFx.Domain;
+using CliFx.Internal;
 
 namespace CliFx
 {
@@ -194,7 +195,7 @@ namespace CliFx
 
         private static string? GetDefaultVersionText() =>
             EntryAssembly != null
-                ? $"v{EntryAssembly.GetName().Version}"
+                ? $"v{EntryAssembly.GetName().Version.ToSemanticString()}"
                 : null;
     }
 }
