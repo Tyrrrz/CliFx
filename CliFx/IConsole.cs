@@ -65,10 +65,15 @@ namespace CliFx
         int CursorTop { get; set; }
 
         /// <summary>
-        /// Provides a token that signals when application cancellation is requested.
-        /// Subsequent calls return the same token.
-        /// When working with system console, the user can request cancellation by issuing an interrupt signal (Ctrl+C).
+        /// Defers the application termination in case of a cancellation request and returns the token that represents it.
+        /// Subsequent calls to this method return the same token.
         /// </summary>
+        /// <remarks>
+        /// When working with <see cref="SystemConsole"/>:<br/>
+        /// - Cancellation can be requested by the user by pressing Ctrl+C.<br/>
+        /// - Cancellation can only be deferred once, subsequent requests to cancel by the user will result in instant termination.<br/>
+        /// - Any code executing prior to calling this method is not cancellation-aware and as such will terminate instantly when cancellation is requested.
+        /// </remarks>
         CancellationToken GetCancellationToken();
     }
 

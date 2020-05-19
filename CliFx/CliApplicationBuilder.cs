@@ -159,9 +159,9 @@ namespace CliFx
         /// </summary>
         public CliApplication Build()
         {
-            _title ??= GetDefaultTitle() ?? "App";
-            _executableName ??= GetDefaultExecutableName() ?? "app";
-            _versionText ??= GetDefaultVersionText() ?? "v1.0";
+            _title ??= TryGetDefaultTitle() ?? "App";
+            _executableName ??= TryGetDefaultExecutableName() ?? "app";
+            _versionText ??= TryGetDefaultVersionText() ?? "v1.0";
             _console ??= new SystemConsole();
             _typeActivator ??= new DefaultTypeActivator();
 
@@ -179,9 +179,9 @@ namespace CliFx
         // Entry assembly is null in tests
         private static Assembly? EntryAssembly => LazyEntryAssembly.Value;
 
-        private static string? GetDefaultTitle() => EntryAssembly?.GetName().Name;
+        private static string? TryGetDefaultTitle() => EntryAssembly?.GetName().Name;
 
-        private static string? GetDefaultExecutableName()
+        private static string? TryGetDefaultExecutableName()
         {
             var entryAssemblyLocation = EntryAssembly?.Location;
 
@@ -193,7 +193,7 @@ namespace CliFx
                 : Path.GetFileNameWithoutExtension(entryAssemblyLocation);
         }
 
-        private static string? GetDefaultVersionText() =>
+        private static string? TryGetDefaultVersionText() =>
             EntryAssembly != null
                 ? $"v{EntryAssembly.GetName().Version.ToSemanticString()}"
                 : null;

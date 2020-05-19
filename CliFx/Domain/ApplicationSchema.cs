@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CliFx.Exceptions;
+using CliFx.Internal;
 
 namespace CliFx.Domain
 {
@@ -13,6 +14,14 @@ namespace CliFx.Domain
         {
             Commands = commands;
         }
+
+        public IReadOnlyList<string> GetCommandNames() => Commands
+            .Select(c => c.Name)
+            .Where(n => !string.IsNullOrWhiteSpace(n))
+            .ToArray()!;
+
+        public CommandSchema? TryFindCommand(string? name) =>
+            Commands.FirstOrDefault(c => c.MatchesName(name));
 
         public CommandSchema? TryFindParentCommand(string? childCommandName)
         {
@@ -40,53 +49,33 @@ namespace CliFx.Domain
                 ? Commands.Where(c => TryFindParentCommand(c.Name)?.MatchesName(parentCommandName) == true).ToArray()
                 : Commands.Where(c => !string.IsNullOrWhiteSpace(c.Name) && TryFindParentCommand(c.Name) == null).ToArray();
 
-        // TODO: this out parameter is not a really nice design
-        public CommandSchema? TryFindCommand(CommandLineInput commandLineInput, out int argumentOffset)
+        private IReadOnlyDictionary<CommandArgumentSchema, object?> GetDefaults(CommandSchema command, ICommand commandInstance)
         {
-            // Try to find the command that contains the most of the input arguments in its name
-            for (var i = commandLineInput.UnboundArguments.Count; i >= 0; i--)
-            {
-                var potentialCommandName = string.Join(" ", commandLineInput.UnboundArguments.Take(i));
-                var matchingCommand = Commands.FirstOrDefault(c => c.MatchesName(potentialCommandName));
+            var result = new Dictionary<CommandArgumentSchema, object?>();
 
-                if (matchingCommand != null)
-                {
-                    argumentOffset = i;
-                    return matchingCommand;
-                }
+            foreach (var argument in command.GetArguments())
+            {
+                var value = argument.Property.GetValue(commandInstance);
+                result[argument] = value;
             }
 
-            argumentOffset = 0;
-            return Commands.FirstOrDefault(c => c.IsDefault);
+            return result;
         }
 
-        public CommandSchema? TryFindCommand(CommandLineInput commandLineInput) =>
-            TryFindCommand(commandLineInput, out _);
-
-        public ICommand InitializeEntryPoint(
+        public ResolvedCommand Resolve(
             CommandLineInput commandLineInput,
             IReadOnlyDictionary<string, string> environmentVariables,
-            ITypeActivator activator)
+            ITypeActivator typeActivator)
         {
-            var command = TryFindCommand(commandLineInput, out var argumentOffset) ??
-                          throw CliFxException.CannotFindMatchingCommand(commandLineInput);
+            var command = TryFindCommand(commandLineInput.CommandName);
 
-            var parameterInputs = argumentOffset == 0
-                ? commandLineInput.UnboundArguments.ToArray()
-                : commandLineInput.UnboundArguments.Skip(argumentOffset).ToArray();
+            var commandInstance = (ICommand) typeActivator.CreateInstance(command.Type);
+            var defaults = GetDefaults(command, commandInstance);
 
-            return command.CreateInstance(parameterInputs, commandLineInput.Options, environmentVariables, activator);
+            var isHelpOptionSpecified =
         }
 
-        public ICommand InitializeEntryPoint(
-            CommandLineInput commandLineInput,
-            IReadOnlyDictionary<string, string> environmentVariables) =>
-            InitializeEntryPoint(commandLineInput, environmentVariables, new DefaultTypeActivator());
-
-        public ICommand InitializeEntryPoint(CommandLineInput commandLineInput) =>
-            InitializeEntryPoint(commandLineInput, new Dictionary<string, string>());
-
-        public override string ToString() => string.Join(Environment.NewLine, Commands);
+        public override string ToString() => Commands.JoinToString(Environment.NewLine);
     }
 
     internal partial class ApplicationSchema
@@ -102,7 +91,8 @@ namespace CliFx.Domain
                 throw CliFxException.CommandParametersDuplicateOrder(
                     command,
                     duplicateOrderGroup.Key,
-                    duplicateOrderGroup.ToArray());
+                    duplicateOrderGroup.ToArray()
+                );
             }
 
             var duplicateNameGroup = command.Parameters
@@ -115,7 +105,8 @@ namespace CliFx.Domain
                 throw CliFxException.CommandParametersDuplicateName(
                     command,
                     duplicateNameGroup.Key,
-                    duplicateNameGroup.ToArray());
+                    duplicateNameGroup.ToArray()
+                );
             }
 
             var nonScalarParameters = command.Parameters
@@ -126,7 +117,8 @@ namespace CliFx.Domain
             {
                 throw CliFxException.CommandParametersTooManyNonScalar(
                     command,
-                    nonScalarParameters);
+                    nonScalarParameters
+                );
             }
 
             var nonLastNonScalarParameter = command.Parameters
@@ -138,7 +130,8 @@ namespace CliFx.Domain
             {
                 throw CliFxException.CommandParametersNonLastNonScalar(
                     command,
-                    nonLastNonScalarParameter);
+                    nonLastNonScalarParameter
+                );
             }
         }
 
@@ -152,7 +145,8 @@ namespace CliFx.Domain
             {
                 throw CliFxException.CommandOptionsNoName(
                     command,
-                    noNameGroup.ToArray());
+                    noNameGroup.ToArray()
+                );
             }
 
             var invalidLengthNameGroup = command.Options
@@ -164,7 +158,8 @@ namespace CliFx.Domain
             {
                 throw CliFxException.CommandOptionsInvalidLengthName(
                     command,
-                    invalidLengthNameGroup);
+                    invalidLengthNameGroup
+                );
             }
 
             var duplicateNameGroup = command.Options
@@ -177,7 +172,8 @@ namespace CliFx.Domain
                 throw CliFxException.CommandOptionsDuplicateName(
                     command,
                     duplicateNameGroup.Key,
-                    duplicateNameGroup.ToArray());
+                    duplicateNameGroup.ToArray()
+                );
             }
 
             var duplicateShortNameGroup = command.Options
@@ -190,7 +186,8 @@ namespace CliFx.Domain
                 throw CliFxException.CommandOptionsDuplicateShortName(
                     command,
                     duplicateShortNameGroup.Key,
-                    duplicateShortNameGroup.ToArray());
+                    duplicateShortNameGroup.ToArray()
+                );
             }
 
             var duplicateEnvironmentVariableNameGroup = command.Options
@@ -203,7 +200,8 @@ namespace CliFx.Domain
                 throw CliFxException.CommandOptionsDuplicateEnvironmentVariableName(
                     command,
                     duplicateEnvironmentVariableNameGroup.Key,
-                    duplicateEnvironmentVariableNameGroup.ToArray());
+                    duplicateEnvironmentVariableNameGroup.ToArray()
+                );
             }
         }
 
@@ -220,12 +218,12 @@ namespace CliFx.Domain
 
             if (duplicateNameGroup != null)
             {
-                if (!string.IsNullOrWhiteSpace(duplicateNameGroup.Key))
-                    throw CliFxException.CommandsDuplicateName(
+                throw !string.IsNullOrWhiteSpace(duplicateNameGroup.Key)
+                    ? CliFxException.CommandsDuplicateName(
                         duplicateNameGroup.Key,
-                        duplicateNameGroup.ToArray());
-
-                throw CliFxException.CommandsTooManyDefaults(duplicateNameGroup.ToArray());
+                        duplicateNameGroup.ToArray()
+                    )
+                    : CliFxException.CommandsTooManyDefaults(duplicateNameGroup.ToArray());
             }
         }
 
@@ -235,8 +233,9 @@ namespace CliFx.Domain
 
             foreach (var commandType in commandTypes)
             {
-                var command = CommandSchema.TryResolve(commandType) ??
-                              throw CliFxException.InvalidCommandType(commandType);
+                var command =
+                    CommandSchema.TryResolve(commandType) ??
+                    throw CliFxException.InvalidCommandType(commandType);
 
                 ValidateParameters(command);
                 ValidateOptions(command);

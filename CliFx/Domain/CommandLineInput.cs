@@ -1,163 +1,181 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using CliFx.Internal;
 
 namespace CliFx.Domain
 {
     internal partial class CommandLineInput
     {
-        public IReadOnlyList<CommandDirectiveInput> Directives { get; }
+        public IReadOnlyList<string> Directives { get; }
 
-        public IReadOnlyList<CommandUnboundArgumentInput> UnboundArguments { get; }
+        public string? CommandName { get; }
 
-        public IReadOnlyList<CommandOptionInput> Options { get; }
+        public IReadOnlyList<string> Parameters { get; }
 
-        public bool IsDebugDirectiveSpecified => Directives.Any(d => d.IsDebugDirective);
-
-        public bool IsPreviewDirectiveSpecified => Directives.Any(d => d.IsPreviewDirective);
-
-        public bool IsHelpOptionSpecified => Options.Any(o => o.IsHelpOption);
-
-        public bool IsVersionOptionSpecified => Options.Any(o => o.IsVersionOption);
+        public IReadOnlyDictionary<string, IReadOnlyList<string>> Options { get; }
 
         public CommandLineInput(
-            IReadOnlyList<CommandDirectiveInput> directives,
-            IReadOnlyList<CommandUnboundArgumentInput> unboundArguments,
-            IReadOnlyList<CommandOptionInput> options)
+            IReadOnlyList<string> directives,
+            string? commandName,
+            IReadOnlyList<string> parameters,
+            IReadOnlyDictionary<string, IReadOnlyList<string>> options)
         {
             Directives = directives;
-            UnboundArguments = unboundArguments;
+            CommandName = commandName;
+            Parameters = parameters;
             Options = options;
-        }
-
-        public override string ToString()
-        {
-            var buffer = new StringBuilder();
-
-            foreach (var directive in Directives)
-            {
-                buffer.AppendIfNotEmpty(' ');
-                buffer.Append(directive);
-            }
-
-            foreach (var argument in UnboundArguments)
-            {
-                buffer.AppendIfNotEmpty(' ');
-                buffer.Append(argument);
-            }
-
-            foreach (var option in Options)
-            {
-                buffer.AppendIfNotEmpty(' ');
-                buffer.Append(option);
-            }
-
-            return buffer.ToString();
         }
     }
 
     internal partial class CommandLineInput
     {
-        public static CommandLineInput Parse(IReadOnlyList<string> commandLineArguments)
+        private static IReadOnlyList<string> ParseDirectives(IEnumerable<string> commandLineArguments, out int lastIndex)
         {
-            var builder = new CommandLineInputBuilder();
-
-            var currentOptionAlias = "";
-            var currentOptionValues = new List<string>();
-
-            bool TryParseDirective(string argument)
-            {
-                if (!string.IsNullOrWhiteSpace(currentOptionAlias))
-                    return false;
-
-                if (!argument.StartsWith("[", StringComparison.OrdinalIgnoreCase) ||
-                    !argument.EndsWith("]", StringComparison.OrdinalIgnoreCase))
-                    return false;
-
-                var directive = argument.Substring(1, argument.Length - 2);
-                builder.AddDirective(directive);
-
-                return true;
-            }
-
-            bool TryParseArgument(string argument)
-            {
-                if (!string.IsNullOrWhiteSpace(currentOptionAlias))
-                    return false;
-
-                builder.AddUnboundArgument(argument);
-
-                return true;
-            }
-
-            bool TryParseOptionName(string argument)
-            {
-                if (!argument.StartsWith("--", StringComparison.OrdinalIgnoreCase))
-                    return false;
-
-                if (!string.IsNullOrWhiteSpace(currentOptionAlias))
-                    builder.AddOption(currentOptionAlias, currentOptionValues);
-
-                currentOptionAlias = argument.Substring(2);
-                currentOptionValues = new List<string>();
-
-                return true;
-            }
-
-            bool TryParseOptionShortName(string argument)
-            {
-                if (!argument.StartsWith("-", StringComparison.OrdinalIgnoreCase))
-                    return false;
-
-                foreach (var c in argument.Substring(1))
-                {
-                    if (!string.IsNullOrWhiteSpace(currentOptionAlias))
-                        builder.AddOption(currentOptionAlias, currentOptionValues);
-
-                    currentOptionAlias = c.AsString();
-                    currentOptionValues = new List<string>();
-                }
-
-                return true;
-            }
-
-            bool TryParseOptionValue(string argument)
-            {
-                if (string.IsNullOrWhiteSpace(currentOptionAlias))
-                    return false;
-
-                currentOptionValues.Add(argument);
-
-                return true;
-            }
+            var result = new List<string>();
+            lastIndex = 0;
 
             foreach (var argument in commandLineArguments)
             {
-                var _ =
-                    TryParseOptionName(argument) ||
-                    TryParseOptionShortName(argument) ||
-                    TryParseDirective(argument) ||
-                    TryParseArgument(argument) ||
-                    TryParseOptionValue(argument);
+                if (argument.StartsWith('[') && argument.EndsWith(']'))
+                {
+                    var directive = argument.Substring(1, argument.Length - 2);
+                    result.Add(directive);
+                }
+                else
+                {
+                    break;
+                }
+
+                lastIndex++;
             }
 
-            if (!string.IsNullOrWhiteSpace(currentOptionAlias))
-                builder.AddOption(currentOptionAlias, currentOptionValues);
+            return result;
+        }
 
-            return builder.Build();
+        private static string? ParseCommandName(IEnumerable<string> commandLineArguments, ISet<string> commandNames, out int lastIndex)
+        {
+            var commandName = default(string?);
+            lastIndex = 0;
+
+            var buffer = new List<string>();
+
+            var i = 0;
+            foreach (var argument in commandLineArguments)
+            {
+                buffer.Add(argument);
+
+                var potentialCommandName = buffer.JoinToString(" ");
+
+                if (commandNames.Contains(potentialCommandName))
+                {
+                    commandName = potentialCommandName;
+                    lastIndex = i;
+                }
+
+                i++;
+            }
+
+            return commandName;
+        }
+
+        private static IReadOnlyList<string> ParseParameters(IEnumerable<string> commandLineArguments, out int lastIndex)
+        {
+            var result = new List<string>();
+            lastIndex = 0;
+
+            foreach (var argument in commandLineArguments)
+            {
+                if (!argument.StartsWith('-'))
+                {
+                    result.Add(argument);
+                }
+                else
+                {
+                    break;
+                }
+
+                lastIndex++;
+            }
+
+            return result;
+        }
+
+        private static IReadOnlyDictionary<string, IReadOnlyList<string>> ParseOptions(IEnumerable<string> commandLineArguments)
+        {
+            var result = new Dictionary<string, IReadOnlyList<string>>();
+
+            var currentOptionAlias = default(string?);
+            var currentOptionValues = new List<string>();
+
+            foreach (var argument in commandLineArguments)
+            {
+                // Short name
+                if (argument.StartsWith("--", StringComparison.Ordinal))
+                {
+                    // Flush
+                    if (!string.IsNullOrWhiteSpace(currentOptionAlias))
+                        result[currentOptionAlias] = currentOptionValues;
+
+                    currentOptionAlias = argument.Substring(2);
+                    currentOptionValues = new List<string>();
+                }
+                else if (argument.StartsWith('-'))
+                {
+                    // Flush
+                    if (!string.IsNullOrWhiteSpace(currentOptionAlias))
+                        result[currentOptionAlias] = currentOptionValues;
+
+                    foreach (var alias in argument.Substring(1))
+                    {
+                        currentOptionAlias = alias.AsString();
+                        currentOptionValues = new List<string>();
+                    }
+                }
+                else
+                {
+                    currentOptionValues.Add(argument);
+                }
+            }
+
+            return result;
+        }
+
+        public static CommandLineInput Parse(IReadOnlyList<string> commandLineArguments, IReadOnlyList<string> availableCommandNames)
+        {
+            var availableCommandNamesSet = availableCommandNames.ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            var directives = ParseDirectives(
+                commandLineArguments,
+                out var directivesLastIndex
+            );
+
+            var commandName = ParseCommandName(
+                commandLineArguments.Skip(directivesLastIndex),
+                availableCommandNamesSet,
+                out var commandNameLastIndex
+            );
+
+            var parameters = ParseParameters(
+                commandLineArguments.Skip(commandNameLastIndex),
+                out var parametersLastIndex
+            );
+
+            var options = ParseOptions(
+                commandLineArguments.Skip(parametersLastIndex)
+            );
+
+            return new CommandLineInput(directives, commandName, parameters, options);
         }
     }
 
     internal partial class CommandLineInput
     {
-        private static IReadOnlyList<CommandDirectiveInput> EmptyDirectives { get; } = new CommandDirectiveInput[0];
-
-        private static IReadOnlyList<CommandUnboundArgumentInput> EmptyUnboundArguments { get; } = new CommandUnboundArgumentInput[0];
-
-        private static IReadOnlyList<CommandOptionInput> EmptyOptions { get; } = new CommandOptionInput[0];
-
-        public static CommandLineInput Empty { get; } = new CommandLineInput(EmptyDirectives, EmptyUnboundArguments, EmptyOptions);
+        public static CommandLineInput Empty { get; } = new CommandLineInput(
+            Array.Empty<string>(),
+            null,
+            Array.Empty<string>(),
+            new Dictionary<string, IReadOnlyList<string>>()
+        );
     }
 }

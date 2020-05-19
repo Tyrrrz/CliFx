@@ -9,6 +9,8 @@ namespace CliFx.Exceptions
     /// </summary>
     public class CommandException : CliFxException
     {
+        private const int DefaultExitCode = -1;
+
         /// <summary>
         /// Initializes an instance of <see cref="CommandException"/>.
         /// </summary>

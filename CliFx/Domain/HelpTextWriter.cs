@@ -58,9 +58,6 @@ namespace CliFx.Domain
 
         private void WriteHorizontalMargin(int size = 2)
         {
-            if (IsEmpty)
-                return;
-
             for (var i = 0; i < size; i++)
                 Write(' ');
         }
@@ -79,11 +76,8 @@ namespace CliFx.Domain
             WriteLine();
         }
 
-        private void WriteApplicationInfo(CommandSchema commandSchema)
+        private void WriteApplicationInfo()
         {
-            if (!commandSchema.IsDefault)
-                return;
-
             // Title and version
             Write(ConsoleColor.Yellow, _metadata.Title);
             Write(' ');
@@ -196,7 +190,7 @@ namespace CliFx.Domain
                 var validValues = parameterSchema.GetValidValues();
                 if (validValues.Any())
                 {
-                    Write($"Valid values: {string.Join(", ", validValues)}.");
+                    Write($"Valid values: {validValues.JoinToString(", ")}.");
                 }
 
                 WriteLine();
@@ -208,11 +202,7 @@ namespace CliFx.Domain
             WriteVerticalMargin();
             WriteHeader("Options");
 
-            var actualOptionSchemas = commandSchema.Options
-                .OrderByDescending(o => o.IsRequired)
-                .Concat(commandSchema.GetBuiltInOptions());
-
-            foreach (var optionSchema in actualOptionSchemas)
+            foreach (var optionSchema in commandSchema.Options.OrderByDescending(o => o.IsRequired))
             {
                 if (optionSchema.IsRequired)
                 {
@@ -332,14 +322,19 @@ namespace CliFx.Domain
             WriteLine();
         }
 
-        public void Write(ApplicationSchema applicationSchema, CommandSchema commandSchema)
+        public void Write(ApplicationSchema applicationSchema, CommandSchema? commandSchema)
         {
-            var childCommandSchemas = applicationSchema.GetChildCommands(commandSchema.Name);
-            var command = (ICommand) _typeActivator.CreateInstance(commandSchema.Type);
+            var childCommandSchemas = applicationSchema.GetChildCommands(commandSchema?.Name);
+
+            var command = commandSchema != null
+                ? (ICommand) _typeActivator.CreateInstance(commandSchema.Type)
+                : null;
 
             _console.ResetColor();
 
-            WriteApplicationInfo(commandSchema);
+            if (commandSchema.IsDefault)
+                WriteApplicationInfo();
+
             WriteCommandDescription(commandSchema);
             WriteCommandUsage(commandSchema, childCommandSchemas);
             WriteCommandParameters(commandSchema);

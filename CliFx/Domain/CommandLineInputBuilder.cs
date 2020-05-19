@@ -4,40 +4,39 @@ namespace CliFx.Domain
 {
     internal class CommandLineInputBuilder
     {
-        private readonly List<CommandDirectiveInput> _directives = new List<CommandDirectiveInput>();
-        private readonly List<CommandUnboundArgumentInput> _unboundArguments = new List<CommandUnboundArgumentInput>();
-        private readonly List<CommandOptionInput> _options = new List<CommandOptionInput>();
+        private readonly List<string> _directives = new List<string>();
+        private readonly List<string> _parameters = new List<string>();
+        private readonly Dictionary<string, IReadOnlyList<string>> _options = new Dictionary<string, IReadOnlyList<string>>();
 
-        public CommandLineInputBuilder AddDirective(CommandDirectiveInput directive)
+        private string? _commandName;
+
+        public CommandLineInputBuilder SetCommandName(string name)
+        {
+            _commandName = name;
+            return this;
+        }
+
+        public CommandLineInputBuilder AddDirective(string directive)
         {
             _directives.Add(directive);
             return this;
         }
 
-        public CommandLineInputBuilder AddDirective(string directive) =>
-            AddDirective(new CommandDirectiveInput(directive));
-
-        public CommandLineInputBuilder AddUnboundArgument(CommandUnboundArgumentInput unboundArgument)
+        public CommandLineInputBuilder AddParameter(string parameter)
         {
-            _unboundArguments.Add(unboundArgument);
+            _parameters.Add(parameter);
             return this;
         }
 
-        public CommandLineInputBuilder AddUnboundArgument(string unboundArgument) =>
-            AddUnboundArgument(new CommandUnboundArgumentInput(unboundArgument));
-
-        public CommandLineInputBuilder AddOption(CommandOptionInput option)
+        public CommandLineInputBuilder AddOption(string alias, IReadOnlyList<string> values)
         {
-            _options.Add(option);
+            _options[alias] = values;
             return this;
         }
 
-        public CommandLineInputBuilder AddOption(string optionAlias, IReadOnlyList<string> values) =>
-            AddOption(new CommandOptionInput(optionAlias, values));
+        public CommandLineInputBuilder AddOption(string alias, params string[] values) =>
+            AddOption(alias, (IReadOnlyList<string>) values);
 
-        public CommandLineInputBuilder AddOption(string optionAlias, params string[] values) =>
-            AddOption(optionAlias, (IReadOnlyList<string>) values);
-
-        public CommandLineInput Build() => new CommandLineInput(_directives, _unboundArguments, _options);
+        public CommandLineInput Build() => new CommandLineInput(_directives, _commandName, _parameters, _options);
     }
 }

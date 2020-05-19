@@ -24,6 +24,10 @@ namespace CliFx.Domain
 
         public IReadOnlyList<CommandOptionSchema> Options { get; }
 
+        public bool IsHelpOptionAvailable => Options.Contains(CommandOptionSchema.HelpOption);
+
+        public bool IsVersionOptionAvailable => Options.Contains(CommandOptionSchema.VersionOption);
+
         public CommandSchema(
             Type type,
             string? name,
@@ -34,25 +38,22 @@ namespace CliFx.Domain
             Type = type;
             Name = name;
             Description = description;
-            Options = options;
             Parameters = parameters;
+            Options = options;
         }
 
-        public bool MatchesName(string? name) => string.Equals(name, Name, StringComparison.OrdinalIgnoreCase);
+        public bool MatchesName(string? name) =>
+            !string.IsNullOrWhiteSpace(Name)
+                ? string.Equals(name, Name, StringComparison.OrdinalIgnoreCase)
+                : string.IsNullOrWhiteSpace(name);
 
-        public IReadOnlyList<CommandOptionSchema> GetBuiltInOptions()
+        public IEnumerable<CommandArgumentSchema> GetArguments()
         {
-            var result = new List<CommandOptionSchema>(2);
+            foreach (var parameter in Parameters)
+                yield return parameter;
 
-            var helpOption = CommandOptionSchema.HelpOption;
-            var versionOption = CommandOptionSchema.VersionOption;
-
-            result.Add(helpOption);
-
-            if (IsDefault)
-                result.Add(versionOption);
-
-            return result;
+            foreach (var option in Options)
+                yield return option;
         }
 
         private void InjectParameters(ICommand command, IReadOnlyList<CommandUnboundArgumentInput> parameterInputs)
@@ -195,6 +196,12 @@ namespace CliFx.Domain
 
             var attribute = type.GetCustomAttribute<CommandAttribute>();
 
+            var name = attribute?.Name;
+
+            var builtInOptions = !string.IsNullOrWhiteSpace(name)
+                ? new[] {CommandOptionSchema.HelpOption, CommandOptionSchema.VersionOption}
+                : new[] {CommandOptionSchema.HelpOption};
+
             var parameters = type.GetProperties()
                 .Select(CommandParameterSchema.TryResolve)
                 .Where(p => p != null)
@@ -203,11 +210,12 @@ namespace CliFx.Domain
             var options = type.GetProperties()
                 .Select(CommandOptionSchema.TryResolve)
                 .Where(o => o != null)
+                .Concat(builtInOptions)
                 .ToArray();
 
             return new CommandSchema(
                 type,
-                attribute?.Name,
+                name,
                 attribute?.Description,
                 parameters!,
                 options!
