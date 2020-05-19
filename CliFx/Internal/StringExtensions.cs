@@ -12,6 +12,13 @@ namespace CliFx.Internal
 
         public static string Quote(this string str) => $"\"{str}\"";
 
+        public static string PrefixDashes(this string str) => str switch
+        {
+            {Length: 0} => str,
+            {Length: 1} => $"-{str}",
+            _ => $"--{str}"
+        };
+
         public static string JoinToString<T>(this IEnumerable<T> source, string separator) => string.Join(separator, source);
 
         public static StringBuilder AppendIfNotEmpty(this StringBuilder builder, char value) =>

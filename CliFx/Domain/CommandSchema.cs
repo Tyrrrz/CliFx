@@ -56,7 +56,7 @@ namespace CliFx.Domain
                 yield return option;
         }
 
-        private void InjectParameters(ICommand command, IReadOnlyList<CommandUnboundArgumentInput> parameterInputs)
+        private void InjectParameters(ICommand command, IReadOnlyList<string> parameterInputs)
         {
             // All inputs must be bound
             var remainingParameterInputs = parameterInputs.ToList();
@@ -75,7 +75,7 @@ namespace CliFx.Domain
                     ? parameterInputs[i]
                     : throw CliFxException.ParameterNotSet(scalarParameter);
 
-                scalarParameter.Inject(command, scalarParameterInput.Value);
+                scalarParameter.Inject(command, scalarParameterInput);
                 remainingParameterInputs.Remove(scalarParameterInput);
             }
 
@@ -86,9 +86,9 @@ namespace CliFx.Domain
 
             if (nonScalarParameter != null)
             {
-                var nonScalarParameterValues = parameterInputs.Skip(scalarParameters.Length).Select(i => i.Value).ToArray();
+                var nonScalarParameterInputs = parameterInputs.Skip(scalarParameters.Length).ToArray();
 
-                nonScalarParameter.Inject(command, nonScalarParameterValues);
+                nonScalarParameter.Inject(command, nonScalarParameterInputs);
                 remainingParameterInputs.Clear();
             }
 
@@ -101,7 +101,7 @@ namespace CliFx.Domain
 
         private void InjectOptions(
             ICommand command,
-            IReadOnlyList<CommandOptionInput> optionInputs,
+            IReadOnlyDictionary<string, IReadOnlyList<string>> optionInputs,
             IReadOnlyDictionary<string, string> environmentVariables)
         {
             // All inputs must be bound
@@ -131,12 +131,12 @@ namespace CliFx.Domain
             foreach (var option in Options)
             {
                 var inputs = optionInputs
-                    .Where(i => option.MatchesNameOrShortName(i.Alias))
+                    .Where(i => option.MatchesNameOrShortName(i.Key))
                     .ToArray();
 
                 if (inputs.Any())
                 {
-                    var inputValues = inputs.SelectMany(i => i.Values).ToArray();
+                    var inputValues = inputs.SelectMany(i => i.Value).ToArray();
                     option.Inject(command, inputValues);
 
                     foreach (var input in inputs)
@@ -161,8 +161,8 @@ namespace CliFx.Domain
         }
 
         public ICommand CreateInstance(
-            IReadOnlyList<CommandUnboundArgumentInput> parameterInputs,
-            IReadOnlyList<CommandOptionInput> optionInputs,
+            IReadOnlyList<string> parameterInputs,
+            IReadOnlyDictionary<string, IReadOnlyList<string>> optionInputs,
             IReadOnlyDictionary<string, string> environmentVariables,
             ITypeActivator activator)
         {

@@ -277,7 +277,7 @@ Environment variable names are not case-sensitive.";
         {
             var message = $@"
 Can't find a command that matches the following arguments:
-{input.UnboundArguments.JoinToString(" ")}";
+{input.Parameters.JoinToString(" ")}";
 
             return new CliFxException(message.Trim(), showHelp: true);
         }
@@ -405,20 +405,20 @@ Missing values for one or more required options:
             return new CliFxException(message.Trim(), showHelp: true);
         }
 
-        internal static CliFxException UnrecognizedParametersProvided(IReadOnlyList<CommandUnboundArgumentInput> argumentInputs)
+        internal static CliFxException UnrecognizedParametersProvided(IReadOnlyList<string> parameterInputs)
         {
             var message = $@"
 Unrecognized parameters provided:
-{argumentInputs.Select(a => a.Value.Quote()).JoinToString(" ")}";
+{parameterInputs.Select(p => p.Quote()).JoinToString(" ")}";
 
             return new CliFxException(message.Trim(), showHelp: true);
         }
 
-        internal static CliFxException UnrecognizedOptionsProvided(IReadOnlyList<CommandOptionInput> optionInputs)
+        internal static CliFxException UnrecognizedOptionsProvided(IReadOnlyDictionary<string, IReadOnlyList<string>> optionInputs)
         {
             var message = $@"
 Unrecognized options provided:
-{optionInputs.Select(o => o.RawAlias).JoinToString(Environment.NewLine)}";
+{optionInputs.Select(o => o.Key.PrefixDashes()).JoinToString(Environment.NewLine)}";
 
             return new CliFxException(message.Trim(), showHelp: true);
         }

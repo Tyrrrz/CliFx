@@ -13,7 +13,7 @@ namespace CliFx
     /// <summary>
     /// Command line application facade.
     /// </summary>
-    public class CliApplication
+    public partial class CliApplication
     {
         private readonly ApplicationMetadata _metadata;
         private readonly ApplicationConfiguration _configuration;
@@ -82,10 +82,7 @@ namespace CliFx
                 _console.WithForegroundColor(ConsoleColor.White, () =>
                 {
                     // Alias
-                    _console.Output.Write(alias.Length == 1
-                        ? "-"
-                        : "--"
-                    );
+                    _console.Output.Write(alias.PrefixDashes());
                     _console.Output.WriteLine(alias);
 
                     // Values
@@ -146,12 +143,12 @@ namespace CliFx
                 var applicationSchema = ApplicationSchema.Resolve(_configuration.CommandTypes);
                 var input = CommandLineInput.Parse(commandLineArguments, applicationSchema.GetCommandNames());
 
-                // Handle debug mode
+                // Debug mode
                 await HandleDebugDirectiveAsync(input);
 
-                // Handle preview mode
+                // Preview mode
                 if (HandlePreviewDirective(input))
-                    return 0;
+                    return ExitCode.Success;
 
                 var resolvedCommand = applicationSchema.Resolve(
                     input,
@@ -161,7 +158,7 @@ namespace CliFx
 
                 try
                 {
-                    return 0;
+                    return ExitCode.Success;
                 }
                 // This handles both domain exceptions from CliFx as well as exceptions
                 // thrown in order to short-circuit command execution due to a failure.
@@ -189,7 +186,7 @@ namespace CliFx
             catch (Exception ex) when (!Debugger.IsAttached)
             {
                 WriteError(ex.ToString());
-                return ex.HResult;
+                return ExitCode.FromException(ex);
             }
         }
 
@@ -227,6 +224,19 @@ namespace CliFx
                 .ToArray();
 
             return await RunAsync(commandLineArguments);
+        }
+    }
+
+    public partial class CliApplication
+    {
+        private static class ExitCode
+        {
+            public const int Success = 0;
+
+            public static int FromException(Exception ex) =>
+                ex is CliFxException localEx
+                    ? localEx.ExitCode
+                    : ex.HResult;
         }
     }
 }
