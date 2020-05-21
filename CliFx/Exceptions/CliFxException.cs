@@ -14,15 +14,7 @@ namespace CliFx.Exceptions
     {
         private const int DefaultExitCode = -100;
 
-        /// <summary>
-        /// Whether to show the help text after handling this exception.
-        /// </summary>
-        public bool ShowHelp { get; }
-
-        /// <summary>
-        /// Whether this exception was constructed with a message.
-        /// </summary>
-        public bool HasMessage { get; }
+        private readonly bool _isMessageSet;
 
         /// <summary>
         /// Returns an exit code associated with this exception.
@@ -30,28 +22,42 @@ namespace CliFx.Exceptions
         public int ExitCode { get; }
 
         /// <summary>
+        /// Whether to show the help text after handling this exception.
+        /// </summary>
+        public bool ShowHelp { get; }
+
+        /// <summary>
         /// Initializes an instance of <see cref="CliFxException"/>.
         /// </summary>
         public CliFxException(string? message, Exception? innerException, int exitCode = DefaultExitCode, bool showHelp = false)
             : base(message, innerException)
         {
-            ExitCode = exitCode != 0
-                ? exitCode
-                : throw new ArgumentException("Exit code must not be zero in order to signify failure.");
-
             // Message property has a fallback so it's never empty, hence why we need this check
-            HasMessage = !string.IsNullOrWhiteSpace(message);
+            _isMessageSet = !string.IsNullOrWhiteSpace(message);
 
+            ExitCode = exitCode;
             ShowHelp = showHelp;
         }
 
         /// <summary>
         /// Initializes an instance of <see cref="CliFxException"/>.
         /// </summary>
-        public CliFxException(string? message, bool showHelp = false)
-            : this(message, null, showHelp: showHelp)
+        public CliFxException(string? message, int exitCode = DefaultExitCode, bool showHelp = false)
+            : this(message, null, exitCode, showHelp)
         {
         }
+
+        /// <summary>
+        /// Initializes an instance of <see cref="CliFxException"/>.
+        /// </summary>
+        public CliFxException(int exitCode = DefaultExitCode, bool showHelp = false)
+            : this(null, exitCode, showHelp)
+        {
+        }
+
+        internal string GetConciseMessage() => _isMessageSet
+            ? Message
+            : ToString();
     }
 
     // Internal exceptions
@@ -273,15 +279,6 @@ Environment variable names are not case-sensitive.";
     // Avoid internal details and fix recommendations here
     public partial class CliFxException
     {
-        internal static CliFxException CannotFindMatchingCommand(CommandLineInput input)
-        {
-            var message = $@"
-Can't find a command that matches the following arguments:
-{input.Parameters.JoinToString(" ")}";
-
-            return new CliFxException(message.Trim(), showHelp: true);
-        }
-
         internal static CliFxException CannotConvertMultipleValuesToNonScalar(
             CommandParameterSchema parameterSchema,
             IReadOnlyList<string> values)
@@ -414,7 +411,7 @@ Unrecognized parameters provided:
             return new CliFxException(message.Trim(), showHelp: true);
         }
 
-        internal static CliFxException UnrecognizedOptionsProvided(IReadOnlyDictionary<string, IReadOnlyList<string>> optionInputs)
+        internal static CliFxException UnrecognizedOptionsProvided(IReadOnlyList<KeyValuePair<string, IReadOnlyList<string>>> optionInputs)
         {
             var message = $@"
 Unrecognized options provided:

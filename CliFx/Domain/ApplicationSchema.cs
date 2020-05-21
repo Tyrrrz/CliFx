@@ -20,8 +20,11 @@ namespace CliFx.Domain
             .Where(n => !string.IsNullOrWhiteSpace(n))
             .ToArray()!;
 
-        public CommandSchema? TryFindCommand(string? name) =>
-            Commands.FirstOrDefault(c => c.MatchesName(name));
+        public CommandSchema? TryFindDefaultCommand() =>
+            Commands.FirstOrDefault(c => c.IsDefault);
+
+        public CommandSchema? TryFindCommand(string? commandName) =>
+            Commands.FirstOrDefault(c => c.MatchesName(commandName));
 
         public CommandSchema? TryFindParentCommand(string? childCommandName)
         {
@@ -48,32 +51,6 @@ namespace CliFx.Domain
             !string.IsNullOrWhiteSpace(parentCommandName) || Commands.Any(c => c.IsDefault)
                 ? Commands.Where(c => TryFindParentCommand(c.Name)?.MatchesName(parentCommandName) == true).ToArray()
                 : Commands.Where(c => !string.IsNullOrWhiteSpace(c.Name) && TryFindParentCommand(c.Name) == null).ToArray();
-
-        private IReadOnlyDictionary<CommandArgumentSchema, object?> GetDefaults(CommandSchema command, ICommand commandInstance)
-        {
-            var result = new Dictionary<CommandArgumentSchema, object?>();
-
-            foreach (var argument in command.GetArguments())
-            {
-                var value = argument.Property.GetValue(commandInstance);
-                result[argument] = value;
-            }
-
-            return result;
-        }
-
-        public ResolvedCommand Resolve(
-            CommandLineInput commandLineInput,
-            IReadOnlyDictionary<string, string> environmentVariables,
-            ITypeActivator typeActivator)
-        {
-            var command = TryFindCommand(commandLineInput.CommandName);
-
-            var commandInstance = (ICommand) typeActivator.CreateInstance(command.Type);
-            var defaults = GetDefaults(command, commandInstance);
-
-            var isHelpOptionSpecified =
-        }
 
         public override string ToString() => Commands.JoinToString(Environment.NewLine);
     }

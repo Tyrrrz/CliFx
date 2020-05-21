@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using CliFx.Attributes;
 using CliFx.Domain;
 using CliFx.Exceptions;
 using CliFx.Internal;
@@ -83,7 +84,6 @@ namespace CliFx
                 {
                     // Alias
                     _console.Output.Write(alias.PrefixDashes());
-                    _console.Output.WriteLine(alias);
 
                     // Values
                     foreach (var value in values)
@@ -102,37 +102,26 @@ namespace CliFx
             _console.Output.WriteLine();
         }
 
-        private async ValueTask<bool> HandleDebugDirectiveAsync(CommandLineInput input)
-        {
-            if (_configuration.IsDebugModeAllowed &&
-                input.Directives.Any(d => string.Equals(d, "debug", StringComparison.OrdinalIgnoreCase)))
-            {
-                await WaitForDebuggerAsync();
-                return true;
-            }
+        private bool IsDebugDirectiveSpecified(CommandLineInput input) =>
+            _configuration.IsDebugModeAllowed &&
+            input.Directives.Any(d => string.Equals(d, "debug", StringComparison.OrdinalIgnoreCase));
 
-            return false;
-        }
+        private bool IsPreviewDirectiveSpecified(CommandLineInput input) =>
+            _configuration.IsPreviewModeAllowed &&
+            input.Directives.Any(d => string.Equals(d, "preview", StringComparison.OrdinalIgnoreCase));
 
-        private bool HandlePreviewDirective(CommandLineInput input)
-        {
-            if (_configuration.IsPreviewModeAllowed &&
-                input.Directives.Any(d => string.Equals(d, "preview", StringComparison.OrdinalIgnoreCase)))
-            {
-                WriteCommandLineInput(input);
-                return true;
-            }
-
-            return false;
-        }
+        private ICommand GetCommandInstance(CommandSchema commandSchema) =>
+            commandSchema != StubDefaultCommand.Schema
+                ? (ICommand) _typeActivator.CreateInstance(commandSchema.Type)
+                : new StubDefaultCommand();
 
         /// <summary>
         /// Runs the application with specified command line arguments and environment variables, and returns the exit code.
         /// </summary>
         /// <remarks>
-        /// This method swallows all exceptions and routes them to the console, but only if the debugger is not attached.
-        /// If the debugger is attached, this method only swallows <see cref="CliFxException"/> or <see cref="CommandException"/>
-        /// thrown during the actual command execution.
+        /// If a <see cref="CommandException"/> is thrown during command execution, it will be handled and routed to the console.
+        /// Additionally, if the debugger is not attached (i.e. the app is running in production), all other exceptions thrown within
+        /// this method will be handled and routed to the console as well.
         /// </remarks>
         public async ValueTask<int> RunAsync(
             IReadOnlyList<string> commandLineArguments,
@@ -144,36 +133,65 @@ namespace CliFx
                 var input = CommandLineInput.Parse(commandLineArguments, applicationSchema.GetCommandNames());
 
                 // Debug mode
-                await HandleDebugDirectiveAsync(input);
+                if (IsDebugDirectiveSpecified(input))
+                {
+                    // Ensure debugger is attached and continue
+                    await WaitForDebuggerAsync();
+                }
 
                 // Preview mode
-                if (HandlePreviewDirective(input))
+                if (IsPreviewDirectiveSpecified(input))
+                {
+                    WriteCommandLineInput(input);
                     return ExitCode.Success;
+                }
 
-                var resolvedCommand = applicationSchema.Resolve(
-                    input,
-                    environmentVariables,
-                    _typeActivator
-                );
+                // Try to get the command matching the input or fallback to default
+                var command =
+                    applicationSchema.TryFindCommand(input.CommandName) ??
+                    applicationSchema.TryFindDefaultCommand() ??
+                    StubDefaultCommand.Schema;
+
+                // Version option
+                if (command.IsVersionOptionSpecified(input))
+                {
+                    _console.Output.WriteLine(_metadata.VersionText);
+                    return ExitCode.Success;
+                }
+
+                // Get command instance (also used in help text)
+                var instance = GetCommandInstance(command);
+
+                // To avoid instantiating the command twice, we need to get default values
+                // before the arguments are bound to the properties
+                var defaultValues = command.GetArgumentValues(instance);
+
+                // Help option
+                if (command.IsHelpOptionSpecified(input))
+                {
+                    _helpTextWriter.Write(applicationSchema, command, defaultValues);
+                    return ExitCode.Success;
+                }
+
+                // Bind actual values from arguments
+                command.Bind(instance, input, environmentVariables);
 
                 try
                 {
+                    // Execute the command
+                    await instance.ExecuteAsync(_console);
                     return ExitCode.Success;
                 }
                 // This handles both domain exceptions from CliFx as well as exceptions
-                // thrown in order to short-circuit command execution due to a failure.
+                // thrown in order to short-circuit command execution in case of an error.
                 catch (CliFxException ex)
                 {
-                    // The stack trace is irrelevant here so avoid it if possible
-                    var message = ex.HasMessage
-                        ? ex.Message
-                        : ex.ToString();
-
-                    WriteError(message);
+                    // We want minimal output from expected exceptions
+                    WriteError(ex.GetConciseMessage());
 
                     // The exception may trigger help text to provide additional info to the user
                     if (ex.ShowHelp)
-                        _helpTextWriter.Write(applicationSchema, resolvedCommand.Schema);
+                        _helpTextWriter.Write(applicationSchema, command, defaultValues);
 
                     return ex.ExitCode;
                 }
@@ -181,8 +199,7 @@ namespace CliFx
             // To prevent the app from showing the annoying Windows troubleshooting dialog,
             // we handle all exceptions and write them to the console nicely.
             // However, we don't want to swallow unhandled exceptions when the debugger is attached,
-            // because we still want the IDE to show unhandled exceptions so that the dev
-            // can fix them.
+            // because we still want the IDE to show unhandled exceptions so that the dev can fix them.
             catch (Exception ex) when (!Debugger.IsAttached)
             {
                 WriteError(ex.ToString());
@@ -195,9 +212,9 @@ namespace CliFx
         /// Environment variables are retrieved automatically.
         /// </summary>
         /// <remarks>
-        /// This method swallows all exceptions and routes them to the console, but only if the debugger is not attached.
-        /// If the debugger is attached, this method only swallows <see cref="CliFxException"/> or <see cref="CommandException"/>
-        /// thrown during the actual command execution.
+        /// If a <see cref="CommandException"/> is thrown during command execution, it will be handled and routed to the console.
+        /// Additionally, if the debugger is not attached (i.e. the app is running in production), all other exceptions thrown within
+        /// this method will be handled and routed to the console as well.
         /// </remarks>
         public async ValueTask<int> RunAsync(IReadOnlyList<string> commandLineArguments)
         {
@@ -213,9 +230,9 @@ namespace CliFx
         /// Command line arguments and environment variables are retrieved automatically.
         /// </summary>
         /// <remarks>
-        /// This method swallows all exceptions and routes them to the console, but only if the debugger is not attached.
-        /// If the debugger is attached, this method only swallows <see cref="CliFxException"/> or <see cref="CommandException"/>
-        /// thrown during the actual command execution.
+        /// If a <see cref="CommandException"/> is thrown during command execution, it will be handled and routed to the console.
+        /// Additionally, if the debugger is not attached (i.e. the app is running in production), all other exceptions thrown within
+        /// this method will be handled and routed to the console as well.
         /// </remarks>
         public async ValueTask<int> RunAsync()
         {
@@ -237,6 +254,14 @@ namespace CliFx
                 ex is CliFxException localEx
                     ? localEx.ExitCode
                     : ex.HResult;
+        }
+
+        [Command]
+        private class StubDefaultCommand : ICommand
+        {
+            public static CommandSchema Schema { get; } = CommandSchema.TryResolve(typeof(StubDefaultCommand))!;
+
+            public ValueTask ExecuteAsync(IConsole console) => throw new CliFxException(showHelp: true);
         }
     }
 }

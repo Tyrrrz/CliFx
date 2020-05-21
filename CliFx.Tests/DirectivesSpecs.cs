@@ -30,7 +30,7 @@ namespace CliFx.Tests
 
             // Assert
             exitCode.Should().Be(0);
-            stdOutData.Should().ContainAll("cmd", "<param>", "[-a]", "[-b]", "[-c]", "[--option foo]");
+            stdOutData.Should().ContainAll("cmd", "<param>", "[-a]", "[-b]", "[-c]", "[--option \"foo\"]");
         }
     }
 }

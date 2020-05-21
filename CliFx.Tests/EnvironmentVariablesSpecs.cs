@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using CliFx.Domain;
+using CliFx.Tests.Internal;
 using CliWrap;
 using CliWrap.Buffered;
 using FluentAssertions;
@@ -53,8 +54,6 @@ namespace CliFx.Tests
         public void Option_of_non_scalar_type_can_take_multiple_separated_values_from_an_environment_variable()
         {
             // Arrange
-            var schema = ApplicationSchema.Resolve(new[] {typeof(EnvironmentVariableCollectionCommand)});
-
             var input = CommandLineInput.Empty;
             var envVars = new Dictionary<string, string>
             {
@@ -62,10 +61,10 @@ namespace CliFx.Tests
             };
 
             // Act
-            var command = schema.InitializeEntryPoint(input, envVars);
+            var instance = CommandHelper.ResolveCommand<EnvironmentVariableCollectionCommand>(input, envVars);
 
             // Assert
-            command.Should().BeEquivalentTo(new EnvironmentVariableCollectionCommand
+            instance.Should().BeEquivalentTo(new EnvironmentVariableCollectionCommand
             {
                 Option = new[] {"foo", "bar"}
             });
@@ -75,8 +74,6 @@ namespace CliFx.Tests
         public void Option_of_scalar_type_can_only_take_a_single_value_from_an_environment_variable_even_if_it_contains_separators()
         {
             // Arrange
-            var schema = ApplicationSchema.Resolve(new[] {typeof(EnvironmentVariableCommand)});
-
             var input = CommandLineInput.Empty;
             var envVars = new Dictionary<string, string>
             {
@@ -84,10 +81,10 @@ namespace CliFx.Tests
             };
 
             // Act
-            var command = schema.InitializeEntryPoint(input, envVars);
+            var instance = CommandHelper.ResolveCommand<EnvironmentVariableCommand>(input, envVars);
 
             // Assert
-            command.Should().BeEquivalentTo(new EnvironmentVariableCommand
+            instance.Should().BeEquivalentTo(new EnvironmentVariableCommand
             {
                 Option = $"foo{Path.PathSeparator}bar"
             });

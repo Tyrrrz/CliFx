@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using CliFx.Attributes;
 using CliFx.Exceptions;
 using CliFx.Internal;
@@ -23,10 +22,6 @@ namespace CliFx.Domain
         public IReadOnlyList<CommandParameterSchema> Parameters { get; }
 
         public IReadOnlyList<CommandOptionSchema> Options { get; }
-
-        public bool IsHelpOptionAvailable => Options.Contains(CommandOptionSchema.HelpOption);
-
-        public bool IsVersionOptionAvailable => Options.Contains(CommandOptionSchema.VersionOption);
 
         public CommandSchema(
             Type type,
@@ -56,7 +51,29 @@ namespace CliFx.Domain
                 yield return option;
         }
 
-        private void InjectParameters(ICommand command, IReadOnlyList<string> parameterInputs)
+        public IReadOnlyDictionary<CommandArgumentSchema, object?> GetArgumentValues(ICommand instance)
+        {
+            var result = new Dictionary<CommandArgumentSchema, object?>();
+
+            foreach (var argument in GetArguments())
+            {
+                var value = argument.Property.GetValue(instance);
+                result[argument] = value;
+            }
+
+            return result;
+        }
+
+        public bool IsHelpOptionSpecified(CommandLineInput input) =>
+            Options.Contains(CommandOptionSchema.HelpOption) &&
+            (input.Options.Any(o => CommandOptionSchema.HelpOption.MatchesNameOrShortName(o.Key)) ||
+             IsDefault && !input.Parameters.Any() && !input.Options.Any());
+
+        public bool IsVersionOptionSpecified(CommandLineInput input) =>
+            Options.Contains(CommandOptionSchema.VersionOption) &&
+            input.Options.Any(o => CommandOptionSchema.VersionOption.MatchesNameOrShortName(o.Key));
+
+        private void BindParameters(ICommand instance, IReadOnlyList<string> parameterInputs)
         {
             // All inputs must be bound
             var remainingParameterInputs = parameterInputs.ToList();
@@ -75,7 +92,7 @@ namespace CliFx.Domain
                     ? parameterInputs[i]
                     : throw CliFxException.ParameterNotSet(scalarParameter);
 
-                scalarParameter.Inject(command, scalarParameterInput);
+                scalarParameter.BindOn(instance, scalarParameterInput);
                 remainingParameterInputs.Remove(scalarParameterInput);
             }
 
@@ -88,7 +105,7 @@ namespace CliFx.Domain
             {
                 var nonScalarParameterInputs = parameterInputs.Skip(scalarParameters.Length).ToArray();
 
-                nonScalarParameter.Inject(command, nonScalarParameterInputs);
+                nonScalarParameter.BindOn(instance, nonScalarParameterInputs);
                 remainingParameterInputs.Clear();
             }
 
@@ -99,8 +116,8 @@ namespace CliFx.Domain
             }
         }
 
-        private void InjectOptions(
-            ICommand command,
+        private void BindOptions(
+            ICommand instance,
             IReadOnlyDictionary<string, IReadOnlyList<string>> optionInputs,
             IReadOnlyDictionary<string, string> environmentVariables)
         {
@@ -121,7 +138,7 @@ namespace CliFx.Domain
                         ? new[] {value}
                         : value.Split(Path.PathSeparator);
 
-                    option.Inject(command, values);
+                    option.BindOn(instance, values);
                     unsetRequiredOptions.Remove(option);
                 }
             }
@@ -137,7 +154,7 @@ namespace CliFx.Domain
                 if (inputs.Any())
                 {
                     var inputValues = inputs.SelectMany(i => i.Value).ToArray();
-                    option.Inject(command, inputValues);
+                    option.BindOn(instance, inputValues);
 
                     foreach (var input in inputs)
                         remainingOptionInputs.Remove(input);
@@ -160,18 +177,13 @@ namespace CliFx.Domain
             }
         }
 
-        public ICommand CreateInstance(
-            IReadOnlyList<string> parameterInputs,
-            IReadOnlyDictionary<string, IReadOnlyList<string>> optionInputs,
-            IReadOnlyDictionary<string, string> environmentVariables,
-            ITypeActivator activator)
+        public void Bind(
+            ICommand instance,
+            CommandLineInput input,
+            IReadOnlyDictionary<string, string> environmentVariables)
         {
-            var command = (ICommand) activator.CreateInstance(Type);
-
-            InjectParameters(command, parameterInputs);
-            InjectOptions(command, optionInputs, environmentVariables);
-
-            return command;
+            BindParameters(instance, input.Parameters);
+            BindOptions(instance, input.Options, environmentVariables);
         }
 
         public string GetUserFacingDisplayString() => Name ?? "";
@@ -220,18 +232,6 @@ namespace CliFx.Domain
                 parameters!,
                 options!
             );
-        }
-    }
-
-    internal partial class CommandSchema
-    {
-        // TODO: won't work with dep injection
-        [Command]
-        public class StubDefaultCommand : ICommand
-        {
-            public ValueTask ExecuteAsync(IConsole console) => default;
-
-            public static CommandSchema Schema { get; } = TryResolve(typeof(StubDefaultCommand))!;
         }
     }
 }

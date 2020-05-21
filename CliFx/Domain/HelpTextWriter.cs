@@ -197,7 +197,9 @@ namespace CliFx.Domain
             }
         }
 
-        private void WriteCommandOptions(CommandSchema commandSchema, ICommand command)
+        private void WriteCommandOptions(
+            CommandSchema commandSchema,
+            IReadOnlyDictionary<CommandArgumentSchema, object?> argumentDefaultValues)
         {
             WriteVerticalMargin();
             WriteHeader("Options");
@@ -259,8 +261,8 @@ namespace CliFx.Domain
                 if (!optionSchema.IsRequired)
                 {
                     // TODO: move quoting logic here?
-                    var defaultValue = optionSchema.TryGetDefaultValue(command);
-                    if (defaultValue != null)
+                    var defaultValue = argumentDefaultValues.GetValueOrDefault(optionSchema);
+                    if (defaultValue != null && !defaultValue.IsTypeDefaultValue())
                     {
                         Write($"Default: {defaultValue}.");
                     }
@@ -322,13 +324,12 @@ namespace CliFx.Domain
             WriteLine();
         }
 
-        public void Write(ApplicationSchema applicationSchema, CommandSchema? commandSchema)
+        public void Write(
+            ApplicationSchema applicationSchema,
+            CommandSchema commandSchema,
+            IReadOnlyDictionary<CommandArgumentSchema, object?> argumentDefaultValues)
         {
-            var childCommandSchemas = applicationSchema.GetChildCommands(commandSchema?.Name);
-
-            var command = commandSchema != null
-                ? (ICommand) _typeActivator.CreateInstance(commandSchema.Type)
-                : null;
+            var childCommandSchemas = applicationSchema.GetChildCommands(commandSchema.Name);
 
             _console.ResetColor();
 
@@ -338,7 +339,7 @@ namespace CliFx.Domain
             WriteCommandDescription(commandSchema);
             WriteCommandUsage(commandSchema, childCommandSchemas);
             WriteCommandParameters(commandSchema);
-            WriteCommandOptions(commandSchema, command);
+            WriteCommandOptions(commandSchema, argumentDefaultValues);
             WriteCommandChildren(commandSchema, childCommandSchemas);
         }
     }

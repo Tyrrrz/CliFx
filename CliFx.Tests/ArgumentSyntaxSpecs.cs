@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using CliFx.Domain;
+using CliFx.Tests.Internal;
 using FluentAssertions;
 using Xunit;
 
@@ -11,10 +13,11 @@ namespace CliFx.Tests
         public void Input_is_empty_if_no_arguments_are_provided()
         {
             // Arrange
-            var args = Array.Empty<string>();
+            var arguments = Array.Empty<string>();
+            var commandNames = Array.Empty<string>();
 
             // Act
-            var input = CommandLineInput.Parse(args);
+            var input = CommandLineInput.Parse(arguments, commandNames);
 
             // Assert
             input.Should().BeEquivalentTo(CommandLineInput.Empty);
@@ -42,10 +45,13 @@ namespace CliFx.Tests
 
         [Theory]
         [MemberData(nameof(DirectivesTestData))]
-        internal void Directive_can_be_enabled_by_specifying_its_name_in_square_brackets(string[] arguments, CommandLineInput expectedInput)
+        internal void Directive_can_be_enabled_by_specifying_its_name_in_square_brackets(IReadOnlyList<string> arguments, CommandLineInput expectedInput)
         {
+            // Arrange
+            var commandNames = Array.Empty<string>();
+
             // Act
-            var input = CommandLineInput.Parse(arguments);
+            var input = CommandLineInput.Parse(arguments, commandNames);
 
             // Assert
             input.Should().BeEquivalentTo(expectedInput);
@@ -124,10 +130,13 @@ namespace CliFx.Tests
 
         [Theory]
         [MemberData(nameof(OptionsTestData))]
-        internal void Option_can_be_set_by_specifying_its_name_after_two_dashes(string[] arguments, CommandLineInput expectedInput)
+        internal void Option_can_be_set_by_specifying_its_name_after_two_dashes(IReadOnlyList<string> arguments, CommandLineInput expectedInput)
         {
+            // Arrange
+            var commandNames = Array.Empty<string>();
+
             // Act
-            var input = CommandLineInput.Parse(arguments);
+            var input = CommandLineInput.Parse(arguments, commandNames);
 
             // Assert
             input.Should().BeEquivalentTo(expectedInput);
@@ -236,22 +245,25 @@ namespace CliFx.Tests
 
         [Theory]
         [MemberData(nameof(ShortOptionsTestData))]
-        internal void Option_can_be_set_by_specifying_its_short_name_after_a_single_dash(string[] arguments, CommandLineInput expectedInput)
+        internal void Option_can_be_set_by_specifying_its_short_name_after_a_single_dash(IReadOnlyList<string> arguments, CommandLineInput expectedInput)
         {
+            // Arrange
+            var commandNames = Array.Empty<string>();
+
             // Act
-            var input = CommandLineInput.Parse(arguments);
+            var input = CommandLineInput.Parse(arguments, commandNames);
 
             // Assert
             input.Should().BeEquivalentTo(expectedInput);
         }
 
-        public static object[][] UnboundArgumentsTestData => new[]
+        public static object[][] ParametersTestData => new[]
         {
             new object[]
             {
                 new[] {"foo"},
                 new CommandLineInputBuilder()
-                    .AddUnboundArgument("foo")
+                    .AddParameter("foo")
                     .Build()
             },
 
@@ -259,8 +271,8 @@ namespace CliFx.Tests
             {
                 new[] {"foo", "bar"},
                 new CommandLineInputBuilder()
-                    .AddUnboundArgument("foo")
-                    .AddUnboundArgument("bar")
+                    .AddParameter("foo")
+                    .AddParameter("bar")
                     .Build()
             },
 
@@ -269,7 +281,7 @@ namespace CliFx.Tests
                 new[] {"[preview]", "foo"},
                 new CommandLineInputBuilder()
                     .AddDirective("preview")
-                    .AddUnboundArgument("foo")
+                    .AddParameter("foo")
                     .Build()
             },
 
@@ -277,7 +289,7 @@ namespace CliFx.Tests
             {
                 new[] {"foo", "--option", "value", "-abc"},
                 new CommandLineInputBuilder()
-                    .AddUnboundArgument("foo")
+                    .AddParameter("foo")
                     .AddOption("option", "value")
                     .AddOption("a")
                     .AddOption("b")
@@ -291,8 +303,8 @@ namespace CliFx.Tests
                 new CommandLineInputBuilder()
                     .AddDirective("preview")
                     .AddDirective("debug")
-                    .AddUnboundArgument("foo")
-                    .AddUnboundArgument("bar")
+                    .AddParameter("foo")
+                    .AddParameter("bar")
                     .AddOption("option", "value")
                     .AddOption("a")
                     .AddOption("b")
@@ -302,11 +314,62 @@ namespace CliFx.Tests
         };
 
         [Theory]
-        [MemberData(nameof(UnboundArgumentsTestData))]
-        internal void Any_remaining_arguments_are_treated_as_unbound_arguments(string[] arguments, CommandLineInput expectedInput)
+        [MemberData(nameof(ParametersTestData))]
+        internal void Parameter_can_be_set_by_specifying_the_value_directly(IReadOnlyList<string> arguments, CommandLineInput expectedInput)
+        {
+            // Arrange
+            var commandNames = Array.Empty<string>();
+
+            // Act
+            var input = CommandLineInput.Parse(arguments, commandNames);
+
+            // Assert
+            input.Should().BeEquivalentTo(expectedInput);
+        }
+
+        public static object[][] CommandNameTestData => new[]
+        {
+            new object[]
+            {
+                new[] {"cmd"},
+                new[] {"cmd"},
+                new CommandLineInputBuilder()
+                    .SetCommandName("cmd")
+                    .Build()
+            },
+
+            new object[]
+            {
+                new[] {"cmd"},
+                new[] {"cmd", "foo", "bar", "-o", "value"},
+                new CommandLineInputBuilder()
+                    .SetCommandName("cmd")
+                    .AddParameter("foo")
+                    .AddParameter("bar")
+                    .AddOption("o", "value")
+                    .Build()
+            },
+
+            new object[]
+            {
+                new[] {"cmd", "cmd sub"},
+                new[] {"cmd", "sub", "foo"},
+                new CommandLineInputBuilder()
+                    .SetCommandName("cmd sub")
+                    .AddParameter("foo")
+                    .Build()
+            }
+        };
+
+        [Theory]
+        [MemberData(nameof(CommandNameTestData))]
+        internal void Command_name_is_matched_from_arguments_that_come_before_parameters(
+            IReadOnlyList<string> commandNames,
+            IReadOnlyList<string> arguments,
+            CommandLineInput expectedInput)
         {
             // Act
-            var input = CommandLineInput.Parse(arguments);
+            var input = CommandLineInput.Parse(arguments, commandNames);
 
             // Assert
             input.Should().BeEquivalentTo(expectedInput);

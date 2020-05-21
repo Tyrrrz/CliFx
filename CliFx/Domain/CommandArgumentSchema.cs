@@ -110,11 +110,11 @@ namespace CliFx.Domain
             }
         }
 
-        public void Inject(ICommand command, IReadOnlyList<string> values) =>
+        public void BindOn(ICommand command, IReadOnlyList<string> values) =>
             Property.SetValue(command, Convert(values));
 
-        public void Inject(ICommand command, params string[] values) =>
-            Inject(command, (IReadOnlyList<string>) values);
+        public void BindOn(ICommand command, params string[] values) =>
+            BindOn(command, (IReadOnlyList<string>) values);
 
         public IReadOnlyList<string> GetValidValues()
         {
