@@ -12,6 +12,11 @@ namespace CliFx.Internal
 
         public static string Quote(this string str) => $"\"{str}\"";
 
+        public static string QuoteIfContainsWhiteSpace(this string str) =>
+            str.Contains(' ')
+                ? str.Quote()
+                : str;
+
         public static string PrefixDashes(this string str) => str switch
         {
             {Length: 0} => str,

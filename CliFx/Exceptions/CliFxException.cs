@@ -402,20 +402,20 @@ Missing values for one or more required options:
             return new CliFxException(message.Trim(), showHelp: true);
         }
 
-        internal static CliFxException UnrecognizedParametersProvided(IReadOnlyList<string> parameterInputs)
+        internal static CliFxException UnrecognizedParametersProvided(IReadOnlyList<CommandParameterInput> parameterInputs)
         {
             var message = $@"
 Unrecognized parameters provided:
-{parameterInputs.Select(p => p.Quote()).JoinToString(" ")}";
+{parameterInputs.Select(p => p.Value.QuoteIfContainsWhiteSpace()).JoinToString(" ")}";
 
             return new CliFxException(message.Trim(), showHelp: true);
         }
 
-        internal static CliFxException UnrecognizedOptionsProvided(IReadOnlyList<KeyValuePair<string, IReadOnlyList<string>>> optionInputs)
+        internal static CliFxException UnrecognizedOptionsProvided(IReadOnlyList<CommandOptionInput> optionInputs)
         {
             var message = $@"
 Unrecognized options provided:
-{optionInputs.Select(o => o.Key.PrefixDashes()).JoinToString(Environment.NewLine)}";
+{optionInputs.Select(o => o.GetRawAlias()).JoinToString(Environment.NewLine)}";
 
             return new CliFxException(message.Trim(), showHelp: true);
         }

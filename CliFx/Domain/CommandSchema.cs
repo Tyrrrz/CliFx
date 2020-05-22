@@ -23,6 +23,10 @@ namespace CliFx.Domain
 
         public IReadOnlyList<CommandOptionSchema> Options { get; }
 
+        public bool IsHelpOptionAvailable => Options.Contains(CommandOptionSchema.HelpOption);
+
+        public bool IsVersionOptionAvailable => Options.Contains(CommandOptionSchema.VersionOption);
+
         public CommandSchema(
             Type type,
             string? name,
@@ -57,23 +61,17 @@ namespace CliFx.Domain
 
             foreach (var argument in GetArguments())
             {
-                var value = argument.Property.GetValue(instance);
-                result[argument] = value;
+                if (argument.Property != null)
+                {
+                    var value = argument.Property.GetValue(instance);
+                    result[argument] = value;
+                }
             }
 
             return result;
         }
 
-        public bool IsHelpOptionSpecified(CommandLineInput input) =>
-            Options.Contains(CommandOptionSchema.HelpOption) &&
-            (input.Options.Any(o => CommandOptionSchema.HelpOption.MatchesNameOrShortName(o.Key)) ||
-             IsDefault && !input.Parameters.Any() && !input.Options.Any());
-
-        public bool IsVersionOptionSpecified(CommandLineInput input) =>
-            Options.Contains(CommandOptionSchema.VersionOption) &&
-            input.Options.Any(o => CommandOptionSchema.VersionOption.MatchesNameOrShortName(o.Key));
-
-        private void BindParameters(ICommand instance, IReadOnlyList<string> parameterInputs)
+        private void BindParameters(ICommand instance, IReadOnlyList<CommandParameterInput> parameterInputs)
         {
             // All inputs must be bound
             var remainingParameterInputs = parameterInputs.ToList();
@@ -92,7 +90,7 @@ namespace CliFx.Domain
                     ? parameterInputs[i]
                     : throw CliFxException.ParameterNotSet(scalarParameter);
 
-                scalarParameter.BindOn(instance, scalarParameterInput);
+                scalarParameter.BindOn(instance, scalarParameterInput.Value);
                 remainingParameterInputs.Remove(scalarParameterInput);
             }
 
@@ -103,9 +101,12 @@ namespace CliFx.Domain
 
             if (nonScalarParameter != null)
             {
-                var nonScalarParameterInputs = parameterInputs.Skip(scalarParameters.Length).ToArray();
+                var nonScalarParameterValues = parameterInputs
+                    .Skip(scalarParameters.Length)
+                    .Select(p => p.Value)
+                    .ToArray();
 
-                nonScalarParameter.BindOn(instance, nonScalarParameterInputs);
+                nonScalarParameter.BindOn(instance, nonScalarParameterValues);
                 remainingParameterInputs.Clear();
             }
 
@@ -118,7 +119,7 @@ namespace CliFx.Domain
 
         private void BindOptions(
             ICommand instance,
-            IReadOnlyDictionary<string, IReadOnlyList<string>> optionInputs,
+            IReadOnlyList<CommandOptionInput> optionInputs,
             IReadOnlyDictionary<string, string> environmentVariables)
         {
             // All inputs must be bound
@@ -148,12 +149,12 @@ namespace CliFx.Domain
             foreach (var option in Options)
             {
                 var inputs = optionInputs
-                    .Where(i => option.MatchesNameOrShortName(i.Key))
+                    .Where(i => option.MatchesNameOrShortName(i.Alias))
                     .ToArray();
 
                 if (inputs.Any())
                 {
-                    var inputValues = inputs.SelectMany(i => i.Value).ToArray();
+                    var inputValues = inputs.SelectMany(i => i.Values).ToArray();
                     option.BindOn(instance, inputValues);
 
                     foreach (var input in inputs)
@@ -210,7 +211,7 @@ namespace CliFx.Domain
 
             var name = attribute?.Name;
 
-            var builtInOptions = !string.IsNullOrWhiteSpace(name)
+            var builtInOptions = string.IsNullOrWhiteSpace(name)
                 ? new[] {CommandOptionSchema.HelpOption, CommandOptionSchema.VersionOption}
                 : new[] {CommandOptionSchema.HelpOption};
 

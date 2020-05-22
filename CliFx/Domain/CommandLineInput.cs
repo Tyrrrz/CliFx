@@ -1,38 +1,84 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using CliFx.Internal;
 
 namespace CliFx.Domain
 {
     internal partial class CommandLineInput
     {
-        public IReadOnlyList<string> Directives { get; }
+        public IReadOnlyList<CommandDirectiveInput> Directives { get; }
 
         public string? CommandName { get; }
 
-        public IReadOnlyList<string> Parameters { get; }
+        public IReadOnlyList<CommandParameterInput> Parameters { get; }
 
-        public IReadOnlyDictionary<string, IReadOnlyList<string>> Options { get; }
+        public IReadOnlyList<CommandOptionInput> Options { get; }
+
+        public bool IsDebugDirectiveSpecified => Directives.Any(d => d.IsDebugDirective);
+
+        public bool IsPreviewDirectiveSpecified => Directives.Any(d => d.IsPreviewDirective);
+
+        public bool IsHelpOptionSpecified => Options.Any(o => o.IsHelpOption);
+
+        public bool IsVersionOptionSpecified => Options.Any(o => o.IsVersionOption);
 
         public CommandLineInput(
-            IReadOnlyList<string> directives,
+            IReadOnlyList<CommandDirectiveInput> directives,
             string? commandName,
-            IReadOnlyList<string> parameters,
-            IReadOnlyDictionary<string, IReadOnlyList<string>> options)
+            IReadOnlyList<CommandParameterInput> parameters,
+            IReadOnlyList<CommandOptionInput> options)
         {
             Directives = directives;
             CommandName = commandName;
             Parameters = parameters;
             Options = options;
         }
+
+        public override string ToString()
+        {
+            var buffer = new StringBuilder();
+
+            foreach (var directive in Directives)
+            {
+                buffer
+                    .AppendIfNotEmpty(' ')
+                    .Append(directive);
+            }
+
+            if (!string.IsNullOrWhiteSpace(CommandName))
+            {
+                buffer
+                    .AppendIfNotEmpty(' ')
+                    .Append(CommandName);
+            }
+
+            foreach (var parameter in Parameters)
+            {
+                buffer
+                    .AppendIfNotEmpty(' ')
+                    .Append(parameter);
+            }
+
+            foreach (var option in Options)
+            {
+                buffer
+                    .AppendIfNotEmpty(' ')
+                    .Append(option);
+            }
+
+            return buffer.ToString();
+        }
     }
 
     internal partial class CommandLineInput
     {
-        private static IReadOnlyList<string> ParseDirectives(IReadOnlyList<string> commandLineArguments, ref int index)
+        private static IReadOnlyList<CommandDirectiveInput> ParseDirectives(
+            IReadOnlyList<string> commandLineArguments,
+            ref int index)
         {
-            var result = new List<string>();
+            var result = new List<CommandDirectiveInput>();
 
             for (; index < commandLineArguments.Count; index++)
             {
@@ -41,7 +87,7 @@ namespace CliFx.Domain
                 if (argument.StartsWith('[') && argument.EndsWith(']'))
                 {
                     var directive = argument.Substring(1, argument.Length - 2);
-                    result.Add(directive);
+                    result.Add(new CommandDirectiveInput(directive));
                 }
                 else
                 {
@@ -52,7 +98,10 @@ namespace CliFx.Domain
             return result;
         }
 
-        private static string? ParseCommandName(IReadOnlyList<string> commandLineArguments, ISet<string> commandNames, ref int index)
+        private static string? ParseCommandName(
+            IReadOnlyList<string> commandLineArguments,
+            ISet<string> commandNames,
+            ref int index)
         {
             var buffer = new List<string>();
 
@@ -80,9 +129,11 @@ namespace CliFx.Domain
             return commandName;
         }
 
-        private static IReadOnlyList<string> ParseParameters(IReadOnlyList<string> commandLineArguments, ref int index)
+        private static IReadOnlyList<CommandParameterInput> ParseParameters(
+            IReadOnlyList<string> commandLineArguments,
+            ref int index)
         {
-            var result = new List<string>();
+            var result = new List<CommandParameterInput>();
 
             for (; index < commandLineArguments.Count; index++)
             {
@@ -90,7 +141,7 @@ namespace CliFx.Domain
 
                 if (!argument.StartsWith('-'))
                 {
-                    result.Add(argument);
+                    result.Add(new CommandParameterInput(argument));
                 }
                 else
                 {
@@ -101,11 +152,12 @@ namespace CliFx.Domain
             return result;
         }
 
-        private static IReadOnlyDictionary<string, IReadOnlyList<string>> ParseOptions(
+        private static IReadOnlyList<CommandOptionInput> ParseOptions(
             IReadOnlyList<string> commandLineArguments, ref int index)
         {
-            var result = new Dictionary<string, List<string>>();
+            var result = new List<CommandOptionInput>();
 
+            var currentOptionAlias = default(string?);
             var currentOptionValues = new List<string>();
 
             for (; index < commandLineArguments.Count; index++)
@@ -115,25 +167,38 @@ namespace CliFx.Domain
                 // Name
                 if (argument.StartsWith("--", StringComparison.Ordinal))
                 {
-                    var alias = argument.Substring(2);
-                    currentOptionValues = result[alias] ??= new List<string>();
+                    // Flush previous
+                    if (!string.IsNullOrWhiteSpace(currentOptionAlias))
+                        result.Add(new CommandOptionInput(currentOptionAlias, currentOptionValues));
+
+                    currentOptionAlias = argument.Substring(2);
+                    currentOptionValues = new List<string>();
                 }
                 // Short name
                 else if (argument.StartsWith('-'))
                 {
                     foreach (var alias in argument.Substring(1))
                     {
-                        currentOptionValues = result[alias.AsString()] ??= new List<string>();
+                        // Flush previous
+                        if (!string.IsNullOrWhiteSpace(currentOptionAlias))
+                            result.Add(new CommandOptionInput(currentOptionAlias, currentOptionValues));
+
+                        currentOptionAlias = alias.AsString();
+                        currentOptionValues = new List<string>();
                     }
                 }
                 // Value
-                else
+                else if (!string.IsNullOrWhiteSpace(currentOptionAlias))
                 {
                     currentOptionValues.Add(argument);
                 }
             }
 
-            return (IReadOnlyDictionary<string, IReadOnlyList<string>>) result;
+            // Flush last option
+            if (!string.IsNullOrWhiteSpace(currentOptionAlias))
+                result.Add(new CommandOptionInput(currentOptionAlias, currentOptionValues));
+
+            return result;
         }
 
         public static CommandLineInput Parse(IReadOnlyList<string> commandLineArguments, IReadOnlyList<string> availableCommandNames)
@@ -170,10 +235,10 @@ namespace CliFx.Domain
     internal partial class CommandLineInput
     {
         public static CommandLineInput Empty { get; } = new CommandLineInput(
-            Array.Empty<string>(),
+            Array.Empty<CommandDirectiveInput>(),
             null,
-            Array.Empty<string>(),
-            new Dictionary<string, IReadOnlyList<string>>()
+            Array.Empty<CommandParameterInput>(),
+            Array.Empty<CommandOptionInput>()
         );
     }
 }

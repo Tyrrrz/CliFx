@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using CliFx.Domain;
 using CliFx.Exceptions;
 using FluentAssertions;
@@ -225,7 +226,8 @@ namespace CliFx.Tests
                             'o',
                             "ENV",
                             false,
-                            "Option description")
+                            "Option description"),
+                        CommandOptionSchema.HelpOption
                     })
             }));
 

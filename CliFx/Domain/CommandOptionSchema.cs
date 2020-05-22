@@ -73,7 +73,7 @@ namespace CliFx.Domain
             return buffer.ToString();
         }
 
-        public string GetInternalDisplayString() => $"{Property.Name} ('{GetUserFacingDisplayString()}')";
+        public string GetInternalDisplayString() => $"{Property?.Name ?? "<implicit>"} ('{GetUserFacingDisplayString()}')";
 
         public override string ToString() => GetInternalDisplayString();
     }

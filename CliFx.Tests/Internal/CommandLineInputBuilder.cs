@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using CliFx.Domain;
 
 namespace CliFx.Tests.Internal
 {
     internal class CommandLineInputBuilder
     {
-        private readonly List<string> _directives = new List<string>();
-        private readonly List<string> _parameters = new List<string>();
-        private readonly List<KeyValuePair<string, IReadOnlyList<string>>> _options = new List<KeyValuePair<string, IReadOnlyList<string>>>();
+        private readonly List<CommandDirectiveInput> _directives = new List<CommandDirectiveInput>();
+        private readonly List<CommandParameterInput> _parameters = new List<CommandParameterInput>();
+        private readonly List<CommandOptionInput> _options = new List<CommandOptionInput>();
 
         private string? _commandName;
 
@@ -20,19 +19,19 @@ namespace CliFx.Tests.Internal
 
         public CommandLineInputBuilder AddDirective(string directive)
         {
-            _directives.Add(directive);
+            _directives.Add(new CommandDirectiveInput(directive));
             return this;
         }
 
         public CommandLineInputBuilder AddParameter(string parameter)
         {
-            _parameters.Add(parameter);
+            _parameters.Add(new CommandParameterInput(parameter));
             return this;
         }
 
         public CommandLineInputBuilder AddOption(string alias, params string[] values)
         {
-            _options.Add(KeyValuePair.Create<string, IReadOnlyList<string>>(alias, values));
+            _options.Add(new CommandOptionInput(alias, values));
             return this;
         }
 
@@ -40,7 +39,7 @@ namespace CliFx.Tests.Internal
             _directives,
             _commandName,
             _parameters,
-            _options.ToDictionary(kvp => kvp.Key, kvp => kvp.Value)
+            _options
         );
     }
 }

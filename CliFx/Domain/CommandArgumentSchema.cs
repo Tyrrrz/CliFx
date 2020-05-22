@@ -11,20 +11,20 @@ namespace CliFx.Domain
 {
     internal abstract partial class CommandArgumentSchema
     {
-        public PropertyInfo Property { get; }
+        public PropertyInfo? Property { get; }
 
         public string? Description { get; }
 
         public bool IsScalar => TryGetEnumerableArgumentUnderlyingType() == null;
 
-        protected CommandArgumentSchema(PropertyInfo property, string? description)
+        protected CommandArgumentSchema(PropertyInfo? property, string? description)
         {
             Property = property;
             Description = description;
         }
 
         private Type? TryGetEnumerableArgumentUnderlyingType() =>
-            Property.PropertyType != typeof(string)
+            Property != null && Property.PropertyType != typeof(string)
                 ? Property.PropertyType.GetEnumerableUnderlyingType()
                 : null;
 
@@ -93,6 +93,9 @@ namespace CliFx.Domain
 
         private object? Convert(IReadOnlyList<string> values)
         {
+            if (Property == null)
+                return null;
+
             var targetType = Property.PropertyType;
             var enumerableUnderlyingType = TryGetEnumerableArgumentUnderlyingType();
 
@@ -111,7 +114,7 @@ namespace CliFx.Domain
         }
 
         public void BindOn(ICommand command, IReadOnlyList<string> values) =>
-            Property.SetValue(command, Convert(values));
+            Property?.SetValue(command, Convert(values));
 
         public void BindOn(ICommand command, params string[] values) =>
             BindOn(command, (IReadOnlyList<string>) values);

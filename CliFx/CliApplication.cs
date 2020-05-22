@@ -76,22 +76,20 @@ namespace CliFx
             }
 
             // Options
-            foreach (var (alias, values) in input.Options)
+            foreach (var option in input.Options)
             {
                 _console.Output.Write('[');
 
                 _console.WithForegroundColor(ConsoleColor.White, () =>
                 {
                     // Alias
-                    _console.Output.Write(alias.PrefixDashes());
+                    _console.Output.Write(option.GetRawAlias());
 
                     // Values
-                    foreach (var value in values)
+                    if (option.Values.Any())
                     {
                         _console.Output.Write(' ');
-                        _console.Output.Write('"');
-                        _console.Output.Write(value);
-                        _console.Output.Write('"');
+                        _console.Output.Write(option.GetRawValues());
                     }
                 });
 
@@ -101,14 +99,6 @@ namespace CliFx
 
             _console.Output.WriteLine();
         }
-
-        private bool IsDebugDirectiveSpecified(CommandLineInput input) =>
-            _configuration.IsDebugModeAllowed &&
-            input.Directives.Any(d => string.Equals(d, "debug", StringComparison.OrdinalIgnoreCase));
-
-        private bool IsPreviewDirectiveSpecified(CommandLineInput input) =>
-            _configuration.IsPreviewModeAllowed &&
-            input.Directives.Any(d => string.Equals(d, "preview", StringComparison.OrdinalIgnoreCase));
 
         private ICommand GetCommandInstance(CommandSchema commandSchema) =>
             commandSchema != StubDefaultCommand.Schema
@@ -133,14 +123,14 @@ namespace CliFx
                 var input = CommandLineInput.Parse(commandLineArguments, applicationSchema.GetCommandNames());
 
                 // Debug mode
-                if (IsDebugDirectiveSpecified(input))
+                if (_configuration.IsDebugModeAllowed && input.IsDebugDirectiveSpecified)
                 {
                     // Ensure debugger is attached and continue
                     await WaitForDebuggerAsync();
                 }
 
                 // Preview mode
-                if (IsPreviewDirectiveSpecified(input))
+                if (_configuration.IsPreviewModeAllowed && input.IsPreviewDirectiveSpecified)
                 {
                     WriteCommandLineInput(input);
                     return ExitCode.Success;
@@ -153,7 +143,7 @@ namespace CliFx
                     StubDefaultCommand.Schema;
 
                 // Version option
-                if (command.IsVersionOptionSpecified(input))
+                if (command.IsVersionOptionAvailable && input.IsVersionOptionSpecified)
                 {
                     _console.Output.WriteLine(_metadata.VersionText);
                     return ExitCode.Success;
@@ -167,17 +157,19 @@ namespace CliFx
                 var defaultValues = command.GetArgumentValues(instance);
 
                 // Help option
-                if (command.IsHelpOptionSpecified(input))
+                if (command.IsHelpOptionAvailable && input.IsHelpOptionSpecified)
                 {
                     _helpTextWriter.Write(applicationSchema, command, defaultValues);
                     return ExitCode.Success;
                 }
 
-                // Bind actual values from arguments
-                command.Bind(instance, input, environmentVariables);
-
+                // Everything in this scope may throw an exception which is directed at the end user
+                // so we want to handle it a nice way
                 try
                 {
+                    // Bind actual values from arguments
+                    command.Bind(instance, input, environmentVariables);
+
                     // Execute the command
                     await instance.ExecuteAsync(_console);
                     return ExitCode.Success;
@@ -200,7 +192,7 @@ namespace CliFx
             // we handle all exceptions and write them to the console nicely.
             // However, we don't want to swallow unhandled exceptions when the debugger is attached,
             // because we still want the IDE to show unhandled exceptions so that the dev can fix them.
-            catch (Exception ex) when (!Debugger.IsAttached)
+            catch (Exception ex) when (ShouldSwallowAllExceptions())
             {
                 WriteError(ex.ToString());
                 return ExitCode.FromException(ex);
@@ -246,6 +238,15 @@ namespace CliFx
 
     public partial class CliApplication
     {
+        private static bool ShouldSwallowAllExceptions()
+        {
+#if DEBUG
+            return false;
+#else
+            return !Debugger.IsAttached
+#endif
+        }
+
         private static class ExitCode
         {
             public const int Success = 0;
@@ -261,7 +262,8 @@ namespace CliFx
         {
             public static CommandSchema Schema { get; } = CommandSchema.TryResolve(typeof(StubDefaultCommand))!;
 
-            public ValueTask ExecuteAsync(IConsole console) => throw new CliFxException(showHelp: true);
+            // Just write help text
+            public ValueTask ExecuteAsync(IConsole console) => throw new CliFxException(0, true);
         }
     }
 }

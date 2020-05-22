@@ -5,8 +5,13 @@
 #if NETSTANDARD2_0
 namespace System
 {
+    using Linq;
+
     internal static class Extensions
     {
+        public static bool Contains(this string str, char c) =>
+            str.Any(i => i == c);
+
         public static bool StartsWith(this string str, char c) =>
             str.Length > 0 && str[0] == c;
 
@@ -27,7 +32,15 @@ namespace System.Collections.Generic
 
         public static TValue GetValueOrDefault<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dic, TKey key) =>
             dic.TryGetValue(key, out var result) ? result! : default!;
+    }
+}
 
+namespace System.Linq
+{
+    using Collections.Generic;
+
+    internal static class Extensions
+    {
         public static HashSet<T> ToHashSet<T>(this IEnumerable<T> source, IEqualityComparer<T> comparer) =>
             new HashSet<T>(source, comparer);
     }
