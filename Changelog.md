@@ -1,3 +1,11 @@
+### v1.3 (23-May-2020)
+
+- Changed analyzers to report errors instead of warnings. If you find that some analyzer works incorrectly, please report it on GitHub. You can also configure inspection severity overrides in your project if you need to.
+- Improved help text by showing default values for non-required options. This only works on types that have a custom override for `ToString()` method. Additionally, if the type implements `IFormattable`, the overload with a format provider will be used instead. (Thanks [@Domn Werner](https://github.com/domn1995))
+- Changed default version text to only show 3 version components instead of 4, if the last component (revision) is not specified or is zero. This makes the default version text compliant with semantic versioning.
+- Fixed an issue where it was possible to define a command with an option that has the same name or short name as built-in help or version options. Previously it would lead to the user-defined option being ignored in favor of the built-in option. Now this will throw an exception instead.
+- Changed the underlying representation of `StreamReader`/`StreamWriter` objects used in `SystemConsole` and `VirtualConsole` to be thread-safe.
+
 ### v1.2 (11-May-2020)
 
 - Added built-in Roslyn analyzers that help catch incorrect usage of the library. Currently, all analyzers report issues as warnings so as to not prevent the project from building. In the future that may change.
