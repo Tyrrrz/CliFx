@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -121,12 +120,10 @@ namespace CliFx.Domain
 
         public IReadOnlyList<string> GetValidValues()
         {
-            var result = new List<string>();
-
-            // Some arguments may have this as null due to a hack that enables built-in options
-            // TODO fix this
             if (Property == null)
-                return result;
+                return Array.Empty<string>();
+
+            var result = new List<string>();
 
             var underlyingType =
                 Property.PropertyType.GetNullableUnderlyingType() ?? Property.PropertyType;
@@ -136,38 +133,6 @@ namespace CliFx.Domain
                 result.AddRange(Enum.GetNames(underlyingType));
 
             return result;
-        }
-
-        public string? TryGetDefaultValue(ICommand instance)
-        {
-            // Some arguments may have this as null due to a hack that enables built-in options
-            // TODO fix this
-            if (Property == null)
-                return null;
-
-            var rawDefaultValue = Property.GetValue(instance);
-
-            if (!(rawDefaultValue is string) && rawDefaultValue is IEnumerable rawDefaultValues)
-            {
-                var elementType = rawDefaultValues.GetType().GetEnumerableUnderlyingType() ?? typeof(object);
-
-                return elementType.IsToStringOverriden()
-                    ? rawDefaultValues
-                        .Cast<object?>()
-                        .Where(o => o != null)
-                        .Select(o => o!.ToFormattableString(FormatProvider).Quote())
-                        .JoinToString(" ")
-                    : null;
-            }
-
-            if (rawDefaultValue != null && !Equals(rawDefaultValue, rawDefaultValue.GetType().GetDefaultValue()))
-            {
-                return rawDefaultValue.GetType().IsToStringOverriden()
-                    ? rawDefaultValue.ToFormattableString(FormatProvider).Quote()
-                    : null;
-            }
-
-            return null;
         }
     }
 

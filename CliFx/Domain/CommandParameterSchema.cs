@@ -10,7 +10,7 @@ namespace CliFx.Domain
 
         public string Name { get; }
 
-        public CommandParameterSchema(PropertyInfo property, int order, string name, string? description)
+        public CommandParameterSchema(PropertyInfo? property, int order, string name, string? description)
             : base(property, description)
         {
             Order = order;
@@ -29,7 +29,7 @@ namespace CliFx.Domain
             return buffer.ToString();
         }
 
-        public string GetInternalDisplayString() => $"{Property.Name} ([{Order}] {GetUserFacingDisplayString()})";
+        public string GetInternalDisplayString() => $"{Property?.Name ?? "<implicit>"} ([{Order}] {GetUserFacingDisplayString()})";
 
         public override string ToString() => GetInternalDisplayString();
     }

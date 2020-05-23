@@ -184,6 +184,28 @@ namespace CliFx.Tests
         }
 
         [Fact]
+        public void Command_options_must_not_have_conflicts_with_the_implicit_help_option()
+        {
+            // Arrange
+            var commandTypes = new[] {typeof(ConflictWithHelpOptionCommand)};
+
+            // Act & assert
+            var ex = Assert.Throws<CliFxException>(() => ApplicationSchema.Resolve(commandTypes));
+            _output.WriteLine(ex.Message);
+        }
+
+        [Fact]
+        public void Command_options_must_not_have_conflicts_with_the_implicit_version_option()
+        {
+            // Arrange
+            var commandTypes = new[] {typeof(ConflictWithVersionOptionCommand)};
+
+            // Act & assert
+            var ex = Assert.Throws<CliFxException>(() => ApplicationSchema.Resolve(commandTypes));
+            _output.WriteLine(ex.Message);
+        }
+
+        [Fact]
         public void Command_options_must_have_unique_environment_variable_names()
         {
             // Arrange

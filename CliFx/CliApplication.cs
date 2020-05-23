@@ -35,7 +35,7 @@ namespace CliFx
             _console = console;
             _typeActivator = typeActivator;
 
-            _helpTextWriter = new HelpTextWriter(metadata, console, typeActivator);
+            _helpTextWriter = new HelpTextWriter(metadata, console);
         }
 
         private void WriteError(string message) => _console.WithForegroundColor(ConsoleColor.Red, () =>
@@ -192,7 +192,7 @@ namespace CliFx
             // we handle all exceptions and write them to the console nicely.
             // However, we don't want to swallow unhandled exceptions when the debugger is attached,
             // because we still want the IDE to show unhandled exceptions so that the dev can fix them.
-            catch (Exception ex) when (ShouldSwallowAllExceptions())
+            catch (Exception ex) when (!Debugger.IsAttached)
             {
                 WriteError(ex.ToString());
                 return ExitCode.FromException(ex);
@@ -238,15 +238,6 @@ namespace CliFx
 
     public partial class CliApplication
     {
-        private static bool ShouldSwallowAllExceptions()
-        {
-#if DEBUG
-            return false;
-#else
-            return !Debugger.IsAttached
-#endif
-        }
-
         private static class ExitCode
         {
             public const int Success = 0;

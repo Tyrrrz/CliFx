@@ -119,6 +119,24 @@ namespace CliFx.Tests
         }
 
         [Command]
+        private class ConflictWithHelpOptionCommand : ICommand
+        {
+            [CommandOption("option-h", 'h')]
+            public string? OptionH { get; set; }
+
+            public ValueTask ExecuteAsync(IConsole console) => default;
+        }
+
+        [Command]
+        private class ConflictWithVersionOptionCommand : ICommand
+        {
+            [CommandOption("version")]
+            public string? Version { get; set; }
+
+            public ValueTask ExecuteAsync(IConsole console) => default;
+        }
+
+        [Command]
         private class DuplicateOptionEnvironmentVariableNamesCommand : ICommand
         {
             [CommandOption("option-a", EnvironmentVariableName = "ENV_VAR")]

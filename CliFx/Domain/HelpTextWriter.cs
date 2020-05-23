@@ -1,26 +1,26 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using CliFx.Internal;
 
 namespace CliFx.Domain
 {
-    internal class HelpTextWriter
+    internal partial class HelpTextWriter
     {
         private readonly ApplicationMetadata _metadata;
         private readonly IConsole _console;
-        private readonly ITypeActivator _typeActivator;
 
         private int _column;
         private int _row;
 
         private bool IsEmpty => _column == 0 && _row == 0;
 
-        public HelpTextWriter(ApplicationMetadata metadata, IConsole console, ITypeActivator typeActivator)
+        public HelpTextWriter(ApplicationMetadata metadata, IConsole console)
         {
             _metadata = metadata;
             _console = console;
-            _typeActivator = typeActivator;
         }
 
         private void Write(char value)
@@ -260,11 +260,10 @@ namespace CliFx.Domain
                 // Default value
                 if (!optionSchema.IsRequired)
                 {
-                    // TODO: move quoting logic here?
                     var defaultValue = argumentDefaultValues.GetValueOrDefault(optionSchema);
-                    if (defaultValue != null && !defaultValue.IsTypeDefaultValue())
+                    if (defaultValue != null)
                     {
-                        Write($"Default: {defaultValue}.");
+                        Write($"Default: {FormatDefaultValue(defaultValue)}.");
                     }
                 }
 
@@ -341,6 +340,37 @@ namespace CliFx.Domain
             WriteCommandParameters(commandSchema);
             WriteCommandOptions(commandSchema, argumentDefaultValues);
             WriteCommandChildren(commandSchema, childCommandSchemas);
+        }
+    }
+
+    internal partial class HelpTextWriter
+    {
+        private static string? FormatDefaultValue(object defaultValue)
+        {
+            // Enumerable
+            if (!(defaultValue is string) && defaultValue is IEnumerable defaultValues)
+            {
+                var elementType = defaultValues.GetType().GetEnumerableUnderlyingType() ?? typeof(object);
+
+                // If the ToString() method is not overriden, we can't format it
+                if (!elementType.IsToStringOverriden())
+                    return null;
+
+                return defaultValues
+                    .Cast<object?>()
+                    .Where(o => o != null)
+                    .Select(o => o!.ToFormattableString(CultureInfo.InvariantCulture).Quote())
+                    .JoinToString(" ");
+            }
+            // Non-enumerable
+            else
+            {
+                // If the ToString() method is not overriden, we can't format it
+                if (!defaultValue.GetType().IsToStringOverriden())
+                    return null;
+
+                return defaultValue.ToFormattableString(CultureInfo.InvariantCulture).Quote();
+            }
         }
     }
 }

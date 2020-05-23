@@ -17,7 +17,7 @@ namespace CliFx.Domain
         public bool IsRequired { get; }
 
         public CommandOptionSchema(
-            PropertyInfo property,
+            PropertyInfo? property,
             string? name,
             char? shortName,
             string? environmentVariableName,
@@ -86,9 +86,12 @@ namespace CliFx.Domain
             if (attribute == null)
                 return null;
 
+            // The user may mistakenly specify dashes, thinking it's required, so trim them
+            var name = attribute.Name?.TrimStart('-');
+
             return new CommandOptionSchema(
                 property,
-                attribute.Name,
+                name,
                 attribute.ShortName,
                 attribute.EnvironmentVariableName,
                 attribute.IsRequired,
@@ -100,9 +103,9 @@ namespace CliFx.Domain
     internal partial class CommandOptionSchema
     {
         public static CommandOptionSchema HelpOption { get; } =
-            new CommandOptionSchema(null!, "help", 'h', null, false, "Shows help text.");
+            new CommandOptionSchema(null, "help", 'h', null, false, "Shows help text.");
 
         public static CommandOptionSchema VersionOption { get; } =
-            new CommandOptionSchema(null!, "version", null, null, false, "Shows version information.");
+            new CommandOptionSchema(null, "version", null, null, false, "Shows version information.");
     }
 }

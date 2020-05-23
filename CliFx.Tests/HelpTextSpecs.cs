@@ -230,11 +230,11 @@ namespace CliFx.Tests
             // Assert
             stdOutData.Should().ContainAll(
                 "Usage",
-                "cmd-with-req-opts", "--option-f <value>", "--option-g <values...>", "[options]",
+                "cmd-with-req-opts", "--option-a <value>", "--option-b <values...>", "[options]",
                 "Options",
-                "* -f|--option-f",
-                "* -g|--option-g",
-                "-h|--option-h"
+                "* -a|--option-a",
+                "* -b|--option-b",
+                "-c|--option-c"
             );
 
             _output.WriteLine(stdOutData);
