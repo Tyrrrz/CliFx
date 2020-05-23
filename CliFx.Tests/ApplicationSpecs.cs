@@ -31,10 +31,10 @@ namespace CliFx.Tests
         {
             // Act
             var app = new CliApplicationBuilder()
-                .AddCommand(typeof(ValidCommand))
-                .AddCommandsFrom(typeof(ValidCommand).Assembly)
-                .AddCommands(new[] {typeof(ValidCommand)})
-                .AddCommandsFrom(new[] {typeof(ValidCommand).Assembly})
+                .AddCommand(typeof(DefaultCommand))
+                .AddCommandsFrom(typeof(DefaultCommand).Assembly)
+                .AddCommands(new[] {typeof(DefaultCommand)})
+                .AddCommandsFrom(new[] {typeof(DefaultCommand).Assembly})
                 .AddCommandsFromThisAssembly()
                 .AllowDebugMode()
                 .AllowPreviewMode()
@@ -88,6 +88,17 @@ namespace CliFx.Tests
         {
             // Arrange
             var commandTypes = new[] {typeof(DuplicateNameCommandA), typeof(DuplicateNameCommandB)};
+
+            // Act & assert
+            var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes));
+            _output.WriteLine(ex.Message);
+        }
+
+        [Fact]
+        public void Command_can_be_default_but_only_if_it_is_the_only_such_command()
+        {
+            // Arrange
+            var commandTypes = new[] {typeof(DefaultCommand), typeof(AnotherDefaultCommand)};
 
             // Act & assert
             var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes));

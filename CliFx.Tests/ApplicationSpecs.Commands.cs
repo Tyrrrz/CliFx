@@ -7,6 +7,18 @@ namespace CliFx.Tests
     public partial class ApplicationSpecs
     {
         [Command]
+        private class DefaultCommand : ICommand
+        {
+            public ValueTask ExecuteAsync(IConsole console) => default;
+        }
+
+        [Command]
+        private class AnotherDefaultCommand : ICommand
+        {
+            public ValueTask ExecuteAsync(IConsole console) => default;
+        }
+
+        [Command]
         private class NonImplementedCommand
         {
         }
@@ -145,12 +157,6 @@ namespace CliFx.Tests
             [CommandOption("option-b", EnvironmentVariableName = "ENV_VAR")]
             public string? OptionB { get; set; }
 
-            public ValueTask ExecuteAsync(IConsole console) => default;
-        }
-
-        [Command]
-        private class ValidCommand : ICommand
-        {
             public ValueTask ExecuteAsync(IConsole console) => default;
         }
 
