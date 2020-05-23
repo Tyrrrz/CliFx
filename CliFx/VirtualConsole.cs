@@ -94,12 +94,12 @@ namespace CliFx
     {
         private static StreamReader WrapInput(Stream? stream) =>
             stream != null
-                ? new StreamReader(stream, Console.InputEncoding, false)
+                ? new StreamReader(Stream.Synchronized(stream), Console.InputEncoding, false)
                 : StreamReader.Null;
 
         private static StreamWriter WrapOutput(Stream? stream) =>
             stream != null
-                ? new StreamWriter(stream, Console.OutputEncoding) {AutoFlush = true}
+                ? new StreamWriter(Stream.Synchronized(stream), Console.OutputEncoding) {AutoFlush = true}
                 : StreamWriter.Null;
     }
 }
