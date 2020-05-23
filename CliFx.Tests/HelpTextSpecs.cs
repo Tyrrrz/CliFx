@@ -241,7 +241,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Help_text_shows_usage_format_which_lists_all_valid_values_for_enum_arguments()
+        public async Task Help_text_lists_all_valid_values_for_enum_arguments()
         {
             // Arrange
             await using var stdOut = new MemoryStream();
@@ -253,7 +253,7 @@ namespace CliFx.Tests
                 .Build();
 
             // Act
-            await application.RunAsync(new[] { "cmd-with-enum-args", "--help" });
+            await application.RunAsync(new[] {"cmd-with-enum-args", "--help"});
             var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
 
             // Assert
@@ -297,7 +297,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Help_text_shows_usage_format_which_lists_all_default_values_for_non_required_options()
+        public async Task Help_text_shows_default_values_for_non_required_options()
         {
             // Arrange
             await using var stdOut = new MemoryStream();
@@ -309,7 +309,7 @@ namespace CliFx.Tests
                 .Build();
 
             // Act
-            await application.RunAsync(new[] { "cmd-with-defaults", "--help" });
+            await application.RunAsync(new[] {"cmd-with-defaults", "--help"});
             var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
 
             // Assert

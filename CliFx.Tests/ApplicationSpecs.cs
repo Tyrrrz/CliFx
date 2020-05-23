@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using CliFx.Domain;
 using CliFx.Exceptions;
 using FluentAssertions;
