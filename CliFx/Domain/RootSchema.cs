@@ -6,11 +6,11 @@ using CliFx.Internal;
 
 namespace CliFx.Domain
 {
-    internal partial class ApplicationSchema
+    internal partial class RootSchema
     {
         public IReadOnlyList<CommandSchema> Commands { get; }
 
-        public ApplicationSchema(IReadOnlyList<CommandSchema> commands)
+        public RootSchema(IReadOnlyList<CommandSchema> commands)
         {
             Commands = commands;
         }
@@ -33,10 +33,10 @@ namespace CliFx.Domain
                 return null;
 
             // Try to find the parent command by repeatedly biting off chunks of its name
-            var route = childCommandName.Split(' ');
-            for (var i = route.Length - 1; i >= 1; i--)
+            var components = childCommandName.Split(' ');
+            for (var i = components.Length - 1; i >= 1; i--)
             {
-                var potentialParentCommandName = string.Join(" ", route.Take(i));
+                var potentialParentCommandName = components.Take(i).JoinToString(" ");
                 var matchingParentCommand = Commands.FirstOrDefault(c => c.MatchesName(potentialParentCommandName));
 
                 if (matchingParentCommand != null)
@@ -44,18 +44,43 @@ namespace CliFx.Domain
             }
 
             // If there's no parent - fall back to default command
-            return Commands.FirstOrDefault(c => c.IsDefault);
+            return TryFindDefaultCommand();
         }
 
-        public IReadOnlyList<CommandSchema> GetChildCommands(string? parentCommandName) =>
-            !string.IsNullOrWhiteSpace(parentCommandName) || Commands.Any(c => c.IsDefault)
-                ? Commands.Where(c => TryFindParentCommand(c.Name)?.MatchesName(parentCommandName) == true).ToArray()
-                : Commands.Where(c => !string.IsNullOrWhiteSpace(c.Name) && TryFindParentCommand(c.Name) == null).ToArray();
+        private IReadOnlyList<CommandSchema> GetDescendantCommands(
+            IReadOnlyList<CommandSchema> potentialParentCommands,
+            string? parentCommandName) =>
+            potentialParentCommands
+                // Default commands can't be children of anything
+                .Where(c => !string.IsNullOrWhiteSpace(c.Name))
+                // Command can't be its own child
+                .Where(c => !c.MatchesName(parentCommandName))
+                .Where(c =>
+                    string.IsNullOrWhiteSpace(parentCommandName) ||
+                    c.Name!.StartsWith(parentCommandName + ' ', StringComparison.OrdinalIgnoreCase))
+                .ToArray();
 
-        public override string ToString() => Commands.JoinToString(Environment.NewLine);
+        public IReadOnlyList<CommandSchema> GetDescendantCommands(string? parentCommandName) =>
+            GetDescendantCommands(Commands, parentCommandName);
+
+        public IReadOnlyList<CommandSchema> GetChildCommands(string? parentCommandName)
+        {
+            var descendants = GetDescendantCommands(parentCommandName);
+
+            // Filter out descendants of descendants, leave only children
+            var result = new List<CommandSchema>(descendants);
+
+            foreach (var descendant in descendants)
+            {
+                var descendantOfDescendants = GetDescendantCommands(descendants, descendant.Name);
+                result.RemoveRange(descendantOfDescendants);
+            }
+
+            return result;
+        }
     }
 
-    internal partial class ApplicationSchema
+    internal partial class RootSchema
     {
         private static void ValidateParameters(CommandSchema command)
         {
@@ -204,7 +229,7 @@ namespace CliFx.Domain
             }
         }
 
-        public static ApplicationSchema Resolve(IReadOnlyList<Type> commandTypes)
+        public static RootSchema Resolve(IReadOnlyList<Type> commandTypes)
         {
             var commands = new List<CommandSchema>();
 
@@ -222,7 +247,7 @@ namespace CliFx.Domain
 
             ValidateCommands(commands);
 
-            return new ApplicationSchema(commands);
+            return new RootSchema(commands);
         }
     }
 }

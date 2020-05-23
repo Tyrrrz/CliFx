@@ -100,9 +100,9 @@ namespace CliFx
             _console.Output.WriteLine();
         }
 
-        private ICommand GetCommandInstance(CommandSchema commandSchema) =>
-            commandSchema != StubDefaultCommand.Schema
-                ? (ICommand) _typeActivator.CreateInstance(commandSchema.Type)
+        private ICommand GetCommandInstance(CommandSchema command) =>
+            command != StubDefaultCommand.Schema
+                ? (ICommand) _typeActivator.CreateInstance(command.Type)
                 : new StubDefaultCommand();
 
         /// <summary>
@@ -119,8 +119,8 @@ namespace CliFx
         {
             try
             {
-                var applicationSchema = ApplicationSchema.Resolve(_configuration.CommandTypes);
-                var input = CommandLineInput.Parse(commandLineArguments, applicationSchema.GetCommandNames());
+                var root = RootSchema.Resolve(_configuration.CommandTypes);
+                var input = CommandLineInput.Parse(commandLineArguments, root.GetCommandNames());
 
                 // Debug mode
                 if (_configuration.IsDebugModeAllowed && input.IsDebugDirectiveSpecified)
@@ -138,8 +138,8 @@ namespace CliFx
 
                 // Try to get the command matching the input or fallback to default
                 var command =
-                    applicationSchema.TryFindCommand(input.CommandName) ??
-                    applicationSchema.TryFindDefaultCommand() ??
+                    root.TryFindCommand(input.CommandName) ??
+                    root.TryFindDefaultCommand() ??
                     StubDefaultCommand.Schema;
 
                 // Version option
@@ -157,41 +157,48 @@ namespace CliFx
                 var defaultValues = command.GetArgumentValues(instance);
 
                 // Help option
-                if (command.IsHelpOptionAvailable && input.IsHelpOptionSpecified)
+                if (command.IsHelpOptionAvailable && input.IsHelpOptionSpecified ||
+                    command == StubDefaultCommand.Schema && !input.Parameters.Any() && !input.Options.Any())
                 {
-                    _helpTextWriter.Write(applicationSchema, command, defaultValues);
+                    _helpTextWriter.Write(root, command, defaultValues);
                     return ExitCode.Success;
                 }
 
-                // Everything in this scope may throw an exception which is directed at the end user
-                // so we want to handle it a nice way
+                // Bind arguments
                 try
                 {
-                    // Bind actual values from arguments
                     command.Bind(instance, input, environmentVariables);
+                }
+                // This may throw exceptions which are useful only to the end-user
+                catch (CliFxException ex)
+                {
+                    WriteError(ex.ToString());
+                    _helpTextWriter.Write(root, command, defaultValues);
 
-                    // Execute the command
+                    return ExitCode.FromException(ex);
+                }
+
+                // Execute the command
+                try
+                {
                     await instance.ExecuteAsync(_console);
                     return ExitCode.Success;
                 }
-                // This handles both domain exceptions from CliFx as well as exceptions
-                // thrown in order to short-circuit command execution in case of an error.
-                catch (CliFxException ex)
+                // Swallow command exceptions and route them to the console
+                catch (CommandException ex)
                 {
-                    // We want minimal output from expected exceptions
-                    WriteError(ex.GetConciseMessage());
+                    WriteError(ex.ToString());
 
-                    // The exception may trigger help text to provide additional info to the user
                     if (ex.ShowHelp)
-                        _helpTextWriter.Write(applicationSchema, command, defaultValues);
+                        _helpTextWriter.Write(root, command, defaultValues);
 
                     return ex.ExitCode;
                 }
             }
             // To prevent the app from showing the annoying Windows troubleshooting dialog,
-            // we handle all exceptions and write them to the console nicely.
+            // we handle all exceptions and route them to the console nicely.
             // However, we don't want to swallow unhandled exceptions when the debugger is attached,
-            // because we still want the IDE to show unhandled exceptions so that the dev can fix them.
+            // because we still want the IDE to show them to the developer.
             catch (Exception ex) when (!Debugger.IsAttached)
             {
                 WriteError(ex.ToString());
@@ -243,8 +250,8 @@ namespace CliFx
             public const int Success = 0;
 
             public static int FromException(Exception ex) =>
-                ex is CliFxException localEx
-                    ? localEx.ExitCode
+                ex is CommandException cmdEx
+                    ? cmdEx.ExitCode
                     : ex.HResult;
         }
 
@@ -253,8 +260,7 @@ namespace CliFx
         {
             public static CommandSchema Schema { get; } = CommandSchema.TryResolve(typeof(StubDefaultCommand))!;
 
-            // Just write help text
-            public ValueTask ExecuteAsync(IConsole console) => throw new CliFxException(0, true);
+            public ValueTask ExecuteAsync(IConsole console) => default;
         }
     }
 }

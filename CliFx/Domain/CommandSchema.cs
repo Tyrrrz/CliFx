@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using CliFx.Attributes;
 using CliFx.Exceptions;
 using CliFx.Internal;
@@ -61,11 +62,12 @@ namespace CliFx.Domain
 
             foreach (var argument in GetArguments())
             {
-                if (argument.Property != null)
-                {
-                    var value = argument.Property.GetValue(instance);
-                    result[argument] = value;
-                }
+                // Skip built-in arguments
+                if (argument.Property == null)
+                    continue;
+
+                var value = argument.Property.GetValue(instance);
+                result[argument] = value;
             }
 
             return result;
@@ -84,14 +86,14 @@ namespace CliFx.Domain
 
             for (var i = 0; i < scalarParameters.Length; i++)
             {
-                var scalarParameter = scalarParameters[i];
+                var parameter = scalarParameters[i];
 
-                var scalarParameterInput = i < parameterInputs.Count
+                var scalarInput = i < parameterInputs.Count
                     ? parameterInputs[i]
-                    : throw CliFxException.ParameterNotSet(scalarParameter);
+                    : throw CliFxException.ParameterNotSet(parameter);
 
-                scalarParameter.BindOn(instance, scalarParameterInput.Value);
-                remainingParameterInputs.Remove(scalarParameterInput);
+                parameter.BindOn(instance, scalarInput.Value);
+                remainingParameterInputs.Remove(scalarInput);
             }
 
             // Non-scalar parameter (only one is allowed)
@@ -101,20 +103,19 @@ namespace CliFx.Domain
 
             if (nonScalarParameter != null)
             {
-                var nonScalarParameterValues = parameterInputs
+                // TODO: Should it verify that at least one value is passed?
+                var nonScalarValues = parameterInputs
                     .Skip(scalarParameters.Length)
                     .Select(p => p.Value)
                     .ToArray();
 
-                nonScalarParameter.BindOn(instance, nonScalarParameterValues);
+                nonScalarParameter.BindOn(instance, nonScalarValues);
                 remainingParameterInputs.Clear();
             }
 
             // Ensure all inputs were bound
             if (remainingParameterInputs.Any())
-            {
                 throw CliFxException.UnrecognizedParametersProvided(remainingParameterInputs);
-            }
         }
 
         private void BindOptions(
@@ -132,19 +133,17 @@ namespace CliFx.Domain
             foreach (var (name, value) in environmentVariables)
             {
                 var option = Options.FirstOrDefault(o => o.MatchesEnvironmentVariableName(name));
+                if (option == null)
+                    continue;
 
-                if (option != null)
-                {
-                    var values = option.IsScalar
-                        ? new[] {value}
-                        : value.Split(Path.PathSeparator);
+                var values = option.IsScalar
+                    ? new[] {value}
+                    : value.Split(Path.PathSeparator);
 
-                    option.BindOn(instance, values);
-                    unsetRequiredOptions.Remove(option);
-                }
+                option.BindOn(instance, values);
+                unsetRequiredOptions.Remove(option);
             }
 
-            // TODO: refactor this part? I wrote this while sick
             // Direct input
             foreach (var option in Options)
             {
@@ -152,30 +151,27 @@ namespace CliFx.Domain
                     .Where(i => option.MatchesNameOrShortName(i.Alias))
                     .ToArray();
 
-                if (inputs.Any())
-                {
-                    var inputValues = inputs.SelectMany(i => i.Values).ToArray();
-                    option.BindOn(instance, inputValues);
+                // Skip if the inputs weren't provided for this option
+                if (!inputs.Any())
+                    continue;
 
-                    foreach (var input in inputs)
-                        remainingOptionInputs.Remove(input);
+                var inputValues = inputs.SelectMany(i => i.Values).ToArray();
+                option.BindOn(instance, inputValues);
 
-                    if (inputValues.Any())
-                        unsetRequiredOptions.Remove(option);
-                }
-            }
+                remainingOptionInputs.RemoveRange(inputs);
 
-            // Ensure all required options were set
-            if (unsetRequiredOptions.Any())
-            {
-                throw CliFxException.RequiredOptionsNotSet(unsetRequiredOptions);
+                // Required option implies that the value has to be set and also be non-empty
+                if (inputValues.Any())
+                    unsetRequiredOptions.Remove(option);
             }
 
             // Ensure all inputs were bound
             if (remainingOptionInputs.Any())
-            {
                 throw CliFxException.UnrecognizedOptionsProvided(remainingOptionInputs);
-            }
+
+            // Ensure all required options were set
+            if (unsetRequiredOptions.Any())
+                throw CliFxException.RequiredOptionsNotSet(unsetRequiredOptions);
         }
 
         public void Bind(
@@ -187,9 +183,27 @@ namespace CliFx.Domain
             BindOptions(instance, input.Options, environmentVariables);
         }
 
-        public string GetUserFacingDisplayString() => Name ?? "";
+        public string GetInternalDisplayString()
+        {
+            var buffer = new StringBuilder();
 
-        public string GetInternalDisplayString() => $"{Type.FullName} ('{GetUserFacingDisplayString()}')";
+            // Type
+            buffer.Append(Type.FullName);
+
+            // Name
+            buffer
+                .Append(' ')
+                .Append('(');
+
+            buffer.Append(IsDefault
+                ? "<default command>"
+                : $"'{Name}'"
+            );
+
+            buffer.Append(')');
+
+            return buffer.ToString();
+        }
 
         public override string ToString() => GetInternalDisplayString();
     }

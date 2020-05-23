@@ -261,10 +261,10 @@ namespace CliFx.Tests
                 "Usage",
                 "cmd-with-enum-args", "[options]",
                 "Parameters",
-                "value", "Valid values: Value1, Value2, Value3.",
+                "value", "Valid values: \"Value1\", \"Value2\", \"Value3\".",
                 "Options",
-                "* --value", "Enum option.", "Valid values: Value1, Value2, Value3.",
-                "--nullable-value", "Nullable enum option.", "Valid values: Value1, Value2, Value3."
+                "* --value", "Enum option.", "Valid values: \"Value1\", \"Value2\", \"Value3\".",
+                "--nullable-value", "Nullable enum option.", "Valid values: \"Value1\", \"Value2\", \"Value3\"."
             );
 
             _output.WriteLine(stdOutData);

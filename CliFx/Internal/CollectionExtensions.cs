@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace CliFx.Internal
 {
     internal static class CollectionExtensions
     {
-        public static int IndexOf<T>(this IReadOnlyList<T> source, Func<T, bool> predicate, int startIndex = 0)
+        public static void RemoveRange<T>(this ICollection<T> source, IEnumerable<T> items)
         {
-            for (var i = startIndex; i < source.Count; i++)
-            {
-                if (predicate(source[i]))
-                    return i;
-            }
-
-            return -1;
+            foreach (var item in items)
+                source.Remove(item);
         }
     }
 }

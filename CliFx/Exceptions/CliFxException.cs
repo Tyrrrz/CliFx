@@ -12,52 +12,22 @@ namespace CliFx.Exceptions
     /// </summary>
     public partial class CliFxException : Exception
     {
-        private const int DefaultExitCode = -100;
-
         private readonly bool _isMessageSet;
-
-        /// <summary>
-        /// Returns an exit code associated with this exception.
-        /// </summary>
-        public int ExitCode { get; }
-
-        /// <summary>
-        /// Whether to show the help text after handling this exception.
-        /// </summary>
-        public bool ShowHelp { get; }
 
         /// <summary>
         /// Initializes an instance of <see cref="CliFxException"/>.
         /// </summary>
-        public CliFxException(string? message, Exception? innerException, int exitCode = DefaultExitCode, bool showHelp = false)
+        public CliFxException(string? message, Exception? innerException = null)
             : base(message, innerException)
         {
             // Message property has a fallback so it's never empty, hence why we need this check
             _isMessageSet = !string.IsNullOrWhiteSpace(message);
-
-            ExitCode = exitCode;
-            ShowHelp = showHelp;
         }
 
-        /// <summary>
-        /// Initializes an instance of <see cref="CliFxException"/>.
-        /// </summary>
-        public CliFxException(string? message, int exitCode = DefaultExitCode, bool showHelp = false)
-            : this(message, null, exitCode, showHelp)
-        {
-        }
-
-        /// <summary>
-        /// Initializes an instance of <see cref="CliFxException"/>.
-        /// </summary>
-        public CliFxException(int exitCode = DefaultExitCode, bool showHelp = false)
-            : this(null, exitCode, showHelp)
-        {
-        }
-
-        internal string GetConciseMessage() => _isMessageSet
+        /// <inheritdoc />
+        public override string ToString() => _isMessageSet
             ? Message
-            : ToString();
+            : base.ToString();
     }
 
     // Internal exceptions
@@ -287,7 +257,7 @@ Environment variable names are not case-sensitive.";
 Parameter {parameterSchema.GetUserFacingDisplayString()} expects a single value, but provided with multiple:
 {values.Select(v => v.Quote()).JoinToString(" ")}";
 
-            return new CliFxException(message.Trim(), showHelp: true);
+            return new CliFxException(message.Trim());
         }
 
         internal static CliFxException CannotConvertMultipleValuesToNonScalar(
@@ -298,7 +268,7 @@ Parameter {parameterSchema.GetUserFacingDisplayString()} expects a single value,
 Option {optionSchema.GetUserFacingDisplayString()} expects a single value, but provided with multiple:
 {values.Select(v => v.Quote()).JoinToString(" ")}";
 
-            return new CliFxException(message.Trim(), showHelp: true);
+            return new CliFxException(message.Trim());
         }
 
         internal static CliFxException CannotConvertMultipleValuesToNonScalar(
@@ -320,7 +290,7 @@ Option {optionSchema.GetUserFacingDisplayString()} expects a single value, but p
 Can't convert value ""{value ?? "<null>"}"" to type '{type.Name}' for parameter {parameterSchema.GetUserFacingDisplayString()}.
 {innerException?.Message ?? "This type is not supported."}";
 
-            return new CliFxException(message.Trim(), innerException, showHelp: true);
+            return new CliFxException(message.Trim(), innerException);
         }
 
         internal static CliFxException CannotConvertToType(
@@ -333,7 +303,7 @@ Can't convert value ""{value ?? "<null>"}"" to type '{type.Name}' for parameter 
 Can't convert value ""{value ?? "<null>"}"" to type '{type.Name}' for option {optionSchema.GetUserFacingDisplayString()}.
 {innerException?.Message ?? "This type is not supported."}";
 
-            return new CliFxException(message.Trim(), innerException, showHelp: true);
+            return new CliFxException(message.Trim(), innerException);
         }
 
         internal static CliFxException CannotConvertToType(
@@ -358,7 +328,7 @@ Can't convert provided values to type '{type.Name}' for parameter {parameterSche
 
 Target type is not assignable from array and doesn't have a public constructor that takes an array.";
 
-            return new CliFxException(message.Trim(), showHelp: true);
+            return new CliFxException(message.Trim());
         }
 
         internal static CliFxException CannotConvertNonScalar(
@@ -372,7 +342,7 @@ Can't convert provided values to type '{type.Name}' for option {optionSchema.Get
 
 Target type is not assignable from array and doesn't have a public constructor that takes an array.";
 
-            return new CliFxException(message.Trim(), showHelp: true);
+            return new CliFxException(message.Trim());
         }
 
         internal static CliFxException CannotConvertNonScalar(
@@ -390,7 +360,7 @@ Target type is not assignable from array and doesn't have a public constructor t
             var message = $@"
 Missing value for parameter {parameterSchema.GetUserFacingDisplayString()}.";
 
-            return new CliFxException(message.Trim(), showHelp: true);
+            return new CliFxException(message.Trim());
         }
 
         internal static CliFxException RequiredOptionsNotSet(IReadOnlyList<CommandOptionSchema> optionSchemas)
@@ -399,7 +369,7 @@ Missing value for parameter {parameterSchema.GetUserFacingDisplayString()}.";
 Missing values for one or more required options:
 {optionSchemas.Select(o => o.GetUserFacingDisplayString()).JoinToString(Environment.NewLine)}";
 
-            return new CliFxException(message.Trim(), showHelp: true);
+            return new CliFxException(message.Trim());
         }
 
         internal static CliFxException UnrecognizedParametersProvided(IReadOnlyList<CommandParameterInput> parameterInputs)
@@ -408,7 +378,7 @@ Missing values for one or more required options:
 Unrecognized parameters provided:
 {parameterInputs.Select(p => p.Value.QuoteIfContainsWhiteSpace()).JoinToString(" ")}";
 
-            return new CliFxException(message.Trim(), showHelp: true);
+            return new CliFxException(message.Trim());
         }
 
         internal static CliFxException UnrecognizedOptionsProvided(IReadOnlyList<CommandOptionInput> optionInputs)
@@ -417,7 +387,7 @@ Unrecognized parameters provided:
 Unrecognized options provided:
 {optionInputs.Select(o => o.GetRawAlias()).JoinToString(Environment.NewLine)}";
 
-            return new CliFxException(message.Trim(), showHelp: true);
+            return new CliFxException(message.Trim());
         }
     }
 }

@@ -84,15 +84,11 @@ namespace CliFx.Domain
             {
                 var argument = commandLineArguments[index];
 
-                if (argument.StartsWith('[') && argument.EndsWith(']'))
-                {
-                    var directive = argument.Substring(1, argument.Length - 2);
-                    result.Add(new CommandDirectiveInput(directive));
-                }
-                else
-                {
+                if (!argument.StartsWith('[') || !argument.EndsWith(']'))
                     break;
-                }
+
+                var name = argument.Substring(1, argument.Length - 2);
+                result.Add(new CommandDirectiveInput(name));
             }
 
             return result;
@@ -123,6 +119,7 @@ namespace CliFx.Domain
                 }
             }
 
+            // Update the index only if command name was found in the arguments
             if (!string.IsNullOrWhiteSpace(commandName))
                 index = lastIndex + 1;
 
@@ -139,21 +136,18 @@ namespace CliFx.Domain
             {
                 var argument = commandLineArguments[index];
 
-                if (!argument.StartsWith('-'))
-                {
-                    result.Add(new CommandParameterInput(argument));
-                }
-                else
-                {
+                if (argument.StartsWith('-'))
                     break;
-                }
+
+                result.Add(new CommandParameterInput(argument));
             }
 
             return result;
         }
 
         private static IReadOnlyList<CommandOptionInput> ParseOptions(
-            IReadOnlyList<string> commandLineArguments, ref int index)
+            IReadOnlyList<string> commandLineArguments,
+            ref int index)
         {
             var result = new List<CommandOptionInput>();
 

@@ -10,6 +10,7 @@ namespace CliFx.Domain
 {
     internal abstract partial class CommandArgumentSchema
     {
+        // Property can be null on built-in arguments (help and version options)
         public PropertyInfo? Property { get; }
 
         public string? Description { get; }
@@ -92,6 +93,7 @@ namespace CliFx.Domain
 
         private object? Convert(IReadOnlyList<string> values)
         {
+            // Short-circuit built-in arguments
             if (Property == null)
                 return null;
 
