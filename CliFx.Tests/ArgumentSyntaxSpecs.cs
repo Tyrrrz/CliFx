@@ -28,7 +28,7 @@ namespace CliFx.Tests
             new object[]
             {
                 new[] {"[preview]"},
-                new CommandLineInputBuilder()
+                new CommandInputBuilder()
                     .AddDirective("preview")
                     .Build()
             },
@@ -36,7 +36,7 @@ namespace CliFx.Tests
             new object[]
             {
                 new[] {"[preview]", "[debug]"},
-                new CommandLineInputBuilder()
+                new CommandInputBuilder()
                     .AddDirective("preview")
                     .AddDirective("debug")
                     .Build()
@@ -62,7 +62,7 @@ namespace CliFx.Tests
             new object[]
             {
                 new[] {"--option"},
-                new CommandLineInputBuilder()
+                new CommandInputBuilder()
                     .AddOption("option")
                     .Build()
             },
@@ -70,7 +70,7 @@ namespace CliFx.Tests
             new object[]
             {
                 new[] {"--option", "value"},
-                new CommandLineInputBuilder()
+                new CommandInputBuilder()
                     .AddOption("option", "value")
                     .Build()
             },
@@ -78,7 +78,7 @@ namespace CliFx.Tests
             new object[]
             {
                 new[] {"--option", "value1", "value2"},
-                new CommandLineInputBuilder()
+                new CommandInputBuilder()
                     .AddOption("option", "value1", "value2")
                     .Build()
             },
@@ -86,7 +86,7 @@ namespace CliFx.Tests
             new object[]
             {
                 new[] {"--option", "same value"},
-                new CommandLineInputBuilder()
+                new CommandInputBuilder()
                     .AddOption("option", "same value")
                     .Build()
             },
@@ -94,7 +94,7 @@ namespace CliFx.Tests
             new object[]
             {
                 new[] {"--option1", "--option2"},
-                new CommandLineInputBuilder()
+                new CommandInputBuilder()
                     .AddOption("option1")
                     .AddOption("option2")
                     .Build()
@@ -103,7 +103,7 @@ namespace CliFx.Tests
             new object[]
             {
                 new[] {"--option1", "value1", "--option2", "value2"},
-                new CommandLineInputBuilder()
+                new CommandInputBuilder()
                     .AddOption("option1", "value1")
                     .AddOption("option2", "value2")
                     .Build()
@@ -112,7 +112,7 @@ namespace CliFx.Tests
             new object[]
             {
                 new[] {"--option1", "value1", "value2", "--option2", "value3", "value4"},
-                new CommandLineInputBuilder()
+                new CommandInputBuilder()
                     .AddOption("option1", "value1", "value2")
                     .AddOption("option2", "value3", "value4")
                     .Build()
@@ -121,7 +121,7 @@ namespace CliFx.Tests
             new object[]
             {
                 new[] {"--option1", "value1", "value2", "--option2"},
-                new CommandLineInputBuilder()
+                new CommandInputBuilder()
                     .AddOption("option1", "value1", "value2")
                     .AddOption("option2")
                     .Build()
@@ -147,7 +147,7 @@ namespace CliFx.Tests
             new object[]
             {
                 new[] {"-o"},
-                new CommandLineInputBuilder()
+                new CommandInputBuilder()
                     .AddOption("o")
                     .Build()
             },
@@ -155,7 +155,7 @@ namespace CliFx.Tests
             new object[]
             {
                 new[] {"-o", "value"},
-                new CommandLineInputBuilder()
+                new CommandInputBuilder()
                     .AddOption("o", "value")
                     .Build()
             },
@@ -163,7 +163,7 @@ namespace CliFx.Tests
             new object[]
             {
                 new[] {"-o", "value1", "value2"},
-                new CommandLineInputBuilder()
+                new CommandInputBuilder()
                     .AddOption("o", "value1", "value2")
                     .Build()
             },
@@ -171,7 +171,7 @@ namespace CliFx.Tests
             new object[]
             {
                 new[] {"-o", "same value"},
-                new CommandLineInputBuilder()
+                new CommandInputBuilder()
                     .AddOption("o", "same value")
                     .Build()
             },
@@ -179,7 +179,7 @@ namespace CliFx.Tests
             new object[]
             {
                 new[] {"-a", "-b"},
-                new CommandLineInputBuilder()
+                new CommandInputBuilder()
                     .AddOption("a")
                     .AddOption("b")
                     .Build()
@@ -188,7 +188,7 @@ namespace CliFx.Tests
             new object[]
             {
                 new[] {"-a", "value1", "-b", "value2"},
-                new CommandLineInputBuilder()
+                new CommandInputBuilder()
                     .AddOption("a", "value1")
                     .AddOption("b", "value2")
                     .Build()
@@ -197,7 +197,7 @@ namespace CliFx.Tests
             new object[]
             {
                 new[] {"-a", "value1", "value2", "-b", "value3", "value4"},
-                new CommandLineInputBuilder()
+                new CommandInputBuilder()
                     .AddOption("a", "value1", "value2")
                     .AddOption("b", "value3", "value4")
                     .Build()
@@ -206,7 +206,7 @@ namespace CliFx.Tests
             new object[]
             {
                 new[] {"-a", "value1", "value2", "-b"},
-                new CommandLineInputBuilder()
+                new CommandInputBuilder()
                     .AddOption("a", "value1", "value2")
                     .AddOption("b")
                     .Build()
@@ -215,7 +215,7 @@ namespace CliFx.Tests
             new object[]
             {
                 new[] {"-abc"},
-                new CommandLineInputBuilder()
+                new CommandInputBuilder()
                     .AddOption("a")
                     .AddOption("b")
                     .AddOption("c")
@@ -225,7 +225,7 @@ namespace CliFx.Tests
             new object[]
             {
                 new[] {"-abc", "value"},
-                new CommandLineInputBuilder()
+                new CommandInputBuilder()
                     .AddOption("a")
                     .AddOption("b")
                     .AddOption("c", "value")
@@ -235,7 +235,7 @@ namespace CliFx.Tests
             new object[]
             {
                 new[] {"-abc", "value1", "value2"},
-                new CommandLineInputBuilder()
+                new CommandInputBuilder()
                     .AddOption("a")
                     .AddOption("b")
                     .AddOption("c", "value1", "value2")
@@ -262,7 +262,7 @@ namespace CliFx.Tests
             new object[]
             {
                 new[] {"foo"},
-                new CommandLineInputBuilder()
+                new CommandInputBuilder()
                     .AddParameter("foo")
                     .Build()
             },
@@ -270,7 +270,7 @@ namespace CliFx.Tests
             new object[]
             {
                 new[] {"foo", "bar"},
-                new CommandLineInputBuilder()
+                new CommandInputBuilder()
                     .AddParameter("foo")
                     .AddParameter("bar")
                     .Build()
@@ -279,7 +279,7 @@ namespace CliFx.Tests
             new object[]
             {
                 new[] {"[preview]", "foo"},
-                new CommandLineInputBuilder()
+                new CommandInputBuilder()
                     .AddDirective("preview")
                     .AddParameter("foo")
                     .Build()
@@ -288,7 +288,7 @@ namespace CliFx.Tests
             new object[]
             {
                 new[] {"foo", "--option", "value", "-abc"},
-                new CommandLineInputBuilder()
+                new CommandInputBuilder()
                     .AddParameter("foo")
                     .AddOption("option", "value")
                     .AddOption("a")
@@ -300,7 +300,7 @@ namespace CliFx.Tests
             new object[]
             {
                 new[] {"[preview]", "[debug]", "foo", "bar", "--option", "value", "-abc"},
-                new CommandLineInputBuilder()
+                new CommandInputBuilder()
                     .AddDirective("preview")
                     .AddDirective("debug")
                     .AddParameter("foo")
@@ -333,7 +333,7 @@ namespace CliFx.Tests
             {
                 new[] {"cmd"},
                 new[] {"cmd"},
-                new CommandLineInputBuilder()
+                new CommandInputBuilder()
                     .SetCommandName("cmd")
                     .Build()
             },
@@ -342,7 +342,7 @@ namespace CliFx.Tests
             {
                 new[] {"cmd"},
                 new[] {"cmd", "foo", "bar", "-o", "value"},
-                new CommandLineInputBuilder()
+                new CommandInputBuilder()
                     .SetCommandName("cmd")
                     .AddParameter("foo")
                     .AddParameter("bar")
@@ -354,7 +354,7 @@ namespace CliFx.Tests
             {
                 new[] {"cmd", "cmd sub"},
                 new[] {"cmd", "sub", "foo"},
-                new CommandLineInputBuilder()
+                new CommandInputBuilder()
                     .SetCommandName("cmd sub")
                     .AddParameter("foo")
                     .Build()
