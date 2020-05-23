@@ -5,7 +5,7 @@ using System.Threading;
 namespace CliFx
 {
     /// <summary>
-    /// Implementation of <see cref="IConsole"/> that routes data to specified streams.
+    /// Implementation of <see cref="IConsole"/> that routes all data to preconfigured streams.
     /// Does not leak to system console in any way.
     /// Use this class as a substitute for system console when running tests.
     /// </summary>

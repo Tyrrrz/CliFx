@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using CliFx.Attributes;
 using CliFx.Domain;
 using CliFx.Exceptions;
 using CliFx.Internal;
@@ -13,7 +14,7 @@ namespace CliFx
     /// <summary>
     /// Command line application facade.
     /// </summary>
-    public class CliApplication
+    public partial class CliApplication
     {
         private readonly ApplicationMetadata _metadata;
         private readonly ApplicationConfiguration _configuration;
@@ -34,15 +35,14 @@ namespace CliFx
             _console = console;
             _typeActivator = typeActivator;
 
-            _helpTextWriter = new HelpTextWriter(metadata, console, typeActivator);
+            _helpTextWriter = new HelpTextWriter(metadata, console);
         }
 
-        private async ValueTask<int?> HandleDebugDirectiveAsync(CommandLineInput commandLineInput)
-        {
-            var isDebugMode = _configuration.IsDebugModeAllowed && commandLineInput.IsDebugDirectiveSpecified;
-            if (!isDebugMode)
-                return null;
+        private void WriteError(string message) => _console.WithForegroundColor(ConsoleColor.Red, () =>
+            _console.Error.WriteLine(message));
 
+        private async ValueTask WaitForDebuggerAsync()
+        {
             var processId = ProcessEx.GetCurrentProcessId();
 
             _console.WithForegroundColor(ConsoleColor.Green, () =>
@@ -50,31 +50,21 @@ namespace CliFx
 
             while (!Debugger.IsAttached)
                 await Task.Delay(100);
-
-            return null;
         }
 
-        private int? HandlePreviewDirective(ApplicationSchema applicationSchema, CommandLineInput commandLineInput)
+        private void WriteCommandLineInput(CommandInput input)
         {
-            var isPreviewMode = _configuration.IsPreviewModeAllowed && commandLineInput.IsPreviewDirectiveSpecified;
-            if (!isPreviewMode)
-                return null;
-
-            var commandSchema = applicationSchema.TryFindCommand(commandLineInput, out var argumentOffset);
-
-            _console.Output.WriteLine("Parser preview:");
-
             // Command name
-            if (commandSchema != null && argumentOffset > 0)
+            if (!string.IsNullOrWhiteSpace(input.CommandName))
             {
                 _console.WithForegroundColor(ConsoleColor.Cyan, () =>
-                    _console.Output.Write(commandSchema.Name));
+                    _console.Output.Write(input.CommandName));
 
                 _console.Output.Write(' ');
             }
 
             // Parameters
-            foreach (var parameter in commandLineInput.UnboundArguments.Skip(argumentOffset))
+            foreach (var parameter in input.Parameters)
             {
                 _console.Output.Write('<');
 
@@ -86,118 +76,133 @@ namespace CliFx
             }
 
             // Options
-            foreach (var option in commandLineInput.Options)
+            foreach (var option in input.Options)
             {
                 _console.Output.Write('[');
 
                 _console.WithForegroundColor(ConsoleColor.White, () =>
-                    _console.Output.Write(option));
+                {
+                    // Alias
+                    _console.Output.Write(option.GetRawAlias());
+
+                    // Values
+                    if (option.Values.Any())
+                    {
+                        _console.Output.Write(' ');
+                        _console.Output.Write(option.GetRawValues());
+                    }
+                });
 
                 _console.Output.Write(']');
                 _console.Output.Write(' ');
             }
 
             _console.Output.WriteLine();
-
-            return 0;
         }
 
-        private int? HandleVersionOption(CommandLineInput commandLineInput)
-        {
-            // Version option is available only on the default command (i.e. when arguments are not specified)
-            var shouldRenderVersion = !commandLineInput.UnboundArguments.Any() && commandLineInput.IsVersionOptionSpecified;
-            if (!shouldRenderVersion)
-                return null;
-
-            _console.Output.WriteLine(_metadata.VersionText);
-
-            return 0;
-        }
-
-        private int? HandleHelpOption(ApplicationSchema applicationSchema, CommandLineInput commandLineInput)
-        {
-            // Help is rendered either when it's requested or when the user provides no arguments and there is no default command
-            var shouldRenderHelp =
-                commandLineInput.IsHelpOptionSpecified ||
-                !applicationSchema.Commands.Any(c => c.IsDefault) && !commandLineInput.UnboundArguments.Any() && !commandLineInput.Options.Any();
-
-            if (!shouldRenderHelp)
-                return null;
-
-            // Get the command schema that matches the input or use a dummy default command as a fallback
-            var commandSchema =
-                applicationSchema.TryFindCommand(commandLineInput) ??
-                CommandSchema.StubDefaultCommand.Schema;
-
-            _helpTextWriter.Write(applicationSchema, commandSchema);
-
-            return 0;
-        }
-
-        private async ValueTask<int> HandleCommandExecutionAsync(
-            ApplicationSchema applicationSchema,
-            CommandLineInput commandLineInput,
-            IReadOnlyDictionary<string, string> environmentVariables)
-        {
-            await applicationSchema
-                .InitializeEntryPoint(commandLineInput, environmentVariables, _typeActivator)
-                .ExecuteAsync(_console);
-
-            return 0;
-        }
-
-        private int HandleCliFxException(IReadOnlyList<string> commandLineArguments, CliFxException ex)
-        {
-            var showHelp = ex.ShowHelp;
-
-            var errorMessage = ex.HasMessage
-                ? ex.Message
-                : ex.ToString();
-
-            _console.WithForegroundColor(ConsoleColor.Red, () => _console.Error.WriteLine(errorMessage));
-
-            if (showHelp)
-            {
-                var applicationSchema = ApplicationSchema.Resolve(_configuration.CommandTypes);
-                var commandLineInput = CommandLineInput.Parse(commandLineArguments);
-                var commandSchema = applicationSchema.TryFindCommand(commandLineInput) ??
-                    CommandSchema.StubDefaultCommand.Schema;
-                _helpTextWriter.Write(applicationSchema, commandSchema);
-            }
-
-            return ex.ExitCode;
-        }
+        private ICommand GetCommandInstance(CommandSchema command) =>
+            command != StubDefaultCommand.Schema
+                ? (ICommand) _typeActivator.CreateInstance(command.Type)
+                : new StubDefaultCommand();
 
         /// <summary>
         /// Runs the application with specified command line arguments and environment variables, and returns the exit code.
         /// </summary>
+        /// <remarks>
+        /// If a <see cref="CommandException"/> is thrown during command execution, it will be handled and routed to the console.
+        /// Additionally, if the debugger is not attached (i.e. the app is running in production), all other exceptions thrown within
+        /// this method will be handled and routed to the console as well.
+        /// </remarks>
         public async ValueTask<int> RunAsync(
             IReadOnlyList<string> commandLineArguments,
             IReadOnlyDictionary<string, string> environmentVariables)
         {
             try
             {
-                var applicationSchema = ApplicationSchema.Resolve(_configuration.CommandTypes);
-                var commandLineInput = CommandLineInput.Parse(commandLineArguments);
+                var root = RootSchema.Resolve(_configuration.CommandTypes);
+                var input = CommandInput.Parse(commandLineArguments, root.GetCommandNames());
 
-                return
-                    await HandleDebugDirectiveAsync(commandLineInput) ??
-                    HandlePreviewDirective(applicationSchema, commandLineInput) ??
-                    HandleVersionOption(commandLineInput) ??
-                    HandleHelpOption(applicationSchema, commandLineInput) ??
-                    await HandleCommandExecutionAsync(applicationSchema, commandLineInput, environmentVariables);
+                // Debug mode
+                if (_configuration.IsDebugModeAllowed && input.IsDebugDirectiveSpecified)
+                {
+                    // Ensure debugger is attached and continue
+                    await WaitForDebuggerAsync();
+                }
+
+                // Preview mode
+                if (_configuration.IsPreviewModeAllowed && input.IsPreviewDirectiveSpecified)
+                {
+                    WriteCommandLineInput(input);
+                    return ExitCode.Success;
+                }
+
+                // Try to get the command matching the input or fallback to default
+                var command =
+                    root.TryFindCommand(input.CommandName) ??
+                    root.TryFindDefaultCommand() ??
+                    StubDefaultCommand.Schema;
+
+                // Version option
+                if (command.IsVersionOptionAvailable && input.IsVersionOptionSpecified)
+                {
+                    _console.Output.WriteLine(_metadata.VersionText);
+                    return ExitCode.Success;
+                }
+
+                // Get command instance (also used in help text)
+                var instance = GetCommandInstance(command);
+
+                // To avoid instantiating the command twice, we need to get default values
+                // before the arguments are bound to the properties
+                var defaultValues = command.GetArgumentValues(instance);
+
+                // Help option
+                if (command.IsHelpOptionAvailable && input.IsHelpOptionSpecified ||
+                    command == StubDefaultCommand.Schema && !input.Parameters.Any() && !input.Options.Any())
+                {
+                    _helpTextWriter.Write(root, command, defaultValues);
+                    return ExitCode.Success;
+                }
+
+                // Bind arguments
+                try
+                {
+                    command.Bind(instance, input, environmentVariables);
+                }
+                // This may throw exceptions which are useful only to the end-user
+                catch (CliFxException ex)
+                {
+                    WriteError(ex.ToString());
+                    _helpTextWriter.Write(root, command, defaultValues);
+
+                    return ExitCode.FromException(ex);
+                }
+
+                // Execute the command
+                try
+                {
+                    await instance.ExecuteAsync(_console);
+                    return ExitCode.Success;
+                }
+                // Swallow command exceptions and route them to the console
+                catch (CommandException ex)
+                {
+                    WriteError(ex.ToString());
+
+                    if (ex.ShowHelp)
+                        _helpTextWriter.Write(root, command, defaultValues);
+
+                    return ex.ExitCode;
+                }
             }
-            catch (CliFxException ex)
+            // To prevent the app from showing the annoying Windows troubleshooting dialog,
+            // we handle all exceptions and route them to the console nicely.
+            // However, we don't want to swallow unhandled exceptions when the debugger is attached,
+            // because we still want the IDE to show them to the developer.
+            catch (Exception ex) when (!Debugger.IsAttached)
             {
-                // Some exceptions may specify exit code or request help
-                return HandleCliFxException(commandLineArguments, ex);
-            }
-            catch (Exception ex)
-            {
-                // We want to catch all exceptions in order to print errors and return correct exit codes.
-                // Doing this also gets rid of the annoying Windows troubleshooting dialog that shows up on unhandled exceptions.
-                _console.WithForegroundColor(ConsoleColor.Red, () => _console.Error.WriteLine(ex.ToString()));
-                return ex.HResult;
+                WriteError(ex.ToString());
+                return ExitCode.FromException(ex);
             }
         }
 
@@ -205,6 +210,11 @@ namespace CliFx
         /// Runs the application with specified command line arguments and returns the exit code.
         /// Environment variables are retrieved automatically.
         /// </summary>
+        /// <remarks>
+        /// If a <see cref="CommandException"/> is thrown during command execution, it will be handled and routed to the console.
+        /// Additionally, if the debugger is not attached (i.e. the app is running in production), all other exceptions thrown within
+        /// this method will be handled and routed to the console as well.
+        /// </remarks>
         public async ValueTask<int> RunAsync(IReadOnlyList<string> commandLineArguments)
         {
             var environmentVariables = Environment.GetEnvironmentVariables()
@@ -218,6 +228,11 @@ namespace CliFx
         /// Runs the application and returns the exit code.
         /// Command line arguments and environment variables are retrieved automatically.
         /// </summary>
+        /// <remarks>
+        /// If a <see cref="CommandException"/> is thrown during command execution, it will be handled and routed to the console.
+        /// Additionally, if the debugger is not attached (i.e. the app is running in production), all other exceptions thrown within
+        /// this method will be handled and routed to the console as well.
+        /// </remarks>
         public async ValueTask<int> RunAsync()
         {
             var commandLineArguments = Environment.GetCommandLineArgs()
@@ -225,6 +240,27 @@ namespace CliFx
                 .ToArray();
 
             return await RunAsync(commandLineArguments);
+        }
+    }
+
+    public partial class CliApplication
+    {
+        private static class ExitCode
+        {
+            public const int Success = 0;
+
+            public static int FromException(Exception ex) =>
+                ex is CommandException cmdEx
+                    ? cmdEx.ExitCode
+                    : ex.HResult;
+        }
+
+        [Command]
+        private class StubDefaultCommand : ICommand
+        {
+            public static CommandSchema Schema { get; } = CommandSchema.TryResolve(typeof(StubDefaultCommand))!;
+
+            public ValueTask ExecuteAsync(IConsole console) => default;
         }
     }
 }

@@ -70,14 +70,14 @@ namespace CliFx.Tests
         [Command("cmd-with-req-opts")]
         private class RequiredOptionsCommand : ICommand
         {
-            [CommandOption("option-f", 'f', IsRequired = true)]
-            public string? OptionF { get; set; }
+            [CommandOption("option-a", 'a', IsRequired = true)]
+            public string? OptionA { get; set; }
 
-            [CommandOption("option-g", 'g', IsRequired = true)]
-            public IEnumerable<int>? OptionG { get; set; }
+            [CommandOption("option-b", 'b', IsRequired = true)]
+            public IEnumerable<int>? OptionB { get; set; }
 
-            [CommandOption("option-h", 'h')]
-            public string? OptionH { get; set; }
+            [CommandOption("option-c", 'c')]
+            public string? OptionC { get; set; }
 
             public ValueTask ExecuteAsync(IConsole console) => default;
         }

@@ -94,6 +94,7 @@ namespace CliFx
 
     public partial class SystemConsole
     {
+        // TODO: use StreamWriter.Synchronized?
         private static StreamReader WrapInput(Stream? stream) =>
             stream != null
                 ? new StreamReader(stream, Console.InputEncoding, false)

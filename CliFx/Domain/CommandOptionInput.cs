@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 using CliFx.Internal;
 
 namespace CliFx.Domain
@@ -7,10 +7,6 @@ namespace CliFx.Domain
     internal class CommandOptionInput
     {
         public string Alias { get; }
-
-        public string RawAlias => Alias.Length > 1
-            ? $"--{Alias}"
-            : $"-{Alias}";
 
         public IReadOnlyList<string> Values { get; }
 
@@ -24,28 +20,15 @@ namespace CliFx.Domain
             Values = values;
         }
 
-        public override string ToString()
+        public string GetRawAlias() => Alias switch
         {
-            var buffer = new StringBuilder();
+            {Length: 0} => Alias,
+            {Length: 1} => $"-{Alias}",
+            _ => $"--{Alias}"
+        };
 
-            buffer.Append(RawAlias);
+        public string GetRawValues() => Values.Select(v => v.Quote()).JoinToString(" ");
 
-            foreach (var value in Values)
-            {
-                buffer.AppendIfNotEmpty(' ');
-
-                var isEscaped = value.Contains(" ");
-
-                if (isEscaped)
-                    buffer.Append('"');
-
-                buffer.Append(value);
-
-                if (isEscaped)
-                    buffer.Append('"');
-            }
-
-            return buffer.ToString();
-        }
+        public override string ToString() => $"{GetRawAlias()} {GetRawValues()}";
     }
 }

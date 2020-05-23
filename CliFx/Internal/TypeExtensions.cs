@@ -8,11 +8,6 @@ namespace CliFx.Internal
 {
     internal static class TypeExtensions
     {
-        public static object? GetDefaultValue(this Type type) =>
-            type.IsValueType
-                ? Activator.CreateInstance(type)
-                : null;
-
         public static bool Implements(this Type type, Type interfaceType) => type.GetInterfaces().Contains(interfaceType);
 
         public static Type? GetNullableUnderlyingType(this Type type) => Nullable.GetUnderlyingType(type);

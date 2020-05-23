@@ -230,18 +230,18 @@ namespace CliFx.Tests
             // Assert
             stdOutData.Should().ContainAll(
                 "Usage",
-                "cmd-with-req-opts", "--option-f <value>", "--option-g <values...>", "[options]",
+                "cmd-with-req-opts", "--option-a <value>", "--option-b <values...>", "[options]",
                 "Options",
-                "* -f|--option-f",
-                "* -g|--option-g",
-                "-h|--option-h"
+                "* -a|--option-a",
+                "* -b|--option-b",
+                "-c|--option-c"
             );
 
             _output.WriteLine(stdOutData);
         }
 
         [Fact]
-        public async Task Help_text_shows_usage_format_which_lists_all_valid_values_for_enum_arguments()
+        public async Task Help_text_lists_all_valid_values_for_enum_arguments()
         {
             // Arrange
             await using var stdOut = new MemoryStream();
@@ -253,7 +253,7 @@ namespace CliFx.Tests
                 .Build();
 
             // Act
-            await application.RunAsync(new[] { "cmd-with-enum-args", "--help" });
+            await application.RunAsync(new[] {"cmd-with-enum-args", "--help"});
             var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
 
             // Assert
@@ -261,10 +261,10 @@ namespace CliFx.Tests
                 "Usage",
                 "cmd-with-enum-args", "[options]",
                 "Parameters",
-                "value", "Valid values: Value1, Value2, Value3.",
+                "value", "Valid values: \"Value1\", \"Value2\", \"Value3\".",
                 "Options",
-                "* --value", "Enum option.", "Valid values: Value1, Value2, Value3.",
-                "--nullable-value", "Nullable enum option.", "Valid values: Value1, Value2, Value3."
+                "* --value", "Enum option.", "Valid values: \"Value1\", \"Value2\", \"Value3\".",
+                "--nullable-value", "Nullable enum option.", "Valid values: \"Value1\", \"Value2\", \"Value3\"."
             );
 
             _output.WriteLine(stdOutData);
@@ -297,7 +297,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Help_text_shows_usage_format_which_lists_all_default_values_for_non_required_options()
+        public async Task Help_text_shows_default_values_for_non_required_options()
         {
             // Arrange
             await using var stdOut = new MemoryStream();
@@ -309,7 +309,7 @@ namespace CliFx.Tests
                 .Build();
 
             // Act
-            await application.RunAsync(new[] { "cmd-with-defaults", "--help" });
+            await application.RunAsync(new[] {"cmd-with-defaults", "--help"});
             var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
 
             // Assert

@@ -1,10 +1,10 @@
 ﻿namespace CliFx.Domain
 {
-    internal class CommandUnboundArgumentInput
+    internal class CommandParameterInput
     {
         public string Value { get; }
 
-        public CommandUnboundArgumentInput(string value) => Value = value;
+        public CommandParameterInput(string value) => Value = value;
 
         public override string ToString() => Value;
     }
