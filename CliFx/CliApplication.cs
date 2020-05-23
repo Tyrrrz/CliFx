@@ -52,7 +52,7 @@ namespace CliFx
                 await Task.Delay(100);
         }
 
-        private void WriteCommandLineInput(CommandLineInput input)
+        private void WriteCommandLineInput(CommandInput input)
         {
             // Command name
             if (!string.IsNullOrWhiteSpace(input.CommandName))
@@ -120,7 +120,7 @@ namespace CliFx
             try
             {
                 var root = RootSchema.Resolve(_configuration.CommandTypes);
-                var input = CommandLineInput.Parse(commandLineArguments, root.GetCommandNames());
+                var input = CommandInput.Parse(commandLineArguments, root.GetCommandNames());
 
                 // Debug mode
                 if (_configuration.IsDebugModeAllowed && input.IsDebugDirectiveSpecified)

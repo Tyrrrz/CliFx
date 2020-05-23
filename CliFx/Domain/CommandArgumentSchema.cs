@@ -125,16 +125,15 @@ namespace CliFx.Domain
             if (Property == null)
                 return Array.Empty<string>();
 
-            var result = new List<string>();
-
             var underlyingType =
-                Property.PropertyType.GetNullableUnderlyingType() ?? Property.PropertyType;
+                Property.PropertyType.GetNullableUnderlyingType() ??
+                Property.PropertyType;
 
             // Enum
             if (underlyingType.IsEnum)
-                result.AddRange(Enum.GetNames(underlyingType));
+                return Enum.GetNames(underlyingType);
 
-            return result;
+            return Array.Empty<string>();
         }
     }
 

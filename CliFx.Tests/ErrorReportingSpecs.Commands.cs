@@ -25,53 +25,10 @@ namespace CliFx.Tests
             [CommandOption("msg", 'm')]
             public string? Message { get; set; }
 
-            public ValueTask ExecuteAsync(IConsole console) => throw new CommandException(Message, ExitCode);
-        }
+            [CommandOption("show-help")]
+            public bool ShowHelp { get; set; }
 
-        [Command("exc")]
-        private class ShowHelpTextOnlyCommand : ICommand
-        {
-            public ValueTask ExecuteAsync(IConsole console) => throw new CommandException(null, showHelp: true);
-        }
-
-        [Command("exc sub")]
-        private class ShowHelpTextOnlySubCommand : ICommand
-        {
-            public ValueTask ExecuteAsync(IConsole console) => default;
-        }
-
-        [Command("exc")]
-        private class ShowErrorMessageThenHelpTextCommand : ICommand
-        {
-            public ValueTask ExecuteAsync(IConsole console) =>
-                throw new CommandException("Error message.", showHelp: true);
-        }
-
-        [Command("exc sub")]
-        private class ShowErrorMessageThenHelpTextSubCommand : ICommand
-        {
-            public ValueTask ExecuteAsync(IConsole console) => default;
-        }
-
-        [Command("exc")]
-        private class StackTraceOnlyCommand : ICommand
-        {
-            [CommandOption("msg", 'm')]
-            public string? Message { get; set; }
-
-            public ValueTask ExecuteAsync(IConsole console) => throw new CommandException(null);
-        }
-
-        [Command("inv")]
-        private class InvalidUserInputCommand : ICommand
-        {
-            [CommandOption("required", 'r')]
-            public string? RequiredOption { get; }
-
-            public ValueTask ExecuteAsync(IConsole console)
-            {
-                throw new NotImplementedException();
-            }
+            public ValueTask ExecuteAsync(IConsole console) => throw new CommandException(Message, ExitCode, ShowHelp);
         }
     }
 }

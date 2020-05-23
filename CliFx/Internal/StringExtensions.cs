@@ -12,11 +12,6 @@ namespace CliFx.Internal
 
         public static string Quote(this string str) => $"\"{str}\"";
 
-        public static string QuoteIfContainsWhiteSpace(this string str) =>
-            str.Contains(' ')
-                ? str.Quote()
-                : str;
-
         public static string JoinToString<T>(this IEnumerable<T> source, string separator) => string.Join(separator, source);
 
         public static StringBuilder AppendIfNotEmpty(this StringBuilder builder, char value) =>

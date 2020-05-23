@@ -54,7 +54,7 @@ Refer to the readme to learn how to integrate a dependency container of your cho
 Failed to create an instance of type '{type.FullName}', received <null> instead.
 
 To fix this, ensure that the provided type activator was configured correctly, as it's not expected to return <null>.
-If you are using a dependency container, ensure this type is registered, because it may return <null> otherwise.";
+If you are using a dependency container, this error may signify that the type wasn't registered.";
 
             return new CliFxException(message.Trim());
         }
@@ -74,7 +74,7 @@ If you're experiencing problems, please refer to the readme for a quickstart exa
             return new CliFxException(message.Trim());
         }
 
-        internal static CliFxException CommandsNotRegistered()
+        internal static CliFxException NoCommandsDefined()
         {
             var message = $@"
 There are no commands configured in the application.
@@ -85,11 +85,11 @@ If you're experiencing problems, please refer to the readme for a quickstart exa
             return new CliFxException(message.Trim());
         }
 
-        internal static CliFxException CommandsTooManyDefaults(IReadOnlyList<CommandSchema> invalidCommandSchemas)
+        internal static CliFxException TooManyDefaultCommands(IReadOnlyList<CommandSchema> invalidCommands)
         {
             var message = $@"
-Application configuration is invalid because there are {invalidCommandSchemas.Count} default commands:
-{invalidCommandSchemas.JoinToString(Environment.NewLine)}
+Application configuration is invalid because there are {invalidCommands.Count} default commands:
+{invalidCommands.JoinToString(Environment.NewLine)}
 
 There can only be one default command (i.e. command with no name) in an application.
 Other commands must have unique non-empty names that identify them.";
@@ -97,13 +97,13 @@ Other commands must have unique non-empty names that identify them.";
             return new CliFxException(message.Trim());
         }
 
-        internal static CliFxException CommandsDuplicateName(
+        internal static CliFxException CommandsWithSameName(
             string name,
-            IReadOnlyList<CommandSchema> invalidCommandSchemas)
+            IReadOnlyList<CommandSchema> invalidCommands)
         {
             var message = $@"
-Application configuration is invalid because there are {invalidCommandSchemas.Count} commands with the same name ('{name}'):
-{invalidCommandSchemas.JoinToString(Environment.NewLine)}
+Application configuration is invalid because there are {invalidCommands.Count} commands with the same name ('{name}'):
+{invalidCommands.JoinToString(Environment.NewLine)}
 
 Commands must have unique names.
 Names are not case-sensitive.";
@@ -111,28 +111,28 @@ Names are not case-sensitive.";
             return new CliFxException(message.Trim());
         }
 
-        internal static CliFxException CommandParametersDuplicateOrder(
-            CommandSchema commandSchema,
+        internal static CliFxException ParametersWithSameOrder(
+            CommandSchema command,
             int order,
-            IReadOnlyList<CommandParameterSchema> invalidParameterSchemas)
+            IReadOnlyList<CommandParameterSchema> invalidParameters)
         {
             var message = $@"
-Command '{commandSchema.Type.FullName}' is invalid because it contains {invalidParameterSchemas.Count} parameters with the same order ({order}):
-{invalidParameterSchemas.JoinToString(Environment.NewLine)}
+Command '{command.Type.FullName}' is invalid because it contains {invalidParameters.Count} parameters with the same order ({order}):
+{invalidParameters.JoinToString(Environment.NewLine)}
 
 Parameters must have unique order.";
 
             return new CliFxException(message.Trim());
         }
 
-        internal static CliFxException CommandParametersDuplicateName(
-            CommandSchema commandSchema,
+        internal static CliFxException ParametersWithSameName(
+            CommandSchema command,
             string name,
-            IReadOnlyList<CommandParameterSchema> invalidParameterSchemas)
+            IReadOnlyList<CommandParameterSchema> invalidParameters)
         {
             var message = $@"
-Command '{commandSchema.Type.FullName}' is invalid because it contains {invalidParameterSchemas.Count} parameters with the same name ('{name}'):
-{invalidParameterSchemas.JoinToString(Environment.NewLine)}
+Command '{command.Type.FullName}' is invalid because it contains {invalidParameters.Count} parameters with the same name ('{name}'):
+{invalidParameters.JoinToString(Environment.NewLine)}
 
 Parameters must have unique names to avoid potential confusion in the help text.
 Names are not case-sensitive.";
@@ -140,15 +140,15 @@ Names are not case-sensitive.";
             return new CliFxException(message.Trim());
         }
 
-        internal static CliFxException CommandParametersTooManyNonScalar(
-            CommandSchema commandSchema,
-            IReadOnlyList<CommandParameterSchema> invalidParameterSchemas)
+        internal static CliFxException TooManyNonScalarParameters(
+            CommandSchema command,
+            IReadOnlyList<CommandParameterSchema> invalidParameters)
         {
             var message = $@"
-Command '{commandSchema.Type.FullName}' is invalid because it contains {invalidParameterSchemas.Count} non-scalar parameters:
-{invalidParameterSchemas.JoinToString(Environment.NewLine)}
+Command '{command.Type.FullName}' is invalid because it contains {invalidParameters.Count} non-scalar parameters:
+{invalidParameters.JoinToString(Environment.NewLine)}
 
-Non-scalar parameter is such that is bound from more than one value (e.g. array or a complex object).
+Non-scalar parameter is such that is bound from more than one value (e.g. array).
 Only one parameter in a command may be non-scalar and it must be the last one in order.
 
 If it's not feasible to fit into these constraints, consider using options instead as they don't have these limitations.";
@@ -156,15 +156,15 @@ If it's not feasible to fit into these constraints, consider using options inste
             return new CliFxException(message.Trim());
         }
 
-        internal static CliFxException CommandParametersNonLastNonScalar(
-            CommandSchema commandSchema,
-            CommandParameterSchema invalidParameterSchema)
+        internal static CliFxException NonLastNonScalarParameter(
+            CommandSchema command,
+            CommandParameterSchema invalidParameter)
         {
             var message = $@"
-Command '{commandSchema.Type.FullName}' is invalid because it contains a non-scalar parameter which is not the last in order:
-{invalidParameterSchema}
+Command '{command.Type.FullName}' is invalid because it contains a non-scalar parameter which is not the last in order:
+{invalidParameter}
 
-Non-scalar parameter is such that is bound from more than one value (e.g. array or a complex object).
+Non-scalar parameter is such that is bound from more than one value (e.g. array).
 Only one parameter in a command may be non-scalar and it must be the last one in order.
 
 If it's not feasible to fit into these constraints, consider using options instead as they don't have these limitations.";
@@ -172,26 +172,26 @@ If it's not feasible to fit into these constraints, consider using options inste
             return new CliFxException(message.Trim());
         }
 
-        internal static CliFxException CommandOptionsNoName(
-            CommandSchema commandSchema,
-            IReadOnlyList<CommandOptionSchema> invalidOptionSchemas)
+        internal static CliFxException OptionsWithNoName(
+            CommandSchema command,
+            IReadOnlyList<CommandOptionSchema> invalidOptions)
         {
             var message = $@"
-Command '{commandSchema.Type.FullName}' is invalid because it contains one or more options without a name:
-{invalidOptionSchemas.JoinToString(Environment.NewLine)}
+Command '{command.Type.FullName}' is invalid because it contains one or more options without a name:
+{invalidOptions.JoinToString(Environment.NewLine)}
 
 Options must have either a name or a short name or both.";
 
             return new CliFxException(message.Trim());
         }
 
-        internal static CliFxException CommandOptionsInvalidLengthName(
-            CommandSchema commandSchema,
-            IReadOnlyList<CommandOptionSchema> invalidOptionSchemas)
+        internal static CliFxException OptionsWithInvalidLengthName(
+            CommandSchema command,
+            IReadOnlyList<CommandOptionSchema> invalidOptions)
         {
             var message = $@"
-Command '{commandSchema.Type.FullName}' is invalid because it contains one or more options whose names are too short:
-{invalidOptionSchemas.JoinToString(Environment.NewLine)}
+Command '{command.Type.FullName}' is invalid because it contains one or more options whose names are too short:
+{invalidOptions.JoinToString(Environment.NewLine)}
 
 Option names must be at least 2 characters long to avoid confusion with short names.
 If you intended to set the short name instead, use the attribute overload that accepts a char.";
@@ -199,14 +199,14 @@ If you intended to set the short name instead, use the attribute overload that a
             return new CliFxException(message.Trim());
         }
 
-        internal static CliFxException CommandOptionsDuplicateName(
-            CommandSchema commandSchema,
+        internal static CliFxException OptionsWithSameName(
+            CommandSchema command,
             string name,
-            IReadOnlyList<CommandOptionSchema> invalidOptionSchemas)
+            IReadOnlyList<CommandOptionSchema> invalidOptions)
         {
             var message = $@"
-Command '{commandSchema.Type.FullName}' is invalid because it contains {invalidOptionSchemas.Count} options with the same name ('{name}'):
-{invalidOptionSchemas.JoinToString(Environment.NewLine)}
+Command '{command.Type.FullName}' is invalid because it contains {invalidOptions.Count} options with the same name ('{name}'):
+{invalidOptions.JoinToString(Environment.NewLine)}
 
 Options must have unique names.
 Names are not case-sensitive.";
@@ -214,14 +214,14 @@ Names are not case-sensitive.";
             return new CliFxException(message.Trim());
         }
 
-        internal static CliFxException CommandOptionsDuplicateShortName(
-            CommandSchema commandSchema,
+        internal static CliFxException OptionsWithSameShortName(
+            CommandSchema command,
             char shortName,
-            IReadOnlyList<CommandOptionSchema> invalidOptionSchemas)
+            IReadOnlyList<CommandOptionSchema> invalidOptions)
         {
             var message = $@"
-Command '{commandSchema.Type.FullName}' is invalid because it contains {invalidOptionSchemas.Count} options with the same short name ('{shortName}'):
-{invalidOptionSchemas.JoinToString(Environment.NewLine)}
+Command '{command.Type.FullName}' is invalid because it contains {invalidOptions.Count} options with the same short name ('{shortName}'):
+{invalidOptions.JoinToString(Environment.NewLine)}
 
 Options must have unique short names.
 Short names are case-sensitive (i.e. 'a' and 'A' are different short names).";
@@ -229,14 +229,14 @@ Short names are case-sensitive (i.e. 'a' and 'A' are different short names).";
             return new CliFxException(message.Trim());
         }
 
-        internal static CliFxException CommandOptionsDuplicateEnvironmentVariableName(
-            CommandSchema commandSchema,
+        internal static CliFxException OptionsWithSameEnvironmentVariableName(
+            CommandSchema command,
             string environmentVariableName,
-            IReadOnlyList<CommandOptionSchema> invalidOptionSchemas)
+            IReadOnlyList<CommandOptionSchema> invalidOptions)
         {
             var message = $@"
-Command '{commandSchema.Type.FullName}' is invalid because it contains {invalidOptionSchemas.Count} options with the same fallback environment variable name ('{environmentVariableName}'):
-{invalidOptionSchemas.JoinToString(Environment.NewLine)}
+Command '{command.Type.FullName}' is invalid because it contains {invalidOptions.Count} options with the same fallback environment variable name ('{environmentVariableName}'):
+{invalidOptions.JoinToString(Environment.NewLine)}
 
 Options cannot share the same environment variable as a fallback.
 Environment variable names are not case-sensitive.";
@@ -250,80 +250,80 @@ Environment variable names are not case-sensitive.";
     public partial class CliFxException
     {
         internal static CliFxException CannotConvertMultipleValuesToNonScalar(
-            CommandParameterSchema parameterSchema,
+            CommandParameterSchema parameter,
             IReadOnlyList<string> values)
         {
             var message = $@"
-Parameter {parameterSchema.GetUserFacingDisplayString()} expects a single value, but provided with multiple:
+Parameter {parameter.GetUserFacingDisplayString()} expects a single value, but provided with multiple:
 {values.Select(v => v.Quote()).JoinToString(" ")}";
 
             return new CliFxException(message.Trim());
         }
 
         internal static CliFxException CannotConvertMultipleValuesToNonScalar(
-            CommandOptionSchema optionSchema,
+            CommandOptionSchema option,
             IReadOnlyList<string> values)
         {
             var message = $@"
-Option {optionSchema.GetUserFacingDisplayString()} expects a single value, but provided with multiple:
+Option {option.GetUserFacingDisplayString()} expects a single value, but provided with multiple:
 {values.Select(v => v.Quote()).JoinToString(" ")}";
 
             return new CliFxException(message.Trim());
         }
 
         internal static CliFxException CannotConvertMultipleValuesToNonScalar(
-            CommandArgumentSchema argumentSchema,
-            IReadOnlyList<string> values) => argumentSchema switch
+            CommandArgumentSchema argument,
+            IReadOnlyList<string> values) => argument switch
         {
-            CommandParameterSchema parameterSchema => CannotConvertMultipleValuesToNonScalar(parameterSchema, values),
-            CommandOptionSchema optionSchema => CannotConvertMultipleValuesToNonScalar(optionSchema, values),
-            _ => throw new ArgumentOutOfRangeException(nameof(argumentSchema))
+            CommandParameterSchema parameter => CannotConvertMultipleValuesToNonScalar(parameter, values),
+            CommandOptionSchema option => CannotConvertMultipleValuesToNonScalar(option, values),
+            _ => throw new ArgumentOutOfRangeException(nameof(argument))
         };
 
         internal static CliFxException CannotConvertToType(
-            CommandParameterSchema parameterSchema,
+            CommandParameterSchema parameter,
             string? value,
             Type type,
             Exception? innerException = null)
         {
             var message = $@"
-Can't convert value ""{value ?? "<null>"}"" to type '{type.Name}' for parameter {parameterSchema.GetUserFacingDisplayString()}.
+Can't convert value ""{value ?? "<null>"}"" to type '{type.Name}' for parameter {parameter.GetUserFacingDisplayString()}.
 {innerException?.Message ?? "This type is not supported."}";
 
             return new CliFxException(message.Trim(), innerException);
         }
 
         internal static CliFxException CannotConvertToType(
-            CommandOptionSchema optionSchema,
+            CommandOptionSchema option,
             string? value,
             Type type,
             Exception? innerException = null)
         {
             var message = $@"
-Can't convert value ""{value ?? "<null>"}"" to type '{type.Name}' for option {optionSchema.GetUserFacingDisplayString()}.
+Can't convert value ""{value ?? "<null>"}"" to type '{type.Name}' for option {option.GetUserFacingDisplayString()}.
 {innerException?.Message ?? "This type is not supported."}";
 
             return new CliFxException(message.Trim(), innerException);
         }
 
         internal static CliFxException CannotConvertToType(
-            CommandArgumentSchema argumentSchema,
+            CommandArgumentSchema argument,
             string? value,
             Type type,
-            Exception? innerException = null) => argumentSchema switch
+            Exception? innerException = null) => argument switch
         {
-            CommandParameterSchema parameterSchema => CannotConvertToType(parameterSchema, value, type, innerException),
-            CommandOptionSchema optionSchema => CannotConvertToType(optionSchema, value, type, innerException),
-            _ => throw new ArgumentOutOfRangeException(nameof(argumentSchema))
+            CommandParameterSchema parameter => CannotConvertToType(parameter, value, type, innerException),
+            CommandOptionSchema option => CannotConvertToType(option, value, type, innerException),
+            _ => throw new ArgumentOutOfRangeException(nameof(argument))
         };
 
         internal static CliFxException CannotConvertNonScalar(
-            CommandParameterSchema parameterSchema,
+            CommandParameterSchema parameter,
             IReadOnlyList<string> values,
             Type type)
         {
             var message = $@"
-Can't convert provided values to type '{type.Name}' for parameter {parameterSchema.GetUserFacingDisplayString()}:
+Can't convert provided values to type '{type.Name}' for parameter {parameter.GetUserFacingDisplayString()}:
 {values.Select(v => v.Quote()).JoinToString(" ")}
 
 Target type is not assignable from array and doesn't have a public constructor that takes an array.";
@@ -332,12 +332,12 @@ Target type is not assignable from array and doesn't have a public constructor t
         }
 
         internal static CliFxException CannotConvertNonScalar(
-            CommandOptionSchema optionSchema,
+            CommandOptionSchema option,
             IReadOnlyList<string> values,
             Type type)
         {
             var message = $@"
-Can't convert provided values to type '{type.Name}' for option {optionSchema.GetUserFacingDisplayString()}:
+Can't convert provided values to type '{type.Name}' for option {option.GetUserFacingDisplayString()}:
 {values.Select(v => v.Quote()).JoinToString(" ")}
 
 Target type is not assignable from array and doesn't have a public constructor that takes an array.";
@@ -346,28 +346,28 @@ Target type is not assignable from array and doesn't have a public constructor t
         }
 
         internal static CliFxException CannotConvertNonScalar(
-            CommandArgumentSchema argumentSchema,
+            CommandArgumentSchema argument,
             IReadOnlyList<string> values,
-            Type type) => argumentSchema switch
+            Type type) => argument switch
         {
-            CommandParameterSchema parameterSchema => CannotConvertNonScalar(parameterSchema, values, type),
-            CommandOptionSchema optionSchema => CannotConvertNonScalar(optionSchema, values, type),
-            _ => throw new ArgumentOutOfRangeException(nameof(argumentSchema))
+            CommandParameterSchema parameter => CannotConvertNonScalar(parameter, values, type),
+            CommandOptionSchema option => CannotConvertNonScalar(option, values, type),
+            _ => throw new ArgumentOutOfRangeException(nameof(argument))
         };
 
-        internal static CliFxException ParameterNotSet(CommandParameterSchema parameterSchema)
+        internal static CliFxException ParameterNotSet(CommandParameterSchema parameter)
         {
             var message = $@"
-Missing value for parameter {parameterSchema.GetUserFacingDisplayString()}.";
+Missing value for parameter {parameter.GetUserFacingDisplayString()}.";
 
             return new CliFxException(message.Trim());
         }
 
-        internal static CliFxException RequiredOptionsNotSet(IReadOnlyList<CommandOptionSchema> optionSchemas)
+        internal static CliFxException RequiredOptionsNotSet(IReadOnlyList<CommandOptionSchema> options)
         {
             var message = $@"
 Missing values for one or more required options:
-{optionSchemas.Select(o => o.GetUserFacingDisplayString()).JoinToString(Environment.NewLine)}";
+{options.Select(o => o.GetUserFacingDisplayString()).JoinToString(Environment.NewLine)}";
 
             return new CliFxException(message.Trim());
         }
@@ -376,7 +376,7 @@ Missing values for one or more required options:
         {
             var message = $@"
 Unrecognized parameters provided:
-{parameterInputs.Select(p => p.Value.QuoteIfContainsWhiteSpace()).JoinToString(" ")}";
+{parameterInputs.Select(p => p.Value).JoinToString(Environment.NewLine)}";
 
             return new CliFxException(message.Trim());
         }

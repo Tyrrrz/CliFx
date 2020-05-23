@@ -54,7 +54,7 @@ namespace CliFx.Tests
         public void Option_of_non_scalar_type_can_take_multiple_separated_values_from_an_environment_variable()
         {
             // Arrange
-            var input = CommandLineInput.Empty;
+            var input = CommandInput.Empty;
             var envVars = new Dictionary<string, string>
             {
                 ["ENV_OPT"] = $"foo{Path.PathSeparator}bar"
@@ -74,7 +74,7 @@ namespace CliFx.Tests
         public void Option_of_scalar_type_can_only_take_a_single_value_from_an_environment_variable_even_if_it_contains_separators()
         {
             // Arrange
-            var input = CommandLineInput.Empty;
+            var input = CommandInput.Empty;
             var envVars = new Dictionary<string, string>
             {
                 ["ENV_OPT"] = $"foo{Path.PathSeparator}bar"

@@ -6,7 +6,7 @@ using CliFx.Internal;
 
 namespace CliFx.Domain
 {
-    internal partial class CommandLineInput
+    internal partial class CommandInput
     {
         public IReadOnlyList<CommandDirectiveInput> Directives { get; }
 
@@ -24,7 +24,7 @@ namespace CliFx.Domain
 
         public bool IsVersionOptionSpecified => Options.Any(o => o.IsVersionOption);
 
-        public CommandLineInput(
+        public CommandInput(
             IReadOnlyList<CommandDirectiveInput> directives,
             string? commandName,
             IReadOnlyList<CommandParameterInput> parameters,
@@ -72,7 +72,7 @@ namespace CliFx.Domain
         }
     }
 
-    internal partial class CommandLineInput
+    internal partial class CommandInput
     {
         private static IReadOnlyList<CommandDirectiveInput> ParseDirectives(
             IReadOnlyList<string> commandLineArguments,
@@ -195,7 +195,7 @@ namespace CliFx.Domain
             return result;
         }
 
-        public static CommandLineInput Parse(IReadOnlyList<string> commandLineArguments, IReadOnlyList<string> availableCommandNames)
+        public static CommandInput Parse(IReadOnlyList<string> commandLineArguments, IReadOnlyList<string> availableCommandNames)
         {
             var availableCommandNamesSet = availableCommandNames.ToHashSet(StringComparer.OrdinalIgnoreCase);
 
@@ -222,13 +222,13 @@ namespace CliFx.Domain
                 ref index
             );
 
-            return new CommandLineInput(directives, commandName, parameters, options);
+            return new CommandInput(directives, commandName, parameters, options);
         }
     }
 
-    internal partial class CommandLineInput
+    internal partial class CommandInput
     {
-        public static CommandLineInput Empty { get; } = new CommandLineInput(
+        public static CommandInput Empty { get; } = new CommandInput(
             Array.Empty<CommandDirectiveInput>(),
             null,
             Array.Empty<CommandParameterInput>(),

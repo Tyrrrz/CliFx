@@ -176,7 +176,7 @@ namespace CliFx.Domain
 
         public void Bind(
             ICommand instance,
-            CommandLineInput input,
+            CommandInput input,
             IReadOnlyDictionary<string, string> environmentVariables)
         {
             BindParameters(instance, input.Parameters);
@@ -193,14 +193,12 @@ namespace CliFx.Domain
             // Name
             buffer
                 .Append(' ')
-                .Append('(');
-
-            buffer.Append(IsDefault
-                ? "<default command>"
-                : $"'{Name}'"
-            );
-
-            buffer.Append(')');
+                .Append('(')
+                .Append(IsDefault
+                    ? "<default command>"
+                    : $"'{Name}'"
+                )
+                .Append(')');
 
             return buffer.ToString();
         }

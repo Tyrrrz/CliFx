@@ -5,7 +5,7 @@ namespace CliFx.Tests.Internal
 {
     internal static class CommandHelper
     {
-        public static TCommand ResolveCommand<TCommand>(CommandLineInput input, IReadOnlyDictionary<string, string> environmentVariables)
+        public static TCommand ResolveCommand<TCommand>(CommandInput input, IReadOnlyDictionary<string, string> environmentVariables)
             where TCommand : ICommand, new()
         {
             var schema = CommandSchema.TryResolve(typeof(TCommand))!;
@@ -16,7 +16,7 @@ namespace CliFx.Tests.Internal
             return instance;
         }
 
-        public static TCommand ResolveCommand<TCommand>(CommandLineInput input)
+        public static TCommand ResolveCommand<TCommand>(CommandInput input)
             where TCommand : ICommand, new() =>
             ResolveCommand<TCommand>(input, new Dictionary<string, string>());
     }

@@ -17,10 +17,10 @@ namespace CliFx.Tests
             var commandNames = Array.Empty<string>();
 
             // Act
-            var input = CommandLineInput.Parse(arguments, commandNames);
+            var input = CommandInput.Parse(arguments, commandNames);
 
             // Assert
-            input.Should().BeEquivalentTo(CommandLineInput.Empty);
+            input.Should().BeEquivalentTo(CommandInput.Empty);
         }
 
         public static object[][] DirectivesTestData => new[]
@@ -45,13 +45,13 @@ namespace CliFx.Tests
 
         [Theory]
         [MemberData(nameof(DirectivesTestData))]
-        internal void Directive_can_be_enabled_by_specifying_its_name_in_square_brackets(IReadOnlyList<string> arguments, CommandLineInput expectedInput)
+        internal void Directive_can_be_enabled_by_specifying_its_name_in_square_brackets(IReadOnlyList<string> arguments, CommandInput expectedInput)
         {
             // Arrange
             var commandNames = Array.Empty<string>();
 
             // Act
-            var input = CommandLineInput.Parse(arguments, commandNames);
+            var input = CommandInput.Parse(arguments, commandNames);
 
             // Assert
             input.Should().BeEquivalentTo(expectedInput);
@@ -130,13 +130,13 @@ namespace CliFx.Tests
 
         [Theory]
         [MemberData(nameof(OptionsTestData))]
-        internal void Option_can_be_set_by_specifying_its_name_after_two_dashes(IReadOnlyList<string> arguments, CommandLineInput expectedInput)
+        internal void Option_can_be_set_by_specifying_its_name_after_two_dashes(IReadOnlyList<string> arguments, CommandInput expectedInput)
         {
             // Arrange
             var commandNames = Array.Empty<string>();
 
             // Act
-            var input = CommandLineInput.Parse(arguments, commandNames);
+            var input = CommandInput.Parse(arguments, commandNames);
 
             // Assert
             input.Should().BeEquivalentTo(expectedInput);
@@ -245,13 +245,13 @@ namespace CliFx.Tests
 
         [Theory]
         [MemberData(nameof(ShortOptionsTestData))]
-        internal void Option_can_be_set_by_specifying_its_short_name_after_a_single_dash(IReadOnlyList<string> arguments, CommandLineInput expectedInput)
+        internal void Option_can_be_set_by_specifying_its_short_name_after_a_single_dash(IReadOnlyList<string> arguments, CommandInput expectedInput)
         {
             // Arrange
             var commandNames = Array.Empty<string>();
 
             // Act
-            var input = CommandLineInput.Parse(arguments, commandNames);
+            var input = CommandInput.Parse(arguments, commandNames);
 
             // Assert
             input.Should().BeEquivalentTo(expectedInput);
@@ -315,13 +315,13 @@ namespace CliFx.Tests
 
         [Theory]
         [MemberData(nameof(ParametersTestData))]
-        internal void Parameter_can_be_set_by_specifying_the_value_directly(IReadOnlyList<string> arguments, CommandLineInput expectedInput)
+        internal void Parameter_can_be_set_by_specifying_the_value_directly(IReadOnlyList<string> arguments, CommandInput expectedInput)
         {
             // Arrange
             var commandNames = Array.Empty<string>();
 
             // Act
-            var input = CommandLineInput.Parse(arguments, commandNames);
+            var input = CommandInput.Parse(arguments, commandNames);
 
             // Assert
             input.Should().BeEquivalentTo(expectedInput);
@@ -366,10 +366,10 @@ namespace CliFx.Tests
         internal void Command_name_is_matched_from_arguments_that_come_before_parameters(
             IReadOnlyList<string> commandNames,
             IReadOnlyList<string> arguments,
-            CommandLineInput expectedInput)
+            CommandInput expectedInput)
         {
             // Act
-            var input = CommandLineInput.Parse(arguments, commandNames);
+            var input = CommandInput.Parse(arguments, commandNames);
 
             // Assert
             input.Should().BeEquivalentTo(expectedInput);

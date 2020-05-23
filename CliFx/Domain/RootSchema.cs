@@ -26,27 +26,6 @@ namespace CliFx.Domain
         public CommandSchema? TryFindCommand(string? commandName) =>
             Commands.FirstOrDefault(c => c.MatchesName(commandName));
 
-        public CommandSchema? TryFindParentCommand(string? childCommandName)
-        {
-            // Default command has no parent
-            if (string.IsNullOrWhiteSpace(childCommandName))
-                return null;
-
-            // Try to find the parent command by repeatedly biting off chunks of its name
-            var components = childCommandName.Split(' ');
-            for (var i = components.Length - 1; i >= 1; i--)
-            {
-                var potentialParentCommandName = components.Take(i).JoinToString(" ");
-                var matchingParentCommand = Commands.FirstOrDefault(c => c.MatchesName(potentialParentCommandName));
-
-                if (matchingParentCommand != null)
-                    return matchingParentCommand;
-            }
-
-            // If there's no parent - fall back to default command
-            return TryFindDefaultCommand();
-        }
-
         private IReadOnlyList<CommandSchema> GetDescendantCommands(
             IReadOnlyList<CommandSchema> potentialParentCommands,
             string? parentCommandName) =>
@@ -72,8 +51,8 @@ namespace CliFx.Domain
 
             foreach (var descendant in descendants)
             {
-                var descendantOfDescendants = GetDescendantCommands(descendants, descendant.Name);
-                result.RemoveRange(descendantOfDescendants);
+                var descendantDescendants = GetDescendantCommands(descendants, descendant.Name);
+                result.RemoveRange(descendantDescendants);
             }
 
             return result;
@@ -90,7 +69,7 @@ namespace CliFx.Domain
 
             if (duplicateOrderGroup != null)
             {
-                throw CliFxException.CommandParametersDuplicateOrder(
+                throw CliFxException.ParametersWithSameOrder(
                     command,
                     duplicateOrderGroup.Key,
                     duplicateOrderGroup.ToArray()
@@ -104,7 +83,7 @@ namespace CliFx.Domain
 
             if (duplicateNameGroup != null)
             {
-                throw CliFxException.CommandParametersDuplicateName(
+                throw CliFxException.ParametersWithSameName(
                     command,
                     duplicateNameGroup.Key,
                     duplicateNameGroup.ToArray()
@@ -117,7 +96,7 @@ namespace CliFx.Domain
 
             if (nonScalarParameters.Length > 1)
             {
-                throw CliFxException.CommandParametersTooManyNonScalar(
+                throw CliFxException.TooManyNonScalarParameters(
                     command,
                     nonScalarParameters
                 );
@@ -130,7 +109,7 @@ namespace CliFx.Domain
 
             if (nonLastNonScalarParameter != null)
             {
-                throw CliFxException.CommandParametersNonLastNonScalar(
+                throw CliFxException.NonLastNonScalarParameter(
                     command,
                     nonLastNonScalarParameter
                 );
@@ -145,7 +124,7 @@ namespace CliFx.Domain
 
             if (noNameGroup.Any())
             {
-                throw CliFxException.CommandOptionsNoName(
+                throw CliFxException.OptionsWithNoName(
                     command,
                     noNameGroup.ToArray()
                 );
@@ -158,7 +137,7 @@ namespace CliFx.Domain
 
             if (invalidLengthNameGroup.Any())
             {
-                throw CliFxException.CommandOptionsInvalidLengthName(
+                throw CliFxException.OptionsWithInvalidLengthName(
                     command,
                     invalidLengthNameGroup
                 );
@@ -171,7 +150,7 @@ namespace CliFx.Domain
 
             if (duplicateNameGroup != null)
             {
-                throw CliFxException.CommandOptionsDuplicateName(
+                throw CliFxException.OptionsWithSameName(
                     command,
                     duplicateNameGroup.Key,
                     duplicateNameGroup.ToArray()
@@ -185,7 +164,7 @@ namespace CliFx.Domain
 
             if (duplicateShortNameGroup != null)
             {
-                throw CliFxException.CommandOptionsDuplicateShortName(
+                throw CliFxException.OptionsWithSameShortName(
                     command,
                     duplicateShortNameGroup.Key,
                     duplicateShortNameGroup.ToArray()
@@ -199,7 +178,7 @@ namespace CliFx.Domain
 
             if (duplicateEnvironmentVariableNameGroup != null)
             {
-                throw CliFxException.CommandOptionsDuplicateEnvironmentVariableName(
+                throw CliFxException.OptionsWithSameEnvironmentVariableName(
                     command,
                     duplicateEnvironmentVariableNameGroup.Key,
                     duplicateEnvironmentVariableNameGroup.ToArray()
@@ -211,7 +190,7 @@ namespace CliFx.Domain
         {
             if (!commands.Any())
             {
-                throw CliFxException.CommandsNotRegistered();
+                throw CliFxException.NoCommandsDefined();
             }
 
             var duplicateNameGroup = commands
@@ -221,11 +200,11 @@ namespace CliFx.Domain
             if (duplicateNameGroup != null)
             {
                 throw !string.IsNullOrWhiteSpace(duplicateNameGroup.Key)
-                    ? CliFxException.CommandsDuplicateName(
+                    ? CliFxException.CommandsWithSameName(
                         duplicateNameGroup.Key,
                         duplicateNameGroup.ToArray()
                     )
-                    : CliFxException.CommandsTooManyDefaults(duplicateNameGroup.ToArray());
+                    : CliFxException.TooManyDefaultCommands(duplicateNameGroup.ToArray());
             }
         }
 
