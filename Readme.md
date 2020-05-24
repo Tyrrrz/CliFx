@@ -168,7 +168,7 @@ Parameters
 * value             Value whose logarithm is to be found.
 
 Options
-  -b|--base         Logarithm base.
+  -b|--base         Logarithm base. Default: "10".
   -h|--help         Shows help text.
   --version         Shows version information.
 ```
@@ -215,9 +215,9 @@ As a general guideline, prefer to use parameters for required inputs that the co
 
 ### Argument syntax
 
-This library supports an argument syntax which is based on the POSIX standard. To be fair, nobody really knows what the standard is about and very few tools actually follow it as they're supposed to, so for the purpose of having dashes and spaces, CliFx is using the "standard command line syntax".
+This library supports an argument syntax which is based on the POSIX standard. To be fair, nobody really knows what the standard is about and very few tools actually follow it to the letter, so for the purpose of having dashes and spaces, CliFx is using the "standard command line syntax".
 
-In more detail, the following examples are all valid:
+More specifically, the following examples are all valid:
 
 - `myapp --foo bar` sets option `"foo"` to value `"bar"`
 - `myapp -f bar` sets option `'f'` to value `"bar"`
@@ -227,32 +227,36 @@ In more detail, the following examples are all valid:
 - `myapp -xqf bar` sets options `'x'` and `'q'` without value, and option `'f'` to value `"bar"`
 - `myapp -i file1.txt file2.txt` sets option `'i'` to a sequence of values `"file1.txt"` and `"file2.txt"`
 - `myapp -i file1.txt -i file2.txt` sets option `'i'` to a sequence of values `"file1.txt"` and `"file2.txt"`
-- `myapp jar new -o cookie` sets option `'o'` to value `"cookie"` and retains two unbound arguments `"jar"` and `"new"`
+- `myapp cmd abc -o` routes to command `cmd` (assuming it exists) with parameter `abc` and sets option `'o'` without value
 
-Note that CliFx purposely employs a context-free parser when consuming command line arguments. That means that every input is parsed the same way.
+Argument parsing in CliFx aims to be as deterministic as possible, ideally yielding the same result no matter the context. The only context-sensitive part in the parser is the command name resolution which needs to know what commands are available in order to discern between arguments that correspond to the command name and arguments which are parameters.
 
-This also means that `myapp -i file1.txt file2.txt` will _always_ be parsed as an option with multiple values, even if the underlying bound property is not enumerable. For the same reason, unseparated arguments such as `myapp -ofile` will be treated as five distinct options `'o'`, `'f'`, `'i'`, `'l'`, `'e'`, instead of `'o'` being set to `"file"`.
+Options are always parsed the same way, disregarding the arity of the actual property it binds to. This means that `myapp -i file1.txt file2.txt` will _always_ be parsed as an option with multiple values, even if the underlying bound property is not enumerable. For the same reason, unseparated arguments such as `myapp -ofile` will be treated as five distinct options `'o'`, `'f'`, `'i'`, `'l'`, `'e'`, instead of `'o'` being set to `"file"`.
 
-When it comes to command name and parameters, they must appear in a strict order, before any options. The parser can't distinguish between arguments that make up a part of the command name and arguments that belong to command parameters, which is why the non-option arguments are bound at a later stage. It is done by trying to find a command that matches the longest sequence of arguments starting from the first, binding any remaining arguments to positional parameters.
+Because of these rules, order of arguments is semantically important and it always goes like this:
 
-The above design may seem like a deficiency, but it actually provides value in the fact that it's deterministic -- given a set of command line arguments, the semantics behind them always remain the same. This leads to a more consistent experience for both you as a developer, as well as for the users of your application.
+```ini
+{directives} {command name} {parameters} {options}
+```
+
+The above design makes the usage of your applications a lot more intuitive and predictable, providing a better end-user experience.
 
 ### Value conversion
 
 Parameters and options can have different underlying types:
 
 - Standard types
-  - Primitive types (`int`, `bool`, `double`, `ulong`, `char`, etc)
+  - Primitive types (`int`, `bool`, `double`, `ulong`, `char`, etc.)
   - Date and time types (`DateTime`, `DateTimeOffset`, `TimeSpan`)
-  - Enum types
+  - Enum types (converted from either name or value)
 - String-initializable types
-  - Types with a constructor that accepts a single `string` parameter (`FileInfo`, `DirectoryInfo`, etc)
+  - Types with a constructor that accepts a single `string` parameter (`FileInfo`, `DirectoryInfo`, etc.)
   - Types with a static method `Parse` that accepts a single `string` parameter (and optionally `IFormatProvider`)
-- Nullable versions of all above types (`decimal?`, `TimeSpan?`, etc)
+- Nullable versions of all above types (`decimal?`, `TimeSpan?`, etc.)
 - Collections of all above types
   - Array types (`T[]`)
-  - Types that are assignable from arrays (`IReadOnlyList<T>`, `ICollection<T>`, etc)
-  - Types with a constructor that accepts a single `T[]` parameter (`HashSet<T>`, `List<T>`, etc)
+  - Types that are assignable from arrays (`IReadOnlyList<T>`, `ICollection<T>`, etc.)
+  - Types with a constructor that accepts a single `T[]` parameter (`HashSet<T>`, `List<T>`, etc.)
 
 When defining a parameter of an enumerable type, keep in mind that it has to be the only such parameter and it must be the last in order. Options, on the other hand, don't have this limitation.
 
@@ -433,7 +437,7 @@ Division by zero is not supported.
 1337
 ```
 
-You can also specify the `showHelp` parameter to instruct whether to show the help text after printing the error:
+You can also specify the `showHelp` parameter to instruct whether to show the help text for the current command after printing the error:
 
 ```c#
 [Command]
@@ -448,7 +452,7 @@ public class ExampleCommand : ICommand
 
 ### Graceful cancellation
 
-It is possible to gracefully cancel execution of a command and preform any necessary cleanup. By default an app gets forcefully killed when it receives an interrupt signal (Ctrl+C or Ctrl+Break), but you can easily override this behavior.
+It is possible to gracefully cancel execution of a command and preform any necessary cleanup. By default an app gets forcefully killed when it receives an interrupt signal (Ctrl+C or Ctrl+Break), but you can override this behavior.
 
 In order to make a command cancellation-aware, you need to call `console.GetCancellationToken()`. This method returns a `CancellationToken` that will trigger when the user issues an interrupt signal. Note that any code that comes before the first call to `GetCancellationToken()` will not be cancellation-aware and as such will terminate instantly. Any subsequent calls to this method will return the same token.
 
@@ -506,7 +510,7 @@ public static class Program
 
 CliFx provides an easy way to write functional tests for your commands thanks to the `IConsole` interface.
 
-You can use `VirtualConsole` to replace the application's stdin, stdout and stderr with your own streams. It has multiple constructor overloads allowing you to specify the exact set of streams that you want. Streams that are not provided are replaced with stubs, i.e. `VirtualConsole` doesn't leak to `System.Console` in any way.
+You can use `VirtualConsole` to replace the application's stdin, stdout and stderr with your own streams. It has multiple constructor overloads allowing you to specify the exact set of streams that you want. Streams which are not provided by you are replaced with stubs, i.e. `VirtualConsole` doesn't leak to `System.Console` in any way.
 
 Let's assume you want to test a simple command such as this one.
 
@@ -633,7 +637,7 @@ for (var i = 0.0; i <= 1; i += 0.01)
 
 ### Environment variables
 
-An option can be configured to use the value of a specific environment variable as a fallback.
+An option can be configured to use the value of an environment variable as a fallback. If an option was not specified by the user, the value will be extracted from that environment variable instead. This also works on options which are marked as required.
 
 ```c#
 [Command]
