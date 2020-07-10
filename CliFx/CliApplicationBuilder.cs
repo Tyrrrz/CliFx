@@ -16,6 +16,7 @@ namespace CliFx
         private readonly HashSet<Type> _commandTypes = new HashSet<Type>();
 
         private bool _isDebugModeAllowed = true;
+        private bool _promptDebuggerLaunch = false;
         private bool _isPreviewModeAllowed = true;
         private string? _title;
         private string? _executableName;
@@ -78,9 +79,10 @@ namespace CliFx
         /// <summary>
         /// Specifies whether debug mode (enabled with [debug] directive) is allowed in the application.
         /// </summary>
-        public CliApplicationBuilder AllowDebugMode(bool isAllowed = true)
+        public CliApplicationBuilder AllowDebugMode(bool isAllowed = true, bool promptDebuggerLaunch = false)
         {
             _isDebugModeAllowed = isAllowed;
+            _promptDebuggerLaunch = promptDebuggerLaunch;
             return this;
         }
 
@@ -166,7 +168,7 @@ namespace CliFx
             _typeActivator ??= new DefaultTypeActivator();
 
             var metadata = new ApplicationMetadata(_title, _executableName, _versionText, _description);
-            var configuration = new ApplicationConfiguration(_commandTypes.ToArray(), _isDebugModeAllowed, _isPreviewModeAllowed);
+            var configuration = new ApplicationConfiguration(_commandTypes.ToArray(), _isDebugModeAllowed, _isPreviewModeAllowed, _promptDebuggerLaunch);
 
             return new CliApplication(metadata, configuration, _console, _typeActivator);
         }

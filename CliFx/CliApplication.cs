@@ -125,8 +125,19 @@ namespace CliFx
                 // Debug mode
                 if (_configuration.IsDebugModeAllowed && input.IsDebugDirectiveSpecified)
                 {
-                    // Ensure debugger is attached and continue
-                    await WaitForDebuggerAsync();
+                    if (_configuration.PromptDebuggerLaunchInDebugMode)
+                    {
+                        // Prompt debugger launcher dialog
+                        if (!Debugger.IsAttached)
+                        {
+                            Debugger.Launch();
+                        }
+                    }
+                    else
+                    {
+                        // Ensure debugger is attached and continue
+                        await WaitForDebuggerAsync();
+                    }
                 }
 
                 // Preview mode
