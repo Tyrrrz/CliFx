@@ -1,3 +1,8 @@
+### v1.3.1 (19-Jul-2020)
+
+- Running the application with the debug directive (`myapp [debug]`) will now also try to launch a debugger instance. In most cases it will save time as you won't need to attach the debugger manually. (Thanks [@Volodymyr Shkolka](https://github.com/BlackGad))
+- Fixed an issue where unhandled generic exceptions (i.e. not `CommandException`) sometimes caused the application to incorrectly return successful exit code due to an overflow issue on Unix systems. Starting from this version, all unhandled generic exceptions will produce `1` as the exit code when thrown. Instances of `CommandException` can still be configured to return any specified exit code, but it's recommended to constrain the values between `1` and `255` to avoid overflow issues. (Thanks [@Ihor Nechyporuk](https://github.com/inech))
+
 ### v1.3 (23-May-2020)
 
 - Changed analyzers to report errors instead of warnings. If you find that some analyzer works incorrectly, please report it on GitHub. You can also configure inspection severity overrides in your project if you need to.
