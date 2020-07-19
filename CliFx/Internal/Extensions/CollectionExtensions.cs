@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace CliFx.Internal
+namespace CliFx.Internal.Extensions
 {
     internal static class CollectionExtensions
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CliFx.Internal
+namespace CliFx.Internal.Extensions
 {
     internal static class VersionExtensions
     {

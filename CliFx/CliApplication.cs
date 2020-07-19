@@ -41,12 +41,14 @@ namespace CliFx
         private void WriteError(string message) => _console.WithForegroundColor(ConsoleColor.Red, () =>
             _console.Error.WriteLine(message));
 
-        private async ValueTask WaitForDebuggerAsync()
+        private async ValueTask LaunchAndWaitForDebuggerAsync()
         {
             var processId = ProcessEx.GetCurrentProcessId();
 
             _console.WithForegroundColor(ConsoleColor.Green, () =>
                 _console.Output.WriteLine($"Attach debugger to PID {processId} to continue."));
+
+            Debugger.Launch();
 
             while (!Debugger.IsAttached)
                 await Task.Delay(100);
@@ -125,19 +127,7 @@ namespace CliFx
                 // Debug mode
                 if (_configuration.IsDebugModeAllowed && input.IsDebugDirectiveSpecified)
                 {
-                    if (_configuration.PromptDebuggerLaunchInDebugMode)
-                    {
-                        // Prompt debugger launcher dialog
-                        if (!Debugger.IsAttached)
-                        {
-                            Debugger.Launch();
-                        }
-                    }
-                    else
-                    {
-                        // Ensure debugger is attached and continue
-                        await WaitForDebuggerAsync();
-                    }
+                    await LaunchAndWaitForDebuggerAsync();
                 }
 
                 // Preview mode

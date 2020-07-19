@@ -17,30 +17,23 @@ namespace CliFx
         /// Whether debug mode is allowed in this application.
         /// </summary>
         public bool IsDebugModeAllowed { get; }
-        
+
         /// <summary>
         /// Whether preview mode is allowed in this application.
         /// </summary>
         public bool IsPreviewModeAllowed { get; }
 
         /// <summary>
-        /// Prompt debugger launch when application is in debug mode
-        /// </summary>
-        public bool PromptDebuggerLaunchInDebugMode { get; }
-
-        /// <summary>
         /// Initializes an instance of <see cref="ApplicationConfiguration"/>.
         /// </summary>
         public ApplicationConfiguration(
             IReadOnlyList<Type> commandTypes,
-            bool isDebugModeAllowed, 
-            bool isPreviewModeAllowed, 
-            bool promptDebuggerLaunchInDebugMode)
+            bool isDebugModeAllowed,
+            bool isPreviewModeAllowed)
         {
             CommandTypes = commandTypes;
             IsDebugModeAllowed = isDebugModeAllowed;
             IsPreviewModeAllowed = isPreviewModeAllowed;
-            PromptDebuggerLaunchInDebugMode = promptDebuggerLaunchInDebugMode;
         }
     }
 }

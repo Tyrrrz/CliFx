@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace CliFx.Internal
+namespace CliFx.Internal.Extensions
 {
     internal static class TypeExtensions
     {

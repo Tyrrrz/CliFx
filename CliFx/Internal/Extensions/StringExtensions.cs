@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CliFx.Internal
+namespace CliFx.Internal.Extensions
 {
     internal static class StringExtensions
     {

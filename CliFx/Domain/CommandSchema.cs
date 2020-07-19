@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using CliFx.Attributes;
 using CliFx.Exceptions;
-using CliFx.Internal;
+using CliFx.Internal.Extensions;
 
 namespace CliFx.Domain
 {
