@@ -20,7 +20,7 @@ namespace CliFx.Tests
         private class CommandExceptionCommand : ICommand
         {
             [CommandOption("code", 'c')]
-            public int ExitCode { get; set; } = 1337;
+            public int ExitCode { get; set; } = 133;
 
             [CommandOption("msg", 'm')]
             public string? Message { get; set; }

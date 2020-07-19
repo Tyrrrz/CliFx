@@ -9,12 +9,14 @@ namespace CliFx.Exceptions
     /// </summary>
     public class CommandException : Exception
     {
-        private const int DefaultExitCode = -1;
+        private const int DefaultExitCode = 1;
 
         private readonly bool _isMessageSet;
 
         /// <summary>
         /// Returns an exit code associated with this exception.
+        /// On Unix systems an exit code is 8-bit unsigned integer so it's strongly recommended to use exit codes between 1 and 255
+        /// otherwise it may overflow and yield unexpected results.
         /// </summary>
         public int ExitCode { get; }
 
@@ -26,6 +28,14 @@ namespace CliFx.Exceptions
         /// <summary>
         /// Initializes an instance of <see cref="CommandException"/>.
         /// </summary>
+        /// <param name="message">The exception message.</param>
+        /// <param name="innerException">The inner exception.</param>
+        /// <param name="exitCode">
+        /// The exit code associated with this exception.
+        /// On Unix systems an exit code is 8-bit unsigned integer so it's strongly recommended to use exit codes between 1 and 255
+        /// otherwise it may overflow and yield unexpected results.
+        /// </param>
+        /// <param name="showHelp">Whether to show the help text after handling this exception.</param>
         public CommandException(string? message, Exception? innerException, int exitCode = DefaultExitCode, bool showHelp = false)
             : base(message, innerException)
         {
@@ -39,6 +49,13 @@ namespace CliFx.Exceptions
         /// <summary>
         /// Initializes an instance of <see cref="CommandException"/>.
         /// </summary>
+        /// <param name="message">The exception message.</param>
+        /// <param name="exitCode">
+        /// The exit code associated with this exception.
+        /// On Unix systems an exit code is 8-bit unsigned integer so it's strongly recommended to use exit codes between 1 and 255
+        /// otherwise it may overflow and yield unexpected results.
+        /// </param>
+        /// <param name="showHelp">Whether to show the help text after handling this exception.</param>
         public CommandException(string? message, int exitCode = DefaultExitCode, bool showHelp = false)
             : this(message, null, exitCode, showHelp)
         {
@@ -47,6 +64,12 @@ namespace CliFx.Exceptions
         /// <summary>
         /// Initializes an instance of <see cref="CommandException"/>.
         /// </summary>
+        /// <param name="exitCode">
+        /// The exit code associated with this exception.
+        /// On Unix systems an exit code is 8-bit unsigned integer so it's strongly recommended to use exit codes between 1 and 255
+        /// otherwise it may overflow and yield unexpected results.
+        /// </param>
+        /// <param name="showHelp">Whether to show the help text after handling this exception.</param>
         public CommandException(int exitCode = DefaultExitCode, bool showHelp = false)
             : this(null, exitCode, showHelp)
         {
