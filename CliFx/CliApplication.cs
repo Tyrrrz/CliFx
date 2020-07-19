@@ -263,7 +263,7 @@ namespace CliFx
             public static int FromException(Exception ex) =>
                 ex is CommandException cmdEx
                     ? cmdEx.ExitCode
-                    : ex.HResult;
+                    : 1;
         }
 
         [Command]

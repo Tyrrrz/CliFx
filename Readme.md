@@ -396,9 +396,11 @@ You can run `myapp.exe cmd1 [command] --help` to show help on a specific command
 
 You may have noticed that commands in CliFx don't return exit codes. This is by design as exit codes are considered a higher-level concern and thus handled by `CliApplication`, not by individual commands.
 
-Commands can report execution failure simply by throwing exceptions just like any other C# code. When an exception is thrown, `CliApplication` will catch it, print the error, and return an appropriate exit code to the calling process.
+Commands can report execution failure simply by throwing exceptions just like any other C# code. When an exception is thrown, `CliApplication` will catch it, print the error, and return an exit code `1` to the calling process.
 
 If you want to communicate a specific error through exit code, you can instead throw an instance of `CommandException` which takes an exit code as a parameter. When a command throws an exception of type `CommandException`, it is assumed that this was a result of a handled error and, as such, only the exception message will be printed to the error stream. If a command throws an exception of any other type, the full stack trace will be printed as well.
+
+> Please note that on Unix systems an exit code is 8-bit unsigned integer so it's strongly recommended to use exit codes between `1` and `255` otherwise it may overflow and yield unexpected results.
 
 ```c#
 [Command]
@@ -414,8 +416,8 @@ public class DivideCommand : ICommand
     {
         if (Math.Abs(Divisor) < double.Epsilon)
         {
-            // This will print the error and set exit code to 1337
-            throw new CommandException("Division by zero is not supported.", 1337);
+            // This will print the error and set exit code to 133
+            throw new CommandException("Division by zero is not supported.", 133);
         }
 
         var result = Dividend / Divisor;
@@ -434,7 +436,7 @@ Division by zero is not supported.
 
 > $LastExitCode
 
-1337
+133
 ```
 
 You can also specify the `showHelp` parameter to instruct whether to show the help text for the current command after printing the error:
