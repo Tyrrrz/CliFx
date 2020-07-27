@@ -89,5 +89,27 @@ namespace CliFx.Tests
                 Option = $"foo{Path.PathSeparator}bar"
             });
         }
+        
+        [Fact]
+        public void Environment_variables_pulled_while_respecting_case()
+        {
+            // Arrange
+            const string expected = "foobar";
+            var input = CommandInput.Empty;
+            var envVars = new Dictionary<string, string>
+            {
+                ["ENV_OPT"] = expected,
+                ["env_opt"] = "2"
+            };
+
+            // Act
+            var instance = CommandHelper.ResolveCommand<EnvironmentVariableCommand>(input, envVars);
+
+            // Assert
+            instance.Should().BeEquivalentTo(new EnvironmentVariableCommand
+            {
+                Option = expected
+            });
+        }
     }
 }

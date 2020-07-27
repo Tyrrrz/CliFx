@@ -45,7 +45,7 @@ namespace CliFx.Domain
 
         public bool MatchesEnvironmentVariableName(string environmentVariableName) =>
             !string.IsNullOrWhiteSpace(EnvironmentVariableName) &&
-            string.Equals(EnvironmentVariableName, environmentVariableName, StringComparison.OrdinalIgnoreCase);
+            string.Equals(EnvironmentVariableName, environmentVariableName, StringComparison.Ordinal);
 
         public string GetUserFacingDisplayString()
         {
