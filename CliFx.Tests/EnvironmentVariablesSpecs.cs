@@ -91,7 +91,7 @@ namespace CliFx.Tests
         }
         
         [Fact]
-        public void Environment_variables_pulled_while_respecting_case()
+        public void Option_can_use_a_specific_environment_variable_as_fallback_while_respecting_case()
         {
             // Arrange
             const string expected = "foobar";
