@@ -218,9 +218,10 @@ namespace CliFx
         /// </remarks>
         public async ValueTask<int> RunAsync(IReadOnlyList<string> commandLineArguments)
         {
+            // Environment variable names are case-insensitive on Windows but are case-sensitive on Linux and macOS
             var environmentVariables = Environment.GetEnvironmentVariables()
                 .Cast<DictionaryEntry>()
-                .ToDictionary(e => (string) e.Key, e => (string) e.Value, StringComparer.OrdinalIgnoreCase);
+                .ToDictionary(e => (string) e.Key, e => (string) e.Value, StringComparer.Ordinal);
 
             return await RunAsync(commandLineArguments, environmentVariables);
         }
