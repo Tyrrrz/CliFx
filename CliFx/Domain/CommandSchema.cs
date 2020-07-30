@@ -103,7 +103,10 @@ namespace CliFx.Domain
 
             if (nonScalarParameter != null)
             {
-                // TODO: Should it verify that at least one value is passed?
+                // Verify that we have at least one value
+                if(!parameterInputs.Skip(scalarParameters.Length).Any())
+                    throw CliFxException.NonScalarParameterNotSet(nonScalarParameter);
+
                 var nonScalarValues = parameterInputs
                     .Skip(scalarParameters.Length)
                     .Select(p => p.Value)
