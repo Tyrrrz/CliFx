@@ -895,6 +895,31 @@ namespace CliFx.Tests
         }
 
         [Fact]
+        public void Scalar_properties_annotated_as_parameter_requires_input()
+        {
+            // Arrange
+            var input = new CommandInputBuilder()
+                .Build();
+            
+            // Act & assert
+            var ex = Assert.Throws<CliFxException>(() => CommandHelper.ResolveCommand<ParametersCommand>(input));
+            _output.WriteLine(ex.Message);
+        }
+
+        [Fact]
+        public void NonScalar_properties_annotated_as_parameter_requires_input() 
+        {
+            // Arrange
+            var input = new CommandInputBuilder()
+                .AddParameter("foo")
+                .AddParameter("bar")
+                .Build();
+
+            var ex = Assert.Throws<CliFxException>(() => CommandHelper.ResolveCommand<ParametersCommand>(input));
+            _output.WriteLine(ex.Message);
+        }
+
+        [Fact]
         public void Property_annotated_as_parameter_must_always_be_bound_to_some_value()
         {
             // Arrange
