@@ -389,11 +389,5 @@ Unrecognized options provided:
 
             return new CliFxException(message.Trim());
         }
-
-        internal static CliFxException NonScalarParameterNotSet(CommandParameterSchema parameter) 
-        {
-            var message = $@"Missing value for non scalar parameter {parameter.GetUserFacingDisplayString()}.";
-            return new CliFxException(message.Trim());
-        }
     }
 }

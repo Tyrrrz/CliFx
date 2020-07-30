@@ -105,7 +105,7 @@ namespace CliFx.Domain
             {
                 // Verify that we have at least one value
                 if(!parameterInputs.Skip(scalarParameters.Length).Any())
-                    throw CliFxException.NonScalarParameterNotSet(nonScalarParameter);
+                    throw CliFxException.ParameterNotSet(nonScalarParameter);
 
                 var nonScalarValues = parameterInputs
                     .Skip(scalarParameters.Length)
