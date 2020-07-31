@@ -1,3 +1,8 @@
+### v1.3.2 (31-Jul-2020)
+
+- Fixed an issue where a command was incorrectly allowed to execute when the user did not specify any value for a non-scalar parameter. Since they are always required, a parameter needs to be bound to (at least) one value. (Thanks [@Daniel Hix](https://github.com/ADustyOldMuffin))
+- Fixed an issue where `CliApplication.RunAsync(...)` threw `ArgumentException` if there were two environment variables, whose names differed only in case. Environment variable names are now treated case-sensitively. (Thanks [@Ron Myers](https://github.com/ron-myers))
+
 ### v1.3.1 (19-Jul-2020)
 
 - Running the application with the debug directive (`myapp [debug]`) will now also try to launch a debugger instance. In most cases it will save time as you won't need to attach the debugger manually. (Thanks [@Volodymyr Shkolka](https://github.com/BlackGad))
