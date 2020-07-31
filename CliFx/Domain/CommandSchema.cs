@@ -103,14 +103,15 @@ namespace CliFx.Domain
 
             if (nonScalarParameter != null)
             {
-                // Verify that we have at least one value
-                if(!parameterInputs.Skip(scalarParameters.Length).Any())
-                    throw CliFxException.ParameterNotSet(nonScalarParameter);
-
                 var nonScalarValues = parameterInputs
                     .Skip(scalarParameters.Length)
                     .Select(p => p.Value)
                     .ToArray();
+
+                // Parameters are required by default and so a non-scalar parameter must
+                // be bound to at least one value
+                if(!nonScalarValues.Any())
+                    throw CliFxException.ParameterNotSet(nonScalarParameter);
 
                 nonScalarParameter.BindOn(instance, nonScalarValues);
                 remainingParameterInputs.Clear();

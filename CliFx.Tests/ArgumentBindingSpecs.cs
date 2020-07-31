@@ -826,113 +826,6 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public void Property_annotated_as_an_option_can_be_bound_from_multiple_values_even_if_the_inputs_use_mixed_naming()
-        {
-            // Arrange
-            var input = new CommandInputBuilder()
-                .AddOption("option", "foo")
-                .AddOption("o", "bar")
-                .AddOption("option", "baz")
-                .Build();
-
-            // Act
-            var instance = CommandHelper.ResolveCommand<ArrayOptionCommand>(input);
-
-            // Assert
-            instance.Should().BeEquivalentTo(new ArrayOptionCommand
-            {
-                Option = new[] {"foo", "bar", "baz"}
-            });
-        }
-
-        [Fact]
-        public void Property_annotated_as_a_required_option_must_always_be_set()
-        {
-            // Arrange
-            var input = new CommandInputBuilder()
-                .AddOption(nameof(RequiredOptionCommand.OptionA), "foo")
-                .Build();
-
-            // Act & assert
-            var ex = Assert.Throws<CliFxException>(() => CommandHelper.ResolveCommand<RequiredOptionCommand>(input));
-            _output.WriteLine(ex.Message);
-        }
-
-        [Fact]
-        public void Property_annotated_as_a_required_option_must_always_be_bound_to_some_value()
-        {
-            // Arrange
-            var input = new CommandInputBuilder()
-                .AddOption(nameof(RequiredOptionCommand.OptionB))
-                .Build();
-
-            // Act & assert
-            var ex = Assert.Throws<CliFxException>(() => CommandHelper.ResolveCommand<RequiredOptionCommand>(input));
-            _output.WriteLine(ex.Message);
-        }
-
-        [Fact]
-        public void Property_annotated_as_parameter_is_bound_directly_from_argument_value_according_to_the_order()
-        {
-            // Arrange
-            var input = new CommandInputBuilder()
-                .AddParameter("foo")
-                .AddParameter("bar")
-                .AddParameter("hello")
-                .AddParameter("world")
-                .Build();
-
-            // Act
-            var instance = CommandHelper.ResolveCommand<ParametersCommand>(input);
-
-            // Assert
-            instance.Should().BeEquivalentTo(new ParametersCommand
-            {
-                ParameterA = "foo",
-                ParameterB = "bar",
-                ParameterC = new[] {"hello", "world"}
-            });
-        }
-
-        [Fact]
-        public void Scalar_properties_annotated_as_parameter_requires_input()
-        {
-            // Arrange
-            var input = new CommandInputBuilder()
-                .Build();
-            
-            // Act & assert
-            var ex = Assert.Throws<CliFxException>(() => CommandHelper.ResolveCommand<ParametersCommand>(input));
-            _output.WriteLine(ex.Message);
-        }
-
-        [Fact]
-        public void NonScalar_properties_annotated_as_parameter_requires_input() 
-        {
-            // Arrange
-            var input = new CommandInputBuilder()
-                .AddParameter("foo")
-                .AddParameter("bar")
-                .Build();
-
-            var ex = Assert.Throws<CliFxException>(() => CommandHelper.ResolveCommand<ParametersCommand>(input));
-            _output.WriteLine(ex.Message);
-        }
-
-        [Fact]
-        public void Property_annotated_as_parameter_must_always_be_bound_to_some_value()
-        {
-            // Arrange
-            var input = new CommandInputBuilder()
-                .AddParameter("foo")
-                .Build();
-
-            // Act & assert
-            var ex = Assert.Throws<CliFxException>(() => CommandHelper.ResolveCommand<ParametersCommand>(input));
-            _output.WriteLine(ex.Message);
-        }
-
-        [Fact]
         public void Property_of_custom_type_that_implements_IEnumerable_can_only_be_bound_if_that_type_has_a_constructor_accepting_an_array()
         {
             // Arrange
@@ -981,6 +874,114 @@ namespace CliFx.Tests
 
             // Act & assert
             var ex = Assert.Throws<CliFxException>(() => CommandHelper.ResolveCommand<AllSupportedTypesCommand>(input));
+            _output.WriteLine(ex.Message);
+        }
+
+        [Fact]
+        public void Property_annotated_as_an_option_can_be_bound_from_multiple_values_even_if_the_inputs_use_mixed_naming()
+        {
+            // Arrange
+            var input = new CommandInputBuilder()
+                .AddOption("option", "foo")
+                .AddOption("o", "bar")
+                .AddOption("option", "baz")
+                .Build();
+
+            // Act
+            var instance = CommandHelper.ResolveCommand<ArrayOptionCommand>(input);
+
+            // Assert
+            instance.Should().BeEquivalentTo(new ArrayOptionCommand
+            {
+                Option = new[] {"foo", "bar", "baz"}
+            });
+        }
+
+        [Fact]
+        public void Property_annotated_as_a_required_option_must_always_be_set()
+        {
+            // Arrange
+            var input = new CommandInputBuilder()
+                .Build();
+
+            // Act & assert
+            var ex = Assert.Throws<CliFxException>(() => CommandHelper.ResolveCommand<RequiredOptionCommand>(input));
+            _output.WriteLine(ex.Message);
+        }
+
+        [Fact]
+        public void Property_annotated_as_a_required_option_must_always_be_bound_to_some_value()
+        {
+            // Arrange
+            var input = new CommandInputBuilder()
+                .AddOption(nameof(RequiredOptionCommand.Option))
+                .Build();
+
+            // Act & assert
+            var ex = Assert.Throws<CliFxException>(() => CommandHelper.ResolveCommand<RequiredOptionCommand>(input));
+            _output.WriteLine(ex.Message);
+        }
+
+        [Fact]
+        public void Property_annotated_as_a_required_option_must_always_be_bound_to_at_least_one_value_if_it_expects_multiple_values()
+        {
+            // Arrange
+            var input = new CommandInputBuilder()
+                .AddOption(nameof(RequiredOptionCommand.Option))
+                .Build();
+
+            // Act & assert
+            var ex = Assert.Throws<CliFxException>(() => CommandHelper.ResolveCommand<RequiredArrayOptionCommand>(input));
+            _output.WriteLine(ex.Message);
+        }
+
+        [Fact]
+        public void Property_annotated_as_parameter_is_bound_directly_from_argument_value_according_to_the_order()
+        {
+            // Arrange
+            var input = new CommandInputBuilder()
+                .AddParameter("foo")
+                .AddParameter("bar")
+                .AddParameter("hello")
+                .AddParameter("world")
+                .Build();
+
+            // Act
+            var instance = CommandHelper.ResolveCommand<ParametersCommand>(input);
+
+            // Assert
+            instance.Should().BeEquivalentTo(new ParametersCommand
+            {
+                ParameterA = "foo",
+                ParameterB = "bar",
+                ParameterC = new[] {"hello", "world"}
+            });
+        }
+
+        [Fact]
+        public void Property_annotated_as_parameter_must_always_be_bound_to_some_value()
+        {
+            // Arrange
+            var input = new CommandInputBuilder()
+                .AddParameter("foo")
+                .Build();
+
+            // Act & assert
+            var ex = Assert.Throws<CliFxException>(() => CommandHelper.ResolveCommand<ParametersCommand>(input));
+            _output.WriteLine(ex.Message);
+        }
+
+        [Fact]
+        public void Property_annotated_as_parameter_must_always_be_bound_to_at_least_one_value_if_it_expects_multiple_values()
+        {
+            // Arrange
+            var input = new CommandInputBuilder()
+                .AddParameter("foo")
+                .AddParameter("bar")
+                .Build();
+
+            // Act & assert
+            var ex = Assert.Throws<CliFxException>(() => CommandHelper.ResolveCommand<ParametersCommand>(input));
             _output.WriteLine(ex.Message);
         }
 

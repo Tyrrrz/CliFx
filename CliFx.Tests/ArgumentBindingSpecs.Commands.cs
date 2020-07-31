@@ -134,11 +134,17 @@ namespace CliFx.Tests
         [Command]
         private class RequiredOptionCommand : ICommand
         {
-            [CommandOption(nameof(OptionA))]
-            public string? OptionA { get; set; }
+            [CommandOption(nameof(Option), IsRequired = true)]
+            public string? Option { get; set; }
 
-            [CommandOption(nameof(OptionB), IsRequired = true)]
-            public string? OptionB { get; set; }
+            public ValueTask ExecuteAsync(IConsole console) => default;
+        }
+
+        [Command]
+        private class RequiredArrayOptionCommand : ICommand
+        {
+            [CommandOption(nameof(Option), IsRequired = true)]
+            public IReadOnlyList<string>? Option { get; set; }
 
             public ValueTask ExecuteAsync(IConsole console) => default;
         }
