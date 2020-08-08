@@ -65,6 +65,26 @@ namespace CliFx
         int CursorTop { get; set; }
 
         /// <summary>
+        /// Window width.
+        /// </summary>
+        int WindowWidth { get; set; }
+
+        /// <summary>
+        /// Window height.
+        /// </summary>
+        int WindowHeight  { get; set; }
+
+        /// <summary>
+        /// Window buffer width.
+        /// </summary>
+        int BufferWidth { get; set; }
+
+        /// <summary>
+        /// Window buffer height.
+        /// </summary>
+        int BufferHeight { get; set; }
+
+        /// <summary>
         /// Defers the application termination in case of a cancellation request and returns the token that represents it.
         /// Subsequent calls to this method return the same token.
         /// </summary>

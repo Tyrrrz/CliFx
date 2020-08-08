@@ -71,6 +71,34 @@ namespace CliFx
         }
 
         /// <inheritdoc />
+        public int WindowWidth
+        {
+            get => Console.WindowWidth;
+            set => Console.WindowWidth = value;
+        }
+
+        /// <inheritdoc />
+        public int WindowHeight
+        {
+            get => Console.WindowHeight;
+            set => Console.WindowHeight = value;
+        }
+
+        /// <inheritdoc />
+        public int BufferWidth
+        {
+            get => Console.BufferWidth;
+            set => Console.BufferWidth = value;
+        }
+
+        /// <inheritdoc />
+        public int BufferHeight
+        {
+            get => Console.BufferHeight;
+            set => Console.BufferHeight = value;
+        }
+
+        /// <inheritdoc />
         public CancellationToken GetCancellationToken()
         {
             if (_cancellationTokenSource != null)

@@ -121,7 +121,7 @@ namespace CliFx.Domain
             WriteHorizontalMargin();
 
             ApplicationConfiguration configuration = _cliContext.Configuration;
-            int width = configuration.IsManualFixedWidth ? configuration.ManualWidth : (int)(_console. * (configuration.ManualWidth / 100.0));
+            int width = configuration.IsManualFixedWidth ? configuration.ManualWidth : (int)(_console.WindowWidth * (configuration.ManualWidth / 100.0));
             Write(TextWrapUtil.WrapText(command.Manual, width, 2));
 
             WriteLine();

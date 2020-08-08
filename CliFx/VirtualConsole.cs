@@ -51,6 +51,18 @@ namespace CliFx
         public int CursorTop { get; set; }
 
         /// <inheritdoc />
+        public int WindowWidth { get; set; } = int.MaxValue;
+
+        /// <inheritdoc />
+        public int WindowHeight { get; set; } = int.MaxValue;
+
+        /// <inheritdoc />
+        public int BufferWidth { get; set; } = int.MaxValue;
+
+        /// <inheritdoc />
+        public int BufferHeight { get; set; } = int.MaxValue;
+
+        /// <inheritdoc />
         public CancellationToken GetCancellationToken() => _cancellationToken;
 
         /// <summary>
