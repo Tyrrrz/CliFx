@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CliFx", "CliFx\CliFx.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CliFx.Tests", "CliFx.Tests\CliFx.Tests.csproj", "{268CF863-65A5-49BB-93CF-08972B7756DC}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3AAE8166-BB8E-49DA-844C-3A0EE6BD40A0}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{3AAE8166-BB8E-49DA-844C-3A0EE6BD40A0}"
 	ProjectSection(SolutionItems) = preProject
 		Changelog.md = Changelog.md
 		CliFx.props = CliFx.props
@@ -26,6 +26,17 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CliFx.Analyzers.Tests", "CliFx.Analyzers.Tests\CliFx.Analyzers.Tests.csproj", "{49878E75-2097-4C79-9151-B98A28FBB973}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CliFx.InteractiveModeDemo", "CliFx.InteractiveModeDemo\CliFx.InteractiveModeDemo.csproj", "{B789C384-5842-4DA0-A26E-9CDDF68F87D3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Configuration", "Configuration", "{055B9CC5-6327-4215-8717-4F384F4C492E}"
+	ProjectSection(SolutionItems) = preProject
+		CliFx.props = CliFx.props
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Src", "Src", "{8217F4D4-8E55-44C4-ADDB-72115BAD7BC4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{10210B58-6AF5-4C6B-B388-99F0468429F7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Demo", "Demo", "{4EC8BB3C-EAA3-469B-B3A5-1FE80BEA748A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -136,6 +147,16 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C0D60B0B-63CF-4DCA-916F-BDB40CEDCE35} = {8217F4D4-8E55-44C4-ADDB-72115BAD7BC4}
+		{268CF863-65A5-49BB-93CF-08972B7756DC} = {10210B58-6AF5-4C6B-B388-99F0468429F7}
+		{8ACD6DC2-D768-4850-9223-5B7C83A78513} = {10210B58-6AF5-4C6B-B388-99F0468429F7}
+		{AAB6844C-BF71-448F-A11B-89AEE459AB15} = {4EC8BB3C-EAA3-469B-B3A5-1FE80BEA748A}
+		{F717347D-8656-44DA-A4A2-BE515E8C4655} = {10210B58-6AF5-4C6B-B388-99F0468429F7}
+		{F8460D69-F8CF-405C-A6ED-BED02A21DB42} = {8217F4D4-8E55-44C4-ADDB-72115BAD7BC4}
+		{49878E75-2097-4C79-9151-B98A28FBB973} = {10210B58-6AF5-4C6B-B388-99F0468429F7}
+		{B789C384-5842-4DA0-A26E-9CDDF68F87D3} = {4EC8BB3C-EAA3-469B-B3A5-1FE80BEA748A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6ACC950B-5F93-429C-A204-6315A92AD3A1}

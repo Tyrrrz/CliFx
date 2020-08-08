@@ -6,6 +6,12 @@ using CliFx.Internal.Extensions;
 
 namespace CliFx.Domain
 {
+    /// <summary>
+    /// Provides a command parser and command class represention.
+    /// <remarks>
+    /// Command schema is `{directives} {command name} {parameters} {options}`.
+    /// </remarks>
+    /// </summary>
     internal partial class CommandInput
     {
         public IReadOnlyList<CommandDirectiveInput> Directives { get; }
@@ -15,10 +21,6 @@ namespace CliFx.Domain
         public IReadOnlyList<CommandParameterInput> Parameters { get; }
 
         public IReadOnlyList<CommandOptionInput> Options { get; }
-
-        public bool IsDebugDirectiveSpecified => Directives.Any(d => d.IsDebugDirective);
-
-        public bool IsPreviewDirectiveSpecified => Directives.Any(d => d.IsPreviewDirective);
 
         public bool IsHelpOptionSpecified => Options.Any(o => o.IsHelpOption);
 
@@ -36,36 +38,64 @@ namespace CliFx.Domain
             Options = options;
         }
 
+        public bool HasDirective(string directive)
+        {
+            string[] aliases = directive.Trim('[', ']')
+                                        .ToLower()
+                                        .Split('|');
+
+            return Directives.Where(x => aliases.Contains(x.Name.ToLower()))
+                             .Any();
+        }
+
+        public bool HasAnyOfDirectives(string[] directives)
+        {
+            foreach(var directive in directives)
+            {
+                if (HasDirective(directive))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public bool HasAllOfDirectives(string[] directives)
+        {
+            foreach(var directive in directives)
+            {
+                if (!HasDirective(directive))
+                    return false;
+            }
+
+            return true;
+        }
+
         public override string ToString()
         {
             var buffer = new StringBuilder();
 
             foreach (var directive in Directives)
             {
-                buffer
-                    .AppendIfNotEmpty(' ')
-                    .Append(directive);
+                buffer.AppendIfNotEmpty(' ')
+                      .Append(directive);
             }
 
             if (!string.IsNullOrWhiteSpace(CommandName))
             {
-                buffer
-                    .AppendIfNotEmpty(' ')
-                    .Append(CommandName);
+                buffer.AppendIfNotEmpty(' ')
+                      .Append(CommandName);
             }
 
             foreach (var parameter in Parameters)
             {
-                buffer
-                    .AppendIfNotEmpty(' ')
-                    .Append(parameter);
+                buffer.AppendIfNotEmpty(' ')
+                      .Append(parameter);
             }
 
             foreach (var option in Options)
             {
-                buffer
-                    .AppendIfNotEmpty(' ')
-                    .Append(option);
+                buffer.AppendIfNotEmpty(' ')
+                      .Append(option);
             }
 
             return buffer.ToString();

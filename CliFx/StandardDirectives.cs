@@ -3,7 +3,7 @@
     /// <summary>
     /// Standard command directives definitions (pipe delimted to specify alternative definitions).
     /// </summary>
-    public static class Directives
+    public static class StandardDirectives
     {
         /// <summary>
         /// When application is ran in debug mode (using the [debug] directive), it will wait for debugger to be attached before proceeding.

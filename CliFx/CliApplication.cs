@@ -122,10 +122,10 @@ namespace CliFx
             _console.Output.WriteLine();
         }
 
-        private ICommand GetCommandInstance(CommandSchema command) =>
-            command != StubDefaultCommand.Schema
-                ? (ICommand)_typeActivator.CreateInstance(command.Type)
-                : new StubDefaultCommand();
+        private ICommand GetCommandInstance(CommandSchema command)
+        {
+            return command != StubDefaultCommand.Schema ? (ICommand)_typeActivator.CreateInstance(command.Type) : new StubDefaultCommand();
+        }
 
         /// <summary>
         /// Runs the application with specified command line arguments and environment variables, and returns the exit code.
@@ -145,16 +145,29 @@ namespace CliFx
                 var input = CommandInput.Parse(commandLineArguments, root.GetCommandNames());
 
                 // Debug mode
-                if (_configuration.IsDebugModeAllowed && input.IsDebugDirectiveSpecified)
+                if (_configuration.IsDebugModeAllowed && input.HasDirective(StandardDirectives.Debug))
                 {
                     await LaunchAndWaitForDebuggerAsync();
                 }
 
                 // Preview mode
-                if (_configuration.IsPreviewModeAllowed && input.IsPreviewDirectiveSpecified)
+                if (_configuration.IsPreviewModeAllowed && input.HasDirective(StandardDirectives.Preview))
                 {
                     WriteCommandLineInput(input);
                     return ExitCode.Success;
+                }
+
+                // Handle directives not supported in normal mode
+                if (_configuration.IsPreviewModeAllowed && input.HasAnyOfDirectives(InteractiveModeDirectives))
+                {
+                    _console.WithForegroundColor(ConsoleColor.Red, () =>
+                    {
+                        _console.Output.WriteLine("The command is invalid.");
+                        _console.Output.WriteLine("This application does support interactive mode.");
+                        _console.Output.WriteLine($"Directives [{string.Join("], [", InteractiveModeDirectives)}] cannot be used in this application.");
+                    });
+
+                    return 1;
                 }
 
                 // Try to get the command matching the input or fallback to default
@@ -272,6 +285,18 @@ namespace CliFx
 
     public partial class CliApplication
     {
+        /// <summary>
+        /// Interactive mode directives <see cref="StandardDirectives"/>.
+        /// </summary>
+        protected static string[] InteractiveModeDirectives = new string[]
+        {
+            StandardDirectives.Interactive,
+            StandardDirectives.Default,
+            StandardDirectives.Scope,
+            StandardDirectives.ScopeUp,
+            StandardDirectives.ScopeReset
+        };
+
         private static class ExitCode
         {
             public const int Success = 0;

@@ -27,8 +27,14 @@ namespace CliFx.Domain
             _ => $"--{Alias}"
         };
 
-        public string GetRawValues() => Values.Select(v => v.Quote()).JoinToString(" ");
+        public string GetRawValues()
+        {
+            return Values.Select(v => v.Quote()).JoinToString(" ");
+        }
 
-        public override string ToString() => $"{GetRawAlias()} {GetRawValues()}";
+        public override string ToString()
+        {
+            return $"{GetRawAlias()} {GetRawValues()}";
+        }
     }
 }

@@ -57,7 +57,7 @@ namespace CliFx
         /// <inheritdoc />
         public override string ToString()
         {
-            return string.Join(' ', CommandLineArguments);
+            return string.Join(" ", CommandLineArguments);
         }
     }
 }
