@@ -33,8 +33,8 @@ namespace CliFx.Tests
             var app = new CliApplicationBuilder()
                 .AddCommand(typeof(DefaultCommand))
                 .AddCommandsFrom(typeof(DefaultCommand).Assembly)
-                .AddCommands(new[] {typeof(DefaultCommand)})
-                .AddCommandsFrom(new[] {typeof(DefaultCommand).Assembly})
+                .AddCommands(new[] { typeof(DefaultCommand) })
+                .AddCommandsFrom(new[] { typeof(DefaultCommand).Assembly })
                 .AddCommandsFromThisAssembly()
                 .AllowDebugMode()
                 .AllowPreviewMode()
@@ -65,7 +65,7 @@ namespace CliFx.Tests
         public void Commands_must_implement_the_corresponding_interface()
         {
             // Arrange
-            var commandTypes = new[] {typeof(NonImplementedCommand)};
+            var commandTypes = new[] { typeof(NonImplementedCommand) };
 
             // Act & assert
             var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes));
@@ -76,7 +76,7 @@ namespace CliFx.Tests
         public void Commands_must_be_annotated_by_an_attribute()
         {
             // Arrange
-            var commandTypes = new[] {typeof(NonAnnotatedCommand)};
+            var commandTypes = new[] { typeof(NonAnnotatedCommand) };
 
             // Act & assert
             var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes));
@@ -87,7 +87,7 @@ namespace CliFx.Tests
         public void Commands_must_have_unique_names()
         {
             // Arrange
-            var commandTypes = new[] {typeof(DuplicateNameCommandA), typeof(DuplicateNameCommandB)};
+            var commandTypes = new[] { typeof(DuplicateNameCommandA), typeof(DuplicateNameCommandB) };
 
             // Act & assert
             var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes));
@@ -98,7 +98,7 @@ namespace CliFx.Tests
         public void Command_can_be_default_but_only_if_it_is_the_only_such_command()
         {
             // Arrange
-            var commandTypes = new[] {typeof(DefaultCommand), typeof(AnotherDefaultCommand)};
+            var commandTypes = new[] { typeof(DefaultCommand), typeof(AnotherDefaultCommand) };
 
             // Act & assert
             var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes));
@@ -109,7 +109,7 @@ namespace CliFx.Tests
         public void Command_parameters_must_have_unique_order()
         {
             // Arrange
-            var commandTypes = new[] {typeof(DuplicateParameterOrderCommand)};
+            var commandTypes = new[] { typeof(DuplicateParameterOrderCommand) };
 
             // Act & assert
             var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes));
@@ -120,7 +120,7 @@ namespace CliFx.Tests
         public void Command_parameters_must_have_unique_names()
         {
             // Arrange
-            var commandTypes = new[] {typeof(DuplicateParameterNameCommand)};
+            var commandTypes = new[] { typeof(DuplicateParameterNameCommand) };
 
             // Act & assert
             var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes));
@@ -131,7 +131,7 @@ namespace CliFx.Tests
         public void Command_parameter_can_be_non_scalar_only_if_no_other_such_parameter_is_present()
         {
             // Arrange
-            var commandTypes = new[] {typeof(MultipleNonScalarParametersCommand)};
+            var commandTypes = new[] { typeof(MultipleNonScalarParametersCommand) };
 
             // Act & assert
             var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes));
@@ -142,7 +142,7 @@ namespace CliFx.Tests
         public void Command_parameter_can_be_non_scalar_only_if_it_is_the_last_in_order()
         {
             // Arrange
-            var commandTypes = new[] {typeof(NonLastNonScalarParameterCommand)};
+            var commandTypes = new[] { typeof(NonLastNonScalarParameterCommand) };
 
             // Act & assert
             var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes));
@@ -153,7 +153,7 @@ namespace CliFx.Tests
         public void Command_options_must_have_names_that_are_not_empty()
         {
             // Arrange
-            var commandTypes = new[] {typeof(EmptyOptionNameCommand)};
+            var commandTypes = new[] { typeof(EmptyOptionNameCommand) };
 
             // Act & assert
             var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes));
@@ -164,7 +164,7 @@ namespace CliFx.Tests
         public void Command_options_must_have_names_that_are_longer_than_one_character()
         {
             // Arrange
-            var commandTypes = new[] {typeof(SingleCharacterOptionNameCommand)};
+            var commandTypes = new[] { typeof(SingleCharacterOptionNameCommand) };
 
             // Act & assert
             var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes));
@@ -175,7 +175,7 @@ namespace CliFx.Tests
         public void Command_options_must_have_unique_names()
         {
             // Arrange
-            var commandTypes = new[] {typeof(DuplicateOptionNamesCommand)};
+            var commandTypes = new[] { typeof(DuplicateOptionNamesCommand) };
 
             // Act & assert
             var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes));
@@ -186,7 +186,7 @@ namespace CliFx.Tests
         public void Command_options_must_have_unique_short_names()
         {
             // Arrange
-            var commandTypes = new[] {typeof(DuplicateOptionShortNamesCommand)};
+            var commandTypes = new[] { typeof(DuplicateOptionShortNamesCommand) };
 
             // Act & assert
             var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes));
@@ -197,7 +197,7 @@ namespace CliFx.Tests
         public void Command_options_must_not_have_conflicts_with_the_implicit_help_option()
         {
             // Arrange
-            var commandTypes = new[] {typeof(ConflictWithHelpOptionCommand)};
+            var commandTypes = new[] { typeof(ConflictWithHelpOptionCommand) };
 
             // Act & assert
             var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes));
@@ -208,7 +208,7 @@ namespace CliFx.Tests
         public void Command_options_must_not_have_conflicts_with_the_implicit_version_option()
         {
             // Arrange
-            var commandTypes = new[] {typeof(ConflictWithVersionOptionCommand)};
+            var commandTypes = new[] { typeof(ConflictWithVersionOptionCommand) };
 
             // Act & assert
             var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes));
@@ -219,7 +219,7 @@ namespace CliFx.Tests
         public void Command_options_must_have_unique_environment_variable_names()
         {
             // Arrange
-            var commandTypes = new[] {typeof(DuplicateOptionEnvironmentVariableNamesCommand)};
+            var commandTypes = new[] { typeof(DuplicateOptionEnvironmentVariableNamesCommand) };
 
             // Act & assert
             var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes));
@@ -230,7 +230,7 @@ namespace CliFx.Tests
         public void Command_options_and_parameters_must_be_annotated_by_corresponding_attributes()
         {
             // Arrange
-            var commandTypes = new[] {typeof(HiddenPropertiesCommand)};
+            var commandTypes = new[] { typeof(HiddenPropertiesCommand) };
 
             // Act
             var schema = RootSchema.Resolve(commandTypes);

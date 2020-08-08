@@ -118,7 +118,7 @@ namespace CliFx.Domain
 
                 // Parameters are required by default and so a non-scalar parameter must
                 // be bound to at least one value
-                if(!nonScalarValues.Any())
+                if (!nonScalarValues.Any())
                     throw CliFxException.ParameterNotSet(nonScalarParameter);
 
                 nonScalarParameter.BindOn(instance, nonScalarValues);
@@ -149,7 +149,7 @@ namespace CliFx.Domain
                     continue;
 
                 var values = option.IsScalar
-                    ? new[] {value}
+                    ? new[] { value }
                     : value.Split(Path.PathSeparator);
 
                 option.BindOn(instance, values);
@@ -236,8 +236,8 @@ namespace CliFx.Domain
             var name = attribute?.Name;
 
             var builtInOptions = string.IsNullOrWhiteSpace(name)
-                ? new[] {CommandOptionSchema.HelpOption, CommandOptionSchema.VersionOption}
-                : new[] {CommandOptionSchema.HelpOption};
+                ? new[] { CommandOptionSchema.HelpOption, CommandOptionSchema.VersionOption }
+                : new[] { CommandOptionSchema.HelpOption };
 
             var parameters = type.GetProperties()
                 .Select(CommandParameterSchema.TryResolve)

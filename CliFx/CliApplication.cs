@@ -46,7 +46,6 @@ namespace CliFx
             _helpTextWriter = new HelpTextWriter(CliContext);
         }
 
-
         /// <summary>
         /// Initializes an instance of <see cref="CliApplication"/>.
         /// </summary>
@@ -159,7 +158,7 @@ namespace CliFx
                 }
 
                 // Try to get the command matching the input or fallback to default
-                var command =
+                CommandSchema command =
                     root.TryFindCommand(input.CommandName) ??
                     root.TryFindDefaultCommand() ??
                     StubDefaultCommand.Schema;
@@ -173,6 +172,8 @@ namespace CliFx
 
                 // Get command instance (also used in help text)
                 var instance = GetCommandInstance(command);
+
+                CliContext.CurrentCommandInfo = new CommandInfo(command, commandLineArguments);
 
                 // To avoid instantiating the command twice, we need to get default values
                 // before the arguments are bound to the properties

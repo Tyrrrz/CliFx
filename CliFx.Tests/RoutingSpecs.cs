@@ -77,7 +77,7 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(
-                new[] {"concat", "-i", "foo", "bar", "-s", ", "},
+                new[] { "concat", "-i", "foo", "bar", "-s", ", " },
                 new Dictionary<string, string>());
 
             var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();

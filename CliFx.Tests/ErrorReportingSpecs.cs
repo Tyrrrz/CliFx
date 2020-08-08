@@ -27,7 +27,7 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(
-                new[] {"exc", "-m", "Kaput"},
+                new[] { "exc", "-m", "Kaput" },
                 new Dictionary<string, string>());
 
             var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray()).TrimEnd();
@@ -56,7 +56,7 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(
-                new[] {"exc", "-m", "Kaput", "-c", "69"},
+                new[] { "exc", "-m", "Kaput", "-c", "69" },
                 new Dictionary<string, string>());
 
             var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray()).TrimEnd();
@@ -82,7 +82,7 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(
-                new[] {"exc"},
+                new[] { "exc" },
                 new Dictionary<string, string>());
 
             var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray()).TrimEnd();
@@ -113,7 +113,7 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(
-                new[] {"exc", "-m", "Kaput", "--show-help"},
+                new[] { "exc", "-m", "Kaput", "--show-help" },
                 new Dictionary<string, string>());
 
             var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray()).TrimEnd();
@@ -148,7 +148,7 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(
-                new[] {"not-a-valid-command", "-r", "foo"},
+                new[] { "not-a-valid-command", "-r", "foo" },
                 new Dictionary<string, string>());
 
             var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray()).TrimEnd();

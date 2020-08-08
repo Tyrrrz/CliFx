@@ -22,8 +22,8 @@ namespace CliFx.Domain
 
         public string GetRawAlias() => Alias switch
         {
-            {Length: 0} => Alias,
-            {Length: 1} => $"-{Alias}",
+            { Length: 0 } => Alias,
+            { Length: 1 } => $"-{Alias}",
             _ => $"--{Alias}"
         };
 

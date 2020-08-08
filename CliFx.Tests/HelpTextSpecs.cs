@@ -28,7 +28,7 @@ namespace CliFx.Tests
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[] {"--version"});
+            var exitCode = await application.RunAsync(new[] { "--version" });
             var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
 
             // Assert
@@ -57,7 +57,7 @@ namespace CliFx.Tests
                 .Build();
 
             // Act
-            await application.RunAsync(new[] {"--help"});
+            await application.RunAsync(new[] { "--help" });
             var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
 
             // Assert
@@ -94,7 +94,7 @@ namespace CliFx.Tests
                 .Build();
 
             // Act
-            await application.RunAsync(new[] {"cmd", "--help"});
+            await application.RunAsync(new[] { "cmd", "--help" });
             var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
 
             // Assert
@@ -132,7 +132,7 @@ namespace CliFx.Tests
                 .Build();
 
             // Act
-            await application.RunAsync(new[] {"cmd", "sub", "--help"});
+            await application.RunAsync(new[] { "cmd", "sub", "--help" });
             var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
 
             // Assert
@@ -166,7 +166,7 @@ namespace CliFx.Tests
                 .Build();
 
             // Act
-            await application.RunAsync(new[] {"--help"});
+            await application.RunAsync(new[] { "--help" });
             var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
 
             // Assert
@@ -197,7 +197,7 @@ namespace CliFx.Tests
                 .Build();
 
             // Act
-            await application.RunAsync(new[] {"cmd-with-params", "--help"});
+            await application.RunAsync(new[] { "cmd-with-params", "--help" });
             var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
 
             // Assert
@@ -222,7 +222,7 @@ namespace CliFx.Tests
                 .Build();
 
             // Act
-            await application.RunAsync(new[] {"cmd-with-req-opts", "--help"});
+            await application.RunAsync(new[] { "cmd-with-req-opts", "--help" });
             var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
 
             // Assert
@@ -251,7 +251,7 @@ namespace CliFx.Tests
                 .Build();
 
             // Act
-            await application.RunAsync(new[] {"cmd-with-enum-args", "--help"});
+            await application.RunAsync(new[] { "cmd-with-enum-args", "--help" });
             var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
 
             // Assert
@@ -281,7 +281,7 @@ namespace CliFx.Tests
                 .Build();
 
             // Act
-            await application.RunAsync(new[] {"cmd-with-env-vars", "--help"});
+            await application.RunAsync(new[] { "cmd-with-env-vars", "--help" });
             var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
 
             // Assert
@@ -307,7 +307,7 @@ namespace CliFx.Tests
                 .Build();
 
             // Act
-            await application.RunAsync(new[] {"cmd-with-defaults", "--help"});
+            await application.RunAsync(new[] { "cmd-with-defaults", "--help" });
             var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
 
             // Assert

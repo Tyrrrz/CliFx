@@ -72,7 +72,7 @@ namespace CliFx
         /// <summary>
         /// Window height.
         /// </summary>
-        int WindowHeight  { get; set; }
+        int WindowHeight { get; set; }
 
         /// <summary>
         /// Window buffer width.

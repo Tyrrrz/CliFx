@@ -50,7 +50,7 @@ namespace CliFx.Attributes
         /// Initializes an instance of <see cref="CommandOptionAttribute"/>.
         /// </summary>
         public CommandOptionAttribute(string name, char shortName)
-            : this(name, (char?) shortName)
+            : this(name, (char?)shortName)
         {
         }
 
@@ -66,7 +66,7 @@ namespace CliFx.Attributes
         /// Initializes an instance of <see cref="CommandOptionAttribute"/>.
         /// </summary>
         public CommandOptionAttribute(char shortName)
-            : this(null, (char?) shortName)
+            : this(null, (char?)shortName)
         {
         }
     }

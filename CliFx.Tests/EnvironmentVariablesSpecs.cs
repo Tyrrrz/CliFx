@@ -66,7 +66,7 @@ namespace CliFx.Tests
             // Assert
             instance.Should().BeEquivalentTo(new EnvironmentVariableCollectionCommand
             {
-                Option = new[] {"foo", "bar"}
+                Option = new[] { "foo", "bar" }
             });
         }
 
@@ -89,7 +89,7 @@ namespace CliFx.Tests
                 Option = $"foo{Path.PathSeparator}bar"
             });
         }
-        
+
         [Fact]
         public void Option_can_use_a_specific_environment_variable_as_fallback_while_respecting_case()
         {

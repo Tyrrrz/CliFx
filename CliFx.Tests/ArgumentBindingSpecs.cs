@@ -47,7 +47,7 @@ namespace CliFx.Tests
             // Assert
             instance.Should().BeEquivalentTo(new AllSupportedTypesCommand
             {
-                ObjectArray = new object[] {"foo", "bar"}
+                ObjectArray = new object[] { "foo", "bar" }
             });
         }
 
@@ -65,7 +65,7 @@ namespace CliFx.Tests
             // Assert
             instance.Should().BeEquivalentTo(new AllSupportedTypesCommand
             {
-                Enumerable = new object[] {"foo", "bar"}
+                Enumerable = new object[] { "foo", "bar" }
             });
         }
 
@@ -101,7 +101,7 @@ namespace CliFx.Tests
             // Assert
             instance.Should().BeEquivalentTo(new AllSupportedTypesCommand
             {
-                StringArray = new[] {"foo", "bar"}
+                StringArray = new[] { "foo", "bar" }
             });
         }
 
@@ -119,7 +119,7 @@ namespace CliFx.Tests
             // Assert
             instance.Should().BeEquivalentTo(new AllSupportedTypesCommand
             {
-                StringEnumerable = new[] {"foo", "bar"}
+                StringEnumerable = new[] { "foo", "bar" }
             });
         }
 
@@ -137,7 +137,7 @@ namespace CliFx.Tests
             // Assert
             instance.Should().BeEquivalentTo(new AllSupportedTypesCommand
             {
-                StringReadOnlyList = new[] {"foo", "bar"}
+                StringReadOnlyList = new[] { "foo", "bar" }
             });
         }
 
@@ -155,7 +155,7 @@ namespace CliFx.Tests
             // Assert
             instance.Should().BeEquivalentTo(new AllSupportedTypesCommand
             {
-                StringList = new List<string> {"foo", "bar"}
+                StringList = new List<string> { "foo", "bar" }
             });
         }
 
@@ -173,7 +173,7 @@ namespace CliFx.Tests
             // Assert
             instance.Should().BeEquivalentTo(new AllSupportedTypesCommand
             {
-                StringHashSet = new HashSet<string>(new[] {"foo", "bar"})
+                StringHashSet = new HashSet<string>(new[] { "foo", "bar" })
             });
         }
 
@@ -389,7 +389,7 @@ namespace CliFx.Tests
             // Assert
             instance.Should().BeEquivalentTo(new AllSupportedTypesCommand
             {
-                IntArray = new[] {3, 14}
+                IntArray = new[] { 3, 14 }
             });
         }
 
@@ -407,7 +407,7 @@ namespace CliFx.Tests
             // Assert
             instance.Should().BeEquivalentTo(new AllSupportedTypesCommand
             {
-                IntNullableArray = new int?[] {3, 14}
+                IntNullableArray = new int?[] { 3, 14 }
             });
         }
 
@@ -713,7 +713,7 @@ namespace CliFx.Tests
             // Assert
             instance.Should().BeEquivalentTo(new AllSupportedTypesCommand
             {
-                CustomEnumArray = new[] {CustomEnum.Value1, CustomEnum.Value3}
+                CustomEnumArray = new[] { CustomEnum.Value1, CustomEnum.Value3 }
             });
         }
 
@@ -731,7 +731,7 @@ namespace CliFx.Tests
             // Assert
             instance.Should().BeEquivalentTo(new AllSupportedTypesCommand
             {
-                CustomEnumArray = new[] {CustomEnum.Value1, CustomEnum.Value3}
+                CustomEnumArray = new[] { CustomEnum.Value1, CustomEnum.Value3 }
             });
         }
 
@@ -749,7 +749,7 @@ namespace CliFx.Tests
             // Assert
             instance.Should().BeEquivalentTo(new AllSupportedTypesCommand
             {
-                CustomEnumArray = new[] {CustomEnum.Value1, CustomEnum.Value3}
+                CustomEnumArray = new[] { CustomEnum.Value1, CustomEnum.Value3 }
             });
         }
 
@@ -785,7 +785,7 @@ namespace CliFx.Tests
             // Assert
             instance.Should().BeEquivalentTo(new AllSupportedTypesCommand
             {
-                TestStringConstructableArray = new[] {new StringConstructable("foo"), new StringConstructable("bar") }
+                TestStringConstructableArray = new[] { new StringConstructable("foo"), new StringConstructable("bar") }
             });
         }
 
@@ -893,7 +893,7 @@ namespace CliFx.Tests
             // Assert
             instance.Should().BeEquivalentTo(new ArrayOptionCommand
             {
-                Option = new[] {"foo", "bar", "baz"}
+                Option = new[] { "foo", "bar", "baz" }
             });
         }
 
@@ -954,7 +954,7 @@ namespace CliFx.Tests
             {
                 ParameterA = "foo",
                 ParameterB = "bar",
-                ParameterC = new[] {"hello", "world"}
+                ParameterC = new[] { "hello", "world" }
             });
         }
 

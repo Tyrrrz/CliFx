@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using CliFx.Attributes;
-using CliFx.InteractiveModeDemo.Services;
 using CliFx.Exceptions;
+using CliFx.InteractiveModeDemo.Services;
 
 namespace CliFx.InteractiveModeDemo.Commands
 {

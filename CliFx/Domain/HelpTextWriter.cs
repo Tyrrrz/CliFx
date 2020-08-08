@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
-using CliFx.Internal;
 using CliFx.Internal.Extensions;
 
 namespace CliFx.Domain

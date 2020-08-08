@@ -129,7 +129,7 @@ namespace CliFx
 
         private static StreamWriter WrapOutput(Stream? stream) =>
             stream != null
-                ? new StreamWriter(Stream.Synchronized(stream), Console.OutputEncoding) {AutoFlush = true}
+                ? new StreamWriter(Stream.Synchronized(stream), Console.OutputEncoding) { AutoFlush = true }
                 : StreamWriter.Null;
     }
 }

@@ -38,8 +38,8 @@ namespace CliFx.Internal.Extensions
         public static MethodInfo GetStaticParseMethod(this Type type, bool withFormatProvider = false)
         {
             var argumentTypes = withFormatProvider
-                ? new[] {typeof(string), typeof(IFormatProvider)}
-                : new[] {typeof(string)};
+                ? new[] { typeof(string), typeof(IFormatProvider) }
+                : new[] { typeof(string) };
 
             return type.GetMethod("Parse",
                 BindingFlags.Public | BindingFlags.Static,

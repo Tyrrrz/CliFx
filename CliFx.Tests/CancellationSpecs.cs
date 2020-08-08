@@ -30,7 +30,7 @@ namespace CliFx.Tests
             cts.CancelAfter(TimeSpan.FromSeconds(0.2));
 
             var exitCode = await application.RunAsync(
-                new[] {"cancel"},
+                new[] { "cancel" },
                 new Dictionary<string, string>());
 
             var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();

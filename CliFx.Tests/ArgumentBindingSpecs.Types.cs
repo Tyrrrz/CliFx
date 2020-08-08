@@ -45,7 +45,7 @@ namespace CliFx.Tests
 
         public class CustomEnumerable<T> : IEnumerable<T>
         {
-            public IEnumerator<T> GetEnumerator() => ((IEnumerable<T>) Array.Empty<T>()).GetEnumerator();
+            public IEnumerator<T> GetEnumerator() => ((IEnumerable<T>)Array.Empty<T>()).GetEnumerator();
 
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }

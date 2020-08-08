@@ -1,3 +1,14 @@
+### v2.0 (XX-XX-2020)
+
+- Added interactive mode and interactive only commands.
+- Added `ICliExceptionHandler` and `CliApplicationBuilder.UseExceptionHandler(...)`
+- Added `CliApplicationBuilder.UseTypeActivator(Func<ICliContext, IConsole, Func<Type, object>> buildServiceProvider)` for easy DI container independent ICliContext and IConsole registration.
+- Added	`Manual` porperty in `CommandAttribute` that can be used to provide a long, extended description of a commmand.
+- Added `CliContext` that can be injected to services and commands with DI.
+- Added `WindowWidth`, `WindowHeight`, `BufferWidth`, and `BufferHeight` to `IConsole`.
+- Added a second demo of that proesents the interactive mode.
+- In demo apps `BookListCommand` prints a red message when there are no books.
+
 ### v1.3.2 (31-Jul-2020)
 
 - Fixed an issue where a command was incorrectly allowed to execute when the user did not specify any value for a non-scalar parameter. Since they are always required, a parameter needs to be bound to (at least) one value. (Thanks [@Daniel Hix](https://github.com/ADustyOldMuffin))

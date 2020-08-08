@@ -14,7 +14,7 @@ namespace CliFx.Benchmarks
     [Orderer(SummaryOrderPolicy.FastestToSlowest)]
     public class Benchmarks
     {
-        private static readonly string[] Arguments = {"--str", "hello world", "-i", "13", "-b"};
+        private static readonly string[] Arguments = { "--str", "hello world", "-i", "13", "-b" };
 
         [Benchmark(Description = "CliFx", Baseline = true)]
         public async ValueTask<int> ExecuteWithCliFx() =>

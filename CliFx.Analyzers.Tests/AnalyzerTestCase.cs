@@ -26,7 +26,7 @@ namespace CliFx.Analyzers.Tests
             string name,
             IReadOnlyList<DiagnosticDescriptor> testedDiagnostics,
             string sourceCode)
-            : this(name, testedDiagnostics, new[] {sourceCode})
+            : this(name, testedDiagnostics, new[] { sourceCode })
         {
         }
 
@@ -34,7 +34,7 @@ namespace CliFx.Analyzers.Tests
             string name,
             DiagnosticDescriptor testedDiagnostic,
             string sourceCode)
-            : this(name, new[] {testedDiagnostic}, sourceCode)
+            : this(name, new[] { testedDiagnostic }, sourceCode)
         {
         }
 

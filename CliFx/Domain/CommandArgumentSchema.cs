@@ -49,19 +49,19 @@ namespace CliFx.Domain
                         : null;
 
                 // String-constructable
-                var stringConstructor = targetType.GetConstructor(new[] {typeof(string)});
+                var stringConstructor = targetType.GetConstructor(new[] { typeof(string) });
                 if (stringConstructor != null)
-                    return stringConstructor.Invoke(new object[] {value!});
+                    return stringConstructor.Invoke(new object[] { value! });
 
                 // String-parseable (with format provider)
                 var parseMethodWithFormatProvider = targetType.GetStaticParseMethod(true);
                 if (parseMethodWithFormatProvider != null)
-                    return parseMethodWithFormatProvider.Invoke(null, new object[] {value!, FormatProvider});
+                    return parseMethodWithFormatProvider.Invoke(null, new object[] { value!, FormatProvider });
 
                 // String-parseable (without format provider)
                 var parseMethod = targetType.GetStaticParseMethod();
                 if (parseMethod != null)
-                    return parseMethod.Invoke(null, new object[] {value!});
+                    return parseMethod.Invoke(null, new object[] { value! });
             }
             catch (Exception ex)
             {
@@ -84,9 +84,9 @@ namespace CliFx.Domain
                 return array;
 
             // Constructable from an array
-            var arrayConstructor = targetEnumerableType.GetConstructor(new[] {arrayType});
+            var arrayConstructor = targetEnumerableType.GetConstructor(new[] { arrayType });
             if (arrayConstructor != null)
-                return arrayConstructor.Invoke(new object[] {array});
+                return arrayConstructor.Invoke(new object[] { array });
 
             throw CliFxException.CannotConvertNonScalar(this, values, targetEnumerableType);
         }
@@ -118,7 +118,7 @@ namespace CliFx.Domain
             Property?.SetValue(command, Convert(values));
 
         public void BindOn(ICommand command, params string[] values) =>
-            BindOn(command, (IReadOnlyList<string>) values);
+            BindOn(command, (IReadOnlyList<string>)values);
 
         public IReadOnlyList<string> GetValidValues()
         {

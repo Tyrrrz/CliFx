@@ -23,7 +23,7 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(
-                new[] {"[preview]", "cmd", "param", "-abc", "--option", "foo"},
+                new[] { "[preview]", "cmd", "param", "-abc", "--option", "foo" },
                 new Dictionary<string, string>());
 
             var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
