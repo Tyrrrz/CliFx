@@ -16,6 +16,11 @@ namespace CliFx
     /// </summary>
     public partial class CliApplication
     {
+        /// <summary>
+        /// Cli Context instance.
+        /// </summary>
+        protected ICliContext CliContext { get; }
+
         private readonly ApplicationMetadata _metadata;
         private readonly ApplicationConfiguration _configuration;
         private readonly IConsole _console;
@@ -26,20 +31,44 @@ namespace CliFx
         /// <summary>
         /// Initializes an instance of <see cref="CliApplication"/>.
         /// </summary>
+        [Obsolete]
         public CliApplication(
             ApplicationMetadata metadata, ApplicationConfiguration configuration,
             IConsole console, ITypeActivator typeActivator)
         {
+            CliContext = new CliContext(metadata, configuration, console);
+
             _metadata = metadata;
             _configuration = configuration;
             _console = console;
-            _typeActivator = typeActivator;
 
-            _helpTextWriter = new HelpTextWriter(metadata, configuration, console);
+            _typeActivator = typeActivator;
+            _helpTextWriter = new HelpTextWriter(CliContext);
         }
 
-        private void WriteError(string message) => _console.WithForegroundColor(ConsoleColor.Red, () =>
-            _console.Error.WriteLine(message));
+
+        /// <summary>
+        /// Initializes an instance of <see cref="CliApplication"/>.
+        /// </summary>
+        public CliApplication(ICliContext cliContext, ITypeActivator typeActivator)
+        {
+            CliContext = cliContext;
+
+            _metadata = cliContext.Metadata;
+            _configuration = cliContext.Configuration;
+            _console = cliContext.Console;
+
+            _typeActivator = typeActivator;
+            _helpTextWriter = new HelpTextWriter(cliContext);
+        }
+
+        /// <summary>
+        /// Write an error message to the console.
+        /// </summary>
+        protected void WriteError(string message)
+        {
+            _console.WithForegroundColor(ConsoleColor.Red, () => _console.Error.WriteLine(message));
+        }
 
         private async ValueTask LaunchAndWaitForDebuggerAsync()
         {
@@ -104,7 +133,7 @@ namespace CliFx
 
         private ICommand GetCommandInstance(CommandSchema command) =>
             command != StubDefaultCommand.Schema
-                ? (ICommand) _typeActivator.CreateInstance(command.Type)
+                ? (ICommand)_typeActivator.CreateInstance(command.Type)
                 : new StubDefaultCommand();
 
         /// <summary>
@@ -115,7 +144,7 @@ namespace CliFx
         /// Additionally, if the debugger is not attached (i.e. the app is running in production), all other exceptions thrown within
         /// this method will be handled and routed to the console as well.
         /// </remarks>
-        public async ValueTask<int> RunAsync(
+        public virtual async ValueTask<int> RunAsync(
             IReadOnlyList<string> commandLineArguments,
             IReadOnlyDictionary<string, string> environmentVariables)
         {
@@ -216,12 +245,12 @@ namespace CliFx
         /// Additionally, if the debugger is not attached (i.e. the app is running in production), all other exceptions thrown within
         /// this method will be handled and routed to the console as well.
         /// </remarks>
-        public async ValueTask<int> RunAsync(IReadOnlyList<string> commandLineArguments)
+        public virtual async ValueTask<int> RunAsync(IReadOnlyList<string> commandLineArguments)
         {
             // Environment variable names are case-insensitive on Windows but are case-sensitive on Linux and macOS
             var environmentVariables = Environment.GetEnvironmentVariables()
                 .Cast<DictionaryEntry>()
-                .ToDictionary(e => (string) e.Key, e => (string) e.Value, StringComparer.Ordinal);
+                .ToDictionary(e => (string)e.Key, e => (string)e.Value, StringComparer.Ordinal);
 
             return await RunAsync(commandLineArguments, environmentVariables);
         }
@@ -235,7 +264,7 @@ namespace CliFx
         /// Additionally, if the debugger is not attached (i.e. the app is running in production), all other exceptions thrown within
         /// this method will be handled and routed to the console as well.
         /// </remarks>
-        public async ValueTask<int> RunAsync()
+        public virtual async ValueTask<int> RunAsync()
         {
             var commandLineArguments = Environment.GetCommandLineArgs()
                 .Skip(1)

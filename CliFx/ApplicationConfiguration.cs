@@ -15,6 +15,16 @@ namespace CliFx
         public IReadOnlyList<Type> CommandTypes { get; }
 
         /// <summary>
+        /// Custom directives defined in this application.
+        /// </summary>
+        public IReadOnlyList<string> CustomDirectives { get; }
+
+        /// <summary>
+        /// Whether interactive mode is allowed in this application.
+        /// </summary>
+        public bool IsInteractiveModeAllowed { get; }
+
+        /// <summary>
         /// Whether debug mode is allowed in this application.
         /// </summary>
         public bool IsDebugModeAllowed { get; }
@@ -39,14 +49,20 @@ namespace CliFx
         /// </summary>
         public ApplicationConfiguration(
             IReadOnlyList<Type> commandTypes,
+            IReadOnlyList<string> customDirectives,
             bool isDebugModeAllowed,
             bool isPreviewModeAllowed,
+            bool isInteractiveModeAllowed,
             bool isManualFixedWidth,
             int manualWidth)
         {
             CommandTypes = commandTypes;
+            CustomDirectives = customDirectives;
+
             IsDebugModeAllowed = isDebugModeAllowed;
             IsPreviewModeAllowed = isPreviewModeAllowed;
+            IsInteractiveModeAllowed = isInteractiveModeAllowed;
+
             IsManualFixedWidth = isManualFixedWidth;
             ManualWidth = IsManualFixedWidth ? manualWidth : MathUtils.Clamp(manualWidth, 1, 100);
         }

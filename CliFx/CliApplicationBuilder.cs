@@ -15,9 +15,11 @@ namespace CliFx
     public partial class CliApplicationBuilder
     {
         private readonly HashSet<Type> _commandTypes = new HashSet<Type>();
+        private readonly List<string> _customDirectives = new List<string>();
 
         private bool _isDebugModeAllowed = true;
         private bool _isPreviewModeAllowed = true;
+        private bool _isInteractiveModeAllowed = false;
         private string? _title;
         private string? _executableName;
         private string? _versionText;
@@ -26,6 +28,28 @@ namespace CliFx
         private int _manualLength;
         private IConsole? _console;
         private ITypeActivator? _typeActivator;
+        private Func<ICliContext, IConsole, Func<Type, object>> _buildServiceProvider;
+
+        /// <summary>
+        /// Add custom directive.
+        /// </summary>
+        public CliApplicationBuilder AddDirective(string directiveName)
+        {
+            _customDirectives.Add(directiveName.Trim('[', ']'));
+
+            return this;
+        }
+
+        /// <summary>
+        /// Add custom directive.
+        /// </summary>
+        public CliApplicationBuilder AddDirectives(params string[] directivesNames)
+        {
+            foreach (var directiveName in directivesNames)
+                AddDirective(directiveName);
+
+            return this;
+        }
 
         /// <summary>
         /// Adds a command of specified type to the application.
@@ -97,6 +121,15 @@ namespace CliFx
         }
 
         /// <summary>
+        /// Specifies whether interactive mode (enabled with [interactive] directive) is allowed in the application.
+        /// </summary>
+        public CliApplicationBuilder AllowInteractiveMode(bool isAllowed = true)
+        {
+            _isInteractiveModeAllowed = isAllowed;
+            return this;
+        }
+
+        /// <summary>
         /// Sets application title, which appears in the help text.
         /// </summary>
         public CliApplicationBuilder UseTitle(string title)
@@ -142,14 +175,24 @@ namespace CliFx
         }
 
         /// <summary>
+        /// Configures the application to use the specified implementation of <see cref="IConsole"/>.
+        /// </summary>
+        public CliApplicationBuilder UseConsole<T>() where T : class, IConsole, new()
+        {
+            _console = new T();
+            return this;
+        }
+
+        /// <summary>
         /// Configures manual word wrapping.
-        /// <param name="fixedLength"> Whether help manual text has a fixed length specified by <paramref cref="value"/> or dynamic defined as a percentage of console width.</param>
-        /// <param name="value">Specifies manual width when <paramref cref="fixedLength"/> is set to true or a percentage of console width (1-100).</param>
+        /// <param name="fixedLength"> Whether help manual text has a fixed length or dynamic defined as a percentage of console width.</param>
+        /// <param name="value">Specifies manual width when <see name="fixedLength"/> is set to true or a percentage of console width (1-100).</param>
         /// </summary>
         public CliApplicationBuilder UseManualLengthConsole(bool fixedLength, int value)
         {
             _manualFixedLength = fixedLength;
             _manualLength = fixedLength ? value : MathUtils.Clamp(value, 1, 100);
+
             return this;
         }
 
@@ -158,15 +201,29 @@ namespace CliFx
         /// </summary>
         public CliApplicationBuilder UseTypeActivator(ITypeActivator typeActivator)
         {
+            _buildServiceProvider = null;
             _typeActivator = typeActivator;
+
             return this;
         }
+
 
         /// <summary>
         /// Configures the application to use the specified function for activating types.
         /// </summary>
         public CliApplicationBuilder UseTypeActivator(Func<Type, object> typeActivator) =>
             UseTypeActivator(new DelegateTypeActivator(typeActivator));
+
+        /// <summary>
+        /// Configures the application to use the specified implementation of <see cref="ITypeActivator"/>.
+        /// </summary>
+        public CliApplicationBuilder UseTypeActivator(Func<ICliContext, IConsole, Func<Type, object>> buildServiceProvider)
+        {
+            _typeActivator = null;
+            _buildServiceProvider = buildServiceProvider;
+
+            return this;
+        }
 
         /// <summary>
         /// Creates an instance of <see cref="CliApplication"/> using configured parameters.
@@ -178,12 +235,29 @@ namespace CliFx
             _executableName ??= TryGetDefaultExecutableName() ?? "app";
             _versionText ??= TryGetDefaultVersionText() ?? "v1.0";
             _console ??= new SystemConsole();
-            _typeActivator ??= new DefaultTypeActivator();
 
             var metadata = new ApplicationMetadata(_title, _executableName, _versionText, _description);
-            var configuration = new ApplicationConfiguration(_commandTypes.ToArray(), _isDebugModeAllowed, _isPreviewModeAllowed, false, 80);
+            var configuration = new ApplicationConfiguration(_commandTypes.ToArray(),
+                                                             _customDirectives.ToArray(),
 
-            return new CliApplication(metadata, configuration, _console, _typeActivator);
+                                                             _isDebugModeAllowed,
+                                                             _isPreviewModeAllowed,
+                                                             _isInteractiveModeAllowed,
+
+                                                             _manualFixedLength,
+                                                             _manualLength);
+
+            ICliContext cliContext = new CliContext(metadata, configuration, _console);
+
+            if (_buildServiceProvider is null)
+                _typeActivator ??= new DefaultTypeActivator();
+            else
+                _typeActivator = new DelegateTypeActivator(_buildServiceProvider.Invoke(cliContext, _console));
+
+            if (_isInteractiveModeAllowed)
+                return new InteractiveCliApplication(cliContext, _typeActivator);
+
+            return new CliApplication(cliContext, _typeActivator);
         }
     }
 

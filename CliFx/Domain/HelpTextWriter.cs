@@ -10,8 +10,7 @@ namespace CliFx.Domain
 {
     internal partial class HelpTextWriter
     {
-        private readonly ApplicationMetadata _metadata;
-        private readonly ApplicationConfiguration _configuration;
+        private readonly ICliContext _cliContext;
         private readonly IConsole _console;
 
         private int _column;
@@ -19,11 +18,10 @@ namespace CliFx.Domain
 
         private bool IsEmpty => _column == 0 && _row == 0;
 
-        public HelpTextWriter(ApplicationMetadata metadata, ApplicationConfiguration configuration, IConsole console)
+        public HelpTextWriter(ICliContext cliContext)
         {
-            _metadata = metadata;
-            _configuration = configuration;
-            _console = console;
+            _cliContext = cliContext;
+            _console = cliContext.Console;
         }
 
         private void Write(char value)
@@ -78,17 +76,19 @@ namespace CliFx.Domain
 
         private void WriteApplicationInfo()
         {
+            ApplicationMetadata metadata = _cliContext.Metadata;
+
             // Title and version
-            Write(ConsoleColor.Yellow, _metadata.Title);
+            Write(ConsoleColor.Yellow, metadata.Title);
             Write(' ');
-            Write(ConsoleColor.Yellow, _metadata.VersionText);
+            Write(ConsoleColor.Yellow, metadata.VersionText);
             WriteLine();
 
             // Description
-            if (!string.IsNullOrWhiteSpace(_metadata.Description))
+            if (!string.IsNullOrWhiteSpace(metadata.Description))
             {
                 WriteHorizontalMargin();
-                Write(_metadata.Description);
+                Write(metadata.Description);
                 WriteLine();
             }
         }
@@ -119,8 +119,11 @@ namespace CliFx.Domain
             WriteHeader("Manual");
 
             WriteHorizontalMargin();
-            int width = _configuration.IsManualFixedWidth ? _configuration.ManualWidth : (int)(Console.WindowWidth * (_configuration.ManualWidth / 100.0));
+
+            ApplicationConfiguration configuration = _cliContext.Configuration;
+            int width = configuration.IsManualFixedWidth ? configuration.ManualWidth : (int)(_console. * (configuration.ManualWidth / 100.0));
             Write(TextWrapUtil.WrapText(command.Manual, width, 2));
+
             WriteLine();
         }
 
@@ -133,7 +136,7 @@ namespace CliFx.Domain
 
             // Exe name
             WriteHorizontalMargin();
-            Write(_metadata.ExecutableName);
+            Write(_cliContext.Metadata.ExecutableName);
 
             // Command name
             if (!string.IsNullOrWhiteSpace(command.Name))
@@ -329,7 +332,7 @@ namespace CliFx.Domain
             // Child command help tip
             WriteVerticalMargin();
             Write("You can run `");
-            Write(_metadata.ExecutableName);
+            Write(_cliContext.Metadata.ExecutableName);
 
             if (!string.IsNullOrWhiteSpace(command.Name))
             {
