@@ -13,7 +13,7 @@ namespace CliFx
     /// </summary>
     public partial class CliInteractiveApplication : CliApplication
     {
-        private readonly ConsoleColor _promptForeground = ConsoleColor.Magenta;
+        private readonly ConsoleColor _promptForeground = ConsoleColor.Yellow;
         private readonly ConsoleColor _commandForeground = ConsoleColor.Yellow;
         private readonly ConsoleColor _finishedResultForeground = ConsoleColor.White;
 
@@ -62,6 +62,8 @@ namespace CliFx
 
                 if (isInteractiveMode)
                 {
+                    CliContext.IsInteractive = true;
+
                     await ProcessCommand(commandLineArguments, environmentVariables, root, input);
                     await RunInteractivelyAsync(environmentVariables, _console, _configuration);
                 }
@@ -87,6 +89,8 @@ namespace CliFx
             //TODO: Add startup message or add behaviours like in mediatr
             while (true) //TODO maybe add CliContext.Exit and CliContext.Status
             {
+                //TODO add directives checking
+
                 string[] commandLineArguments = GetInput(_console, CliContext.Metadata.ExecutableName);
 
                 var root = RootSchema.Resolve(_configuration.CommandTypes);
@@ -96,10 +100,10 @@ namespace CliFx
 
                 _console.WithForegroundColor(_finishedResultForeground, () =>
                 {
-                    if (exitCode == 0)
-                        _console.Output.WriteLine($"{CliContext.Metadata.ExecutableName}: Command finished succesfully");
-                    else
-                        _console.Output.WriteLine($"{CliContext.Metadata.ExecutableName}: Command finished with exit code ({exitCode})");
+                    //if (exitCode == 0)
+                    //    _console.Output.WriteLine($"{CliContext.Metadata.ExecutableName}: Command finished succesfully");
+                    //else
+                    _console.Output.WriteLine($"{CliContext.Metadata.ExecutableName}: Command finished with exit code ({exitCode})");
                 });
             }
 
@@ -115,9 +119,23 @@ namespace CliFx
                 _console.WithForegroundColor(_promptForeground, () =>
                 {
                     _console.Output.Write(executableName);
-                    _console.Output.Write("> ");
-                    _console.ForegroundColor = _commandForeground;
+                });
 
+                if (!string.IsNullOrWhiteSpace(CliContext.Scope))
+                {
+                    _console.WithForegroundColor(ConsoleColor.Cyan, () =>
+                    {
+                        _console.Output.Write(CliContext.Scope);
+                    });
+                }
+
+                _console.WithForegroundColor(_promptForeground, () =>
+                {
+                    _console.Output.Write("> ");
+                });
+
+                _console.WithForegroundColor(_commandForeground, () =>
+                {
                     line = _console.Input.ReadLine();
                 });
 

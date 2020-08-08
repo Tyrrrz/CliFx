@@ -226,6 +226,17 @@ namespace CliFx
                 return ExitCode.Success;
             }
 
+            // Handle directives not supported in normal mode
+            if (!_configuration.IsInteractiveModeAllowed && command.InteractiveModeOnly)
+            {
+                throw CliFxException.InteractiveOnlyCommandButThisIsNormalApplication(command);
+            }
+            else if (_configuration.IsInteractiveModeAllowed && command.InteractiveModeOnly &&
+                     !(CliContext.IsInteractive || input.HasDirective(StandardDirectives.Interactive)))
+            {
+                throw CliFxException.InteractiveOnlyCommandButInteractiveModeNotStarted(command);
+            }
+
             // Bind arguments
             try
             {

@@ -394,5 +394,25 @@ Unrecognized options provided:
 
             return new CliFxException(message.Trim());
         }
+
+        internal static CliFxException InteractiveOnlyCommandButThisIsNormalApplication(CommandSchema command)
+        {
+            var message = $@"
+Command '{command.Type.FullName}' can be executed only in interactive mode, but this is a application is using {nameof(CliApplication)}.
+
+Please consider switching to interactive application or removing the command.";
+
+            return new CliFxException(message.Trim());
+        }
+
+        internal static CliFxException InteractiveOnlyCommandButInteractiveModeNotStarted(CommandSchema command)
+        {
+            var message = $@"
+Command '{command.Type.FullName}' can be executed only in interactive mode, but this is a application is not running in this mode.
+
+You can start the interactive mode with [{StandardDirectives.Interactive}].";
+
+            return new CliFxException(message.Trim());
+        }
     }
 }
