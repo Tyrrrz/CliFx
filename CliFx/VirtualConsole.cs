@@ -38,6 +38,12 @@ namespace CliFx
         public ConsoleColor BackgroundColor { get; set; } = ConsoleColor.Black;
 
         /// <inheritdoc />
+        public void Clear()
+        {
+
+        }
+
+        /// <inheritdoc />
         public void ResetColor()
         {
             ForegroundColor = ConsoleColor.Gray;

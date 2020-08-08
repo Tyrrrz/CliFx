@@ -1,6 +1,6 @@
 ### v2.0 (XX-XX-2020)
 
-- Added interactive mode and interactive only commands.
+- Added interactive mode `CliInteractiveApplication` and interactive only commands.
 - Added `ICliExceptionHandler` and `CliApplicationBuilder.UseExceptionHandler(...)`
 - Added `CliApplicationBuilder.UseTypeActivator(Func<ICliContext, IConsole, Func<Type, object>> buildServiceProvider)` for easy DI container independent ICliContext and IConsole registration.
 - Added	`Manual` porperty in `CommandAttribute` that can be used to provide a long, extended description of a commmand.

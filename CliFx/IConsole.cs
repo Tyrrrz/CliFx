@@ -50,6 +50,11 @@ namespace CliFx
         ConsoleColor BackgroundColor { get; set; }
 
         /// <summary>
+        /// Clears the console.
+        /// </summary>
+        void Clear();
+
+        /// <summary>
         /// Resets foreground and background color to default values.
         /// </summary>
         void ResetColor();
@@ -107,7 +112,7 @@ namespace CliFx
         /// </summary>
         public static void WithForegroundColor(this IConsole console, ConsoleColor foregroundColor, Action action)
         {
-            var lastColor = console.ForegroundColor;
+            ConsoleColor lastColor = console.ForegroundColor;
             console.ForegroundColor = foregroundColor;
 
             action();
@@ -120,7 +125,7 @@ namespace CliFx
         /// </summary>
         public static void WithBackgroundColor(this IConsole console, ConsoleColor backgroundColor, Action action)
         {
-            var lastColor = console.BackgroundColor;
+            ConsoleColor lastColor = console.BackgroundColor;
             console.BackgroundColor = backgroundColor;
 
             action();

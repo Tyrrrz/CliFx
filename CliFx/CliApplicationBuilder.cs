@@ -259,7 +259,7 @@ namespace CliFx
                 _typeActivator = new DelegateTypeActivator(_buildServiceProvider.Invoke(cliContext, _console));
 
             if (_isInteractiveModeAllowed)
-                return new InteractiveCliApplication(cliContext, _typeActivator);
+                return new CliInteractiveApplication(cliContext, _typeActivator);
 
             return new CliApplication(cliContext, _typeActivator);
         }

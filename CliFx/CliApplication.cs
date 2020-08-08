@@ -32,9 +32,10 @@ namespace CliFx
         /// Initializes an instance of <see cref="CliApplication"/>.
         /// </summary>
         [Obsolete]
-        public CliApplication(
-            ApplicationMetadata metadata, ApplicationConfiguration configuration,
-            IConsole console, ITypeActivator typeActivator)
+        public CliApplication(ApplicationMetadata metadata,
+                              ApplicationConfiguration configuration,
+                              IConsole console,
+                              ITypeActivator typeActivator)
         {
             CliContext = new CliContext(metadata, configuration, console);
 
@@ -61,7 +62,10 @@ namespace CliFx
             _helpTextWriter = new HelpTextWriter(cliContext);
         }
 
-        private async ValueTask LaunchAndWaitForDebuggerAsync()
+        /// <summary>
+        /// Launches and waits for debugger.
+        /// </summary>
+        protected async ValueTask LaunchAndWaitForDebuggerAsync()
         {
             var processId = ProcessEx.GetCurrentProcessId();
 
@@ -74,7 +78,10 @@ namespace CliFx
                 await Task.Delay(100);
         }
 
-        private void WriteCommandLineInput(CommandInput input)
+        /// <summary>
+        /// Writes command line input.
+        /// </summary>
+        internal void WriteCommandLineInput(CommandInput input)
         {
             // Command name
             if (!string.IsNullOrWhiteSpace(input.CommandName))
@@ -131,13 +138,12 @@ namespace CliFx
         /// Runs the application with specified command line arguments and environment variables, and returns the exit code.
         /// </summary>
         /// <remarks>
-        /// If a <see cref="CommandException"/> is thrown during command execution, it will be handled and routed to the console.
+        /// If a <see cref="CommandException"/> or <see cref="CliFxException"/> is thrown during command execution, it will be handled and routed to the console.
         /// Additionally, if the debugger is not attached (i.e. the app is running in production), all other exceptions thrown within
         /// this method will be handled and routed to the console as well.
         /// </remarks>
-        public virtual async ValueTask<int> RunAsync(
-            IReadOnlyList<string> commandLineArguments,
-            IReadOnlyDictionary<string, string> environmentVariables)
+        public virtual async ValueTask<int> RunAsync(IReadOnlyList<string> commandLineArguments,
+                                                     IReadOnlyDictionary<string, string> environmentVariables)
         {
             try
             {
@@ -158,7 +164,8 @@ namespace CliFx
                 }
 
                 // Handle directives not supported in normal mode
-                if (_configuration.IsPreviewModeAllowed && input.HasAnyOfDirectives(InteractiveModeDirectives))
+                if (!_configuration.IsInteractiveModeAllowed &&
+                    (input.HasDirective(StandardDirectives.Interactive) || input.HasAnyOfDirectives(InteractiveModeDirectives)))
                 {
                     _console.WithForegroundColor(ConsoleColor.Red, () =>
                     {
@@ -170,68 +177,7 @@ namespace CliFx
                     return 1;
                 }
 
-                // Try to get the command matching the input or fallback to default
-                CommandSchema command =
-                    root.TryFindCommand(input.CommandName) ??
-                    root.TryFindDefaultCommand() ??
-                    StubDefaultCommand.Schema;
-
-                // Version option
-                if (command.IsVersionOptionAvailable && input.IsVersionOptionSpecified)
-                {
-                    _console.Output.WriteLine(_metadata.VersionText);
-                    return ExitCode.Success;
-                }
-
-                // Get command instance (also used in help text)
-                var instance = GetCommandInstance(command);
-
-                CliContext.CurrentCommandInfo = new CommandInfo(command, commandLineArguments);
-
-                // To avoid instantiating the command twice, we need to get default values
-                // before the arguments are bound to the properties
-                var defaultValues = command.GetArgumentValues(instance);
-
-                // Help option
-                if (command.IsHelpOptionAvailable && input.IsHelpOptionSpecified ||
-                    command == StubDefaultCommand.Schema && !input.Parameters.Any() && !input.Options.Any())
-                {
-                    _helpTextWriter.Write(root, command, defaultValues);
-                    return ExitCode.Success;
-                }
-
-                // Bind arguments
-                try
-                {
-                    command.Bind(instance, input, environmentVariables);
-                }
-                // This may throw exceptions which are useful only to the end-user
-                catch (CliFxException ex)
-                {
-                    _configuration.ExceptionHandler.HandleCliFxException(_console, ex);
-
-                    if (ex.ShowHelp)
-                        _helpTextWriter.Write(root, command, defaultValues);
-
-                    return ExitCode.FromException(ex);
-                }
-
-                // Execute the command
-                try
-                {
-                    await instance.ExecuteAsync(_console);
-                    return ExitCode.Success;
-                }
-                // Swallow command exceptions and route them to the console
-                catch (CommandException ex)
-                {
-                    _configuration.ExceptionHandler.HandleCommandException(_console, ex);
-
-                    if (ex.ShowHelp)
-                        _helpTextWriter.Write(root, command, defaultValues);
-
-                    return ex.ExitCode;
-                }
+                return await ProcessCommand(commandLineArguments, environmentVariables, root, input);
             }
             // To prevent the app from showing the annoying Windows troubleshooting dialog,
             // we handle all exceptions and route them to the console nicely.
@@ -242,6 +188,75 @@ namespace CliFx
                 _configuration.ExceptionHandler.HandleException(_console, ex);
 
                 return ExitCode.FromException(ex);
+            }
+        }
+
+        internal async ValueTask<int> ProcessCommand(IReadOnlyList<string> commandLineArguments,
+                                                     IReadOnlyDictionary<string, string> environmentVariables,
+                                                     RootSchema root,
+                                                     CommandInput input)
+        {
+            // Try to get the command matching the input or fallback to default
+            CommandSchema command =
+                root.TryFindCommand(input.CommandName) ??
+                root.TryFindDefaultCommand() ??
+                StubDefaultCommand.Schema;
+
+            // Version option
+            if (command.IsVersionOptionAvailable && input.IsVersionOptionSpecified)
+            {
+                _console.Output.WriteLine(_metadata.VersionText);
+                return ExitCode.Success;
+            }
+
+            // Get command instance (also used in help text)
+            var instance = GetCommandInstance(command);
+
+            CliContext.CurrentCommandInfo = new CommandInfo(command, commandLineArguments);
+
+            // To avoid instantiating the command twice, we need to get default values
+            // before the arguments are bound to the properties
+            var defaultValues = command.GetArgumentValues(instance);
+
+            // Help option
+            if (command.IsHelpOptionAvailable && input.IsHelpOptionSpecified ||
+                command == StubDefaultCommand.Schema && !input.Parameters.Any() && !input.Options.Any())
+            {
+                _helpTextWriter.Write(root, command, defaultValues);
+                return ExitCode.Success;
+            }
+
+            // Bind arguments
+            try
+            {
+                command.Bind(instance, input, environmentVariables);
+            }
+            // This may throw exceptions which are useful only to the end-user
+            catch (CliFxException ex)
+            {
+                _configuration.ExceptionHandler.HandleCliFxException(_console, ex);
+
+                if (ex.ShowHelp)
+                    _helpTextWriter.Write(root, command, defaultValues);
+
+                return ExitCode.FromException(ex);
+            }
+
+            // Execute the command
+            try
+            {
+                await instance.ExecuteAsync(_console);
+                return ExitCode.Success;
+            }
+            // Swallow command exceptions and route them to the console
+            catch (CommandException ex)
+            {
+                _configuration.ExceptionHandler.HandleCommandException(_console, ex);
+
+                if (ex.ShowHelp)
+                    _helpTextWriter.Write(root, command, defaultValues);
+
+                return ex.ExitCode;
             }
         }
 
@@ -290,17 +305,25 @@ namespace CliFx
         /// </summary>
         protected static string[] InteractiveModeDirectives = new string[]
         {
-            StandardDirectives.Interactive,
             StandardDirectives.Default,
             StandardDirectives.Scope,
             StandardDirectives.ScopeUp,
             StandardDirectives.ScopeReset
         };
 
-        private static class ExitCode
+        /// <summary>
+        /// Static exit codes helper class.
+        /// </summary>
+        protected static class ExitCode
         {
+            /// <summary>
+            /// Success exit code.
+            /// </summary>
             public const int Success = 0;
 
+            /// <summary>
+            /// Gets an exit code from exception.
+            /// </summary>
             public static int FromException(Exception ex) =>
                 ex is CommandException cmdEx
                     ? cmdEx.ExitCode
