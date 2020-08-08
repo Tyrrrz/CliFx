@@ -493,15 +493,18 @@ public static class Program
 
         // Register services
         services.AddSingleton<MyService>();
+        services.AddSingleton<IConsole>(new SystemConsole()); // or `new VirtualConsole();`, depending on what you need
 
         // Register commands
         services.AddTransient<MyCommand>();
 
         var serviceProvider = services.BuildServiceProvider();
+        var console = serviceProvider.GetService<IConsole>();
 
         return await new CliApplicationBuilder()
             .AddCommandsFromThisAssembly()
             .UseTypeActivator(serviceProvider.GetService)
+            .UseConsole(console) // make sure CliFx is using the same instance of IConsole
             .Build()
             .RunAsync();
     }
