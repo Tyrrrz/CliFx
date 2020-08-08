@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using CliFx.Domain;
+using CliFx.Internal;
 using CliFx.Internal.Extensions;
 
 namespace CliFx
@@ -21,6 +22,8 @@ namespace CliFx
         private string? _executableName;
         private string? _versionText;
         private string? _description;
+        private bool _manualFixedLength;
+        private int _manualLength;
         private IConsole? _console;
         private ITypeActivator? _typeActivator;
 
@@ -139,6 +142,18 @@ namespace CliFx
         }
 
         /// <summary>
+        /// Configures manual word wrapping.
+        /// <param name="fixedLength"> Whether help manual text has a fixed length specified by <paramref cref="value"/> or dynamic defined as a percentage of console width.</param>
+        /// <param name="value">Specifies manual width when <paramref cref="fixedLength"/> is set to true or a percentage of console width (1-100).</param>
+        /// </summary>
+        public CliApplicationBuilder UseManualLengthConsole(bool fixedLength, int value)
+        {
+            _manualFixedLength = fixedLength;
+            _manualLength = fixedLength ? value : MathUtils.Clamp(value, 1, 100);
+            return this;
+        }
+
+        /// <summary>
         /// Configures the application to use the specified implementation of <see cref="ITypeActivator"/>.
         /// </summary>
         public CliApplicationBuilder UseTypeActivator(ITypeActivator typeActivator)
@@ -166,7 +181,7 @@ namespace CliFx
             _typeActivator ??= new DefaultTypeActivator();
 
             var metadata = new ApplicationMetadata(_title, _executableName, _versionText, _description);
-            var configuration = new ApplicationConfiguration(_commandTypes.ToArray(), _isDebugModeAllowed, _isPreviewModeAllowed);
+            var configuration = new ApplicationConfiguration(_commandTypes.ToArray(), _isDebugModeAllowed, _isPreviewModeAllowed, false, 80);
 
             return new CliApplication(metadata, configuration, _console, _typeActivator);
         }

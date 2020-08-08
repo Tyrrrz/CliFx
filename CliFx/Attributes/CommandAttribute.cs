@@ -6,7 +6,7 @@ namespace CliFx.Attributes
     /// Annotates a type that defines a command.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    public class CommandAttribute : Attribute
+    public sealed class CommandAttribute : Attribute
     {
         /// <summary>
         /// Command name.
@@ -20,6 +20,11 @@ namespace CliFx.Attributes
         /// Command description, which is used in help text.
         /// </summary>
         public string? Description { get; set; }
+
+        /// <summary>
+        /// Command manaul, which is used in help text.
+        /// </summary>
+        public string? Manual { get; set; }
 
         /// <summary>
         /// Initializes an instance of <see cref="CommandAttribute"/>.

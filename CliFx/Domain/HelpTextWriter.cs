@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using CliFx.Internal;
 using CliFx.Internal.Extensions;
 
 namespace CliFx.Domain
@@ -10,6 +11,7 @@ namespace CliFx.Domain
     internal partial class HelpTextWriter
     {
         private readonly ApplicationMetadata _metadata;
+        private readonly ApplicationConfiguration _configuration;
         private readonly IConsole _console;
 
         private int _column;
@@ -17,9 +19,10 @@ namespace CliFx.Domain
 
         private bool IsEmpty => _column == 0 && _row == 0;
 
-        public HelpTextWriter(ApplicationMetadata metadata, IConsole console)
+        public HelpTextWriter(ApplicationMetadata metadata, ApplicationConfiguration configuration, IConsole console)
         {
             _metadata = metadata;
+            _configuration = configuration;
             _console = console;
         }
 
@@ -102,6 +105,22 @@ namespace CliFx.Domain
 
             WriteHorizontalMargin();
             Write(command.Description);
+            WriteLine();
+        }
+
+        private void WriteCommandManual(CommandSchema command)
+        {
+            if (string.IsNullOrWhiteSpace(command.Manual))
+                return;
+
+            if (!IsEmpty)
+                WriteVerticalMargin();
+
+            WriteHeader("Manual");
+
+            WriteHorizontalMargin();
+            int width = _configuration.IsManualFixedWidth ? _configuration.ManualWidth : (int)(Console.WindowWidth * (_configuration.ManualWidth / 100.0));
+            Write(TextWrapUtil.WrapText(command.Manual, width, 2));
             WriteLine();
         }
 
@@ -346,6 +365,7 @@ namespace CliFx.Domain
             WriteCommandParameters(command);
             WriteCommandOptions(command, defaultValues);
             WriteCommandChildren(command, childCommands);
+            WriteCommandManual(command);
         }
     }
 

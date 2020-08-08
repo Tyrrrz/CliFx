@@ -242,6 +242,7 @@ namespace CliFx.Tests
                     typeof(HiddenPropertiesCommand),
                     "hidden",
                     "Description",
+                    "Manual",
                     new[]
                     {
                         new CommandParameterSchema(

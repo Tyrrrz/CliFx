@@ -35,7 +35,7 @@ namespace CliFx
             _console = console;
             _typeActivator = typeActivator;
 
-            _helpTextWriter = new HelpTextWriter(metadata, console);
+            _helpTextWriter = new HelpTextWriter(metadata, configuration, console);
         }
 
         private void WriteError(string message) => _console.WithForegroundColor(ConsoleColor.Red, () =>

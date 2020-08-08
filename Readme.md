@@ -493,7 +493,7 @@ public static class Program
 
         // Register services
         services.AddSingleton<MyService>();
-        services.AddSingleton<IConsole>(new SystemConsole()); // or `new VirtualConsole();`, depending on what you need
+        services.AddSingleton<IConsole, SystemConsole>(); // or `VirtualConsole`, depending on what you need
 
         // Register commands
         services.AddTransient<MyCommand>();

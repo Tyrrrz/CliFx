@@ -20,6 +20,8 @@ namespace CliFx.Domain
 
         public string? Description { get; }
 
+        public string? Manual { get; }
+
         public IReadOnlyList<CommandParameterSchema> Parameters { get; }
 
         public IReadOnlyList<CommandOptionSchema> Options { get; }
@@ -32,6 +34,7 @@ namespace CliFx.Domain
             Type type,
             string? name,
             string? description,
+            string? manual,
             IReadOnlyList<CommandParameterSchema> parameters,
             IReadOnlyList<CommandOptionSchema> options)
         {
@@ -40,6 +43,7 @@ namespace CliFx.Domain
             Description = description;
             Parameters = parameters;
             Options = options;
+            Manual = manual;
         }
 
         public bool MatchesName(string? name) =>
@@ -246,6 +250,7 @@ namespace CliFx.Domain
                 type,
                 name,
                 attribute?.Description,
+                attribute?.Manual,
                 parameters!,
                 options!
             );

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using CliFx.Internal;
 
 namespace CliFx
 {
@@ -24,16 +25,30 @@ namespace CliFx
         public bool IsPreviewModeAllowed { get; }
 
         /// <summary>
+        /// Whether help manual text has a fixed length specified by <seealso cref="ManualWidth"/> or dynamic defined as a percentage of console width.
+        /// </summary>
+        public bool IsManualFixedWidth { get; }
+
+        /// <summary>
+        /// Specifies manual width when <seealso cref="ManualWidth"/> is set to true or a percentage of console width (1-100).
+        /// </summary>
+        public int ManualWidth { get; }
+
+        /// <summary>
         /// Initializes an instance of <see cref="ApplicationConfiguration"/>.
         /// </summary>
         public ApplicationConfiguration(
             IReadOnlyList<Type> commandTypes,
             bool isDebugModeAllowed,
-            bool isPreviewModeAllowed)
+            bool isPreviewModeAllowed,
+            bool isManualFixedWidth,
+            int manualWidth)
         {
             CommandTypes = commandTypes;
             IsDebugModeAllowed = isDebugModeAllowed;
             IsPreviewModeAllowed = isPreviewModeAllowed;
+            IsManualFixedWidth = isManualFixedWidth;
+            ManualWidth = IsManualFixedWidth ? manualWidth : MathUtils.Clamp(manualWidth, 1, 100);
         }
     }
 }
