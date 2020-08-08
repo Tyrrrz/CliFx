@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using CliFx.Attributes;
 using CliFx.Demo.Internal;
 using CliFx.Demo.Services;
@@ -30,6 +31,9 @@ namespace CliFx.Demo.Commands
                 // Render book
                 console.RenderBook(book);
             }
+
+            if (isFirst)
+                console.WithForegroundColor(ConsoleColor.Red, () => console.Output.WriteLine("No books"));
 
             return default;
         }
