@@ -19,7 +19,7 @@ namespace CliFx
         /// <summary>
         /// Cli Context instance.
         /// </summary>
-        protected ICliContext CliContext { get; }
+        protected CliContext CliContext { get; }
 
         private readonly ApplicationMetadata _metadata;
         private readonly ApplicationConfiguration _configuration;
@@ -50,7 +50,7 @@ namespace CliFx
         /// <summary>
         /// Initializes an instance of <see cref="CliApplication"/>.
         /// </summary>
-        public CliApplication(ICliContext cliContext, ITypeActivator typeActivator)
+        public CliApplication(CliContext cliContext, ITypeActivator typeActivator)
         {
             CliContext = cliContext;
 
@@ -60,14 +60,6 @@ namespace CliFx
 
             _typeActivator = typeActivator;
             _helpTextWriter = new HelpTextWriter(cliContext);
-        }
-
-        /// <summary>
-        /// Write an error message to the console.
-        /// </summary>
-        protected void WriteError(string message)
-        {
-            _console.WithForegroundColor(ConsoleColor.Red, () => _console.Error.WriteLine(message));
         }
 
         private async ValueTask LaunchAndWaitForDebuggerAsync()
@@ -202,8 +194,10 @@ namespace CliFx
                 // This may throw exceptions which are useful only to the end-user
                 catch (CliFxException ex)
                 {
-                    WriteError(ex.ToString());
-                    _helpTextWriter.Write(root, command, defaultValues);
+                    _configuration.ExceptionHandler.HandleCliFxException(_console, ex);
+
+                    if (ex.ShowHelp)
+                        _helpTextWriter.Write(root, command, defaultValues);
 
                     return ExitCode.FromException(ex);
                 }
@@ -217,7 +211,7 @@ namespace CliFx
                 // Swallow command exceptions and route them to the console
                 catch (CommandException ex)
                 {
-                    WriteError(ex.ToString());
+                    _configuration.ExceptionHandler.HandleCommandException(_console, ex);
 
                     if (ex.ShowHelp)
                         _helpTextWriter.Write(root, command, defaultValues);
@@ -231,7 +225,8 @@ namespace CliFx
             // because we still want the IDE to show them to the developer.
             catch (Exception ex) when (!Debugger.IsAttached)
             {
-                WriteError(ex.ToString());
+                _configuration.ExceptionHandler.HandleException(_console, ex);
+
                 return ExitCode.FromException(ex);
             }
         }
@@ -245,7 +240,7 @@ namespace CliFx
         /// Additionally, if the debugger is not attached (i.e. the app is running in production), all other exceptions thrown within
         /// this method will be handled and routed to the console as well.
         /// </remarks>
-        public virtual async ValueTask<int> RunAsync(IReadOnlyList<string> commandLineArguments)
+        public async ValueTask<int> RunAsync(IReadOnlyList<string> commandLineArguments)
         {
             // Environment variable names are case-insensitive on Windows but are case-sensitive on Linux and macOS
             var environmentVariables = Environment.GetEnvironmentVariables()
@@ -264,7 +259,7 @@ namespace CliFx
         /// Additionally, if the debugger is not attached (i.e. the app is running in production), all other exceptions thrown within
         /// this method will be handled and routed to the console as well.
         /// </remarks>
-        public virtual async ValueTask<int> RunAsync()
+        public async ValueTask<int> RunAsync()
         {
             var commandLineArguments = Environment.GetCommandLineArgs()
                 .Skip(1)

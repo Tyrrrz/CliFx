@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
 using CliFx.Attributes;
-using CliFx.Demo.Internal;
-using CliFx.Demo.Services;
+using CliFx.InteractiveModeDemo.Internal;
+using CliFx.InteractiveModeDemo.Services;
 using CliFx.Exceptions;
 
-namespace CliFx.Demo.Commands
+namespace CliFx.InteractiveModeDemo.Commands
 {
     [Command("book", Description = "View, list, add or remove books.")]
     public class BookCommand : ICommand

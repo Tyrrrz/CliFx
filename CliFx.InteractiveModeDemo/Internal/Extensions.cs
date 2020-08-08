@@ -1,7 +1,7 @@
 ﻿using System;
-using CliFx.Demo.Models;
+using CliFx.InteractiveModeDemo.Models;
 
-namespace CliFx.Demo.Internal
+namespace CliFx.InteractiveModeDemo.Internal
 {
     internal static class Extensions
     {

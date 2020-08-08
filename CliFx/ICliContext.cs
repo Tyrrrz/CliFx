@@ -8,7 +8,12 @@
         /// <summary>
         /// Whether the application is running in interactive mode.
         /// </summary>
-        public bool IsInteractive { get; }
+        bool IsInteractive { get; }
+
+        /// <summary>
+        /// Current command sope in interactive mode.
+        /// </summary>
+        string Scope { get; }
 
         /// <summary>
         /// Metadata associated with an application.
@@ -24,5 +29,10 @@
         /// Console instance.
         /// </summary>
         IConsole Console { get; }
+
+        /// <summary>
+        /// Infomrations about current command.
+        /// </summary>
+        CommandInfo? CurrentCommandInfo { get; }
     }
 }

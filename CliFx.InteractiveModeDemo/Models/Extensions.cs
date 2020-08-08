@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace CliFx.Demo.Models
+namespace CliFx.InteractiveModeDemo.Models
 {
     public static class Extensions
     {

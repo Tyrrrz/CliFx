@@ -15,6 +15,11 @@ namespace CliFx.Exceptions
         private readonly bool _isMessageSet;
 
         /// <summary>
+        /// Whether to show the help text after handling this exception.
+        /// </summary>
+        public bool ShowHelp { get; set; } = true;
+
+        /// <summary>
         /// Initializes an instance of <see cref="CliFxException"/>.
         /// </summary>
         public CliFxException(string? message, Exception? innerException = null)

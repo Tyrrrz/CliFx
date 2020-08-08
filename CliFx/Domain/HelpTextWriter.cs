@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
 using CliFx.Internal;
 using CliFx.Internal.Extensions;
 
@@ -10,6 +11,18 @@ namespace CliFx.Domain
 {
     internal partial class HelpTextWriter
     {
+        private const ConsoleColor TitleColor = ConsoleColor.Yellow;
+        private const ConsoleColor VersionColor = ConsoleColor.Yellow;
+        private const ConsoleColor HeaderColor = ConsoleColor.Magenta;
+        private const ConsoleColor CommandNameColor = ConsoleColor.Cyan;
+        private const ConsoleColor ChildCommandPlaceholderColor = ConsoleColor.Cyan;
+        private const ConsoleColor ParametersColor = ConsoleColor.White;
+        private const ConsoleColor OptionsPlaceholderColor = ConsoleColor.White;
+        private const ConsoleColor RequiredColor = ConsoleColor.Red;
+        private const ConsoleColor InteractiveOnlyColor = ConsoleColor.Magenta;
+        private const ConsoleColor RequiredParameterNameColor = ConsoleColor.White;
+        private const ConsoleColor OptionNameColor = ConsoleColor.White;
+
         private readonly ICliContext _cliContext;
         private readonly IConsole _console;
 
@@ -56,11 +69,10 @@ namespace CliFx.Domain
 
         private void WriteHorizontalMargin(int size = 2)
         {
-            for (var i = 0; i < size; i++)
-                Write(' ');
+            Write(new string(' ', size));
         }
 
-        private void WriteColumnMargin(int columnSize = 20, int offsetSize = 2)
+        private void WriteColumnMargin(int columnSize = 24, int offsetSize = 2)
         {
             if (_column + offsetSize < columnSize)
                 WriteHorizontalMargin(columnSize - _column);
@@ -70,7 +82,7 @@ namespace CliFx.Domain
 
         private void WriteHeader(string text)
         {
-            Write(ConsoleColor.Magenta, text);
+            Write(HeaderColor, text);
             WriteLine();
         }
 
@@ -79,9 +91,9 @@ namespace CliFx.Domain
             ApplicationMetadata metadata = _cliContext.Metadata;
 
             // Title and version
-            Write(ConsoleColor.Yellow, metadata.Title);
+            Write(TitleColor, metadata.Title);
             Write(' ');
-            Write(ConsoleColor.Yellow, metadata.VersionText);
+            Write(VersionColor, metadata.VersionText);
             WriteLine();
 
             // Description
@@ -117,12 +129,12 @@ namespace CliFx.Domain
                 WriteVerticalMargin();
 
             WriteHeader("Manual");
-
             WriteHorizontalMargin();
 
-            ApplicationConfiguration configuration = _cliContext.Configuration;
-            int width = configuration.IsManualFixedWidth ? configuration.ManualWidth : (int)(_console.WindowWidth * (configuration.ManualWidth / 100.0));
-            Write(TextWrapUtil.WrapText(command.Manual, width, 2));
+            string sanitizedManual = command.Manual.Replace("\t", "  ");
+            sanitizedManual = Regex.Replace(sanitizedManual, @"\t\n\r", Environment.NewLine);
+
+            Write(sanitizedManual);
 
             WriteLine();
         }
@@ -135,21 +147,29 @@ namespace CliFx.Domain
             WriteHeader("Usage");
 
             // Exe name
-            WriteHorizontalMargin();
-            Write(_cliContext.Metadata.ExecutableName);
+            if (command.InteractiveModeOnly)
+            {
+                Write(InteractiveOnlyColor, "@");
+                WriteHorizontalMargin(1);
+            }
+            else
+                WriteHorizontalMargin();
+
+            if (!command.InteractiveModeOnly && !_cliContext.IsInteractive)
+                Write(_cliContext.Metadata.ExecutableName);
 
             // Command name
             if (!string.IsNullOrWhiteSpace(command.Name))
             {
                 Write(' ');
-                Write(ConsoleColor.Cyan, command.Name);
+                Write(CommandNameColor, command.Name);
             }
 
             // Child command placeholder
             if (childCommands.Any())
             {
                 Write(' ');
-                Write(ConsoleColor.Cyan, "[command]");
+                Write(ChildCommandPlaceholderColor, "[command]");
             }
 
             // Parameters
@@ -166,7 +186,7 @@ namespace CliFx.Domain
             foreach (var option in command.Options.Where(o => o.IsRequired))
             {
                 Write(' ');
-                Write(ConsoleColor.White, !string.IsNullOrWhiteSpace(option.Name)
+                Write(ParametersColor, !string.IsNullOrWhiteSpace(option.Name)
                     ? $"--{option.Name}"
                     : $"-{option.ShortName}"
                 );
@@ -180,7 +200,7 @@ namespace CliFx.Domain
 
             // Options placeholder
             Write(' ');
-            Write(ConsoleColor.White, "[options]");
+            Write(OptionsPlaceholderColor, "[options]");
 
             WriteLine();
         }
@@ -197,8 +217,8 @@ namespace CliFx.Domain
 
             foreach (var parameter in command.Parameters.OrderBy(p => p.Order))
             {
-                Write(ConsoleColor.Red, "* ");
-                Write(ConsoleColor.White, $"{parameter.Name}");
+                Write(RequiredColor, "* ");
+                Write(RequiredParameterNameColor, $"{parameter.Name}");
 
                 WriteColumnMargin();
 
@@ -233,7 +253,7 @@ namespace CliFx.Domain
             {
                 if (option.IsRequired)
                 {
-                    Write(ConsoleColor.Red, "* ");
+                    Write(RequiredColor, "* ");
                 }
                 else
                 {
@@ -243,7 +263,7 @@ namespace CliFx.Domain
                 // Short name
                 if (option.ShortName != null)
                 {
-                    Write(ConsoleColor.White, $"-{option.ShortName}");
+                    Write(OptionNameColor, $"-{option.ShortName}");
                 }
 
                 // Separator
@@ -255,7 +275,7 @@ namespace CliFx.Domain
                 // Name
                 if (!string.IsNullOrWhiteSpace(option.Name))
                 {
-                    Write(ConsoleColor.White, $"--{option.Name}");
+                    Write(OptionNameColor, $"--{option.Name}");
                 }
 
                 WriteColumnMargin();
@@ -316,8 +336,15 @@ namespace CliFx.Domain
                     : childCommand.Name!;
 
                 // Name
-                WriteHorizontalMargin();
-                Write(ConsoleColor.Cyan, relativeCommandName);
+                if (childCommand.InteractiveModeOnly)
+                {
+                    Write(InteractiveOnlyColor, "@");
+                    WriteHorizontalMargin(1);
+                }
+                else
+                    WriteHorizontalMargin();
+
+                Write(CommandNameColor, relativeCommandName);
 
                 // Description
                 if (!string.IsNullOrWhiteSpace(childCommand.Description))

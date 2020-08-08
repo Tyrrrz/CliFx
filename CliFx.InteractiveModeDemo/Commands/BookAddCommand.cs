@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Threading.Tasks;
 using CliFx.Attributes;
-using CliFx.Demo.Internal;
-using CliFx.Demo.Models;
-using CliFx.Demo.Services;
+using CliFx.InteractiveModeDemo.Internal;
+using CliFx.InteractiveModeDemo.Models;
+using CliFx.InteractiveModeDemo.Services;
 using CliFx.Exceptions;
 
-namespace CliFx.Demo.Commands
+namespace CliFx.InteractiveModeDemo.Commands
 {
-    [Command("book add", Description = "Add a book to the library.")]
+    [Command("book add", Description = "Add a book to the library.",
+            Manual = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer euismod nunc lorem, vitae cursus sem facilisis ut. Cras et nibh justo. Mauris eu elit lectus. Suspendisse potenti. Mauris luctus sapien quis arcu semper, vel venenatis elit ultrices. Quisque suscipit arcu vel massa vestibulum dapibus. Maecenas felis lacus, pharetra sed fermentum in, molestie vel ipsum. Nullam elementum arcu eget est tempor, blandit lacinia odio facilisis. Proin nulla odio, sodales et tellus nec, pulvinar ultrices nunc. Integer ornare, odio vel tincidunt congue, diam lorem facilisis lectus, id tempor sapien nibh vitae justo. Mauris ut odio justo. Etiam sed felis tellus. Nam sollicitudin neque in tempor scelerisque. Praesent sit amet nisi quis justo scelerisque placerat.")]
     public partial class BookAddCommand : ICommand
     {
         private readonly LibraryService _libraryService;

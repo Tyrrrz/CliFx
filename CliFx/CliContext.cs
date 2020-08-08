@@ -7,6 +7,9 @@
         public bool IsInteractive { get; internal set; }
 
         /// <inheritdoc/>
+        public string Scope { get; internal set; } = string.Empty;
+
+        /// <inheritdoc/>
         public ApplicationMetadata Metadata { get; }
 
         /// <inheritdoc/>
@@ -14,6 +17,9 @@
 
         /// <inheritdoc/>
         public IConsole Console { get; }
+
+        /// <inheritdoc/>
+        public CommandInfo? CurrentCommandInfo { get; internal set; }
 
         /// <summary>
         /// Initializes an instance of <see cref="CliContext"/>.

@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
 using CliFx.Attributes;
-using CliFx.Demo.Internal;
-using CliFx.Demo.Services;
+using CliFx.InteractiveModeDemo.Internal;
+using CliFx.InteractiveModeDemo.Services;
 
-namespace CliFx.Demo.Commands
+namespace CliFx.InteractiveModeDemo.Commands
 {
     [Command("book list", Description = "List all books in the library.")]
     public class BookListCommand : ICommand

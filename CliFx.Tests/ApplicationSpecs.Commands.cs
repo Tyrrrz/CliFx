@@ -160,7 +160,7 @@ namespace CliFx.Tests
             public ValueTask ExecuteAsync(IConsole console) => default;
         }
 
-        [Command("hidden", Description = "Description", Manual = "Manual")]
+        [Command("hidden", Description = "Description", Manual = "Manual", InteractiveModeOnly = false)]
         private class HiddenPropertiesCommand : ICommand
         {
             [CommandParameter(13, Name = "param", Description = "Param description")]

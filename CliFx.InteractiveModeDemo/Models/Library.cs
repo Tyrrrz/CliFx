@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace CliFx.Demo.Models
+namespace CliFx.InteractiveModeDemo.Models
 {
     public partial class Library
     {

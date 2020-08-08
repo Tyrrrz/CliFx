@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
-using CliFx.Demo.Commands;
-using CliFx.Demo.Services;
+using CliFx.InteractiveModeDemo.Commands;
+using CliFx.InteractiveModeDemo.Services;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace CliFx.Demo
+namespace CliFx.InteractiveModeDemo
 {
     public static class Program
     {
@@ -23,6 +23,7 @@ namespace CliFx.Demo
             services.AddTransient<BookAddCommand>();
             services.AddTransient<BookRemoveCommand>();
             services.AddTransient<BookListCommand>();
+            services.AddTransient<BookListInteractiveCommand>();
 
             return services.BuildServiceProvider().GetService;
         }
@@ -32,6 +33,7 @@ namespace CliFx.Demo
             return await new CliApplicationBuilder()
                 .AddCommandsFromThisAssembly()
                 .UseTypeActivator(GetServiceCollection)
+                .AllowInteractiveMode(true)
                 .Build()
                 .RunAsync();
         }

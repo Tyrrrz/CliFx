@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using CliFx.Domain;
+using CliFx.Exceptions;
 using CliFx.Internal;
 using CliFx.Internal.Extensions;
 
@@ -24,11 +25,11 @@ namespace CliFx
         private string? _executableName;
         private string? _versionText;
         private string? _description;
-        private bool _manualFixedLength;
-        private int _manualLength;
+
         private IConsole? _console;
         private ITypeActivator? _typeActivator;
-        private Func<ICliContext, IConsole, Func<Type, object>> _buildServiceProvider;
+        private ICliExceptionHandler? _exceptionHandler;
+        private Func<ICliContext, IConsole, Func<Type, object>>? _buildServiceProvider;
 
         /// <summary>
         /// Add custom directive.
@@ -184,15 +185,21 @@ namespace CliFx
         }
 
         /// <summary>
-        /// Configures manual word wrapping.
-        /// <param name="fixedLength"> Whether help manual text has a fixed length or dynamic defined as a percentage of console width.</param>
-        /// <param name="value">Specifies manual width when <see name="fixedLength"/> is set to true or a percentage of console width (1-100).</param>
+        /// Configures the application to use the specified implementation of <see cref="ICliExceptionHandler"/>.
         /// </summary>
-        public CliApplicationBuilder UseManualLengthConsole(bool fixedLength, int value)
+        public CliApplicationBuilder UseExceptionHandler<T>()
+            where T : class, ICliExceptionHandler, new()
         {
-            _manualFixedLength = fixedLength;
-            _manualLength = fixedLength ? value : MathUtils.Clamp(value, 1, 100);
+            _exceptionHandler = new T();
+            return this;
+        }
 
+        /// <summary>
+        /// Configures the application to use the specified implementation of <see cref="ICliExceptionHandler"/>.
+        /// </summary>
+        public CliApplicationBuilder UseExceptionHandler(ICliExceptionHandler handler)
+        {
+            _exceptionHandler = handler;
             return this;
         }
 
@@ -235,19 +242,17 @@ namespace CliFx
             _executableName ??= TryGetDefaultExecutableName() ?? "app";
             _versionText ??= TryGetDefaultVersionText() ?? "v1.0";
             _console ??= new SystemConsole();
+            _exceptionHandler ??= new DefaultExceptionHandler();
 
             var metadata = new ApplicationMetadata(_title, _executableName, _versionText, _description);
             var configuration = new ApplicationConfiguration(_commandTypes.ToArray(),
                                                              _customDirectives.ToArray(),
-
+                                                             _exceptionHandler,
                                                              _isDebugModeAllowed,
                                                              _isPreviewModeAllowed,
-                                                             _isInteractiveModeAllowed,
+                                                             _isInteractiveModeAllowed);
 
-                                                             _manualFixedLength,
-                                                             _manualLength);
-
-            ICliContext cliContext = new CliContext(metadata, configuration, _console);
+            CliContext cliContext = new CliContext(metadata, configuration, _console);
 
             if (_buildServiceProvider is null)
                 _typeActivator ??= new DefaultTypeActivator();

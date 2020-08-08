@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CliFx.Demo.Models
+namespace CliFx.InteractiveModeDemo.Models
 {
     public partial class Isbn
     {

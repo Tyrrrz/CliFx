@@ -22,9 +22,14 @@ namespace CliFx.Attributes
         public string? Description { get; set; }
 
         /// <summary>
-        /// Command manaul, which is used in help text.
+        /// Command manual text, which is used in help text.
         /// </summary>
         public string? Manual { get; set; }
+
+        /// <summary>
+        /// Whether command can run only in interactive mode.
+        /// </summary>
+        public bool InteractiveModeOnly { get; set; }
 
         /// <summary>
         /// Initializes an instance of <see cref="CommandAttribute"/>.

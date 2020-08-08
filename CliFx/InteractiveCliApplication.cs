@@ -10,10 +10,14 @@ namespace CliFx
     /// </summary>
     public partial class InteractiveCliApplication : CliApplication
     {
+        private readonly ConsoleColor promptForeground = ConsoleColor.Magenta;
+        private readonly ConsoleColor commandForeground = ConsoleColor.Yellow;
+        private readonly ConsoleColor finishedResultForeground = ConsoleColor.White;
+
         /// <summary>
         /// Initializes an instance of <see cref="InteractiveCliApplication"/>.
         /// </summary>
-        public InteractiveCliApplication(ICliContext cliContext, ITypeActivator typeActivator) :
+        public InteractiveCliApplication(CliContext cliContext, ITypeActivator typeActivator) :
             base(cliContext, typeActivator)
         {
 
@@ -31,35 +35,7 @@ namespace CliFx
             IReadOnlyList<string> commandLineArguments,
             IReadOnlyDictionary<string, string> environmentVariables)
         {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Runs the application with specified command line arguments and returns the exit code.
-        /// Environment variables are retrieved automatically.
-        /// </summary>
-        /// <remarks>
-        /// If a <see cref="CommandException"/> is thrown during command execution, it will be handled and routed to the console.
-        /// Additionally, if the debugger is not attached (i.e. the app is running in production), all other exceptions thrown within
-        /// this method will be handled and routed to the console as well.
-        /// </remarks>
-        public override async ValueTask<int> RunAsync(IReadOnlyList<string> commandLineArguments)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Runs the application and returns the exit code.
-        /// Command line arguments and environment variables are retrieved automatically.
-        /// </summary>
-        /// <remarks>
-        /// If a <see cref="CommandException"/> is thrown during command execution, it will be handled and routed to the console.
-        /// Additionally, if the debugger is not attached (i.e. the app is running in production), all other exceptions thrown within
-        /// this method will be handled and routed to the console as well.
-        /// </remarks>
-        public override async ValueTask<int> RunAsync()
-        {
-            throw new NotImplementedException();
+            return await base.RunAsync(commandLineArguments, environmentVariables);
         }
     }
 }

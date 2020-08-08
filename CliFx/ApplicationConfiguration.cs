@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using CliFx.Internal;
+using CliFx.Exceptions;
 
 namespace CliFx
 {
@@ -20,6 +20,11 @@ namespace CliFx
         public IReadOnlyList<string> CustomDirectives { get; }
 
         /// <summary>
+        /// Exception Handler instance.
+        /// </summary>
+        internal ICliExceptionHandler ExceptionHandler { get; }
+
+        /// <summary>
         /// Whether interactive mode is allowed in this application.
         /// </summary>
         public bool IsInteractiveModeAllowed { get; }
@@ -35,36 +40,23 @@ namespace CliFx
         public bool IsPreviewModeAllowed { get; }
 
         /// <summary>
-        /// Whether help manual text has a fixed length specified by <seealso cref="ManualWidth"/> or dynamic defined as a percentage of console width.
-        /// </summary>
-        public bool IsManualFixedWidth { get; }
-
-        /// <summary>
-        /// Specifies manual width when <seealso cref="ManualWidth"/> is set to true or a percentage of console width (1-100).
-        /// </summary>
-        public int ManualWidth { get; }
-
-        /// <summary>
         /// Initializes an instance of <see cref="ApplicationConfiguration"/>.
         /// </summary>
         public ApplicationConfiguration(
             IReadOnlyList<Type> commandTypes,
             IReadOnlyList<string> customDirectives,
+            ICliExceptionHandler exceptionHandler,
             bool isDebugModeAllowed,
             bool isPreviewModeAllowed,
-            bool isInteractiveModeAllowed,
-            bool isManualFixedWidth,
-            int manualWidth)
+            bool isInteractiveModeAllowed)
         {
             CommandTypes = commandTypes;
             CustomDirectives = customDirectives;
+            ExceptionHandler = exceptionHandler;
 
             IsDebugModeAllowed = isDebugModeAllowed;
             IsPreviewModeAllowed = isPreviewModeAllowed;
             IsInteractiveModeAllowed = isInteractiveModeAllowed;
-
-            IsManualFixedWidth = isManualFixedWidth;
-            ManualWidth = IsManualFixedWidth ? manualWidth : MathUtils.Clamp(manualWidth, 1, 100);
         }
     }
 }

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "CliFx.InteractiveModeDemo": {
+      "commandName": "Project",
+      "commandLineArgs": "book -h"
+    }
+  }
+}

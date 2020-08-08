@@ -22,6 +22,8 @@ namespace CliFx.Domain
 
         public string? Manual { get; }
 
+        public bool InteractiveModeOnly { get; }
+
         public IReadOnlyList<CommandParameterSchema> Parameters { get; }
 
         public IReadOnlyList<CommandOptionSchema> Options { get; }
@@ -35,6 +37,7 @@ namespace CliFx.Domain
             string? name,
             string? description,
             string? manual,
+            bool interactiveModeOnly,
             IReadOnlyList<CommandParameterSchema> parameters,
             IReadOnlyList<CommandOptionSchema> options)
         {
@@ -44,6 +47,7 @@ namespace CliFx.Domain
             Parameters = parameters;
             Options = options;
             Manual = manual;
+            InteractiveModeOnly = interactiveModeOnly;
         }
 
         public bool MatchesName(string? name) =>
@@ -251,6 +255,7 @@ namespace CliFx.Domain
                 name,
                 attribute?.Description,
                 attribute?.Manual,
+                attribute?.InteractiveModeOnly ?? false,
                 parameters!,
                 options!
             );

@@ -243,6 +243,7 @@ namespace CliFx.Tests
                     "hidden",
                     "Description",
                     "Manual",
+                    false,
                     new[]
                     {
                         new CommandParameterSchema(

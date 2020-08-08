@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
 using CliFx.Attributes;
-using CliFx.Demo.Services;
+using CliFx.InteractiveModeDemo.Services;
 using CliFx.Exceptions;
 
-namespace CliFx.Demo.Commands
+namespace CliFx.InteractiveModeDemo.Commands
 {
     [Command("book remove", Description = "Remove a book from the library.")]
     public class BookRemoveCommand : ICommand

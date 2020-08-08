@@ -1,9 +1,9 @@
 ﻿using System.IO;
 using System.Linq;
-using CliFx.Demo.Models;
+using CliFx.InteractiveModeDemo.Models;
 using Newtonsoft.Json;
 
-namespace CliFx.Demo.Services
+namespace CliFx.InteractiveModeDemo.Services
 {
     public class LibraryService
     {
