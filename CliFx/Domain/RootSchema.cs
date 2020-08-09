@@ -8,51 +8,57 @@ namespace CliFx.Domain
 {
     internal partial class RootSchema
     {
-        public IReadOnlyList<CommandSchema> Commands { get; }
+        public IReadOnlyDictionary<string, CommandSchema> Commands { get; }
+        public CommandSchema? DefaultCommand { get; }
 
-        public RootSchema(IReadOnlyList<CommandSchema> commands)
+        private HashSet<string>? _commandNamesHashSet;
+
+        public RootSchema(IReadOnlyDictionary<string, CommandSchema> commands, CommandSchema? defaultCommand)
         {
             Commands = commands;
+            DefaultCommand = defaultCommand;
         }
 
-        public IReadOnlyList<string> GetCommandNames() => Commands
-            .Select(c => c.Name)
-            .Where(n => !string.IsNullOrWhiteSpace(n))
-            .ToArray()!;
+        public ISet<string> GetCommandNames()
+        {
+            _commandNamesHashSet ??= Commands.Keys.ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-        public CommandSchema? TryFindDefaultCommand() =>
-            Commands.FirstOrDefault(c => c.IsDefault);
+            return _commandNamesHashSet;
+        }
 
-        public CommandSchema? TryFindCommand(string? commandName) =>
-            Commands.FirstOrDefault(c => c.MatchesName(commandName));
+        public CommandSchema? TryFindCommand(string? commandName)
+        {
+            if (string.IsNullOrWhiteSpace(commandName))
+                return DefaultCommand;
 
-        private IReadOnlyList<CommandSchema> GetDescendantCommands(
-            IReadOnlyList<CommandSchema> potentialParentCommands,
-            string? parentCommandName) =>
-            potentialParentCommands
-                // Default commands can't be children of anything
-                .Where(c => !string.IsNullOrWhiteSpace(c.Name))
-                // Command can't be its own child
-                .Where(c => !c.MatchesName(parentCommandName))
-                .Where(c =>
-                    string.IsNullOrWhiteSpace(parentCommandName) ||
-                    c.Name!.StartsWith(parentCommandName + ' ', StringComparison.OrdinalIgnoreCase))
-                .ToArray();
+            Commands.TryGetValue(commandName, out var value);
 
-        public IReadOnlyList<CommandSchema> GetDescendantCommands(string? parentCommandName) =>
-            GetDescendantCommands(Commands, parentCommandName);
+            return value;
+        }
+
+
+        private IEnumerable<CommandSchema> GetDescendantCommands(IEnumerable<CommandSchema> potentialParentCommands, string? parentCommandName)
+        {
+            return potentialParentCommands.Where(c => string.IsNullOrWhiteSpace(parentCommandName) ||
+                                                 c.Name!.StartsWith(parentCommandName + ' ', StringComparison.OrdinalIgnoreCase));
+        }
+
+        public IReadOnlyList<CommandSchema> GetDescendantCommands(string? parentCommandName)
+        {
+            return GetDescendantCommands(Commands.Values, parentCommandName).ToArray();
+        }
 
         public IReadOnlyList<CommandSchema> GetChildCommands(string? parentCommandName)
         {
-            var descendants = GetDescendantCommands(parentCommandName);
+            var descendants = GetDescendantCommands(Commands.Values, parentCommandName);
 
             // Filter out descendants of descendants, leave only children
             var result = new List<CommandSchema>(descendants);
 
             foreach (var descendant in descendants)
             {
-                var descendantDescendants = GetDescendantCommands(descendants, descendant.Name);
-                result.RemoveRange(descendantDescendants);
+                var descendantDescendants = GetDescendantCommands(descendants, descendant.Name).ToHashSet();
+                result.RemoveAll(t => descendantDescendants.Contains(t));
             }
 
             return result;
@@ -91,8 +97,8 @@ namespace CliFx.Domain
             }
 
             var nonScalarParameters = command.Parameters
-                .Where(p => !p.IsScalar)
-                .ToArray();
+                                             .Where(p => !p.IsScalar)
+                                             .ToArray();
 
             if (nonScalarParameters.Length > 1)
             {
@@ -118,9 +124,8 @@ namespace CliFx.Domain
 
         private static void ValidateOptions(CommandSchema command)
         {
-            var noNameGroup = command.Options
-                .Where(o => o.ShortName == null && string.IsNullOrWhiteSpace(o.Name))
-                .ToArray();
+            IEnumerable<CommandOptionSchema> noNameGroup = command.Options
+                                                                  .Where(o => o.ShortName == null && string.IsNullOrWhiteSpace(o.Name));
 
             if (noNameGroup.Any())
             {
@@ -186,47 +191,50 @@ namespace CliFx.Domain
             }
         }
 
-        private static void ValidateCommands(IReadOnlyList<CommandSchema> commands)
-        {
-            if (!commands.Any())
-            {
-                throw CliFxException.NoCommandsDefined();
-            }
-
-            var duplicateNameGroup = commands
-                .GroupBy(c => c.Name, StringComparer.OrdinalIgnoreCase)
-                .FirstOrDefault(g => g.Count() > 1);
-
-            if (duplicateNameGroup != null)
-            {
-                throw !string.IsNullOrWhiteSpace(duplicateNameGroup.Key)
-                    ? CliFxException.CommandsWithSameName(
-                        duplicateNameGroup.Key,
-                        duplicateNameGroup.ToArray()
-                    )
-                    : CliFxException.TooManyDefaultCommands(duplicateNameGroup.ToArray());
-            }
-        }
-
         public static RootSchema Resolve(IReadOnlyList<Type> commandTypes)
         {
-            var commands = new List<CommandSchema>();
+            var commands = new Dictionary<string, CommandSchema>();
+            var invalidCommands = new List<CommandSchema>();
+            CommandSchema? defaultCommand = null;
 
             foreach (var commandType in commandTypes)
             {
-                var command =
-                    CommandSchema.TryResolve(commandType) ??
-                    throw CliFxException.InvalidCommandType(commandType);
+                var command = CommandSchema.TryResolve(commandType) ?? throw CliFxException.InvalidCommandType(commandType);
 
                 ValidateParameters(command);
                 ValidateOptions(command);
 
-                commands.Add(command);
+                if (string.IsNullOrWhiteSpace(command.Name))
+                {
+                    defaultCommand = defaultCommand is null ? command : throw CliFxException.TooManyDefaultCommands();
+
+                    continue;
+                }
+
+#if NETSTANDARD2_0
+                if (commands.ContainsKey(command.Name))
+                    invalidCommands.Add(command);
+                else
+                    commands.Add(command.Name, command);
+#else
+                if (!commands.TryAdd(command.Name, command))
+                    invalidCommands.Add(command);
+#endif
             }
 
-            ValidateCommands(commands);
+            if (commands.Count == 0 && defaultCommand is null)
+                throw CliFxException.NoCommandsDefined();
 
-            return new RootSchema(commands);
+            if (invalidCommands.Count > 0)
+            {
+                var duplicateNameGroup = invalidCommands.Union(commands.Values)
+                                                        .GroupBy(c => c.Name!, StringComparer.OrdinalIgnoreCase)
+                                                        .FirstOrDefault();
+
+                throw CliFxException.CommandsWithSameName(duplicateNameGroup.Key, duplicateNameGroup.ToArray());
+            }
+
+            return new RootSchema(commands, defaultCommand);
         }
     }
 }

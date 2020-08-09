@@ -225,10 +225,8 @@ namespace CliFx.Domain
             return result;
         }
 
-        public static CommandInput Parse(IReadOnlyList<string> commandLineArguments, IReadOnlyList<string> availableCommandNames)
+        public static CommandInput Parse(IReadOnlyList<string> commandLineArguments, ISet<string> availableCommandNamesSet)
         {
-            var availableCommandNamesSet = availableCommandNames.ToHashSet(StringComparer.OrdinalIgnoreCase);
-
             var index = 0;
 
             var directives = ParseDirectives(

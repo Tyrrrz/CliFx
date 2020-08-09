@@ -14,7 +14,7 @@ namespace CliFx.Tests
         {
             // Arrange
             var arguments = Array.Empty<string>();
-            var commandNames = Array.Empty<string>();
+            var commandNames = new HashSet<string>();
 
             // Act
             var input = CommandInput.Parse(arguments, commandNames);
@@ -48,7 +48,7 @@ namespace CliFx.Tests
         internal void Directive_can_be_enabled_by_specifying_its_name_in_square_brackets(IReadOnlyList<string> arguments, CommandInput expectedInput)
         {
             // Arrange
-            var commandNames = Array.Empty<string>();
+            var commandNames = new HashSet<string>();
 
             // Act
             var input = CommandInput.Parse(arguments, commandNames);
@@ -133,7 +133,7 @@ namespace CliFx.Tests
         internal void Option_can_be_set_by_specifying_its_name_after_two_dashes(IReadOnlyList<string> arguments, CommandInput expectedInput)
         {
             // Arrange
-            var commandNames = Array.Empty<string>();
+            var commandNames = new HashSet<string>();
 
             // Act
             var input = CommandInput.Parse(arguments, commandNames);
@@ -248,7 +248,7 @@ namespace CliFx.Tests
         internal void Option_can_be_set_by_specifying_its_short_name_after_a_single_dash(IReadOnlyList<string> arguments, CommandInput expectedInput)
         {
             // Arrange
-            var commandNames = Array.Empty<string>();
+            var commandNames = new HashSet<string>();
 
             // Act
             var input = CommandInput.Parse(arguments, commandNames);
@@ -318,7 +318,7 @@ namespace CliFx.Tests
         internal void Parameter_can_be_set_by_specifying_the_value_directly(IReadOnlyList<string> arguments, CommandInput expectedInput)
         {
             // Arrange
-            var commandNames = Array.Empty<string>();
+            var commandNames = new HashSet<string>();
 
             // Act
             var input = CommandInput.Parse(arguments, commandNames);
@@ -331,7 +331,7 @@ namespace CliFx.Tests
         {
             new object[]
             {
-                new[] {"cmd"},
+                new HashSet<string>() {"cmd"},
                 new[] {"cmd"},
                 new CommandInputBuilder()
                     .SetCommandName("cmd")
@@ -340,7 +340,7 @@ namespace CliFx.Tests
 
             new object[]
             {
-                new[] {"cmd"},
+                new HashSet<string>() {"cmd"},
                 new[] {"cmd", "foo", "bar", "-o", "value"},
                 new CommandInputBuilder()
                     .SetCommandName("cmd")
@@ -352,7 +352,7 @@ namespace CliFx.Tests
 
             new object[]
             {
-                new[] {"cmd", "cmd sub"},
+                new HashSet<string>() {"cmd", "cmd sub"},
                 new[] {"cmd", "sub", "foo"},
                 new CommandInputBuilder()
                     .SetCommandName("cmd sub")
@@ -364,7 +364,7 @@ namespace CliFx.Tests
         [Theory]
         [MemberData(nameof(CommandNameTestData))]
         internal void Command_name_is_matched_from_arguments_that_come_before_parameters(
-            IReadOnlyList<string> commandNames,
+            ISet<string> commandNames,
             IReadOnlyList<string> arguments,
             CommandInput expectedInput)
         {

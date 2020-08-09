@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using CliFx.Domain;
 using CliFx.Exceptions;
+using CliWrap;
 using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
@@ -236,34 +238,36 @@ namespace CliFx.Tests
             var schema = RootSchema.Resolve(commandTypes);
 
             // Assert
-            schema.Should().BeEquivalentTo(new RootSchema(new[]
+            schema.Should().BeEquivalentTo(new RootSchema(new Dictionary<string, CommandSchema>
             {
-                new CommandSchema(
-                    typeof(HiddenPropertiesCommand),
-                    "hidden",
-                    "Description",
-                    "Manual",
-                    false,
-                    new[]
-                    {
-                        new CommandParameterSchema(
-                            typeof(HiddenPropertiesCommand).GetProperty(nameof(HiddenPropertiesCommand.Parameter))!,
-                            13,
-                            "param",
-                            "Param description")
-                    },
-                    new[]
-                    {
-                        new CommandOptionSchema(
-                            typeof(HiddenPropertiesCommand).GetProperty(nameof(HiddenPropertiesCommand.Option))!,
-                            "option",
-                            'o',
-                            "ENV",
-                            false,
-                            "Option description"),
-                        CommandOptionSchema.HelpOption
-                    })
-            }));
+                { "hidden",
+                  new CommandSchema(
+                      typeof(HiddenPropertiesCommand),
+                      "hidden",
+                      "Description",
+                      "Manual",
+                      false,
+                      new[]
+                      {
+                          new CommandParameterSchema(
+                              typeof(HiddenPropertiesCommand).GetProperty(nameof(HiddenPropertiesCommand.Parameter))!,
+                              13,
+                              "param",
+                              "Param description")
+                      },
+                      new[]
+                      {
+                          new CommandOptionSchema(
+                              typeof(HiddenPropertiesCommand).GetProperty(nameof(HiddenPropertiesCommand.Option))!,
+                              "option",
+                              'o',
+                              "ENV",
+                              false,
+                              "Option description"),
+                          CommandOptionSchema.HelpOption
+                      })
+                }
+            }, null));
 
             schema.ToString().Should().NotBeNullOrWhiteSpace(); // this is only for coverage, I'm sorry
         }

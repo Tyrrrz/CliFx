@@ -91,12 +91,12 @@ namespace CliFx
             //TODO: Add startup message or add behaviours like in mediatr
             while (true) //TODO maybe add CliContext.Exit and CliContext.Status
             {
+
                 //TODO add directives checking
 
                 string[] commandLineArguments = GetInput(_console, CliContext.Metadata.ExecutableName);
 
                 var input = CommandInput.Parse(commandLineArguments, root.GetCommandNames());
-
                 int exitCode = await ProcessCommand(commandLineArguments, environmentVariables, root, input);
 
                 _console.WithForegroundColor(_finishedResultForeground, () =>

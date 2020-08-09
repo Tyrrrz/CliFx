@@ -41,6 +41,9 @@ namespace System.Linq
 
     internal static class Extensions
     {
+        public static HashSet<T> ToHashSet<T>(this IEnumerable<T> source) =>
+            new HashSet<T>(source);
+
         public static HashSet<T> ToHashSet<T>(this IEnumerable<T> source, IEqualityComparer<T> comparer) =>
             new HashSet<T>(source, comparer);
     }

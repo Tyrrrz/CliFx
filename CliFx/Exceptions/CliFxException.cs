@@ -90,11 +90,10 @@ If you're experiencing problems, please refer to the readme for a quickstart exa
             return new CliFxException(message.Trim());
         }
 
-        internal static CliFxException TooManyDefaultCommands(IReadOnlyList<CommandSchema> invalidCommands)
+        internal static CliFxException TooManyDefaultCommands()
         {
             var message = $@"
-Application configuration is invalid because there are {invalidCommands.Count} default commands:
-{invalidCommands.JoinToString(Environment.NewLine)}
+Application configuration is invalid because there are too many default commands.
 
 There can only be one default command (i.e. command with no name) in an application.
 Other commands must have unique non-empty names that identify them.";
