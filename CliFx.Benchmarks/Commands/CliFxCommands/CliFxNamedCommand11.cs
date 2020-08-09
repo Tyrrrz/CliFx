@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
 using CliFx.Attributes;
 
-namespace CliFx.Benchmarks.Commands
+namespace CliFx.Benchmarks.Commands.CliFxCommands
 {
-    [Command]
-    public class CliFxCommand : ICommand
+    [Command("named-command11")]
+    public class CliFxNamedCommandCommand11 : ICommand
     {
         [CommandOption("str", 's')]
         public string? StrOption { get; set; }

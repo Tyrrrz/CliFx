@@ -5,6 +5,7 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Running;
 using CliFx.Benchmarks.Commands;
+using CliFx.Benchmarks.Commands.CliFxCommands;
 using CommandLine;
 
 namespace CliFx.Benchmarks
@@ -16,10 +17,44 @@ namespace CliFx.Benchmarks
     {
         private static readonly string[] Arguments = { "--str", "hello world", "-i", "13", "-b" };
 
-        [Benchmark(Description = "CliFx", Baseline = true)]
-        public async ValueTask<int> ExecuteWithCliFx()
+        [Benchmark(Description = "CliFx - 1 command", Baseline = true)]
+        public async ValueTask<int> ExecuteWithCliFxDefaultCommandOnly()
         {
             return await new CliApplicationBuilder().AddCommand(typeof(CliFxCommand))
+                                                    .Build()
+                                                    .RunAsync(Arguments, new Dictionary<string, string>());
+        }
+
+        [Benchmark(Description = "CliFx - 2 commands")]
+        public async ValueTask<int> ExecuteWithCliFx2Commands()
+        {
+            return await new CliApplicationBuilder().AddCommand(typeof(CliFxCommand))
+                                                    .AddCommand(typeof(CliFxNamedCommandCommand))
+                                                    .Build()
+                                                    .RunAsync(Arguments, new Dictionary<string, string>());
+        }
+
+        [Benchmark(Description = "CliFx - 10 commands")]
+        public async ValueTask<int> ExecuteWithCliFx10Commands()
+        {
+            return await new CliApplicationBuilder().AddCommand(typeof(CliFxCommand))
+                                                    .AddCommand(typeof(CliFxNamedCommandCommand))
+                                                    .AddCommand(typeof(CliFxNamedCommandCommand00))
+                                                    .AddCommand(typeof(CliFxNamedCommandCommand01))
+                                                    .AddCommand(typeof(CliFxNamedCommandCommand02))
+                                                    .AddCommand(typeof(CliFxNamedCommandCommand03))
+                                                    .AddCommand(typeof(CliFxNamedCommandCommand04))
+                                                    .AddCommand(typeof(CliFxNamedCommandCommand05))
+                                                    .AddCommand(typeof(CliFxNamedCommandCommand06))
+                                                    .AddCommand(typeof(CliFxNamedCommandCommand07))
+                                                    .Build()
+                                                    .RunAsync(Arguments, new Dictionary<string, string>());
+        }
+
+        [Benchmark(Description = "CliFx - 22 commands")]
+        public async ValueTask<int> ExecuteWithCliFxAllCommands()
+        {
+            return await new CliApplicationBuilder().AddCommandsFromThisAssembly()
                                                     .Build()
                                                     .RunAsync(Arguments, new Dictionary<string, string>());
         }
