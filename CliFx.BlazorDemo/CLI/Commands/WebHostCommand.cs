@@ -11,6 +11,9 @@ namespace CliFx.BlazorDemo.CLI.Commands
         private readonly ICliContext _cliContext;
         private readonly IWebHostRunnerService _webHostRunnerService;
 
+        [CommandParameter(0, Name = "message", Description = "Exception message.")]
+        public string Message { get; set; } = "";
+
         public WebHostCommand(ICliContext cliContext, IWebHostRunnerService webHostRunnerService)
         {
             _cliContext = cliContext;
@@ -20,7 +23,7 @@ namespace CliFx.BlazorDemo.CLI.Commands
         public async ValueTask ExecuteAsync(IConsole console)
         {
             if (_cliContext.IsInteractive)
-                throw new CommandException(exitCode: 0, showHelp: true);
+                throw new CommandException(Message, exitCode: 0, showHelp: false);
 
             await _webHostRunnerService.RunAsync(console.GetCancellationToken());
         }

@@ -22,6 +22,7 @@ namespace CliFx.BlazorDemo
             services.AddTransient<IBackgroundWebHostProvider, BackgroundWebHostProvider>();
 
             // Register commands
+            services.AddTransient<DefaultCommand>();
             services.AddTransient<WebHostCommand>();
             services.AddTransient<WebHostRestartCommand>();
             services.AddTransient<WebHostStartCommand>();
@@ -40,20 +41,5 @@ namespace CliFx.BlazorDemo
                 .Build()
                 .RunAsync();
         }
-    }
-
-    public class WebHostUtil
-    {
-        public static void Start(string[] args)
-        {
-            CreateHostBuilder(args).Build().Run();
-        }
-
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
     }
 }

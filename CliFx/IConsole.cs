@@ -138,7 +138,9 @@ namespace CliFx
         /// <summary>
         /// Sets console foreground and background colors, executes specified action, and sets the colors back to the original values.
         /// </summary>
-        public static void WithColors(this IConsole console, ConsoleColor foregroundColor, ConsoleColor backgroundColor, Action action) =>
+        public static void WithColors(this IConsole console, ConsoleColor foregroundColor, ConsoleColor backgroundColor, Action action)
+        {
             console.WithForegroundColor(foregroundColor, () => console.WithBackgroundColor(backgroundColor, action));
+        }
     }
 }

@@ -5,11 +5,11 @@ using CliFx.BlazorDemo.CLI.Services;
 namespace CliFx.BlazorDemo.CLI.Commands
 {
     [Command(Description = "Runs webhost in normal mode.")]
-    public class RunWebHostCommand : ICommand
+    public class DefaultCommand : ICommand
     {
         private readonly IWebHostRunnerService _webHostRunnerService;
 
-        public RunWebHostCommand(IWebHostRunnerService webHostRunnerService)
+        public DefaultCommand(IWebHostRunnerService webHostRunnerService)
         {
             _webHostRunnerService = webHostRunnerService;
         }

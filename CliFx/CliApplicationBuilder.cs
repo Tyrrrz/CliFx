@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,22 +14,31 @@ namespace CliFx
     /// </summary>
     public partial class CliApplicationBuilder
     {
+        //Directives and commands settings
         private readonly HashSet<Type> _commandTypes = new HashSet<Type>();
         private readonly List<string> _customDirectives = new List<string>();
 
         private bool _isDebugModeAllowed = true;
         private bool _isPreviewModeAllowed = true;
-        private bool _isInteractiveModeAllowed = false;
+
+        //Metadata settings
         private string? _title;
         private string? _executableName;
         private string? _versionText;
         private string? _description;
 
+        //Exceptions
+        private ICliExceptionHandler? _exceptionHandler;
+
+        // Dependecy injection and type activation
         private IConsole? _console;
         private ITypeActivator? _typeActivator;
-        private ICliExceptionHandler? _exceptionHandler;
         private Func<ICliContext, IConsole, Func<Type, object>>? _buildServiceProvider;
 
+        //Interactive mode settings
+        private bool _isInteractiveModeAllowed = false;
+
+        #region Directives and commands
         /// <summary>
         /// Add custom directive.
         /// </summary>
@@ -100,7 +109,10 @@ namespace CliFx
         /// Adds commands from the calling assembly to the application.
         /// Only adds public valid command types.
         /// </summary>
-        public CliApplicationBuilder AddCommandsFromThisAssembly() => AddCommandsFrom(Assembly.GetCallingAssembly());
+        public CliApplicationBuilder AddCommandsFromThisAssembly()
+        {
+            return AddCommandsFrom(Assembly.GetCallingAssembly());
+        }
 
         /// <summary>
         /// Specifies whether debug mode (enabled with [debug] directive) is allowed in the application.
@@ -119,16 +131,9 @@ namespace CliFx
             _isPreviewModeAllowed = isAllowed;
             return this;
         }
+        #endregion
 
-        /// <summary>
-        /// Specifies whether interactive mode (enabled with [interactive] directive) is allowed in the application.
-        /// </summary>
-        public CliApplicationBuilder AllowInteractiveMode(bool isAllowed = true)
-        {
-            _isInteractiveModeAllowed = isAllowed;
-            return this;
-        }
-
+        #region Metadata
         /// <summary>
         /// Sets application title, which appears in the help text.
         /// </summary>
@@ -164,7 +169,9 @@ namespace CliFx
             _description = description;
             return this;
         }
+        #endregion
 
+        #region Dependecy injection and type activation
         /// <summary>
         /// Configures the application to use the specified implementation of <see cref="IConsole"/>.
         /// </summary>
@@ -184,6 +191,38 @@ namespace CliFx
         }
 
         /// <summary>
+        /// Configures the application to use the specified implementation of <see cref="ITypeActivator"/>.
+        /// </summary>
+        public CliApplicationBuilder UseTypeActivator(ITypeActivator typeActivator)
+        {
+            _buildServiceProvider = null;
+            _typeActivator = typeActivator;
+
+            return this;
+        }
+
+        /// <summary>
+        /// Configures the application to use the specified function for activating types.
+        /// </summary>
+        public CliApplicationBuilder UseTypeActivator(Func<Type, object> typeActivator)
+        {
+            return UseTypeActivator(new DelegateTypeActivator(typeActivator));
+        }
+
+        /// <summary>
+        /// Configures the application to use the specified implementation of <see cref="ITypeActivator"/>.
+        /// </summary>
+        public CliApplicationBuilder UseTypeActivator(Func<ICliContext, IConsole, Func<Type, object>> buildServiceProvider)
+        {
+            _typeActivator = null;
+            _buildServiceProvider = buildServiceProvider;
+
+            return this;
+        }
+        #endregion
+
+        #region Exceptions
+        /// <summary>
         /// Configures the application to use the specified implementation of <see cref="ICliExceptionHandler"/>.
         /// </summary>
         public CliApplicationBuilder UseExceptionHandler<T>()
@@ -201,35 +240,19 @@ namespace CliFx
             _exceptionHandler = handler;
             return this;
         }
+        #endregion
+
+        #region Interactive Mode
 
         /// <summary>
-        /// Configures the application to use the specified implementation of <see cref="ITypeActivator"/>.
+        /// Specifies whether interactive mode (enabled with [interactive] directive) is allowed in the application.
         /// </summary>
-        public CliApplicationBuilder UseTypeActivator(ITypeActivator typeActivator)
+        public CliApplicationBuilder AllowInteractiveMode(bool isAllowed = true)
         {
-            _buildServiceProvider = null;
-            _typeActivator = typeActivator;
-
+            _isInteractiveModeAllowed = isAllowed;
             return this;
         }
-
-
-        /// <summary>
-        /// Configures the application to use the specified function for activating types.
-        /// </summary>
-        public CliApplicationBuilder UseTypeActivator(Func<Type, object> typeActivator) =>
-            UseTypeActivator(new DelegateTypeActivator(typeActivator));
-
-        /// <summary>
-        /// Configures the application to use the specified implementation of <see cref="ITypeActivator"/>.
-        /// </summary>
-        public CliApplicationBuilder UseTypeActivator(Func<ICliContext, IConsole, Func<Type, object>> buildServiceProvider)
-        {
-            _typeActivator = null;
-            _buildServiceProvider = buildServiceProvider;
-
-            return this;
-        }
+        #endregion
 
         /// <summary>
         /// Creates an instance of <see cref="CliApplication"/> using configured parameters.
@@ -259,7 +282,7 @@ namespace CliFx
                 _typeActivator = new DelegateTypeActivator(_buildServiceProvider.Invoke(cliContext, _console));
 
             if (_isInteractiveModeAllowed)
-                return new CliInteractiveApplication(cliContext, _typeActivator);
+                return new InteractiveCliApplication(cliContext, _typeActivator);
 
             return new CliApplication(cliContext, _typeActivator);
         }
@@ -272,23 +295,26 @@ namespace CliFx
         // Entry assembly is null in tests
         private static Assembly? EntryAssembly => LazyEntryAssembly.Value;
 
-        private static string? TryGetDefaultTitle() => EntryAssembly?.GetName().Name;
+        private static string? TryGetDefaultTitle()
+        {
+            return EntryAssembly?.GetName().Name;
+        }
 
         private static string? TryGetDefaultExecutableName()
         {
-            var entryAssemblyLocation = EntryAssembly?.Location;
+            string? entryAssemblyLocation = EntryAssembly?.Location;
 
             // The assembly can be an executable or a dll, depending on how it was packaged
-            var isDll = string.Equals(Path.GetExtension(entryAssemblyLocation), ".dll", StringComparison.OrdinalIgnoreCase);
+            bool isDll = string.Equals(Path.GetExtension(entryAssemblyLocation), ".dll", StringComparison.OrdinalIgnoreCase);
 
             return isDll
                 ? "dotnet " + Path.GetFileName(entryAssemblyLocation)
                 : Path.GetFileNameWithoutExtension(entryAssemblyLocation);
         }
 
-        private static string? TryGetDefaultVersionText() =>
-            EntryAssembly != null
-                ? $"v{EntryAssembly.GetName().Version.ToSemanticString()}"
-                : null;
+        private static string? TryGetDefaultVersionText()
+        {
+            return EntryAssembly != null ? $"v{EntryAssembly.GetName().Version.ToSemanticString()}" : null;
+        }
     }
 }

@@ -11,16 +11,16 @@ namespace CliFx
     /// <summary>
     /// Command line application facade.
     /// </summary>
-    public partial class CliInteractiveApplication : CliApplication
+    public partial class InteractiveCliApplication : CliApplication
     {
-        private readonly ConsoleColor _promptForeground = ConsoleColor.Yellow;
+        private readonly ConsoleColor _promptForeground = ConsoleColor.Blue;
         private readonly ConsoleColor _commandForeground = ConsoleColor.Yellow;
         private readonly ConsoleColor _finishedResultForeground = ConsoleColor.White;
 
         /// <summary>
-        /// Initializes an instance of <see cref="CliInteractiveApplication"/>.
+        /// Initializes an instance of <see cref="InteractiveCliApplication"/>.
         /// </summary>
-        public CliInteractiveApplication(CliContext cliContext, ITypeActivator typeActivator) :
+        public InteractiveCliApplication(CliContext cliContext, ITypeActivator typeActivator) :
             base(cliContext, typeActivator)
         {
 
@@ -39,6 +39,7 @@ namespace CliFx
         {
             ApplicationConfiguration _configuration = CliContext.Configuration;
             IConsole _console = CliContext.Console;
+            _console.ForegroundColor = ConsoleColor.Gray;
 
             try
             {
@@ -65,7 +66,7 @@ namespace CliFx
                     CliContext.IsInteractive = true;
 
                     await ProcessCommand(commandLineArguments, environmentVariables, root, input);
-                    await RunInteractivelyAsync(environmentVariables, _console, _configuration);
+                    await RunInteractivelyAsync(environmentVariables, _console, root, _configuration);
                 }
 
                 return await ProcessCommand(commandLineArguments, environmentVariables, root, input);
@@ -84,6 +85,7 @@ namespace CliFx
 
         private async ValueTask<int> RunInteractivelyAsync(IReadOnlyDictionary<string, string> environmentVariables,
                                                            IConsole _console,
+                                                           RootSchema root,
                                                            ApplicationConfiguration _configuration)
         {
             //TODO: Add startup message or add behaviours like in mediatr
@@ -93,7 +95,6 @@ namespace CliFx
 
                 string[] commandLineArguments = GetInput(_console, CliContext.Metadata.ExecutableName);
 
-                var root = RootSchema.Resolve(_configuration.CommandTypes);
                 var input = CommandInput.Parse(commandLineArguments, root.GetCommandNames());
 
                 int exitCode = await ProcessCommand(commandLineArguments, environmentVariables, root, input);
