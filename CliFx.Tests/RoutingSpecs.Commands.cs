@@ -8,6 +8,21 @@ namespace CliFx.Tests
     public partial class RoutingSpecs
     {
         [Command]
+        public class BenchmarkCliFxCommand : ICommand
+        {
+            [CommandOption("str", 's')]
+            public string? StrOption { get; set; }
+
+            [CommandOption("int", 'i')]
+            public int IntOption { get; set; }
+
+            [CommandOption("bool", 'b')]
+            public bool BoolOption { get; set; }
+
+            public ValueTask ExecuteAsync(IConsole console) => default;
+        }
+
+        [Command]
         private class DefaultCommand : ICommand
         {
             public ValueTask ExecuteAsync(IConsole console)

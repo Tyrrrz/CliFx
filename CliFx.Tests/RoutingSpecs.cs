@@ -36,6 +36,56 @@ namespace CliFx.Tests
         }
 
         [Fact]
+        public async Task Default_command_is_executed_if_provided_arguments_do_not_match_any_named_command_and_is_only_command()
+        {
+            // Arrange
+            await using var stdOut = new MemoryStream();
+            var console = new VirtualConsole(output: stdOut);
+
+            var application = new CliApplicationBuilder()
+                .AddCommand(typeof(DefaultCommand))
+                .UseConsole(console)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(
+                Array.Empty<string>(),
+                new Dictionary<string, string>());
+
+            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
+
+            // Assert
+            exitCode.Should().Be(0);
+            stdOutData.Should().Be("Hello world!");
+        }
+
+        [Fact]
+        public async Task Default_benchmark_command_is_executed_if_provided_arguments_do_not_match_any_named_command_and_is_only_command()
+        {
+            string[] arguments = { "--str", "hello world", "-i", "13", "-b" };
+
+            // Arrange
+            await using var stdOut = new MemoryStream();
+            var console = new VirtualConsole(output: stdOut);
+
+            var application = new CliApplicationBuilder()
+                .AddCommand(typeof(BenchmarkCliFxCommand))
+                .UseConsole(console)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(
+                arguments,
+                new Dictionary<string, string>());
+
+            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
+
+            // Assert
+            exitCode.Should().Be(0);
+            stdOutData.Should().BeEmpty();
+        }
+
+        [Fact]
         public async Task Help_text_is_printed_if_no_arguments_were_provided_and_default_command_is_not_defined()
         {
             // Arrange
