@@ -76,6 +76,9 @@ namespace CliFx
 
             while (!Debugger.IsAttached)
                 await Task.Delay(100);
+
+            _console.WithForegroundColor(ConsoleColor.Green, () =>
+                _console.Output.WriteLine($"Debugger attached to PID {processId}."));
         }
 
         /// <summary>
@@ -134,6 +137,19 @@ namespace CliFx
             return command != StubDefaultCommand.Schema ? (ICommand)_typeActivator.CreateInstance(command.Type) : new StubDefaultCommand();
         }
 
+
+        /// <summary>
+        /// Prints the startup message if availble.
+        /// </summary>
+        protected void PrintStartupMessage()
+        {
+            if (_metadata.StartupMessage is null)
+                return;
+
+            _console.WithForegroundColor(ConsoleColor.Blue, () =>
+                _console.Output.WriteLine(_metadata.StartupMessage));
+        }
+
         /// <summary>
         /// Runs the application with specified command line arguments and environment variables, and returns the exit code.
         /// </summary>
@@ -145,6 +161,8 @@ namespace CliFx
         public virtual async ValueTask<int> RunAsync(IReadOnlyList<string> commandLineArguments,
                                                      IReadOnlyDictionary<string, string> environmentVariables)
         {
+            PrintStartupMessage();
+
             try
             {
                 var root = RootSchema.Resolve(_configuration.CommandTypes);
@@ -215,6 +233,8 @@ namespace CliFx
             // before the arguments are bound to the properties
             var defaultValues = command.GetArgumentValues(instance);
 
+
+            //If we want to throw error if `-hg`, `-h -g`, `--version -unknown` are given, we should move help handling to try statement after //Bind arguments
             // Help option
             if (command.IsHelpOptionAvailable && input.IsHelpOptionSpecified ||
                 command == StubDefaultCommand.Schema && !input.Parameters.Any() && !input.Options.Any())

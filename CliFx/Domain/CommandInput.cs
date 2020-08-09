@@ -50,7 +50,7 @@ namespace CliFx.Domain
 
         public bool HasAnyOfDirectives(string[] directives)
         {
-            foreach(var directive in directives)
+            foreach (var directive in directives)
             {
                 if (HasDirective(directive))
                     return true;
@@ -61,7 +61,7 @@ namespace CliFx.Domain
 
         public bool HasAllOfDirectives(string[] directives)
         {
-            foreach(var directive in directives)
+            foreach (var directive in directives)
             {
                 if (!HasDirective(directive))
                     return false;

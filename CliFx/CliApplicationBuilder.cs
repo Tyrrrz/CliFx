@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
+using System.Text.RegularExpressions;
 using CliFx.Domain;
 using CliFx.Exceptions;
 using CliFx.Internal.Extensions;
@@ -26,6 +28,7 @@ namespace CliFx
         private string? _executableName;
         private string? _versionText;
         private string? _description;
+        private string? _startupMessage;
 
         //Exceptions
         private ICliExceptionHandler? _exceptionHandler;
@@ -169,6 +172,23 @@ namespace CliFx
             _description = description;
             return this;
         }
+
+        /// <summary>
+        /// Sets application startup message, which appears just after starting the app.
+        ///
+        /// You can use the following macros:
+        ///     `{title}` for application title,
+        ///     `{executable}` for executable name,
+        ///     `{version}` for application version,
+        ///     `{description}` for application description.
+        ///
+        /// Double braces can be used to escape macro replacement, while unknown macros will simply act as if they were escaped.
+        /// </summary>
+        public CliApplicationBuilder UseStartupMessage(string? message)
+        {
+            _startupMessage = message;
+            return this;
+        }
         #endregion
 
         #region Dependecy injection and type activation
@@ -266,7 +286,24 @@ namespace CliFx
             _console ??= new SystemConsole();
             _exceptionHandler ??= new DefaultExceptionHandler();
 
-            var metadata = new ApplicationMetadata(_title, _executableName, _versionText, _description);
+            if (_startupMessage != null)
+            {
+                _startupMessage = Regex.Replace(_startupMessage, @"{(?<x>[^}]+)}", match =>
+                {
+                    string value = match.Groups["x"].Value;
+
+                    return value.ToLower() switch
+                    {
+                        "title" => _title,
+                        "executable" => _executableName,
+                        "version" => _versionText,
+                        "description" => _description ?? string.Empty,
+                        _ => string.Concat("{", value, "}")
+                    };
+                });
+            }
+
+            var metadata = new ApplicationMetadata(_title, _executableName, _versionText, _description, _startupMessage);
             var configuration = new ApplicationConfiguration(_commandTypes.ToArray(),
                                                              _customDirectives.ToArray(),
                                                              _exceptionHandler,

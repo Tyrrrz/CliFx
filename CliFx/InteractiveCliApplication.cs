@@ -37,6 +37,8 @@ namespace CliFx
         public override async ValueTask<int> RunAsync(IReadOnlyList<string> commandLineArguments,
                                                       IReadOnlyDictionary<string, string> environmentVariables)
         {
+            PrintStartupMessage();
+
             ApplicationConfiguration _configuration = CliContext.Configuration;
             IConsole _console = CliContext.Console;
             _console.ForegroundColor = ConsoleColor.Gray;
@@ -48,24 +50,17 @@ namespace CliFx
 
                 bool isInteractiveMode = input.HasDirective(StandardDirectives.Interactive);
 
-                // Debug mode
-                if (_configuration.IsDebugModeAllowed && input.HasDirective(StandardDirectives.Debug))
-                {
-                    await LaunchAndWaitForDebuggerAsync();
-                }
-
-                // Preview mode
-                if (_configuration.IsPreviewModeAllowed && input.HasDirective(StandardDirectives.Preview))
-                {
-                    WriteCommandLineInput(input);
-                    return ExitCode.Success;
-                }
+                if (await ProcessDirectives(_configuration, input) is int retVal)
+                    return retVal;
 
                 if (isInteractiveMode)
                 {
                     CliContext.IsInteractive = true;
 
-                    await ProcessCommand(commandLineArguments, environmentVariables, root, input);
+                    // we don't want to run default command for e.g. `[interactive]`
+                    if (!string.IsNullOrWhiteSpace(input.CommandName))
+                        await ProcessCommand(commandLineArguments, environmentVariables, root, input);
+
                     await RunInteractivelyAsync(environmentVariables, _console, root, _configuration);
                 }
 
@@ -83,6 +78,54 @@ namespace CliFx
             }
         }
 
+        private async Task<int?> ProcessDirectives(ApplicationConfiguration _configuration, CommandInput input)
+        {
+            // Debug mode
+            if (_configuration.IsDebugModeAllowed && input.HasDirective(StandardDirectives.Debug))
+            {
+                await LaunchAndWaitForDebuggerAsync();
+            }
+
+            // Preview mode
+            if (_configuration.IsPreviewModeAllowed && input.HasDirective(StandardDirectives.Preview))
+            {
+                WriteCommandLineInput(input);
+
+                return ExitCode.Success;
+            }
+
+            // Scope
+            if (input.HasDirective(StandardDirectives.Scope))
+            {
+                CliContext.Scope = input.CommandName ?? string.Empty;
+
+                return ExitCode.Success;
+            }
+
+            // Scope reset
+            if (input.HasDirective(StandardDirectives.ScopeReset))
+            {
+                CliContext.Scope = string.Empty;
+
+                return ExitCode.Success;
+            }
+
+            // Scope up
+            if (input.HasDirective(StandardDirectives.ScopeUp))
+            {
+                string[] splittedScope = CliContext.Scope.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                if (splittedScope.Length > 1)
+                    CliContext.Scope = string.Join(" ", splittedScope, 0, splittedScope.Length - 1);
+                else if (splittedScope.Length == 1)
+                    CliContext.Scope = string.Empty;
+
+                return ExitCode.Success;
+            }
+
+            return null;
+        }
+
         private async ValueTask<int> RunInteractivelyAsync(IReadOnlyDictionary<string, string> environmentVariables,
                                                            IConsole _console,
                                                            RootSchema root,
@@ -91,20 +134,22 @@ namespace CliFx
             //TODO: Add startup message or add behaviours like in mediatr
             while (true) //TODO maybe add CliContext.Exit and CliContext.Status
             {
-
                 //TODO add directives checking
 
                 string[] commandLineArguments = GetInput(_console, CliContext.Metadata.ExecutableName);
 
                 var input = CommandInput.Parse(commandLineArguments, root.GetCommandNames());
-                int exitCode = await ProcessCommand(commandLineArguments, environmentVariables, root, input);
+
+                int? exitCode = await ProcessDirectives(_configuration, input);
+                exitCode ??= await ProcessCommand(commandLineArguments, environmentVariables, root, input);
 
                 _console.WithForegroundColor(_finishedResultForeground, () =>
                 {
                     //if (exitCode == 0)
                     //    _console.Output.WriteLine($"{CliContext.Metadata.ExecutableName}: Command finished succesfully");
                     //else
-                    _console.Output.WriteLine($"{CliContext.Metadata.ExecutableName}: Command finished with exit code ({exitCode})");
+                    if (exitCode > 0)
+                        _console.Output.WriteLine($"{CliContext.Metadata.ExecutableName}: Command finished with exit code ({exitCode})");
                 });
             }
 
@@ -126,6 +171,7 @@ namespace CliFx
                 {
                     _console.WithForegroundColor(ConsoleColor.Cyan, () =>
                     {
+                        _console.Output.Write(' ');
                         _console.Output.Write(CliContext.Scope);
                     });
                 }
@@ -143,11 +189,21 @@ namespace CliFx
                 if (line.StartsWith(StandardDirectives.Default))
                     return Array.Empty<string>();
 
-#if NETSTANDARD2_0
-                arguments = line.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).ToArray();
-#else
-                arguments = line.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToArray();
-#endif
+                if (string.IsNullOrWhiteSpace(CliContext.Scope))
+                {
+                    arguments = line.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                                    .ToArray();
+                }
+                else
+                {
+                    var tmp = line.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                                  .ToList();
+
+                    int lastDirective = tmp.FindLastIndex(x => x.StartsWith('[') && x.EndsWith(']'));
+                    tmp.Insert(lastDirective + 1, CliContext.Scope);
+
+                    arguments = tmp.ToArray();
+                }
 
             } while (string.IsNullOrWhiteSpace(line));
 

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using CliFx.Domain;
 using CliFx.Exceptions;
-using CliWrap;
 using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;

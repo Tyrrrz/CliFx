@@ -7,7 +7,13 @@
 - Added `CliContext` that can be injected to services and commands with DI.
 - Added `WindowWidth`, `WindowHeight`, `BufferWidth`, and `BufferHeight` to `IConsole`.
 - Added a second demo of that proesents the interactive mode.
-- In demo apps `BookListCommand` prints a red message when there are no books.
+- Added new demo apps and improved existing demo.
+- Added `"Debugger attached to PID {processId}.` message after debugger attachment.
+- Added benchmarks for multiple commands.
+- Added startup message option with macros.
+- Rewritten `RootSchema` with HashSet.
+- Added tests of the command used in benchmagking to easily chech if it executs correctly and won't cause banchmarking freezing.
+- Improved code readability.
 
 ### v1.3.2 (31-Jul-2020)
 

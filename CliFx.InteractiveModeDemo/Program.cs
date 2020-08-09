@@ -19,6 +19,7 @@ namespace CliFx.InteractiveModeDemo
             services.AddSingleton<LibraryService>();
 
             // Register commands
+            services.AddTransient<DefaultCommand>();
             services.AddTransient<BookCommand>();
             services.AddTransient<BookAddCommand>();
             services.AddTransient<BookRemoveCommand>();
@@ -34,6 +35,7 @@ namespace CliFx.InteractiveModeDemo
                 .AddCommandsFromThisAssembly()
                 .UseTypeActivator(GetServiceCollection)
                 .AllowInteractiveMode(true)
+                .UseStartupMessage("{title} CLI {version} {{title}} {executable} {{{description}}} {test}")
                 .Build()
                 .RunAsync();
         }

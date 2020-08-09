@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using CliFx.Exceptions;
-using CliFx.Internal.Extensions;
 
 namespace CliFx.Domain
 {
@@ -211,15 +210,8 @@ namespace CliFx.Domain
                     continue;
                 }
 
-#if NETSTANDARD2_0
-                if (commands.ContainsKey(command.Name))
-                    invalidCommands.Add(command);
-                else
-                    commands.Add(command.Name, command);
-#else
                 if (!commands.TryAdd(command.Name, command))
                     invalidCommands.Add(command);
-#endif
             }
 
             if (commands.Count == 0 && defaultCommand is null)

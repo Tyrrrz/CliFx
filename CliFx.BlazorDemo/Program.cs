@@ -2,9 +2,7 @@ using System;
 using System.Threading.Tasks;
 using CliFx.BlazorDemo.CLI.Commands;
 using CliFx.BlazorDemo.CLI.Services;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 namespace CliFx.BlazorDemo
 {

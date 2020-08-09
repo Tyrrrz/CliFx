@@ -1,18 +1,15 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using CliFx.Attributes;
-using CliFx.Exceptions;
 using CliFx.InteractiveModeDemo.Internal;
 using CliFx.InteractiveModeDemo.Services;
 
 namespace CliFx.InteractiveModeDemo.Commands
 {
-    [Command("book", Description = "View, list, add or remove books.")]
+    [Command("book", Description = "List all books in the library.")]
     public class BookCommand : ICommand
     {
         private readonly LibraryService _libraryService;
-
-        [CommandParameter(0, Name = "title", Description = "Book title.")]
-        public string Title { get; set; } = "";
 
         public BookCommand(LibraryService libraryService)
         {
@@ -21,12 +18,22 @@ namespace CliFx.InteractiveModeDemo.Commands
 
         public ValueTask ExecuteAsync(IConsole console)
         {
-            var book = _libraryService.GetBook(Title);
+            var library = _libraryService.GetLibrary();
 
-            if (book == null)
-                throw new CommandException("Book not found.", 1);
+            var isFirst = true;
+            foreach (var book in library.Books)
+            {
+                // Margin
+                if (!isFirst)
+                    console.Output.WriteLine();
+                isFirst = false;
 
-            console.RenderBook(book);
+                // Render book
+                console.RenderBook(book);
+            }
+
+            if (isFirst)
+                console.WithForegroundColor(ConsoleColor.Red, () => console.Output.WriteLine("No books"));
 
             return default;
         }
