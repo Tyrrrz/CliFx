@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CliFx.Attributes;
 using CliFx.Domain;
+using CliFx.Domain.Input;
 using CliFx.Internal.Extensions;
 
 namespace CliFx.Exceptions
@@ -22,17 +23,35 @@ namespace CliFx.Exceptions
         /// <summary>
         /// Initializes an instance of <see cref="CliFxException"/>.
         /// </summary>
-        public CliFxException(string? message, Exception? innerException = null)
-            : base(message, innerException)
+        public CliFxException()
         {
-            // Message property has a fallback so it's never empty, hence why we need this check
+
+        }
+
+        /// <summary>
+        /// Initializes an instance of <see cref="CliFxException"/> with a specified error message.
+        /// </summary>
+        public CliFxException(string? message)
+            : base(message)
+        {
+            _isMessageSet = !string.IsNullOrWhiteSpace(message);
+        }
+
+        /// <summary>
+        /// Initializes an instance of <see cref="CliFxException"/> with a specified error
+        /// message and a reference to the inner exception that is the cause of this exception.
+        /// </summary>
+        public CliFxException(string? message, Exception? innerException)
+            : base(message, innerException!)
+        {
             _isMessageSet = !string.IsNullOrWhiteSpace(message);
         }
 
         /// <inheritdoc />
-        public override string ToString() => _isMessageSet
-            ? Message
-            : base.ToString();
+        public override string ToString()
+        {
+            return _isMessageSet ? Message : base.ToString();
+        }
     }
 
     // Internal exceptions

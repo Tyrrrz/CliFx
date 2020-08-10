@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using CliFx.Domain;
+using CliFx.Domain.Input;
 using CliFx.Tests.Internal;
 using FluentAssertions;
 using Xunit;

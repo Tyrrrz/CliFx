@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CliFx.Attributes;
 using CliFx.Domain;
+using CliFx.Domain.Input;
 using CliFx.Exceptions;
 using CliFx.Internal;
 
@@ -166,6 +167,8 @@ namespace CliFx
             try
             {
                 var root = RootSchema.Resolve(_configuration.CommandTypes);
+                CliContext.Root = root;
+
                 var input = CommandInput.Parse(commandLineArguments, root.GetCommandNames());
 
                 // Debug mode
@@ -216,6 +219,7 @@ namespace CliFx
         {
             // Try to get the command matching the input or fallback to default
             CommandSchema command = root.TryFindCommand(input.CommandName) ?? StubDefaultCommand.Schema;
+            CliContext.CurrentCommandSchema = command;
 
             // Version option
             if (command.IsVersionOptionAvailable && input.IsVersionOptionSpecified)
@@ -227,12 +231,9 @@ namespace CliFx
             // Get command instance (also used in help text)
             var instance = GetCommandInstance(command);
 
-            CliContext.CurrentCommandInfo = new CommandInfo(command, commandLineArguments);
-
             // To avoid instantiating the command twice, we need to get default values
             // before the arguments are bound to the properties
             var defaultValues = command.GetArgumentValues(instance);
-
 
             //If we want to throw error if `-hg`, `-h -g`, `--version -unknown` are given, we should move help handling to try statement after //Bind arguments
             // Help option

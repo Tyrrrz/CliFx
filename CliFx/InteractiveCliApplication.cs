@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using CliFx.Domain;
+using CliFx.Domain.Input;
 using CliFx.Exceptions;
 
 namespace CliFx
@@ -46,6 +47,8 @@ namespace CliFx
             try
             {
                 var root = RootSchema.Resolve(_configuration.CommandTypes);
+                CliContext.Root = root;
+
                 var input = CommandInput.Parse(commandLineArguments, root.GetCommandNames());
 
                 bool isInteractiveMode = input.HasDirective(StandardDirectives.Interactive);

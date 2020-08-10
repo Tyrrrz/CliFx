@@ -5,19 +5,35 @@ using CliFx.Exceptions;
 
 namespace CliFx.Domain
 {
-    internal partial class RootSchema
+    /// <summary>
+    /// Stores all commands in application.
+    /// </summary>
+    public partial class RootSchema
     {
+        /// <summary>
+        /// List of defined commands in application.
+        /// </summary>
         public IReadOnlyDictionary<string, CommandSchema> Commands { get; }
+
+        /// <summary>
+        /// Default command (null if no default command).
+        /// </summary>
         public CommandSchema? DefaultCommand { get; }
 
         private HashSet<string>? _commandNamesHashSet;
 
+        /// <summary>
+        /// Initializes an instance of <see cref="RootSchema"/>.
+        /// </summary>
         public RootSchema(IReadOnlyDictionary<string, CommandSchema> commands, CommandSchema? defaultCommand)
         {
             Commands = commands;
             DefaultCommand = defaultCommand;
         }
 
+        /// <summary>
+        /// Returns collection of commands names.
+        /// </summary>
         public ISet<string> GetCommandNames()
         {
             _commandNamesHashSet ??= Commands.Keys.ToHashSet(StringComparer.OrdinalIgnoreCase);
@@ -25,6 +41,9 @@ namespace CliFx.Domain
             return _commandNamesHashSet;
         }
 
+        /// <summary>
+        /// Finds command schema by name.
+        /// </summary>
         public CommandSchema? TryFindCommand(string? commandName)
         {
             if (string.IsNullOrWhiteSpace(commandName))
@@ -34,7 +53,6 @@ namespace CliFx.Domain
 
             return value;
         }
-
 
         private IEnumerable<CommandSchema> GetDescendantCommands(IEnumerable<CommandSchema> potentialParentCommands, string? parentCommandName)
         {
@@ -47,6 +65,9 @@ namespace CliFx.Domain
             return GetDescendantCommands(Commands.Values, parentCommandName).ToArray();
         }
 
+        /// <summary>
+        /// Finds all child commands of the parrent command by name.
+        /// </summary>
         public IReadOnlyList<CommandSchema> GetChildCommands(string? parentCommandName)
         {
             var descendants = GetDescendantCommands(Commands.Values, parentCommandName);
@@ -64,7 +85,7 @@ namespace CliFx.Domain
         }
     }
 
-    internal partial class RootSchema
+    public partial class RootSchema
     {
         private static void ValidateParameters(CommandSchema command)
         {

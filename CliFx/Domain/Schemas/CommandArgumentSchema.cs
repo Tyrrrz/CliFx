@@ -8,25 +8,39 @@ using CliFx.Internal.Extensions;
 
 namespace CliFx.Domain
 {
-    internal abstract partial class CommandArgumentSchema
+    /// <summary>
+    /// Abstract command argument schema used in <see cref="CommandParameterSchema"/> and <see cref="CommandOptionSchema"/>
+    /// </summary>
+    public abstract partial class CommandArgumentSchema
     {
         // Property can be null on built-in arguments (help and version options)
-        public PropertyInfo? Property { get; }
+        internal PropertyInfo? Property { get; }
 
+        /// <summary>
+        /// Command argument description, which is used in help text.
+        /// </summary>
         public string? Description { get; }
 
+        /// <summary>
+        /// Whetehr command argument is scalar.
+        /// </summary>
         public bool IsScalar => TryGetEnumerableArgumentUnderlyingType() == null;
 
+        /// <summary>
+        /// Initializes an instance of <see cref="CommandArgumentSchema"/>.
+        /// </summary>
         protected CommandArgumentSchema(PropertyInfo? property, string? description)
         {
             Property = property;
             Description = description;
         }
 
-        private Type? TryGetEnumerableArgumentUnderlyingType() =>
-            Property != null && Property.PropertyType != typeof(string)
-                ? Property.PropertyType.GetEnumerableUnderlyingType()
-                : null;
+        private Type? TryGetEnumerableArgumentUnderlyingType()
+        {
+            return Property != null && Property.PropertyType != typeof(string)
+                   ? Property.PropertyType.GetEnumerableUnderlyingType()
+                   : null;
+        }
 
         private object? ConvertScalar(string? value, Type targetType)
         {
@@ -114,20 +128,22 @@ namespace CliFx.Domain
             }
         }
 
-        public void BindOn(ICommand command, IReadOnlyList<string> values) =>
+        internal void BindOn(ICommand command, IReadOnlyList<string> values)
+        {
             Property?.SetValue(command, Convert(values));
+        }
 
-        public void BindOn(ICommand command, params string[] values) =>
+        internal void BindOn(ICommand command, params string[] values)
+        {
             BindOn(command, (IReadOnlyList<string>)values);
+        }
 
-        public IReadOnlyList<string> GetValidValues()
+        internal IReadOnlyList<string> GetValidValues()
         {
             if (Property == null)
                 return Array.Empty<string>();
 
-            var underlyingType =
-                Property.PropertyType.GetNullableUnderlyingType() ??
-                Property.PropertyType;
+            var underlyingType = Property.PropertyType.GetNullableUnderlyingType() ?? Property.PropertyType;
 
             // Enum
             if (underlyingType.IsEnum)
@@ -137,7 +153,7 @@ namespace CliFx.Domain
         }
     }
 
-    internal partial class CommandArgumentSchema
+    public partial class CommandArgumentSchema
     {
         private static readonly IFormatProvider FormatProvider = CultureInfo.InvariantCulture;
 

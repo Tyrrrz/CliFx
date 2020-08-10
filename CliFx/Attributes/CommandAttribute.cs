@@ -44,6 +44,7 @@ namespace CliFx.Attributes
         /// </summary>
         public CommandAttribute()
         {
+
         }
     }
 }

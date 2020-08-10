@@ -1,4 +1,6 @@
-﻿namespace CliFx
+﻿using CliFx.Domain;
+
+namespace CliFx
 {
     /// <inheritdoc/>
     public class CliContext : ICliContext
@@ -19,7 +21,10 @@
         public IConsole Console { get; }
 
         /// <inheritdoc/>
-        public CommandInfo? CurrentCommandInfo { get; internal set; }
+        public RootSchema? Root { get; internal set; }
+
+        /// <inheritdoc/>
+        public CommandSchema? CurrentCommandSchema { get; internal set; }
 
         /// <summary>
         /// Initializes an instance of <see cref="CliContext"/>.

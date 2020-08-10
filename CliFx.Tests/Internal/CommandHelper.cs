@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
 using CliFx.Domain;
+using CliFx.Domain.Input;
 
 namespace CliFx.Tests.Internal
 {
     internal static class CommandHelper
     {
-        public static TCommand ResolveCommand<TCommand>(CommandInput input, IReadOnlyDictionary<string, string> environmentVariables)
+        public static TCommand ResolveCommand<TCommand>(CommandInput input,
+                                                        IReadOnlyDictionary<string, string> environmentVariables)
             where TCommand : ICommand, new()
         {
             var schema = CommandSchema.TryResolve(typeof(TCommand))!;
@@ -17,7 +19,9 @@ namespace CliFx.Tests.Internal
         }
 
         public static TCommand ResolveCommand<TCommand>(CommandInput input)
-            where TCommand : ICommand, new() =>
-            ResolveCommand<TCommand>(input, new Dictionary<string, string>());
+            where TCommand : ICommand, new()
+        {
+            return ResolveCommand<TCommand>(input, new Dictionary<string, string>());
+        }
     }
 }

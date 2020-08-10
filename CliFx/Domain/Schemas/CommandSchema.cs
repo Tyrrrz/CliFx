@@ -5,41 +5,77 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using CliFx.Attributes;
+using CliFx.Domain.Input;
 using CliFx.Exceptions;
 using CliFx.Internal.Extensions;
 
 namespace CliFx.Domain
 {
-    internal partial class CommandSchema
+    /// <summary>
+    /// Stores command schema.
+    /// </summary>
+    public partial class CommandSchema
     {
+        /// <summary>
+        /// Command name.
+        /// If the name is not set, the command is treated as a default command, i.e. the one that gets executed when the user
+        /// does not specify a command name in the arguments.
+        /// All commands in an application must have different names. Likewise, only one command without a name is allowed.
+        /// </summary>
         public Type Type { get; }
 
+        /// <summary>
+        /// Whether command is default.
+        /// </summary>
         public string? Name { get; }
 
+        /// <summary>
+        /// Command description, which is used in help text.
+        /// </summary>
         public bool IsDefault => string.IsNullOrWhiteSpace(Name);
 
+        /// <summary>
+        /// Command description, which is used in help text.
+        /// </summary>
         public string? Description { get; }
 
+        /// <summary>
+        /// Command manual text, which is used in help text.
+        /// </summary>
         public string? Manual { get; }
 
+        /// <summary>
+        /// Whether command can run only in interactive mode.
+        /// </summary>
         public bool InteractiveModeOnly { get; }
 
+        /// <summary>
+        /// List of parameters.
+        /// </summary>
         public IReadOnlyList<CommandParameterSchema> Parameters { get; }
 
+        /// <summary>
+        /// List of options.
+        /// </summary>
         public IReadOnlyList<CommandOptionSchema> Options { get; }
 
+        /// <summary>
+        /// Whether help option is available for this command.
+        /// </summary>
         public bool IsHelpOptionAvailable => Options.Contains(CommandOptionSchema.HelpOption);
 
+        /// <summary>
+        /// Whether version option is available for this command.
+        /// </summary>
         public bool IsVersionOptionAvailable => Options.Contains(CommandOptionSchema.VersionOption);
 
-        public CommandSchema(
-            Type type,
-            string? name,
-            string? description,
-            string? manual,
-            bool interactiveModeOnly,
-            IReadOnlyList<CommandParameterSchema> parameters,
-            IReadOnlyList<CommandOptionSchema> options)
+        internal CommandSchema(Type type,
+                               string? name,
+                               string? description,
+                               string? manual,
+                               bool interactiveModeOnly,
+                               IReadOnlyList<CommandParameterSchema> parameters,
+                               IReadOnlyList<CommandOptionSchema> options)
         {
             Type = type;
             Name = name;
@@ -50,11 +86,9 @@ namespace CliFx.Domain
             InteractiveModeOnly = interactiveModeOnly;
         }
 
-        public bool MatchesName(string? name) =>
-            !string.IsNullOrWhiteSpace(Name)
-                ? string.Equals(name, Name, StringComparison.OrdinalIgnoreCase)
-                : string.IsNullOrWhiteSpace(name);
-
+        /// <summary>
+        /// Enumerates through parameters and options.
+        /// </summary>
         public IEnumerable<CommandArgumentSchema> GetArguments()
         {
             foreach (var parameter in Parameters)
@@ -64,6 +98,9 @@ namespace CliFx.Domain
                 yield return option;
         }
 
+        /// <summary>
+        /// Returns dictionary of arguments and its values.
+        /// </summary>
         public IReadOnlyDictionary<CommandArgumentSchema, object?> GetArgumentValues(ICommand instance)
         {
             var result = new Dictionary<CommandArgumentSchema, object?>();
@@ -130,10 +167,9 @@ namespace CliFx.Domain
                 throw CliFxException.UnrecognizedParametersProvided(remainingParameterInputs);
         }
 
-        private void BindOptions(
-            ICommand instance,
-            IReadOnlyList<CommandOptionInput> optionInputs,
-            IReadOnlyDictionary<string, string> environmentVariables)
+        private void BindOptions(ICommand instance,
+                                 IReadOnlyList<CommandOptionInput> optionInputs,
+                                 IReadOnlyDictionary<string, string> environmentVariables)
         {
             // All inputs must be bound
             var remainingOptionInputs = optionInputs.ToList();
@@ -186,16 +222,15 @@ namespace CliFx.Domain
                 throw CliFxException.RequiredOptionsNotSet(unsetRequiredOptions);
         }
 
-        public void Bind(
-            ICommand instance,
-            CommandInput input,
-            IReadOnlyDictionary<string, string> environmentVariables)
+        internal void Bind(ICommand instance,
+                           CommandInput input,
+                           IReadOnlyDictionary<string, string> environmentVariables)
         {
             BindParameters(instance, input.Parameters);
             BindOptions(instance, input.Options, environmentVariables);
         }
 
-        public string GetInternalDisplayString()
+        internal string GetInternalDisplayString()
         {
             var buffer = new StringBuilder();
 
@@ -203,35 +238,37 @@ namespace CliFx.Domain
             buffer.Append(Type.FullName);
 
             // Name
-            buffer
-                .Append(' ')
-                .Append('(')
-                .Append(IsDefault
-                    ? "<default command>"
-                    : $"'{Name}'"
-                )
-                .Append(')');
+            buffer.Append(' ')
+                  .Append('(')
+                  .Append(IsDefault ? "<default command>" : $"'{Name}'")
+                  .Append(')');
 
             return buffer.ToString();
         }
 
-        public override string ToString() => GetInternalDisplayString();
+        /// <inheritdoc/>
+        public override string ToString()
+        {
+            return GetInternalDisplayString();
+        }
     }
 
-    internal partial class CommandSchema
+    public partial class CommandSchema
     {
-        public static bool IsCommandType(Type type) =>
-            type.Implements(typeof(ICommand)) &&
-            type.IsDefined(typeof(CommandAttribute)) &&
-            !type.IsAbstract &&
-            !type.IsInterface;
+        internal static bool IsCommandType(Type type)
+        {
+            return type.Implements(typeof(ICommand)) &&
+                   type.IsDefined(typeof(CommandAttribute)) &&
+                   !type.IsAbstract &&
+                   !type.IsInterface;
+        }
 
-        public static CommandSchema? TryResolve(Type type)
+        internal static CommandSchema? TryResolve(Type type)
         {
             if (!IsCommandType(type))
                 return null;
 
-            var attribute = type.GetCustomAttribute<CommandAttribute>();
+            CommandAttribute? attribute = type.GetCustomAttribute<CommandAttribute>();
 
             var name = attribute?.Name;
 

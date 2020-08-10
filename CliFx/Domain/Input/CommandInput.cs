@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using CliFx.Internal.Extensions;
 
-namespace CliFx.Domain
+namespace CliFx.Domain.Input
 {
     /// <summary>
     /// Provides a command parser and command class represention.
@@ -12,25 +12,45 @@ namespace CliFx.Domain
     /// Command schema is `{directives} {command name} {parameters} {options}`.
     /// </remarks>
     /// </summary>
-    internal partial class CommandInput
+    public partial class CommandInput
     {
+        /// <summary>
+        /// Command direcitves list.
+        /// </summary>
         public IReadOnlyList<CommandDirectiveInput> Directives { get; }
 
+        /// <summary>
+        /// Command name. Null or empty/whitespace if default command.
+        /// </summary>
         public string? CommandName { get; }
 
+        /// <summary>
+        /// Command parameters list.
+        /// </summary>
         public IReadOnlyList<CommandParameterInput> Parameters { get; }
 
+        /// <summary>
+        /// Command options list.
+        /// </summary>
         public IReadOnlyList<CommandOptionInput> Options { get; }
 
+        /// <summary>
+        /// Whether command has help option specified (--help|-h).
+        /// </summary>
         public bool IsHelpOptionSpecified => Options.Any(o => o.IsHelpOption);
 
+        /// <summary>
+        /// Whether command has version option specified (--version).
+        /// </summary>
         public bool IsVersionOptionSpecified => Options.Any(o => o.IsVersionOption);
 
-        public CommandInput(
-            IReadOnlyList<CommandDirectiveInput> directives,
-            string? commandName,
-            IReadOnlyList<CommandParameterInput> parameters,
-            IReadOnlyList<CommandOptionInput> options)
+        /// <summary>
+        /// Initializes an instance of <see cref="CommandInput"/>.
+        /// </summary>
+        public CommandInput(IReadOnlyList<CommandDirectiveInput> directives,
+                            string? commandName,
+                            IReadOnlyList<CommandParameterInput> parameters,
+                            IReadOnlyList<CommandOptionInput> options)
         {
             Directives = directives;
             CommandName = commandName;
@@ -38,6 +58,9 @@ namespace CliFx.Domain
             Options = options;
         }
 
+        /// <summary>
+        /// Whether command has a directive.
+        /// </summary>
         public bool HasDirective(string directive)
         {
             string[] aliases = directive.Trim('[', ']')
@@ -48,7 +71,10 @@ namespace CliFx.Domain
                              .Any();
         }
 
-        public bool HasAnyOfDirectives(string[] directives)
+        /// <summary>
+        /// Whether command has any of given directives.
+        /// </summary>
+        internal bool HasAnyOfDirectives(string[] directives)
         {
             foreach (var directive in directives)
             {
@@ -59,17 +85,7 @@ namespace CliFx.Domain
             return false;
         }
 
-        public bool HasAllOfDirectives(string[] directives)
-        {
-            foreach (var directive in directives)
-            {
-                if (!HasDirective(directive))
-                    return false;
-            }
-
-            return true;
-        }
-
+        /// <inheritdoc/>
         public override string ToString()
         {
             var buffer = new StringBuilder();
@@ -102,11 +118,10 @@ namespace CliFx.Domain
         }
     }
 
-    internal partial class CommandInput
+    public partial class CommandInput
     {
-        private static IReadOnlyList<CommandDirectiveInput> ParseDirectives(
-            IReadOnlyList<string> commandLineArguments,
-            ref int index)
+        private static IReadOnlyList<CommandDirectiveInput> ParseDirectives(IReadOnlyList<string> commandLineArguments,
+                                                                            ref int index)
         {
             var result = new List<CommandDirectiveInput>();
 
@@ -124,10 +139,9 @@ namespace CliFx.Domain
             return result;
         }
 
-        private static string? ParseCommandName(
-            IReadOnlyList<string> commandLineArguments,
-            ISet<string> commandNames,
-            ref int index)
+        private static string? ParseCommandName(IReadOnlyList<string> commandLineArguments,
+                                                ISet<string> commandNames,
+                                                ref int index)
         {
             var buffer = new List<string>();
 
@@ -156,9 +170,8 @@ namespace CliFx.Domain
             return commandName;
         }
 
-        private static IReadOnlyList<CommandParameterInput> ParseParameters(
-            IReadOnlyList<string> commandLineArguments,
-            ref int index)
+        private static IReadOnlyList<CommandParameterInput> ParseParameters(IReadOnlyList<string> commandLineArguments,
+                                                                            ref int index)
         {
             var result = new List<CommandParameterInput>();
 
@@ -175,9 +188,8 @@ namespace CliFx.Domain
             return result;
         }
 
-        private static IReadOnlyList<CommandOptionInput> ParseOptions(
-            IReadOnlyList<string> commandLineArguments,
-            ref int index)
+        private static IReadOnlyList<CommandOptionInput> ParseOptions(IReadOnlyList<string> commandLineArguments,
+                                                                      ref int index)
         {
             var result = new List<CommandOptionInput>();
 
@@ -225,7 +237,8 @@ namespace CliFx.Domain
             return result;
         }
 
-        public static CommandInput Parse(IReadOnlyList<string> commandLineArguments, ISet<string> availableCommandNamesSet)
+        internal static CommandInput Parse(IReadOnlyList<string> commandLineArguments,
+                                           ISet<string> availableCommandNamesSet)
         {
             var index = 0;
 
@@ -254,7 +267,7 @@ namespace CliFx.Domain
         }
     }
 
-    internal partial class CommandInput
+    public partial class CommandInput
     {
         public static CommandInput Empty { get; } = new CommandInput(
             Array.Empty<CommandDirectiveInput>(),

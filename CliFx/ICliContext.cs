@@ -1,4 +1,6 @@
-﻿namespace CliFx
+﻿using CliFx.Domain;
+
+namespace CliFx
 {
     /// <summary>
     /// Command line application context.
@@ -31,8 +33,13 @@
         IConsole Console { get; }
 
         /// <summary>
-        /// Infomrations about current command.
+        /// Root schema (null value when not resolved).
         /// </summary>
-        CommandInfo? CurrentCommandInfo { get; }
+        RootSchema? Root { get; }
+
+        /// <summary>
+        /// Current command schema (null value when not when command context).
+        /// </summary>
+        CommandSchema? CurrentCommandSchema { get; }
     }
 }

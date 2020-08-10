@@ -11,6 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{3AAE8166-B
 	ProjectSection(SolutionItems) = preProject
 		Changelog.md = Changelog.md
 		CliFx.props = CliFx.props
+		.github\FUNDING.yml = .github\FUNDING.yml
 		License.txt = License.txt
 		Readme.md = Readme.md
 	EndProjectSection
@@ -29,6 +30,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CliFx.InteractiveModeDemo",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Configuration", "Configuration", "{055B9CC5-6327-4215-8717-4F384F4C492E}"
 	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		.github\workflows\CD.yml = .github\workflows\CD.yml
+		.github\workflows\CI.yml = .github\workflows\CI.yml
 		CliFx.props = CliFx.props
 	EndProjectSection
 EndProject
