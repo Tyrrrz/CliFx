@@ -8,12 +8,14 @@ namespace CliFx.InteractiveModeDemo.Commands
     [Command]
     public class DefaultCommand : ICommand
     {
+        private readonly ICliContext _cliContext;
+
         [CommandParameter(0)]
-        public IReadOnlyList<string> Values { get; set; }
+        public IReadOnlyList<string> Values { get; set; } = default!;
 
-        public DefaultCommand()
+        public DefaultCommand(ICliContext cliContext)
         {
-
+            _cliContext = cliContext;
         }
 
         public ValueTask ExecuteAsync(IConsole console)

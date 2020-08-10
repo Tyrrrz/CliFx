@@ -14,17 +14,23 @@ namespace CliFx
     /// </summary>
     public partial class InteractiveCliApplication : CliApplication
     {
-        private readonly ConsoleColor _promptForeground = ConsoleColor.Blue;
-        private readonly ConsoleColor _commandForeground = ConsoleColor.Yellow;
-        private readonly ConsoleColor _finishedResultForeground = ConsoleColor.White;
+        private readonly ConsoleColor _promptForeground;
+        private readonly ConsoleColor _commandForeground;
+        private readonly ConsoleColor _finishedResultForeground;
 
         /// <summary>
         /// Initializes an instance of <see cref="InteractiveCliApplication"/>.
         /// </summary>
-        public InteractiveCliApplication(CliContext cliContext, ITypeActivator typeActivator) :
+        public InteractiveCliApplication(CliContext cliContext,
+                                         ITypeActivator typeActivator,
+                                         ConsoleColor promptForeground,
+                                         ConsoleColor commandForeground,
+                                         ConsoleColor finishedResultForeground) :
             base(cliContext, typeActivator)
         {
-
+            _promptForeground = promptForeground;
+            _commandForeground = commandForeground;
+            _finishedResultForeground = finishedResultForeground;
         }
 
         /// <summary>

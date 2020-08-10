@@ -13,7 +13,7 @@ namespace CliFx
         bool IsInteractive { get; }
 
         /// <summary>
-        /// Current command sope in interactive mode.
+        /// Current command scope in interactive mode.
         /// </summary>
         string Scope { get; }
 
@@ -38,8 +38,8 @@ namespace CliFx
         RootSchema? Root { get; }
 
         /// <summary>
-        /// Current command schema (null value when not when command context).
+        /// Current command schema (null value when not in command context).
         /// </summary>
-        CommandSchema? CurrentCommandSchema { get; }
+        CommandSchema? CurrentCommand { get; }
     }
 }

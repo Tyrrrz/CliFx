@@ -219,7 +219,7 @@ namespace CliFx
         {
             // Try to get the command matching the input or fallback to default
             CommandSchema command = root.TryFindCommand(input.CommandName) ?? StubDefaultCommand.Schema;
-            CliContext.CurrentCommandSchema = command;
+            CliContext.CurrentCommand = command;
 
             // Version option
             if (command.IsVersionOptionAvailable && input.IsVersionOptionSpecified)

@@ -40,6 +40,9 @@ namespace CliFx
 
         //Interactive mode settings
         private bool _isInteractiveModeAllowed = false;
+        private ConsoleColor _promptForeground = ConsoleColor.Blue;
+        private ConsoleColor _commandForeground = ConsoleColor.Yellow;
+        private ConsoleColor _finishedResultForeground = ConsoleColor.White;
 
         #region Directives and commands
         /// <summary>
@@ -234,6 +237,8 @@ namespace CliFx
         /// </summary>
         public CliApplicationBuilder UseTypeActivator(Func<ICliContext, IConsole, Func<Type, object>> buildServiceProvider)
         {
+            //TODO: consider using Microsoft.Extensions.DependencyInjection
+
             _typeActivator = null;
             _buildServiceProvider = buildServiceProvider;
 
@@ -270,6 +275,33 @@ namespace CliFx
         public CliApplicationBuilder AllowInteractiveMode(bool isAllowed = true)
         {
             _isInteractiveModeAllowed = isAllowed;
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies whether interactive mode (enabled with [interactive] directive) is allowed in the application.
+        /// </summary>
+        public CliApplicationBuilder UsePromptForeground(ConsoleColor color)
+        {
+            _promptForeground = color;
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies whether interactive mode (enabled with [interactive] directive) is allowed in the application.
+        /// </summary>
+        public CliApplicationBuilder UseCommandInputForeground(ConsoleColor color)
+        {
+            _commandForeground = color;
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies whether interactive mode (enabled with [interactive] directive) is allowed in the application.
+        /// </summary>
+        public CliApplicationBuilder UseFinishedResultForeground(ConsoleColor color)
+        {
+            _finishedResultForeground = color;
             return this;
         }
         #endregion
@@ -319,7 +351,11 @@ namespace CliFx
                 _typeActivator = new DelegateTypeActivator(_buildServiceProvider.Invoke(cliContext, _console));
 
             if (_isInteractiveModeAllowed)
-                return new InteractiveCliApplication(cliContext, _typeActivator);
+                return new InteractiveCliApplication(cliContext,
+                                                     _typeActivator,
+                                                     _promptForeground,
+                                                     _commandForeground,
+                                                     _finishedResultForeground);
 
             return new CliApplication(cliContext, _typeActivator);
         }

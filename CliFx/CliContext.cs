@@ -1,4 +1,5 @@
-﻿using CliFx.Domain;
+﻿using System;
+using CliFx.Domain;
 
 namespace CliFx
 {
@@ -24,7 +25,7 @@ namespace CliFx
         public RootSchema? Root { get; internal set; }
 
         /// <inheritdoc/>
-        public CommandSchema? CurrentCommandSchema { get; internal set; }
+        public CommandSchema? CurrentCommand { get; internal set; }
 
         /// <summary>
         /// Initializes an instance of <see cref="CliContext"/>.
