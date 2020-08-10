@@ -1,4 +1,5 @@
 ﻿using CliFx.Domain;
+using CliFx.Domain.Input;
 
 namespace CliFx
 {
@@ -10,7 +11,7 @@ namespace CliFx
         /// <summary>
         /// Whether the application is running in interactive mode.
         /// </summary>
-        bool IsInteractive { get; }
+        bool IsInteractiveMode { get; }
 
         /// <summary>
         /// Current command scope in interactive mode.
@@ -41,5 +42,10 @@ namespace CliFx
         /// Current command schema (null value when not in command context).
         /// </summary>
         CommandSchema? CurrentCommand { get; }
+
+        /// <summary>
+        /// Parsed CLI input.
+        /// </summary>
+        CommandInput? CurrentInput { get; }
     }
 }

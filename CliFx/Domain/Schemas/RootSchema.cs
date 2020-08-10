@@ -60,6 +60,9 @@ namespace CliFx.Domain
                                                  c.Name!.StartsWith(parentCommandName + ' ', StringComparison.OrdinalIgnoreCase));
         }
 
+        /// <summary>
+        /// Finds all descendant commands of the parrent command by name.
+        /// </summary>
         public IReadOnlyList<CommandSchema> GetDescendantCommands(string? parentCommandName)
         {
             return GetDescendantCommands(Commands.Values, parentCommandName).ToArray();
@@ -211,7 +214,10 @@ namespace CliFx.Domain
             }
         }
 
-        public static RootSchema Resolve(IReadOnlyList<Type> commandTypes)
+        /// <summary>
+        /// Resolves the root schema.
+        /// </summary>
+        internal static RootSchema Resolve(IReadOnlyList<Type> commandTypes)
         {
             var commands = new Dictionary<string, CommandSchema>();
             var invalidCommands = new List<CommandSchema>();

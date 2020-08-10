@@ -432,5 +432,15 @@ You can start the interactive mode with [{StandardDirectives.Interactive}].";
 
             return new CliFxException(message.Trim());
         }
+
+        internal static CliFxException InteractiveModeDirectivesNotSupported()
+        {
+            var message = $@"
+This application does not support interactive mode.
+
+Directives[{ string.Join("], [", CliApplication.InteractiveModeDirectives)}] cannot be used in this application.";
+
+            return new CliFxException(message.Trim());
+        }
     }
 }

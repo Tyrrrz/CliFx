@@ -26,6 +26,8 @@ namespace CliFx.BlazorDemo
             services.AddTransient<WebHostStartCommand>();
             services.AddTransient<WebHostStatusCommand>();
             services.AddTransient<WebHostStopCommand>();
+            services.AddTransient<DatabaseMigrateCommand>();
+            services.AddTransient<DatabaseVerifyCommand>();
 
             return services.BuildServiceProvider().GetService;
         }

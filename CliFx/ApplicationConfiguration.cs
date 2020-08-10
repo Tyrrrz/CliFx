@@ -40,6 +40,16 @@ namespace CliFx
         public bool IsPreviewModeAllowed { get; }
 
         /// <summary>
+        /// Command exit message level.
+        /// </summary>
+        public CommandExitMessageOptions CommandExitMessageOptions { get; }
+
+        /// <summary>
+        /// Command exit message foreground.
+        /// </summary>
+        public ConsoleColor CommandExitMessageForeground { get; }
+
+        /// <summary>
         /// Initializes an instance of <see cref="ApplicationConfiguration"/>.
         /// </summary>
         public ApplicationConfiguration(
@@ -48,7 +58,9 @@ namespace CliFx
             ICliExceptionHandler exceptionHandler,
             bool isDebugModeAllowed,
             bool isPreviewModeAllowed,
-            bool isInteractiveModeAllowed)
+            bool isInteractiveModeAllowed,
+            CommandExitMessageOptions commandExitMessageOptions,
+            ConsoleColor commandExitMessageForeground)
         {
             CommandTypes = commandTypes;
             CustomDirectives = customDirectives;
@@ -57,6 +69,9 @@ namespace CliFx
             IsDebugModeAllowed = isDebugModeAllowed;
             IsPreviewModeAllowed = isPreviewModeAllowed;
             IsInteractiveModeAllowed = isInteractiveModeAllowed;
+
+            CommandExitMessageOptions = commandExitMessageOptions;
+            CommandExitMessageForeground = commandExitMessageForeground;
         }
     }
 }

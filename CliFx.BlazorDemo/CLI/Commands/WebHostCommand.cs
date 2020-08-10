@@ -22,7 +22,7 @@ namespace CliFx.BlazorDemo.CLI.Commands
 
         public async ValueTask ExecuteAsync(IConsole console)
         {
-            if (_cliContext.IsInteractive)
+            if (_cliContext.IsInteractiveMode)
                 throw new CommandException(Message, exitCode: 0, showHelp: false);
 
             await _webHostRunnerService.RunAsync(console.GetCancellationToken());

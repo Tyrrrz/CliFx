@@ -16,7 +16,6 @@ namespace CliFx
     {
         private readonly ConsoleColor _promptForeground;
         private readonly ConsoleColor _commandForeground;
-        private readonly ConsoleColor _finishedResultForeground;
 
         /// <summary>
         /// Initializes an instance of <see cref="InteractiveCliApplication"/>.
@@ -24,84 +23,40 @@ namespace CliFx
         public InteractiveCliApplication(CliContext cliContext,
                                          ITypeActivator typeActivator,
                                          ConsoleColor promptForeground,
-                                         ConsoleColor commandForeground,
-                                         ConsoleColor finishedResultForeground) :
+                                         ConsoleColor commandForeground) :
             base(cliContext, typeActivator)
         {
             _promptForeground = promptForeground;
             _commandForeground = commandForeground;
-            _finishedResultForeground = finishedResultForeground;
         }
 
-        /// <summary>
-        /// Runs the application with specified command line arguments and environment variables, and returns the exit code.
-        /// </summary>
-        /// <remarks>
-        /// If a <see cref="CommandException"/> or <see cref="CliFxException"/> is thrown during command execution, it will be handled and routed to the console.
-        /// Additionally, if the debugger is not attached (i.e. the app is running in production), all other exceptions thrown within
-        /// this method will be handled and routed to the console as well.
-        /// </remarks>
-        public override async ValueTask<int> RunAsync(IReadOnlyList<string> commandLineArguments,
-                                                      IReadOnlyDictionary<string, string> environmentVariables)
+        /// <inheritdoc/>
+        protected override async Task<int> PreExecuteCommand(IReadOnlyList<string> commandLineArguments,
+                                                             IReadOnlyDictionary<string, string> environmentVariables,
+                                                             RootSchema root)
         {
-            PrintStartupMessage();
+            var input = CommandInput.Parse(commandLineArguments, root.GetCommandNames());
+            CliContext.CurrentInput = input;
 
-            ApplicationConfiguration _configuration = CliContext.Configuration;
-            IConsole _console = CliContext.Console;
-            _console.ForegroundColor = ConsoleColor.Gray;
-
-            try
+            if (input.HasDirective(StandardDirectives.Interactive))
             {
-                var root = RootSchema.Resolve(_configuration.CommandTypes);
-                CliContext.Root = root;
+                CliContext.IsInteractiveMode = true;
 
-                var input = CommandInput.Parse(commandLineArguments, root.GetCommandNames());
+                // we don't want to run default command for e.g. `[interactive]`
+                if (!string.IsNullOrWhiteSpace(input.CommandName))
+                    await ExecuteCommand(environmentVariables, root, input);
 
-                bool isInteractiveMode = input.HasDirective(StandardDirectives.Interactive);
-
-                if (await ProcessDirectives(_configuration, input) is int retVal)
-                    return retVal;
-
-                if (isInteractiveMode)
-                {
-                    CliContext.IsInteractive = true;
-
-                    // we don't want to run default command for e.g. `[interactive]`
-                    if (!string.IsNullOrWhiteSpace(input.CommandName))
-                        await ProcessCommand(commandLineArguments, environmentVariables, root, input);
-
-                    await RunInteractivelyAsync(environmentVariables, _console, root, _configuration);
-                }
-
-                return await ProcessCommand(commandLineArguments, environmentVariables, root, input);
+                await RunInteractivelyAsync(environmentVariables, root);
             }
-            // To prevent the app from showing the annoying Windows troubleshooting dialog,
-            // we handle all exceptions and route them to the console nicely.
-            // However, we don't want to swallow unhandled exceptions when the debugger is attached,
-            // because we still want the IDE to show them to the developer.
-            catch (Exception ex) when (!Debugger.IsAttached)
-            {
-                _configuration.ExceptionHandler.HandleException(_console, ex);
 
-                return ExitCode.FromException(ex);
-            }
+            return await ExecuteCommand(environmentVariables, root, input);
         }
 
-        private async Task<int?> ProcessDirectives(ApplicationConfiguration _configuration, CommandInput input)
+        /// <inheritdoc/>
+        protected override async Task<int?> ProcessDirectives(ApplicationConfiguration configuration, CommandInput input)
         {
-            // Debug mode
-            if (_configuration.IsDebugModeAllowed && input.HasDirective(StandardDirectives.Debug))
-            {
-                await LaunchAndWaitForDebuggerAsync();
-            }
-
-            // Preview mode
-            if (_configuration.IsPreviewModeAllowed && input.HasDirective(StandardDirectives.Preview))
-            {
-                WriteCommandLineInput(input);
-
-                return ExitCode.Success;
-            }
+            if (await base.ProcessDirectives(configuration, input) is int exitCode)
+                return exitCode;
 
             // Scope
             if (input.HasDirective(StandardDirectives.Scope))
@@ -135,34 +90,21 @@ namespace CliFx
             return null;
         }
 
-        private async ValueTask<int> RunInteractivelyAsync(IReadOnlyDictionary<string, string> environmentVariables,
-                                                           IConsole _console,
-                                                           RootSchema root,
-                                                           ApplicationConfiguration _configuration)
+        private async Task RunInteractivelyAsync(IReadOnlyDictionary<string, string> environmentVariables,
+                                                 RootSchema root)
         {
-            //TODO: Add startup message or add behaviours like in mediatr
+            IConsole console = CliContext.Console;
+            string executableName = CliContext.Metadata.ExecutableName;
+
+            //TODO: Add behaviours like in mediatr
             while (true) //TODO maybe add CliContext.Exit and CliContext.Status
             {
-                //TODO add directives checking
-
-                string[] commandLineArguments = GetInput(_console, CliContext.Metadata.ExecutableName);
-
+                string[] commandLineArguments = GetInput(console, executableName);
                 var input = CommandInput.Parse(commandLineArguments, root.GetCommandNames());
+                CliContext.CurrentInput = input; //TODO maybe refactor with some clever IDisposable class
 
-                int? exitCode = await ProcessDirectives(_configuration, input);
-                exitCode ??= await ProcessCommand(commandLineArguments, environmentVariables, root, input);
-
-                _console.WithForegroundColor(_finishedResultForeground, () =>
-                {
-                    //if (exitCode == 0)
-                    //    _console.Output.WriteLine($"{CliContext.Metadata.ExecutableName}: Command finished succesfully");
-                    //else
-                    if (exitCode > 0)
-                        _console.Output.WriteLine($"{CliContext.Metadata.ExecutableName}: Command finished with exit code ({exitCode})");
-                });
+                await ExecuteCommand(environmentVariables, root, input);
             }
-
-            //return ExitCode.Success;
         }
 
         private string[] GetInput(IConsole _console, string executableName)
@@ -171,6 +113,7 @@ namespace CliFx
             string line = string.Empty;
             do
             {
+                // Print prompt
                 _console.WithForegroundColor(_promptForeground, () =>
                 {
                     _console.Output.Write(executableName);
@@ -190,20 +133,23 @@ namespace CliFx
                     _console.Output.Write("> ");
                 });
 
+                // Read user input
                 _console.WithForegroundColor(_commandForeground, () =>
                 {
                     line = _console.Input.ReadLine();
                 });
 
+                // handle default directive
+                // TODO: fix for `[default] [debug]` etc.
                 if (line.StartsWith(StandardDirectives.Default))
                     return Array.Empty<string>();
 
-                if (string.IsNullOrWhiteSpace(CliContext.Scope))
+                if (string.IsNullOrWhiteSpace(CliContext.Scope)) // handle unscoped command input
                 {
                     arguments = line.Split(' ', StringSplitOptions.RemoveEmptyEntries)
                                     .ToArray();
                 }
-                else
+                else // handle scoped command input
                 {
                     var tmp = line.Split(' ', StringSplitOptions.RemoveEmptyEntries)
                                   .ToList();
@@ -214,7 +160,7 @@ namespace CliFx
                     arguments = tmp.ToArray();
                 }
 
-            } while (string.IsNullOrWhiteSpace(line));
+            } while (string.IsNullOrWhiteSpace(line)); // retry on empty line
 
             return arguments;
         }

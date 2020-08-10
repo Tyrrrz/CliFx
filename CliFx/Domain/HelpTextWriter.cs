@@ -154,7 +154,7 @@ namespace CliFx.Domain
             else
                 WriteHorizontalMargin();
 
-            if (!command.InteractiveModeOnly && !_cliContext.IsInteractive)
+            if (!command.InteractiveModeOnly && !_cliContext.IsInteractiveMode)
                 Write(_cliContext.Metadata.ExecutableName);
 
             // Command name

@@ -107,8 +107,6 @@ namespace CliFx
     /// </summary>
     public static class ConsoleExtensions
     {
-        //TODO: Add WriteWithColor, WriteLineWithColor etc.
-
         /// <summary>
         /// Sets console foreground color, executes specified action, and sets the color back to the original value.
         /// </summary>

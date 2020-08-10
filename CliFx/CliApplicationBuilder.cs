@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Text.RegularExpressions;
 using CliFx.Domain;
 using CliFx.Exceptions;
@@ -32,6 +31,8 @@ namespace CliFx
 
         //Exceptions
         private ICliExceptionHandler? _exceptionHandler;
+        private CommandExitMessageOptions _commandExitMessageLevel;
+        private ConsoleColor _exitMessageForeground = ConsoleColor.White;
 
         // Dependecy injection and type activation
         private IConsole? _console;
@@ -42,7 +43,6 @@ namespace CliFx
         private bool _isInteractiveModeAllowed = false;
         private ConsoleColor _promptForeground = ConsoleColor.Blue;
         private ConsoleColor _commandForeground = ConsoleColor.Yellow;
-        private ConsoleColor _finishedResultForeground = ConsoleColor.White;
 
         #region Directives and commands
         /// <summary>
@@ -248,6 +248,24 @@ namespace CliFx
 
         #region Exceptions
         /// <summary>
+        /// Configures the exit code reporting level.
+        /// </summary>
+        public CliApplicationBuilder UseCommandExitMessageLevel(CommandExitMessageOptions option)
+        {
+            _commandExitMessageLevel = option;
+            return this;
+        }
+
+        /// <summary>
+        /// Configures command exit message foreground color.
+        /// </summary>
+        public CliApplicationBuilder UseCommandExitMessageForeground(ConsoleColor color)
+        {
+            _exitMessageForeground = color;
+            return this;
+        }
+
+        /// <summary>
         /// Configures the application to use the specified implementation of <see cref="ICliExceptionHandler"/>.
         /// </summary>
         public CliApplicationBuilder UseExceptionHandler<T>()
@@ -270,7 +288,7 @@ namespace CliFx
         #region Interactive Mode
 
         /// <summary>
-        /// Specifies whether interactive mode (enabled with [interactive] directive) is allowed in the application.
+        /// Configures whether interactive mode (enabled with [interactive] directive) is allowed in the application.
         /// </summary>
         public CliApplicationBuilder AllowInteractiveMode(bool isAllowed = true)
         {
@@ -279,7 +297,7 @@ namespace CliFx
         }
 
         /// <summary>
-        /// Specifies whether interactive mode (enabled with [interactive] directive) is allowed in the application.
+        /// Configures the command prompt foreground color in interactive mode.
         /// </summary>
         public CliApplicationBuilder UsePromptForeground(ConsoleColor color)
         {
@@ -288,20 +306,11 @@ namespace CliFx
         }
 
         /// <summary>
-        /// Specifies whether interactive mode (enabled with [interactive] directive) is allowed in the application.
+        /// Configures the command input foreground color in interactive mode.
         /// </summary>
         public CliApplicationBuilder UseCommandInputForeground(ConsoleColor color)
         {
             _commandForeground = color;
-            return this;
-        }
-
-        /// <summary>
-        /// Specifies whether interactive mode (enabled with [interactive] directive) is allowed in the application.
-        /// </summary>
-        public CliApplicationBuilder UseFinishedResultForeground(ConsoleColor color)
-        {
-            _finishedResultForeground = color;
             return this;
         }
         #endregion
@@ -341,7 +350,9 @@ namespace CliFx
                                                              _exceptionHandler,
                                                              _isDebugModeAllowed,
                                                              _isPreviewModeAllowed,
-                                                             _isInteractiveModeAllowed);
+                                                             _isInteractiveModeAllowed,
+                                                             _commandExitMessageLevel,
+                                                             _exitMessageForeground);
 
             CliContext cliContext = new CliContext(metadata, configuration, _console);
 
@@ -351,11 +362,12 @@ namespace CliFx
                 _typeActivator = new DelegateTypeActivator(_buildServiceProvider.Invoke(cliContext, _console));
 
             if (_isInteractiveModeAllowed)
+            {
                 return new InteractiveCliApplication(cliContext,
                                                      _typeActivator,
                                                      _promptForeground,
-                                                     _commandForeground,
-                                                     _finishedResultForeground);
+                                                     _commandForeground);
+            }
 
             return new CliApplication(cliContext, _typeActivator);
         }
