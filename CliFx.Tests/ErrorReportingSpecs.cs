@@ -157,6 +157,7 @@ namespace CliFx.Tests
             // Assert
             exitCode.Should().NotBe(0);
             stdErrData.Should().NotBeNullOrWhiteSpace();
+            stdErrData.Should().ContainAll("Unrecognized parameters provided:", "not-a-valid-command");
 
             stdOutData.Should().ContainAll(
                 "Usage",

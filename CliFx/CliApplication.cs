@@ -38,6 +38,7 @@ namespace CliFx
         /// </summary>
         public CliApplication(IServiceProvider serviceProvider, CliContext cliContext)
         {
+            ServiceProvider = serviceProvider;
             CliContext = cliContext;
 
             _metadata = cliContext.Metadata;
@@ -60,7 +61,7 @@ namespace CliFx
         /// <summary>
         /// Prints the startup message if availble.
         /// </summary>
-        protected void PrintStartupMessage()
+        protected void PrintStartupMessage() //TODO remove and add mediatr like behaviours or middlewares
         {
             if (_metadata.StartupMessage is null)
                 return;
@@ -71,7 +72,7 @@ namespace CliFx
         /// <summary>
         /// Prints the exit message if availble.
         /// </summary>
-        protected void PrintExitMessage(int exitCode)
+        protected void PrintExitMessage(int exitCode) //TODO remove and add mediatr like behaviours or middlewares
         {
             CommandExitMessageOptions level = _configuration.CommandExitMessageOptions;
             bool isInteractive = CliContext.IsInteractiveMode;
@@ -209,8 +210,12 @@ namespace CliFx
 
             try
             {
-                if (await ProcessHardcodedDirectives(_configuration, input) is int exitCodeA)
-                    return exitCodeA;
+                // Handle directives not supported in normal mode
+                if (!_configuration.IsInteractiveModeAllowed &&
+                    (input.HasDirective(StandardDirectives.Interactive) || input.HasAnyOfDirectives(InteractiveModeDirectives)))
+                {
+                    throw CliFxException.InteractiveModeDirectivesNotSupported();
+                }
 
                 if (!await ProcessDefinedDirectives(root, input))
                     return ExitCode.Success;
@@ -218,6 +223,16 @@ namespace CliFx
             catch (DirectiveException ex)
             {
                 _configuration.ExceptionHandler.HandleDirectiveException(CliContext, ex);
+
+                if (ex.ShowHelp)
+                    _helpTextWriter.Write(root, command, defaultValues);
+
+                return ExitCode.FromException(ex);
+            }
+            // This may throw exceptions which are useful only to the end-user
+            catch (CliFxException ex)
+            {
+                _configuration.ExceptionHandler.HandleCliFxException(CliContext, ex);
 
                 if (ex.ShowHelp)
                     _helpTextWriter.Write(root, command, defaultValues);
@@ -295,21 +310,6 @@ namespace CliFx
             }
 
             return true;
-        }
-
-        /// <summary>
-        /// Process directives.
-        /// </summary>
-        protected virtual ValueTask<int?> ProcessHardcodedDirectives(ApplicationConfiguration configuration, CommandInput input)
-        {
-            // Handle directives not supported in normal mode
-            if (!configuration.IsInteractiveModeAllowed &&
-                (input.HasDirective(StandardDirectives.Interactive) || input.HasAnyOfDirectives(InteractiveModeDirectives)))
-            {
-                throw CliFxException.InteractiveModeDirectivesNotSupported();
-            }
-
-            return new ValueTask<int?>((int?)null);
         }
     }
 

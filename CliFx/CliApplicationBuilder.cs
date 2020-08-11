@@ -64,7 +64,7 @@ namespace CliFx
         public CliApplicationBuilder AddDirective<T>()
             where T : IDirective
         {
-            _customDirectives.Add(typeof(T));
+            AddDirective(typeof(T));
 
             return this;
         }
@@ -133,7 +133,7 @@ namespace CliFx
         public CliApplicationBuilder AddCommand<T>()
             where T : ICommand
         {
-            _commandTypes.Add(typeof(T));
+            AddCommand(typeof(T));
 
             return this;
         }
@@ -307,7 +307,9 @@ namespace CliFx
         public CliApplicationBuilder UseInteractiveMode()
         {
             _isInteractiveModeAllowed = true;
-            _serviceCollection.AddSingleton<ScopeDirective>();
+            AddDirective<ScopeDirective>();
+            AddDirective<ScopeResetDirective>();
+            AddDirective<ScopeUpDirective>();
 
             return this;
         }

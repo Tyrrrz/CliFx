@@ -11,6 +11,8 @@ namespace CliFx.Exceptions
         public void HandleCliFxException(ICliContext context, CliFxException ex)
         {
             WriteError(context.Console, ex.ToString());
+            context.Console.Error.WriteLine();
+
             //ex.ShowHelp = false;
         }
 
@@ -18,12 +20,14 @@ namespace CliFx.Exceptions
         public void HandleDirectiveException(ICliContext context, DirectiveException ex)
         {
             WriteError(context.Console, ex.ToString());
+            context.Console.Error.WriteLine();
         }
 
         /// <inheritdoc/>
         public void HandleCommandException(ICliContext context, CommandException ex)
         {
             WriteError(context.Console, ex.ToString());
+            context.Console.Error.WriteLine();
         }
 
         /// <inheritdoc/>

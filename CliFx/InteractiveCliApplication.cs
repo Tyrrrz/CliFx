@@ -50,28 +50,6 @@ namespace CliFx
             return await ExecuteCommand(environmentVariables, root, input);
         }
 
-        /// <inheritdoc/>
-        protected override async ValueTask<int?> ProcessHardcodedDirectives(ApplicationConfiguration configuration, CommandInput input)
-        {
-            if (await base.ProcessHardcodedDirectives(configuration, input) is int exitCode)
-                return exitCode;
-
-            //// Scope up
-            //if (input.HasDirective(StandardDirectives.ScopeUp))
-            //{
-            //    string[] splittedScope = CliContext.Scope.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-            //    if (splittedScope.Length > 1)
-            //        CliContext.Scope = string.Join(" ", splittedScope, 0, splittedScope.Length - 1);
-            //    else if (splittedScope.Length == 1)
-            //        CliContext.Scope = string.Empty;
-
-            //    return ExitCode.Success;
-            //}
-
-            return null;
-        }
-
         private async Task RunInteractivelyAsync(IReadOnlyDictionary<string, string> environmentVariables,
                                                  RootSchema root)
         {
@@ -90,36 +68,36 @@ namespace CliFx
             }
         }
 
-        private string[] GetInput(IConsole _console, string executableName)
+        private string[] GetInput(IConsole console, string executableName)
         {
             string[] arguments;
             string line = string.Empty;
             do
             {
                 // Print prompt
-                _console.WithForegroundColor(_promptForeground, () =>
+                console.WithForegroundColor(_promptForeground, () =>
                 {
-                    _console.Output.Write(executableName);
+                    console.Output.Write(executableName);
                 });
 
                 if (!string.IsNullOrWhiteSpace(CliContext.Scope))
                 {
-                    _console.WithForegroundColor(ConsoleColor.Cyan, () =>
+                    console.WithForegroundColor(ConsoleColor.Cyan, () =>
                     {
-                        _console.Output.Write(' ');
-                        _console.Output.Write(CliContext.Scope);
+                        console.Output.Write(' ');
+                        console.Output.Write(CliContext.Scope);
                     });
                 }
 
-                _console.WithForegroundColor(_promptForeground, () =>
+                console.WithForegroundColor(_promptForeground, () =>
                 {
-                    _console.Output.Write("> ");
+                    console.Output.Write("> ");
                 });
 
                 // Read user input
-                _console.WithForegroundColor(_commandForeground, () =>
+                console.WithForegroundColor(_commandForeground, () =>
                 {
-                    line = _console.Input.ReadLine();
+                    line = console.Input.ReadLine();
                 });
 
                 // handle default directive
@@ -144,6 +122,8 @@ namespace CliFx
                 }
 
             } while (string.IsNullOrWhiteSpace(line)); // retry on empty line
+
+            console.ForegroundColor = ConsoleColor.Gray;
 
             return arguments;
         }

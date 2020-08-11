@@ -8,9 +8,15 @@ namespace CliFx.Internal.Extensions
 {
     internal static class TypeExtensions
     {
-        public static bool Implements(this Type type, Type interfaceType) => type.GetInterfaces().Contains(interfaceType);
+        public static bool Implements(this Type type, Type interfaceType)
+        {
+            return type.GetInterfaces().Contains(interfaceType);
+        }
 
-        public static Type? GetNullableUnderlyingType(this Type type) => Nullable.GetUnderlyingType(type);
+        public static Type? GetNullableUnderlyingType(this Type type)
+        {
+            return Nullable.GetUnderlyingType(type);
+        }
 
         public static Type? GetEnumerableUnderlyingType(this Type type)
         {
@@ -31,9 +37,15 @@ namespace CliFx.Internal.Extensions
                 .FirstOrDefault();
         }
 
-        public static MethodInfo GetToStringMethod(this Type type) => type.GetMethod(nameof(ToString), Type.EmptyTypes);
+        public static MethodInfo GetToStringMethod(this Type type)
+        {
+            return type.GetMethod(nameof(ToString), Type.EmptyTypes);
+        }
 
-        public static bool IsToStringOverriden(this Type type) => type.GetToStringMethod() != typeof(object).GetToStringMethod();
+        public static bool IsToStringOverriden(this Type type)
+        {
+            return type.GetToStringMethod() != typeof(object).GetToStringMethod();
+        }
 
         public static MethodInfo GetStaticParseMethod(this Type type, bool withFormatProvider = false)
         {

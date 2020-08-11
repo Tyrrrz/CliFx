@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CliFx.BlazorDemo.CLI.Services;
+using CliFx.Directives;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CliFx.BlazorDemo
@@ -7,12 +8,17 @@ namespace CliFx.BlazorDemo
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            throw new NotImplementedException();
+            // Register services
+            services.AddSingleton<IWebHostRunnerService, WebHostRunnerService>()
+                    .AddSingleton<IBackgroundWebHostProvider, BackgroundWebHostProvider>();
         }
 
         public void Configure(CliApplicationBuilder app)
         {
-            throw new NotImplementedException();
+            app.AddCommandsFromThisAssembly()
+               .AddDirective<DebugDirective>()
+               .ConfigureServices(ConfigureServices)
+               .UseInteractiveMode();
         }
     }
 }
