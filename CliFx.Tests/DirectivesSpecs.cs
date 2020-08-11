@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using CliFx.Directives;
 using FluentAssertions;
 using Xunit;
 
@@ -18,7 +19,7 @@ namespace CliFx.Tests
             var application = new CliApplicationBuilder()
                 .AddCommand(typeof(NamedCommand))
                 .UseConsole(console)
-                .AllowPreviewMode()
+                .AddDirective<PreviewDirective>()
                 .Build();
 
             // Act

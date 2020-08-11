@@ -15,6 +15,9 @@ namespace CliFx.Directives
     public sealed class DebugDirective : IDirective
     {
         /// <inheritdoc/>
+        public bool ContinueExecution => true;
+
+        /// <inheritdoc/>
         public async ValueTask HandleAsync(IConsole console)
         {
             var processId = ProcessEx.GetCurrentProcessId();

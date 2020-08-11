@@ -8,6 +8,7 @@ using CliFx.Attributes;
 using CliFx.Domain;
 using CliFx.Domain.Input;
 using CliFx.Exceptions;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CliFx
 {
@@ -17,6 +18,11 @@ namespace CliFx
     public partial class CliApplication
     {
         /// <summary>
+        /// Services provider.
+        /// </summary>
+        protected IServiceProvider ServiceProvider { get; }
+
+        /// <summary>
         /// Cli Context instance.
         /// </summary>
         protected CliContext CliContext { get; }
@@ -24,33 +30,13 @@ namespace CliFx
         private readonly ApplicationMetadata _metadata;
         private readonly ApplicationConfiguration _configuration;
         private readonly IConsole _console;
-        private readonly ITypeActivator _typeActivator;
 
         private readonly HelpTextWriter _helpTextWriter;
 
         /// <summary>
         /// Initializes an instance of <see cref="CliApplication"/>.
         /// </summary>
-        [Obsolete]
-        public CliApplication(ApplicationMetadata metadata,
-                              ApplicationConfiguration configuration,
-                              IConsole console,
-                              ITypeActivator typeActivator)
-        {
-            CliContext = new CliContext(metadata, configuration, console);
-
-            _metadata = metadata;
-            _configuration = configuration;
-            _console = console;
-
-            _typeActivator = typeActivator;
-            _helpTextWriter = new HelpTextWriter(CliContext);
-        }
-
-        /// <summary>
-        /// Initializes an instance of <see cref="CliApplication"/>.
-        /// </summary>
-        public CliApplication(CliContext cliContext, ITypeActivator typeActivator)
+        public CliApplication(IServiceProvider serviceProvider, CliContext cliContext)
         {
             CliContext = cliContext;
 
@@ -58,18 +44,17 @@ namespace CliFx
             _configuration = cliContext.Configuration;
             _console = cliContext.Console;
 
-            _typeActivator = typeActivator;
             _helpTextWriter = new HelpTextWriter(cliContext);
         }
 
         private ICommand GetCommandInstance(CommandSchema command)
         {
-            return command != StubDefaultCommand.Schema ? (ICommand)_typeActivator.CreateInstance(command.Type) : new StubDefaultCommand();
+            return command != StubDefaultCommand.Schema ? (ICommand)ServiceProvider.GetRequiredService(command.Type) : new StubDefaultCommand();
         }
 
         private IDirective GetDirectiveInstance(DirectiveSchema directive)
         {
-            return (IDirective)_typeActivator.CreateInstance(directive.Type);
+            return (IDirective)ServiceProvider.GetRequiredService(directive.Type);
         }
 
         /// <summary>
@@ -177,7 +162,7 @@ namespace CliFx
             // because we still want the IDE to show them to the developer.
             catch (Exception ex) when (!Debugger.IsAttached)
             {
-                _configuration.ExceptionHandler.HandleException(_console, CliContext, ex);
+                _configuration.ExceptionHandler.HandleException(CliContext, ex);
 
                 return ExitCode.FromException(ex);
             }
@@ -203,12 +188,6 @@ namespace CliFx
                                                  RootSchema root,
                                                  CommandInput input)
         {
-            if (await ProcessHardcodedDirectives(_configuration, input) is int exitCodeA)
-                return exitCodeA;
-
-            if (await ProcessDefinedDirectives(root, input) is int exitCodeB)
-                return exitCodeB;
-
             // Try to get the command matching the input or fallback to default
             CommandSchema command = root.TryFindCommand(input.CommandName) ?? StubDefaultCommand.Schema;
             CliContext.CurrentCommand = command;
@@ -217,6 +196,7 @@ namespace CliFx
             if (command.IsVersionOptionAvailable && input.IsVersionOptionSpecified)
             {
                 _console.Output.WriteLine(_metadata.VersionText);
+
                 return ExitCode.Success;
             }
 
@@ -227,7 +207,24 @@ namespace CliFx
             // before the arguments are bound to the properties
             var defaultValues = command.GetArgumentValues(instance);
 
-            // If we want to throw error if `-hg`, `-h -g`, `--version -unknown` are given, we should move help handling to try statement after //Bind arguments
+            try
+            {
+                if (await ProcessHardcodedDirectives(_configuration, input) is int exitCodeA)
+                    return exitCodeA;
+
+                if (!await ProcessDefinedDirectives(root, input))
+                    return ExitCode.Success;
+            }
+            catch (DirectiveException ex)
+            {
+                _configuration.ExceptionHandler.HandleDirectiveException(CliContext, ex);
+
+                if (ex.ShowHelp)
+                    _helpTextWriter.Write(root, command, defaultValues);
+
+                return ExitCode.FromException(ex);
+            }
+
             // Help option
             if (command.IsHelpOptionAvailable && input.IsHelpOptionSpecified ||
                 command == StubDefaultCommand.Schema && !input.Parameters.Any() && !input.Options.Any())
@@ -255,7 +252,7 @@ namespace CliFx
             // This may throw exceptions which are useful only to the end-user
             catch (CliFxException ex)
             {
-                _configuration.ExceptionHandler.HandleCliFxException(_console, CliContext, ex);
+                _configuration.ExceptionHandler.HandleCliFxException(CliContext, ex);
 
                 if (ex.ShowHelp)
                     _helpTextWriter.Write(root, command, defaultValues);
@@ -272,7 +269,7 @@ namespace CliFx
             // Swallow command exceptions and route them to the console
             catch (CommandException ex)
             {
-                _configuration.ExceptionHandler.HandleCommandException(_console, CliContext, ex);
+                _configuration.ExceptionHandler.HandleCommandException(CliContext, ex);
 
                 if (ex.ShowHelp)
                     _helpTextWriter.Write(root, command, defaultValues);
@@ -281,7 +278,7 @@ namespace CliFx
             }
         }
 
-        private async Task<int?> ProcessDefinedDirectives(RootSchema root, CommandInput input)
+        private async Task<bool> ProcessDefinedDirectives(RootSchema root, CommandInput input)
         {
             foreach (var directiveInput in input.Directives)
             {
@@ -291,11 +288,13 @@ namespace CliFx
                 // Get directive instance
                 var instance = GetDirectiveInstance(directive);
 
-                if (await instance.HandleAsync(_console) is int exitCode)
-                    return exitCode;
+                await instance.HandleAsync(_console);
+
+                if (!instance.ContinueExecution)
+                    return false;
             }
 
-            return null;
+            return true;
         }
 
         /// <summary>
@@ -316,16 +315,17 @@ namespace CliFx
 
     public partial class CliApplication
     {
+
         /// <summary>
         /// Interactive mode directives <see cref="StandardDirectives"/>.
         /// </summary>
         internal static string[] InteractiveModeDirectives = new string[]
-        {
-            StandardDirectives.Default,
-            StandardDirectives.Scope,
-            StandardDirectives.ScopeUp,
-            StandardDirectives.ScopeReset
-        };
+            {
+                StandardDirectives.Default,
+                StandardDirectives.Scope,
+                StandardDirectives.ScopeUp,
+                StandardDirectives.ScopeReset
+            };
 
         /// <summary>
         /// Static exit codes helper class.

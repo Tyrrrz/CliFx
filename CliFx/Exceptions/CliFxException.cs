@@ -58,31 +58,6 @@ namespace CliFx.Exceptions
     // Provide more diagnostic information here
     public partial class CliFxException
     {
-        internal static CliFxException DefaultActivatorFailed(Type type, Exception? innerException = null)
-        {
-            var configureActivatorMethodName = $"{nameof(CliApplicationBuilder)}.{nameof(CliApplicationBuilder.UseTypeActivator)}(...)";
-
-            var message = $@"
-Failed to create an instance of type '{type.FullName}'.
-The type must have a public parameterless constructor in order to be instantiated by the default activator.
-
-To fix this, either make sure this type has a public parameterless constructor, or configure a custom activator using {configureActivatorMethodName}. 
-Refer to the readme to learn how to integrate a dependency container of your choice to act as a type activator.";
-
-            return new CliFxException(message.Trim(), innerException);
-        }
-
-        internal static CliFxException DelegateActivatorReturnedNull(Type type)
-        {
-            var message = $@"
-Failed to create an instance of type '{type.FullName}', received <null> instead.
-
-To fix this, ensure that the provided type activator was configured correctly, as it's not expected to return <null>.
-If you are using a dependency container, this error may signify that the type wasn't registered.";
-
-            return new CliFxException(message.Trim());
-        }
-
         internal static CliFxException InvalidCommandType(Type type)
         {
             var message = $@"

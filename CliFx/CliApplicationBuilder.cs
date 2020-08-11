@@ -4,9 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using CliFx.Directives;
 using CliFx.Domain;
 using CliFx.Exceptions;
 using CliFx.Internal.Extensions;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace CliFx
 {
@@ -31,10 +34,11 @@ namespace CliFx
         private CommandExitMessageOptions _commandExitMessageLevel;
         private ConsoleColor _exitMessageForeground = ConsoleColor.White;
 
-        // Dependecy injection and type activation
+        // Console
         private IConsole? _console;
-        private ITypeActivator? _typeActivator;
-        private Func<ICliContext, IConsole, Func<Type, object>>? _buildServiceProvider;
+
+        //Dependency injection
+        private ServiceCollection _serviceCollection = new ServiceCollection();
 
         //Interactive mode settings
         private bool _isInteractiveModeAllowed = false;
@@ -45,9 +49,11 @@ namespace CliFx
         /// <summary>
         /// Add a custom directive to the application.
         /// </summary>
-        public CliApplicationBuilder AddDirective(Type directive)
+        public CliApplicationBuilder AddDirective(Type directiveType)
         {
-            _customDirectives.Add(directive);
+            _customDirectives.Add(directiveType);
+            _serviceCollection.TryAddTransient(directiveType);
+            _serviceCollection.TryAddTransient(typeof(IDirective), directiveType);
 
             return this;
         }
@@ -115,6 +121,8 @@ namespace CliFx
         public CliApplicationBuilder AddCommand(Type commandType)
         {
             _commandTypes.Add(commandType);
+            _serviceCollection.TryAddTransient(typeof(ICommand), commandType);
+            _serviceCollection.TryAddTransient(commandType);
 
             return this;
         }
@@ -230,7 +238,8 @@ namespace CliFx
         }
         #endregion
 
-        #region Dependecy injection and type activation
+        #region Console
+
         /// <summary>
         /// Configures the application to use the specified implementation of <see cref="IConsole"/>.
         /// </summary>
@@ -243,41 +252,10 @@ namespace CliFx
         /// <summary>
         /// Configures the application to use the specified implementation of <see cref="IConsole"/>.
         /// </summary>
-        public CliApplicationBuilder UseConsole<T>() where T : class, IConsole, new()
+        public CliApplicationBuilder UseConsole<T>()
+            where T : class, IConsole, new()
         {
             _console = new T();
-            return this;
-        }
-
-        /// <summary>
-        /// Configures the application to use the specified implementation of <see cref="ITypeActivator"/>.
-        /// </summary>
-        public CliApplicationBuilder UseTypeActivator(ITypeActivator typeActivator)
-        {
-            _buildServiceProvider = null;
-            _typeActivator = typeActivator;
-
-            return this;
-        }
-
-        /// <summary>
-        /// Configures the application to use the specified function for activating types.
-        /// </summary>
-        public CliApplicationBuilder UseTypeActivator(Func<Type, object> typeActivator)
-        {
-            return UseTypeActivator(new DelegateTypeActivator(typeActivator));
-        }
-
-        /// <summary>
-        /// Configures the application to use the specified implementation of <see cref="ITypeActivator"/>.
-        /// </summary>
-        public CliApplicationBuilder UseTypeActivator(Func<ICliContext, IConsole, Func<Type, object>> buildServiceProvider)
-        {
-            //TODO: consider using Microsoft.Extensions.DependencyInjection
-
-            _typeActivator = null;
-            _buildServiceProvider = buildServiceProvider;
-
             return this;
         }
         #endregion
@@ -326,9 +304,11 @@ namespace CliFx
         /// <summary>
         /// Configures whether interactive mode (enabled with [interactive] directive) is allowed in the application.
         /// </summary>
-        public CliApplicationBuilder AllowInteractiveMode(bool isAllowed = true)
+        public CliApplicationBuilder UseInteractiveMode()
         {
-            _isInteractiveModeAllowed = isAllowed;
+            _isInteractiveModeAllowed = true;
+            _serviceCollection.AddSingleton<ScopeDirective>();
+
             return this;
         }
 
@@ -351,18 +331,55 @@ namespace CliFx
         }
         #endregion
 
+        #region Configuration
+        /// <summary>
+        /// Configures application services.
+        /// </summary>
+        public CliApplicationBuilder Configure(Action<CliApplicationBuilder> action)
+        {
+            action.Invoke(this);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Configures application services.
+        /// </summary>
+        public CliApplicationBuilder ConfigureServices(Action<IServiceCollection> action)
+        {
+            action.Invoke(_serviceCollection);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Configures application using <see cref="ICliStartup"/> class instance.
+        /// </summary>
+        public CliApplicationBuilder UseStartup<T>()
+            where T : class, ICliStartup, new()
+        {
+            ICliStartup t = new T();
+            t.ConfigureServices(_serviceCollection);
+            t.Configure(this);
+
+            return this;
+        }
+        #endregion
+
         /// <summary>
         /// Creates an instance of <see cref="CliApplication"/> or <see cref="InteractiveCliApplication"/> using configured parameters.
         /// Default values are used in place of parameters that were not specified.
         /// </summary>
         public CliApplication Build()
         {
+            // Set default values
             _title ??= TryGetDefaultTitle() ?? "App";
             _executableName ??= TryGetDefaultExecutableName() ?? "app";
             _versionText ??= TryGetDefaultVersionText() ?? "v1.0";
             _console ??= new SystemConsole();
             _exceptionHandler ??= new DefaultExceptionHandler();
 
+            // Format startup message
             if (_startupMessage != null)
             {
                 _startupMessage = Regex.Replace(_startupMessage, @"{(?<x>[^}]+)}", match =>
@@ -380,6 +397,7 @@ namespace CliFx
                 });
             }
 
+            // Create context
             var metadata = new ApplicationMetadata(_title, _executableName, _versionText, _description, _startupMessage);
             var configuration = new ApplicationConfiguration(_commandTypes,
                                                              _customDirectives,
@@ -390,20 +408,24 @@ namespace CliFx
 
             CliContext cliContext = new CliContext(metadata, configuration, _console);
 
-            if (_buildServiceProvider is null)
-                _typeActivator ??= new DefaultTypeActivator();
-            else
-                _typeActivator = new DelegateTypeActivator(_buildServiceProvider.Invoke(cliContext, _console));
+            // Add core services
+            _serviceCollection.AddSingleton(typeof(ApplicationMetadata), (provider) => metadata);
+            _serviceCollection.AddSingleton(typeof(ApplicationConfiguration), (provider) => configuration);
+            _serviceCollection.AddSingleton(typeof(ICliContext), (provider) => cliContext);
+            _serviceCollection.AddSingleton(typeof(IConsole), (provider) => _console);
 
+            ServiceProvider serviceProvider = _serviceCollection.BuildServiceProvider();
+
+            // Create application instance
             if (_isInteractiveModeAllowed)
             {
-                return new InteractiveCliApplication(cliContext,
-                                                     _typeActivator,
+                return new InteractiveCliApplication(serviceProvider,
+                                                     cliContext,
                                                      _promptForeground,
                                                      _commandForeground);
             }
 
-            return new CliApplication(cliContext, _typeActivator);
+            return new CliApplication(serviceProvider, cliContext);
         }
     }
 

@@ -10,16 +10,21 @@ namespace CliFx.Exceptions
         /// <summary>
         /// Handles exception of <see cref="CliFxException"/>.
         /// </summary>
-        void HandleCliFxException(IConsole console, ICliContext context, CliFxException ex);
+        void HandleCliFxException(ICliContext context, CliFxException ex);
+
+        /// <summary>
+        /// Handles exception of <see cref="DirectiveException"/>.
+        /// </summary>
+        void HandleDirectiveException(ICliContext context, DirectiveException ex);
 
         /// <summary>
         /// Handles exception of <see cref="CommandException"/>.
         /// </summary>
-        void HandleCommandException(IConsole console, ICliContext context, CommandException ex);
+        void HandleCommandException(ICliContext context, CommandException ex);
 
         /// <summary>
         /// Handles exception of <see cref="Exception"/>.
         /// </summary>
-        void HandleException(IConsole console, ICliContext context, Exception ex);
+        void HandleException(ICliContext context, Exception ex);
     }
 }

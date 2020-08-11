@@ -18,11 +18,11 @@ namespace CliFx
         /// <summary>
         /// Initializes an instance of <see cref="InteractiveCliApplication"/>.
         /// </summary>
-        public InteractiveCliApplication(CliContext cliContext,
-                                         ITypeActivator typeActivator,
+        public InteractiveCliApplication(IServiceProvider serviceProvider,
+                                         CliContext cliContext,
                                          ConsoleColor promptForeground,
                                          ConsoleColor commandForeground) :
-            base(cliContext, typeActivator)
+            base(serviceProvider, cliContext)
         {
             _promptForeground = promptForeground;
             _commandForeground = commandForeground;
@@ -56,34 +56,18 @@ namespace CliFx
             if (await base.ProcessHardcodedDirectives(configuration, input) is int exitCode)
                 return exitCode;
 
-            // Scope
-            if (input.HasDirective(StandardDirectives.Scope))
-            {
-                CliContext.Scope = input.CommandName ?? string.Empty;
+            //// Scope up
+            //if (input.HasDirective(StandardDirectives.ScopeUp))
+            //{
+            //    string[] splittedScope = CliContext.Scope.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-                return ExitCode.Success;
-            }
+            //    if (splittedScope.Length > 1)
+            //        CliContext.Scope = string.Join(" ", splittedScope, 0, splittedScope.Length - 1);
+            //    else if (splittedScope.Length == 1)
+            //        CliContext.Scope = string.Empty;
 
-            // Scope reset
-            if (input.HasDirective(StandardDirectives.ScopeReset))
-            {
-                CliContext.Scope = string.Empty;
-
-                return ExitCode.Success;
-            }
-
-            // Scope up
-            if (input.HasDirective(StandardDirectives.ScopeUp))
-            {
-                string[] splittedScope = CliContext.Scope.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-                if (splittedScope.Length > 1)
-                    CliContext.Scope = string.Join(" ", splittedScope, 0, splittedScope.Length - 1);
-                else if (splittedScope.Length == 1)
-                    CliContext.Scope = string.Empty;
-
-                return ExitCode.Success;
-            }
+            //    return ExitCode.Success;
+            //}
 
             return null;
         }

@@ -16,6 +16,9 @@ namespace CliFx.Directives
     {
         private readonly ICliContext _cliContext;
 
+        /// <inheritdoc/>
+        public bool ContinueExecution => false;
+
         /// <summary>
         /// Initializes an instance of <see cref="CliApplication"/>.
         /// </summary>
@@ -25,11 +28,11 @@ namespace CliFx.Directives
         }
 
         /// <inheritdoc/>
-        public ValueTask<int?> HandleAsync(IConsole console)
+        public ValueTask HandleAsync(IConsole console)
         {
             WriteCommandLineInput(console, _cliContext.CurrentInput);
 
-            return new ValueTask<int?>(0);
+            return default;
         }
 
         private void WriteCommandLineInput(IConsole console, CommandInput input)

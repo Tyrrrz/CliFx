@@ -7,40 +7,34 @@ namespace CliFx.Exceptions
     /// </summary>
     public class DefaultExceptionHandler : ICliExceptionHandler
     {
-        /// <summary>
-        /// Initializes an instance of <see cref="DefaultExceptionHandler"/>.
-        /// </summary>
-        public DefaultExceptionHandler()
-        {
-
-        }
-
         /// <inheritdoc/>
-        public void HandleCliFxException(IConsole console, ICliContext context, CliFxException ex)
+        public void HandleCliFxException(ICliContext context, CliFxException ex)
         {
-            WriteError(console, ex.ToString());
+            WriteError(context.Console, ex.ToString());
             //ex.ShowHelp = false;
         }
 
         /// <inheritdoc/>
-        public void HandleCommandException(IConsole console, ICliContext context, CommandException ex)
+        public void HandleDirectiveException(ICliContext context, DirectiveException ex)
         {
-            WriteError(console, ex.ToString());
+            WriteError(context.Console, ex.ToString());
         }
 
         /// <inheritdoc/>
-        public void HandleException(IConsole console, ICliContext context, Exception ex)
+        public void HandleCommandException(ICliContext context, CommandException ex)
         {
+            WriteError(context.Console, ex.ToString());
+        }
+
+        /// <inheritdoc/>
+        public void HandleException(ICliContext context, Exception ex)
+        {
+            IConsole console = context.Console;
+
             if (context.CurrentCommand is null)
-            {
-                console.WithForegroundColor(ConsoleColor.Red, () =>
-                    console.Error.WriteLine($"Fatal error occured in {context.Metadata.ExecutableName}."));
-            }
+                WriteError(console, $"Fatal error occured in {context.Metadata.ExecutableName}.");
             else
-            {
-                console.WithForegroundColor(ConsoleColor.Red, () =>
-                    console.Error.WriteLine($"Fatal error occured in {context.Metadata.ExecutableName} during execution of '{context.CurrentCommand.Name ?? "default"}' command."));
-            }
+                WriteError(console, $"Fatal error occured in {context.Metadata.ExecutableName} during execution of '{context.CurrentCommand.Name ?? "default"}' command.");
 
             console.Error.WriteLine();
             WriteError(console, ex.ToString());

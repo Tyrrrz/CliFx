@@ -3,11 +3,11 @@
 namespace CliFx.Exceptions
 {
     /// <summary>
-    /// Thrown when a command cannot proceed with normal execution due to an error.
-    /// Use this exception if you want to report an error that occured during the execution of a command.
+    /// Thrown when a directive cannot proceed with normal execution due to an error.
+    /// Use this exception if you want to report an error that occured during the execution of a directive.
     /// This exception also allows specifying exit code which will be returned to the calling process.
     /// </summary>
-    public class CommandException : Exception
+    public class DirectiveException : Exception
     {
         private const int DefaultExitCode = 1;
 
@@ -24,12 +24,12 @@ namespace CliFx.Exceptions
         public bool ShowHelp { get; }
 
         /// <summary>
-        /// Initializes an instance of <see cref="CommandException"/>.
+        /// Initializes an instance of <see cref="DirectiveException"/>.
         /// </summary>
         /// <remarks>
         /// On Unix systems an exit code is 8-bit unsigned integer so it's strongly recommended to use values between 1 and 255 to avoid overflow.
         /// </remarks>
-        public CommandException(string? message, Exception? innerException, int exitCode = DefaultExitCode, bool showHelp = false)
+        public DirectiveException(string? message, Exception? innerException, int exitCode = DefaultExitCode, bool showHelp = false)
             : base(message, innerException)
         {
             ExitCode = exitCode;
@@ -40,23 +40,23 @@ namespace CliFx.Exceptions
         }
 
         /// <summary>
-        /// Initializes an instance of <see cref="CommandException"/>.
+        /// Initializes an instance of <see cref="DirectiveException"/>.
         /// </summary>
         /// <remarks>
         /// On Unix systems an exit code is 8-bit unsigned integer so it's strongly recommended to use values between 1 and 255 to avoid overflow.
         /// </remarks>
-        public CommandException(string? message, int exitCode = DefaultExitCode, bool showHelp = false)
+        public DirectiveException(string? message, int exitCode = DefaultExitCode, bool showHelp = false)
             : this(message, null, exitCode, showHelp)
         {
         }
 
         /// <summary>
-        /// Initializes an instance of <see cref="CommandException"/>.
+        /// Initializes an instance of <see cref="DirectiveException"/>.
         /// </summary>
         /// <remarks>
         /// On Unix systems an exit code is 8-bit unsigned integer so it's strongly recommended to use values between 1 and 255 to avoid overflow.
         /// </remarks>
-        public CommandException(int exitCode = DefaultExitCode, bool showHelp = false)
+        public DirectiveException(int exitCode = DefaultExitCode, bool showHelp = false)
             : this(null, exitCode, showHelp)
         {
         }

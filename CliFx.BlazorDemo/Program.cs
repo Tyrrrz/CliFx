@@ -1,43 +1,26 @@
-using System;
 using System.Threading.Tasks;
-using CliFx.BlazorDemo.CLI.Commands;
 using CliFx.BlazorDemo.CLI.Services;
+using CliFx.Directives;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CliFx.BlazorDemo
 {
     public static class Program
     {
-        private static Func<Type, object> GetServiceCollection(ICliContext cliContext, IConsole console)
+        private static void ConfigureServices(IServiceCollection services)
         {
-            // We use Microsoft.Extensions.DependencyInjection for injecting dependencies in commands
-            var services = new ServiceCollection();
-
             // Register services
-            services.AddSingleton(cliContext);
-            services.AddSingleton(console);
             services.AddTransient<IWebHostRunnerService, WebHostRunnerService>();
             services.AddTransient<IBackgroundWebHostProvider, BackgroundWebHostProvider>();
-
-            // Register commands
-            services.AddTransient<DefaultCommand>();
-            services.AddTransient<WebHostCommand>();
-            services.AddTransient<WebHostRestartCommand>();
-            services.AddTransient<WebHostStartCommand>();
-            services.AddTransient<WebHostStatusCommand>();
-            services.AddTransient<WebHostStopCommand>();
-            services.AddTransient<DatabaseMigrateCommand>();
-            services.AddTransient<DatabaseVerifyCommand>();
-
-            return services.BuildServiceProvider().GetService;
         }
 
         public static async Task<int> Main()
         {
             return await new CliApplicationBuilder()
                 .AddCommandsFromThisAssembly()
-                .UseTypeActivator(GetServiceCollection)
-                .AllowInteractiveMode(true)
+                .AddDirective<DebugDirective>()
+                .ConfigureServices(ConfigureServices)
+                .UseInteractiveMode()
                 .Build()
                 .RunAsync();
         }

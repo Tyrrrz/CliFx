@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using CliFx.Directives;
 using CliFx.Domain;
 using CliFx.Exceptions;
 using FluentAssertions;
@@ -37,14 +38,13 @@ namespace CliFx.Tests
                 .AddCommands(new[] { typeof(DefaultCommand) })
                 .AddCommandsFrom(new[] { typeof(DefaultCommand).Assembly })
                 .AddCommandsFromThisAssembly()
-                .AllowDebugMode()
-                .AllowPreviewMode()
+                .AddDirective<DebugDirective>()
+                .AddDirective<PreviewDirective>()
                 .UseTitle("test")
                 .UseExecutableName("test")
                 .UseVersionText("test")
                 .UseDescription("test")
                 .UseConsole(new VirtualConsole(Stream.Null))
-                .UseTypeActivator(Activator.CreateInstance!)
                 .Build();
 
             // Assert

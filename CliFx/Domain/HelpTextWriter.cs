@@ -377,10 +377,9 @@ namespace CliFx.Domain
             WriteLine();
         }
 
-        public void Write(
-            RootSchema root,
-            CommandSchema command,
-            IReadOnlyDictionary<CommandArgumentSchema, object?> defaultValues)
+        public void Write(RootSchema root,
+                          CommandSchema command,
+                          IReadOnlyDictionary<CommandArgumentSchema, object?> defaultValues)
         {
             var childCommands = root.GetChildCommands(command.Name);
 
