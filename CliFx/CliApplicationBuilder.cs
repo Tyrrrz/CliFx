@@ -53,7 +53,7 @@ namespace CliFx
         {
             _customDirectives.Add(directiveType);
             _serviceCollection.TryAddTransient(directiveType);
-            _serviceCollection.TryAddTransient(typeof(IDirective), directiveType);
+            _serviceCollection.AddTransient(typeof(IDirective), directiveType);
 
             return this;
         }
@@ -121,8 +121,8 @@ namespace CliFx
         public CliApplicationBuilder AddCommand(Type commandType)
         {
             _commandTypes.Add(commandType);
-            _serviceCollection.TryAddTransient(typeof(ICommand), commandType);
             _serviceCollection.TryAddTransient(commandType);
+            _serviceCollection.AddTransient(typeof(ICommand), commandType);
 
             return this;
         }
@@ -416,6 +416,8 @@ namespace CliFx
             _serviceCollection.AddSingleton(typeof(ICliContext), (provider) => cliContext);
             _serviceCollection.AddSingleton(typeof(IConsole), (provider) => _console);
 
+            //DebugPrintServices();
+
             ServiceProvider serviceProvider = _serviceCollection.BuildServiceProvider();
 
             // Create application instance
@@ -428,6 +430,38 @@ namespace CliFx
             }
 
             return new CliApplication(serviceProvider, cliContext);
+        }
+
+        private void DebugPrintServices()
+        {
+            _console.Output.WriteLine(new string('-', 105));
+            _console.Output.Write(" Service Type".PadRight(41));
+            _console.Output.Write('|');
+            _console.Output.Write(" ImplementationType".PadRight(41));
+            _console.Output.Write('|');
+            _console.Output.WriteLine(" Lifetime".PadRight(21));
+
+            _console.Output.Write(new string('-', 41));
+            _console.Output.Write('+');
+            _console.Output.Write(new string('-', 41));
+            _console.Output.Write('+');
+            _console.Output.WriteLine(new string('-', 21));
+
+            foreach (var item in _serviceCollection.OrderBy(x => x.Lifetime)
+                                                   .ThenBy(x=>x.ServiceType.Name)
+                                                   .ThenBy(x=>x.ImplementationType?.Name))
+            {
+                _console.Output.Write(' ');
+                _console.Output.Write(item.ServiceType.Name.PadRight(40));
+                _console.Output.Write('|');
+                _console.Output.Write(' ');
+                _console.Output.Write(item.ImplementationType?.Name.PadRight(40) ?? string.Empty.PadRight(40));
+                _console.Output.Write('|');
+                _console.Output.Write(' ');
+                _console.Output.WriteLine(item.Lifetime.ToString().PadRight(20));
+            }
+
+            _console.Output.WriteLine(new string('-', 105));
         }
     }
 
