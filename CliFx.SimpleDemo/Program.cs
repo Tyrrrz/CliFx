@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using CliFx.Directives;
 using CliFx.SimpleDemo.Commands;
 
 namespace CliFx.SimpleDemo
@@ -11,6 +12,8 @@ namespace CliFx.SimpleDemo
         public static async Task<int> Main()
         {
             return await new CliApplicationBuilder().AddCommand(typeof(CliFxBenchmarkCommand))
+                                                    .AddDirective<DebugDirective>()
+                                                    .AddDirective<PreviewDirective>()
                                                     .Build()
                                                     .RunAsync(Arguments, new Dictionary<string, string>());
         }

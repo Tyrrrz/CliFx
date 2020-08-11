@@ -6,27 +6,35 @@ using CliFx.Exceptions;
 namespace CliFx.Domain
 {
     /// <summary>
-    /// Stores all commands in application.
+    /// Stores all schemas of commands and directives in the application.
     /// </summary>
     public partial class RootSchema
     {
         /// <summary>
-        /// List of defined commands in application.
+        /// List of defined directives in the application.
+        /// </summary>
+        public IReadOnlyDictionary<string, DirectiveSchema> Directives { get; }
+
+        private HashSet<string>? _directiveNamesHashSet;
+
+        /// <summary>
+        /// List of defined commands in the application.
         /// </summary>
         public IReadOnlyDictionary<string, CommandSchema> Commands { get; }
+
+        private HashSet<string>? _commandNamesHashSet;
 
         /// <summary>
         /// Default command (null if no default command).
         /// </summary>
         public CommandSchema? DefaultCommand { get; }
 
-        private HashSet<string>? _commandNamesHashSet;
-
         /// <summary>
         /// Initializes an instance of <see cref="RootSchema"/>.
         /// </summary>
-        public RootSchema(IReadOnlyDictionary<string, CommandSchema> commands, CommandSchema? defaultCommand)
+        internal RootSchema(IReadOnlyDictionary<string, DirectiveSchema> directives, IReadOnlyDictionary<string, CommandSchema> commands, CommandSchema? defaultCommand)
         {
+            Directives = directives;
             Commands = commands;
             DefaultCommand = defaultCommand;
         }
@@ -42,6 +50,16 @@ namespace CliFx.Domain
         }
 
         /// <summary>
+        /// Returns collection of directives names.
+        /// </summary>
+        public ISet<string> GetDirectivesNames()
+        {
+            _directiveNamesHashSet ??= Directives.Keys.ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            return _directiveNamesHashSet;
+        }
+
+        /// <summary>
         /// Finds command schema by name.
         /// </summary>
         public CommandSchema? TryFindCommand(string? commandName)
@@ -50,6 +68,19 @@ namespace CliFx.Domain
                 return DefaultCommand;
 
             Commands.TryGetValue(commandName, out var value);
+
+            return value;
+        }
+
+        /// <summary>
+        /// Finds command schema by name.
+        /// </summary>
+        public DirectiveSchema? TryFindDirective(string directiveName)
+        {
+            if (string.IsNullOrWhiteSpace(directiveName))
+                return null;
+
+            Directives.TryGetValue(directiveName, out var value);
 
             return value;
         }
@@ -90,135 +121,12 @@ namespace CliFx.Domain
 
     public partial class RootSchema
     {
-        private static void ValidateParameters(CommandSchema command)
-        {
-            var duplicateOrderGroup = command.Parameters
-                .GroupBy(a => a.Order)
-                .FirstOrDefault(g => g.Count() > 1);
-
-            if (duplicateOrderGroup != null)
-            {
-                throw CliFxException.ParametersWithSameOrder(
-                    command,
-                    duplicateOrderGroup.Key,
-                    duplicateOrderGroup.ToArray()
-                );
-            }
-
-            var duplicateNameGroup = command.Parameters
-                .Where(a => !string.IsNullOrWhiteSpace(a.Name))
-                .GroupBy(a => a.Name!, StringComparer.OrdinalIgnoreCase)
-                .FirstOrDefault(g => g.Count() > 1);
-
-            if (duplicateNameGroup != null)
-            {
-                throw CliFxException.ParametersWithSameName(
-                    command,
-                    duplicateNameGroup.Key,
-                    duplicateNameGroup.ToArray()
-                );
-            }
-
-            var nonScalarParameters = command.Parameters
-                                             .Where(p => !p.IsScalar)
-                                             .ToArray();
-
-            if (nonScalarParameters.Length > 1)
-            {
-                throw CliFxException.TooManyNonScalarParameters(
-                    command,
-                    nonScalarParameters
-                );
-            }
-
-            var nonLastNonScalarParameter = command.Parameters
-                .OrderByDescending(a => a.Order)
-                .Skip(1)
-                .LastOrDefault(p => !p.IsScalar);
-
-            if (nonLastNonScalarParameter != null)
-            {
-                throw CliFxException.NonLastNonScalarParameter(
-                    command,
-                    nonLastNonScalarParameter
-                );
-            }
-        }
-
-        private static void ValidateOptions(CommandSchema command)
-        {
-            IEnumerable<CommandOptionSchema> noNameGroup = command.Options
-                                                                  .Where(o => o.ShortName == null && string.IsNullOrWhiteSpace(o.Name));
-
-            if (noNameGroup.Any())
-            {
-                throw CliFxException.OptionsWithNoName(
-                    command,
-                    noNameGroup.ToArray()
-                );
-            }
-
-            var invalidLengthNameGroup = command.Options
-                .Where(o => !string.IsNullOrWhiteSpace(o.Name))
-                .Where(o => o.Name!.Length <= 1)
-                .ToArray();
-
-            if (invalidLengthNameGroup.Any())
-            {
-                throw CliFxException.OptionsWithInvalidLengthName(
-                    command,
-                    invalidLengthNameGroup
-                );
-            }
-
-            var duplicateNameGroup = command.Options
-                .Where(o => !string.IsNullOrWhiteSpace(o.Name))
-                .GroupBy(o => o.Name!, StringComparer.OrdinalIgnoreCase)
-                .FirstOrDefault(g => g.Count() > 1);
-
-            if (duplicateNameGroup != null)
-            {
-                throw CliFxException.OptionsWithSameName(
-                    command,
-                    duplicateNameGroup.Key,
-                    duplicateNameGroup.ToArray()
-                );
-            }
-
-            var duplicateShortNameGroup = command.Options
-                .Where(o => o.ShortName != null)
-                .GroupBy(o => o.ShortName!.Value)
-                .FirstOrDefault(g => g.Count() > 1);
-
-            if (duplicateShortNameGroup != null)
-            {
-                throw CliFxException.OptionsWithSameShortName(
-                    command,
-                    duplicateShortNameGroup.Key,
-                    duplicateShortNameGroup.ToArray()
-                );
-            }
-
-            var duplicateEnvironmentVariableNameGroup = command.Options
-                .Where(o => !string.IsNullOrWhiteSpace(o.EnvironmentVariableName))
-                .GroupBy(o => o.EnvironmentVariableName!, StringComparer.OrdinalIgnoreCase)
-                .FirstOrDefault(g => g.Count() > 1);
-
-            if (duplicateEnvironmentVariableNameGroup != null)
-            {
-                throw CliFxException.OptionsWithSameEnvironmentVariableName(
-                    command,
-                    duplicateEnvironmentVariableNameGroup.Key,
-                    duplicateEnvironmentVariableNameGroup.ToArray()
-                );
-            }
-        }
-
         /// <summary>
         /// Resolves the root schema.
         /// </summary>
-        internal static RootSchema Resolve(IReadOnlyList<Type> commandTypes)
+        internal static RootSchema Resolve(IReadOnlyList<Type> commandTypes, IReadOnlyList<Type> directiveTypes)
         {
+            //Resolve commands
             var commands = new Dictionary<string, CommandSchema>();
             var invalidCommands = new List<CommandSchema>();
             CommandSchema? defaultCommand = null;
@@ -226,9 +134,6 @@ namespace CliFx.Domain
             foreach (var commandType in commandTypes)
             {
                 var command = CommandSchema.TryResolve(commandType) ?? throw CliFxException.InvalidCommandType(commandType);
-
-                ValidateParameters(command);
-                ValidateOptions(command);
 
                 if (string.IsNullOrWhiteSpace(command.Name))
                 {
@@ -253,7 +158,28 @@ namespace CliFx.Domain
                 throw CliFxException.CommandsWithSameName(duplicateNameGroup.Key, duplicateNameGroup.ToArray());
             }
 
-            return new RootSchema(commands, defaultCommand);
+            //Resolve directives
+            var directives = new Dictionary<string, DirectiveSchema>();
+            var invalidDirectives = new List<DirectiveSchema>();
+
+            foreach (var directiveType in directiveTypes)
+            {
+                var directive = DirectiveSchema.TryResolve(directiveType) ?? throw CliFxException.InvalidDirectiveType(directiveType);
+
+                if (!directives.TryAdd(directive.Name, directive))
+                    invalidDirectives.Add(directive);
+            }
+
+            if (invalidDirectives.Count > 0)
+            {
+                var duplicateNameGroup = invalidDirectives.Union(directives.Values)
+                                                          .GroupBy(c => c.Name, StringComparer.OrdinalIgnoreCase)
+                                                          .FirstOrDefault();
+
+                throw CliFxException.DirectiveWithSameName(duplicateNameGroup.Key, duplicateNameGroup.ToArray());
+            }
+
+            return new RootSchema(directives, commands, defaultCommand);
         }
     }
 }

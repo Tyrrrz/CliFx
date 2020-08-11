@@ -36,16 +36,16 @@ namespace CliFx
         /// <summary>
         /// Root schema (null value when not resolved).
         /// </summary>
-        RootSchema? Root { get; }
-
-        /// <summary>
-        /// Current command schema (null value when not in command context).
-        /// </summary>
-        CommandSchema? CurrentCommand { get; }
+        RootSchema Root { get; }
 
         /// <summary>
         /// Parsed CLI input.
         /// </summary>
-        CommandInput? CurrentInput { get; }
+        CommandInput CurrentInput { get; }
+
+        /// <summary>
+        /// Current command schema (null value when not in command context).
+        /// </summary>
+        CommandSchema CurrentCommand { get; }
     }
 }

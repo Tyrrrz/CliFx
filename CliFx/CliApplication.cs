@@ -8,7 +8,6 @@ using CliFx.Attributes;
 using CliFx.Domain;
 using CliFx.Domain.Input;
 using CliFx.Exceptions;
-using CliFx.Internal;
 
 namespace CliFx
 {
@@ -63,79 +62,14 @@ namespace CliFx
             _helpTextWriter = new HelpTextWriter(cliContext);
         }
 
-        /// <summary>
-        /// Launches and waits for debugger.
-        /// </summary>
-        protected async ValueTask LaunchAndWaitForDebuggerAsync()
-        {
-            var processId = ProcessEx.GetCurrentProcessId();
-
-            _console.WithForegroundColor(ConsoleColor.Green, () =>
-                _console.Output.WriteLine($"Attach debugger to PID {processId} to continue."));
-
-            Debugger.Launch();
-
-            while (!Debugger.IsAttached)
-                await Task.Delay(100);
-
-            _console.WithForegroundColor(ConsoleColor.Green, () =>
-                _console.Output.WriteLine($"Debugger attached to PID {processId}."));
-        }
-
-        /// <summary>
-        /// Writes command line input.
-        /// </summary>
-        internal void WriteCommandLineInput(CommandInput input)
-        {
-            // Command name
-            if (!string.IsNullOrWhiteSpace(input.CommandName))
-            {
-                _console.WithForegroundColor(ConsoleColor.Cyan, () =>
-                    _console.Output.Write(input.CommandName));
-
-                _console.Output.Write(' ');
-            }
-
-            // Parameters
-            foreach (var parameter in input.Parameters)
-            {
-                _console.Output.Write('<');
-
-                _console.WithForegroundColor(ConsoleColor.White, () =>
-                    _console.Output.Write(parameter));
-
-                _console.Output.Write('>');
-                _console.Output.Write(' ');
-            }
-
-            // Options
-            foreach (var option in input.Options)
-            {
-                _console.Output.Write('[');
-
-                _console.WithForegroundColor(ConsoleColor.White, () =>
-                {
-                    // Alias
-                    _console.Output.Write(option.GetRawAlias());
-
-                    // Values
-                    if (option.Values.Any())
-                    {
-                        _console.Output.Write(' ');
-                        _console.Output.Write(option.GetRawValues());
-                    }
-                });
-
-                _console.Output.Write(']');
-                _console.Output.Write(' ');
-            }
-
-            _console.Output.WriteLine();
-        }
-
         private ICommand GetCommandInstance(CommandSchema command)
         {
             return command != StubDefaultCommand.Schema ? (ICommand)_typeActivator.CreateInstance(command.Type) : new StubDefaultCommand();
+        }
+
+        private IDirective GetDirectiveInstance(DirectiveSchema directive)
+        {
+            return (IDirective)_typeActivator.CreateInstance(directive.Type);
         }
 
         /// <summary>
@@ -224,9 +158,11 @@ namespace CliFx
             try
             {
                 _console.ResetColor();
+                _console.ForegroundColor = ConsoleColor.Gray;
+
                 PrintStartupMessage();
 
-                var root = RootSchema.Resolve(_configuration.CommandTypes);
+                var root = RootSchema.Resolve(_configuration.CommandTypes, _configuration.DirectiveTypes);
                 CliContext.Root = root;
 
                 int exitCode = await PreExecuteCommand(commandLineArguments, environmentVariables, root);
@@ -267,8 +203,11 @@ namespace CliFx
                                                  RootSchema root,
                                                  CommandInput input)
         {
-            if (await ProcessDirectives(_configuration, input) is int exitCode)
-                return exitCode;
+            if (await ProcessHardcodedDirectives(_configuration, input) is int exitCodeA)
+                return exitCodeA;
+
+            if (await ProcessDefinedDirectives(root, input) is int exitCodeB)
+                return exitCodeB;
 
             // Try to get the command matching the input or fallback to default
             CommandSchema command = root.TryFindCommand(input.CommandName) ?? StubDefaultCommand.Schema;
@@ -293,7 +232,7 @@ namespace CliFx
             if (command.IsHelpOptionAvailable && input.IsHelpOptionSpecified ||
                 command == StubDefaultCommand.Schema && !input.Parameters.Any() && !input.Options.Any())
             {
-                _helpTextWriter.Write(root, command, defaultValues);
+                _helpTextWriter.Write(root, command, defaultValues); //TODO: add directives help
                 return ExitCode.Success;
             }
 
@@ -342,24 +281,28 @@ namespace CliFx
             }
         }
 
+        private async Task<int?> ProcessDefinedDirectives(RootSchema root, CommandInput input)
+        {
+            foreach (var directiveInput in input.Directives)
+            {
+                // Try to get the directive matching the input or fallback to default
+                DirectiveSchema directive = root.TryFindDirective(directiveInput.Name) ?? throw CliFxException.UnknownDirectiveName(directiveInput);
+
+                // Get directive instance
+                var instance = GetDirectiveInstance(directive);
+
+                if (await instance.HandleAsync(_console) is int exitCode)
+                    return exitCode;
+            }
+
+            return null;
+        }
+
         /// <summary>
         /// Process directives.
         /// </summary>
-        protected virtual async Task<int?> ProcessDirectives(ApplicationConfiguration configuration, CommandInput input)
+        protected virtual ValueTask<int?> ProcessHardcodedDirectives(ApplicationConfiguration configuration, CommandInput input)
         {
-            // Debug mode
-            if (configuration.IsDebugModeAllowed && input.HasDirective(StandardDirectives.Debug))
-            {
-                await LaunchAndWaitForDebuggerAsync();
-            }
-
-            // Preview mode
-            if (configuration.IsPreviewModeAllowed && input.HasDirective(StandardDirectives.Preview))
-            {
-                WriteCommandLineInput(input);
-                return ExitCode.Success;
-            }
-
             // Handle directives not supported in normal mode
             if (!configuration.IsInteractiveModeAllowed &&
                 (input.HasDirective(StandardDirectives.Interactive) || input.HasAnyOfDirectives(InteractiveModeDirectives)))
@@ -367,7 +310,7 @@ namespace CliFx
                 throw CliFxException.InteractiveModeDirectivesNotSupported();
             }
 
-            return null;
+            return new ValueTask<int?>((int?)null);
         }
     }
 

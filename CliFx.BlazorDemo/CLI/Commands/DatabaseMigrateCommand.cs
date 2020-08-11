@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using CliFx.Attributes;
-using CliFx.BlazorDemo.CLI.Services;
 
 namespace CliFx.BlazorDemo.CLI.Commands
 {

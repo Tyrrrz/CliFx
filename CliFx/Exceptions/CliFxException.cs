@@ -98,6 +98,21 @@ If you're experiencing problems, please refer to the readme for a quickstart exa
             return new CliFxException(message.Trim());
         }
 
+        internal static CliFxException InvalidDirectiveType(Type type)
+        {
+            var message = $@"
+Directive '{type.FullName}' is not a valid directive type.
+
+In order to be a valid command type, it must:
+- Not be an abstract class
+- Implement {typeof(IDirective).FullName}
+- Be annotated with {typeof(DirectiveAttribute).FullName}
+
+If you're experiencing problems, please refer to the readme for a quickstart example.";
+
+            return new CliFxException(message.Trim());
+        }
+
         internal static CliFxException NoCommandsDefined()
         {
             var message = $@"
@@ -129,6 +144,32 @@ Application configuration is invalid because there are {invalidCommands.Count} c
 {invalidCommands.JoinToString(Environment.NewLine)}
 
 Commands must have unique names.
+Names are not case-sensitive.";
+
+            return new CliFxException(message.Trim());
+        }
+
+        internal static CliFxException DirectiveWithSameName(
+            string name,
+            IReadOnlyList<DirectiveSchema> invalidDirectives)
+        {
+            var message = $@"
+Application configuration is invalid because there are {invalidDirectives.Count} directives with the same name ('[{name}]'):
+{invalidDirectives.JoinToString(Environment.NewLine)}
+
+Directives must have unique names.
+Names are not case-sensitive.";
+
+            return new CliFxException(message.Trim());
+        }
+
+        internal static CliFxException DirectiveNameIsInvalid(
+            string name, Type type)
+        {
+            var message = $@"
+Directive '{type.FullName}' is invalid because its name is empty or whitespace ('[{name}]').
+
+Directives must have unique, non-empty, and non-whitespace names.
 Names are not case-sensitive.";
 
             return new CliFxException(message.Trim());
@@ -423,6 +464,14 @@ Please consider switching to interactive application or removing the command.";
             return new CliFxException(message.Trim());
         }
 
+        internal static CliFxException UnknownDirectiveName(CommandDirectiveInput directive)
+        {
+            var message = $@"
+Unknown directive '{directive}'.";
+
+            return new CliFxException(message.Trim());
+        }
+
         internal static CliFxException InteractiveOnlyCommandButInteractiveModeNotStarted(CommandSchema command)
         {
             var message = $@"
@@ -438,7 +487,7 @@ You can start the interactive mode with [{StandardDirectives.Interactive}].";
             var message = $@"
 This application does not support interactive mode.
 
-Directives[{ string.Join("], [", CliApplication.InteractiveModeDirectives)}] cannot be used in this application.";
+Directives [{ string.Join("], [", CliApplication.InteractiveModeDirectives)}] cannot be used in this application.";
 
             return new CliFxException(message.Trim());
         }

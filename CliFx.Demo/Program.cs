@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using CliFx.Demo.Commands;
 using CliFx.Demo.Services;
+using CliFx.Directives;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CliFx.Demo
@@ -27,8 +28,10 @@ namespace CliFx.Demo
 
         public static async Task<int> Main() =>
             await new CliApplicationBuilder()
-                .AddCommandsFromThisAssembly()
                 .UseTypeActivator(GetServiceProvider().GetService)
+                .AddCommandsFromThisAssembly()
+                .AddDirective<DebugDirective>()
+                .AddDirective<PreviewDirective>()
                 .Build()
                 .RunAsync();
     }

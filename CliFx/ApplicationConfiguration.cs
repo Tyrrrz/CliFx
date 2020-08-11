@@ -12,12 +12,12 @@ namespace CliFx
         /// <summary>
         /// Command types defined in this application.
         /// </summary>
-        public IReadOnlyList<Type> CommandTypes { get; }
+        internal IReadOnlyList<Type> CommandTypes { get; }
 
         /// <summary>
         /// Custom directives defined in this application.
         /// </summary>
-        public IReadOnlyList<string> CustomDirectives { get; }
+        internal IReadOnlyList<Type> DirectiveTypes { get; }
 
         /// <summary>
         /// Exception Handler instance.
@@ -28,16 +28,6 @@ namespace CliFx
         /// Whether interactive mode is allowed in this application.
         /// </summary>
         public bool IsInteractiveModeAllowed { get; }
-
-        /// <summary>
-        /// Whether debug mode is allowed in this application.
-        /// </summary>
-        public bool IsDebugModeAllowed { get; }
-
-        /// <summary>
-        /// Whether preview mode is allowed in this application.
-        /// </summary>
-        public bool IsPreviewModeAllowed { get; }
 
         /// <summary>
         /// Command exit message level.
@@ -54,20 +44,16 @@ namespace CliFx
         /// </summary>
         public ApplicationConfiguration(
             IReadOnlyList<Type> commandTypes,
-            IReadOnlyList<string> customDirectives,
+            IReadOnlyList<Type> customDirectives,
             ICliExceptionHandler exceptionHandler,
-            bool isDebugModeAllowed,
-            bool isPreviewModeAllowed,
             bool isInteractiveModeAllowed,
             CommandExitMessageOptions commandExitMessageOptions,
             ConsoleColor commandExitMessageForeground)
         {
             CommandTypes = commandTypes;
-            CustomDirectives = customDirectives;
+            DirectiveTypes = customDirectives;
             ExceptionHandler = exceptionHandler;
 
-            IsDebugModeAllowed = isDebugModeAllowed;
-            IsPreviewModeAllowed = isPreviewModeAllowed;
             IsInteractiveModeAllowed = isInteractiveModeAllowed;
 
             CommandExitMessageOptions = commandExitMessageOptions;

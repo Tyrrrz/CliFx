@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using CliFx.Directives;
 using CliFx.InteractiveModeDemo.Commands;
 using CliFx.InteractiveModeDemo.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,8 +33,10 @@ namespace CliFx.InteractiveModeDemo
         public static async Task<int> Main()
         {
             return await new CliApplicationBuilder()
-                .AddCommandsFromThisAssembly()
                 .UseTypeActivator(GetServiceCollection)
+                .AddCommandsFromThisAssembly()
+                .AddDirective<DebugDirective>()
+                .AddDirective<PreviewDirective>()
                 .AllowInteractiveMode(true)
                 .UseStartupMessage("{title} CLI {version} {{title}} {executable} {{{description}}} {test}")
                 .Build()

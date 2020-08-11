@@ -16,11 +16,8 @@ namespace CliFx
     public partial class CliApplicationBuilder
     {
         //Directives and commands settings
-        private readonly HashSet<Type> _commandTypes = new HashSet<Type>();
-        private readonly List<string> _customDirectives = new List<string>();
-
-        private bool _isDebugModeAllowed = true;
-        private bool _isPreviewModeAllowed = true;
+        private readonly List<Type> _commandTypes = new List<Type>();
+        private readonly List<Type> _customDirectives = new List<Type>();
 
         //Metadata settings
         private string? _title;
@@ -44,24 +41,80 @@ namespace CliFx
         private ConsoleColor _promptForeground = ConsoleColor.Blue;
         private ConsoleColor _commandForeground = ConsoleColor.Yellow;
 
-        #region Directives and commands
+        #region Directives
         /// <summary>
-        /// Add custom directive.
+        /// Add a custom directive to the application.
         /// </summary>
-        public CliApplicationBuilder AddDirective(string directiveName)
+        public CliApplicationBuilder AddDirective(Type directive)
         {
-            _customDirectives.Add(directiveName.Trim('[', ']'));
+            _customDirectives.Add(directive);
 
             return this;
         }
 
         /// <summary>
-        /// Add custom directive.
+        /// Add a custom directive to the application.
         /// </summary>
-        public CliApplicationBuilder AddDirectives(params string[] directivesNames)
+        public CliApplicationBuilder AddDirective<T>()
+            where T : IDirective
         {
-            foreach (var directiveName in directivesNames)
-                AddDirective(directiveName);
+            _customDirectives.Add(typeof(T));
+
+            return this;
+        }
+
+        /// <summary>
+        /// Add custom directives to the application.
+        /// </summary>
+        public CliApplicationBuilder AddDirectives(IEnumerable<Type> directiveTypes)
+        {
+            foreach (var directiveType in directiveTypes)
+                AddDirective(directiveType);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Adds directives from the specified assembly to the application.
+        /// Only adds public valid directive types.
+        /// </summary>
+        public CliApplicationBuilder AddDirectivesFrom(Assembly directiveAssembly)
+        {
+            foreach (var directiveType in directiveAssembly.ExportedTypes.Where(CommandSchema.IsCommandType))
+                AddCommand(directiveType);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Adds directives from the specified assemblies to the application.
+        /// Only adds public valid directive types.
+        /// </summary>
+        public CliApplicationBuilder AddDirectivesFrom(IEnumerable<Assembly> directiveAssemblies)
+        {
+            foreach (var directiveType in directiveAssemblies)
+                AddCommandsFrom(directiveType);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Adds directives from the calling assembly to the application.
+        /// Only adds public valid directive types.
+        /// </summary>
+        public CliApplicationBuilder AddDirectivesFromThisAssembly()
+        {
+            return AddDirectivesFrom(Assembly.GetCallingAssembly());
+        }
+        #endregion
+
+        #region Commands
+        /// <summary>
+        /// Adds a command of specified type to the application.
+        /// </summary>
+        public CliApplicationBuilder AddCommand(Type commandType)
+        {
+            _commandTypes.Add(commandType);
 
             return this;
         }
@@ -69,9 +122,10 @@ namespace CliFx
         /// <summary>
         /// Adds a command of specified type to the application.
         /// </summary>
-        public CliApplicationBuilder AddCommand(Type commandType)
+        public CliApplicationBuilder AddCommand<T>()
+            where T : ICommand
         {
-            _commandTypes.Add(commandType);
+            _commandTypes.Add(typeof(T));
 
             return this;
         }
@@ -118,24 +172,6 @@ namespace CliFx
         public CliApplicationBuilder AddCommandsFromThisAssembly()
         {
             return AddCommandsFrom(Assembly.GetCallingAssembly());
-        }
-
-        /// <summary>
-        /// Specifies whether debug mode (enabled with [debug] directive) is allowed in the application.
-        /// </summary>
-        public CliApplicationBuilder AllowDebugMode(bool isAllowed = true)
-        {
-            _isDebugModeAllowed = isAllowed;
-            return this;
-        }
-
-        /// <summary>
-        /// Specifies whether preview mode (enabled with [preview] directive) is allowed in the application.
-        /// </summary>
-        public CliApplicationBuilder AllowPreviewMode(bool isAllowed = true)
-        {
-            _isPreviewModeAllowed = isAllowed;
-            return this;
         }
         #endregion
 
@@ -316,7 +352,7 @@ namespace CliFx
         #endregion
 
         /// <summary>
-        /// Creates an instance of <see cref="CliApplication"/> using configured parameters.
+        /// Creates an instance of <see cref="CliApplication"/> or <see cref="InteractiveCliApplication"/> using configured parameters.
         /// Default values are used in place of parameters that were not specified.
         /// </summary>
         public CliApplication Build()
@@ -345,11 +381,9 @@ namespace CliFx
             }
 
             var metadata = new ApplicationMetadata(_title, _executableName, _versionText, _description, _startupMessage);
-            var configuration = new ApplicationConfiguration(_commandTypes.ToArray(),
-                                                             _customDirectives.ToArray(),
+            var configuration = new ApplicationConfiguration(_commandTypes,
+                                                             _customDirectives,
                                                              _exceptionHandler,
-                                                             _isDebugModeAllowed,
-                                                             _isPreviewModeAllowed,
                                                              _isInteractiveModeAllowed,
                                                              _commandExitMessageLevel,
                                                              _exitMessageForeground);

@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using CliFx.Domain;
 using CliFx.Domain.Input;
-using CliFx.Exceptions;
 
 namespace CliFx
 {
@@ -53,9 +51,9 @@ namespace CliFx
         }
 
         /// <inheritdoc/>
-        protected override async Task<int?> ProcessDirectives(ApplicationConfiguration configuration, CommandInput input)
+        protected override async ValueTask<int?> ProcessHardcodedDirectives(ApplicationConfiguration configuration, CommandInput input)
         {
-            if (await base.ProcessDirectives(configuration, input) is int exitCode)
+            if (await base.ProcessHardcodedDirectives(configuration, input) is int exitCode)
                 return exitCode;
 
             // Scope
@@ -104,6 +102,7 @@ namespace CliFx
                 CliContext.CurrentInput = input; //TODO maybe refactor with some clever IDisposable class
 
                 await ExecuteCommand(environmentVariables, root, input);
+                console.ResetColor();
             }
         }
 

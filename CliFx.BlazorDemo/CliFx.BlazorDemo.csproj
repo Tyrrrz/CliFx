@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="ShellProgressBar" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CliFx.Analyzers\CliFx.Analyzers.csproj" />
     <ProjectReference Include="..\CliFx\CliFx.csproj" />
   </ItemGroup>

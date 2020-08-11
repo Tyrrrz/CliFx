@@ -17,20 +17,20 @@ namespace CliFx.Domain
     public partial class CommandSchema
     {
         /// <summary>
+        /// Command type.
+        /// </summary>
+        public Type Type { get; }
+
+        /// <summary>
         /// Command name.
         /// If the name is not set, the command is treated as a default command, i.e. the one that gets executed when the user
         /// does not specify a command name in the arguments.
         /// All commands in an application must have different names. Likewise, only one command without a name is allowed.
         /// </summary>
-        public Type Type { get; }
-
-        /// <summary>
-        /// Whether command is default.
-        /// </summary>
         public string? Name { get; }
 
         /// <summary>
-        /// Command description, which is used in help text.
+        /// Whether command is a default command.
         /// </summary>
         public bool IsDefault => string.IsNullOrWhiteSpace(Name);
 
@@ -70,12 +70,12 @@ namespace CliFx.Domain
         public bool IsVersionOptionAvailable => Options.Contains(CommandOptionSchema.VersionOption);
 
         internal CommandSchema(Type type,
-                               string? name,
-                               string? description,
-                               string? manual,
-                               bool interactiveModeOnly,
-                               IReadOnlyList<CommandParameterSchema> parameters,
-                               IReadOnlyList<CommandOptionSchema> options)
+                              string? name,
+                              string? description,
+                              string? manual,
+                              bool interactiveModeOnly,
+                              IReadOnlyList<CommandParameterSchema> parameters,
+                              IReadOnlyList<CommandOptionSchema> options)
         {
             Type = type;
             Name = name;
@@ -255,6 +255,130 @@ namespace CliFx.Domain
 
     public partial class CommandSchema
     {
+        private static void ValidateParameters(CommandSchema command)
+        {
+            var duplicateOrderGroup = command.Parameters
+                .GroupBy(a => a.Order)
+                .FirstOrDefault(g => g.Count() > 1);
+
+            if (duplicateOrderGroup != null)
+            {
+                throw CliFxException.ParametersWithSameOrder(
+                    command,
+                    duplicateOrderGroup.Key,
+                    duplicateOrderGroup.ToArray()
+                );
+            }
+
+            var duplicateNameGroup = command.Parameters
+                .Where(a => !string.IsNullOrWhiteSpace(a.Name))
+                .GroupBy(a => a.Name!, StringComparer.OrdinalIgnoreCase)
+                .FirstOrDefault(g => g.Count() > 1);
+
+            if (duplicateNameGroup != null)
+            {
+                throw CliFxException.ParametersWithSameName(
+                    command,
+                    duplicateNameGroup.Key,
+                    duplicateNameGroup.ToArray()
+                );
+            }
+
+            var nonScalarParameters = command.Parameters
+                                             .Where(p => !p.IsScalar)
+                                             .ToArray();
+
+            if (nonScalarParameters.Length > 1)
+            {
+                throw CliFxException.TooManyNonScalarParameters(
+                    command,
+                    nonScalarParameters
+                );
+            }
+
+            var nonLastNonScalarParameter = command.Parameters
+                .OrderByDescending(a => a.Order)
+                .Skip(1)
+                .LastOrDefault(p => !p.IsScalar);
+
+            if (nonLastNonScalarParameter != null)
+            {
+                throw CliFxException.NonLastNonScalarParameter(
+                    command,
+                    nonLastNonScalarParameter
+                );
+            }
+        }
+
+        private static void ValidateOptions(CommandSchema command)
+        {
+            IEnumerable<CommandOptionSchema> noNameGroup = command.Options
+                                                                  .Where(o => o.ShortName == null && string.IsNullOrWhiteSpace(o.Name));
+
+            if (noNameGroup.Any())
+            {
+                throw CliFxException.OptionsWithNoName(
+                    command,
+                    noNameGroup.ToArray()
+                );
+            }
+
+            var invalidLengthNameGroup = command.Options
+                .Where(o => !string.IsNullOrWhiteSpace(o.Name))
+                .Where(o => o.Name!.Length <= 1)
+                .ToArray();
+
+            if (invalidLengthNameGroup.Any())
+            {
+                throw CliFxException.OptionsWithInvalidLengthName(
+                    command,
+                    invalidLengthNameGroup
+                );
+            }
+
+            var duplicateNameGroup = command.Options
+                .Where(o => !string.IsNullOrWhiteSpace(o.Name))
+                .GroupBy(o => o.Name!, StringComparer.OrdinalIgnoreCase)
+                .FirstOrDefault(g => g.Count() > 1);
+
+            if (duplicateNameGroup != null)
+            {
+                throw CliFxException.OptionsWithSameName(
+                    command,
+                    duplicateNameGroup.Key,
+                    duplicateNameGroup.ToArray()
+                );
+            }
+
+            var duplicateShortNameGroup = command.Options
+                .Where(o => o.ShortName != null)
+                .GroupBy(o => o.ShortName!.Value)
+                .FirstOrDefault(g => g.Count() > 1);
+
+            if (duplicateShortNameGroup != null)
+            {
+                throw CliFxException.OptionsWithSameShortName(
+                    command,
+                    duplicateShortNameGroup.Key,
+                    duplicateShortNameGroup.ToArray()
+                );
+            }
+
+            var duplicateEnvironmentVariableNameGroup = command.Options
+                .Where(o => !string.IsNullOrWhiteSpace(o.EnvironmentVariableName))
+                .GroupBy(o => o.EnvironmentVariableName!, StringComparer.OrdinalIgnoreCase)
+                .FirstOrDefault(g => g.Count() > 1);
+
+            if (duplicateEnvironmentVariableNameGroup != null)
+            {
+                throw CliFxException.OptionsWithSameEnvironmentVariableName(
+                    command,
+                    duplicateEnvironmentVariableNameGroup.Key,
+                    duplicateEnvironmentVariableNameGroup.ToArray()
+                );
+            }
+        }
+
         internal static bool IsCommandType(Type type)
         {
             return type.Implements(typeof(ICommand)) &&
@@ -268,9 +392,9 @@ namespace CliFx.Domain
             if (!IsCommandType(type))
                 return null;
 
-            CommandAttribute? attribute = type.GetCustomAttribute<CommandAttribute>();
+            CommandAttribute attribute = type.GetCustomAttribute<CommandAttribute>()!;
 
-            var name = attribute?.Name;
+            var name = attribute.Name;
 
             var builtInOptions = string.IsNullOrWhiteSpace(name)
                 ? new[] { CommandOptionSchema.HelpOption, CommandOptionSchema.VersionOption }
@@ -287,15 +411,20 @@ namespace CliFx.Domain
                 .Concat(builtInOptions)
                 .ToArray();
 
-            return new CommandSchema(
+            CommandSchema command = new CommandSchema(
                 type,
                 name,
-                attribute?.Description,
-                attribute?.Manual,
-                attribute?.InteractiveModeOnly ?? false,
+                attribute.Description,
+                attribute.Manual,
+                attribute.InteractiveModeOnly,
                 parameters!,
                 options!
             );
+
+            ValidateParameters(command);
+            ValidateOptions(command);
+
+            return command;
         }
     }
 }

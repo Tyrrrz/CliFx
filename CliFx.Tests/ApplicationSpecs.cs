@@ -56,9 +56,10 @@ namespace CliFx.Tests
         {
             // Arrange
             var commandTypes = Array.Empty<Type>();
+            var directiveTypes = Array.Empty<Type>();
 
             // Act & assert
-            var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes));
+            var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes, directiveTypes));
             _output.WriteLine(ex.Message);
         }
 
@@ -67,9 +68,10 @@ namespace CliFx.Tests
         {
             // Arrange
             var commandTypes = new[] { typeof(NonImplementedCommand) };
+            var directiveTypes = Array.Empty<Type>();
 
             // Act & assert
-            var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes));
+            var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes, directiveTypes));
             _output.WriteLine(ex.Message);
         }
 
@@ -78,9 +80,10 @@ namespace CliFx.Tests
         {
             // Arrange
             var commandTypes = new[] { typeof(NonAnnotatedCommand) };
+            var directiveTypes = Array.Empty<Type>();
 
             // Act & assert
-            var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes));
+            var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes, directiveTypes));
             _output.WriteLine(ex.Message);
         }
 
@@ -89,9 +92,10 @@ namespace CliFx.Tests
         {
             // Arrange
             var commandTypes = new[] { typeof(DuplicateNameCommandA), typeof(DuplicateNameCommandB) };
+            var directiveTypes = Array.Empty<Type>();
 
             // Act & assert
-            var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes));
+            var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes, directiveTypes));
             _output.WriteLine(ex.Message);
         }
 
@@ -100,9 +104,10 @@ namespace CliFx.Tests
         {
             // Arrange
             var commandTypes = new[] { typeof(DefaultCommand), typeof(AnotherDefaultCommand) };
+            var directiveTypes = Array.Empty<Type>();
 
             // Act & assert
-            var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes));
+            var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes, directiveTypes));
             _output.WriteLine(ex.Message);
         }
 
@@ -111,9 +116,10 @@ namespace CliFx.Tests
         {
             // Arrange
             var commandTypes = new[] { typeof(DuplicateParameterOrderCommand) };
+            var directiveTypes = Array.Empty<Type>();
 
             // Act & assert
-            var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes));
+            var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes, directiveTypes));
             _output.WriteLine(ex.Message);
         }
 
@@ -122,9 +128,10 @@ namespace CliFx.Tests
         {
             // Arrange
             var commandTypes = new[] { typeof(DuplicateParameterNameCommand) };
+            var directiveTypes = Array.Empty<Type>();
 
             // Act & assert
-            var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes));
+            var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes, directiveTypes));
             _output.WriteLine(ex.Message);
         }
 
@@ -133,9 +140,10 @@ namespace CliFx.Tests
         {
             // Arrange
             var commandTypes = new[] { typeof(MultipleNonScalarParametersCommand) };
+            var directiveTypes = Array.Empty<Type>();
 
             // Act & assert
-            var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes));
+            var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes, directiveTypes));
             _output.WriteLine(ex.Message);
         }
 
@@ -144,9 +152,10 @@ namespace CliFx.Tests
         {
             // Arrange
             var commandTypes = new[] { typeof(NonLastNonScalarParameterCommand) };
+            var directiveTypes = Array.Empty<Type>();
 
             // Act & assert
-            var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes));
+            var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes, directiveTypes));
             _output.WriteLine(ex.Message);
         }
 
@@ -155,9 +164,10 @@ namespace CliFx.Tests
         {
             // Arrange
             var commandTypes = new[] { typeof(EmptyOptionNameCommand) };
+            var directiveTypes = Array.Empty<Type>();
 
             // Act & assert
-            var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes));
+            var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes, directiveTypes));
             _output.WriteLine(ex.Message);
         }
 
@@ -166,9 +176,10 @@ namespace CliFx.Tests
         {
             // Arrange
             var commandTypes = new[] { typeof(SingleCharacterOptionNameCommand) };
+            var directiveTypes = Array.Empty<Type>();
 
             // Act & assert
-            var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes));
+            var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes, directiveTypes));
             _output.WriteLine(ex.Message);
         }
 
@@ -177,9 +188,10 @@ namespace CliFx.Tests
         {
             // Arrange
             var commandTypes = new[] { typeof(DuplicateOptionNamesCommand) };
+            var directiveTypes = Array.Empty<Type>();
 
             // Act & assert
-            var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes));
+            var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes, directiveTypes));
             _output.WriteLine(ex.Message);
         }
 
@@ -188,9 +200,10 @@ namespace CliFx.Tests
         {
             // Arrange
             var commandTypes = new[] { typeof(DuplicateOptionShortNamesCommand) };
+            var directiveTypes = Array.Empty<Type>();
 
             // Act & assert
-            var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes));
+            var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes, directiveTypes));
             _output.WriteLine(ex.Message);
         }
 
@@ -199,9 +212,10 @@ namespace CliFx.Tests
         {
             // Arrange
             var commandTypes = new[] { typeof(ConflictWithHelpOptionCommand) };
+            var directiveTypes = Array.Empty<Type>();
 
             // Act & assert
-            var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes));
+            var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes, directiveTypes));
             _output.WriteLine(ex.Message);
         }
 
@@ -210,9 +224,10 @@ namespace CliFx.Tests
         {
             // Arrange
             var commandTypes = new[] { typeof(ConflictWithVersionOptionCommand) };
+            var directiveTypes = Array.Empty<Type>();
 
             // Act & assert
-            var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes));
+            var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes, directiveTypes));
             _output.WriteLine(ex.Message);
         }
 
@@ -221,9 +236,10 @@ namespace CliFx.Tests
         {
             // Arrange
             var commandTypes = new[] { typeof(DuplicateOptionEnvironmentVariableNamesCommand) };
+            var directiveTypes = Array.Empty<Type>();
 
             // Act & assert
-            var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes));
+            var ex = Assert.Throws<CliFxException>(() => RootSchema.Resolve(commandTypes, directiveTypes));
             _output.WriteLine(ex.Message);
         }
 
@@ -232,41 +248,43 @@ namespace CliFx.Tests
         {
             // Arrange
             var commandTypes = new[] { typeof(HiddenPropertiesCommand) };
+            var directiveTypes = Array.Empty<Type>();
 
             // Act
-            var schema = RootSchema.Resolve(commandTypes);
+            var schema = RootSchema.Resolve(commandTypes, directiveTypes);
 
             // Assert
-            schema.Should().BeEquivalentTo(new RootSchema(new Dictionary<string, CommandSchema>
-            {
-                { "hidden",
-                  new CommandSchema(
-                      typeof(HiddenPropertiesCommand),
-                      "hidden",
-                      "Description",
-                      "Manual",
-                      false,
-                      new[]
-                      {
-                          new CommandParameterSchema(
-                              typeof(HiddenPropertiesCommand).GetProperty(nameof(HiddenPropertiesCommand.Parameter))!,
-                              13,
-                              "param",
-                              "Param description")
-                      },
-                      new[]
-                      {
-                          new CommandOptionSchema(
-                              typeof(HiddenPropertiesCommand).GetProperty(nameof(HiddenPropertiesCommand.Option))!,
-                              "option",
-                              'o',
-                              "ENV",
-                              false,
-                              "Option description"),
-                          CommandOptionSchema.HelpOption
-                      })
-                }
-            }, null));
+            schema.Should().BeEquivalentTo(new RootSchema(new Dictionary<string, DirectiveSchema>(),
+                new Dictionary<string, CommandSchema>
+                {
+                    { "hidden",
+                      new CommandSchema(
+                          typeof(HiddenPropertiesCommand),
+                          "hidden",
+                          "Description",
+                          "Manual",
+                          false,
+                          new[]
+                          {
+                              new CommandParameterSchema(
+                                  typeof(HiddenPropertiesCommand).GetProperty(nameof(HiddenPropertiesCommand.Parameter))!,
+                                  13,
+                                  "param",
+                                  "Param description")
+                          },
+                          new[]
+                          {
+                              new CommandOptionSchema(
+                                  typeof(HiddenPropertiesCommand).GetProperty(nameof(HiddenPropertiesCommand.Option))!,
+                                  "option",
+                                  'o',
+                                  "ENV",
+                                  false,
+                                  "Option description"),
+                              CommandOptionSchema.HelpOption
+                          })
+                    }
+                }, null));
 
             schema.ToString().Should().NotBeNullOrWhiteSpace(); // this is only for coverage, I'm sorry
         }
