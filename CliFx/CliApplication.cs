@@ -23,6 +23,14 @@ namespace CliFx
         protected IServiceProvider ServiceProvider { get; }
 
         /// <summary>
+        /// Service scope factory.
+        /// <remarks>
+        /// A scope is defined as a lifetime of a command execution pipeline that includes directives handling.
+        /// </remarks>
+        /// </summary>
+        protected IServiceScopeFactory ServiceScopeFactory { get; }
+
+        /// <summary>
         /// Cli Context instance.
         /// </summary>
         protected CliContext CliContext { get; }
@@ -39,6 +47,8 @@ namespace CliFx
         public CliApplication(IServiceProvider serviceProvider, CliContext cliContext)
         {
             ServiceProvider = serviceProvider;
+            ServiceScopeFactory = serviceProvider.GetService<IServiceScopeFactory>();
+
             CliContext = cliContext;
 
             _metadata = cliContext.Metadata;
@@ -48,14 +58,14 @@ namespace CliFx
             _helpTextWriter = new HelpTextWriter(cliContext);
         }
 
-        private ICommand GetCommandInstance(CommandSchema command)
+        private ICommand GetCommandInstance(IServiceScope serviceScope, CommandSchema command)
         {
-            return command != StubDefaultCommand.Schema ? (ICommand)ServiceProvider.GetRequiredService(command.Type) : new StubDefaultCommand();
+            return command != StubDefaultCommand.Schema ? (ICommand)serviceScope.ServiceProvider.GetRequiredService(command.Type) : new StubDefaultCommand();
         }
 
-        private IDirective GetDirectiveInstance(DirectiveSchema directive)
+        private IDirective GetDirectiveInstance(IServiceScope serviceScope, DirectiveSchema directive)
         {
-            return (IDirective)ServiceProvider.GetRequiredService(directive.Type);
+            return (IDirective)serviceScope.ServiceProvider.GetRequiredService(directive.Type);
         }
 
         /// <summary>
@@ -189,6 +199,9 @@ namespace CliFx
                                                  RootSchema root,
                                                  CommandInput input)
         {
+            // Create service scope
+            using IServiceScope serviceScope = ServiceScopeFactory.CreateScope();
+
             // Try to get the command matching the input or fallback to default
             CommandSchema command = root.TryFindCommand(input.CommandName) ?? StubDefaultCommand.Schema;
             CliContext.CurrentCommand = command;
@@ -202,7 +215,7 @@ namespace CliFx
             }
 
             // Get command instance (also used in help text)
-            var instance = GetCommandInstance(command);
+            var instance = GetCommandInstance(serviceScope, command);
 
             // To avoid instantiating the command twice, we need to get default values
             // before the arguments are bound to the properties
@@ -217,7 +230,7 @@ namespace CliFx
                     throw CliFxException.InteractiveModeDirectivesNotSupported();
                 }
 
-                if (!await ProcessDefinedDirectives(root, input))
+                if (!await ProcessDefinedDirectives(serviceScope, root, input))
                     return ExitCode.Success;
             }
             catch (DirectiveException ex)
@@ -293,7 +306,7 @@ namespace CliFx
             }
         }
 
-        private async Task<bool> ProcessDefinedDirectives(RootSchema root, CommandInput input)
+        private async Task<bool> ProcessDefinedDirectives(IServiceScope serviceScope, RootSchema root, CommandInput input)
         {
             foreach (var directiveInput in input.Directives)
             {
@@ -301,7 +314,7 @@ namespace CliFx
                 DirectiveSchema directive = root.TryFindDirective(directiveInput.Name) ?? throw CliFxException.UnknownDirectiveName(directiveInput);
 
                 // Get directive instance
-                var instance = GetDirectiveInstance(directive);
+                var instance = GetDirectiveInstance(serviceScope, directive);
 
                 await instance.HandleAsync(_console);
 
