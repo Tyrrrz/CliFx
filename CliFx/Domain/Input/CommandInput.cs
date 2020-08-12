@@ -63,11 +63,10 @@ namespace CliFx.Domain.Input
         /// </summary>
         public bool HasDirective(string directive)
         {
-            string[] aliases = directive.Trim('[', ']')
-                                        .ToLower()
-                                        .Split('|');
+            string v = directive.Trim('[', ']')
+                                .ToLower();
 
-            return Directives.Where(x => aliases.Contains(x.Name.ToLower()))
+            return Directives.Where(x => x.Name == v)
                              .Any();
         }
 
@@ -145,16 +144,16 @@ namespace CliFx.Domain.Input
         {
             var buffer = new List<string>();
 
-            var commandName = default(string?);
-            var lastIndex = index;
+            string? commandName = null;
+            int lastIndex = index;
 
             // We need to look ahead to see if we can match as many consecutive arguments to a command name as possible
-            for (var i = index; i < commandLineArguments.Count; i++)
+            for (int i = index; i < commandLineArguments.Count; i++)
             {
-                var argument = commandLineArguments[i];
+                string argument = commandLineArguments[i];
                 buffer.Add(argument);
 
-                var potentialCommandName = buffer.JoinToString(" ");
+                string potentialCommandName = buffer.JoinToString(" ");
 
                 if (commandNames.Contains(potentialCommandName))
                 {
@@ -240,25 +239,25 @@ namespace CliFx.Domain.Input
         internal static CommandInput Parse(IReadOnlyList<string> commandLineArguments,
                                            ISet<string> availableCommandNamesSet)
         {
-            var index = 0;
+            int index = 0;
 
-            var directives = ParseDirectives(
+            IReadOnlyList<CommandDirectiveInput> directives = ParseDirectives(
                 commandLineArguments,
                 ref index
             );
 
-            var commandName = ParseCommandName(
+            string? commandName = ParseCommandName(
                 commandLineArguments,
                 availableCommandNamesSet,
                 ref index
             );
 
-            var parameters = ParseParameters(
+            IReadOnlyList<CommandParameterInput> parameters = ParseParameters(
                 commandLineArguments,
                 ref index
             );
 
-            var options = ParseOptions(
+            IReadOnlyList<CommandOptionInput> options = ParseOptions(
                 commandLineArguments,
                 ref index
             );
@@ -269,7 +268,7 @@ namespace CliFx.Domain.Input
 
     public partial class CommandInput
     {
-        public static CommandInput Empty { get; } = new CommandInput(
+        internal static CommandInput Empty { get; } = new CommandInput(
             Array.Empty<CommandDirectiveInput>(),
             null,
             Array.Empty<CommandParameterInput>(),

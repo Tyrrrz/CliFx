@@ -7,8 +7,7 @@ using CliFx.Internal;
 namespace CliFx.Directives
 {
     /// <summary>
-    /// When troubleshooting issues, you may find it useful to run your app in debug mode.
-    /// If your application is ran in debug mode(using the `[debug]` directive), it will wait for debugger to be attached before proceeding.
+    /// When application is ran in debug mode (using the [debug] directive), it will wait for debugger to be attached before proceeding.
     /// This is useful for debugging apps that were ran outside of the IDE.
     /// </summary>
     [Directive("debug")]

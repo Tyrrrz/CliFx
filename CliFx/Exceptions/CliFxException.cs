@@ -452,17 +452,25 @@ Unknown directive '{directive}'.";
             var message = $@"
 Command '{command.Type.FullName}' can be executed only in interactive mode, but this is a application is not running in this mode.
 
-You can start the interactive mode with [{StandardDirectives.Interactive}].";
+You can start the interactive mode with [{BuiltInDirectives.Interactive}].";
 
             return new CliFxException(message.Trim());
         }
 
-        internal static CliFxException InteractiveModeDirectivesNotSupported()
+        internal static CliFxException InteractiveModeNotSupported()
         {
             var message = $@"
-This application does not support interactive mode.
+This application does not support interactive mode.";
 
-Directives [{ string.Join("], [", CliApplication.InteractiveModeDirectives)}] cannot be used in this application.";
+            return new CliFxException(message.Trim());
+        }
+
+        internal static CliFxException InteractiveModeDirectiveNotAvailable(string directiveName)
+        {
+            var message = $@"
+This application does not run interactive mode.
+
+Directive '[{directiveName}]' is for interactive mode only. Thus, cannot be used in normal mode.";
 
             return new CliFxException(message.Trim());
         }

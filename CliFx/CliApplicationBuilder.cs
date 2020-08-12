@@ -41,7 +41,7 @@ namespace CliFx
         private ServiceCollection _serviceCollection = new ServiceCollection();
 
         //Interactive mode settings
-        private bool _isInteractiveModeAllowed = false;
+        private bool _useInteractiveMode = false;
         private ConsoleColor _promptForeground = ConsoleColor.Blue;
         private ConsoleColor _commandForeground = ConsoleColor.Yellow;
 
@@ -306,7 +306,7 @@ namespace CliFx
         /// </summary>
         public CliApplicationBuilder UseInteractiveMode()
         {
-            _isInteractiveModeAllowed = true;
+            _useInteractiveMode = true;
             AddDirective<ScopeDirective>();
             AddDirective<ScopeResetDirective>();
             AddDirective<ScopeUpDirective>();
@@ -404,7 +404,7 @@ namespace CliFx
             var configuration = new ApplicationConfiguration(_commandTypes,
                                                              _customDirectives,
                                                              _exceptionHandler,
-                                                             _isInteractiveModeAllowed,
+                                                             _useInteractiveMode,
                                                              _commandExitMessageLevel,
                                                              _exitMessageForeground);
 
@@ -421,7 +421,7 @@ namespace CliFx
             ServiceProvider serviceProvider = _serviceCollection.BuildServiceProvider();
 
             // Create application instance
-            if (_isInteractiveModeAllowed)
+            if (_useInteractiveMode)
             {
                 return new InteractiveCliApplication(serviceProvider,
                                                      cliContext,
@@ -448,8 +448,8 @@ namespace CliFx
             _console.Output.WriteLine(new string('-', 21));
 
             foreach (var item in _serviceCollection.OrderBy(x => x.Lifetime)
-                                                   .ThenBy(x=>x.ServiceType.Name)
-                                                   .ThenBy(x=>x.ImplementationType?.Name))
+                                                   .ThenBy(x => x.ServiceType.Name)
+                                                   .ThenBy(x => x.ImplementationType?.Name))
             {
                 _console.Output.Write(' ');
                 _console.Output.Write(item.ServiceType.Name.PadRight(40));

@@ -16,7 +16,7 @@ namespace CliFx
         /// <summary>
         /// Current command scope in interactive mode.
         /// </summary>
-        string Scope { get; }
+        string Scope { get; set; }
 
         /// <summary>
         /// Metadata associated with an application.

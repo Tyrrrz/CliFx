@@ -15,7 +15,7 @@ namespace CliFx
         public bool IsInteractiveMode { get; internal set; }
 
         /// <inheritdoc/>
-        public string Scope { get; internal set; } = string.Empty;
+        public string Scope { get; set; } = string.Empty;
 
         /// <inheritdoc/>
         public ApplicationMetadata Metadata { get; }

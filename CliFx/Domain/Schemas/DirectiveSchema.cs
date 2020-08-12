@@ -238,7 +238,7 @@ namespace CliFx.Domain
                 .Where(p => p != null)
                 .ToArray();
 
-            string name = attribute.Name;
+            string name = attribute.Name.TrimStart('[').TrimEnd(']');
             if (string.IsNullOrWhiteSpace(name))
                 throw CliFxException.DirectiveNameIsInvalid(name, type);
 

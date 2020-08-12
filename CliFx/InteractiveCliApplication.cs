@@ -36,7 +36,7 @@ namespace CliFx
             var input = CommandInput.Parse(commandLineArguments, root.GetCommandNames());
             CliContext.CurrentInput = input;
 
-            if (input.HasDirective(StandardDirectives.Interactive))
+            if (input.HasDirective(BuiltInDirectives.Interactive))
             {
                 CliContext.IsInteractiveMode = true;
 
@@ -102,7 +102,7 @@ namespace CliFx
 
                 // handle default directive
                 // TODO: fix for `[default] [debug]` etc.
-                if (line.StartsWith(StandardDirectives.Default))
+                if (line.StartsWith(BuiltInDirectives.Default))
                     return Array.Empty<string>();
 
                 if (string.IsNullOrWhiteSpace(CliContext.Scope)) // handle unscoped command input

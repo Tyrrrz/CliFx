@@ -3,7 +3,25 @@ using CliFx.Attributes;
 
 namespace CliFx.Directives
 {
-    [Directive("scope")]
+    /// <summary>
+    /// If application rans in interactive mode, [>] directive followed by command(s) would scope to the command(s), allowing to ommit specified command name(s).
+    /// <example>
+    /// Commands:
+    ///              > [>] cmd1 sub
+    ///      cmd1 sub> list
+    ///      cmd1 sub> get
+    ///              > [>] cmd1
+    ///          cmd1> test
+    ///          cmd1> -h
+    ///
+    /// are an equivalent to:
+    ///              > cmd1 sub list
+    ///              > cmd1 sub get
+    ///              > cmd1 test
+    ///              > cmd1 -h
+    /// </example>
+    /// </summary>
+    [Directive(">", Description = "Sets a scope to defined command(s).", InteractiveModeOnly = true)]
     internal sealed class ScopeDirective : IDirective
     {
         private readonly CliContext _cliContext;

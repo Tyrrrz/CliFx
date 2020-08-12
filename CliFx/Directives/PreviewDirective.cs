@@ -7,8 +7,7 @@ using CliFx.Domain.Input;
 namespace CliFx.Directives
 {
     /// <summary>
-    /// When troubleshooting issues, you may find it useful to run your app in preview mode.
-    /// If preview mode is specified (using the `[preview]` directive), the app will short-circuit by printing consumed command line arguments as they were parsed.
+    /// When preview mode is specified (using the [preview] directive), the app will short-circuit by printing consumed command line arguments as they were parsed.
     /// This is useful when troubleshooting issues related to command routing and argument binding.
     /// </summary>
     [Directive("preview")]

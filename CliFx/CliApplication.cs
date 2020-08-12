@@ -224,11 +224,8 @@ namespace CliFx
             try
             {
                 // Handle directives not supported in normal mode
-                if (!_configuration.IsInteractiveModeAllowed &&
-                    (input.HasDirective(StandardDirectives.Interactive) || input.HasAnyOfDirectives(InteractiveModeDirectives)))
-                {
-                    throw CliFxException.InteractiveModeDirectivesNotSupported();
-                }
+                if (!_configuration.IsInteractiveModeAllowed && (input.HasDirective(BuiltInDirectives.Interactive)))
+                    throw CliFxException.InteractiveModeNotSupported();
 
                 if (!await ProcessDefinedDirectives(serviceScope, root, input))
                     return ExitCode.Success;
@@ -267,7 +264,7 @@ namespace CliFx
                 throw CliFxException.InteractiveOnlyCommandButThisIsNormalApplication(command);
             }
             else if (_configuration.IsInteractiveModeAllowed && command.InteractiveModeOnly &&
-                     !(CliContext.IsInteractiveMode || input.HasDirective(StandardDirectives.Interactive)))
+                     !(CliContext.IsInteractiveMode || input.HasDirective(BuiltInDirectives.Interactive)))
             {
                 throw CliFxException.InteractiveOnlyCommandButInteractiveModeNotStarted(command);
             }
@@ -292,6 +289,7 @@ namespace CliFx
             try
             {
                 await instance.ExecuteAsync(_console);
+
                 return ExitCode.Success;
             }
             // Swallow command exceptions and route them to the console
@@ -308,10 +306,14 @@ namespace CliFx
 
         private async Task<bool> ProcessDefinedDirectives(IServiceScope serviceScope, RootSchema root, CommandInput input)
         {
+            bool isInteractiveMode = CliContext.IsInteractiveMode;
             foreach (var directiveInput in input.Directives)
             {
                 // Try to get the directive matching the input or fallback to default
                 DirectiveSchema directive = root.TryFindDirective(directiveInput.Name) ?? throw CliFxException.UnknownDirectiveName(directiveInput);
+
+                if (!isInteractiveMode && directive.InteractiveModeOnly)
+                    throw CliFxException.InteractiveModeDirectiveNotAvailable(directiveInput.Name);
 
                 // Get directive instance
                 var instance = GetDirectiveInstance(serviceScope, directive);
@@ -328,18 +330,6 @@ namespace CliFx
 
     public partial class CliApplication
     {
-
-        /// <summary>
-        /// Interactive mode directives <see cref="StandardDirectives"/>.
-        /// </summary>
-        internal static string[] InteractiveModeDirectives = new string[]
-            {
-                StandardDirectives.Default,
-                StandardDirectives.Scope,
-                StandardDirectives.ScopeUp,
-                StandardDirectives.ScopeReset
-            };
-
         /// <summary>
         /// Static exit codes helper class.
         /// </summary>
