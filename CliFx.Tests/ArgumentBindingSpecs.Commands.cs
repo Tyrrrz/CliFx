@@ -119,7 +119,10 @@ namespace CliFx.Tests
             [CommandOption(nameof(StringHashSet))]
             public HashSet<string>? StringHashSet { get; set; }
 
-            public ValueTask ExecuteAsync(IConsole console) => default;
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                return default;
+            }
         }
 
         [Command]
@@ -128,7 +131,10 @@ namespace CliFx.Tests
             [CommandOption("option", 'o')]
             public IReadOnlyList<string>? Option { get; set; }
 
-            public ValueTask ExecuteAsync(IConsole console) => default;
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                return default;
+            }
         }
 
         [Command]
@@ -137,7 +143,10 @@ namespace CliFx.Tests
             [CommandOption(nameof(Option), IsRequired = true)]
             public string? Option { get; set; }
 
-            public ValueTask ExecuteAsync(IConsole console) => default;
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                return default;
+            }
         }
 
         [Command]
@@ -146,7 +155,10 @@ namespace CliFx.Tests
             [CommandOption(nameof(Option), IsRequired = true)]
             public IReadOnlyList<string>? Option { get; set; }
 
-            public ValueTask ExecuteAsync(IConsole console) => default;
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                return default;
+            }
         }
 
         [Command]
@@ -161,7 +173,10 @@ namespace CliFx.Tests
             [CommandParameter(2)]
             public IReadOnlyList<string>? ParameterC { get; set; }
 
-            public ValueTask ExecuteAsync(IConsole console) => default;
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                return default;
+            }
         }
 
         [Command]
@@ -170,7 +185,10 @@ namespace CliFx.Tests
             [CommandOption(nameof(Option))]
             public DummyType? Option { get; set; }
 
-            public ValueTask ExecuteAsync(IConsole console) => default;
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                return default;
+            }
         }
 
         [Command]
@@ -179,7 +197,10 @@ namespace CliFx.Tests
             [CommandOption(nameof(Option))]
             public CustomEnumerable<string>? Option { get; set; }
 
-            public ValueTask ExecuteAsync(IConsole console) => default;
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                return default;
+            }
         }
 
         [Command]
@@ -191,7 +212,10 @@ namespace CliFx.Tests
             [CommandOption(nameof(OptionB))]
             public string? OptionB { get; set; }
 
-            public ValueTask ExecuteAsync(IConsole console) => default;
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                return default;
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using CliFx.Attributes;
 using CliFx.Demo.Internal;
+using CliFx.Demo.Models;
 using CliFx.Demo.Services;
 using CliFx.Exceptions;
 
@@ -22,9 +23,9 @@ namespace CliFx.Demo.Commands
 
         public ValueTask ExecuteAsync(IConsole console)
         {
-            var book = _libraryService.GetBook(Title);
+            Book? book = _libraryService.GetBook(Title);
 
-            if (book == null)
+            if (book is null)
                 throw new CommandException("Book not found.", 1);
 
             console.RenderBook(book);

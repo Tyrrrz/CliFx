@@ -50,20 +50,26 @@ namespace CliFx.Demo.Commands
     {
         private static readonly Random Random = new Random();
 
-        private static DateTimeOffset CreateRandomDate() => new DateTimeOffset(
-            Random.Next(1800, 2020),
-            Random.Next(1, 12),
-            Random.Next(1, 28),
-            Random.Next(1, 23),
-            Random.Next(1, 59),
-            Random.Next(1, 59),
-            TimeSpan.Zero);
+        private static DateTimeOffset CreateRandomDate()
+        {
+            return new DateTimeOffset(
+                       Random.Next(1800, 2020),
+                       Random.Next(1, 12),
+                       Random.Next(1, 28),
+                       Random.Next(1, 23),
+                       Random.Next(1, 59),
+                       Random.Next(1, 59),
+                       TimeSpan.Zero);
+        }
 
-        private static Isbn CreateRandomIsbn() => new Isbn(
-            Random.Next(0, 999),
-            Random.Next(0, 99),
-            Random.Next(0, 99999),
-            Random.Next(0, 99),
-            Random.Next(0, 9));
+        private static Isbn CreateRandomIsbn()
+        {
+            return new Isbn(
+                       Random.Next(0, 999),
+                       Random.Next(0, 99),
+                       Random.Next(0, 99999),
+                       Random.Next(0, 99),
+                       Random.Next(0, 9));
+        }
     }
 }

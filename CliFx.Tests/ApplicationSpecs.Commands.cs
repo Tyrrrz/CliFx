@@ -9,13 +9,19 @@ namespace CliFx.Tests
         [Command]
         private class DefaultCommand : ICommand
         {
-            public ValueTask ExecuteAsync(IConsole console) => default;
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                return default;
+            }
         }
 
         [Command]
         private class AnotherDefaultCommand : ICommand
         {
-            public ValueTask ExecuteAsync(IConsole console) => default;
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                return default;
+            }
         }
 
         [Command]
@@ -25,19 +31,28 @@ namespace CliFx.Tests
 
         private class NonAnnotatedCommand : ICommand
         {
-            public ValueTask ExecuteAsync(IConsole console) => default;
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                return default;
+            }
         }
 
         [Command("dup")]
         private class DuplicateNameCommandA : ICommand
         {
-            public ValueTask ExecuteAsync(IConsole console) => default;
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                return default;
+            }
         }
 
         [Command("dup")]
         private class DuplicateNameCommandB : ICommand
         {
-            public ValueTask ExecuteAsync(IConsole console) => default;
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                return default;
+            }
         }
 
         [Command]
@@ -49,7 +64,10 @@ namespace CliFx.Tests
             [CommandParameter(13)]
             public string? ParameterB { get; set; }
 
-            public ValueTask ExecuteAsync(IConsole console) => default;
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                return default;
+            }
         }
 
         [Command]
@@ -61,7 +79,10 @@ namespace CliFx.Tests
             [CommandParameter(1, Name = "param")]
             public string? ParameterB { get; set; }
 
-            public ValueTask ExecuteAsync(IConsole console) => default;
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                return default;
+            }
         }
 
         [Command]
@@ -73,7 +94,10 @@ namespace CliFx.Tests
             [CommandParameter(1)]
             public IReadOnlyList<string>? ParameterB { get; set; }
 
-            public ValueTask ExecuteAsync(IConsole console) => default;
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                return default;
+            }
         }
 
         [Command]
@@ -85,7 +109,10 @@ namespace CliFx.Tests
             [CommandParameter(1)]
             public string? ParameterB { get; set; }
 
-            public ValueTask ExecuteAsync(IConsole console) => default;
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                return default;
+            }
         }
 
         [Command]
@@ -94,7 +121,10 @@ namespace CliFx.Tests
             [CommandOption("")]
             public string? Apples { get; set; }
 
-            public ValueTask ExecuteAsync(IConsole console) => default;
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                return default;
+            }
         }
 
         [Command]
@@ -103,7 +133,10 @@ namespace CliFx.Tests
             [CommandOption("a")]
             public string? Apples { get; set; }
 
-            public ValueTask ExecuteAsync(IConsole console) => default;
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                return default;
+            }
         }
 
         [Command]
@@ -115,7 +148,10 @@ namespace CliFx.Tests
             [CommandOption("fruits")]
             public string? Oranges { get; set; }
 
-            public ValueTask ExecuteAsync(IConsole console) => default;
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                return default;
+            }
         }
 
         [Command]
@@ -127,7 +163,10 @@ namespace CliFx.Tests
             [CommandOption('x')]
             public string? OptionB { get; set; }
 
-            public ValueTask ExecuteAsync(IConsole console) => default;
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                return default;
+            }
         }
 
         [Command]
@@ -136,7 +175,10 @@ namespace CliFx.Tests
             [CommandOption("option-h", 'h')]
             public string? OptionH { get; set; }
 
-            public ValueTask ExecuteAsync(IConsole console) => default;
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                return default;
+            }
         }
 
         [Command]
@@ -145,7 +187,10 @@ namespace CliFx.Tests
             [CommandOption("version")]
             public string? Version { get; set; }
 
-            public ValueTask ExecuteAsync(IConsole console) => default;
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                return default;
+            }
         }
 
         [Command]
@@ -157,7 +202,10 @@ namespace CliFx.Tests
             [CommandOption("option-b", EnvironmentVariableName = "ENV_VAR")]
             public string? OptionB { get; set; }
 
-            public ValueTask ExecuteAsync(IConsole console) => default;
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                return default;
+            }
         }
 
         [Command("hidden", Description = "Description", Manual = "Manual", InteractiveModeOnly = false)]
@@ -173,7 +221,10 @@ namespace CliFx.Tests
 
             public bool? HiddenB { get; set; }
 
-            public ValueTask ExecuteAsync(IConsole console) => default;
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                return default;
+            }
         }
     }
 }

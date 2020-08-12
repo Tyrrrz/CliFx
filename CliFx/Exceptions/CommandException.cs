@@ -29,7 +29,10 @@ namespace CliFx.Exceptions
         /// <remarks>
         /// On Unix systems an exit code is 8-bit unsigned integer so it's strongly recommended to use values between 1 and 255 to avoid overflow.
         /// </remarks>
-        public CommandException(string? message, Exception? innerException, int exitCode = DefaultExitCode, bool showHelp = false)
+        public CommandException(string? message,
+                                Exception? innerException,
+                                int exitCode = DefaultExitCode,
+                                bool showHelp = false)
             : base(message, innerException)
         {
             ExitCode = exitCode;
@@ -45,9 +48,12 @@ namespace CliFx.Exceptions
         /// <remarks>
         /// On Unix systems an exit code is 8-bit unsigned integer so it's strongly recommended to use values between 1 and 255 to avoid overflow.
         /// </remarks>
-        public CommandException(string? message, int exitCode = DefaultExitCode, bool showHelp = false)
+        public CommandException(string? message,
+                                int exitCode = DefaultExitCode,
+                                bool showHelp = false)
             : this(message, null, exitCode, showHelp)
         {
+
         }
 
         /// <summary>
@@ -56,9 +62,11 @@ namespace CliFx.Exceptions
         /// <remarks>
         /// On Unix systems an exit code is 8-bit unsigned integer so it's strongly recommended to use values between 1 and 255 to avoid overflow.
         /// </remarks>
-        public CommandException(int exitCode = DefaultExitCode, bool showHelp = false)
+        public CommandException(int exitCode = DefaultExitCode,
+                                bool showHelp = false)
             : this(null, exitCode, showHelp)
         {
+
         }
 
         /// <inheritdoc />

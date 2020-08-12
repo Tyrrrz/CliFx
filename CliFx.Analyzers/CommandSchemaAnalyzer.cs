@@ -24,9 +24,11 @@ namespace CliFx.Analyzers
             DiagnosticDescriptors.CliFx0045
         );
 
-        private static bool IsScalarType(ITypeSymbol typeSymbol) =>
-            KnownSymbols.IsSystemString(typeSymbol) ||
-            !typeSymbol.AllInterfaces.Select(i => i.ConstructedFrom).Any(KnownSymbols.IsSystemCollectionsGenericIEnumerable);
+        private static bool IsScalarType(ITypeSymbol typeSymbol)
+        {
+            return KnownSymbols.IsSystemString(typeSymbol) ||
+                   !typeSymbol.AllInterfaces.Select(i => i.ConstructedFrom).Any(KnownSymbols.IsSystemCollectionsGenericIEnumerable);
+        }
 
         private static void CheckCommandParameterProperties(
             SymbolAnalysisContext context,

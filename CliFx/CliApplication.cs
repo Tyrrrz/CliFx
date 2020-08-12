@@ -114,9 +114,9 @@ namespace CliFx
         /// </remarks>
         public async ValueTask<int> RunAsync()
         {
-            var commandLineArguments = Environment.GetCommandLineArgs()
-                                                  .Skip(1)
-                                                  .ToArray();
+            string[] commandLineArguments = Environment.GetCommandLineArgs()
+                                                       .Skip(1)
+                                                       .ToArray();
 
             return await RunAsync(commandLineArguments);
         }
@@ -133,9 +133,11 @@ namespace CliFx
         public async ValueTask<int> RunAsync(IReadOnlyList<string> commandLineArguments)
         {
             // Environment variable names are case-insensitive on Windows but are case-sensitive on Linux and macOS
-            var environmentVariables = Environment.GetEnvironmentVariables()
-                .Cast<DictionaryEntry>()
-                .ToDictionary(e => (string)e.Key, e => (string)e.Value, StringComparer.Ordinal);
+            Dictionary<string, string> environmentVariables = Environment.GetEnvironmentVariables()
+                                                                         .Cast<DictionaryEntry>()
+                                                                         .ToDictionary(x => (string)x.Key,
+                                                                                       x => (string)x.Value,
+                                                                                       StringComparer.Ordinal);
 
             return await RunAsync(commandLineArguments, environmentVariables);
         }
@@ -158,7 +160,7 @@ namespace CliFx
 
                 PrintStartupMessage();
 
-                var root = RootSchema.Resolve(_configuration.CommandTypes, _configuration.DirectiveTypes);
+                RootSchema root = RootSchema.Resolve(_configuration.CommandTypes, _configuration.DirectiveTypes);
                 CliContext.Root = root;
 
                 int exitCode = await PreExecuteCommand(commandLineArguments, environmentVariables, root);
@@ -186,7 +188,7 @@ namespace CliFx
                                                             IReadOnlyDictionary<string, string> environmentVariables,
                                                             RootSchema root)
         {
-            var input = CommandInput.Parse(commandLineArguments, root.GetCommandNames());
+            CommandInput input = CommandInput.Parse(commandLineArguments, root.GetCommandNames());
             CliContext.CurrentInput = input;
 
             return await ExecuteCommand(environmentVariables, root, input);
@@ -307,7 +309,7 @@ namespace CliFx
         private async Task<bool> ProcessDefinedDirectives(IServiceScope serviceScope, RootSchema root, CommandInput input)
         {
             bool isInteractiveMode = CliContext.IsInteractiveMode;
-            foreach (var directiveInput in input.Directives)
+            foreach (CommandDirectiveInput directiveInput in input.Directives)
             {
                 // Try to get the directive matching the input or fallback to default
                 DirectiveSchema directive = root.TryFindDirective(directiveInput.Name) ?? throw CliFxException.UnknownDirectiveName(directiveInput);
@@ -316,7 +318,7 @@ namespace CliFx
                     throw CliFxException.InteractiveModeDirectiveNotAvailable(directiveInput.Name);
 
                 // Get directive instance
-                var instance = GetDirectiveInstance(serviceScope, directive);
+                IDirective instance = GetDirectiveInstance(serviceScope, directive);
 
                 await instance.HandleAsync(_console);
 
@@ -359,7 +361,10 @@ namespace CliFx
         {
             public static CommandSchema Schema { get; } = CommandSchema.TryResolve(typeof(StubDefaultCommand))!;
 
-            public ValueTask ExecuteAsync(IConsole console) => default;
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                return default;
+            }
         }
     }
 }

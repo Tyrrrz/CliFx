@@ -8,7 +8,10 @@ namespace CliFx.Tests
         [Command("cmd")]
         private class NamedCommand : ICommand
         {
-            public ValueTask ExecuteAsync(IConsole console) => default;
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                return default;
+            }
         }
     }
 }

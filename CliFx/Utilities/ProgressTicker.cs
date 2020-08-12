@@ -15,22 +15,25 @@ namespace CliFx.Utilities
         /// <summary>
         /// Initializes an instance of <see cref="ProgressTicker"/>.
         /// </summary>
-        public ProgressTicker(IConsole console) => _console = console;
+        public ProgressTicker(IConsole console)
+        {
+            _console = console;
+        }
 
         private void RenderProgress(double progress)
         {
-            if (_originalCursorLeft != null && _originalCursorTop != null)
-            {
-                _console.CursorLeft = _originalCursorLeft.Value;
-                _console.CursorTop = _originalCursorTop.Value;
-            }
-            else
+            if (_originalCursorLeft is null || _originalCursorTop is null)
             {
                 _originalCursorLeft = _console.CursorLeft;
                 _originalCursorTop = _console.CursorTop;
             }
+            else
+            {
+                _console.CursorLeft = _originalCursorLeft.Value;
+                _console.CursorTop = _originalCursorTop.Value;
+            }
 
-            var str = progress.ToString("P2", _console.Output.FormatProvider);
+            string str = progress.ToString("P2", _console.Output.FormatProvider);
             _console.Output.Write(str);
         }
 
@@ -57,6 +60,9 @@ namespace CliFx.Utilities
         /// <summary>
         /// Creates a <see cref="ProgressTicker"/> bound to this console.
         /// </summary>
-        public static ProgressTicker CreateProgressTicker(this IConsole console) => new ProgressTicker(console);
+        public static ProgressTicker CreateProgressTicker(this IConsole console)
+        {
+            return new ProgressTicker(console);
+        }
     }
 }

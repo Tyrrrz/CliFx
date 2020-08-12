@@ -19,7 +19,10 @@ namespace CliFx.Tests
             [CommandOption("bool", 'b')]
             public bool BoolOption { get; set; }
 
-            public ValueTask ExecuteAsync(IConsole console) => default;
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                return default;
+            }
         }
 
         [Command]

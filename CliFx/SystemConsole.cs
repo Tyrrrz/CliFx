@@ -54,10 +54,16 @@ namespace CliFx
         }
 
         /// <inheritdoc />
-        public void Clear() => Console.Clear();
+        public void Clear()
+        {
+            Console.Clear();
+        }
 
         /// <inheritdoc />
-        public void ResetColor() => Console.ResetColor();
+        public void ResetColor()
+        {
+            Console.ResetColor();
+        }
 
         /// <inheritdoc />
         public int CursorLeft
@@ -125,14 +131,18 @@ namespace CliFx
 
     public partial class SystemConsole
     {
-        private static StreamReader WrapInput(Stream? stream) =>
-            stream != null
-                ? new StreamReader(Stream.Synchronized(stream), Console.InputEncoding, false)
-                : StreamReader.Null;
+        private static StreamReader WrapInput(Stream? stream)
+        {
+            return stream != null
+                    ? new StreamReader(Stream.Synchronized(stream), Console.InputEncoding, false)
+                    : StreamReader.Null;
+        }
 
-        private static StreamWriter WrapOutput(Stream? stream) =>
-            stream != null
-                ? new StreamWriter(Stream.Synchronized(stream), Console.OutputEncoding) { AutoFlush = true }
-                : StreamWriter.Null;
+        private static StreamWriter WrapOutput(Stream? stream)
+        {
+            return stream != null
+                    ? new StreamWriter(Stream.Synchronized(stream), Console.OutputEncoding) { AutoFlush = true }
+                    : StreamWriter.Null;
+        }
     }
 }

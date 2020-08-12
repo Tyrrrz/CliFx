@@ -49,21 +49,22 @@ namespace CliFx.Internal.Extensions
 
         public static MethodInfo GetStaticParseMethod(this Type type, bool withFormatProvider = false)
         {
-            var argumentTypes = withFormatProvider
+            Type[] argumentTypes = withFormatProvider
                 ? new[] { typeof(string), typeof(IFormatProvider) }
                 : new[] { typeof(string) };
 
             return type.GetMethod("Parse",
-                BindingFlags.Public | BindingFlags.Static,
-                null, argumentTypes, null
-            );
+                                  BindingFlags.Public | BindingFlags.Static,
+                                  null,
+                                  argumentTypes,
+                                  null);
         }
 
         public static Array ToNonGenericArray<T>(this IEnumerable<T> source, Type elementType)
         {
-            var sourceAsCollection = source as ICollection ?? source.ToArray();
+            ICollection sourceAsCollection = source as ICollection ?? source.ToArray();
 
-            var array = Array.CreateInstance(elementType, sourceAsCollection.Count);
+            Array array = Array.CreateInstance(elementType, sourceAsCollection.Count);
             sourceAsCollection.CopyTo(array, 0);
 
             return array;

@@ -12,10 +12,12 @@ namespace CliFx.Tests.Dummy
 
     public static partial class Program
     {
-        public static async Task Main() =>
+        public static async Task Main()
+        {
             await new CliApplicationBuilder()
                 .AddCommandsFromThisAssembly()
                 .Build()
                 .RunAsync();
+        }
     }
 }

@@ -46,7 +46,7 @@ namespace CliFx.Directives
             }
 
             // Parameters
-            foreach (var parameter in input.Parameters)
+            foreach (CommandParameterInput parameter in input.Parameters)
             {
                 console.Output.Write('<');
 
@@ -58,7 +58,7 @@ namespace CliFx.Directives
             }
 
             // Options
-            foreach (var option in input.Options)
+            foreach (CommandOptionInput option in input.Options)
             {
                 console.Output.Write('[');
 

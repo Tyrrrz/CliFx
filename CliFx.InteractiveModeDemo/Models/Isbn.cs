@@ -23,8 +23,10 @@ namespace CliFx.InteractiveModeDemo.Models
             CheckDigit = checkDigit;
         }
 
-        public override string ToString() =>
-            $"{EanPrefix:000}-{RegistrationGroup:00}-{Registrant:00000}-{Publication:00}-{CheckDigit:0}";
+        public override string ToString()
+        {
+            return $"{EanPrefix:000}-{RegistrationGroup:00}-{Registrant:00000}-{Publication:00}-{CheckDigit:0}";
+        }
     }
 
     public partial class Isbn

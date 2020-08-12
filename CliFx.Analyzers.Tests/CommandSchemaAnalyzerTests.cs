@@ -478,12 +478,16 @@ public class MyCommand : ICommand
 
         [Theory]
         [MemberData(nameof(GetValidCases))]
-        public void Valid(AnalyzerTestCase testCase) =>
+        public void Valid(AnalyzerTestCase testCase)
+        {
             Analyzer.Should().NotProduceDiagnostics(testCase);
+        }
 
         [Theory]
         [MemberData(nameof(GetInvalidCases))]
-        public void Invalid(AnalyzerTestCase testCase) =>
+        public void Invalid(AnalyzerTestCase testCase)
+        {
             Analyzer.Should().ProduceDiagnostics(testCase);
+        }
     }
 }

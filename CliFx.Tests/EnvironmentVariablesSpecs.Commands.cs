@@ -12,7 +12,10 @@ namespace CliFx.Tests
             [CommandOption("opt", EnvironmentVariableName = "ENV_OPT")]
             public IReadOnlyList<string>? Option { get; set; }
 
-            public ValueTask ExecuteAsync(IConsole console) => default;
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                return default;
+            }
         }
 
         [Command]
@@ -21,7 +24,10 @@ namespace CliFx.Tests
             [CommandOption("opt", EnvironmentVariableName = "ENV_OPT")]
             public string? Option { get; set; }
 
-            public ValueTask ExecuteAsync(IConsole console) => default;
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                return default;
+            }
         }
     }
 }

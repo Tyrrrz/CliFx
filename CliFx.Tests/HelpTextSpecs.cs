@@ -10,7 +10,10 @@ namespace CliFx.Tests
     {
         private readonly ITestOutputHelper _output;
 
-        public HelpTextSpecs(ITestOutputHelper output) => _output = output;
+        public HelpTextSpecs(ITestOutputHelper output)
+        {
+            _output = output;
+        }
 
         [Fact]
         public async Task Version_information_can_be_requested_by_providing_the_version_option_without_other_arguments()

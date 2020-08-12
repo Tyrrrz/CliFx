@@ -6,7 +6,10 @@ namespace CliFx.Benchmarks.Commands
 {
     public class SystemCommandLineCommand
     {
-        public static int ExecuteHandler(string s, int i, bool b) => 0;
+        public static int ExecuteHandler(string s, int i, bool b)
+        {
+            return 0;
+        }
 
         public Task<int> ExecuteAsync(string[] args)
         {

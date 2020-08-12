@@ -59,7 +59,7 @@ namespace CliFx.Domain
         /// </summary>
         public IEnumerable<CommandArgumentSchema> GetArguments()
         {
-            foreach (var parameter in Parameters)
+            foreach (CommandParameterSchema parameter in Parameters)
                 yield return parameter;
         }
 
@@ -70,13 +70,13 @@ namespace CliFx.Domain
         {
             var result = new Dictionary<CommandArgumentSchema, object?>();
 
-            foreach (var argument in GetArguments())
+            foreach (CommandArgumentSchema argument in GetArguments())
             {
                 // Skip built-in arguments
                 if (argument.Property == null)
                     continue;
 
-                var value = argument.Property.GetValue(instance);
+                object? value = argument.Property.GetValue(instance);
                 result[argument] = value;
             }
 

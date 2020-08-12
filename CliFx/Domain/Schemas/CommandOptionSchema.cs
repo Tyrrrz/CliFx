@@ -118,12 +118,12 @@ namespace CliFx.Domain
     {
         internal static CommandOptionSchema? TryResolve(PropertyInfo property)
         {
-            var attribute = property.GetCustomAttribute<CommandOptionAttribute>();
-            if (attribute == null)
+            CommandOptionAttribute? attribute = property.GetCustomAttribute<CommandOptionAttribute>();
+            if (attribute is null)
                 return null;
 
             // The user may mistakenly specify dashes, thinking it's required, so trim them
-            var name = attribute.Name?.TrimStart('-');
+            string name = attribute.Name?.TrimStart('-');
 
             return new CommandOptionSchema(
                 property,

@@ -23,15 +23,17 @@ namespace CliFx.Demo.Models
             CheckDigit = checkDigit;
         }
 
-        public override string ToString() =>
-            $"{EanPrefix:000}-{RegistrationGroup:00}-{Registrant:00000}-{Publication:00}-{CheckDigit:0}";
+        public override string ToString()
+        {
+            return $"{EanPrefix:000}-{RegistrationGroup:00}-{Registrant:00000}-{Publication:00}-{CheckDigit:0}";
+        }
     }
 
     public partial class Isbn
     {
         public static Isbn Parse(string value, IFormatProvider formatProvider)
         {
-            var components = value.Split('-', 5, StringSplitOptions.RemoveEmptyEntries);
+            string[] components = value.Split('-', 5, StringSplitOptions.RemoveEmptyEntries);
 
             return new Isbn(
                 int.Parse(components[0], formatProvider),

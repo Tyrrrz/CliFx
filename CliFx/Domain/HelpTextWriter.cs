@@ -62,7 +62,7 @@ namespace CliFx.Domain
 
         private void WriteVerticalMargin(int size = 1)
         {
-            for (var i = 0; i < size; i++)
+            for (int i = 0; i < size; i++)
                 WriteLine();
         }
 
@@ -172,7 +172,7 @@ namespace CliFx.Domain
             }
 
             // Parameters
-            foreach (var parameter in command.Parameters)
+            foreach (CommandParameterSchema parameter in command.Parameters)
             {
                 Write(' ');
                 Write(parameter.IsScalar
@@ -182,7 +182,7 @@ namespace CliFx.Domain
             }
 
             // Required options
-            foreach (var option in command.Options.Where(o => o.IsRequired))
+            foreach (CommandOptionSchema option in command.Options.Where(o => o.IsRequired))
             {
                 Write(' ');
                 Write(ParametersColor, !string.IsNullOrWhiteSpace(option.Name)
@@ -214,7 +214,7 @@ namespace CliFx.Domain
 
             WriteHeader("Parameters");
 
-            foreach (var parameter in command.Parameters.OrderBy(p => p.Order))
+            foreach (CommandParameterSchema parameter in command.Parameters.OrderBy(p => p.Order))
             {
                 Write(RequiredColor, "* ");
                 Write(RequiredParameterNameColor, $"{parameter.Name}");
@@ -248,7 +248,7 @@ namespace CliFx.Domain
 
             WriteHeader("Options");
 
-            foreach (var option in command.Options.OrderByDescending(o => o.IsRequired))
+            foreach (CommandOptionSchema option in command.Options.OrderByDescending(o => o.IsRequired))
             {
                 if (option.IsRequired)
                 {
@@ -304,8 +304,8 @@ namespace CliFx.Domain
                 // Default value
                 if (!option.IsRequired)
                 {
-                    var defaultValue = argumentDefaultValues.GetValueOrDefault(option);
-                    var defaultValueFormatted = FormatDefaultValue(defaultValue);
+                    object? defaultValue = argumentDefaultValues.GetValueOrDefault(option);
+                    string? defaultValueFormatted = FormatDefaultValue(defaultValue);
                     if (defaultValueFormatted != null)
                     {
                         Write($"Default: {defaultValueFormatted}.");
@@ -328,9 +328,9 @@ namespace CliFx.Domain
 
             WriteHeader("Commands");
 
-            foreach (var childCommand in childCommands)
+            foreach (CommandSchema childCommand in childCommands)
             {
-                var relativeCommandName = !string.IsNullOrWhiteSpace(command.Name)
+                string relativeCommandName = !string.IsNullOrWhiteSpace(command.Name)
                     ? childCommand.Name!.Substring(command.Name.Length).Trim()
                     : childCommand.Name!;
 
@@ -381,7 +381,7 @@ namespace CliFx.Domain
                           CommandSchema command,
                           IReadOnlyDictionary<CommandArgumentSchema, object?> defaultValues)
         {
-            var childCommands = root.GetChildCommands(command.Name);
+            IReadOnlyList<CommandSchema> childCommands = root.GetChildCommands(command.Name);
 
             _console.ResetColor();
 
@@ -399,8 +399,10 @@ namespace CliFx.Domain
 
     internal partial class HelpTextWriter
     {
-        private static string FormatValidValues(IReadOnlyList<string> values) =>
-            values.Select(v => v.Quote()).JoinToString(", ");
+        private static string FormatValidValues(IReadOnlyList<string> values)
+        {
+            return values.Select(v => v.Quote()).JoinToString(", ");
+        }
 
         private static string? FormatDefaultValue(object? defaultValue)
         {
@@ -410,17 +412,16 @@ namespace CliFx.Domain
             // Enumerable
             if (!(defaultValue is string) && defaultValue is IEnumerable defaultValues)
             {
-                var elementType = defaultValues.GetType().GetEnumerableUnderlyingType() ?? typeof(object);
+                Type elementType = defaultValues.GetType().GetEnumerableUnderlyingType() ?? typeof(object);
 
                 // If the ToString() method is not overriden, the default value can't be formatted nicely
                 if (!elementType.IsToStringOverriden())
                     return null;
 
-                return defaultValues
-                    .Cast<object?>()
-                    .Where(o => o != null)
-                    .Select(o => o!.ToFormattableString(CultureInfo.InvariantCulture).Quote())
-                    .JoinToString(" ");
+                return defaultValues.Cast<object?>()
+                                    .Where(o => o != null)
+                                    .Select(o => o!.ToFormattableString(CultureInfo.InvariantCulture).Quote())
+                                    .JoinToString(" ");
             }
             // Non-enumerable
             else

@@ -13,13 +13,15 @@ namespace CliFx.Demo
             services.AddSingleton<LibraryService>();
         }
 
-        public static async Task<int> Main() =>
-            await new CliApplicationBuilder()
+        public static async Task<int> Main()
+        {
+            return await new CliApplicationBuilder()
                 .ConfigureServices(ConfigureServices)
                 .AddCommandsFromThisAssembly()
                 .AddDirective<DebugDirective>()
                 .AddDirective<PreviewDirective>()
                 .Build()
                 .RunAsync();
+        }
     }
 }

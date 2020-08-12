@@ -38,6 +38,9 @@ namespace CliFx.Analyzers.Tests
         {
         }
 
-        public override string ToString() => $"{Name} [{string.Join(", ", TestedDiagnostics.Select(d => d.Id))}]";
+        public override string ToString()
+        {
+            return $"{Name} [{string.Join(", ", TestedDiagnostics.Select(d => d.Id))}]";
+        }
     }
 }

@@ -38,7 +38,7 @@ namespace CliFx
         private IConsole? _console;
 
         //Dependency injection
-        private ServiceCollection _serviceCollection = new ServiceCollection();
+        private readonly ServiceCollection _serviceCollection = new ServiceCollection();
 
         //Interactive mode settings
         private bool _useInteractiveMode = false;
@@ -190,6 +190,7 @@ namespace CliFx
         public CliApplicationBuilder UseTitle(string title)
         {
             _title = title;
+
             return this;
         }
 
@@ -199,6 +200,7 @@ namespace CliFx
         public CliApplicationBuilder UseExecutableName(string executableName)
         {
             _executableName = executableName;
+
             return this;
         }
 
@@ -208,6 +210,7 @@ namespace CliFx
         public CliApplicationBuilder UseVersionText(string versionText)
         {
             _versionText = versionText;
+
             return this;
         }
 
@@ -217,6 +220,7 @@ namespace CliFx
         public CliApplicationBuilder UseDescription(string? description)
         {
             _description = description;
+
             return this;
         }
 
@@ -234,6 +238,7 @@ namespace CliFx
         public CliApplicationBuilder UseStartupMessage(string? message)
         {
             _startupMessage = message;
+
             return this;
         }
         #endregion
@@ -246,6 +251,7 @@ namespace CliFx
         public CliApplicationBuilder UseConsole(IConsole console)
         {
             _console = console;
+
             return this;
         }
 
@@ -256,6 +262,7 @@ namespace CliFx
             where T : class, IConsole, new()
         {
             _console = new T();
+
             return this;
         }
         #endregion
@@ -267,6 +274,7 @@ namespace CliFx
         public CliApplicationBuilder UseCommandExitMessageLevel(CommandExitMessageOptions option)
         {
             _commandExitMessageLevel = option;
+
             return this;
         }
 
@@ -276,6 +284,7 @@ namespace CliFx
         public CliApplicationBuilder UseCommandExitMessageForeground(ConsoleColor color)
         {
             _exitMessageForeground = color;
+
             return this;
         }
 
@@ -286,6 +295,7 @@ namespace CliFx
             where T : class, ICliExceptionHandler, new()
         {
             _exceptionHandler = new T();
+
             return this;
         }
 
@@ -295,6 +305,7 @@ namespace CliFx
         public CliApplicationBuilder UseExceptionHandler(ICliExceptionHandler handler)
         {
             _exceptionHandler = handler;
+
             return this;
         }
         #endregion
@@ -320,6 +331,7 @@ namespace CliFx
         public CliApplicationBuilder UsePromptForeground(ConsoleColor color)
         {
             _promptForeground = color;
+
             return this;
         }
 
@@ -329,6 +341,7 @@ namespace CliFx
         public CliApplicationBuilder UseCommandInputForeground(ConsoleColor color)
         {
             _commandForeground = color;
+
             return this;
         }
         #endregion
@@ -447,9 +460,9 @@ namespace CliFx
             _console.Output.Write('+');
             _console.Output.WriteLine(new string('-', 21));
 
-            foreach (var item in _serviceCollection.OrderBy(x => x.Lifetime)
-                                                   .ThenBy(x => x.ServiceType.Name)
-                                                   .ThenBy(x => x.ImplementationType?.Name))
+            foreach (ServiceDescriptor item in _serviceCollection.OrderBy(x => x.Lifetime)
+                                                                 .ThenBy(x => x.ServiceType.Name)
+                                                                 .ThenBy(x => x.ImplementationType?.Name))
             {
                 _console.Output.Write(' ');
                 _console.Output.Write(item.ServiceType.Name.PadRight(40));

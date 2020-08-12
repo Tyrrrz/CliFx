@@ -13,7 +13,10 @@ namespace CliFx.Tests
             [CommandOption("msg", 'm')]
             public string? Message { get; set; }
 
-            public ValueTask ExecuteAsync(IConsole console) => throw new Exception(Message);
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                throw new Exception(Message);
+            }
         }
 
         [Command("exc")]
@@ -28,7 +31,10 @@ namespace CliFx.Tests
             [CommandOption("show-help")]
             public bool ShowHelp { get; set; }
 
-            public ValueTask ExecuteAsync(IConsole console) => throw new CommandException(Message, ExitCode, ShowHelp);
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                throw new CommandException(Message, ExitCode, ShowHelp);
+            }
         }
     }
 }

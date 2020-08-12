@@ -32,7 +32,9 @@ namespace CliFx.Domain
         /// <summary>
         /// Initializes an instance of <see cref="RootSchema"/>.
         /// </summary>
-        internal RootSchema(IReadOnlyDictionary<string, DirectiveSchema> directives, IReadOnlyDictionary<string, CommandSchema> commands, CommandSchema? defaultCommand)
+        internal RootSchema(IReadOnlyDictionary<string, DirectiveSchema> directives,
+                            IReadOnlyDictionary<string, CommandSchema> commands,
+                            CommandSchema? defaultCommand)
         {
             Directives = directives;
             Commands = commands;
@@ -67,7 +69,7 @@ namespace CliFx.Domain
             if (string.IsNullOrWhiteSpace(commandName))
                 return DefaultCommand;
 
-            Commands.TryGetValue(commandName, out var value);
+            Commands.TryGetValue(commandName, out CommandSchema value);
 
             return value;
         }
@@ -80,7 +82,7 @@ namespace CliFx.Domain
             if (string.IsNullOrWhiteSpace(directiveName))
                 return null;
 
-            Directives.TryGetValue(directiveName, out var value);
+            Directives.TryGetValue(directiveName, out DirectiveSchema value);
 
             return value;
         }
@@ -104,7 +106,7 @@ namespace CliFx.Domain
         /// </summary>
         public IReadOnlyList<CommandSchema> GetChildCommands(string? parentCommandName)
         {
-            var descendants = GetDescendantCommands(Commands.Values, parentCommandName);
+            IEnumerable<CommandSchema> descendants = GetDescendantCommands(Commands.Values, parentCommandName);
 
             // Filter out descendants of descendants, leave only children
             var result = new List<CommandSchema>(descendants);
@@ -131,9 +133,9 @@ namespace CliFx.Domain
             var invalidCommands = new List<CommandSchema>();
             CommandSchema? defaultCommand = null;
 
-            foreach (var commandType in commandTypes)
+            foreach (Type commandType in commandTypes)
             {
-                var command = CommandSchema.TryResolve(commandType) ?? throw CliFxException.InvalidCommandType(commandType);
+                CommandSchema command = CommandSchema.TryResolve(commandType) ?? throw CliFxException.InvalidCommandType(commandType);
 
                 if (string.IsNullOrWhiteSpace(command.Name))
                 {
@@ -164,7 +166,7 @@ namespace CliFx.Domain
 
             foreach (var directiveType in directiveTypes)
             {
-                var directive = DirectiveSchema.TryResolve(directiveType) ?? throw CliFxException.InvalidDirectiveType(directiveType);
+                DirectiveSchema directive = DirectiveSchema.TryResolve(directiveType) ?? throw CliFxException.InvalidDirectiveType(directiveType);
 
                 if (!directives.TryAdd(directive.Name, directive))
                     invalidDirectives.Add(directive);

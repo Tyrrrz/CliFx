@@ -25,7 +25,10 @@ namespace CliFx.InteractiveModeDemo.Services
             return JsonConvert.DeserializeObject<Library>(data);
         }
 
-        public Book? GetBook(string title) => GetLibrary().Books.FirstOrDefault(b => b.Title == title);
+        public Book? GetBook(string title)
+        {
+            return GetLibrary().Books.FirstOrDefault(b => b.Title == title);
+        }
 
         public void AddBook(Book book)
         {

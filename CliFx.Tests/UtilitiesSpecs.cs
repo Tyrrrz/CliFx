@@ -11,7 +11,10 @@ namespace CliFx.Tests
     {
         private readonly ITestOutputHelper _output;
 
-        public UtilitiesSpecs(ITestOutputHelper output) => _output = output;
+        public UtilitiesSpecs(ITestOutputHelper output)
+        {
+            _output = output;
+        }
 
         [Fact]
         public void Progress_ticker_can_be_used_to_report_progress_to_console()

@@ -73,11 +73,6 @@ namespace CliFx.BlazorDemo.CLI.Commands
                     });
                 }
             }
-
-            if (_cliContext.CurrentInput.HasDirective("hidden")) //TODO: remove this; add AddCustomDirective<T>(string name) to builder; add AddCustomDirectivesFromAssembly; add AddCustomDirectivesFromThisAssembly
-            {
-                console.Output.WriteLine("Hello World!");
-            }
         }
     }
 }

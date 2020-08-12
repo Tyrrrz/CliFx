@@ -33,7 +33,7 @@ namespace CliFx
                                                              IReadOnlyDictionary<string, string> environmentVariables,
                                                              RootSchema root)
         {
-            var input = CommandInput.Parse(commandLineArguments, root.GetCommandNames());
+            CommandInput input = CommandInput.Parse(commandLineArguments, root.GetCommandNames());
             CliContext.CurrentInput = input;
 
             if (input.IsInteractiveDirectiveSpecified)
@@ -60,7 +60,7 @@ namespace CliFx
             while (true) //TODO maybe add CliContext.Exit and CliContext.Status
             {
                 string[] commandLineArguments = GetInput(console, executableName);
-                var input = CommandInput.Parse(commandLineArguments, root.GetCommandNames());
+                CommandInput input = CommandInput.Parse(commandLineArguments, root.GetCommandNames());
                 CliContext.CurrentInput = input; //TODO maybe refactor with some clever IDisposable class
 
                 await ExecuteCommand(environmentVariables, root, input);
@@ -112,8 +112,8 @@ namespace CliFx
                 }
                 else // handle scoped command input
                 {
-                    var tmp = line.Split(' ', StringSplitOptions.RemoveEmptyEntries)
-                                  .ToList();
+                    List<string> tmp = line.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                                           .ToList();
 
                     int lastDirective = tmp.FindLastIndex(x => x.StartsWith('[') && x.EndsWith(']'));
                     tmp.Insert(lastDirective + 1, CliContext.Scope);

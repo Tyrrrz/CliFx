@@ -91,10 +91,10 @@ namespace CliFx.Domain
         /// </summary>
         public IEnumerable<CommandArgumentSchema> GetArguments()
         {
-            foreach (var parameter in Parameters)
+            foreach (CommandParameterSchema parameter in Parameters)
                 yield return parameter;
 
-            foreach (var option in Options)
+            foreach (CommandOptionSchema option in Options)
                 yield return option;
         }
 
@@ -105,13 +105,13 @@ namespace CliFx.Domain
         {
             var result = new Dictionary<CommandArgumentSchema, object?>();
 
-            foreach (var argument in GetArguments())
+            foreach (CommandArgumentSchema argument in GetArguments())
             {
                 // Skip built-in arguments
-                if (argument.Property == null)
+                if (argument.Property is null)
                     continue;
 
-                var value = argument.Property.GetValue(instance);
+                object? value = argument.Property.GetValue(instance);
                 result[argument] = value;
             }
 
@@ -121,37 +121,34 @@ namespace CliFx.Domain
         private void BindParameters(ICommand instance, IReadOnlyList<CommandParameterInput> parameterInputs)
         {
             // All inputs must be bound
-            var remainingParameterInputs = parameterInputs.ToList();
+            List<CommandParameterInput> remainingParameterInputs = parameterInputs.ToList();
 
             // Scalar parameters
-            var scalarParameters = Parameters
-                .OrderBy(p => p.Order)
-                .TakeWhile(p => p.IsScalar)
-                .ToArray();
+            CommandParameterSchema[] scalarParameters = Parameters.OrderBy(p => p.Order)
+                                                                  .TakeWhile(p => p.IsScalar)
+                                                                  .ToArray();
 
-            for (var i = 0; i < scalarParameters.Length; i++)
+            for (int i = 0; i < scalarParameters.Length; i++)
             {
-                var parameter = scalarParameters[i];
+                CommandParameterSchema parameter = scalarParameters[i];
 
-                var scalarInput = i < parameterInputs.Count
-                    ? parameterInputs[i]
-                    : throw CliFxException.ParameterNotSet(parameter);
+                CommandParameterInput scalarInput = i < parameterInputs.Count
+                                                        ? parameterInputs[i]
+                                                        : throw CliFxException.ParameterNotSet(parameter);
 
                 parameter.BindOn(instance, scalarInput.Value);
                 remainingParameterInputs.Remove(scalarInput);
             }
 
             // Non-scalar parameter (only one is allowed)
-            var nonScalarParameter = Parameters
-                .OrderBy(p => p.Order)
-                .FirstOrDefault(p => !p.IsScalar);
+            CommandParameterSchema nonScalarParameter = Parameters.OrderBy(p => p.Order)
+                                                                  .FirstOrDefault(p => !p.IsScalar);
 
             if (nonScalarParameter != null)
             {
-                var nonScalarValues = parameterInputs
-                    .Skip(scalarParameters.Length)
-                    .Select(p => p.Value)
-                    .ToArray();
+                string[] nonScalarValues = parameterInputs.Skip(scalarParameters.Length)
+                                                          .Select(p => p.Value)
+                                                          .ToArray();
 
                 // Parameters are required by default and so a non-scalar parameter must
                 // be bound to at least one value
@@ -172,38 +169,38 @@ namespace CliFx.Domain
                                  IReadOnlyDictionary<string, string> environmentVariables)
         {
             // All inputs must be bound
-            var remainingOptionInputs = optionInputs.ToList();
+            List<CommandOptionInput> remainingOptionInputs = optionInputs.ToList();
 
             // All required options must be set
-            var unsetRequiredOptions = Options.Where(o => o.IsRequired).ToList();
+            List<CommandOptionSchema> unsetRequiredOptions = Options.Where(o => o.IsRequired)
+                                                                    .ToList();
 
             // Environment variables
-            foreach (var (name, value) in environmentVariables)
+            foreach ((string name, string value) in environmentVariables)
             {
-                var option = Options.FirstOrDefault(o => o.MatchesEnvironmentVariableName(name));
-                if (option == null)
+                CommandOptionSchema? option = Options.FirstOrDefault(o => o.MatchesEnvironmentVariableName(name));
+                if (option is null)
                     continue;
 
-                var values = option.IsScalar
-                    ? new[] { value }
-                    : value.Split(Path.PathSeparator);
+                string[] values = option.IsScalar ? new[] { value } : value.Split(Path.PathSeparator);
 
                 option.BindOn(instance, values);
                 unsetRequiredOptions.Remove(option);
             }
 
             // Direct input
-            foreach (var option in Options)
+            foreach (CommandOptionSchema option in Options)
             {
-                var inputs = optionInputs
-                    .Where(i => option.MatchesNameOrShortName(i.Alias))
-                    .ToArray();
+                CommandOptionInput[] inputs = optionInputs.Where(i => option.MatchesNameOrShortName(i.Alias))
+                                                          .ToArray();
 
                 // Skip if the inputs weren't provided for this option
                 if (!inputs.Any())
                     continue;
 
-                var inputValues = inputs.SelectMany(i => i.Values).ToArray();
+                string[] inputValues = inputs.SelectMany(i => i.Values)
+                                             .ToArray();
+
                 option.BindOn(instance, inputValues);
 
                 remainingOptionInputs.RemoveRange(inputs);
@@ -257,9 +254,9 @@ namespace CliFx.Domain
     {
         private static void ValidateParameters(CommandSchema command)
         {
-            var duplicateOrderGroup = command.Parameters
-                .GroupBy(a => a.Order)
-                .FirstOrDefault(g => g.Count() > 1);
+            IGrouping<int, CommandParameterSchema>? duplicateOrderGroup = command.Parameters
+                                                                                 .GroupBy(a => a.Order)
+                                                                                 .FirstOrDefault(g => g.Count() > 1);
 
             if (duplicateOrderGroup != null)
             {
@@ -270,10 +267,10 @@ namespace CliFx.Domain
                 );
             }
 
-            var duplicateNameGroup = command.Parameters
-                .Where(a => !string.IsNullOrWhiteSpace(a.Name))
-                .GroupBy(a => a.Name!, StringComparer.OrdinalIgnoreCase)
-                .FirstOrDefault(g => g.Count() > 1);
+            IGrouping<string, CommandParameterSchema>? duplicateNameGroup = command.Parameters
+                                                                                   .Where(a => !string.IsNullOrWhiteSpace(a.Name))
+                                                                                   .GroupBy(a => a.Name!, StringComparer.OrdinalIgnoreCase)
+                                                                                   .FirstOrDefault(g => g.Count() > 1);
 
             if (duplicateNameGroup != null)
             {
@@ -284,9 +281,9 @@ namespace CliFx.Domain
                 );
             }
 
-            var nonScalarParameters = command.Parameters
-                                             .Where(p => !p.IsScalar)
-                                             .ToArray();
+            CommandParameterSchema[]? nonScalarParameters = command.Parameters
+                                                                   .Where(p => !p.IsScalar)
+                                                                   .ToArray();
 
             if (nonScalarParameters.Length > 1)
             {
@@ -296,10 +293,10 @@ namespace CliFx.Domain
                 );
             }
 
-            var nonLastNonScalarParameter = command.Parameters
-                .OrderByDescending(a => a.Order)
-                .Skip(1)
-                .LastOrDefault(p => !p.IsScalar);
+            CommandParameterSchema? nonLastNonScalarParameter = command.Parameters
+                                                                       .OrderByDescending(a => a.Order)
+                                                                       .Skip(1)
+                                                                       .LastOrDefault(p => !p.IsScalar);
 
             if (nonLastNonScalarParameter != null)
             {
@@ -313,7 +310,7 @@ namespace CliFx.Domain
         private static void ValidateOptions(CommandSchema command)
         {
             IEnumerable<CommandOptionSchema> noNameGroup = command.Options
-                                                                  .Where(o => o.ShortName == null && string.IsNullOrWhiteSpace(o.Name));
+                .Where(o => o.ShortName == null && string.IsNullOrWhiteSpace(o.Name));
 
             if (noNameGroup.Any())
             {
@@ -323,7 +320,7 @@ namespace CliFx.Domain
                 );
             }
 
-            var invalidLengthNameGroup = command.Options
+            CommandOptionSchema[] invalidLengthNameGroup = command.Options
                 .Where(o => !string.IsNullOrWhiteSpace(o.Name))
                 .Where(o => o.Name!.Length <= 1)
                 .ToArray();
@@ -336,7 +333,7 @@ namespace CliFx.Domain
                 );
             }
 
-            var duplicateNameGroup = command.Options
+            IGrouping<string, CommandOptionSchema>? duplicateNameGroup = command.Options
                 .Where(o => !string.IsNullOrWhiteSpace(o.Name))
                 .GroupBy(o => o.Name!, StringComparer.OrdinalIgnoreCase)
                 .FirstOrDefault(g => g.Count() > 1);
@@ -350,7 +347,7 @@ namespace CliFx.Domain
                 );
             }
 
-            var duplicateShortNameGroup = command.Options
+            IGrouping<char, CommandOptionSchema>? duplicateShortNameGroup = command.Options
                 .Where(o => o.ShortName != null)
                 .GroupBy(o => o.ShortName!.Value)
                 .FirstOrDefault(g => g.Count() > 1);
@@ -364,7 +361,7 @@ namespace CliFx.Domain
                 );
             }
 
-            var duplicateEnvironmentVariableNameGroup = command.Options
+            IGrouping<string, CommandOptionSchema>? duplicateEnvironmentVariableNameGroup = command.Options
                 .Where(o => !string.IsNullOrWhiteSpace(o.EnvironmentVariableName))
                 .GroupBy(o => o.EnvironmentVariableName!, StringComparer.OrdinalIgnoreCase)
                 .FirstOrDefault(g => g.Count() > 1);
@@ -394,22 +391,22 @@ namespace CliFx.Domain
 
             CommandAttribute attribute = type.GetCustomAttribute<CommandAttribute>()!;
 
-            var name = attribute.Name;
+            string? name = attribute.Name;
 
-            var builtInOptions = string.IsNullOrWhiteSpace(name)
+            CommandOptionSchema[] builtInOptions = string.IsNullOrWhiteSpace(name)
                 ? new[] { CommandOptionSchema.HelpOption, CommandOptionSchema.VersionOption }
                 : new[] { CommandOptionSchema.HelpOption };
 
-            var parameters = type.GetProperties()
-                .Select(CommandParameterSchema.TryResolve)
-                .Where(p => p != null)
-                .ToArray();
+            CommandParameterSchema?[] parameters = type.GetProperties()
+                                                       .Select(CommandParameterSchema.TryResolve)
+                                                       .Where(p => p != null)
+                                                       .ToArray();
 
-            var options = type.GetProperties()
-                .Select(CommandOptionSchema.TryResolve)
-                .Where(o => o != null)
-                .Concat(builtInOptions)
-                .ToArray();
+            CommandOptionSchema?[] options = type.GetProperties()
+                                                 .Select(CommandOptionSchema.TryResolve)
+                                                 .Where(o => o != null)
+                                                 .Concat(builtInOptions)
+                                                 .ToArray();
 
             CommandSchema command = new CommandSchema(
                 type,

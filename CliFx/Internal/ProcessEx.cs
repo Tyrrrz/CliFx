@@ -6,7 +6,7 @@ namespace CliFx.Internal
     {
         public static int GetCurrentProcessId()
         {
-            using var process = Process.GetCurrentProcess();
+            using Process process = Process.GetCurrentProcess();
             return process.Id;
         }
     }

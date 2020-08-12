@@ -69,7 +69,10 @@ namespace CliFx
         public int BufferHeight { get; set; } = int.MaxValue;
 
         /// <inheritdoc />
-        public CancellationToken GetCancellationToken() => _cancellationToken;
+        public CancellationToken GetCancellationToken()
+        {
+            return _cancellationToken;
+        }
 
         /// <summary>
         /// Initializes an instance of <see cref="VirtualConsole"/>.
@@ -110,14 +113,18 @@ namespace CliFx
 
     public partial class VirtualConsole
     {
-        private static StreamReader WrapInput(Stream? stream) =>
-            stream != null
-                ? new StreamReader(Stream.Synchronized(stream), Console.InputEncoding, false)
-                : StreamReader.Null;
+        private static StreamReader WrapInput(Stream? stream)
+        {
+            return stream != null
+                    ? new StreamReader(Stream.Synchronized(stream), Console.InputEncoding, false)
+                    : StreamReader.Null;
+        }
 
-        private static StreamWriter WrapOutput(Stream? stream) =>
-            stream != null
-                ? new StreamWriter(Stream.Synchronized(stream), Console.OutputEncoding) { AutoFlush = true }
-                : StreamWriter.Null;
+        private static StreamWriter WrapOutput(Stream? stream)
+        {
+            return stream != null
+                    ? new StreamWriter(Stream.Synchronized(stream), Console.OutputEncoding) { AutoFlush = true }
+                    : StreamWriter.Null;
+        }
     }
 }

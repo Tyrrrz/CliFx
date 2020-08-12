@@ -48,11 +48,11 @@ namespace CliFx.Domain
     {
         internal static CommandParameterSchema? TryResolve(PropertyInfo property)
         {
-            var attribute = property.GetCustomAttribute<CommandParameterAttribute>();
-            if (attribute == null)
+            CommandParameterAttribute? attribute = property.GetCustomAttribute<CommandParameterAttribute>();
+            if (attribute is null)
                 return null;
 
-            var name = attribute.Name ?? property.Name.ToLowerInvariant();
+            string name = attribute.Name ?? property.Name.ToLowerInvariant();
 
             return new CommandParameterSchema(
                 property,

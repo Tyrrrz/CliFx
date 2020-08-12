@@ -47,7 +47,7 @@ namespace CliFx.Domain
             try
             {
                 // Primitive
-                var primitiveConverter = PrimitiveConverters.GetValueOrDefault(targetType);
+                Func<string?, object?>? primitiveConverter = PrimitiveConverters.GetValueOrDefault(targetType);
                 if (primitiveConverter != null)
                     return primitiveConverter(value);
 
@@ -56,24 +56,26 @@ namespace CliFx.Domain
                     return Enum.Parse(targetType, value, true);
 
                 // Nullable
-                var nullableUnderlyingType = targetType.GetNullableUnderlyingType();
+                Type? nullableUnderlyingType = targetType.GetNullableUnderlyingType();
                 if (nullableUnderlyingType != null)
+                {
                     return !string.IsNullOrWhiteSpace(value)
                         ? ConvertScalar(value, nullableUnderlyingType)
                         : null;
+                }
 
                 // String-constructable
-                var stringConstructor = targetType.GetConstructor(new[] { typeof(string) });
+                ConstructorInfo? stringConstructor = targetType.GetConstructor(new[] { typeof(string) });
                 if (stringConstructor != null)
                     return stringConstructor.Invoke(new object[] { value! });
 
                 // String-parseable (with format provider)
-                var parseMethodWithFormatProvider = targetType.GetStaticParseMethod(true);
+                MethodInfo? parseMethodWithFormatProvider = targetType.GetStaticParseMethod(true);
                 if (parseMethodWithFormatProvider != null)
                     return parseMethodWithFormatProvider.Invoke(null, new object[] { value!, FormatProvider });
 
                 // String-parseable (without format provider)
-                var parseMethod = targetType.GetStaticParseMethod();
+                MethodInfo? parseMethod = targetType.GetStaticParseMethod();
                 if (parseMethod != null)
                     return parseMethod.Invoke(null, new object[] { value! });
             }
@@ -87,18 +89,17 @@ namespace CliFx.Domain
 
         private object ConvertNonScalar(IReadOnlyList<string> values, Type targetEnumerableType, Type targetElementType)
         {
-            var array = values
-                .Select(v => ConvertScalar(v, targetElementType))
-                .ToNonGenericArray(targetElementType);
+            Array array = values.Select(v => ConvertScalar(v, targetElementType))
+                                .ToNonGenericArray(targetElementType);
 
-            var arrayType = array.GetType();
+            Type arrayType = array.GetType();
 
             // Assignable from an array
             if (targetEnumerableType.IsAssignableFrom(arrayType))
                 return array;
 
             // Constructable from an array
-            var arrayConstructor = targetEnumerableType.GetConstructor(new[] { arrayType });
+            ConstructorInfo? arrayConstructor = targetEnumerableType.GetConstructor(new[] { arrayType });
             if (arrayConstructor != null)
                 return arrayConstructor.Invoke(new object[] { array });
 
@@ -111,8 +112,8 @@ namespace CliFx.Domain
             if (Property == null)
                 return null;
 
-            var targetType = Property.PropertyType;
-            var enumerableUnderlyingType = TryGetEnumerableArgumentUnderlyingType();
+            Type targetType = Property.PropertyType;
+            Type? enumerableUnderlyingType = TryGetEnumerableArgumentUnderlyingType();
 
             // Scalar
             if (enumerableUnderlyingType == null)
@@ -143,7 +144,7 @@ namespace CliFx.Domain
             if (Property == null)
                 return Array.Empty<string>();
 
-            var underlyingType = Property.PropertyType.GetNullableUnderlyingType() ?? Property.PropertyType;
+            Type underlyingType = Property.PropertyType.GetNullableUnderlyingType() ?? Property.PropertyType;
 
             // Enum
             if (underlyingType.IsEnum)

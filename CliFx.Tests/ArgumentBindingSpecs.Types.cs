@@ -17,26 +17,40 @@ namespace CliFx.Tests
         {
             public string Value { get; }
 
-            public StringConstructable(string value) => Value = value;
+            public StringConstructable(string value)
+            {
+                Value = value;
+            }
         }
 
         private class StringParseable
         {
             public string Value { get; }
 
-            private StringParseable(string value) => Value = value;
+            private StringParseable(string value)
+            {
+                Value = value;
+            }
 
-            public static StringParseable Parse(string value) => new StringParseable(value);
+            public static StringParseable Parse(string value)
+            {
+                return new StringParseable(value);
+            }
         }
 
         private class StringParseableWithFormatProvider
         {
             public string Value { get; }
 
-            private StringParseableWithFormatProvider(string value) => Value = value;
+            private StringParseableWithFormatProvider(string value)
+            {
+                Value = value;
+            }
 
-            public static StringParseableWithFormatProvider Parse(string value, IFormatProvider formatProvider) =>
-                new StringParseableWithFormatProvider(value + " " + formatProvider);
+            public static StringParseableWithFormatProvider Parse(string value, IFormatProvider formatProvider)
+            {
+                return new StringParseableWithFormatProvider(value + " " + formatProvider);
+            }
         }
 
         private class DummyType
@@ -45,9 +59,15 @@ namespace CliFx.Tests
 
         public class CustomEnumerable<T> : IEnumerable<T>
         {
-            public IEnumerator<T> GetEnumerator() => ((IEnumerable<T>)Array.Empty<T>()).GetEnumerator();
+            public IEnumerator<T> GetEnumerator()
+            {
+                return ((IEnumerable<T>)Array.Empty<T>()).GetEnumerator();
+            }
 
-            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
         }
     }
 }

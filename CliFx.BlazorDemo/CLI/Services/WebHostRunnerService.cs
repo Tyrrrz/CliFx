@@ -15,10 +15,12 @@ namespace CliFx.BlazorDemo.CLI.Services
             _console = console;
         }
 
-        public static IWebHostBuilder CreateHostBuilder() =>
-             WebHost.CreateDefaultBuilder()
-                    .UseKestrel()
-                    .UseStartup<Startup>();
+        public static IWebHostBuilder CreateHostBuilder()
+        {
+            return WebHost.CreateDefaultBuilder()
+                          .UseKestrel()
+                          .UseStartup<Startup>();
+        }
 
         public IWebHost GetWebHost()
         {

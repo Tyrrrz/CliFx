@@ -13,6 +13,9 @@ namespace CliFx.Benchmarks.Commands
         [Option("--bool|-b")]
         public bool BoolOption { get; set; }
 
-        public int OnExecute() => 0;
+        public int OnExecute()
+        {
+            return 0;
+        }
     }
 }

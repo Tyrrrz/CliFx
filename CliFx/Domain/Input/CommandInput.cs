@@ -92,7 +92,7 @@ namespace CliFx.Domain.Input
         /// </summary>
         internal bool HasAnyOfDirectives(string[] directives)
         {
-            foreach (var directive in directives)
+            foreach (string directive in directives)
             {
                 if (HasDirective(directive))
                     return true;
@@ -106,7 +106,7 @@ namespace CliFx.Domain.Input
         {
             var buffer = new StringBuilder();
 
-            foreach (var directive in Directives)
+            foreach (CommandDirectiveInput directive in Directives)
             {
                 buffer.AppendIfNotEmpty(' ')
                       .Append(directive);
@@ -118,13 +118,13 @@ namespace CliFx.Domain.Input
                       .Append(CommandName);
             }
 
-            foreach (var parameter in Parameters)
+            foreach (CommandParameterInput parameter in Parameters)
             {
                 buffer.AppendIfNotEmpty(' ')
                       .Append(parameter);
             }
 
-            foreach (var option in Options)
+            foreach (CommandOptionInput option in Options)
             {
                 buffer.AppendIfNotEmpty(' ')
                       .Append(option);
@@ -145,12 +145,12 @@ namespace CliFx.Domain.Input
 
             for (; index < commandLineArguments.Count; index++)
             {
-                var argument = commandLineArguments[index];
+                string argument = commandLineArguments[index];
 
                 if (!argument.StartsWith('[') || !argument.EndsWith(']'))
                     break;
 
-                var name = argument.Substring(1, argument.Length - 2);
+                string name = argument.Substring(1, argument.Length - 2);
 
                 if (name == BuiltInDirectives.Interactive)
                     isInteractiveDirectiveSpecified = true;
@@ -199,7 +199,7 @@ namespace CliFx.Domain.Input
 
             for (; index < commandLineArguments.Count; index++)
             {
-                var argument = commandLineArguments[index];
+                string argument = commandLineArguments[index];
 
                 if (argument.StartsWith('-'))
                     break;
@@ -215,12 +215,12 @@ namespace CliFx.Domain.Input
         {
             var result = new List<CommandOptionInput>();
 
-            var currentOptionAlias = default(string?);
+            string? currentOptionAlias = null;
             var currentOptionValues = new List<string>();
 
             for (; index < commandLineArguments.Count; index++)
             {
-                var argument = commandLineArguments[index];
+                string argument = commandLineArguments[index];
 
                 // Name
                 if (argument.StartsWith("--", StringComparison.Ordinal))

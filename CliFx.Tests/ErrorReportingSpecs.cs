@@ -11,7 +11,10 @@ namespace CliFx.Tests
     {
         private readonly ITestOutputHelper _output;
 
-        public ErrorReportingSpecs(ITestOutputHelper output) => _output = output;
+        public ErrorReportingSpecs(ITestOutputHelper output)
+        {
+            _output = output;
+        }
 
         [Fact]
         public async Task Command_may_throw_a_generic_exception_which_exits_and_prints_error_message_and_stack_trace()

@@ -13,7 +13,10 @@ namespace CliFx.Tests
     {
         private readonly ITestOutputHelper _output;
 
-        public ArgumentBindingSpecs(ITestOutputHelper output) => _output = output;
+        public ArgumentBindingSpecs(ITestOutputHelper output)
+        {
+            _output = output;
+        }
 
         [Fact]
         public void Property_of_type_object_is_bound_directly_from_the_argument_value()

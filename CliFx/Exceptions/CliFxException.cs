@@ -312,12 +312,15 @@ Option {option.GetUserFacingDisplayString()} expects a single value, but provide
 
         internal static CliFxException CannotConvertMultipleValuesToNonScalar(
             CommandArgumentSchema argument,
-            IReadOnlyList<string> values) => argument switch
+            IReadOnlyList<string> values)
+        {
+            return argument switch
             {
                 CommandParameterSchema parameter => CannotConvertMultipleValuesToNonScalar(parameter, values),
                 CommandOptionSchema option => CannotConvertMultipleValuesToNonScalar(option, values),
                 _ => throw new ArgumentOutOfRangeException(nameof(argument))
             };
+        }
 
         internal static CliFxException CannotConvertToType(
             CommandParameterSchema parameter,
@@ -349,12 +352,15 @@ Can't convert value ""{value ?? "<null>"}"" to type '{type.Name}' for option {op
             CommandArgumentSchema argument,
             string? value,
             Type type,
-            Exception? innerException = null) => argument switch
+            Exception? innerException = null)
+        {
+            return argument switch
             {
                 CommandParameterSchema parameter => CannotConvertToType(parameter, value, type, innerException),
                 CommandOptionSchema option => CannotConvertToType(option, value, type, innerException),
                 _ => throw new ArgumentOutOfRangeException(nameof(argument))
             };
+        }
 
         internal static CliFxException CannotConvertNonScalar(
             CommandParameterSchema parameter,
@@ -387,12 +393,15 @@ Target type is not assignable from array and doesn't have a public constructor t
         internal static CliFxException CannotConvertNonScalar(
             CommandArgumentSchema argument,
             IReadOnlyList<string> values,
-            Type type) => argument switch
+            Type type)
+        {
+            return argument switch
             {
                 CommandParameterSchema parameter => CannotConvertNonScalar(parameter, values, type),
                 CommandOptionSchema option => CannotConvertNonScalar(option, values, type),
                 _ => throw new ArgumentOutOfRangeException(nameof(argument))
             };
+        }
 
         internal static CliFxException ParameterNotSet(CommandParameterSchema parameter)
         {

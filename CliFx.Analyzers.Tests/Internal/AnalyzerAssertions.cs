@@ -38,8 +38,10 @@ Produced: {(producedIds.Any() ? string.Join(", ", producedIds) : "<none>")}
 ".Trim());
         }
 
-        public void ProduceDiagnostics(AnalyzerTestCase testCase) =>
+        public void ProduceDiagnostics(AnalyzerTestCase testCase)
+        {
             ProduceDiagnostics(testCase.TestedDiagnostics, testCase.SourceCodes);
+        }
 
         public void NotProduceDiagnostics(
             IReadOnlyList<DiagnosticDescriptor> diagnostics,
@@ -59,8 +61,10 @@ Produced: {string.Join(", ", producedIds)}
 ".Trim());
         }
 
-        public void NotProduceDiagnostics(AnalyzerTestCase testCase) =>
+        public void NotProduceDiagnostics(AnalyzerTestCase testCase)
+        {
             NotProduceDiagnostics(testCase.TestedDiagnostics, testCase.SourceCodes);
+        }
     }
 
     internal partial class AnalyzerAssertions
@@ -102,6 +106,9 @@ Produced: {string.Join(", ", producedIds)}
 
     internal static class AnalyzerAssertionsExtensions
     {
-        public static AnalyzerAssertions Should(this DiagnosticAnalyzer analyzer) => new AnalyzerAssertions(analyzer);
+        public static AnalyzerAssertions Should(this DiagnosticAnalyzer analyzer)
+        {
+            return new AnalyzerAssertions(analyzer);
+        }
     }
 }

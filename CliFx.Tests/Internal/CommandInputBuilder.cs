@@ -35,12 +35,15 @@ namespace CliFx.Tests.Internal
             return this;
         }
 
-        public CommandInput Build() => new CommandInput(
-            false,
-            _directives,
-            _commandName,
-            _parameters,
-            _options
-        );
+        public CommandInput Build()
+        {
+            return new CommandInput(
+                false,
+                _directives,
+                _commandName,
+                _parameters,
+                _options
+                );
+        }
     }
 }

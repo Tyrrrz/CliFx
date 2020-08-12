@@ -16,7 +16,10 @@ namespace CliFx.Tests
             [CommandOption("option-b", 'b', Description = "OptionB description.")]
             public string? OptionB { get; set; }
 
-            public ValueTask ExecuteAsync(IConsole console) => default;
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                return default;
+            }
         }
 
         [Command("cmd", Description = "NamedCommand description.")]
@@ -31,7 +34,10 @@ namespace CliFx.Tests
             [CommandOption("option-d", 'd', Description = "OptionD description.")]
             public string? OptionD { get; set; }
 
-            public ValueTask ExecuteAsync(IConsole console) => default;
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                return default;
+            }
         }
 
         [Command("cmd sub", Description = "NamedSubCommand description.")]
@@ -46,7 +52,10 @@ namespace CliFx.Tests
             [CommandOption("option-e", 'e', Description = "OptionE description.")]
             public string? OptionE { get; set; }
 
-            public ValueTask ExecuteAsync(IConsole console) => default;
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                return default;
+            }
         }
 
         [Command("cmd-with-params")]
@@ -64,7 +73,10 @@ namespace CliFx.Tests
             [CommandOption("option", 'o')]
             public string? Option { get; set; }
 
-            public ValueTask ExecuteAsync(IConsole console) => default;
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                return default;
+            }
         }
 
         [Command("cmd-with-req-opts")]
@@ -79,7 +91,10 @@ namespace CliFx.Tests
             [CommandOption("option-c", 'c')]
             public string? OptionC { get; set; }
 
-            public ValueTask ExecuteAsync(IConsole console) => default;
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                return default;
+            }
         }
 
         [Command("cmd-with-enum-args")]
@@ -96,7 +111,10 @@ namespace CliFx.Tests
             [CommandOption("nullable-value", Description = "Nullable enum option.")]
             public CustomEnum? OptionB { get; set; }
 
-            public ValueTask ExecuteAsync(IConsole console) => default;
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                return default;
+            }
         }
 
         [Command("cmd-with-env-vars")]
@@ -108,7 +126,10 @@ namespace CliFx.Tests
             [CommandOption("option-b", 'b', EnvironmentVariableName = "ENV_OPT_B")]
             public string? OptionB { get; set; }
 
-            public ValueTask ExecuteAsync(IConsole console) => default;
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                return default;
+            }
         }
 
         [Command("cmd-with-defaults")]
@@ -149,7 +170,10 @@ namespace CliFx.Tests
             [CommandOption(nameof(IntArray))]
             public int[]? IntArray { get; set; } = { 1, 2, 3 };
 
-            public ValueTask ExecuteAsync(IConsole console) => default;
+            public ValueTask ExecuteAsync(IConsole console)
+            {
+                return default;
+            }
         }
     }
 }

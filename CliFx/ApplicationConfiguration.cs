@@ -42,13 +42,12 @@ namespace CliFx
         /// <summary>
         /// Initializes an instance of <see cref="ApplicationConfiguration"/>.
         /// </summary>
-        public ApplicationConfiguration(
-            IReadOnlyList<Type> commandTypes,
-            IReadOnlyList<Type> customDirectives,
-            ICliExceptionHandler exceptionHandler,
-            bool isInteractiveModeAllowed,
-            CommandExitMessageOptions commandExitMessageOptions,
-            ConsoleColor commandExitMessageForeground)
+        public ApplicationConfiguration(IReadOnlyList<Type> commandTypes,
+                                        IReadOnlyList<Type> customDirectives,
+                                        ICliExceptionHandler exceptionHandler,
+                                        bool isInteractiveModeAllowed,
+                                        CommandExitMessageOptions commandExitMessageOptions,
+                                        ConsoleColor commandExitMessageForeground)
         {
             CommandTypes = commandTypes;
             DirectiveTypes = customDirectives;

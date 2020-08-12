@@ -52,6 +52,7 @@ namespace CliFx.Attributes
         public CommandOptionAttribute(string name, char shortName)
             : this(name, (char?)shortName)
         {
+
         }
 
         /// <summary>
@@ -60,6 +61,7 @@ namespace CliFx.Attributes
         public CommandOptionAttribute(string name)
             : this(name, null)
         {
+
         }
 
         /// <summary>
@@ -68,6 +70,7 @@ namespace CliFx.Attributes
         public CommandOptionAttribute(char shortName)
             : this(null, (char?)shortName)
         {
+
         }
     }
 }

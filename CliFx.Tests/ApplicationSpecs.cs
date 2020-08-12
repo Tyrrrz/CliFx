@@ -14,7 +14,10 @@ namespace CliFx.Tests
     {
         private readonly ITestOutputHelper _output;
 
-        public ApplicationSpecs(ITestOutputHelper output) => _output = output;
+        public ApplicationSpecs(ITestOutputHelper output)
+        {
+            _output = output;
+        }
 
         [Fact]
         public void Application_can_be_created_with_a_default_configuration()
