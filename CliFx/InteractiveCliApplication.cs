@@ -36,12 +36,12 @@ namespace CliFx
             var input = CommandInput.Parse(commandLineArguments, root.GetCommandNames());
             CliContext.CurrentInput = input;
 
-            if (input.HasDirective(BuiltInDirectives.Interactive))
+            if (input.IsInteractiveDirectiveSpecified)
             {
                 CliContext.IsInteractiveMode = true;
 
-                // we don't want to run default command for e.g. `[interactive]`
-                if (!string.IsNullOrWhiteSpace(input.CommandName))
+                // we don't want to run default command for e.g. `[interactive]` but we want to run if there is sth else
+                if (!input.IsDefaultCommandOrEmpty)
                     await ExecuteCommand(environmentVariables, root, input);
 
                 await RunInteractivelyAsync(environmentVariables, root);

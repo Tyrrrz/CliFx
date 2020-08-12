@@ -468,9 +468,9 @@ This application does not support interactive mode.";
         internal static CliFxException InteractiveModeDirectiveNotAvailable(string directiveName)
         {
             var message = $@"
-This application does not run interactive mode.
+Directive '[{directiveName}]' is for interactive mode only. Thus, cannot be used in normal mode.
 
-Directive '[{directiveName}]' is for interactive mode only. Thus, cannot be used in normal mode.";
+You can start the interactive mode with [{BuiltInDirectives.Interactive}].";
 
             return new CliFxException(message.Trim());
         }

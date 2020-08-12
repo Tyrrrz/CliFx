@@ -264,7 +264,7 @@ namespace CliFx
                 throw CliFxException.InteractiveOnlyCommandButThisIsNormalApplication(command);
             }
             else if (_configuration.IsInteractiveModeAllowed && command.InteractiveModeOnly &&
-                     !(CliContext.IsInteractiveMode || input.HasDirective(BuiltInDirectives.Interactive)))
+                     !(CliContext.IsInteractiveMode || input.IsInteractiveDirectiveSpecified))
             {
                 throw CliFxException.InteractiveOnlyCommandButInteractiveModeNotStarted(command);
             }

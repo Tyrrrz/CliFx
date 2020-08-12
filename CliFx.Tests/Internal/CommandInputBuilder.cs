@@ -36,6 +36,7 @@ namespace CliFx.Tests.Internal
         }
 
         public CommandInput Build() => new CommandInput(
+            false,
             _directives,
             _commandName,
             _parameters,

@@ -15,7 +15,12 @@ namespace CliFx.Domain.Input
     public partial class CommandInput
     {
         /// <summary>
-        /// Command direcitves list.
+        /// Whether interactive directive [interactive] is specified.
+        /// </summary>
+        public bool IsInteractiveDirectiveSpecified { get; }
+
+        /// <summary>
+        /// Command direcitves list without special [interactive] directive.
         /// </summary>
         public IReadOnlyList<CommandDirectiveInput> Directives { get; }
 
@@ -45,17 +50,29 @@ namespace CliFx.Domain.Input
         public bool IsVersionOptionSpecified => Options.Any(o => o.IsVersionOption);
 
         /// <summary>
+        /// Whether command input is default command or empty (no command name, no options, no parameters, and no directives other than [interactive]_.
+        /// </summary>
+        public bool IsDefaultCommandOrEmpty { get; }
+
+        /// <summary>
         /// Initializes an instance of <see cref="CommandInput"/>.
         /// </summary>
-        public CommandInput(IReadOnlyList<CommandDirectiveInput> directives,
+        public CommandInput(bool isInteractiveDirectiveSpecified,
+                            IReadOnlyList<CommandDirectiveInput> directives,
                             string? commandName,
                             IReadOnlyList<CommandParameterInput> parameters,
                             IReadOnlyList<CommandOptionInput> options)
         {
+            IsInteractiveDirectiveSpecified = isInteractiveDirectiveSpecified;
             Directives = directives;
             CommandName = commandName;
             Parameters = parameters;
             Options = options;
+
+            IsDefaultCommandOrEmpty = Options.Count == 0 &&
+                                      Parameters.Count == 0 &&
+                                      Directives.Count == 0 &&
+                                      string.IsNullOrWhiteSpace(CommandName);
         }
 
         /// <summary>
@@ -120,8 +137,10 @@ namespace CliFx.Domain.Input
     public partial class CommandInput
     {
         private static IReadOnlyList<CommandDirectiveInput> ParseDirectives(IReadOnlyList<string> commandLineArguments,
-                                                                            ref int index)
+                                                                            ref int index,
+                                                                            out bool isInteractiveDirectiveSpecified)
         {
+            isInteractiveDirectiveSpecified = false;
             var result = new List<CommandDirectiveInput>();
 
             for (; index < commandLineArguments.Count; index++)
@@ -132,7 +151,11 @@ namespace CliFx.Domain.Input
                     break;
 
                 var name = argument.Substring(1, argument.Length - 2);
-                result.Add(new CommandDirectiveInput(name));
+
+                if (name == BuiltInDirectives.Interactive)
+                    isInteractiveDirectiveSpecified = true;
+                else
+                    result.Add(new CommandDirectiveInput(name));
             }
 
             return result;
@@ -243,7 +266,8 @@ namespace CliFx.Domain.Input
 
             IReadOnlyList<CommandDirectiveInput> directives = ParseDirectives(
                 commandLineArguments,
-                ref index
+                ref index,
+                out bool isInteractiveDirectiveSpecified
             );
 
             string? commandName = ParseCommandName(
@@ -262,13 +286,14 @@ namespace CliFx.Domain.Input
                 ref index
             );
 
-            return new CommandInput(directives, commandName, parameters, options);
+            return new CommandInput(isInteractiveDirectiveSpecified, directives, commandName, parameters, options);
         }
     }
 
     public partial class CommandInput
     {
         internal static CommandInput Empty { get; } = new CommandInput(
+            false,
             Array.Empty<CommandDirectiveInput>(),
             null,
             Array.Empty<CommandParameterInput>(),
