@@ -5,10 +5,18 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using CliFx.Attributes;
-using CliFx.Domain;
-using CliFx.Domain.Input;
 using CliFx.Exceptions;
+using CliFx.Input;
+using CliFx.Internal;
+using CliFx.Schemas;
 using Microsoft.Extensions.DependencyInjection;
+/* Unmerged change from project 'CliFx (netstandard2.0)'
+Before:
+using CliFx.Internal;
+After:
+using Microsoft.Extensions.DependencyInjection;
+*/
+
 
 namespace CliFx
 {

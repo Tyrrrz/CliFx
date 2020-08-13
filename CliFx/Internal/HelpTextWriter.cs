@@ -5,8 +5,9 @@ using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using CliFx.Internal.Extensions;
+using CliFx.Schemas;
 
-namespace CliFx.Domain
+namespace CliFx.Internal
 {
     internal partial class HelpTextWriter
     {

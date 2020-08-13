@@ -5,11 +5,11 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using CliFx.Attributes;
-using CliFx.Domain.Input;
 using CliFx.Exceptions;
+using CliFx.Input;
 using CliFx.Internal.Extensions;
 
-namespace CliFx.Domain
+namespace CliFx.Schemas
 {
     /// <summary>
     /// Stores command schema.

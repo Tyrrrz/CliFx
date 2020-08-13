@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CliFx.Domain;
-using CliFx.Domain.Input;
+using CliFx.Input;
+using CliFx.Schemas;
 
 namespace CliFx
 {

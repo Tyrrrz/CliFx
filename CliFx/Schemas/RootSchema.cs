@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CliFx.Exceptions;
 
-namespace CliFx.Domain
+namespace CliFx.Schemas
 {
     /// <summary>
     /// Stores all schemas of commands and directives in the application.

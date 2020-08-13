@@ -6,7 +6,7 @@ using System.Reflection;
 using CliFx.Exceptions;
 using CliFx.Internal.Extensions;
 
-namespace CliFx.Domain
+namespace CliFx.Schemas
 {
     /// <summary>
     /// Abstract command argument schema used in <see cref="CommandParameterSchema"/> and <see cref="CommandOptionSchema"/>

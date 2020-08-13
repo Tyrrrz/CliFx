@@ -1,5 +1,5 @@
-﻿using CliFx.Domain;
-using CliFx.Domain.Input;
+﻿using CliFx.Input;
+using CliFx.Schemas;
 
 namespace CliFx
 {

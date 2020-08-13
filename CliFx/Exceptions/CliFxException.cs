@@ -2,9 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using CliFx.Attributes;
-using CliFx.Domain;
-using CliFx.Domain.Input;
+using CliFx.Input;
 using CliFx.Internal.Extensions;
+using CliFx.Schemas;
+/* Unmerged change from project 'CliFx (netstandard2.0)'
+Before:
+using CliFx.Internal.Extensions;
+After:
+using CliFx.Schemas;
+*/
+
 
 namespace CliFx.Exceptions
 {

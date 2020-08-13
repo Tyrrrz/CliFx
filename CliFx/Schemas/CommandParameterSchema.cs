@@ -2,7 +2,7 @@
 using System.Text;
 using CliFx.Attributes;
 
-namespace CliFx.Domain
+namespace CliFx.Schemas
 {
     /// <summary>
     /// Stores command parameter schema.

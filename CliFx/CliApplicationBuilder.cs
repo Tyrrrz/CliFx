@@ -5,9 +5,16 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using CliFx.Directives;
-using CliFx.Domain;
 using CliFx.Exceptions;
+
+/* Unmerged change from project 'CliFx (netstandard2.0)'
+Before:
+using CliFx.Exceptions;
+After:
+using CliFx.Internal;
+*/
 using CliFx.Internal.Extensions;
+using CliFx.Schemas;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 

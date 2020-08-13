@@ -1,4 +1,4 @@
-﻿namespace CliFx.Domain.Input
+﻿namespace CliFx.Input
 {
     /// <summary>
     /// Stores command parameter input.

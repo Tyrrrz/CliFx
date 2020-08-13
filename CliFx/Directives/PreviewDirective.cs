@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using CliFx.Attributes;
-using CliFx.Domain.Input;
+using CliFx.Input;
 
 namespace CliFx.Directives
 {

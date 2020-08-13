@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using CliFx.Directives;
-using CliFx.Domain;
 using CliFx.Exceptions;
+using CliFx.Schemas;
 using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;

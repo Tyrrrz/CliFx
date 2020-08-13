@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using CliFx.Domain.Input;
+using CliFx.Input;
 
 namespace CliFx.Tests.Internal
 {

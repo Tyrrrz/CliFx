@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using CliFx.Internal.Extensions;
+using CliFx.Schemas;
 
-namespace CliFx.Domain.Input
+namespace CliFx.Input
 {
     /// <summary>
     /// Stores command option input.
