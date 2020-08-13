@@ -21,7 +21,7 @@ namespace CliFx.Directives
     ///              > cmd1 -h
     /// </example>
     /// </summary>
-    [Directive(">", Description = "Sets a scope to defined command(s).", InteractiveModeOnly = true)]
+    [Directive(">", Description = "Sets a scope to command(s).", InteractiveModeOnly = true)]
     internal sealed class ScopeDirective : IDirective
     {
         private readonly CliContext _cliContext;

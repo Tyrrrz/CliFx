@@ -60,6 +60,7 @@ namespace CliFx
             while (true) //TODO maybe add CliContext.Exit and CliContext.Status
             {
                 string[] commandLineArguments = GetInput(console, executableName);
+
                 CommandInput input = CommandInput.Parse(commandLineArguments, root.GetCommandNames());
                 CliContext.CurrentInput = input; //TODO maybe refactor with some clever IDisposable class
 

@@ -164,7 +164,6 @@ namespace CliFx
                 CliContext.Root = root;
 
                 int exitCode = await PreExecuteCommand(commandLineArguments, environmentVariables, root);
-
                 PrintExitMessage(exitCode);
 
                 return exitCode;

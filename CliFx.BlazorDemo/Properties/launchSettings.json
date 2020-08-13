@@ -10,7 +10,7 @@
     },
     "CliFx.BlazorDemo [interactive]": {
       "commandName": "Project",
-      "commandLineArgs": "[interactive]",
+      "commandLineArgs": "[interactive] -h",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },

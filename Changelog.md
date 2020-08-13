@@ -2,7 +2,6 @@
 
 - Added interactive mode `CliInteractiveApplication` and interactive only commands.
 - Added `ICliExceptionHandler` and `CliApplicationBuilder.UseExceptionHandler(...)`
-- Added `CliApplicationBuilder.UseTypeActivator(Func<ICliContext, IConsole, Func<Type, object>> buildServiceProvider)` for easy DI container independent ICliContext and IConsole registration.
 - Added	`Manual` porperty in `CommandAttribute` that can be used to provide a long, extended description of a commmand.
 - Added `CliContext` that can be injected to services and commands with DI.
 - Added `WindowWidth`, `WindowHeight`, `BufferWidth`, and `BufferHeight` to `IConsole`.
@@ -12,8 +11,9 @@
 - Added benchmarks for multiple commands.
 - Added startup message option with macros.
 - Rewritten `RootSchema` with HashSet.
-- Added tests of the command used in benchmagking to easily chech if it executs correctly and won't cause banchmarking freezing.
+- Added tests of the command used in benchmarking to easily check if it executs correctly and won't cause banchmarking freezing.
 - Improved code readability.
+- Removed `CliApplicationBuilder.UseTypeActivator` and added Microsoft.Extensions.DependencyInjection
 
 ### v1.3.2 (31-Jul-2020)
 

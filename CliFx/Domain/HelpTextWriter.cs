@@ -13,8 +13,8 @@ namespace CliFx.Domain
         private const ConsoleColor TitleColor = ConsoleColor.Yellow;
         private const ConsoleColor VersionColor = ConsoleColor.Yellow;
         private const ConsoleColor HeaderColor = ConsoleColor.Magenta;
+        private const ConsoleColor DirectiveNameColor = ConsoleColor.Green;
         private const ConsoleColor CommandNameColor = ConsoleColor.Cyan;
-        private const ConsoleColor ChildCommandPlaceholderColor = ConsoleColor.Cyan;
         private const ConsoleColor ParametersColor = ConsoleColor.White;
         private const ConsoleColor OptionsPlaceholderColor = ConsoleColor.White;
         private const ConsoleColor RequiredColor = ConsoleColor.Red;
@@ -104,6 +104,46 @@ namespace CliFx.Domain
             }
         }
 
+        private void WriteDirectivesManual(IReadOnlyDictionary<string, DirectiveSchema> directives)
+        {
+            if (directives.Count == 0)
+                return;
+
+            if (!IsEmpty)
+                WriteVerticalMargin();
+
+            WriteHeader("Directives");
+
+            foreach (KeyValuePair<string, DirectiveSchema> directive in directives)
+            {
+                DirectiveSchema schema = directive.Value;
+
+                // Name
+                if (schema.InteractiveModeOnly)
+                {
+                    Write(InteractiveOnlyColor, "@");
+                    WriteHorizontalMargin(1);
+                }
+                else
+                    WriteHorizontalMargin();
+
+                Write(DirectiveNameColor, "[");
+                Write(DirectiveNameColor, directive.Key);
+                Write(DirectiveNameColor, "]");
+                WriteDirectiveDescription(schema);
+                WriteLine();
+            }
+        }
+
+        private void WriteDirectiveDescription(DirectiveSchema directive)
+        {
+            if (string.IsNullOrWhiteSpace(directive.Description))
+                return;
+
+            WriteColumnMargin();
+            Write(directive.Description);
+        }
+
         private void WriteCommandDescription(CommandSchema command)
         {
             if (string.IsNullOrWhiteSpace(command.Description))
@@ -138,7 +178,9 @@ namespace CliFx.Domain
             WriteLine();
         }
 
-        private void WriteCommandUsage(CommandSchema command, IReadOnlyList<CommandSchema> childCommands)
+        private void WriteCommandUsage(IReadOnlyDictionary<string, DirectiveSchema> directives,
+                                       CommandSchema command,
+                                       IReadOnlyList<CommandSchema> childCommands)
         {
             if (!IsEmpty)
                 WriteVerticalMargin();
@@ -157,6 +199,13 @@ namespace CliFx.Domain
             if (!command.InteractiveModeOnly && !_cliContext.IsInteractiveMode)
                 Write(_cliContext.Metadata.ExecutableName);
 
+            // Child command placeholder
+            if (directives.Any())
+            {
+                Write(' ');
+                Write(DirectiveNameColor, "[directive]");
+            }
+
             // Command name
             if (!string.IsNullOrWhiteSpace(command.Name))
             {
@@ -168,7 +217,7 @@ namespace CliFx.Domain
             if (childCommands.Any())
             {
                 Write(' ');
-                Write(ChildCommandPlaceholderColor, "[command]");
+                Write(CommandNameColor, "[command]");
             }
 
             // Parameters
@@ -239,9 +288,8 @@ namespace CliFx.Domain
             }
         }
 
-        private void WriteCommandOptions(
-            CommandSchema command,
-            IReadOnlyDictionary<CommandArgumentSchema, object?> argumentDefaultValues)
+        private void WriteCommandOptions(CommandSchema command,
+                                         IReadOnlyDictionary<CommandArgumentSchema, object?> argumentDefaultValues)
         {
             if (!IsEmpty)
                 WriteVerticalMargin();
@@ -316,9 +364,8 @@ namespace CliFx.Domain
             }
         }
 
-        private void WriteCommandChildren(
-            CommandSchema command,
-            IReadOnlyList<CommandSchema> childCommands)
+        private void WriteCommandChildren(CommandSchema command,
+                                          IReadOnlyList<CommandSchema> childCommands)
         {
             if (!childCommands.Any())
                 return;
@@ -358,15 +405,22 @@ namespace CliFx.Domain
             // Child command help tip
             WriteVerticalMargin();
             Write("You can run `");
-            Write(_cliContext.Metadata.ExecutableName);
+
+            bool isNormalMode = !command.InteractiveModeOnly && !_cliContext.IsInteractiveMode;
+            if (isNormalMode)
+                Write(_cliContext.Metadata.ExecutableName);
 
             if (!string.IsNullOrWhiteSpace(command.Name))
             {
-                Write(' ');
+                if (isNormalMode)
+                    Write(' ');
+
                 Write(ConsoleColor.Cyan, command.Name);
             }
 
-            Write(' ');
+            if (isNormalMode)
+                Write(' ');
+
             Write(ConsoleColor.Cyan, "[command]");
 
             Write(' ');
@@ -384,15 +438,17 @@ namespace CliFx.Domain
             IReadOnlyList<CommandSchema> childCommands = root.GetChildCommands(command.Name);
 
             _console.ResetColor();
+            _console.ForegroundColor = ConsoleColor.Gray;
 
             if (command.IsDefault)
                 WriteApplicationInfo();
 
             WriteCommandDescription(command);
-            WriteCommandUsage(command, childCommands);
+            WriteCommandUsage(root.Directives, command, childCommands);
             WriteCommandParameters(command);
             WriteCommandOptions(command, defaultValues);
             WriteCommandChildren(command, childCommands);
+            WriteDirectivesManual(root.Directives);
             WriteCommandManual(command);
         }
     }
