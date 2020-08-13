@@ -309,7 +309,7 @@
         private async Task<bool> ProcessDefinedDirectives(IServiceScope serviceScope, RootSchema root, CommandInput input)
         {
             bool isInteractiveMode = CliContext.IsInteractiveMode;
-            foreach (CommandDirectiveInput directiveInput in input.Directives)
+            foreach (DirectiveInput directiveInput in input.Directives)
             {
                 // Try to get the directive matching the input or fallback to default
                 DirectiveSchema directive = root.TryFindDirective(directiveInput.Name) ?? throw CliFxException.UnknownDirectiveName(directiveInput);

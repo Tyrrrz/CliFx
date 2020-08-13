@@ -5,7 +5,7 @@
 
     internal class CommandInputBuilder
     {
-        private readonly List<CommandDirectiveInput> _directives = new List<CommandDirectiveInput>();
+        private readonly List<DirectiveInput> _directives = new List<DirectiveInput>();
         private readonly List<CommandParameterInput> _parameters = new List<CommandParameterInput>();
         private readonly List<CommandOptionInput> _options = new List<CommandOptionInput>();
 
@@ -19,7 +19,7 @@
 
         public CommandInputBuilder AddDirective(string directive)
         {
-            _directives.Add(new CommandDirectiveInput(directive));
+            _directives.Add(new DirectiveInput(directive));
             return this;
         }
 

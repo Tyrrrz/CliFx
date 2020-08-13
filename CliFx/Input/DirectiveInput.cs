@@ -3,7 +3,7 @@
     /// <summary>
     /// Stores command directive input.
     /// </summary>
-    public class CommandDirectiveInput
+    public class DirectiveInput
     {
         /// <summary>
         /// Directive name.
@@ -11,9 +11,9 @@
         public string Name { get; }
 
         /// <summary>
-        /// Initializes an instance of <see cref="CommandDirectiveInput"/>.
+        /// Initializes an instance of <see cref="DirectiveInput"/>.
         /// </summary>
-        public CommandDirectiveInput(string name)
+        public DirectiveInput(string name)
         {
             Name = name;
         }

@@ -80,16 +80,16 @@
             Type = type;
             Name = name;
             Description = description;
-            Parameters = parameters;
-            Options = options;
             Manual = manual;
             InteractiveModeOnly = interactiveModeOnly;
+            Parameters = parameters;
+            Options = options;
         }
 
         /// <summary>
         /// Enumerates through parameters and options.
         /// </summary>
-        public IEnumerable<CommandArgumentSchema> GetArguments()
+        public IEnumerable<ArgumentSchema> GetArguments()
         {
             foreach (CommandParameterSchema parameter in Parameters)
                 yield return parameter;
@@ -101,11 +101,11 @@
         /// <summary>
         /// Returns dictionary of arguments and its values.
         /// </summary>
-        public IReadOnlyDictionary<CommandArgumentSchema, object?> GetArgumentValues(ICommand instance)
+        public IReadOnlyDictionary<ArgumentSchema, object?> GetArgumentValues(ICommand instance)
         {
-            var result = new Dictionary<CommandArgumentSchema, object?>();
+            var result = new Dictionary<ArgumentSchema, object?>();
 
-            foreach (CommandArgumentSchema argument in GetArguments())
+            foreach (ArgumentSchema argument in GetArguments())
             {
                 // Skip built-in arguments
                 if (argument.Property is null)

@@ -9,7 +9,7 @@
     /// <summary>
     /// Stores command option schema.
     /// </summary>
-    public partial class CommandOptionSchema : CommandArgumentSchema
+    public partial class CommandOptionSchema : ArgumentSchema
     {
         /// <summary>
         /// Option name.

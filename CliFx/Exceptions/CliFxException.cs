@@ -311,7 +311,7 @@ Option {option.GetUserFacingDisplayString()} expects a single value, but provide
         }
 
         internal static CliFxException CannotConvertMultipleValuesToNonScalar(
-            CommandArgumentSchema argument,
+            ArgumentSchema argument,
             IReadOnlyList<string> values)
         {
             return argument switch
@@ -349,7 +349,7 @@ Can't convert value ""{value ?? "<null>"}"" to type '{type.Name}' for option {op
         }
 
         internal static CliFxException CannotConvertToType(
-            CommandArgumentSchema argument,
+            ArgumentSchema argument,
             string? value,
             Type type,
             Exception? innerException = null)
@@ -391,7 +391,7 @@ Target type is not assignable from array and doesn't have a public constructor t
         }
 
         internal static CliFxException CannotConvertNonScalar(
-            CommandArgumentSchema argument,
+            ArgumentSchema argument,
             IReadOnlyList<string> values,
             Type type)
         {
@@ -448,7 +448,7 @@ Please consider switching to interactive application or removing the command.";
             return new CliFxException(message.Trim());
         }
 
-        internal static CliFxException UnknownDirectiveName(CommandDirectiveInput directive)
+        internal static CliFxException UnknownDirectiveName(DirectiveInput directive)
         {
             var message = $@"
 Unknown directive '{directive}'.";

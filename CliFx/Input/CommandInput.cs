@@ -22,7 +22,7 @@
         /// <summary>
         /// Command direcitves list without special [interactive] directive.
         /// </summary>
-        public IReadOnlyList<CommandDirectiveInput> Directives { get; }
+        public IReadOnlyList<DirectiveInput> Directives { get; }
 
         /// <summary>
         /// Command name. Null or empty/whitespace if default command.
@@ -58,7 +58,7 @@
         /// Initializes an instance of <see cref="CommandInput"/>.
         /// </summary>
         public CommandInput(bool isInteractiveDirectiveSpecified,
-                            IReadOnlyList<CommandDirectiveInput> directives,
+                            IReadOnlyList<DirectiveInput> directives,
                             string? commandName,
                             IReadOnlyList<CommandParameterInput> parameters,
                             IReadOnlyList<CommandOptionInput> options)
@@ -106,7 +106,7 @@
         {
             var buffer = new StringBuilder();
 
-            foreach (CommandDirectiveInput directive in Directives)
+            foreach (DirectiveInput directive in Directives)
             {
                 buffer.AppendIfNotEmpty(' ')
                       .Append(directive);
@@ -136,12 +136,12 @@
 
     public partial class CommandInput
     {
-        private static IReadOnlyList<CommandDirectiveInput> ParseDirectives(IReadOnlyList<string> commandLineArguments,
+        private static IReadOnlyList<DirectiveInput> ParseDirectives(IReadOnlyList<string> commandLineArguments,
                                                                             ref int index,
                                                                             out bool isInteractiveDirectiveSpecified)
         {
             isInteractiveDirectiveSpecified = false;
-            var result = new List<CommandDirectiveInput>();
+            var result = new List<DirectiveInput>();
 
             for (; index < commandLineArguments.Count; index++)
             {
@@ -155,7 +155,7 @@
                 if (name == BuiltInDirectives.Interactive)
                     isInteractiveDirectiveSpecified = true;
                 else
-                    result.Add(new CommandDirectiveInput(name));
+                    result.Add(new DirectiveInput(name));
             }
 
             return result;
@@ -264,7 +264,7 @@
         {
             int index = 0;
 
-            IReadOnlyList<CommandDirectiveInput> directives = ParseDirectives(
+            IReadOnlyList<DirectiveInput> directives = ParseDirectives(
                 commandLineArguments,
                 ref index,
                 out bool isInteractiveDirectiveSpecified
@@ -294,7 +294,7 @@
     {
         internal static CommandInput Empty { get; } = new CommandInput(
             false,
-            Array.Empty<CommandDirectiveInput>(),
+            Array.Empty<DirectiveInput>(),
             null,
             Array.Empty<CommandParameterInput>(),
             Array.Empty<CommandOptionInput>()

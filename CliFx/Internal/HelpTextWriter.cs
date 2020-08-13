@@ -115,7 +115,7 @@
 
             WriteHeader("Directives");
 
-            foreach (KeyValuePair<string, DirectiveSchema> directive in directives)
+            foreach (KeyValuePair<string, DirectiveSchema> directive in directives.OrderBy(x => x.Value.Name))
             {
                 DirectiveSchema schema = directive.Value;
 
@@ -290,7 +290,7 @@
         }
 
         private void WriteCommandOptions(CommandSchema command,
-                                         IReadOnlyDictionary<CommandArgumentSchema, object?> argumentDefaultValues)
+                                         IReadOnlyDictionary<ArgumentSchema, object?> argumentDefaultValues)
         {
             if (!IsEmpty)
                 WriteVerticalMargin();
@@ -434,7 +434,7 @@
 
         public void Write(RootSchema root,
                           CommandSchema command,
-                          IReadOnlyDictionary<CommandArgumentSchema, object?> defaultValues)
+                          IReadOnlyDictionary<ArgumentSchema, object?> defaultValues)
         {
             IReadOnlyList<CommandSchema> childCommands = root.GetChildCommands(command.Name);
 

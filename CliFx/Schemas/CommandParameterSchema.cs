@@ -7,7 +7,7 @@
     /// <summary>
     /// Stores command parameter schema.
     /// </summary>
-    public partial class CommandParameterSchema : CommandArgumentSchema
+    public partial class CommandParameterSchema : ArgumentSchema
     {
         /// <summary>
         /// Parameter order.

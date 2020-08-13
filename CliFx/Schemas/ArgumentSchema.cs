@@ -11,7 +11,7 @@
     /// <summary>
     /// Abstract command argument schema used in <see cref="CommandParameterSchema"/> and <see cref="CommandOptionSchema"/>
     /// </summary>
-    public abstract partial class CommandArgumentSchema
+    public abstract partial class ArgumentSchema
     {
         // Property can be null on built-in arguments (help and version options)
         internal PropertyInfo? Property { get; }
@@ -27,9 +27,9 @@
         public bool IsScalar => TryGetEnumerableArgumentUnderlyingType() == null;
 
         /// <summary>
-        /// Initializes an instance of <see cref="CommandArgumentSchema"/>.
+        /// Initializes an instance of <see cref="ArgumentSchema"/>.
         /// </summary>
-        protected CommandArgumentSchema(PropertyInfo? property, string? description)
+        protected ArgumentSchema(PropertyInfo? property, string? description)
         {
             Property = property;
             Description = description;
@@ -154,7 +154,7 @@
         }
     }
 
-    public partial class CommandArgumentSchema
+    public partial class ArgumentSchema
     {
         private static readonly IFormatProvider FormatProvider = CultureInfo.InvariantCulture;
 

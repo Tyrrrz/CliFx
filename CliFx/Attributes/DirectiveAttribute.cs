@@ -24,6 +24,8 @@
         /// </summary>
         public bool InteractiveModeOnly { get; set; }
 
+        //TODO: Maybe add directive parameters, e.g., "[name:parameter]". Maybe only single parameter?
+
         /// <summary>
         /// Initializes an instance of <see cref="CommandAttribute"/>.
         /// </summary>
