@@ -1,9 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
-using CliFx.Attributes;
-
-namespace CliFx.Tests.Dummy.Commands
+﻿namespace CliFx.Tests.Dummy.Commands
 {
+    using System;
+    using System.Threading.Tasks;
+    using CliFx.Attributes;
+
     [Command("console-test")]
     public class ConsoleTestCommand : ICommand
     {

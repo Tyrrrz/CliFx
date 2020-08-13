@@ -1,8 +1,8 @@
-﻿using System.Threading.Tasks;
-using CliFx.Attributes;
-
-namespace CliFx.Benchmarks.Commands.CliFxCommands
+﻿namespace CliFx.Benchmarks.Commands.CliFxCommands
 {
+    using System.Threading.Tasks;
+    using CliFx.Attributes;
+
     [Command("named-command16")]
     public class CliFxNamedCommandCommand16 : ICommand
     {

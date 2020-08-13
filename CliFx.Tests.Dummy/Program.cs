@@ -1,8 +1,8 @@
-﻿using System.Reflection;
-using System.Threading.Tasks;
-
-namespace CliFx.Tests.Dummy
+﻿namespace CliFx.Tests.Dummy
 {
+    using System.Reflection;
+    using System.Threading.Tasks;
+
     public static partial class Program
     {
         public static Assembly Assembly { get; } = typeof(Program).Assembly;

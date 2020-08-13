@@ -1,16 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using CliFx.Attributes;
-using CliFx.Exceptions;
-using CliFx.Input;
-using CliFx.Internal.Extensions;
-
-namespace CliFx.Schemas
+﻿namespace CliFx.Schemas
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Reflection;
+    using System.Text;
+    using CliFx.Attributes;
+    using CliFx.Exceptions;
+    using CliFx.Input;
+    using CliFx.Internal.Extensions;
+
     /// <summary>
     /// Stores command schema.
     /// </summary>

@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-
-namespace CliFx.Tests
+﻿namespace CliFx.Tests
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+
     public partial class ArgumentBindingSpecs
     {
         private enum CustomEnum

@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using CliFx.Input;
-using CliFx.Tests.Internal;
-using FluentAssertions;
-using Xunit;
-
-namespace CliFx.Tests
+﻿namespace CliFx.Tests
 {
+    using System;
+    using System.Collections.Generic;
+    using CliFx.Input;
+    using CliFx.Tests.Internal;
+    using FluentAssertions;
+    using Xunit;
+
     public class ArgumentSyntaxSpecs
     {
         [Fact]

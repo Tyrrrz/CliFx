@@ -1,7 +1,7 @@
-﻿using McMaster.Extensions.CommandLineUtils;
-
-namespace CliFx.Benchmarks.Commands
+﻿namespace CliFx.Benchmarks.Commands
 {
+    using McMaster.Extensions.CommandLineUtils;
+
     public class McMasterCommand
     {
         [Option("--str|-s")]

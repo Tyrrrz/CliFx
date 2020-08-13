@@ -1,10 +1,10 @@
-﻿using System;
-using System.Threading.Tasks;
-using CliFx.Attributes;
-using CliFx.Exceptions;
-
-namespace CliFx.Tests
+﻿namespace CliFx.Tests
 {
+    using System;
+    using System.Threading.Tasks;
+    using CliFx.Attributes;
+    using CliFx.Exceptions;
+
     public partial class ErrorReportingSpecs
     {
         [Command("exc")]

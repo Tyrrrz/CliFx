@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace CliFx.Utilities
+﻿namespace CliFx.Utilities
 {
+    using System;
+
     /// <summary>
     /// Utility for rendering current progress to the console that erases and rewrites output on every tick.
     /// </summary>

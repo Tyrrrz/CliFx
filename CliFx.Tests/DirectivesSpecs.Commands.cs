@@ -1,8 +1,8 @@
-﻿using System.Threading.Tasks;
-using CliFx.Attributes;
-
-namespace CliFx.Tests
+﻿namespace CliFx.Tests
 {
+    using System.Threading.Tasks;
+    using CliFx.Attributes;
+
     public partial class DirectivesSpecs
     {
         [Command("cmd")]

@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using CliFx.Analyzers.Tests.Internal;
-using Microsoft.CodeAnalysis.Diagnostics;
-using Xunit;
-
-namespace CliFx.Analyzers.Tests
+﻿namespace CliFx.Analyzers.Tests
 {
+    using System.Collections.Generic;
+    using CliFx.Analyzers.Tests.Internal;
+    using Microsoft.CodeAnalysis.Diagnostics;
+    using Xunit;
+
     public class ConsoleUsageAnalyzerTests
     {
         private static DiagnosticAnalyzer Analyzer { get; } = new ConsoleUsageAnalyzer();

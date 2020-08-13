@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace CliFx.Internal.Extensions
+﻿namespace CliFx.Internal.Extensions
 {
+    using System;
+
     internal static class VersionExtensions
     {
         public static string ToSemanticString(this Version version)

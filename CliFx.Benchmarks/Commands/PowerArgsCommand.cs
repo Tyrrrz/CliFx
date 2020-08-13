@@ -1,7 +1,7 @@
-﻿using PowerArgs;
-
-namespace CliFx.Benchmarks.Commands
+﻿namespace CliFx.Benchmarks.Commands
 {
+    using PowerArgs;
+
     public class PowerArgsCommand
     {
         [ArgShortcut("--str"), ArgShortcut("-s")]
@@ -15,6 +15,7 @@ namespace CliFx.Benchmarks.Commands
 
         public void Main()
         {
+
         }
     }
 }

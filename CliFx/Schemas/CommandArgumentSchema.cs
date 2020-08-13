@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Reflection;
-using CliFx.Exceptions;
-using CliFx.Internal.Extensions;
-
-namespace CliFx.Schemas
+﻿namespace CliFx.Schemas
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.Linq;
+    using System.Reflection;
+    using CliFx.Exceptions;
+    using CliFx.Internal.Extensions;
+
     /// <summary>
     /// Abstract command argument schema used in <see cref="CommandParameterSchema"/> and <see cref="CommandOptionSchema"/>
     /// </summary>

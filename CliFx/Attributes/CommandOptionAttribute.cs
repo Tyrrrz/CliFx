@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace CliFx.Attributes
+﻿namespace CliFx.Attributes
 {
+    using System;
+
     /// <summary>
     /// Annotates a property that defines a command option.
     /// </summary>

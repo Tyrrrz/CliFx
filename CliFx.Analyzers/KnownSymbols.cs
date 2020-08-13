@@ -1,8 +1,8 @@
-﻿using CliFx.Analyzers.Internal;
-using Microsoft.CodeAnalysis;
-
-namespace CliFx.Analyzers
+﻿namespace CliFx.Analyzers
 {
+    using CliFx.Analyzers.Internal;
+    using Microsoft.CodeAnalysis;
+
     public static class KnownSymbols
     {
         public static bool IsSystemString(ISymbol symbol)

@@ -1,9 +1,9 @@
-﻿using System;
-using System.IO;
-using System.Threading;
-
-namespace CliFx
+﻿namespace CliFx
 {
+    using System;
+    using System.IO;
+    using System.Threading;
+
     /// <summary>
     /// Implementation of <see cref="IConsole"/> that wraps the default system console.
     /// </summary>

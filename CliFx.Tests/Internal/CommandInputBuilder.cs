@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using CliFx.Input;
-
-namespace CliFx.Tests.Internal
+﻿namespace CliFx.Tests.Internal
 {
+    using System.Collections.Generic;
+    using CliFx.Input;
+
     internal class CommandInputBuilder
     {
         private readonly List<CommandDirectiveInput> _directives = new List<CommandDirectiveInput>();

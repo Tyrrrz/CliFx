@@ -1,13 +1,13 @@
-﻿using System;
-using System.IO;
-using System.Threading.Tasks;
-using CliWrap;
-using CliWrap.Buffered;
-using FluentAssertions;
-using Xunit;
-
-namespace CliFx.Tests
+﻿namespace CliFx.Tests
 {
+    using System;
+    using System.IO;
+    using System.Threading.Tasks;
+    using CliWrap;
+    using CliWrap.Buffered;
+    using FluentAssertions;
+    using Xunit;
+
     public class ConsoleSpecs
     {
         [Fact]

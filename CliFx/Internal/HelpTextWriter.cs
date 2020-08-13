@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text.RegularExpressions;
-using CliFx.Internal.Extensions;
-using CliFx.Schemas;
-
-namespace CliFx.Internal
+﻿namespace CliFx.Internal
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.Linq;
+    using System.Text.RegularExpressions;
+    using CliFx.Internal.Extensions;
+    using CliFx.Schemas;
+
     internal partial class HelpTextWriter
     {
         private const ConsoleColor TitleColor = ConsoleColor.Yellow;

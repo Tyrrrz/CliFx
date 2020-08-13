@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-
-namespace CliFx.Internal.Extensions
+﻿namespace CliFx.Internal.Extensions
 {
+    using System.Collections.Generic;
+
     internal static class CollectionExtensions
     {
         public static void RemoveRange<T>(this ICollection<T> source, IEnumerable<T> items)

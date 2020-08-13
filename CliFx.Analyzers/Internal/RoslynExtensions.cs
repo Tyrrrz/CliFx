@@ -1,8 +1,8 @@
-﻿using System;
-using Microsoft.CodeAnalysis;
-
-namespace CliFx.Analyzers.Internal
+﻿namespace CliFx.Analyzers.Internal
 {
+    using System;
+    using Microsoft.CodeAnalysis;
+
     internal static class RoslynExtensions
     {
         public static bool DisplayNameMatches(this ISymbol symbol, string name)

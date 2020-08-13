@@ -1,11 +1,11 @@
-﻿using System.IO;
-using System.Threading.Tasks;
-using FluentAssertions;
-using Xunit;
-using Xunit.Abstractions;
-
-namespace CliFx.Tests
+﻿namespace CliFx.Tests
 {
+    using System.IO;
+    using System.Threading.Tasks;
+    using FluentAssertions;
+    using Xunit;
+    using Xunit.Abstractions;
+
     public partial class HelpTextSpecs
     {
         private readonly ITestOutputHelper _output;

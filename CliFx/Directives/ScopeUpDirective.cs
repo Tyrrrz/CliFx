@@ -1,9 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
-using CliFx.Attributes;
-
-namespace CliFx.Directives
+﻿namespace CliFx.Directives
 {
+    using System;
+    using System.Threading.Tasks;
+    using CliFx.Attributes;
+
     /// <summary>
     /// If application rans in interactive mode, this [.] directive can be used to remove one command from the scope.
     /// <example>

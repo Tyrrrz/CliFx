@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using CliFx.Directives;
-using CliFx.Exceptions;
-using CliFx.Schemas;
-using FluentAssertions;
-using Xunit;
-using Xunit.Abstractions;
-
-namespace CliFx.Tests
+﻿namespace CliFx.Tests
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using CliFx.Directives;
+    using CliFx.Exceptions;
+    using CliFx.Schemas;
+    using FluentAssertions;
+    using Xunit;
+    using Xunit.Abstractions;
+
     public partial class ApplicationSpecs
     {
         private readonly ITestOutputHelper _output;

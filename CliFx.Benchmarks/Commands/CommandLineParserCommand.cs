@@ -1,7 +1,7 @@
-﻿using CommandLine;
-
-namespace CliFx.Benchmarks.Commands
+﻿namespace CliFx.Benchmarks.Commands
 {
+    using CommandLine;
+
     public class CommandLineParserCommand
     {
         [Option('s', "str")]
@@ -15,6 +15,7 @@ namespace CliFx.Benchmarks.Commands
 
         public void Execute()
         {
+
         }
     }
 }

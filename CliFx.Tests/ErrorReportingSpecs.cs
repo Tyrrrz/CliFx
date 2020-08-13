@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
-using FluentAssertions;
-using Xunit;
-using Xunit.Abstractions;
-
-namespace CliFx.Tests
+﻿namespace CliFx.Tests
 {
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Threading.Tasks;
+    using FluentAssertions;
+    using Xunit;
+    using Xunit.Abstractions;
+
     public partial class ErrorReportingSpecs
     {
         private readonly ITestOutputHelper _output;

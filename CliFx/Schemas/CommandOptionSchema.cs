@@ -1,11 +1,11 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using CliFx.Attributes;
-
-namespace CliFx.Schemas
+﻿namespace CliFx.Schemas
 {
+    using System;
+    using System.Linq;
+    using System.Reflection;
+    using System.Text;
+    using CliFx.Attributes;
+
     /// <summary>
     /// Stores command option schema.
     /// </summary>

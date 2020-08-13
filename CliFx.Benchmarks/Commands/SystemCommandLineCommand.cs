@@ -1,9 +1,9 @@
-﻿using System.CommandLine;
-using System.CommandLine.Invocation;
-using System.Threading.Tasks;
-
-namespace CliFx.Benchmarks.Commands
+﻿namespace CliFx.Benchmarks.Commands
 {
+    using System.CommandLine;
+    using System.CommandLine.Invocation;
+    using System.Threading.Tasks;
+
     public class SystemCommandLineCommand
     {
         public static int ExecuteHandler(string s, int i, bool b)

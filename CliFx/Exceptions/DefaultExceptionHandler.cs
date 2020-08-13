@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace CliFx.Exceptions
+﻿namespace CliFx.Exceptions
 {
+    using System;
+
     /// <summary>
     /// Implementation of <see cref="ICliExceptionHandler"/> that prints all exceptions to console.
     /// </summary>

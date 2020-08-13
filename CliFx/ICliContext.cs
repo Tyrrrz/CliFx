@@ -1,8 +1,8 @@
-﻿using CliFx.Input;
-using CliFx.Schemas;
-
-namespace CliFx
+﻿namespace CliFx
 {
+    using CliFx.Input;
+    using CliFx.Schemas;
+
     /// <summary>
     /// Command line application context.
     /// </summary>

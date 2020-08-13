@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using CliFx.Internal.Extensions;
-
-namespace CliFx.Input
+﻿namespace CliFx.Input
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using CliFx.Internal.Extensions;
+
     /// <summary>
     /// Provides a command parser and command class represention.
     /// <remarks>

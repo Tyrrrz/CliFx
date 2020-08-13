@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace CliFx
+﻿namespace CliFx
 {
+    using System;
+
     /// <summary>
     /// Command exit message options.
     /// </summary>

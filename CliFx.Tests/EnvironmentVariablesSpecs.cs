@@ -1,15 +1,15 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
-using CliFx.Input;
-using CliFx.Tests.Internal;
-using CliWrap;
-using CliWrap.Buffered;
-using FluentAssertions;
-using Xunit;
-
-namespace CliFx.Tests
+﻿namespace CliFx.Tests
 {
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Threading.Tasks;
+    using CliFx.Input;
+    using CliFx.Tests.Internal;
+    using CliWrap;
+    using CliWrap.Buffered;
+    using FluentAssertions;
+    using Xunit;
+
     public partial class EnvironmentVariablesSpecs
     {
         // This test uses a real application to make sure environment variables are actually read correctly

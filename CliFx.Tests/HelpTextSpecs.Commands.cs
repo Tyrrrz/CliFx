@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using CliFx.Attributes;
-
-namespace CliFx.Tests
+﻿namespace CliFx.Tests
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+    using CliFx.Attributes;
+
     public partial class HelpTextSpecs
     {
         [Command(Description = "DefaultCommand description.")]

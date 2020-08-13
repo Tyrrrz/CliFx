@@ -1,8 +1,8 @@
-﻿using System;
-using System.Threading.Tasks;
-
-namespace CliFx.Tests.Internal
+﻿namespace CliFx.Tests.Internal
 {
+    using System;
+    using System.Threading.Tasks;
+
     internal static class TaskExtensions
     {
         public static async Task IgnoreCancellation(this Task task)
@@ -13,6 +13,7 @@ namespace CliFx.Tests.Internal
             }
             catch (OperationCanceledException)
             {
+
             }
         }
     }

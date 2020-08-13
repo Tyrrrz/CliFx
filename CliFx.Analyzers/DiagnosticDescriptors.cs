@@ -1,7 +1,7 @@
-﻿using Microsoft.CodeAnalysis;
-
-namespace CliFx.Analyzers
+﻿namespace CliFx.Analyzers
 {
+    using Microsoft.CodeAnalysis;
+
     public static class DiagnosticDescriptors
     {
         public static readonly DiagnosticDescriptor CliFx0001 =

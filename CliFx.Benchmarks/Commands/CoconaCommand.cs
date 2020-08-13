@@ -1,7 +1,7 @@
-﻿using Cocona;
-
-namespace CliFx.Benchmarks.Commands
+﻿namespace CliFx.Benchmarks.Commands
 {
+    using Cocona;
+
     public class CoconaCommand
     {
         public void Execute(

@@ -1,25 +1,18 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text.RegularExpressions;
-using CliFx.Directives;
-using CliFx.Exceptions;
-
-/* Unmerged change from project 'CliFx (netstandard2.0)'
-Before:
-using CliFx.Exceptions;
-After:
-using CliFx.Internal;
-*/
-using CliFx.Internal.Extensions;
-using CliFx.Schemas;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-
 namespace CliFx
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Reflection;
+    using System.Text.RegularExpressions;
+    using CliFx.Directives;
+    using CliFx.Exceptions;
+    using CliFx.Internal.Extensions;
+    using CliFx.Schemas;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.DependencyInjection.Extensions;
+
     /// <summary>
     /// Builds an instance of <see cref="CliApplication"/>.
     /// </summary>

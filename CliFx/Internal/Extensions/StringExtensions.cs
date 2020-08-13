@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CliFx.Internal.Extensions
+﻿namespace CliFx.Internal.Extensions
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Text;
+
     internal static class StringExtensions
     {
         public static string Repeat(this char c, int count)

@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-
-namespace CliFx.Internal.Extensions
+﻿namespace CliFx.Internal.Extensions
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
+
     internal static class TypeExtensions
     {
         public static bool Implements(this Type type, Type interfaceType)

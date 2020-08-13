@@ -1,11 +1,11 @@
-﻿using System;
-using System.Diagnostics;
-using System.Threading.Tasks;
-using CliFx.Attributes;
-using CliFx.Internal;
-
-namespace CliFx.Directives
+﻿namespace CliFx.Directives
 {
+    using System;
+    using System.Diagnostics;
+    using System.Threading.Tasks;
+    using CliFx.Attributes;
+    using CliFx.Internal;
+
     /// <summary>
     /// When application is ran in debug mode (using the [debug] directive), it will wait for debugger to be attached before proceeding.
     /// This is useful for debugging apps that were ran outside of the IDE.

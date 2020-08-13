@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-namespace CliFx
+﻿namespace CliFx
 {
+    using Microsoft.Extensions.DependencyInjection;
+
     /// <summary>
     /// Abstraction for CliFx framework configuration using startup class.
     /// </summary>

@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace CliFx.Exceptions
+﻿namespace CliFx.Exceptions
 {
+    using System;
+
     /// <summary>
     /// Abstraction for exception handling.
     /// </summary>

@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using CliFx.Internal.Extensions;
-using CliFx.Schemas;
-
-namespace CliFx.Input
+﻿namespace CliFx.Input
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using CliFx.Internal.Extensions;
+    using CliFx.Schemas;
+
     /// <summary>
     /// Stores command option input.
     /// </summary>

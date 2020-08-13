@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using CliFx.Attributes;
-
-namespace CliFx.Tests
+﻿namespace CliFx.Tests
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+    using CliFx.Attributes;
+
     public partial class ArgumentBindingSpecs
     {
         [Command]

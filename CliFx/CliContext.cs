@@ -1,9 +1,9 @@
-﻿using System;
-using CliFx.Input;
-using CliFx.Schemas;
-
-namespace CliFx
+﻿namespace CliFx
 {
+    using System;
+    using CliFx.Input;
+    using CliFx.Schemas;
+
     /// <inheritdoc/>
     public class CliContext : ICliContext
     {

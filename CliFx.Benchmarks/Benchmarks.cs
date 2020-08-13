@@ -1,15 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Order;
-using BenchmarkDotNet.Running;
-using CliFx.Benchmarks.Commands;
-using CliFx.Benchmarks.Commands.CliFxCommands;
-using CommandLine;
-
-namespace CliFx.Benchmarks
+﻿namespace CliFx.Benchmarks
 {
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+    using BenchmarkDotNet.Attributes;
+    using BenchmarkDotNet.Configs;
+    using BenchmarkDotNet.Order;
+    using BenchmarkDotNet.Running;
+    using CliFx.Benchmarks.Commands;
+    using CliFx.Benchmarks.Commands.CliFxCommands;
+    using CommandLine;
+
     [SimpleJob]
     [RankColumn]
     [Orderer(SummaryOrderPolicy.FastestToSlowest)]

@@ -1,12 +1,12 @@
-﻿using System.IO;
-using System.Linq;
-using CliFx.Utilities;
-using FluentAssertions;
-using Xunit;
-using Xunit.Abstractions;
-
-namespace CliFx.Tests
+﻿namespace CliFx.Tests
 {
+    using System.IO;
+    using System.Linq;
+    using CliFx.Utilities;
+    using FluentAssertions;
+    using Xunit;
+    using Xunit.Abstractions;
+
     public class UtilitiesSpecs
     {
         private readonly ITestOutputHelper _output;

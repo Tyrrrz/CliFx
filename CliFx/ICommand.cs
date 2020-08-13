@@ -1,7 +1,7 @@
-﻿using System.Threading.Tasks;
-
-namespace CliFx
+﻿namespace CliFx
 {
+    using System.Threading.Tasks;
+
     /// <summary>
     /// Entry point in a command line application.
     /// </summary>

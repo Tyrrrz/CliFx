@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
-using CliFx.Directives;
-using FluentAssertions;
-using Xunit;
-
-namespace CliFx.Tests
+﻿namespace CliFx.Tests
 {
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Threading.Tasks;
+    using CliFx.Directives;
+    using FluentAssertions;
+    using Xunit;
+
     public partial class DirectivesSpecs
     {
         [Fact]

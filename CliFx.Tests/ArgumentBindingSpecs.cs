@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using CliFx.Exceptions;
-using CliFx.Tests.Internal;
-using FluentAssertions;
-using Xunit;
-using Xunit.Abstractions;
-
-namespace CliFx.Tests
+﻿namespace CliFx.Tests
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using CliFx.Exceptions;
+    using CliFx.Tests.Internal;
+    using FluentAssertions;
+    using Xunit;
+    using Xunit.Abstractions;
+
     public partial class ArgumentBindingSpecs
     {
         private readonly ITestOutputHelper _output;

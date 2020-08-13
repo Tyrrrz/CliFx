@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using CliFx.Attributes;
-
-namespace CliFx.Tests
+﻿namespace CliFx.Tests
 {
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+    using CliFx.Attributes;
+
     public partial class EnvironmentVariablesSpecs
     {
         [Command]

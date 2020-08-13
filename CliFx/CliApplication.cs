@@ -1,25 +1,18 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
-using CliFx.Attributes;
-using CliFx.Exceptions;
-using CliFx.Input;
-using CliFx.Internal;
-using CliFx.Schemas;
-using Microsoft.Extensions.DependencyInjection;
-/* Unmerged change from project 'CliFx (netstandard2.0)'
-Before:
-using CliFx.Internal;
-After:
-using Microsoft.Extensions.DependencyInjection;
-*/
-
-
-namespace CliFx
+﻿namespace CliFx
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using CliFx.Attributes;
+    using CliFx.Exceptions;
+    using CliFx.Input;
+    using CliFx.Internal;
+    using CliFx.Schemas;
+    using Microsoft.Extensions.DependencyInjection;
+
     /// <summary>
     /// Command line application facade.
     /// </summary>

@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using CliFx.Input;
-using CliFx.Schemas;
-
-namespace CliFx.Tests.Internal
+﻿namespace CliFx.Tests.Internal
 {
+    using System.Collections.Generic;
+    using CliFx.Input;
+    using CliFx.Schemas;
+
     internal static class CommandHelper
     {
         public static TCommand ResolveCommand<TCommand>(CommandInput input,

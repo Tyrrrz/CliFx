@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using CliFx.Exceptions;
-
-namespace CliFx.Schemas
+﻿namespace CliFx.Schemas
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using CliFx.Exceptions;
+
     /// <summary>
     /// Stores all schemas of commands and directives in the application.
     /// </summary>

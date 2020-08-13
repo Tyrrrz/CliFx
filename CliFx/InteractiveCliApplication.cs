@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using CliFx.Input;
-using CliFx.Schemas;
-
-namespace CliFx
+﻿namespace CliFx
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using CliFx.Input;
+    using CliFx.Schemas;
+
     /// <summary>
     /// Command line application facade.
     /// </summary>

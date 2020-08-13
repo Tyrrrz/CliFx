@@ -1,9 +1,9 @@
-﻿using System.Reflection;
-using System.Text;
-using CliFx.Attributes;
-
-namespace CliFx.Schemas
+﻿namespace CliFx.Schemas
 {
+    using System.Reflection;
+    using System.Text;
+    using CliFx.Attributes;
+
     /// <summary>
     /// Stores command parameter schema.
     /// </summary>

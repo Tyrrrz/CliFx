@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using FluentAssertions.Execution;
-using FluentAssertions.Primitives;
-using Gu.Roslyn.Asserts;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.Diagnostics;
-
-namespace CliFx.Analyzers.Tests.Internal
+﻿namespace CliFx.Analyzers.Tests.Internal
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using FluentAssertions.Execution;
+    using FluentAssertions.Primitives;
+    using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis;
+    using Microsoft.CodeAnalysis.CSharp;
+    using Microsoft.CodeAnalysis.Diagnostics;
+
     internal partial class AnalyzerAssertions : ReferenceTypeAssertions<DiagnosticAnalyzer, AnalyzerAssertions>
     {
         protected override string Identifier { get; } = "analyzer";

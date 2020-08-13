@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using CliFx.Exceptions;
-
-namespace CliFx
+﻿namespace CliFx
 {
+    using System;
+    using System.Collections.Generic;
+    using CliFx.Exceptions;
+
     /// <summary>
     /// Configuration of an application.
     /// </summary>

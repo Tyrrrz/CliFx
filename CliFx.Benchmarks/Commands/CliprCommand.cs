@@ -1,7 +1,7 @@
-﻿using clipr;
-
-namespace CliFx.Benchmarks.Commands
+﻿namespace CliFx.Benchmarks.Commands
 {
+    using clipr;
+
     public class CliprCommand
     {
         [NamedArgument('s', "str")]

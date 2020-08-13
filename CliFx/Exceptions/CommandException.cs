@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace CliFx.Exceptions
+﻿namespace CliFx.Exceptions
 {
+    using System;
+
     /// <summary>
     /// Thrown when a command cannot proceed with normal execution due to an error.
     /// Use this exception if you want to report an error that occured during the execution of a command.
