@@ -313,12 +313,14 @@ namespace CliFx
         #region Interactive Mode
         /// <summary>
         /// Configures whether interactive mode (enabled with [interactive] directive) is allowed in the application.
+        /// By default this adds [default], [>], [.], and [..]. If you wish to add only [default] directive, set addScopeDirectives to false.
         /// </summary>
-        public CliApplicationBuilder UseInteractiveMode(bool addDirectives = true)
+        public CliApplicationBuilder UseInteractiveMode(bool addScopeDirectives = true)
         {
             _useInteractiveMode = true;
+            AddDirective<DefaultDirective>();
 
-            if (addDirectives)
+            if (addScopeDirectives)
             {
                 AddDirective<ScopeDirective>();
                 AddDirective<ScopeResetDirective>();

@@ -29,6 +29,9 @@
         /// <inheritdoc/>
         public bool ContinueExecution => false;
 
+        /// <summary>
+        /// Initializes an instance of <see cref="ScopeDirective"/>.
+        /// </summary>
         public ScopeDirective(ICliContext cliContext)
         {
             _cliContext = (CliContext)cliContext;

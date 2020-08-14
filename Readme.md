@@ -528,7 +528,7 @@ Example:
 
 #### [default] aka execute default or scoped command
 
-Normally if application rans in interactive mode, an empty line does nothing; but `[default]` will override this behaviour, executing a root (empty) command or scoped command.
+Normally if application rans in interactive mode, an empty line does nothing; but `[default]` will override this behaviour, executing a root (empty) command or scoped command without arguments (parameters and options).
 
 #### Defining custom directives
 
@@ -575,10 +575,10 @@ An interactive mode is a special mode of application, which allows passing multi
     builder.UseInteractiveMode();
 ```
 
-Method `UseInteractiveMode` automatically adds the following directives: `[>]`, `[.]`, and `[..]`. If you wish not to add them, you can use:
+Method `UseInteractiveMode` automatically adds the following directives: `[default]`, `[>]`, `[.]`, and `[..]`. If you wish not to add `[>]`, `[.]`, and `[..]` directives, you can use:
 
 ``` c#
-    builder.UseInteractiveMode(addDirectives: false);
+    builder.UseInteractiveMode(addScopeDirectives: false);
 ```
 
 Since every empty command in interactive mode will do nothing more than printing a command promt in a new line, a special directive `[default]` can be used to execute default or scoped command without parameters.

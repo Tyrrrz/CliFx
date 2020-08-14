@@ -20,6 +20,9 @@
         /// <inheritdoc/>
         public bool ContinueExecution => false;
 
+        /// <summary>
+        /// Initializes an instance of <see cref="ScopeResetDirective"/>.
+        /// </summary>
         public ScopeResetDirective(ICliContext cliContext)
         {
             _cliContext = (CliContext)cliContext;
