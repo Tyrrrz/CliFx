@@ -101,11 +101,6 @@
                     line = console.Input.ReadLine();
                 });
 
-                // handle default directive
-                // TODO: fix for `[default] [debug]` etc.
-                if (line.StartsWith(BuiltInDirectives.Default))
-                    return Array.Empty<string>();
-
                 if (string.IsNullOrWhiteSpace(CliContext.Scope)) // handle unscoped command input
                 {
                     arguments = line.Split(' ', StringSplitOptions.RemoveEmptyEntries)

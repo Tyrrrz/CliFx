@@ -13,7 +13,7 @@
     /// </example>
     /// </summary>
     [Directive("..", Description = "Resets the scope to default value.", InteractiveModeOnly = true)]
-    internal sealed class ScopeResetDirective : IDirective
+    public sealed class ScopeResetDirective : IDirective
     {
         private readonly CliContext _cliContext;
 

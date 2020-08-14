@@ -22,7 +22,7 @@
     /// </example>
     /// </summary>
     [Directive(">", Description = "Sets a scope to command(s).", InteractiveModeOnly = true)]
-    internal sealed class ScopeDirective : IDirective
+    public sealed class ScopeDirective : IDirective
     {
         private readonly CliContext _cliContext;
 

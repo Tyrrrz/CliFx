@@ -21,6 +21,7 @@ An important property of CliFx, when compared to some other libraries, is that i
 - Configuration via attributes
 - Handles conversions to various types, including custom types
 - Supports multi-level command hierarchies
+- Supports interactive mode
 - Exposes raw input, output, error streams to handle binary data
 - Allows graceful command cancellation
 - Prints errors and routes exit codes on exceptions
@@ -28,7 +29,7 @@ An important property of CliFx, when compared to some other libraries, is that i
 - Highly testable and easy to debug
 - Comes with built-in analyzers to help catch common mistakes
 - Targets .NET Standard 2.0+
-- No external dependencies
+- Uses `Microsoft.Extensions.DependencyInjection` but no other external dependencies
 
 ## Screenshots
 
@@ -36,18 +37,35 @@ An important property of CliFx, when compared to some other libraries, is that i
 
 ## Usage
 
-- [Quick start](#quick-start)
-- [Binding arguments](#binding-arguments)
-- [Argument syntax](#argument-syntax)
-- [Value conversion](#value-conversion)
-- [Multiple commands](#multiple-commands)
-- [Reporting errors](#reporting-errors)
-- [Graceful cancellation](#graceful-cancellation)
-- [Dependency injection](#dependency-injection)
-- [Testing](#testing)
-- [Debug and preview mode](#debug-and-preview-mode)
-- [Reporting progress](#reporting-progress)
-- [Environment variables](#environment-variables)
+- [CliFx](#clifx)
+  - [Download](#download)
+  - [Features](#features)
+  - [Screenshots](#screenshots)
+  - [Usage](#usage)
+    - [Quick start](#quick-start)
+    - [Binding arguments](#binding-arguments)
+    - [Argument syntax](#argument-syntax)
+    - [Value conversion](#value-conversion)
+    - [Multiple commands](#multiple-commands)
+    - [Built-in and custom directives](#built-in-and-custom-directives)
+      - [[debug] aka debug mode](#debug-aka-debug-mode)
+      - [[preview] aka preview mode](#preview-aka-preview-mode)
+      - [[>] aka scope to command(s)](#-aka-scope-to-commands)
+      - [[.] aka scope-up](#-aka-scope-up)
+      - [[..] aka scope-reset](#-aka-scope-reset)
+      - [[default] aka execute default or scoped command](#default-aka-execute-default-or-scoped-command)
+      - [Defining custom directives](#defining-custom-directives)
+    - [Interactive mode](#interactive-mode)
+    - [Reporting errors](#reporting-errors)
+    - [Exception handling](#exception-handling)
+    - [Graceful cancellation](#graceful-cancellation)
+    - [Dependency injection](#dependency-injection)
+    - [Testing](#testing)
+    - [Environment variables](#environment-variables)
+  - [Utilities](#utilities)
+    - [Reporting progress](#reporting-progress)
+  - [Benchmarks](#benchmarks)
+  - [Etymology](#etymology)
 
 ### Quick start
 
@@ -65,6 +83,36 @@ public static class Program
             .AddCommandsFromThisAssembly()
             .Build()
             .RunAsync();
+}
+```
+
+It is also possible to use a startup class to configure application.
+
+```c#
+public static class Program
+{
+    public static async Task<int> Main() =>
+        await new CliApplicationBuilder()
+            .UseStartup<CliStartup>()
+            .Build()
+            .RunAsync();
+}
+
+public class CliStartup : ICliStartup
+{
+    public void ConfigureServices(IServiceCollection services)
+    {
+        // Register services
+        services.AddSingleton<ICustomService, CustomService>();
+    }
+
+    public void Configure(CliApplicationBuilder app)
+    {
+        app.AddCommandsFromThisAssembly()
+           .AddDirective<DebugDirective>()
+           .AddDirective<PreviewDirective>()
+           .UseInteractiveMode();
+    }
 }
 ```
 
@@ -392,6 +440,153 @@ Commands
 You can run `myapp.exe cmd1 [command] --help` to show help on a specific command.
 ```
 
+In every command it is possible to define a description and a manual with `[Command]` attribute. `[Command]` attribute provides also an easy way for excluding a command from execution in normal mode through `InteractiveModeOnly` property.
+
+### Built-in and custom directives
+
+By default CliFx provides 6 directives, i.e., `[debug]`, `[preview]`, `[>]`, `[.]`, `[..]`, and `[default]`. The last 4 directives are only for interactive mode. Directives are used to change the behaviour of the whole application, e.g., imagine you have an application that logs everything to a fiel, then you can add `[no-logging]` directive to disable logging for a command or whole interactive session.
+
+#### [debug] aka debug mode
+
+When troubleshooting issues, you may find it useful to run your app in debug mode. If your application is ran in debug mode (using the `[debug]` directive), it will wait for debugger to be attached before proceeding. This is useful for debugging apps that were ran outside of the IDE.
+
+```sh
+> myapp.exe [debug] cmd -o
+
+Attach debugger to PID 3148 to continue.
+```
+
+By default this directive is disallowed. To add a support of this directive, use `AddDirective` method in the `CliApplicationBuilder`:
+
+``` c#
+builder.AddDirective<DebugDirective>();
+```
+
+#### [preview] aka preview mode
+
+When troubleshooting issues, you may find it useful to run your app in preview mode. If preview mode is specified (using the `[preview]` directive), the app will short-circuit by printing consumed command line arguments as they were parsed. This is useful when troubleshooting issues related to command routing and argument binding.
+
+```sh
+> myapp.exe [preview] cmd arg1 arg2 -o foo --option bar1 bar2
+
+Parser preview:
+cmd <arg1> <arg2> [-o foo] [--option bar1 bar2]
+```
+
+By default this directive is disallowed. To add a support of this directive, use `AddDirective` method in the `CliApplicationBuilder`:
+
+``` c#
+builder.AddDirective<PreviewDirective>();
+```
+
+#### [>] aka scope to command(s)
+
+If application rans in interactive mode, `[>]` directive followed by command(s) name(s) would scope to the command(s), allowing to ommit specified command name(s).
+
+For example, commands:
+```sh
+            > [>] cmd1 sub
+    cmd1 sub> list
+    cmd1 sub> get
+            > [>] cmd1
+        cmd1> test
+        cmd1> -h
+```
+
+are an equivalent to:
+
+``` sh
+            > cmd1 sub list
+            > cmd1 sub get
+            > cmd1 test
+            > cmd1 -h
+```
+
+#### [.] aka scope-up
+
+If application rans in interactive mode, `[.]` directive can be used to remove one command from the scope.
+
+Example:
+```sh
+            > [>] cmd1 sub
+    cmd1 sub> list
+    cmd1 sub> [.]
+        cmd1>
+```
+
+#### [..] aka scope-reset
+
+If application rans in interactive mode, `[..]` directive can be used to reset current scope to default (global scope).
+
+Example:
+```sh
+            > [>] cmd1 sub
+    cmd1 sub> list
+    cmd1 sub> [..]
+            >
+```
+
+#### [default] aka execute default or scoped command
+
+Normally if application rans in interactive mode, an empty line does nothing; but `[default]` will override this behaviour, executing a root (empty) command or scoped command.
+
+#### Defining custom directives
+
+To define a custom directive, just create a new class that implements the `IDirective` interface and annotate it with `[Directive]` attribute:
+
+```c#
+[Directive("example", Description = "Example directive", InteractiveModeOnly = true)]
+public class ScopeDirective : IDirective
+{
+    private readonly CliContext _cliContext;
+
+    public bool ContinueExecution => false;
+
+    public ScopeDirective(ICliContext cliContext)
+    {
+        _cliContext = (CliContext)cliContext;
+    }
+
+    public ValueTask HandleAsync(IConsole console)
+    {
+        console.Output.WriteLine("Test");
+        console.Output.WriteLine(_cliContext.IsInteractiveMode);
+
+        return default;
+    }
+}
+```
+
+To implement `IDirective`, the class needs to define `ContinueExecution` property and the `HandleAsync` method what gets called when the user specifies the directive in a command.
+
+To facilitate both asynchronous and synchronous execution, this method returns a `ValueTask`. Since the simple command above executes synchronously, we can just put `return default` at the end. In an asynchronous command, however, we would use the `async`/`await` keywords instead.
+
+As a parameter, this method takes an instance of `IConsole`, an abstraction around the system console. You should use this abstraction in places where you would normally use `System.Console`, in order to make your command testable.
+
+`ContinueExecution` property is used to determine whether to stop execution of the command after exiting the directive handler. It can be a get only or a get/set property.
+
+Similarly to commands, in every directive it is possible to define a description and a manual with `[Directive]` attribute. `[Directive]` attribute provides also an easy way for excluding a command from execution in normal mode through `InteractiveModeOnly` property.
+
+### Interactive mode
+
+An interactive mode is a special mode of application, which allows passing multiple commands to the application without exiting the application. To start application in interactive mode simply specify `[interactive]` directive when running the application. By default applications do no support interactive mode. This can be changes with:
+
+``` c#
+    builder.UseInteractiveMode();
+```
+
+Method `UseInteractiveMode` automatically adds the following directives: `[>]`, `[.]`, and `[..]`. If you wish not to add them, you can use:
+
+``` c#
+    builder.UseInteractiveMode(addDirectives: false);
+```
+
+Since every empty command in interactive mode will do nothing more than printing a command promt in a new line, a special directive `[default]` can be used to execute default or scoped command without parameters.
+
+In help view, every command and directive that can be executed only in interactive mode are indicated with `@`.
+
+When starting the application in interactive mode it is possible to pass a command that will be executed just after startign the applicaton, e.g., `interactive] -h` will start the application in interactive mode, print help message, and then show the prompt.
+
 ### Reporting errors
 
 You may have noticed that commands in CliFx don't return exit codes. This is by design as exit codes are considered a higher-level concern and thus handled by `CliApplication`, not by individual commands.
@@ -452,6 +647,54 @@ public class ExampleCommand : ICommand
 }
 ```
 
+### Exception handling
+
+By default all exceptions are handled using `DefaultExceptionHandler` class instance. Howeever, it is possible to customize the behavior with a custom implementation of `ICliExceptionHandler`.
+
+``` c#
+    public class CustomExceptionHandler : ICliExceptionHandler
+    {
+        public void HandleCliFxException(ICliContext context, CliFxException ex)
+        {
+            WriteError(context.Console, ex.ToString());
+            context.Console.Error.WriteLine();
+
+            ex.ShowHelp = false;
+        }
+
+        public void HandleDirectiveException(ICliContext context, DirectiveException ex)
+        {
+            WriteError(context.Console, ex.ToString());
+            context.Console.Error.WriteLine();
+        }
+
+        public void HandleCommandException(ICliContext context, CommandException ex)
+        {
+            WriteError(context.Console, ex.ToString());
+            context.Console.Error.WriteLine();
+        }
+
+        public void HandleException(ICliContext context, Exception ex)
+        {
+            WriteError(context.Console, ex.ToString());
+            context.Console.Error.WriteLine();
+        }
+
+        protected static void WriteError(IConsole console, string message)
+        {
+            console.WithForegroundColor(ConsoleColor.DarkRed, () => console.Error.WriteLine(message));
+        }
+    }
+```
+
+To register the custom exception handler use:
+
+``` c#
+    builder.UseExceptionHandler(new CustomExceptionHandler()))
+    //or
+    builder.UseExceptionHandler<CustomExceptionHandler>();
+```
+
 ### Graceful cancellation
 
 It is possible to gracefully cancel execution of a command and preform any necessary cleanup. By default an app gets forcefully killed when it receives an interrupt signal (Ctrl+C or Ctrl+Break), but you can override this behavior.
@@ -478,33 +721,38 @@ Keep in mind that a command may delay cancellation only once. If the user decide
 
 ### Dependency injection
 
-CliFx uses an implementation of `ITypeActivator` to initialize commands and by default it only works with types that have parameterless constructors.
+CliFx uses [`Microsoft.Extensions.DependencyInjection`](https://nuget.org/packages/Microsoft.Extensions.DependencyInjection) (aka the built-in dependency container in ASP.NET Core) to initialize commands and directives, and to support services injection.
 
-In real-life scenarios, however, your commands will most likely have dependencies that need to be injected. CliFx doesn't come with its own dependency container but it makes it really easy to integrate any container of your choice.
+By default the following services are registered:
 
-For example, here is how you would configure your application to use [`Microsoft.Extensions.DependencyInjection`](https://nuget.org/packages/Microsoft.Extensions.DependencyInjection) (aka the built-in dependency container in ASP.NET Core).
+| Type                     | Lifetime  | Description                               |
+|--------------------------|-----------|-------------------------------------------|
+| ApplicationMetadata      | Singleton | Metadata associated with the application. |
+| ApplicationConfiguration | Singleton | Configuration of the application.         |
+| ICliContext              | Singleton | Command line application context.         |
+| IConsole                 | Singleton | Provides interaction with the console.    |
+
+Additionally, every directive ad command is registered using its interface (`IDirective` or `ICommand`) implementation class with a lifetime set ot `Transient`. Thus, it is possible to get an enumeration/list of all directives or commands.
+
+Services can be registerd using `ConfigureServices` or `UseStartup`.
+
+CliFx supports also `Scoped` services. A scope begins after parsing the console input, and ends with the command execution.
 
 ```c#
 public static class Program
 {
     public static async Task<int> Main()
     {
-        var services = new ServiceCollection();
-
-        // Register services
-        services.AddSingleton<MyService>();
-        services.AddSingleton<IConsole, SystemConsole>(); // or `VirtualConsole`, depending on what you need
-
-        // Register commands
-        services.AddTransient<MyCommand>();
-
-        var serviceProvider = services.BuildServiceProvider();
-        var console = serviceProvider.GetService<IConsole>();
-
         return await new CliApplicationBuilder()
             .AddCommandsFromThisAssembly()
-            .UseTypeActivator(serviceProvider.GetService)
-            .UseConsole(console) // make sure CliFx is using the same instance of IConsole
+            .AddDirectivesFromThisAssembly()
+            .ConfigureServices((services) =>
+            {
+                // Register services
+                services.AddSingleton<MyService>();
+                services.AddTransient<MyCommand>();
+            })
+            .UseConsole<SystemConsole>()
             .Build()
             .RunAsync();
     }
@@ -594,52 +842,6 @@ public async Task ConcatCommand_Test()
 
 Note that CliFx applications have access to underlying binary streams that allows them to write binary data directly. By using the approach outlined above, we're making the assumption that the application is only expected to produce text output.
 
-### Debug and preview mode
-
-When troubleshooting issues, you may find it useful to run your app in debug or preview mode. To do it, simply pass the corresponding directive to your app along with other command line arguments.
-
-If your application is ran in debug mode (using the `[debug]` directive), it will wait for debugger to be attached before proceeding. This is useful for debugging apps that were ran outside of the IDE.
-
-```sh
-> myapp.exe [debug] cmd -o
-
-Attach debugger to PID 3148 to continue.
-```
-
-If preview mode is specified (using the `[preview]` directive), the app will short-circuit by printing consumed command line arguments as they were parsed. This is useful when troubleshooting issues related to command routing and argument binding.
-
-```sh
-> myapp.exe [preview] cmd arg1 arg2 -o foo --option bar1 bar2
-
-Parser preview:
-cmd <arg1> <arg2> [-o foo] [--option bar1 bar2]
-```
-
-You can also disallow these directives, e.g. when running in production, by calling `AllowDebugMode` and `AllowPreviewMode` methods on `CliApplicationBuilder`.
-
-```c#
-var app = new CliApplicationBuilder()
-    .AddCommandsFromThisAssembly()
-    .AllowDebugMode(true) // allow debug mode
-    .AllowPreviewMode(false) // disallow preview mode
-    .Build();
-```
-
-### Reporting progress
-
-CliFx comes with a simple utility for reporting progress to the console, `ProgressTicker`, which renders progress in-place on every tick.
-
-It implements a well-known `IProgress<double>` interface so you can pass it to methods that are aware of this abstraction.
-
-To avoid polluting output when it's not bound to a console, `ProgressTicker` will simply no-op if stdout is redirected.
-
-```c#
-var progressTicker = console.CreateProgressTicker();
-
-for (var i = 0.0; i <= 1; i += 0.01)
-    progressTicker.Report(i);
-```
-
 ### Environment variables
 
 An option can be configured to use the value of an environment variable as a fallback. If an option was not specified by the user, the value will be extracted from that environment variable instead. This also works on options which are marked as required.
@@ -669,6 +871,23 @@ test
 ```
 
 Environment variables can be used as fallback for options of enumerable types too. In this case, the value of the variable will be split by `Path.PathSeparator` (which is `;` on Windows, `:` on Linux).
+
+## Utilities
+
+### Reporting progress
+
+CliFx comes with a simple utility for reporting progress to the console, `ProgressTicker`, which renders progress in-place on every tick.
+
+It implements a well-known `IProgress<double>` interface so you can pass it to methods that are aware of this abstraction.
+
+To avoid polluting output when it's not bound to a console, `ProgressTicker` will simply no-op if stdout is redirected.
+
+```c#
+var progressTicker = console.CreateProgressTicker();
+
+for (var i = 0.0; i <= 1; i += 0.01)
+    progressTicker.Report(i);
+```
 
 ## Benchmarks
 

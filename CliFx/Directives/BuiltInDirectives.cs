@@ -26,7 +26,7 @@
         public const string Interactive = "interactive";
 
         /// <summary>
-        /// Normally if application rans in interactive mode, an empty line does nothing; but [default] will override this behaviour, executing a root (empty) command.
+        /// Normally if application rans in interactive mode, an empty line does nothing; but [default] will override this behaviour, executing a root (empty) command or scoped command.
         /// </summary>
         public const string Default = "default";
 
@@ -51,7 +51,7 @@
         public const string Scope = ">";
 
         /// <summary>
-        /// If application rans in interactive mode, this [.] directive can be used to remove one command from the scope.
+        /// If application rans in interactive mode, [.] directive can be used to remove one command from the scope.
         /// <example>
         ///             > [>] cmd1 sub
         ///     cmd1 sub> list
@@ -62,7 +62,7 @@
         public const string ScopeUp = ".";
 
         /// <summary>
-        /// If application rans in interactive mode, this [..] directive can be used to reset current scope to default (global scope).
+        /// If application rans in interactive mode, [..] directive can be used to reset current scope to default (global scope).
         /// <example>
         ///             > [>] cmd1 sub
         ///     cmd1 sub> list

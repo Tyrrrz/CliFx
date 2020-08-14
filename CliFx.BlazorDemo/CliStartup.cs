@@ -17,7 +17,6 @@ namespace CliFx.BlazorDemo
         {
             app.AddCommandsFromThisAssembly()
                .AddDirective<DebugDirective>()
-               .ConfigureServices(ConfigureServices)
                .UseInteractiveMode();
         }
     }

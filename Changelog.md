@@ -2,7 +2,7 @@
 
 - Added interactive mode `CliInteractiveApplication` and interactive only commands.
 - Added `ICliExceptionHandler` and `CliApplicationBuilder.UseExceptionHandler(...)`
-- Added	`Manual` porperty in `CommandAttribute` that can be used to provide a long, extended description of a commmand.
+- Added	`Manual` property in `CommandAttribute` that can be used to provide a long, extended description of a commmand.
 - Added `CliContext` that can be injected to services and commands with DI.
 - Added `WindowWidth`, `WindowHeight`, `BufferWidth`, and `BufferHeight` to `IConsole`.
 - Added a second demo of that proesents the interactive mode.

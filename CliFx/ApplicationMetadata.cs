@@ -1,7 +1,7 @@
 ﻿namespace CliFx
 {
     /// <summary>
-    /// Metadata associated with an application.
+    /// Metadata associated with the application.
     /// </summary>
     public class ApplicationMetadata
     {

@@ -5,7 +5,7 @@
     using CliFx.Exceptions;
 
     /// <summary>
-    /// Configuration of an application.
+    /// Configuration of the application.
     /// </summary>
     public class ApplicationConfiguration
     {

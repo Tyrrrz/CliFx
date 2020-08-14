@@ -14,7 +14,7 @@
     /// </example>
     /// </summary>
     [Directive(".", Description = "Removed one command from the scope.", InteractiveModeOnly = true)]
-    internal sealed class ScopeUpDirective : IDirective
+    public sealed class ScopeUpDirective : IDirective
     {
         private readonly CliContext _cliContext;
 

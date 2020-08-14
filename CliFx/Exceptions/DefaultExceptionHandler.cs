@@ -42,6 +42,7 @@
 
             console.Error.WriteLine();
             WriteError(console, ex.ToString());
+            console.Error.WriteLine();
         }
 
         /// <summary>

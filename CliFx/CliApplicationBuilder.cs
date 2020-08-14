@@ -244,7 +244,6 @@ namespace CliFx
         #endregion
 
         #region Console
-
         /// <summary>
         /// Configures the application to use the specified implementation of <see cref="IConsole"/>.
         /// </summary>
@@ -273,6 +272,7 @@ namespace CliFx
         /// </summary>
         public CliApplicationBuilder UseCommandExitMessageLevel(CommandExitMessageOptions option)
         {
+            //TODO: replace with mediatr like behaviours or middleware
             _commandExitMessageLevel = option;
 
             return this;
@@ -311,16 +311,19 @@ namespace CliFx
         #endregion
 
         #region Interactive Mode
-
         /// <summary>
         /// Configures whether interactive mode (enabled with [interactive] directive) is allowed in the application.
         /// </summary>
-        public CliApplicationBuilder UseInteractiveMode()
+        public CliApplicationBuilder UseInteractiveMode(bool addDirectives = true)
         {
             _useInteractiveMode = true;
-            AddDirective<ScopeDirective>();
-            AddDirective<ScopeResetDirective>();
-            AddDirective<ScopeUpDirective>();
+
+            if (addDirectives)
+            {
+                AddDirective<ScopeDirective>();
+                AddDirective<ScopeResetDirective>();
+                AddDirective<ScopeUpDirective>();
+            }
 
             return this;
         }
@@ -429,7 +432,7 @@ namespace CliFx
             _serviceCollection.AddSingleton(typeof(ICliContext), (provider) => cliContext);
             _serviceCollection.AddSingleton(typeof(IConsole), (provider) => _console);
 
-            //DebugPrintServices();
+            //DebugPrintServices(_console);
 
             ServiceProvider serviceProvider = _serviceCollection.BuildServiceProvider();
 
@@ -445,36 +448,36 @@ namespace CliFx
             return new CliApplication(serviceProvider, cliContext);
         }
 
-        private void DebugPrintServices()
+        private void DebugPrintServices(IConsole console)
         {
-            _console.Output.WriteLine(new string('-', 105));
-            _console.Output.Write(" Service Type".PadRight(41));
-            _console.Output.Write('|');
-            _console.Output.Write(" ImplementationType".PadRight(41));
-            _console.Output.Write('|');
-            _console.Output.WriteLine(" Lifetime".PadRight(21));
+            console.Output.WriteLine(new string('-', 105));
+            console.Output.Write(" Service Type".PadRight(41));
+            console.Output.Write('|');
+            console.Output.Write(" ImplementationType".PadRight(41));
+            console.Output.Write('|');
+            console.Output.WriteLine(" Lifetime".PadRight(21));
 
-            _console.Output.Write(new string('-', 41));
-            _console.Output.Write('+');
-            _console.Output.Write(new string('-', 41));
-            _console.Output.Write('+');
-            _console.Output.WriteLine(new string('-', 21));
+            console.Output.Write(new string('-', 41));
+            console.Output.Write('+');
+            console.Output.Write(new string('-', 41));
+            console.Output.Write('+');
+            console.Output.WriteLine(new string('-', 21));
 
             foreach (ServiceDescriptor item in _serviceCollection.OrderBy(x => x.Lifetime)
                                                                  .ThenBy(x => x.ServiceType.Name)
                                                                  .ThenBy(x => x.ImplementationType?.Name))
             {
-                _console.Output.Write(' ');
-                _console.Output.Write(item.ServiceType.Name.PadRight(40));
-                _console.Output.Write('|');
-                _console.Output.Write(' ');
-                _console.Output.Write(item.ImplementationType?.Name.PadRight(40) ?? string.Empty.PadRight(40));
-                _console.Output.Write('|');
-                _console.Output.Write(' ');
-                _console.Output.WriteLine(item.Lifetime.ToString().PadRight(20));
+                console.Output.Write(' ');
+                console.Output.Write(item.ServiceType.Name.PadRight(40));
+                console.Output.Write('|');
+                console.Output.Write(' ');
+                console.Output.Write(item.ImplementationType?.Name.PadRight(40) ?? string.Empty.PadRight(40));
+                console.Output.Write('|');
+                console.Output.Write(' ');
+                console.Output.WriteLine(item.Lifetime.ToString().PadRight(20));
             }
 
-            _console.Output.WriteLine(new string('-', 105));
+            console.Output.WriteLine(new string('-', 105));
         }
     }
 
