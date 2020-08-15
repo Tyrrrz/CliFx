@@ -29,7 +29,8 @@ namespace CliFx.InteractiveModeDemo.Commands
             TableUtils.Write(console,
                              serviceDescriptors.OrderBy(x => x.Lifetime)
                                                .ThenBy(x => x.ServiceType.Name)
-                                               .ThenBy(x => x.ImplementationType?.Name),
+                                               .ThenBy(x => x.ImplementationType?.Name)
+                                               .GroupBy(x => x.Lifetime),
                              new string[] { "Service type", "Implementation type", "F", "I", "Lifetime" },
                              footnotes:
                              "  F - whether implementation factory is used\n" +

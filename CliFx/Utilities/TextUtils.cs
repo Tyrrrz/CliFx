@@ -8,14 +8,14 @@
     /// </summary>
     public static class TextUtils
     {
-        private static Regex newLinesRegex = new Regex(@"\n\r", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+        private readonly static Regex _newLinesRegex = new Regex(@"\n\r", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
         /// <summary>
         /// Replaces new line characters to match 'Environment.NewLine'.
         /// </summary>
         public static string AdjustNewLines(string text)
         {
-            return newLinesRegex.Replace(text, Environment.NewLine);
+            return _newLinesRegex.Replace(text, Environment.NewLine);
         }
 
         /// <summary>
