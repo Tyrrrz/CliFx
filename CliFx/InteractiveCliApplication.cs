@@ -18,11 +18,12 @@
         /// <summary>
         /// Initializes an instance of <see cref="InteractiveCliApplication"/>.
         /// </summary>
-        public InteractiveCliApplication(IServiceProvider serviceProvider,
+        public InteractiveCliApplication(LinkedList<Type> middlewareTypes,
+                                         IServiceProvider serviceProvider,
                                          CliContext cliContext,
                                          ConsoleColor promptForeground,
                                          ConsoleColor commandForeground) :
-            base(serviceProvider, cliContext)
+            base(middlewareTypes, serviceProvider, cliContext)
         {
             _promptForeground = promptForeground;
             _commandForeground = commandForeground;
@@ -34,7 +35,7 @@
                                                              RootSchema root)
         {
             CommandInput input = CommandInput.Parse(commandLineArguments, root.GetCommandNames());
-            CliContext.CurrentInput = input;
+            CliContext.Input = input;
 
             if (input.IsInteractiveDirectiveSpecified)
             {
@@ -62,7 +63,7 @@
                 string[] commandLineArguments = GetInput(console, executableName);
 
                 CommandInput input = CommandInput.Parse(commandLineArguments, root.GetCommandNames());
-                CliContext.CurrentInput = input; //TODO maybe refactor with some clever IDisposable class
+                CliContext.Input = input; //TODO maybe refactor with some clever IDisposable class
 
                 await ExecuteCommand(environmentVariables, root, input);
                 console.ResetColor();

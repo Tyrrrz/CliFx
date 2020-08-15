@@ -20,7 +20,7 @@ namespace CliFx.BlazorDemo.CLI.Commands
             console.Output.WriteLine($"DEBUG INFO:");
             console.Output.WriteLine();
             await console.Output.WriteLineAsync(_cliContext.Metadata.ExecutableName);
-            await console.Output.WriteLineAsync(string.Join(", ", _cliContext.Root!.GetCommandNames()));
+            await console.Output.WriteLineAsync(string.Join(", ", _cliContext.RootSchema!.GetCommandNames()));
             console.Output.WriteLine($"scope: {_cliContext.Scope}");
         }
     }

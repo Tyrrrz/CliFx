@@ -33,7 +33,7 @@
         public ValueTask HandleAsync(IConsole console)
         {
             // Scope up
-            if (_cliContext.CurrentInput.HasDirective(BuiltInDirectives.ScopeUp))
+            if (_cliContext.Input.HasDirective(BuiltInDirectives.ScopeUp))
             {
                 string[] splittedScope = _cliContext.Scope.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 

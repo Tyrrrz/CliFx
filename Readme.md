@@ -725,14 +725,15 @@ CliFx uses [`Microsoft.Extensions.DependencyInjection`](https://nuget.org/packag
 
 By default the following services are registered:
 
-| Type                     | Lifetime  | Description                               |
-|--------------------------|-----------|-------------------------------------------|
-| ApplicationMetadata      | Singleton | Metadata associated with the application. |
-| ApplicationConfiguration | Singleton | Configuration of the application.         |
-| ICliContext              | Singleton | Command line application context.         |
-| IConsole                 | Singleton | Provides interaction with the console.    |
+| Type                     | Lifetime  | Description                                                                     |
+|--------------------------|-----------|---------------------------------------------------------------------------------|
+| ApplicationMetadata      | Singleton | Metadata associated with the application.                                       |
+| ApplicationConfiguration | Singleton | Configuration of the application.                                               |
+| ICliContext              | Singleton | Command line application context.                                               |
+| IConsole                 | Singleton | Provides interaction with the console.                                          |
+| ICommandMiddleware       | Singleton | Represents an async continuation for the next task to execute in the pipeline.  |
 
-Additionally, every directive ad command is registered using its interface (`IDirective` or `ICommand`) implementation class with a lifetime set ot `Transient`. Thus, it is possible to get an enumeration/list of all directives or commands.
+Additionally, every directive, middleware, and command is registered using its interface (`IDirective` or `ICommand`) implementation class with a lifetime set ot `Transient`. Thus, it is possible to get an enumeration/list of all directives or commands.
 
 Services can be registerd using `ConfigureServices` or `UseStartup`.
 

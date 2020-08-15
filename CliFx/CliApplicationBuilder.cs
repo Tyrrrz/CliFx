@@ -16,7 +16,7 @@ namespace CliFx
     /// <summary>
     /// Builds an instance of <see cref="CliApplication"/>.
     /// </summary>
-    public partial class CliApplicationBuilder
+    public sealed partial class CliApplicationBuilder
     {
         //Directives and commands settings
         private readonly List<Type> _commandTypes = new List<Type>();
@@ -31,8 +31,6 @@ namespace CliFx
 
         //Exceptions
         private ICliExceptionHandler? _exceptionHandler;
-        private CommandExitMessageOptions _commandExitMessageLevel;
-        private ConsoleColor _exitMessageForeground = ConsoleColor.White;
 
         // Console
         private IConsole? _console;
@@ -44,6 +42,9 @@ namespace CliFx
         private bool _useInteractiveMode = false;
         private ConsoleColor _promptForeground = ConsoleColor.Blue;
         private ConsoleColor _commandForeground = ConsoleColor.Yellow;
+
+        //Middleware
+        private LinkedList<Type> _middlewareTypes = new LinkedList<Type>();
 
         #region Directives
         /// <summary>
@@ -64,9 +65,7 @@ namespace CliFx
         public CliApplicationBuilder AddDirective<T>()
             where T : IDirective
         {
-            AddDirective(typeof(T));
-
-            return this;
+            return AddDirective(typeof(T));
         }
 
         /// <summary>
@@ -133,9 +132,7 @@ namespace CliFx
         public CliApplicationBuilder AddCommand<T>()
             where T : ICommand
         {
-            AddCommand(typeof(T));
-
-            return this;
+            return AddCommand(typeof(T));
         }
 
         /// <summary>
@@ -268,27 +265,6 @@ namespace CliFx
 
         #region Exceptions
         /// <summary>
-        /// Configures the exit code reporting level.
-        /// </summary>
-        public CliApplicationBuilder UseCommandExitMessageLevel(CommandExitMessageOptions option)
-        {
-            //TODO: replace with mediatr like behaviours or middleware
-            _commandExitMessageLevel = option;
-
-            return this;
-        }
-
-        /// <summary>
-        /// Configures command exit message foreground color.
-        /// </summary>
-        public CliApplicationBuilder UseCommandExitMessageForeground(ConsoleColor color)
-        {
-            _exitMessageForeground = color;
-
-            return this;
-        }
-
-        /// <summary>
         /// Configures the application to use the specified implementation of <see cref="ICliExceptionHandler"/>.
         /// </summary>
         public CliApplicationBuilder UseExceptionHandler<T>()
@@ -386,6 +362,29 @@ namespace CliFx
         }
         #endregion
 
+        #region Middleware
+        /// <summary>
+        /// Adds a middleware to the command execution pipeline.
+        /// </summary>
+        public CliApplicationBuilder UseMiddleware(Type middleware)
+        {
+            _serviceCollection.AddSingleton(typeof(ICommandMiddleware), middleware);
+            _serviceCollection.AddSingleton(middleware);
+            _middlewareTypes.AddFirst(middleware);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a middleware to the command execution pipeline.
+        /// </summary>
+        public CliApplicationBuilder UseMiddleware<TMiddleware>()
+            where TMiddleware : class
+        {
+            return UseMiddleware(typeof(TMiddleware)); ;
+        }
+        #endregion
+
         /// <summary>
         /// Creates an instance of <see cref="CliApplication"/> or <see cref="InteractiveCliApplication"/> using configured parameters.
         /// Default values are used in place of parameters that were not specified.
@@ -422,11 +421,9 @@ namespace CliFx
             var configuration = new ApplicationConfiguration(_commandTypes,
                                                              _customDirectives,
                                                              _exceptionHandler,
-                                                             _useInteractiveMode,
-                                                             _commandExitMessageLevel,
-                                                             _exitMessageForeground);
+                                                             _useInteractiveMode);
 
-            CliContext cliContext = new CliContext(metadata, configuration, _console);
+            CliContext cliContext = new CliContext(metadata, configuration, _serviceCollection, _console);
 
             // Add core services
             _serviceCollection.AddSingleton(typeof(ApplicationMetadata), (provider) => metadata);
@@ -434,52 +431,19 @@ namespace CliFx
             _serviceCollection.AddSingleton(typeof(ICliContext), (provider) => cliContext);
             _serviceCollection.AddSingleton(typeof(IConsole), (provider) => _console);
 
-            //DebugPrintServices(_console);
-
             ServiceProvider serviceProvider = _serviceCollection.BuildServiceProvider();
 
             // Create application instance
             if (_useInteractiveMode)
             {
-                return new InteractiveCliApplication(serviceProvider,
+                return new InteractiveCliApplication(_middlewareTypes,
+                                                     serviceProvider,
                                                      cliContext,
                                                      _promptForeground,
                                                      _commandForeground);
             }
 
-            return new CliApplication(serviceProvider, cliContext);
-        }
-
-        private void DebugPrintServices(IConsole console)
-        {
-            console.Output.WriteLine(new string('-', 105));
-            console.Output.Write(" Service Type".PadRight(41));
-            console.Output.Write('|');
-            console.Output.Write(" ImplementationType".PadRight(41));
-            console.Output.Write('|');
-            console.Output.WriteLine(" Lifetime".PadRight(21));
-
-            console.Output.Write(new string('-', 41));
-            console.Output.Write('+');
-            console.Output.Write(new string('-', 41));
-            console.Output.Write('+');
-            console.Output.WriteLine(new string('-', 21));
-
-            foreach (ServiceDescriptor item in _serviceCollection.OrderBy(x => x.Lifetime)
-                                                                 .ThenBy(x => x.ServiceType.Name)
-                                                                 .ThenBy(x => x.ImplementationType?.Name))
-            {
-                console.Output.Write(' ');
-                console.Output.Write(item.ServiceType.Name.PadRight(40));
-                console.Output.Write('|');
-                console.Output.Write(' ');
-                console.Output.Write(item.ImplementationType?.Name.PadRight(40) ?? string.Empty.PadRight(40));
-                console.Output.Write('|');
-                console.Output.Write(' ');
-                console.Output.WriteLine(item.Lifetime.ToString().PadRight(20));
-            }
-
-            console.Output.WriteLine(new string('-', 105));
+            return new CliApplication(_middlewareTypes, serviceProvider, cliContext);
         }
     }
 

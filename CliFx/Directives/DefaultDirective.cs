@@ -2,7 +2,6 @@
 {
     using System.Threading.Tasks;
     using CliFx.Attributes;
-    using CliFx.Input;
 
     /// <summary>
     /// Normally if application rans in interactive mode, an empty line does nothing; but [default] will override this behaviour, executing a root (empty) command or scoped command without arguments.

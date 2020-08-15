@@ -29,15 +29,6 @@
         /// </summary>
         public bool IsInteractiveModeAllowed { get; }
 
-        /// <summary>
-        /// Command exit message level.
-        /// </summary>
-        public CommandExitMessageOptions CommandExitMessageOptions { get; }
-
-        /// <summary>
-        /// Command exit message foreground.
-        /// </summary>
-        public ConsoleColor CommandExitMessageForeground { get; }
 
         /// <summary>
         /// Initializes an instance of <see cref="ApplicationConfiguration"/>.
@@ -45,18 +36,13 @@
         public ApplicationConfiguration(IReadOnlyList<Type> commandTypes,
                                         IReadOnlyList<Type> customDirectives,
                                         ICliExceptionHandler exceptionHandler,
-                                        bool isInteractiveModeAllowed,
-                                        CommandExitMessageOptions commandExitMessageOptions,
-                                        ConsoleColor commandExitMessageForeground)
+                                        bool isInteractiveModeAllowed)
         {
             CommandTypes = commandTypes;
             DirectiveTypes = customDirectives;
             ExceptionHandler = exceptionHandler;
 
             IsInteractiveModeAllowed = isInteractiveModeAllowed;
-
-            CommandExitMessageOptions = commandExitMessageOptions;
-            CommandExitMessageForeground = commandExitMessageForeground;
         }
     }
 }

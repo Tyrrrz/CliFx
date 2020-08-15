@@ -29,7 +29,7 @@ namespace CliFx.Directives
         /// <inheritdoc/>
         public ValueTask HandleAsync(IConsole console)
         {
-            WriteCommandLineInput(console, _cliContext.CurrentInput);
+            WriteCommandLineInput(console, _cliContext.Input);
 
             return default;
         }

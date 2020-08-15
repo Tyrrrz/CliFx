@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using CliFx.Directives;
+using CliFx.InteractiveModeDemo.Middlewares;
 using CliFx.InteractiveModeDemo.Services;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -19,6 +20,9 @@ namespace CliFx.InteractiveModeDemo
                 .AddCommandsFromThisAssembly()
                 .AddDirective<DebugDirective>()
                 .AddDirective<PreviewDirective>()
+                .UseMiddleware<ExitCodeMiddleware>()
+                .UseMiddleware<ExecutionTimingMiddleware>()
+                .UseMiddleware<ExecutionLogMiddleware>()
                 .UseInteractiveMode()
                 .UseStartupMessage("{title} CLI {version} {{title}} {executable} {{{description}}} {test}")
                 .Build()

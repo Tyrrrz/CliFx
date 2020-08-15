@@ -40,7 +40,7 @@
         /// <inheritdoc/>
         public ValueTask HandleAsync(IConsole console)
         {
-            _cliContext.Scope = _cliContext.CurrentInput.CommandName ?? string.Empty;
+            _cliContext.Scope = _cliContext.Input.CommandName ?? string.Empty;
 
             return default;
         }

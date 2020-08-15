@@ -5,6 +5,7 @@
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
     using CliFx.Attributes;
     using CliFx.Exceptions;
@@ -42,10 +43,15 @@
 
         private readonly HelpTextWriter _helpTextWriter;
 
+        private readonly LinkedList<MiddlewareComponentNode> _middlewareComponenets;
+        private readonly CommandPipelineHandlerDelegate _processMiddlewareComponenets;
+
         /// <summary>
         /// Initializes an instance of <see cref="CliApplication"/>.
         /// </summary>
-        public CliApplication(IServiceProvider serviceProvider, CliContext cliContext)
+        public CliApplication(LinkedList<Type> middlewareTypes,
+                              IServiceProvider serviceProvider,
+                              CliContext cliContext)
         {
             ServiceProvider = serviceProvider;
             ServiceScopeFactory = serviceProvider.GetService<IServiceScopeFactory>();
@@ -57,6 +63,25 @@
             _console = cliContext.Console;
 
             _helpTextWriter = new HelpTextWriter(cliContext);
+
+            _middlewareComponenets = BuildMiddlewares(middlewareTypes);
+            _processMiddlewareComponenets = _middlewareComponenets.Count == 0 ? (CommandPipelineHandlerDelegate)ExecuteCommandMiddleware : _middlewareComponenets.First.Value.ProcessAsync;
+        }
+
+        private LinkedList<MiddlewareComponentNode> BuildMiddlewares(LinkedList<Type> middlewareTypes)
+        {
+            MiddlewareComponentNode? node = null;
+
+            LinkedList<MiddlewareComponentNode> middlewareComponenets = new LinkedList<MiddlewareComponentNode>();
+            foreach (var middlewareType in middlewareTypes)
+            {
+                CommandPipelineHandlerDelegate next = node is null ? (CommandPipelineHandlerDelegate)ExecuteCommandMiddleware : node.ProcessAsync;
+
+                node = new MiddlewareComponentNode(ServiceProvider, middlewareType, next);
+                middlewareComponenets.AddFirst(node);
+            }
+
+            return middlewareComponenets;
         }
 
         private ICommand GetCommandInstance(IServiceScope serviceScope, CommandSchema command)
@@ -72,7 +97,7 @@
         /// <summary>
         /// Prints the startup message if availble.
         /// </summary>
-        protected void PrintStartupMessage() //TODO remove and add mediatr like behaviours or middlewares
+        protected void PrintStartupMessage()
         {
             if (_metadata.StartupMessage is null)
                 return;
@@ -80,30 +105,7 @@
             _console.WithForegroundColor(ConsoleColor.Blue, () => _console.Output.WriteLine(_metadata.StartupMessage));
         }
 
-        /// <summary>
-        /// Prints the exit message if availble.
-        /// </summary>
-        protected void PrintExitMessage(int exitCode) //TODO remove and add mediatr like behaviours or middlewares
-        {
-            CommandExitMessageOptions level = _configuration.CommandExitMessageOptions;
-            bool isInteractive = CliContext.IsInteractiveMode;
-
-            if ((isInteractive && level.HasFlag(CommandExitMessageOptions.InIteractiveMode)) ||
-                (!isInteractive && level.HasFlag(CommandExitMessageOptions.InNormalMode)))
-            {
-                if (exitCode > 0 && level.HasFlag(CommandExitMessageOptions.OnError))
-                {
-                    _console.WithForegroundColor(_configuration.CommandExitMessageForeground, () =>
-                        _console.Output.WriteLine($"{CliContext.Metadata.ExecutableName}: Command finished with exit code ({exitCode})."));
-                }
-                else if (exitCode == 0 && level.HasFlag(CommandExitMessageOptions.OnSuccess))
-                {
-                    _console.WithForegroundColor(_configuration.CommandExitMessageForeground, () =>
-                        _console.Output.WriteLine($"{CliContext.Metadata.ExecutableName}: Command finished succesfully."));
-                }
-            }
-        }
-
+        #region Run
         /// <summary>
         /// Runs the application and returns the exit code.
         /// Command line arguments and environment variables are retrieved automatically.
@@ -162,10 +164,9 @@
                 PrintStartupMessage();
 
                 RootSchema root = RootSchema.Resolve(_configuration.CommandTypes, _configuration.DirectiveTypes);
-                CliContext.Root = root;
+                CliContext.RootSchema = root;
 
                 int exitCode = await PreExecuteCommand(commandLineArguments, environmentVariables, root);
-                PrintExitMessage(exitCode);
 
                 return exitCode;
             }
@@ -189,7 +190,7 @@
                                                             RootSchema root)
         {
             CommandInput input = CommandInput.Parse(commandLineArguments, root.GetCommandNames());
-            CliContext.CurrentInput = input;
+            CliContext.Input = input;
 
             return await ExecuteCommand(environmentVariables, root, input);
         }
@@ -206,7 +207,7 @@
 
             // Try to get the command matching the input or fallback to default
             CommandSchema command = root.TryFindCommand(input.CommandName) ?? StubDefaultCommand.Schema;
-            CliContext.CurrentCommand = command;
+            CliContext.CommandSchema = command;
 
             // Version option
             if (command.IsVersionOptionAvailable && input.IsVersionOptionSpecified)
@@ -217,11 +218,13 @@
             }
 
             // Get command instance (also used in help text)
-            var instance = GetCommandInstance(serviceScope, command);
+            ICommand instance = GetCommandInstance(serviceScope, command);
+            CliContext.Command = instance;
 
             // To avoid instantiating the command twice, we need to get default values
             // before the arguments are bound to the properties
-            var defaultValues = command.GetArgumentValues(instance);
+            IReadOnlyDictionary<ArgumentSchema, object?> defaultValues = command.GetArgumentValues(instance);
+            CliContext.CommandDefaultValues = defaultValues;
 
             try
             {
@@ -288,11 +291,18 @@
             }
 
             // Execute the command
+            await _processMiddlewareComponenets(CliContext, _console.GetCancellationToken());
+            return CliContext.ExitCode ??= ExitCode.Error;
+        }
+
+        private async Task ExecuteCommandMiddleware(ICliContext cliContext, CancellationToken cancellationToken)
+        {
+            // Execute the command
             try
             {
-                await instance.ExecuteAsync(_console);
+                await CliContext.Command.ExecuteAsync(_console);
 
-                return ExitCode.Success;
+                CliContext.ExitCode ??= ExitCode.Success;
             }
             // Swallow command exceptions and route them to the console
             catch (CommandException ex)
@@ -300,9 +310,9 @@
                 _configuration.ExceptionHandler.HandleCommandException(CliContext, ex);
 
                 if (ex.ShowHelp)
-                    _helpTextWriter.Write(root, command, defaultValues);
+                    _helpTextWriter.Write(CliContext.RootSchema, CliContext.CommandSchema, CliContext.CommandDefaultValues);
 
-                return ex.ExitCode;
+                CliContext.ExitCode = ex.ExitCode;
             }
         }
 
@@ -328,6 +338,7 @@
 
             return true;
         }
+        #endregion
     }
 
     public partial class CliApplication

@@ -1,7 +1,9 @@
 ﻿namespace CliFx
 {
+    using System.Collections.Generic;
     using CliFx.Input;
     using CliFx.Schemas;
+    using Microsoft.Extensions.DependencyInjection;
 
     /// <summary>
     /// Command line application context.
@@ -29,23 +31,44 @@
         ApplicationConfiguration Configuration { get; }
 
         /// <summary>
+        /// Service collection.
+        /// </summary>
+        public IEnumerable<ServiceDescriptor> Services { get; }
+
+        /// <summary>
         /// Console instance.
         /// </summary>
         IConsole Console { get; }
 
         /// <summary>
-        /// Root schema (null value when not resolved).
+        /// Root schema.
         /// </summary>
-        RootSchema Root { get; }
+        RootSchema RootSchema { get; }
 
         /// <summary>
         /// Parsed CLI input.
         /// </summary>
-        CommandInput CurrentInput { get; }
+        CommandInput Input { get; }
 
         /// <summary>
-        /// Current command schema (null value when not in command context).
+        /// Current command schema.
         /// </summary>
-        CommandSchema CurrentCommand { get; }
+        CommandSchema CommandSchema { get; }
+
+        /// <summary>
+        /// Current command instance.
+        /// </summary>
+        ICommand Command { get; }
+
+        /// <summary>
+        /// Collection of command's default values.
+        /// </summary>
+        IReadOnlyDictionary<ArgumentSchema, object?> CommandDefaultValues { get; }
+
+        /// <summary>
+        /// Exit code from current command.
+        /// Null if not set. If pipeline exits with null exit code it will be replaced with error exit code (1).
+        /// </summary>
+        int? ExitCode { get; set; }
     }
 }
