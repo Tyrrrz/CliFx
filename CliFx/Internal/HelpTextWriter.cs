@@ -8,6 +8,7 @@
     using System.Text.RegularExpressions;
     using CliFx.Internal.Extensions;
     using CliFx.Schemas;
+    using CliFx.Utilities;
 
     internal partial class HelpTextWriter
     {
@@ -171,10 +172,10 @@
             WriteHeader("Manual");
             WriteHorizontalMargin();
 
-            string sanitizedManual = command.Manual.Replace("\t", "  ");
-            sanitizedManual = Regex.Replace(sanitizedManual, @"\t\n\r", Environment.NewLine);
+            string text = TextUtils.ConvertTabsToSpaces(command.Manual);
+            text = TextUtils.AdjustNewLines(text);
 
-            Write(sanitizedManual);
+            Write(text);
 
             WriteLine();
         }

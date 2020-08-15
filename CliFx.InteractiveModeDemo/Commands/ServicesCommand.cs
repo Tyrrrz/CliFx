@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using CliFx.Attributes;
+using CliFx.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CliFx.InteractiveModeDemo.Commands
@@ -25,40 +26,19 @@ namespace CliFx.InteractiveModeDemo.Commands
 
         private void DebugPrintServices(IConsole console, IEnumerable<ServiceDescriptor> serviceDescriptors)
         {
-            console.Output.WriteLine(new string('=', 105));
-
-            console.Output.Write(" Service Type".PadRight(41));
-            console.Output.Write('|');
-            console.Output.Write(" ImplementationType".PadRight(41));
-            console.Output.Write('|');
-            console.Output.WriteLine(" Lifetime".PadRight(21));
-
-            console.Output.WriteLine(new string('=', 105));
-
-            ServiceLifetime? lastLifetime = null;
-            foreach (ServiceDescriptor item in serviceDescriptors.OrderBy(x => x.Lifetime)
-                                                                 .ThenBy(x => x.ServiceType.Name)
-                                                                 .ThenBy(x => x.ImplementationType?.Name))
-            {
-                if (lastLifetime is null)
-                    lastLifetime = item.Lifetime;
-                else if (lastLifetime != item.Lifetime)
-                {
-                    console.Output.WriteLine(new string('-', 105));
-                    lastLifetime = item.Lifetime;
-                }
-
-                console.Output.Write(' ');
-                console.Output.Write(item.ServiceType.Name.PadRight(40));
-                console.Output.Write('|');
-                console.Output.Write(' ');
-                console.Output.Write(item.ImplementationType?.Name.PadRight(40) ?? string.Empty.PadRight(40));
-                console.Output.Write('|');
-                console.Output.Write(' ');
-                console.Output.WriteLine(item.Lifetime.ToString().PadRight(20));
-            }
-
-            console.Output.WriteLine(new string('=', 105));
+            TableUtils.Write(console,
+                             serviceDescriptors.OrderBy(x => x.Lifetime)
+                                               .ThenBy(x => x.ServiceType.Name)
+                                               .ThenBy(x => x.ImplementationType?.Name),
+                             new string[] { "Service type", "Implementation type", "F", "I", "Lifetime" },
+                             footnotes:
+                             "  F - whether implementation factory is used\n" +
+                             "  I - whether implementation instanace is used",
+                             x => x.ServiceType.Name,
+                             x => x.ImplementationType == null ? string.Empty : x.ImplementationType.Name,
+                             x => x.ImplementationFactory == null ? string.Empty : "+",
+                             x => x.ImplementationInstance == null ? string.Empty : "+",
+                             x => x.Lifetime.ToString());
         }
     }
 }

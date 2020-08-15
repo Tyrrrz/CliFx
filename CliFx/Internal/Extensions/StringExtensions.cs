@@ -13,7 +13,7 @@
 
         public static string AsString(this char c)
         {
-            return c.Repeat(1);
+            return new string(c, 1);
         }
 
         public static string Quote(this string str)
