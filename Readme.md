@@ -63,7 +63,9 @@ An important property of CliFx, when compared to some other libraries, is that i
     - [Testing](#testing)
     - [Environment variables](#environment-variables)
   - [Utilities](#utilities)
-    - [Reporting progress](#reporting-progress)
+    - [ProgressTicker](#progressticker)
+    - [TableUtils](#tableutils)
+    - [TextUtils](#textutils)
   - [Benchmarks](#benchmarks)
   - [Etymology](#etymology)
 
@@ -875,7 +877,7 @@ Environment variables can be used as fallback for options of enumerable types to
 
 ## Utilities
 
-### Reporting progress
+### ProgressTicker
 
 CliFx comes with a simple utility for reporting progress to the console, `ProgressTicker`, which renders progress in-place on every tick.
 
@@ -889,6 +891,75 @@ var progressTicker = console.CreateProgressTicker();
 for (var i = 0.0; i <= 1; i += 0.01)
     progressTicker.Report(i);
 ```
+
+### TableUtils
+
+CliFx comes with a simple utility for writing tables to the console. It can display both ungrouped and single-level grouped collections.
+ Its configuration uses expressions to specfiy columns and column values transformations to string.
+
+``` c#
+TableUtils.Write(console,
+                 _cliContext.Services.OrderBy(x => x.Lifetime)
+                                     .ThenBy(x => x.ServiceType.Name)
+                                     .ThenBy(x => x.ImplementationType?.Name)
+                                     .GroupBy(x => x.Lifetime),
+                 new string[] { "Service type", "Implementation type", "F", "I", "Lifetime" },
+                 footnotes:
+                 "  F - whether implementation factory is used\n" +
+                 "  I - whether implementation instanace is used",
+                 x => x.ServiceType.Name,
+                 x => x.ImplementationType == null ? string.Empty : x.ImplementationType.Name,
+                 x => x.ImplementationFactory == null ? string.Empty : "+",
+                 x => x.ImplementationInstance == null ? string.Empty : "+",
+                 x => x.Lifetime.ToString());
+```
+
+``` sh
+=============================================================================
+ Service type               | Implementation type        | F | I | Lifetime
+=============================================================================
+-----------------------------------------------------------------------------
+                               Singleton (9)
+-----------------------------------------------------------------------------
+ ApplicationConfiguration   |                            | + |   | Singleton
+ ApplicationMetadata        |                            | + |   | Singleton
+ ExecutionTimingMiddleware  | ExecutionTimingMiddleware  |   |   | Singleton
+ ExitCodeMiddleware         | ExitCodeMiddleware         |   |   | Singleton
+ ICliContext                |                            | + |   | Singleton
+ ICommandMiddleware         | ExecutionTimingMiddleware  |   |   | Singleton
+ ICommandMiddleware         | ExitCodeMiddleware         |   |   | Singleton
+ IConsole                   |                            | + |   | Singleton
+ LibraryService             | LibraryService             |   |   | Singleton
+-----------------------------------------------------------------------------
+                               Transient (14)
+-----------------------------------------------------------------------------
+ BookAddCommand             | BookAddCommand             |   |   | Transient
+ BookCommand                | BookCommand                |   |   | Transient
+ BookListCommand            | BookListCommand            |   |   | Transient
+ BookRemoveCommand          | BookRemoveCommand          |   |   | Transient
+ DefaultDirective           | DefaultDirective           |   |   | Transient
+ ICommand                   | BookAddCommand             |   |   | Transient
+ ICommand                   | BookCommand                |   |   | Transient
+ ICommand                   | BookListCommand            |   |   | Transient
+ ICommand                   | BookRemoveCommand          |   |   | Transient
+ ICommand                   | ServicesCommand            |   |   | Transient
+ IDirective                 | DefaultDirective           |   |   | Transient
+ IDirective                 | PreviewDirective           |   |   | Transient
+ PreviewDirective           | PreviewDirective           |   |   | Transient
+ ServicesCommand            | ServicesCommand            |   |   | Transient
+=============================================================================
+  F - whether implementation factory is used
+  I - whether implementation instanace is used
+=============================================================================
+```
+
+### TextUtils
+
+`TextUtils` contains simple text transformations:
+
+    - `AdjustNewLines` transforms line ending to appropriate format for the current operating system.
+    - `ConvertTabsToSpaces` replaces tabs with spaces. By default two spaces are used in place of one tabulator.
+
 
 ## Benchmarks
 

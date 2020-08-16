@@ -9,10 +9,12 @@
 - Added `"Debugger attached to PID {processId}.` message after debugger attachment.
 - Added benchmarks for multiple commands.
 - Added startup message option with macros.
-- Rewritten `RootSchema` with HashSet.
+- Rewritten `RootSchema` with HashSet for faster execution, esspecially in interactive mode.
 - Added tests of the command used in benchmarking to easily check if it executs correctly and won't cause banchmarking freezing.
 - Improved code readability.
 - Removed `CliApplicationBuilder.UseTypeActivator` and added Microsoft.Extensions.DependencyInjection
+- Added support for middlewares.
+- Added `TableUtils` and `TextUtils`.
 
 ### v1.3.2 (31-Jul-2020)
 
