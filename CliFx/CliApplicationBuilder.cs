@@ -381,7 +381,7 @@ namespace CliFx
         public CliApplicationBuilder UseMiddleware<TMiddleware>()
             where TMiddleware : class
         {
-            return UseMiddleware(typeof(TMiddleware)); ;
+            return UseMiddleware(typeof(TMiddleware));
         }
         #endregion
 

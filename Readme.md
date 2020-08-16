@@ -735,7 +735,7 @@ By default the following services are registered:
 | IConsole                 | Singleton | Provides interaction with the console.                                          |
 | ICommandMiddleware       | Singleton | Represents an async continuation for the next task to execute in the pipeline.  |
 
-Additionally, every directive, middleware, and command is registered using its interface (`IDirective` or `ICommand`) implementation class with a lifetime set ot `Transient`. Thus, it is possible to get an enumeration/list of all directives or commands.
+Additionally, every directive, middleware, and command is registered using its interface (`IDirective`, `ICommandMiddleware`, and `ICommand`, respectively) implementation class with a lifetime set ot `Singleton`. Thus, it is possible to get an enumeration/list of all directives or commands.
 
 Services can be registerd using `ConfigureServices` or `UseStartup`.
 
