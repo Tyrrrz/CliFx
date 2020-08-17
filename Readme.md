@@ -587,7 +587,7 @@ Since every empty command in interactive mode will do nothing more than printing
 
 In help view, every command and directive that can be executed only in interactive mode are indicated with `@`.
 
-When starting the application in interactive mode it is possible to pass a command that will be executed just after startign the applicaton, e.g., `interactive] -h` will start the application in interactive mode, print help message, and then show the prompt.
+When starting the application in interactive mode it is possible to pass a command that will be executed just after startign the applicaton, e.g., `[interactive] -h` will start the application in interactive mode, print help message, and then show the prompt.
 
 ### Reporting errors
 
