@@ -1,11 +1,12 @@
 ﻿using CliFx.Exceptions;
+using CliFx.Tests.Commands;
 using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace CliFx.Tests
 {
-    public partial class DependencyInjectionSpecs
+    public class DependencyInjectionSpecs
     {
         private readonly ITestOutputHelper _output;
 
@@ -18,10 +19,10 @@ namespace CliFx.Tests
             var activator = new DefaultTypeActivator();
 
             // Act
-            var obj = activator.CreateInstance(typeof(WithoutDependenciesCommand));
+            var obj = activator.CreateInstance(typeof(DefaultCommand));
 
             // Assert
-            obj.Should().BeOfType<WithoutDependenciesCommand>();
+            obj.Should().BeOfType<DefaultCommand>();
         }
 
         [Fact]
@@ -40,7 +41,10 @@ namespace CliFx.Tests
         {
             // Arrange
             var activator = new DelegateTypeActivator(_ =>
-                new WithDependenciesCommand(new DependencyA(), new DependencyB()));
+                new WithDependenciesCommand(
+                    new WithDependenciesCommand.DependencyA(),
+                    new WithDependenciesCommand.DependencyB())
+            );
 
             // Act
             var obj = activator.CreateInstance(typeof(WithDependenciesCommand));

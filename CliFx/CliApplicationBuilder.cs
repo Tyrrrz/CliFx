@@ -35,6 +35,12 @@ namespace CliFx
         }
 
         /// <summary>
+        /// Adds a command of specified type to the application.
+        /// </summary>
+        public CliApplicationBuilder AddCommand<TCommand>() where TCommand : ICommand =>
+            AddCommand(typeof(TCommand));
+
+        /// <summary>
         /// Adds multiple commands to the application.
         /// </summary>
         public CliApplicationBuilder AddCommands(IEnumerable<Type> commandTypes)

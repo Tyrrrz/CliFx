@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Threading.Tasks;
+using CliFx.Tests.Commands;
 using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace CliFx.Tests
 {
-    public partial class ErrorReportingSpecs
+    public class ErrorReportingSpecs
     {
         private readonly ITestOutputHelper _output;
 
@@ -17,28 +17,32 @@ namespace CliFx.Tests
         public async Task Command_may_throw_a_generic_exception_which_exits_and_prints_error_message_and_stack_trace()
         {
             // Arrange
+            await using var stdOut = new MemoryStream();
             await using var stdErr = new MemoryStream();
-            var console = new VirtualConsole(error: stdErr);
+
+            var console = new VirtualConsole(output: stdOut, error: stdErr);
 
             var application = new CliApplicationBuilder()
-                .AddCommand(typeof(GenericExceptionCommand))
+                .AddCommand<GenericExceptionCommand>()
                 .UseConsole(console)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(
-                new[] {"exc", "-m", "Kaput"},
-                new Dictionary<string, string>());
+            var exitCode = await application.RunAsync(new[] {"cmd", "-m", "Kaput"});
 
+            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
             var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray()).TrimEnd();
 
             // Assert
             exitCode.Should().NotBe(0);
+            stdOutData.Should().BeEmpty();
             stdErrData.Should().ContainAll(
                 "System.Exception:",
                 "Kaput", "at",
-                "CliFx.Tests");
+                "CliFx.Tests"
+            );
 
+            _output.WriteLine(stdOutData);
             _output.WriteLine(stdErrData);
         }
 
@@ -46,25 +50,28 @@ namespace CliFx.Tests
         public async Task Command_may_throw_a_specialized_exception_which_exits_with_custom_code_and_prints_minimal_error_details()
         {
             // Arrange
+            await using var stdOut = new MemoryStream();
             await using var stdErr = new MemoryStream();
-            var console = new VirtualConsole(error: stdErr);
+
+            var console = new VirtualConsole(output: stdOut, error: stdErr);
 
             var application = new CliApplicationBuilder()
-                .AddCommand(typeof(CommandExceptionCommand))
+                .AddCommand<CommandExceptionCommand>()
                 .UseConsole(console)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(
-                new[] {"exc", "-m", "Kaput", "-c", "69"},
-                new Dictionary<string, string>());
+            var exitCode = await application.RunAsync(new[] {"cmd", "-m", "Kaput", "-c", "69"});
 
+            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
             var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray()).TrimEnd();
 
             // Assert
             exitCode.Should().Be(69);
+            stdOutData.Should().BeEmpty();
             stdErrData.Should().Be("Kaput");
 
+            _output.WriteLine(stdOutData);
             _output.WriteLine(stdErrData);
         }
 
@@ -72,28 +79,32 @@ namespace CliFx.Tests
         public async Task Command_may_throw_a_specialized_exception_without_error_message_which_exits_and_prints_full_error_details()
         {
             // Arrange
+            await using var stdOut = new MemoryStream();
             await using var stdErr = new MemoryStream();
-            var console = new VirtualConsole(error: stdErr);
+
+            var console = new VirtualConsole(output: stdOut, error: stdErr);
 
             var application = new CliApplicationBuilder()
-                .AddCommand(typeof(CommandExceptionCommand))
+                .AddCommand<CommandExceptionCommand>()
                 .UseConsole(console)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(
-                new[] {"exc"},
-                new Dictionary<string, string>());
+            var exitCode = await application.RunAsync(new[] {"cmd"});
 
+            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
             var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray()).TrimEnd();
 
             // Assert
             exitCode.Should().NotBe(0);
+            stdOutData.Should().BeEmpty();
             stdErrData.Should().ContainAll(
                 "CliFx.Exceptions.CommandException:",
                 "at",
-                "CliFx.Tests");
+                "CliFx.Tests"
+            );
 
+            _output.WriteLine(stdOutData);
             _output.WriteLine(stdErrData);
         }
 
@@ -107,30 +118,27 @@ namespace CliFx.Tests
             var console = new VirtualConsole(output: stdOut, error: stdErr);
 
             var application = new CliApplicationBuilder()
-                .AddCommand(typeof(CommandExceptionCommand))
+                .AddCommand<CommandExceptionCommand>()
                 .UseConsole(console)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(
-                new[] {"exc", "-m", "Kaput", "--show-help"},
-                new Dictionary<string, string>());
+            var exitCode = await application.RunAsync(new[] {"cmd", "-m", "Kaput", "--show-help"});
 
-            var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray()).TrimEnd();
             var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
+            var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray()).TrimEnd();
 
             // Assert
             exitCode.Should().NotBe(0);
-            stdErrData.Should().Be("Kaput");
-
             stdOutData.Should().ContainAll(
                 "Usage",
                 "Options",
-                "-h|--help", "Shows help text."
+                "-h|--help"
             );
+            stdErrData.Should().Be("Kaput");
 
-            _output.WriteLine(stdErrData);
             _output.WriteLine(stdOutData);
+            _output.WriteLine(stdErrData);
         }
 
         [Fact]
@@ -139,34 +147,31 @@ namespace CliFx.Tests
             // Arrange
             await using var stdOut = new MemoryStream();
             await using var stdErr = new MemoryStream();
+
             var console = new VirtualConsole(output: stdOut, error: stdErr);
 
             var application = new CliApplicationBuilder()
-                .AddCommand(typeof(CommandExceptionCommand))
+                .AddCommand<DefaultCommand>()
                 .UseConsole(console)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(
-                new[] {"not-a-valid-command", "-r", "foo"},
-                new Dictionary<string, string>());
+            var exitCode = await application.RunAsync(new[] {"not-a-valid-command", "-r", "foo"});
 
-            var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray()).TrimEnd();
             var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
+            var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray()).TrimEnd();
 
             // Assert
             exitCode.Should().NotBe(0);
-            stdErrData.Should().NotBeNullOrWhiteSpace();
-
             stdOutData.Should().ContainAll(
                 "Usage",
-                "[command]",
                 "Options",
-                "-h|--help", "Shows help text."
+                "-h|--help"
             );
+            stdErrData.Should().NotBeNullOrWhiteSpace();
 
-            _output.WriteLine(stdErrData);
             _output.WriteLine(stdOutData);
+            _output.WriteLine(stdErrData);
         }
     }
 }

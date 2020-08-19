@@ -48,7 +48,7 @@ namespace CliFx.Domain
                         ? ConvertScalar(value, nullableUnderlyingType)
                         : null;
 
-                // String-constructable
+                // String-constructible
                 var stringConstructor = targetType.GetConstructor(new[] {typeof(string)});
                 if (stringConstructor != null)
                     return stringConstructor.Invoke(new object[] {value!});
@@ -83,7 +83,7 @@ namespace CliFx.Domain
             if (targetEnumerableType.IsAssignableFrom(arrayType))
                 return array;
 
-            // Constructable from an array
+            // Constructible from an array
             var arrayConstructor = targetEnumerableType.GetConstructor(new[] {arrayType});
             if (arrayConstructor != null)
                 return arrayConstructor.Invoke(new object[] {array});

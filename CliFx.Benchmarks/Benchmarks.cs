@@ -18,7 +18,7 @@ namespace CliFx.Benchmarks
 
         [Benchmark(Description = "CliFx", Baseline = true)]
         public async ValueTask<int> ExecuteWithCliFx() =>
-            await new CliApplicationBuilder().AddCommand(typeof(CliFxCommand)).Build().RunAsync(Arguments, new Dictionary<string, string>());
+            await new CliApplicationBuilder().AddCommand<CliFxCommand>().Build().RunAsync(Arguments, new Dictionary<string, string>());
 
         [Benchmark(Description = "System.CommandLine")]
         public async Task<int> ExecuteWithSystemCommandLine() =>

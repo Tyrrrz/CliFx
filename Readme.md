@@ -573,7 +573,7 @@ public async Task ConcatCommand_Test()
     var console = new VirtualConsole(output: stdOut);
 
     var app = new CliApplicationBuilder()
-        .AddCommand(typeof(ConcatCommand))
+        .AddCommand<ConcatCommand>()
         .UseConsole(console)
         .Build();
 

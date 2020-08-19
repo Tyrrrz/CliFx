@@ -38,7 +38,8 @@ namespace CliFx.Tests
             var console = new VirtualConsole(
                 input: stdIn,
                 output: stdOut,
-                error: stdErr);
+                error: stdErr
+            );
 
             // Act
             console.Output.Write("output");
