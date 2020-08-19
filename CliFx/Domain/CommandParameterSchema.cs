@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using System.Text;
 using CliFx.Attributes;
 
@@ -31,6 +32,7 @@ namespace CliFx.Domain
 
         public string GetInternalDisplayString() => $"{Property?.Name ?? "<implicit>"} ([{Order}] {GetUserFacingDisplayString()})";
 
+        [ExcludeFromCodeCoverage]
         public override string ToString() => GetInternalDisplayString();
     }
 

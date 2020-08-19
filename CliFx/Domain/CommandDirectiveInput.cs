@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace CliFx.Domain
 {
@@ -12,6 +13,7 @@ namespace CliFx.Domain
 
         public CommandDirectiveInput(string name) => Name = name;
 
+        [ExcludeFromCodeCoverage]
         public override string ToString() => $"[{Name}]";
     }
 }

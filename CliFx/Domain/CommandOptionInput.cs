@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using CliFx.Internal.Extensions;
 
@@ -29,6 +30,7 @@ namespace CliFx.Domain
 
         public string GetRawValues() => Values.Select(v => v.Quote()).JoinToString(" ");
 
+        [ExcludeFromCodeCoverage]
         public override string ToString() => $"{GetRawAlias()} {GetRawValues()}";
     }
 }
