@@ -54,8 +54,7 @@ namespace CliFx.Tests
         [Fact]
         public async Task At_least_one_command_must_be_defined_in_an_application()
         {
-            await using var stdErr = new MemoryStream();
-            var console = new VirtualConsole(error: stdErr);
+            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .UseConsole(console)
@@ -63,20 +62,18 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(Array.Empty<string>());
-            var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray()).TrimEnd();
 
             // Assert
             exitCode.Should().NotBe(0);
-            stdErrData.Should().NotBeEmpty();
+            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
 
-            _output.WriteLine(stdErrData);
+            _output.WriteLine(stdErr.GetString());
         }
 
         [Fact]
         public async Task Commands_must_implement_the_corresponding_interface()
         {
-            await using var stdErr = new MemoryStream();
-            var console = new VirtualConsole(error: stdErr);
+            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand(typeof(NonImplementedCommand))
@@ -85,20 +82,18 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(Array.Empty<string>());
-            var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray()).TrimEnd();
 
             // Assert
             exitCode.Should().NotBe(0);
-            stdErrData.Should().NotBeEmpty();
+            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
 
-            _output.WriteLine(stdErrData);
+            _output.WriteLine(stdErr.GetString());
         }
 
         [Fact]
         public async Task Commands_must_be_annotated_by_an_attribute()
         {
-            await using var stdErr = new MemoryStream();
-            var console = new VirtualConsole(error: stdErr);
+            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<NonAnnotatedCommand>()
@@ -107,20 +102,18 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(Array.Empty<string>());
-            var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray()).TrimEnd();
 
             // Assert
             exitCode.Should().NotBe(0);
-            stdErrData.Should().NotBeEmpty();
+            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
 
-            _output.WriteLine(stdErrData);
+            _output.WriteLine(stdErr.GetString());
         }
 
         [Fact]
         public async Task Commands_must_have_unique_names()
         {
-            await using var stdErr = new MemoryStream();
-            var console = new VirtualConsole(error: stdErr);
+            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<GenericExceptionCommand>()
@@ -130,20 +123,18 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(Array.Empty<string>());
-            var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray()).TrimEnd();
 
             // Assert
             exitCode.Should().NotBe(0);
-            stdErrData.Should().NotBeEmpty();
+            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
 
-            _output.WriteLine(stdErrData);
+            _output.WriteLine(stdErr.GetString());
         }
 
         [Fact]
         public async Task Command_can_be_default_but_only_if_it_is_the_only_such_command()
         {
-            await using var stdErr = new MemoryStream();
-            var console = new VirtualConsole(error: stdErr);
+            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<DefaultCommand>()
@@ -153,20 +144,18 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(Array.Empty<string>());
-            var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray()).TrimEnd();
 
             // Assert
             exitCode.Should().NotBe(0);
-            stdErrData.Should().NotBeEmpty();
+            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
 
-            _output.WriteLine(stdErrData);
+            _output.WriteLine(stdErr.GetString());
         }
 
         [Fact]
         public async Task Command_parameters_must_have_unique_order()
         {
-            await using var stdErr = new MemoryStream();
-            var console = new VirtualConsole(error: stdErr);
+            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<DuplicateParameterOrderCommand>()
@@ -175,20 +164,18 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(Array.Empty<string>());
-            var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray()).TrimEnd();
 
             // Assert
             exitCode.Should().NotBe(0);
-            stdErrData.Should().NotBeEmpty();
+            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
 
-            _output.WriteLine(stdErrData);
+            _output.WriteLine(stdErr.GetString());
         }
 
         [Fact]
         public async Task Command_parameters_must_have_unique_names()
         {
-            await using var stdErr = new MemoryStream();
-            var console = new VirtualConsole(error: stdErr);
+            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<DuplicateParameterNameCommand>()
@@ -197,20 +184,18 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(Array.Empty<string>());
-            var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray()).TrimEnd();
 
             // Assert
             exitCode.Should().NotBe(0);
-            stdErrData.Should().NotBeEmpty();
+            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
 
-            _output.WriteLine(stdErrData);
+            _output.WriteLine(stdErr.GetString());
         }
 
         [Fact]
         public async Task Command_parameter_can_be_non_scalar_only_if_no_other_such_parameter_is_present()
         {
-            await using var stdErr = new MemoryStream();
-            var console = new VirtualConsole(error: stdErr);
+            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<MultipleNonScalarParametersCommand>()
@@ -219,20 +204,18 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(Array.Empty<string>());
-            var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray()).TrimEnd();
 
             // Assert
             exitCode.Should().NotBe(0);
-            stdErrData.Should().NotBeEmpty();
+            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
 
-            _output.WriteLine(stdErrData);
+            _output.WriteLine(stdErr.GetString());
         }
 
         [Fact]
         public async Task Command_parameter_can_be_non_scalar_only_if_it_is_the_last_in_order()
         {
-            await using var stdErr = new MemoryStream();
-            var console = new VirtualConsole(error: stdErr);
+            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<NonLastNonScalarParameterCommand>()
@@ -241,20 +224,18 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(Array.Empty<string>());
-            var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray()).TrimEnd();
 
             // Assert
             exitCode.Should().NotBe(0);
-            stdErrData.Should().NotBeEmpty();
+            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
 
-            _output.WriteLine(stdErrData);
+            _output.WriteLine(stdErr.GetString());
         }
 
         [Fact]
         public async Task Command_options_must_have_names_that_are_not_empty()
         {
-            await using var stdErr = new MemoryStream();
-            var console = new VirtualConsole(error: stdErr);
+            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<EmptyOptionNameCommand>()
@@ -263,20 +244,18 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(Array.Empty<string>());
-            var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray()).TrimEnd();
 
             // Assert
             exitCode.Should().NotBe(0);
-            stdErrData.Should().NotBeEmpty();
+            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
 
-            _output.WriteLine(stdErrData);
+            _output.WriteLine(stdErr.GetString());
         }
 
         [Fact]
         public async Task Command_options_must_have_names_that_are_longer_than_one_character()
         {
-            await using var stdErr = new MemoryStream();
-            var console = new VirtualConsole(error: stdErr);
+            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SingleCharacterOptionNameCommand>()
@@ -285,20 +264,18 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(Array.Empty<string>());
-            var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray()).TrimEnd();
 
             // Assert
             exitCode.Should().NotBe(0);
-            stdErrData.Should().NotBeEmpty();
+            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
 
-            _output.WriteLine(stdErrData);
+            _output.WriteLine(stdErr.GetString());
         }
 
         [Fact]
         public async Task Command_options_must_have_unique_names()
         {
-            await using var stdErr = new MemoryStream();
-            var console = new VirtualConsole(error: stdErr);
+            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<DuplicateOptionNamesCommand>()
@@ -307,20 +284,18 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(Array.Empty<string>());
-            var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray()).TrimEnd();
 
             // Assert
             exitCode.Should().NotBe(0);
-            stdErrData.Should().NotBeEmpty();
+            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
 
-            _output.WriteLine(stdErrData);
+            _output.WriteLine(stdErr.GetString());
         }
 
         [Fact]
         public async Task Command_options_must_have_unique_short_names()
         {
-            await using var stdErr = new MemoryStream();
-            var console = new VirtualConsole(error: stdErr);
+            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<DuplicateOptionShortNamesCommand>()
@@ -329,20 +304,18 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(Array.Empty<string>());
-            var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray()).TrimEnd();
 
             // Assert
             exitCode.Should().NotBe(0);
-            stdErrData.Should().NotBeEmpty();
+            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
 
-            _output.WriteLine(stdErrData);
+            _output.WriteLine(stdErr.GetString());
         }
 
         [Fact]
         public async Task Command_options_must_have_unique_environment_variable_names()
         {
-            await using var stdErr = new MemoryStream();
-            var console = new VirtualConsole(error: stdErr);
+            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<DuplicateOptionEnvironmentVariableNamesCommand>()
@@ -351,20 +324,18 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(Array.Empty<string>());
-            var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray()).TrimEnd();
 
             // Assert
             exitCode.Should().NotBe(0);
-            stdErrData.Should().NotBeEmpty();
+            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
 
-            _output.WriteLine(stdErrData);
+            _output.WriteLine(stdErr.GetString());
         }
 
         [Fact]
         public async Task Command_options_must_not_have_conflicts_with_the_implicit_help_option()
         {
-            await using var stdErr = new MemoryStream();
-            var console = new VirtualConsole(error: stdErr);
+            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<ConflictWithHelpOptionCommand>()
@@ -373,20 +344,18 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(Array.Empty<string>());
-            var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray()).TrimEnd();
 
             // Assert
             exitCode.Should().NotBe(0);
-            stdErrData.Should().NotBeEmpty();
+            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
 
-            _output.WriteLine(stdErrData);
+            _output.WriteLine(stdErr.GetString());
         }
 
         [Fact]
         public async Task Command_options_must_not_have_conflicts_with_the_implicit_version_option()
         {
-            await using var stdErr = new MemoryStream();
-            var console = new VirtualConsole(error: stdErr);
+            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<ConflictWithVersionOptionCommand>()
@@ -395,13 +364,12 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(Array.Empty<string>());
-            var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray()).TrimEnd();
 
             // Assert
             exitCode.Should().NotBe(0);
-            stdErrData.Should().NotBeEmpty();
+            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
 
-            _output.WriteLine(stdErrData);
+            _output.WriteLine(stdErr.GetString());
         }
     }
 }

@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Threading.Tasks;
 using CliFx.Tests.Commands;
+using CliFx.Tests.Internal;
 using FluentAssertions;
-using Newtonsoft.Json;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -21,8 +20,7 @@ namespace CliFx.Tests
         public async Task Property_of_type_object_is_bound_directly_from_the_argument_value()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -35,8 +33,7 @@ namespace CliFx.Tests
                 "cmd", "--obj", "value"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -51,8 +48,7 @@ namespace CliFx.Tests
         public async Task Property_of_type_object_array_is_bound_directly_from_the_argument_values()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -65,8 +61,7 @@ namespace CliFx.Tests
                 "cmd", "--obj-array", "foo", "bar"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -81,8 +76,7 @@ namespace CliFx.Tests
         public async Task Property_of_type_string_is_bound_directly_from_the_argument_value()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -95,8 +89,7 @@ namespace CliFx.Tests
                 "cmd", "--str", "value"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -111,8 +104,7 @@ namespace CliFx.Tests
         public async Task Property_of_type_string_array_is_bound_directly_from_the_argument_values()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -125,8 +117,7 @@ namespace CliFx.Tests
                 "cmd", "--str-array", "foo", "bar"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -141,8 +132,7 @@ namespace CliFx.Tests
         public async Task Property_of_type_string_IEnumerable_is_bound_directly_from_the_argument_values()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -155,8 +145,7 @@ namespace CliFx.Tests
                 "cmd", "--str-enumerable", "foo", "bar"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -171,8 +160,7 @@ namespace CliFx.Tests
         public async Task Property_of_type_string_IReadOnlyList_is_bound_directly_from_the_argument_values()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -185,8 +173,7 @@ namespace CliFx.Tests
                 "cmd", "--str-read-only-list", "foo", "bar"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -201,8 +188,7 @@ namespace CliFx.Tests
         public async Task Property_of_type_string_List_is_bound_directly_from_the_argument_values()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -215,8 +201,7 @@ namespace CliFx.Tests
                 "cmd", "--str-list", "foo", "bar"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -231,8 +216,7 @@ namespace CliFx.Tests
         public async Task Property_of_type_string_HashSet_is_bound_directly_from_the_argument_values()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -245,8 +229,7 @@ namespace CliFx.Tests
                 "cmd", "--str-set", "foo", "bar"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -261,8 +244,7 @@ namespace CliFx.Tests
         public async Task Property_of_type_bool_is_bound_as_true_if_the_argument_value_is_true()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -275,8 +257,7 @@ namespace CliFx.Tests
                 "cmd", "--bool", "true"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -291,8 +272,7 @@ namespace CliFx.Tests
         public async Task Property_of_type_bool_is_bound_as_false_if_the_argument_value_is_false()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -305,8 +285,7 @@ namespace CliFx.Tests
                 "cmd", "--bool", "false"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -321,8 +300,7 @@ namespace CliFx.Tests
         public async Task Property_of_type_bool_is_bound_as_true_if_the_argument_value_is_not_set()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -335,8 +313,7 @@ namespace CliFx.Tests
                 "cmd", "--bool"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -351,8 +328,7 @@ namespace CliFx.Tests
         public async Task Property_of_type_char_is_bound_directly_from_the_argument_value_if_it_contains_only_one_character()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -365,8 +341,7 @@ namespace CliFx.Tests
                 "cmd", "--char", "a"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -381,8 +356,7 @@ namespace CliFx.Tests
         public async Task Property_of_type_sbyte_is_bound_by_parsing_the_argument_value()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -395,8 +369,7 @@ namespace CliFx.Tests
                 "cmd", "--sbyte", "15"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -411,8 +384,7 @@ namespace CliFx.Tests
         public async Task Property_of_type_byte_is_bound_by_parsing_the_argument_value()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -425,8 +397,7 @@ namespace CliFx.Tests
                 "cmd", "--byte", "15"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -441,8 +412,7 @@ namespace CliFx.Tests
         public async Task Property_of_type_short_is_bound_by_parsing_the_argument_value()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -455,8 +425,7 @@ namespace CliFx.Tests
                 "cmd", "--short", "15"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -471,8 +440,7 @@ namespace CliFx.Tests
         public async Task Property_of_type_ushort_is_bound_by_parsing_the_argument_value()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -485,8 +453,7 @@ namespace CliFx.Tests
                 "cmd", "--ushort", "15"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -501,8 +468,7 @@ namespace CliFx.Tests
         public async Task Property_of_type_int_is_bound_by_parsing_the_argument_value()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -515,8 +481,7 @@ namespace CliFx.Tests
                 "cmd", "--int", "15"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -531,8 +496,7 @@ namespace CliFx.Tests
         public async Task Property_of_type_nullable_int_is_bound_by_parsing_the_argument_value_if_it_is_set()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -545,8 +509,7 @@ namespace CliFx.Tests
                 "cmd", "--int-nullable", "15"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -561,8 +524,7 @@ namespace CliFx.Tests
         public async Task Property_of_type_nullable_int_is_bound_as_null_if_the_argument_value_is_not_set()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -575,8 +537,7 @@ namespace CliFx.Tests
                 "cmd", "--int-nullable"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -591,8 +552,7 @@ namespace CliFx.Tests
         public async Task Property_of_type_int_array_is_bound_by_parsing_the_argument_values()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -605,8 +565,7 @@ namespace CliFx.Tests
                 "cmd", "--int-array", "3", "15"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -621,8 +580,7 @@ namespace CliFx.Tests
         public async Task Property_of_type_nullable_int_array_is_bound_by_parsing_the_argument_values()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -635,8 +593,7 @@ namespace CliFx.Tests
                 "cmd", "--int-nullable-array", "3", "15"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -651,8 +608,7 @@ namespace CliFx.Tests
         public async Task Property_of_type_uint_is_bound_by_parsing_the_argument_value()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -665,8 +621,7 @@ namespace CliFx.Tests
                 "cmd", "--uint", "15"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -681,8 +636,7 @@ namespace CliFx.Tests
         public async Task Property_of_type_long_is_bound_by_parsing_the_argument_value()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -695,8 +649,7 @@ namespace CliFx.Tests
                 "cmd", "--long", "15"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -711,8 +664,7 @@ namespace CliFx.Tests
         public async Task Property_of_type_ulong_is_bound_by_parsing_the_argument_value()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -725,8 +677,7 @@ namespace CliFx.Tests
                 "cmd", "--ulong", "15"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -741,8 +692,7 @@ namespace CliFx.Tests
         public async Task Property_of_type_float_is_bound_by_parsing_the_argument_value()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -755,8 +705,7 @@ namespace CliFx.Tests
                 "cmd", "--float", "3.14"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -771,8 +720,7 @@ namespace CliFx.Tests
         public async Task Property_of_type_double_is_bound_by_parsing_the_argument_value()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -785,8 +733,7 @@ namespace CliFx.Tests
                 "cmd", "--double", "3.14"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -801,8 +748,7 @@ namespace CliFx.Tests
         public async Task Property_of_type_decimal_is_bound_by_parsing_the_argument_value()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -815,8 +761,7 @@ namespace CliFx.Tests
                 "cmd", "--decimal", "3.14"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -831,8 +776,7 @@ namespace CliFx.Tests
         public async Task Property_of_type_DateTime_is_bound_by_parsing_the_argument_value()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -845,8 +789,7 @@ namespace CliFx.Tests
                 "cmd", "--datetime", "28 Apr 1995"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -861,8 +804,7 @@ namespace CliFx.Tests
         public async Task Property_of_type_DateTimeOffset_is_bound_by_parsing_the_argument_value()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -875,8 +817,7 @@ namespace CliFx.Tests
                 "cmd", "--datetime-offset", "28 Apr 1995"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -891,8 +832,7 @@ namespace CliFx.Tests
         public async Task Property_of_type_TimeSpan_is_bound_by_parsing_the_argument_value()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -905,8 +845,7 @@ namespace CliFx.Tests
                 "cmd", "--timespan", "00:14:59"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -921,8 +860,7 @@ namespace CliFx.Tests
         public async Task Property_of_type_nullable_TimeSpan_is_bound_by_parsing_the_argument_value_if_it_is_set()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -935,8 +873,7 @@ namespace CliFx.Tests
                 "cmd", "--timespan-nullable", "00:14:59"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -951,8 +888,7 @@ namespace CliFx.Tests
         public async Task Property_of_type_nullable_TimeSpan_is_bound_as_null_if_the_argument_value_is_not_set()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -965,8 +901,7 @@ namespace CliFx.Tests
                 "cmd", "--timespan-nullable"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -981,8 +916,7 @@ namespace CliFx.Tests
         public async Task Property_of_an_enum_type_is_bound_by_parsing_the_argument_value_as_name()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -995,8 +929,7 @@ namespace CliFx.Tests
                 "cmd", "--enum", "value2"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -1011,8 +944,7 @@ namespace CliFx.Tests
         public async Task Property_of_an_enum_type_is_bound_by_parsing_the_argument_value_as_id()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -1025,8 +957,7 @@ namespace CliFx.Tests
                 "cmd", "--enum", "2"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -1041,8 +972,7 @@ namespace CliFx.Tests
         public async Task Property_of_a_nullable_enum_type_is_bound_by_parsing_the_argument_value_as_name_if_it_is_set()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -1055,8 +985,7 @@ namespace CliFx.Tests
                 "cmd", "--enum-nullable", "value3"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -1071,8 +1000,7 @@ namespace CliFx.Tests
         public async Task Property_of_a_nullable_enum_type_is_bound_by_parsing_the_argument_value_as_id_if_it_is_set()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -1085,8 +1013,7 @@ namespace CliFx.Tests
                 "cmd", "--enum-nullable", "3"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -1101,8 +1028,7 @@ namespace CliFx.Tests
         public async Task Property_of_a_nullable_enum_type_is_bound_as_null_if_the_argument_value_is_not_set()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -1115,8 +1041,7 @@ namespace CliFx.Tests
                 "cmd", "--enum-nullable"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -1131,8 +1056,7 @@ namespace CliFx.Tests
         public async Task Property_of_an_enum_array_type_is_bound_by_parsing_the_argument_values_as_names()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -1145,8 +1069,7 @@ namespace CliFx.Tests
                 "cmd", "--enum-array", "value1", "value3"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -1161,8 +1084,7 @@ namespace CliFx.Tests
         public async Task Property_of_an_enum_array_type_is_bound_by_parsing_the_argument_values_as_ids()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -1175,8 +1097,7 @@ namespace CliFx.Tests
                 "cmd", "--enum-array", "1", "3"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -1191,8 +1112,7 @@ namespace CliFx.Tests
         public async Task Property_of_an_enum_array_type_is_bound_by_parsing_the_argument_values_as_either_names_or_ids()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -1205,8 +1125,7 @@ namespace CliFx.Tests
                 "cmd", "--enum-array", "1", "value3"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -1221,8 +1140,7 @@ namespace CliFx.Tests
         public async Task Property_of_a_type_that_has_a_constructor_accepting_a_string_is_bound_by_invoking_the_constructor_with_the_argument_value()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -1235,8 +1153,7 @@ namespace CliFx.Tests
                 "cmd", "--str-constructible", "foobar"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -1251,8 +1168,7 @@ namespace CliFx.Tests
         public async Task Property_of_an_array_of_type_that_has_a_constructor_accepting_a_string_is_bound_by_invoking_the_constructor_with_the_argument_values()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -1265,8 +1181,7 @@ namespace CliFx.Tests
                 "cmd", "--str-constructible-array", "foo", "bar"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -1285,8 +1200,7 @@ namespace CliFx.Tests
         public async Task Property_of_a_type_that_has_a_static_Parse_method_accepting_a_string_is_bound_by_invoking_the_method()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -1299,8 +1213,7 @@ namespace CliFx.Tests
                 "cmd", "--str-parseable", "foobar"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -1315,8 +1228,7 @@ namespace CliFx.Tests
         public async Task Property_of_a_type_that_has_a_static_Parse_method_accepting_a_string_and_format_provider_is_bound_by_invoking_the_method()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -1329,8 +1241,7 @@ namespace CliFx.Tests
                 "cmd", "--str-parseable-format", "foobar"
             });
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<SupportedArgumentTypesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -1346,8 +1257,7 @@ namespace CliFx.Tests
         public async Task Property_of_custom_type_must_be_string_initializable_in_order_to_be_bound()
         {
             // Arrange
-            await using var stdErr = new MemoryStream();
-            var console = new VirtualConsole(error: stdErr);
+            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<UnsupportedArgumentTypesCommand>()
@@ -1360,21 +1270,18 @@ namespace CliFx.Tests
                 "cmd", "--str-non-initializable", "foobar"
             });
 
-            var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray()).TrimEnd();
-
             // Assert
             exitCode.Should().NotBe(0);
-            stdErrData.Should().NotBeEmpty();
+            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
 
-            _output.WriteLine(stdErrData);
+            _output.WriteLine(stdErr.GetString());
         }
 
         [Fact]
         public async Task Property_of_custom_type_that_implements_IEnumerable_can_only_be_bound_if_that_type_has_a_constructor_accepting_an_array()
         {
             // Arrange
-            await using var stdErr = new MemoryStream();
-            var console = new VirtualConsole(error: stdErr);
+            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<UnsupportedArgumentTypesCommand>()
@@ -1387,21 +1294,18 @@ namespace CliFx.Tests
                 "cmd", "--str-enumerable-non-initializable", "foobar"
             });
 
-            var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray()).TrimEnd();
-
             // Assert
             exitCode.Should().NotBe(0);
-            stdErrData.Should().NotBeEmpty();
+            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
 
-            _output.WriteLine(stdErrData);
+            _output.WriteLine(stdErr.GetString());
         }
 
         [Fact]
         public async Task Property_of_non_nullable_type_can_only_be_bound_if_the_argument_value_is_set()
         {
             // Arrange
-            await using var stdErr = new MemoryStream();
-            var console = new VirtualConsole(error: stdErr);
+            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -1414,21 +1318,18 @@ namespace CliFx.Tests
                 "cmd", "--int"
             });
 
-            var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray()).TrimEnd();
-
             // Assert
             exitCode.Should().NotBe(0);
-            stdErrData.Should().NotBeEmpty();
+            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
 
-            _output.WriteLine(stdErrData);
+            _output.WriteLine(stdErr.GetString());
         }
 
         [Fact]
         public async Task Property_must_have_a_type_that_implements_IEnumerable_in_order_to_be_bound_from_multiple_argument_values()
         {
             // Arrange
-            await using var stdErr = new MemoryStream();
-            var console = new VirtualConsole(error: stdErr);
+            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -1441,13 +1342,11 @@ namespace CliFx.Tests
                 "cmd", "--int", "1", "2", "3"
             });
 
-            var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray()).TrimEnd();
-
             // Assert
             exitCode.Should().NotBe(0);
-            stdErrData.Should().NotBeEmpty();
+            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
 
-            _output.WriteLine(stdErrData);
+            _output.WriteLine(stdErr.GetString());
         }
     }
 }

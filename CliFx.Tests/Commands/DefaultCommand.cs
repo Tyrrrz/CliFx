@@ -3,7 +3,7 @@ using CliFx.Attributes;
 
 namespace CliFx.Tests.Commands
 {
-    [Command(Description = nameof(DefaultCommand))]
+    [Command(Description = "Default command description")]
     public class DefaultCommand : ICommand
     {
         public const string ExpectedOutputText = nameof(DefaultCommand);

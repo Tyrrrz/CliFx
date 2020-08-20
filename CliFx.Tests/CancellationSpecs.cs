@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using CliFx.Tests.Commands;
@@ -17,9 +16,7 @@ namespace CliFx.Tests
 
             // Arrange
             using var cts = new CancellationTokenSource();
-
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut, cancellationToken: cts.Token);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered(cts.Token);
 
             var application = new CliApplicationBuilder()
                 .AddCommand<CancellableCommand>()
@@ -30,11 +27,10 @@ namespace CliFx.Tests
             cts.CancelAfter(TimeSpan.FromSeconds(0.2));
 
             var exitCode = await application.RunAsync(new[] {"cmd"});
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
 
             // Assert
             exitCode.Should().NotBe(0);
-            stdOutData.Should().Be(CancellableCommand.CancellationOutputText);
+            stdOut.GetString().Trim().Should().Be(CancellableCommand.CancellationOutputText);
         }
     }
 }

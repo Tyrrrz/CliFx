@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using CliFx.Tests.Commands;
 using FluentAssertions;
 using Xunit;
@@ -17,8 +16,7 @@ namespace CliFx.Tests
         public async Task Help_text_shows_usage_format_which_lists_all_parameters()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<WithParametersCommand>()
@@ -27,24 +25,22 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(new[] {"cmd", "--help"});
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
 
             // Assert
             exitCode.Should().Be(0);
-            stdOutData.Should().ContainAll(
+            stdOut.GetString().Should().ContainAll(
                 "Usage",
                 "cmd", "<parama>", "<paramb>", "<paramc...>"
             );
 
-            _output.WriteLine(stdOutData);
+            _output.WriteLine(stdOut.GetString());
         }
 
         [Fact]
         public async Task Help_text_shows_usage_format_which_lists_all_required_options()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<WithRequiredOptionsCommand>()
@@ -53,11 +49,10 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(new[] {"cmd", "--help"});
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
 
             // Assert
             exitCode.Should().Be(0);
-            stdOutData.Should().ContainAll(
+            stdOut.GetString().Should().ContainAll(
                 "Usage",
                 "cmd", "--opt-a <value>", "--opt-c <values...>", "[options]",
                 "Options",
@@ -66,15 +61,14 @@ namespace CliFx.Tests
                 "* -c|--opt-c"
             );
 
-            _output.WriteLine(stdOutData);
+            _output.WriteLine(stdOut.GetString());
         }
 
         [Fact]
         public async Task Help_text_shows_all_valid_values_for_enum_arguments()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<WithEnumArgumentsCommand>()
@@ -83,11 +77,10 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(new[] {"cmd", "--help"});
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
 
             // Assert
             exitCode.Should().Be(0);
-            stdOutData.Should().ContainAll(
+            stdOut.GetString().Should().ContainAll(
                 "Parameters",
                 "enum", "Valid values: \"Value1\", \"Value2\", \"Value3\".",
                 "Options",
@@ -95,15 +88,14 @@ namespace CliFx.Tests
                 "* --required-enum", "Valid values: \"Value1\", \"Value2\", \"Value3\"."
             );
 
-            _output.WriteLine(stdOutData);
+            _output.WriteLine(stdOut.GetString());
         }
 
         [Fact]
         public async Task Help_text_shows_environment_variable_names_for_options_that_have_them_defined()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<WithEnvironmentVariablesCommand>()
@@ -112,25 +104,23 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(new[] {"cmd", "--help"});
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
 
             // Assert
             exitCode.Should().Be(0);
-            stdOutData.Should().ContainAll(
+            stdOut.GetString().Should().ContainAll(
                 "Options",
                 "-a|--opt-a", "Environment variable:", "ENV_OPT_A",
                 "-b|--opt-b", "Environment variable:", "ENV_OPT_B"
             );
 
-            _output.WriteLine(stdOutData);
+            _output.WriteLine(stdOut.GetString());
         }
 
         [Fact]
         public async Task Help_text_shows_default_values_for_non_required_options()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<WithDefaultValuesCommand>()
@@ -139,11 +129,10 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(new[] {"cmd", "--help"});
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
 
             // Assert
             exitCode.Should().Be(0);
-            stdOutData.Should().ContainAll(
+            stdOut.GetString().Should().ContainAll(
                 "Options",
                 "--obj", "Default: \"42\"",
                 "--str", "Default: \"foo\"",
@@ -158,7 +147,7 @@ namespace CliFx.Tests
                 "--enum", "Default: \"Value2\""
             );
 
-            _output.WriteLine(stdOutData);
+            _output.WriteLine(stdOut.GetString());
         }
     }
 }

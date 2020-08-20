@@ -18,8 +18,7 @@ namespace CliFx.Tests
         public async Task Preview_directive_can_be_specified_to_print_provided_arguments_as_they_were_parsed()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<NamedCommand>()
@@ -32,13 +31,13 @@ namespace CliFx.Tests
                 new[] {"[preview]", "named", "param", "-abc", "--option", "foo"},
                 new Dictionary<string, string>());
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-
             // Assert
             exitCode.Should().Be(0);
-            stdOutData.Should().ContainAll("named", "<param>", "[-a]", "[-b]", "[-c]", "[--option \"foo\"]");
+            stdOut.GetString().Should().ContainAll(
+                "named", "<param>", "[-a]", "[-b]", "[-c]", "[--option \"foo\"]"
+            );
 
-            _output.WriteLine(stdOutData);
+            _output.WriteLine(stdOut.GetString());
         }
     }
 }

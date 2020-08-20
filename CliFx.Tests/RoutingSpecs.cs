@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Threading.Tasks;
 using CliFx.Tests.Commands;
 using FluentAssertions;
@@ -18,8 +17,7 @@ namespace CliFx.Tests
         public async Task Default_command_is_executed_if_provided_arguments_do_not_match_any_named_command()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<DefaultCommand>()
@@ -30,21 +28,19 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(Array.Empty<string>());
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
 
             // Assert
             exitCode.Should().Be(0);
-            stdOutData.Should().Be(DefaultCommand.ExpectedOutputText);
+            stdOut.GetString().Trim().Should().Be(DefaultCommand.ExpectedOutputText);
 
-            _output.WriteLine(stdOutData);
+            _output.WriteLine(stdOut.GetString());
         }
 
         [Fact]
         public async Task Specific_named_command_is_executed_if_provided_arguments_match_its_name()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<DefaultCommand>()
@@ -55,21 +51,19 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(new[] {"named"});
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
 
             // Assert
             exitCode.Should().Be(0);
-            stdOutData.Should().Be(NamedCommand.ExpectedOutputText);
+            stdOut.GetString().Trim().Should().Be(NamedCommand.ExpectedOutputText);
 
-            _output.WriteLine(stdOutData);
+            _output.WriteLine(stdOut.GetString());
         }
 
         [Fact]
         public async Task Specific_named_sub_command_is_executed_if_provided_arguments_match_its_name()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<DefaultCommand>()
@@ -80,21 +74,19 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(new[] {"named", "sub"});
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
 
             // Assert
             exitCode.Should().Be(0);
-            stdOutData.Should().Be(NamedSubCommand.ExpectedOutputText);
+            stdOut.GetString().Trim().Should().Be(NamedSubCommand.ExpectedOutputText);
 
-            _output.WriteLine(stdOutData);
+            _output.WriteLine(stdOut.GetString());
         }
 
         [Fact]
         public async Task Help_text_is_printed_if_no_arguments_were_provided_and_default_command_is_not_defined()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<NamedCommand>()
@@ -105,21 +97,19 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(Array.Empty<string>());
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
 
             // Assert
             exitCode.Should().Be(0);
-            stdOutData.Should().Contain("This will be visible in help");
+            stdOut.GetString().Should().Contain("This will be visible in help");
 
-            _output.WriteLine(stdOutData);
+            _output.WriteLine(stdOut.GetString());
         }
 
         [Fact]
         public async Task Help_text_is_printed_if_provided_arguments_contain_the_help_option()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<DefaultCommand>()
@@ -130,24 +120,22 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(new[] {"--help"});
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
 
             // Assert
             exitCode.Should().Be(0);
-            stdOutData.Should().ContainAll(
-                nameof(DefaultCommand),
+            stdOut.GetString().Should().ContainAll(
+                "Default command description",
                 "Usage"
             );
 
-            _output.WriteLine(stdOutData);
+            _output.WriteLine(stdOut.GetString());
         }
 
         [Fact]
         public async Task Help_text_is_printed_if_provided_arguments_contain_the_help_option_even_if_default_command_is_not_defined()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<NamedCommand>()
@@ -158,21 +146,19 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(new[] {"--help"});
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
 
             // Assert
             exitCode.Should().Be(0);
-            stdOutData.Should().Contain("This will be visible in help");
+            stdOut.GetString().Should().Contain("This will be visible in help");
 
-            _output.WriteLine(stdOutData);
+            _output.WriteLine(stdOut.GetString());
         }
 
         [Fact]
         public async Task Help_text_for_a_specific_named_command_is_printed_if_provided_arguments_match_its_name_and_contain_the_help_option()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<DefaultCommand>()
@@ -183,25 +169,23 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(new[] {"named", "--help"});
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
 
             // Assert
             exitCode.Should().Be(0);
-            stdOutData.Should().ContainAll(
-                nameof(NamedCommand),
+            stdOut.GetString().Should().ContainAll(
+                "Named command description",
                 "Usage",
                 "named"
             );
 
-            _output.WriteLine(stdOutData);
+            _output.WriteLine(stdOut.GetString());
         }
 
         [Fact]
         public async Task Help_text_for_a_specific_named_sub_command_is_printed_if_provided_arguments_match_its_name_and_contain_the_help_option()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<DefaultCommand>()
@@ -212,25 +196,23 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(new[] {"named", "sub", "--help"});
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
 
             // Assert
             exitCode.Should().Be(0);
-            stdOutData.Should().ContainAll(
-                nameof(NamedSubCommand),
+            stdOut.GetString().Should().ContainAll(
+                "Named sub command description",
                 "Usage",
                 "named", "sub"
             );
 
-            _output.WriteLine(stdOutData);
+            _output.WriteLine(stdOut.GetString());
         }
 
         [Fact]
         public async Task Version_is_printed_if_the_only_provided_argument_is_the_version_option()
         {
             // Arrange
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<DefaultCommand>()
@@ -242,13 +224,12 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(new[] {"--version"});
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
 
             // Assert
             exitCode.Should().Be(0);
-            stdOutData.Should().Be("v6.9");
+            stdOut.GetString().Trim().Should().Be("v6.9");
 
-            _output.WriteLine(stdOutData);
+            _output.WriteLine(stdOut.GetString());
         }
     }
 }

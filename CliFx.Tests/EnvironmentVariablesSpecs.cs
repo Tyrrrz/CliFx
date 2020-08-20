@@ -2,10 +2,10 @@
 using System.IO;
 using System.Threading.Tasks;
 using CliFx.Tests.Commands;
+using CliFx.Tests.Internal;
 using CliWrap;
 using CliWrap.Buffered;
 using FluentAssertions;
-using Newtonsoft.Json;
 using Xunit;
 
 namespace CliFx.Tests
@@ -27,7 +27,7 @@ namespace CliFx.Tests
             var stdOut = await command.ExecuteBufferedAsync().Select(r => r.StandardOutput);
 
             // Assert
-            stdOut.TrimEnd().Should().Be("Hello Mars!");
+            stdOut.Trim().Should().Be("Hello Mars!");
         }
 
         // This test uses a real application to make sure environment variables are actually read correctly
@@ -47,14 +47,13 @@ namespace CliFx.Tests
             var stdOut = await command.ExecuteBufferedAsync().Select(r => r.StandardOutput);
 
             // Assert
-            stdOut.TrimEnd().Should().Be("Hello Jupiter!");
+            stdOut.Trim().Should().Be("Hello Jupiter!");
         }
 
         [Fact]
         public async Task Option_only_uses_an_environment_variable_as_fallback_if_the_name_matches_case_sensitively()
         {
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<WithEnvironmentVariablesCommand>()
@@ -71,8 +70,7 @@ namespace CliFx.Tests
                 }
             );
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<WithEnvironmentVariablesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<WithEnvironmentVariablesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -85,8 +83,7 @@ namespace CliFx.Tests
         [Fact]
         public async Task Option_of_non_scalar_type_can_use_an_environment_variable_as_fallback_and_extract_multiple_values()
         {
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<WithEnvironmentVariablesCommand>()
@@ -102,8 +99,7 @@ namespace CliFx.Tests
                 }
             );
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<WithEnvironmentVariablesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<WithEnvironmentVariablesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -116,8 +112,7 @@ namespace CliFx.Tests
         [Fact]
         public async Task Option_of_scalar_type_can_use_an_environment_variable_as_fallback_regardless_of_separators()
         {
-            await using var stdOut = new MemoryStream();
-            var console = new VirtualConsole(output: stdOut);
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<WithEnvironmentVariablesCommand>()
@@ -133,8 +128,7 @@ namespace CliFx.Tests
                 }
             );
 
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray()).TrimEnd();
-            var commandInstance = JsonConvert.DeserializeObject<WithEnvironmentVariablesCommand>(stdOutData);
+            var commandInstance = stdOut.GetString().DeserializeJson<WithEnvironmentVariablesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
