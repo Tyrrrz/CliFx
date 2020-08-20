@@ -1,3 +1,8 @@
+### v1.4 (20-Aug-2020)
+
+- Added `VirtualConsole.CreateBuffered()` method to simplify test setup when using in-memory backing stores for output and error streams. Please refer to the readme for updated recommendations on how to test applications built with CliFx.
+- Added generic `CliApplicationBuilder.AddCommand<TCommand>()`. This overload simplifies adding commands one-by-one as it also checks that the type implements `ICommand`.
+
 ### v1.3.2 (31-Jul-2020)
 
 - Fixed an issue where a command was incorrectly allowed to execute when the user did not specify any value for a non-scalar parameter. Since they are always required, a parameter needs to be bound to (at least) one value. (Thanks [@Daniel Hix](https://github.com/ADustyOldMuffin))

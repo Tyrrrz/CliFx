@@ -510,11 +510,29 @@ public static class Program
 
 ### Testing
 
-CliFx provides an easy way to write functional tests for your commands thanks to the `IConsole` interface.
+CliFx provides a convenient way to write functional tests for your applications, thanks to the `IConsole` interface.
 
-You can use `VirtualConsole` to replace the application's stdin, stdout and stderr with your own streams. It has multiple constructor overloads allowing you to specify the exact set of streams that you want. Streams which are not provided by you are replaced with stubs, i.e. `VirtualConsole` doesn't leak to `System.Console` in any way.
+Instead of interacting with the real console, you can use an instance of `VirtualConsole` to replace the application's stdin, stdout and stderr with your own streams. Using optional parameters you can also choose to substitute only some of the streams, in which case the remaining streams are replaced with no-op stubs:
 
-Let's assume you want to test a simple command such as this one.
+```c#
+var console = new VirtualConsole(
+    input: stdIn,
+    output: stdOut,
+    error: stdErr
+);
+```
+
+Although `VirtualConsole` can be constructed with all kinds of streams, most of the time you will want to test against in-memory stores. To simplify setup in such scenarios, CliFx also provides a `CreateBuffered` factory method that returns an instance of `IConsole` along with in-memory streams that you can later read from:
+
+```c#
+var (console, stdOut, stdErr) = VirtualConsole.CreateBuffered();
+
+// ...
+
+var stdOutData = stdOut.GetString();
+```
+
+To illustrate how to use all this, let's look at an example. Assume you want to test a simple command such as this one:
 
 ```c#
 [Command]
@@ -537,15 +555,15 @@ public class ConcatCommand : ICommand
 }
 ```
 
-By substituting `IConsole` you can write your test cases like this:
+By substituting `IConsole` you can write your test cases like so:
 
 ```c#
+// Integration test at command level
 [Test]
-public async Task ConcatCommand_Test()
+public async Task ConcatCommand_executes_successfully()
 {
     // Arrange
-    await using var stdOut = new MemoryStream();
-    var console = new VirtualConsole(output: stdOut);
+    var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
     var command = new ConcatCommand
     {
@@ -555,22 +573,21 @@ public async Task ConcatCommand_Test()
 
     // Act
     await command.ExecuteAsync(console);
-    var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray());
 
     // Assert
-    Assert.That(stdOutData, Is.EqualTo("foo bar"));
+    Assert.That(stdOut.GetString(), Is.EqualTo("foo bar"));
 }
 ```
 
-And if you want, you can also test the whole application in a similar fashion:
+Similarly, you can also test the command end-to-end like so:
 
 ```c#
+// End-to-end test at application level
 [Test]
-public async Task ConcatCommand_Test()
+public async Task ConcatCommand_executes_successfully()
 {
     // Arrange
-    await using var stdOut = new MemoryStream();
-    var console = new VirtualConsole(output: stdOut);
+    var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
     var app = new CliApplicationBuilder()
         .AddCommand<ConcatCommand>()
@@ -582,14 +599,25 @@ public async Task ConcatCommand_Test()
 
     // Act
     await app.RunAsync(args, envVars);
-    var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray());
 
     // Assert
-    Assert.That(stdOutData, Is.EqualTo("foo bar"));
+    Assert.That(stdOut.GetString(), Is.EqualTo("foo bar"));
 }
 ```
 
-Note that CliFx applications have access to underlying binary streams that allows them to write binary data directly. By using the approach outlined above, we're making the assumption that the application is only expected to produce text output.
+As a general recommendation, it's nearly always more preferable to test at the application level. While you can validate your command's execution adequately simply by testing its `ExecuteAsync` method, testing end-to-end helps you to also catch bugs related to configuration, such as incorrect option names, parameter order, environment variable names, etc.
+
+Additionally, it's important to remember that commands in CliFx are not constrained to text and can also produce binary data. In such cases, you can still use the above setup but use `GetBytes` instead of `GetString`:
+
+```c#
+// Act
+await app.RunAsync(args, envVars);
+
+// Assert
+Assert.That(stdOut.GetBytes(), Is.EqualTo(new byte[] {1, 2, 3, 4, 5}));
+``` 
+
+In some scenarios the binary data may be too large to load in-memory. In situations like this, it's recommended to use `VirtualConsole` directly with custom streams.
 
 ### Debug and preview mode
 
