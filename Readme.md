@@ -8,8 +8,6 @@
 
 CliFx is a simple to use, yet powerful framework for building command line applications. Its primary goal is to completely take over the user input layer, letting you forget about the infrastructure and instead focus on writing your application. This framework uses a declarative class-first approach for defining commands, avoiding excessive boilerplate code and complex configurations.
 
-An important property of CliFx, when compared to some other libraries, is that it's not just a parser -- it's a complete application framework. The main goal of the library is to provide a consistent and enjoyable development experience when building command line applications. At its core, CliFx is highly opinionated, giving preference to convention over configuration, strictness over extensibility, consistency over ambiguity, and so on.
-
 ## Download
 
 - [NuGet](https://nuget.org/packages/CliFx): `dotnet add package CliFx`
@@ -27,7 +25,7 @@ An important property of CliFx, when compared to some other libraries, is that i
 - Provides comprehensive and colorful auto-generated help text
 - Highly testable and easy to debug
 - Comes with built-in analyzers to help catch common mistakes
-- Targets .NET Standard 2.0+
+- Works with .NET Standard 2.0+, .NET Core 2.0+, .NET Framework 4.6.1+
 - No external dependencies
 
 ## Screenshots
@@ -46,16 +44,13 @@ An important property of CliFx, when compared to some other libraries, is that i
 - [Dependency injection](#dependency-injection)
 - [Testing](#testing)
 - [Debug and preview mode](#debug-and-preview-mode)
-- [Reporting progress](#reporting-progress)
 - [Environment variables](#environment-variables)
 
 ### Quick start
 
 ![quick start animated](https://i.imgur.com/uouNh2u.gif)
 
-To turn your application into a command line interface you need to change your program's `Main` method so that it delegates execution to `CliApplication`.
-
-The following code will create and run a default `CliApplication` that will resolve commands defined in the calling assembly. Using fluent interface provided by `CliApplicationBuilder` you can easily configure different aspects of your application.
+To turn your application into a command line interface you need to change your program's `Main` method so that it delegates execution to `CliApplication`. This is how to do it:
 
 ```c#
 public static class Program
@@ -68,7 +63,9 @@ public static class Program
 }
 ```
 
-In order to add functionality to your application, you need to define at least one command. Commands are essentially entry points through which the user can interact with your application. You can think of them as something similar to controllers in ASP.NET Core.
+The above code will create and run a `CliApplication` that will resolve commands defined in the calling assembly. Using fluent interface provided by `CliApplicationBuilder` you can also easily configure other aspects of your application.
+
+In order to add functionality, however, you need to define at least one command. Commands are essentially entry points through which the user can interact with your application. You can think of them as something similar to controllers in ASP.NET Core.
 
 To define a command, just create a new class that implements the `ICommand` interface and annotate it with `[Command]` attribute:
 
@@ -86,11 +83,11 @@ public class HelloWorldCommand : ICommand
 }
 ```
 
-To implement `ICommand`, the class needs to define the `ExecuteAsync` method. This is the method that gets called when the user executes the command.
+To implement `ICommand`, the class needs to define an `ExecuteAsync()` method. This is the method that gets called by CliFx when the user runs the application.
 
 To facilitate both asynchronous and synchronous execution, this method returns a `ValueTask`. Since the simple command above executes synchronously, we can just put `return default` at the end. In an asynchronous command, however, we would use the `async`/`await` keywords instead.
 
-As a parameter, this method takes an instance of `IConsole`, an abstraction around the system console. You should use this abstraction in places where you would normally use `System.Console`, in order to make your command testable.
+As a parameter, this method takes an instance of `IConsole`, an abstraction around the system console. You should use this abstraction in places where you would normally interact with `System.Console`, in order to make your command testable.
 
 With this basic setup, the user can execute your application and get a greeting in return:
 
@@ -125,7 +122,7 @@ v1.0
 
 Commands can be configured to take input from command line arguments. To do that, we need to add properties to the command and annotate them with special attributes.
 
-In CliFx, there are two types of argument bindings: **parameters** and **options**. Parameters are positional arguments that are identified by the order they appear in, while options are identified by their names.
+In CliFx, there are two types of argument bindings: **parameters** and **options**. Parameters are positional arguments that are identified by the order they appear in, while options are arguments identified by their names.
 
 Here's an example command that calculates a logarithm of a value, which uses both a parameter and an option:
 
@@ -181,7 +178,7 @@ As we can see, in order to execute this command, at a minimum, the user has to s
 4
 ```
 
-They can also set the `base` option to override the default logarithm base of 10:
+They can also set the non-required `base` option to override the default logarithm base of 10:
 
 ```sh
 > myapp.exe 729 -b 3
@@ -195,7 +192,7 @@ They can also set the `base` option to override the default logarithm base of 10
 3.199426017362198
 ```
 
-On the other hand, if the user fails to provide the required parameter, they will get an error:
+On the other hand, if the user fails to provide the parameter, they will get an error, as parameters are always required:
 
 ```sh
 > myapp.exe -b 10
@@ -203,7 +200,7 @@ On the other hand, if the user fails to provide the required parameter, they wil
 Missing value for parameter <value>.
 ```
 
-Differences between parameters and options:
+Overall, the difference between parameters and options is as follows:
 
 - Parameters are identified by their relative order. Options are identified by two dashes followed by their name, or a single dash followed by their short name (single character).
 - Parameters can't be optional. Options are usually optional (as evident by the name), but can be configured to be required as well.
@@ -231,7 +228,7 @@ More specifically, the following examples are all valid:
 
 Argument parsing in CliFx aims to be as deterministic as possible, ideally yielding the same result no matter the context. The only context-sensitive part in the parser is the command name resolution which needs to know what commands are available in order to discern between arguments that correspond to the command name and arguments which are parameters.
 
-Options are always parsed the same way, disregarding the arity of the actual property it binds to. This means that `myapp -i file1.txt file2.txt` will _always_ be parsed as an option with multiple values, even if the underlying bound property is not enumerable. For the same reason, unseparated arguments such as `myapp -ofile` will be treated as five distinct options `'o'`, `'f'`, `'i'`, `'l'`, `'e'`, instead of `'o'` being set to `"file"`.
+An option is always parsed the same way, regardless of the arity of the actual property it's bound to. This means that `myapp -i file1.txt file2.txt` will _always_ be parsed as an option set to multiple values, even if the underlying property is not enumerable. For the same reason, unseparated arguments such as `myapp -ofile` will be treated as five distinct options `'o'`, `'f'`, `'i'`, `'l'`, `'e'`, instead of `'o'` being set to `"file"`.
 
 Because of these rules, order of arguments is semantically important and it always goes like this:
 
@@ -350,9 +347,7 @@ public class SubCommand : ICommand
 }
 ```
 
-The user can access other commands by specifying the name before any other arguments, e.g. `myapp.exe cmd1 arg1 -p 42`.
-
-In a multi-command application you may also choose to not have a default command, in which case executing your application without any arguments will just show the help text.
+There is no limit to the number of commands or the level of their nesting. Once configured, the user can execute a specific command by typing its name before any other arguments, e.g. `myapp.exe cmd1 arg1 -p 42`.
 
 Requesting help on the application above will show:
 
@@ -392,15 +387,15 @@ Commands
 You can run `myapp.exe cmd1 [command] --help` to show help on a specific command.
 ```
 
+In a multi-command application you may also choose to not have a default command and only use named commands. If that's the case, running an application without parameters will simply print help text.
+
 ### Reporting errors
 
-You may have noticed that commands in CliFx don't return exit codes. This is by design as exit codes are considered a higher-level concern and thus handled by `CliApplication`, not by individual commands.
+You may have noticed that commands in CliFx don't return exit codes. This is by design as exit codes are considered an infrastructural concern and thus handled by `CliApplication`, not by individual commands.
 
-Commands can report execution failure simply by throwing exceptions just like any other C# code. When an exception is thrown, `CliApplication` will catch it, print the error, and return `1` as the exit code to the calling process.
+Commands can instead report execution failure by throwing an instance of `CommandException`. Using this exception, you can specify the message printed to stderr and the returned exit code.
 
-If you want to communicate a specific error through exit code, you can instead throw an instance of `CommandException` which takes an exit code as a parameter. When a command throws an exception of type `CommandException`, it is assumed that this was a result of a handled error and, as such, only the exception message will be printed to the error stream. If a command throws an exception of any other type, the full stack trace will be printed as well.
-
-> Note: Unix systems rely on 8-bit unsigned integers for exit codes, so it's strongly recommended to use values between `1` and `255` to avoid potential overflow issues.
+Here is an example:
 
 ```c#
 [Command]
@@ -452,11 +447,17 @@ public class ExampleCommand : ICommand
 }
 ```
 
+> Note: Unix systems rely on 8-bit unsigned integers for exit codes, so it's strongly recommended to use values between `1` and `255` when specifying exit code, in order to avoid potential overflow issues.
+
 ### Graceful cancellation
 
-It is possible to gracefully cancel execution of a command and preform any necessary cleanup. By default an app gets forcefully killed when it receives an interrupt signal (Ctrl+C or Ctrl+Break), but you can override this behavior.
+A user of a command line application may send an interrupt signal (Ctrl+C or Ctrl+Break) to gracefully abort execution. Commands in CliFx can intercept this signal to cancel any ongoing operations and perform cleanup.
 
-In order to make a command cancellation-aware, you need to call `console.GetCancellationToken()`. This method returns a `CancellationToken` that will trigger when the user issues an interrupt signal. Note that any code that comes before the first call to `GetCancellationToken()` will not be cancellation-aware and as such will terminate instantly. Any subsequent calls to this method will return the same token.
+In order to make a command cancellation-aware, all you need to do is call `console.GetCancellationToken()`. This method returns a `CancellationToken` that will trigger when the user issues an interrupt signal.
+
+Note that any code that comes before the first call to `GetCancellationToken()` will not be cancellation-aware and as such will terminate instantly. Any subsequent calls to this method will return the same token.
+
+Here's an example of a command that supports cancellation:
 
 ```c#
 [Command("cancel")]
@@ -464,25 +465,25 @@ public class CancellableCommand : ICommand
 {
     public async ValueTask ExecuteAsync(IConsole console)
     {
-        console.Output.WriteLine("Printed");
+        // Make the command cancellation-aware
+        var token = console.GetCancellationToken();
 
-        // Long-running cancellable operation that throws when canceled
-        await Task.Delay(Timeout.InfiniteTimeSpan, console.GetCancellationToken());
-
-        console.Output.WriteLine("Never printed");
+        // Execute some long-running operation
+        await Task.Delay(Timespan.FromMinutes(10), token);
+        console.Output.WriteLine("Done.");
     }
 }
 ```
 
-Keep in mind that a command may delay cancellation only once. If the user decides to press Ctrl+C again after the first time, the execution will be forcefully terminated.
+Keep in mind that a command may delay cancellation only once. If the user decides to send an interrupt signal again after the first time, the execution will be forcefully terminated regardless of whether the command is cancellation-aware.
 
 ### Dependency injection
 
-CliFx uses an implementation of `ITypeActivator` to initialize commands and by default it only works with types that have parameterless constructors.
+CliFx uses an implementation of `ITypeActivator` to initialize commands and by default it only works with types that have parameter-less constructors. This is sufficient for majority of scenarios.
 
-In real-life scenarios, however, your commands will most likely have dependencies that need to be injected. CliFx doesn't come with its own dependency container but it makes it really easy to integrate any container of your choice.
+However, in some cases you may also want to initialize commands dynamically with the help of a dependency injection container. CliFx makes it really easy to integrate with any DI framework of your choice.
 
-For example, here is how you would configure your application to use [`Microsoft.Extensions.DependencyInjection`](https://nuget.org/packages/Microsoft.Extensions.DependencyInjection) (aka the built-in dependency container in ASP.NET Core).
+For example, here is how you would configure your application to use [`Microsoft.Extensions.DependencyInjection`](https://nuget.org/packages/Microsoft.Extensions.DependencyInjection) (aka the built-in dependency container in ASP.NET Core):
 
 ```c#
 public static class Program
@@ -510,9 +511,9 @@ public static class Program
 
 ### Testing
 
-CliFx provides a convenient way to write functional tests for your applications, thanks to the `IConsole` interface.
+CliFx provides a convenient way to write functional tests for your applications, thanks to the `IConsole` interface. While a command running in production uses `SystemConsole` for console interactions, you can rely on `VirtualConsole` in your tests to validate these interactions in a simulated environment.
 
-Instead of interacting with the real console, you can use an instance of `VirtualConsole` to replace the application's stdin, stdout and stderr with your own streams. Using optional parameters you can also choose to substitute only some of the streams, in which case the remaining streams are replaced with no-op stubs:
+When you initialize an instance of `VirtualConsole`, you can supply your own streams which will be used as the application's stdin, stdout, and stderr. You don't have to supply all of them, however, and any remaining streams will be substituted with a no-op stub.
 
 ```c#
 var console = new VirtualConsole(
@@ -529,10 +530,11 @@ var (console, stdOut, stdErr) = VirtualConsole.CreateBuffered();
 
 // ...
 
+// Get the text that was written so far
 var stdOutData = stdOut.GetString();
 ```
 
-To illustrate how to use all this, let's look at an example. Assume you want to test a simple command such as this one:
+To illustrate how to use this, let's look at an example. Assume you want to test a simple command such as this one:
 
 ```c#
 [Command]
@@ -558,7 +560,7 @@ public class ConcatCommand : ICommand
 By substituting `IConsole` you can write your test cases like so:
 
 ```c#
-// Integration test at command level
+// Integration test at the command level
 [Test]
 public async Task ConcatCommand_executes_successfully()
 {
@@ -579,10 +581,10 @@ public async Task ConcatCommand_executes_successfully()
 }
 ```
 
-Similarly, you can also test the command end-to-end like so:
+Similarly, you can also test the entire execution end-to-end like so:
 
 ```c#
-// End-to-end test at application level
+// End-to-end test at the application level
 [Test]
 public async Task ConcatCommand_executes_successfully()
 {
@@ -605,9 +607,9 @@ public async Task ConcatCommand_executes_successfully()
 }
 ```
 
-As a general recommendation, it's nearly always more preferable to test at the application level. While you can validate your command's execution adequately simply by testing its `ExecuteAsync` method, testing end-to-end helps you to also catch bugs related to configuration, such as incorrect option names, parameter order, environment variable names, etc.
+As a general recommendation, it's always more preferable to test at the application level. While you can validate your command's execution adequately simply by testing its `ExecuteAsync()` method, testing end-to-end also helps you catch bugs related to configuration, such as incorrect option names, parameter order, environment variable names, etc.
 
-Additionally, it's important to remember that commands in CliFx are not constrained to text and can also produce binary data. In such cases, you can still use the above setup but use `GetBytes` instead of `GetString`:
+Additionally, it's important to remember that commands in CliFx are not constrained to text and can produce binary data. In such cases, you can still use the above setup but call `GetBytes()` instead of `GetString()`:
 
 ```c#
 // Act
@@ -615,13 +617,13 @@ await app.RunAsync(args, envVars);
 
 // Assert
 Assert.That(stdOut.GetBytes(), Is.EqualTo(new byte[] {1, 2, 3, 4, 5}));
-``` 
+```
 
-In some scenarios the binary data may be too large to load in-memory. In situations like this, it's recommended to use `VirtualConsole` directly with custom streams.
+In some scenarios the binary data may be too large to load in-memory. If that's the case, it's recommended to use `VirtualConsole` directly with custom streams.
 
 ### Debug and preview mode
 
-When troubleshooting issues, you may find it useful to run your app in debug or preview mode. To do it, simply pass the corresponding directive to your app along with other command line arguments.
+When troubleshooting issues, you may find it useful to run your app in debug or preview mode. To do it, simply pass the corresponding directive to your app along with any other command line arguments.
 
 If your application is ran in debug mode (using the `[debug]` directive), it will wait for debugger to be attached before proceeding. This is useful for debugging apps that were ran outside of the IDE.
 
@@ -650,24 +652,11 @@ var app = new CliApplicationBuilder()
     .Build();
 ```
 
-### Reporting progress
-
-CliFx comes with a simple utility for reporting progress to the console, `ProgressTicker`, which renders progress in-place on every tick.
-
-It implements a well-known `IProgress<double>` interface so you can pass it to methods that are aware of this abstraction.
-
-To avoid polluting output when it's not bound to a console, `ProgressTicker` will simply no-op if stdout is redirected.
-
-```c#
-var progressTicker = console.CreateProgressTicker();
-
-for (var i = 0.0; i <= 1; i += 0.01)
-    progressTicker.Report(i);
-```
-
 ### Environment variables
 
-An option can be configured to use the value of an environment variable as a fallback. If an option was not specified by the user, the value will be extracted from that environment variable instead. This also works on options which are marked as required.
+An option can be configured to use the value of an environment variable as a fallback. If the value for such an option is not directly specified in the arguments, it will be extracted from that environment variable instead.
+
+Here's an example of a required option that can be either provided directly or extracted from the environment:
 
 ```c#
 [Command]
@@ -708,15 +697,15 @@ Frequency=3124994 Hz, Resolution=320.0006 ns, Timer=TSC
   DefaultJob : .NET Core 3.1.0 (CoreCLR 4.700.19.56402, CoreFX 4.700.19.56404), X64 RyuJIT
 ```
 
-|                               Method |        Mean |     Error |     StdDev | Ratio | RatioSD | Rank |
-|------------------------------------- |------------:|----------:|-----------:|------:|--------:|-----:|
-|                    CommandLineParser |    24.79 us |  0.166 us |   0.155 us |  0.49 |    0.00 |    1 |
-|                                CliFx |    50.27 us |  0.248 us |   0.232 us |  1.00 |    0.00 |    2 |
-|                                Clipr |   160.22 us |  0.817 us |   0.764 us |  3.19 |    0.02 |    3 |
+| Method                               |        Mean |     Error |     StdDev | Ratio | RatioSD | Rank |
+| ------------------------------------ | ----------: | --------: | ---------: | ----: | ------: | ---: |
+| CommandLineParser                    |    24.79 us |  0.166 us |   0.155 us |  0.49 |    0.00 |    1 |
+| CliFx                                |    50.27 us |  0.248 us |   0.232 us |  1.00 |    0.00 |    2 |
+| Clipr                                |   160.22 us |  0.817 us |   0.764 us |  3.19 |    0.02 |    3 |
 | McMaster.Extensions.CommandLineUtils |   166.45 us |  1.111 us |   1.039 us |  3.31 |    0.03 |    4 |
-|                   System.CommandLine |   170.27 us |  0.599 us |   0.560 us |  3.39 |    0.02 |    5 |
-|                            PowerArgs |   306.12 us |  1.495 us |   1.398 us |  6.09 |    0.03 |    6 |
-|                               Cocona | 1,856.07 us | 48.727 us | 141.367 us | 37.88 |    2.60 |    7 |
+| System.CommandLine                   |   170.27 us |  0.599 us |   0.560 us |  3.39 |    0.02 |    5 |
+| PowerArgs                            |   306.12 us |  1.495 us |   1.398 us |  6.09 |    0.03 |    6 |
+| Cocona                               | 1,856.07 us | 48.727 us | 141.367 us | 37.88 |    2.60 |    7 |
 
 ## Etymology
 
