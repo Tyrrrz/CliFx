@@ -451,11 +451,11 @@ public class ExampleCommand : ICommand
 
 ### Graceful cancellation
 
-A user of a command line application may send an interrupt signal (Ctrl+C or Ctrl+Break) to gracefully abort execution. Commands in CliFx can intercept this signal to cancel any ongoing operations and perform cleanup.
+The user may abort execution by sending an interrupt signal (Ctrl+C or Ctrl+Break). If your command has critical disposable resources, you can intercept this signal to perform cleanup before exiting.
 
 In order to make a command cancellation-aware, all you need to do is call `console.GetCancellationToken()`. This method returns a `CancellationToken` that will trigger when the user issues an interrupt signal.
 
-Note that any code that comes before the first call to `GetCancellationToken()` will not be cancellation-aware and as such will terminate instantly. Any subsequent calls to this method will return the same token.
+Note that any operation which precedes `console.GetCancellationToken()` will not be cancellation-aware and as such will not delay the process termination. Calling this method multiple times is fine, as it will always return the same token.
 
 Here's an example of a command that supports cancellation:
 
@@ -463,19 +463,25 @@ Here's an example of a command that supports cancellation:
 [Command("cancel")]
 public class CancellableCommand : ICommand
 {
+    private async ValueTask DoSomethingAsync(CancellationToken cancellation)
+    {
+        await Task.Delay(TimeSpan.FromMinutes(10), cancellation);
+    }
+
     public async ValueTask ExecuteAsync(IConsole console)
     {
         // Make the command cancellation-aware
-        var token = console.GetCancellationToken();
+        var cancellation = console.GetCancellationToken();
 
-        // Execute some long-running operation
-        await Task.Delay(Timespan.FromMinutes(10), token);
+        // Execute some long-running cancellable operation
+        await DoSomethingAsync(cancellation);
+
         console.Output.WriteLine("Done.");
     }
 }
 ```
 
-Keep in mind that a command may delay cancellation only once. If the user decides to send an interrupt signal again after the first time, the execution will be forcefully terminated regardless of whether the command is cancellation-aware.
+Keep in mind that a command may delay cancellation only once. If the user decides to send an interrupt signal for the second time, the execution will be terminated immediately.
 
 ### Dependency injection
 
