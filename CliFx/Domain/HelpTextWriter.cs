@@ -107,6 +107,16 @@ namespace CliFx.Domain
 
         private void WriteCommandUsage(CommandSchema command, IReadOnlyList<CommandSchema> childCommands)
         {
+            WriteOverviewCommandUsage(command, childCommands);
+            foreach (var childCommand in childCommands)
+            {
+                WriteSubCommandUsage(childCommand);
+            }
+
+        }
+
+        private void WriteOverviewCommandUsage(CommandSchema command, IReadOnlyList<CommandSchema> childCommands)
+        {
             if (!IsEmpty)
                 WriteVerticalMargin();
 
@@ -128,6 +138,57 @@ namespace CliFx.Domain
             {
                 Write(' ');
                 Write(ConsoleColor.Cyan, "[command]");
+            }
+
+            // Parameters
+            foreach (var parameter in command.Parameters)
+            {
+                Write(' ');
+                Write(parameter.IsScalar
+                    ? $"<{parameter.Name}>"
+                    : $"<{parameter.Name}...>"
+                );
+            }
+
+            // Required options
+            foreach (var option in command.Options.Where(o => o.IsRequired))
+            {
+                Write(' ');
+                Write(ConsoleColor.White, !string.IsNullOrWhiteSpace(option.Name)
+                    ? $"--{option.Name}"
+                    : $"-{option.ShortName}"
+                );
+
+                Write(' ');
+                Write(option.IsScalar
+                    ? "<value>"
+                    : "<values...>"
+                );
+            }
+
+            // Options placeholder
+            Write(' ');
+            Write(ConsoleColor.White, "[options]");
+
+            WriteLine();
+        }
+
+        // TODO: refactor: extract common logic between WriteOverviewCommandUsage and WriteSubCommandUsage
+        private void WriteSubCommandUsage(CommandSchema command)
+        {
+            if (!IsEmpty)
+                WriteVerticalMargin();
+
+            // Exe name
+            WriteHorizontalMargin(size: 4);
+            // TODO: determine short form
+            Write("{app}");
+
+            // Command name
+            if (!string.IsNullOrWhiteSpace(command.Name))
+            {
+                Write(' ');
+                Write(ConsoleColor.Cyan, command.Name);
             }
 
             // Parameters
@@ -342,7 +403,7 @@ namespace CliFx.Domain
                 WriteApplicationInfo();
 
             WriteCommandDescription(command);
-            WriteCommandUsage(command, childCommands);
+            WriteCommandUsage(command, root.Commands);
             WriteCommandParameters(command);
             WriteCommandOptions(command, defaultValues);
             WriteCommandChildren(command, childCommands);
