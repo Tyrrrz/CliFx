@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using CliFx.Tests.Commands;
 using FluentAssertions;
 using Xunit;
@@ -30,9 +30,41 @@ namespace CliFx.Tests
             exitCode.Should().NotBe(0);
             stdOut.GetString().Should().BeEmpty();
             stdErr.GetString().Should().ContainAll(
-                "System.Exception:",
+                typeof(System.Exception).FullName + ":",
                 "Kaput", "at",
-                "CliFx.Tests"
+                typeof(GenericExceptionCommand).FullName + "." + nameof(GenericExceptionCommand.ExecuteAsync)
+            );
+
+            _output.WriteLine(stdOut.GetString());
+            _output.WriteLine(stdErr.GetString());
+        }
+
+        [Fact]
+        public async Task Command_may_throw_a_generic_exception_which_exits_and_prints_a_short_error_message_when_told_to()
+        {
+            // Arrange
+            var (console, stdOut, stdErr) = VirtualConsole.CreateBuffered();
+
+            var application = new CliApplicationBuilder()
+                .AddCommand<GenericExceptionCommand>()
+                .UseConsole(console)
+                .UseShortErrors()
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(new[] {"cmd", "-m", "Kaput"});
+
+            // Assert
+            exitCode.Should().NotBe(0);
+            stdOut.GetString().Should().BeEmpty();
+            stdErr.GetString().Should().ContainAll(
+                "Exception:",
+                "Kaput", "at",
+                nameof(GenericExceptionCommand.ExecuteAsync)
+            );
+            stdErr.GetString().Should().NotContainAny(
+                typeof(System.Exception).FullName + ":",
+                typeof(GenericExceptionCommand).FullName
             );
 
             _output.WriteLine(stdOut.GetString());
