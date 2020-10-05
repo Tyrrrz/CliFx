@@ -19,9 +19,12 @@ namespace CliFx.Domain
         private static readonly Lazy<Regex> ParameterMatcher = new Lazy<Regex>(() => new Regex(@"(?<type>.+? )(?<name>.+?)(?:(?<separator>, )|\))"));
         private static readonly Lazy<Regex> FileMatcher = new Lazy<Regex>(() => new Regex(@"(?<prefix>\S+?) (?<path>.*?)(?<file>[^\\/]+?(?:\.\w*)?):[^:]+? (?<line>\d+)"));
 
+        private readonly ApplicationConfiguration _configuration;
         private readonly IConsole _console;
-        public ErrorTextWriter(IConsole console)
+
+        public ErrorTextWriter(ApplicationConfiguration configuration, IConsole console)
         {
+            _configuration = configuration;
             _console = console;
         }
 
@@ -33,19 +36,30 @@ namespace CliFx.Domain
 
             var exType = ex.GetType();
 
-            Write(NameColor, indentation + exType.Namespace + ".");
+            _console.Error.Write(indentation);
+
+            // (Fully qualified) type of the exception
+            if (!_configuration.IsUsingShortErrors)
+            {
+                Write(NameColor, exType.Namespace + ".");
+            }
             Write(SpecificNameColor, exType.Name);
             _console.Error.Write(": ");
+
+            // Message
             Write(MessageColor, ex.Message);
             _console.Error.WriteLine();
 
+            // Prints the inner exception
+            // with one higher indentation level
             if (ex.InnerException is Exception innerException)
-			{
+            {
                 WriteError(innerException, indentLevel + 1);
-			}
+            }
 
-			foreach (var trace in ex.StackTrace.Split('\n'))
-			{
+            // Each step in the stack trace is formated and printed
+            foreach (var trace in ex.StackTrace.Split('\n'))
+            {
                 var methodMatch = MethodMatcher.Value.Match(trace);
                 var parameterMatches = ParameterMatcher.Value.Matches(trace, methodMatch.Index + methodMatch.Length);
                 var fileMatch = FileMatcher.Value.Match(
@@ -57,29 +71,63 @@ namespace CliFx.Domain
                     }
                 );
 
-                _console.Error.Write(indentation + extraIndentation + methodMatch.Groups["prefix"].Value + " ");
-                Write(NameColor, methodMatch.Groups["name"].Value);
-                Write(MethodColor, methodMatch.Groups["methodName"].Value);
+                _console.Error.Write(indentation + extraIndentation);
 
-                _console.Error.Write("(");
-				foreach (Match parameterMatch in parameterMatches)
+                WriteMethodDescriptor(methodMatch.Groups["prefix"].Value, methodMatch.Groups["name"].Value, methodMatch.Groups["methodName"].Value);
+
+                WriteParameters(parameterMatches);
+
+                _console.Error.Write(fileMatch.Groups["prefix"].Value);
+                if (!_configuration.IsUsingShortErrors)
                 {
-                    Write(ParameterTypeColor, parameterMatch.Groups["type"].Value);
-                    Write(SpecificNameColor, parameterMatch.Groups["name"].Value);
-
-                    if (parameterMatch.Groups["separator"] is Group separatorGroup)
-					{
-                        _console.Error.Write(separatorGroup.Value);
-					}
+                    _console.Error.Write("\n" + indentation + extraIndentation + extraIndentation);
                 }
-                _console.Error.WriteLine(") " + fileMatch.Groups["prefix"].Value);
+                else
+                {
+                    _console.Error.Write(" ");
+                }
+                WriteFileDescriptor(fileMatch.Groups["path"].Value, fileMatch.Groups["file"].Value, fileMatch.Groups["line"].Value);
 
-                Write(NameColor, indentation + extraIndentation + extraIndentation + fileMatch.Groups["path"].Value);
-                Write(FileColor, fileMatch.Groups["file"].Value);
-                _console.Error.Write(":");
-                Write(LineColor, fileMatch.Groups["line"].Value);
                 _console.Error.WriteLine();
             }
+        }
+
+        private void WriteMethodDescriptor(string prefix, string name, string methodName)
+        {
+            _console.Error.Write(prefix + " ");
+            if (!_configuration.IsUsingShortErrors)
+            {
+                Write(NameColor, name);
+            }
+            Write(MethodColor, methodName);
+        }
+
+        private void WriteParameters(MatchCollection parameterMatches)
+        {
+            _console.Error.Write("(");
+            foreach (Match parameterMatch in parameterMatches)
+            {
+                Write(ParameterTypeColor, parameterMatch.Groups["type"].Value);
+                Write(SpecificNameColor, parameterMatch.Groups["name"].Value);
+
+                if (parameterMatch.Groups["separator"] is Group separatorGroup)
+                {
+                    _console.Error.Write(separatorGroup.Value);
+                }
+            }
+            _console.Error.Write(") ");
+        }
+
+        private void WriteFileDescriptor(string path, string fileName, string lineNumber)
+        {
+            if (!_configuration.IsUsingShortErrors)
+            {
+                Write(NameColor, path);
+            }
+
+            Write(FileColor, fileName);
+            _console.Error.Write(":");
+            Write(LineColor, lineNumber);
         }
 
         private void Write(ConsoleColor color, string value)
