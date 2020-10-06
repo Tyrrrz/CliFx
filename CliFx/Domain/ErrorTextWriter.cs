@@ -15,9 +15,9 @@ namespace CliFx.Domain
         private static readonly ConsoleColor FileColor = ConsoleColor.Yellow;
         private static readonly ConsoleColor LineColor = ConsoleColor.Blue;
 
-        private static readonly Lazy<Regex> MethodMatcher = new Lazy<Regex>(() => new Regex(@"(?<prefix>\S+) (?<name>.*?)(?<methodName>[^\.]+)\("));
-        private static readonly Lazy<Regex> ParameterMatcher = new Lazy<Regex>(() => new Regex(@"(?<type>.+? )(?<name>.+?)(?:(?<separator>, )|\))"));
-        private static readonly Lazy<Regex> FileMatcher = new Lazy<Regex>(() => new Regex(@"(?<prefix>\S+?) (?<path>.*?)(?<file>[^\\/]+?(?:\.\w*)?):[^:]+? (?<line>\d+)"));
+        private static readonly Regex MethodMatcher = new Regex(@"(?<prefix>\S+) (?<name>.*?)(?<methodName>[^\.]+)\(");
+        private static readonly Regex ParameterMatcher = new Regex(@"(?<type>.+? )(?<name>.+?)(?:(?<separator>, )|\))");
+        private static readonly Regex FileMatcher = new Regex(@"(?<prefix>\S+?) (?<path>.*?)(?<file>[^\\/]+?(?:\.\w*)?):[^:]+? (?<line>\d+)");
 
         private readonly IConsole _console;
 
@@ -29,8 +29,8 @@ namespace CliFx.Domain
         public void WriteError(Exception ex) => WriteError(ex, 0);
         private void WriteError(Exception ex, int indentLevel)
         {
-            var indentation = new String(' ', indent * indentLevel);
-            var extraIndentation = new String(' ', indent / 2);
+            var indentation = new string(' ', indent * indentLevel);
+            var extraIndentation = new string(' ', indent / 2);
 
             var exType = ex.GetType();
 
@@ -53,9 +53,9 @@ namespace CliFx.Domain
             // Each step in the stack trace is formated and printed
             foreach (var trace in ex.StackTrace.Split('\n'))
             {
-                var methodMatch = MethodMatcher.Value.Match(trace);
-                var parameterMatches = ParameterMatcher.Value.Matches(trace, methodMatch.Index + methodMatch.Length);
-                var fileMatch = FileMatcher.Value.Match(
+                var methodMatch = MethodMatcher.Match(trace);
+                var parameterMatches = ParameterMatcher.Matches(trace, methodMatch.Index + methodMatch.Length);
+                var fileMatch = FileMatcher.Match(
                     trace,
                     parameterMatches.Count switch
                     {
