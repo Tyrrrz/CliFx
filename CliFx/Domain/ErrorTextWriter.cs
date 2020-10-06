@@ -19,12 +19,10 @@ namespace CliFx.Domain
         private static readonly Lazy<Regex> ParameterMatcher = new Lazy<Regex>(() => new Regex(@"(?<type>.+? )(?<name>.+?)(?:(?<separator>, )|\))"));
         private static readonly Lazy<Regex> FileMatcher = new Lazy<Regex>(() => new Regex(@"(?<prefix>\S+?) (?<path>.*?)(?<file>[^\\/]+?(?:\.\w*)?):[^:]+? (?<line>\d+)"));
 
-        private readonly ApplicationConfiguration _configuration;
         private readonly IConsole _console;
 
-        public ErrorTextWriter(ApplicationConfiguration configuration, IConsole console)
+        public ErrorTextWriter(IConsole console)
         {
-            _configuration = configuration;
             _console = console;
         }
 
@@ -36,13 +34,8 @@ namespace CliFx.Domain
 
             var exType = ex.GetType();
 
-            _console.Error.Write(indentation);
-
             // (Fully qualified) type of the exception
-            if (!_configuration.IsUsingShortErrors)
-            {
-                Write(NameColor, exType.Namespace + ".");
-            }
+            Write(NameColor, indentation + exType.Namespace + ".");
             Write(SpecificNameColor, exType.Name);
             _console.Error.Write(": ");
 
@@ -78,14 +71,7 @@ namespace CliFx.Domain
                 WriteParameters(parameterMatches);
 
                 _console.Error.Write(fileMatch.Groups["prefix"].Value);
-                if (!_configuration.IsUsingShortErrors)
-                {
-                    _console.Error.Write("\n" + indentation + extraIndentation + extraIndentation);
-                }
-                else
-                {
-                    _console.Error.Write(" ");
-                }
+                _console.Error.Write("\n" + indentation + extraIndentation + extraIndentation);
                 WriteFileDescriptor(fileMatch.Groups["path"].Value, fileMatch.Groups["file"].Value, fileMatch.Groups["line"].Value);
 
                 _console.Error.WriteLine();
@@ -95,10 +81,7 @@ namespace CliFx.Domain
         private void WriteMethodDescriptor(string prefix, string name, string methodName)
         {
             _console.Error.Write(prefix + " ");
-            if (!_configuration.IsUsingShortErrors)
-            {
-                Write(NameColor, name);
-            }
+            Write(NameColor, name);
             Write(MethodColor, methodName);
         }
 
@@ -120,10 +103,7 @@ namespace CliFx.Domain
 
         private void WriteFileDescriptor(string path, string fileName, string lineNumber)
         {
-            if (!_configuration.IsUsingShortErrors)
-            {
-                Write(NameColor, path);
-            }
+            Write(NameColor, path);
 
             Write(FileColor, fileName);
             _console.Error.Write(":");

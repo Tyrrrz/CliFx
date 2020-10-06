@@ -24,23 +24,16 @@ namespace CliFx
         public bool IsPreviewModeAllowed { get; }
 
         /// <summary>
-        /// Whether error messages should include fully qualified names and paths.
-        /// </summary>
-        public bool IsUsingShortErrors { get; }
-
-        /// <summary>
         /// Initializes an instance of <see cref="ApplicationConfiguration"/>.
         /// </summary>
         public ApplicationConfiguration(
             IReadOnlyList<Type> commandTypes,
             bool isDebugModeAllowed,
-            bool isPreviewModeAllowed,
-            bool isUsingShortErrors)
+            bool isPreviewModeAllowed)
         {
             CommandTypes = commandTypes;
             IsDebugModeAllowed = isDebugModeAllowed;
             IsPreviewModeAllowed = isPreviewModeAllowed;
-            IsUsingShortErrors = isUsingShortErrors;
         }
     }
 }

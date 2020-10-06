@@ -17,7 +17,6 @@ namespace CliFx
 
         private bool _isDebugModeAllowed = true;
         private bool _isPreviewModeAllowed = true;
-        private bool _isUsingShortErrors = false;
         private string? _title;
         private string? _executableName;
         private string? _versionText;
@@ -146,15 +145,6 @@ namespace CliFx
         }
 
         /// <summary>
-        /// Specifies whether errors should be printed with fully qualified names and paths.
-        /// </summary>
-        public CliApplicationBuilder UseShortErrors(bool shortErrors = true)
-        {
-            _isUsingShortErrors = shortErrors;
-            return this;
-        }
-
-        /// <summary>
         /// Configures the application to use the specified implementation of <see cref="ITypeActivator"/>.
         /// </summary>
         public CliApplicationBuilder UseTypeActivator(ITypeActivator typeActivator)
@@ -182,7 +172,7 @@ namespace CliFx
             _typeActivator ??= new DefaultTypeActivator();
 
             var metadata = new ApplicationMetadata(_title, _executableName, _versionText, _description);
-            var configuration = new ApplicationConfiguration(_commandTypes.ToArray(), _isDebugModeAllowed, _isPreviewModeAllowed, _isUsingShortErrors);
+            var configuration = new ApplicationConfiguration(_commandTypes.ToArray(), _isDebugModeAllowed, _isPreviewModeAllowed);
 
             return new CliApplication(metadata, configuration, _console, _typeActivator);
         }
