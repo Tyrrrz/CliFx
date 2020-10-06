@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -22,6 +22,7 @@ namespace CliFx
         private readonly ITypeActivator _typeActivator;
 
         private readonly HelpTextWriter _helpTextWriter;
+        private readonly ErrorTextWriter _errorTextWriter;
 
         /// <summary>
         /// Initializes an instance of <see cref="CliApplication"/>.
@@ -36,6 +37,7 @@ namespace CliFx
             _typeActivator = typeActivator;
 
             _helpTextWriter = new HelpTextWriter(metadata, console);
+            _errorTextWriter = new ErrorTextWriter(console);
         }
 
         private void WriteError(string message) => _console.WithForegroundColor(ConsoleColor.Red, () =>
@@ -202,7 +204,7 @@ namespace CliFx
             // because we still want the IDE to show them to the developer.
             catch (Exception ex) when (!Debugger.IsAttached)
             {
-                WriteError(ex.ToString());
+                _errorTextWriter.WriteError(ex);
                 return ExitCode.FromException(ex);
             }
         }
