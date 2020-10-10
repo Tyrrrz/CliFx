@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -62,6 +63,10 @@ namespace CliFx.Domain
                 var parseMethod = targetType.GetStaticParseMethod();
                 if (parseMethod != null)
                     return parseMethod.Invoke(null, new object[] {value!});
+
+                var customTypeConverter = TypeDescriptor.GetConverter(targetType);
+                if (customTypeConverter != null && customTypeConverter.CanConvertFrom(typeof(string)))
+                    return customTypeConverter.ConvertFrom(value);
             }
             catch (Exception ex)
             {

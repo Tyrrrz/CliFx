@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -158,6 +159,12 @@ namespace CliFx
         /// </summary>
         public CliApplicationBuilder UseTypeActivator(Func<Type, object> typeActivator) =>
             UseTypeActivator(new DelegateTypeActivator(typeActivator));
+
+        public CliApplicationBuilder AddConverter(Type @for, Type use)
+        {
+            TypeDescriptor.AddAttributes(@for, new TypeConverterAttribute(use));
+            return this;
+        }
 
         /// <summary>
         /// Creates an instance of <see cref="CliApplication"/> using configured parameters.
