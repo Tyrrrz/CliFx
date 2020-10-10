@@ -4,7 +4,7 @@ using System.Globalization;
 
 namespace CliFx.Demo
 {
-    public abstract class GenericConverter<TSource, TDestination> : TypeConverter
+    public abstract class CustomTypeConverter<TSource, TDestination> : TypeConverter
     {
         public abstract TDestination Convert(TSource input);
 
