@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
 using CliFx.Tests.Commands;
+using CliFx.Tests.Converters;
 using CliFx.Tests.Internal;
 using FluentAssertions;
 using Xunit;
@@ -1347,6 +1348,73 @@ namespace CliFx.Tests
             stdErr.GetString().Should().NotBeNullOrWhiteSpace();
 
             _output.WriteLine(stdErr.GetString());
+        }
+
+        [Fact]
+        public async Task Property_of_custom_type_is_bound_when_the_valid_converter_type_is_specified()
+        {
+            // Arrange
+            const string foo = "foo";
+
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+
+            var application = new CliApplicationBuilder()
+                .AddCommand<CommandWithCustomTypeParameter>()
+                .UseConverter(typeof(CustomTypeConverter), typeof(CustomType))
+                .UseConsole(console)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(new[]
+            {
+                "cmd", "--custom-type", foo
+            });
+
+            // Assert
+            exitCode.Should().Be(0);
+
+            var commandInstance = stdOut.GetString().DeserializeJson<CommandWithCustomTypeParameter>();
+
+            commandInstance.Should().BeEquivalentTo(new CommandWithCustomTypeParameter()
+            {
+                Property = new CustomTypeConverter().Convert(foo)
+            });
+        }
+
+        [Fact]
+        public async Task Enumerable_of_properties_of_custom_type_are_bound_when_the_valid_converter_type_is_specified()
+        {
+            // Arrange
+            string foo = "foo";
+            string bar = "bar";
+
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+
+            var application = new CliApplicationBuilder()
+                .AddCommand<CommandWithListOfTheCustomTypeParameters>()
+                .UseConverter(typeof(CustomTypeConverter), typeof(CustomType))
+                .UseConsole(console)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(new[]
+            {
+                "cmd", "--custom-type", foo, bar
+            });
+
+            // Assert
+            exitCode.Should().Be(0);
+
+            var commandInstance = stdOut.GetString().DeserializeJson<CommandWithListOfTheCustomTypeParameters>();
+
+            commandInstance.Should().BeEquivalentTo(new CommandWithListOfTheCustomTypeParameters()
+            {
+                Properties = new List<CustomType> 
+                {
+                    new CustomTypeConverter().Convert(foo),
+                    new CustomTypeConverter().Convert(bar)
+                }
+            });
         }
     }
 }
