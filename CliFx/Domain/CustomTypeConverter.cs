@@ -38,7 +38,7 @@ namespace CliFx.Domain
         }
 
         public sealed override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value) =>
-            Convert((TSource)value);
+            Convert((TSource)value)!;
 
         // Hide unused interface members
         #region TypeConverter
