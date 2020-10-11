@@ -65,7 +65,7 @@ namespace CliFx.Domain
                     return parseMethod.Invoke(null, new object[] {value!});
 
                 var converter = TypeDescriptor.GetConverter(targetType);
-                if (converter?.CanConvertFrom(value!.GetType()) ?? false)
+                if (converter.CanConvertFrom(value?.GetType()) && converter.IsValid(value!))
                     return converter.ConvertFrom(value);
             }
             catch (Exception ex)

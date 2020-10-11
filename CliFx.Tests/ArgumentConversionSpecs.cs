@@ -1382,7 +1382,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Enumerable_of_properties_of_custom_type_are_bound_when_the_valid_converter_type_is_specified()
+        public async Task Enumerable_of_the_custom_type_is_bound_when_the_valid_converter_type_is_specified()
         {
             // Arrange
             string foo = "foo";
@@ -1415,6 +1415,31 @@ namespace CliFx.Tests
                     new CustomTypeConverter().Convert(bar)
                 }
             });
+        }
+
+        [Fact]
+        public async Task Input_value_must_pass_validity_check_in_order_to_be_converted_to_a_custom_type()
+        {
+            // Arrange
+            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
+
+            var application = new CliApplicationBuilder()
+                .AddCommand<CommandWithCustomTypeParameter>()
+                .UseConverter(typeof(CustomTypeConverter), typeof(CustomType))
+                .UseConsole(console)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(new[]
+            {
+                "cmd", "--custom-type"
+            });
+
+            // Assert
+            exitCode.Should().NotBe(0);
+            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
+
+            _output.WriteLine(stdErr.GetString());
         }
     }
 }

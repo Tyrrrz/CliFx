@@ -12,6 +12,10 @@ namespace CliFx.Tests.Converters
 
     internal class CustomTypeConverter : StringTypeConverter<CustomType>
     {
-        public override CustomType Convert(string input) => new CustomType() { Length = input.Length };
+        public override bool IsValid(string input) =>
+            !string.IsNullOrEmpty(input);
+
+        public override CustomType Convert(string input) =>
+            new CustomType() { Length = input.Length };
     }
 }
