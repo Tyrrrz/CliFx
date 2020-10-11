@@ -160,9 +160,12 @@ namespace CliFx
         public CliApplicationBuilder UseTypeActivator(Func<Type, object> typeActivator) =>
             UseTypeActivator(new DelegateTypeActivator(typeActivator));
 
-        public CliApplicationBuilder AddConverter(Type @for, Type use)
+        /// <summary>
+        /// Configures the application to use the specified converter type when converting to a custom defined type or to a non-primitive type. 
+        /// </summary>
+        public CliApplicationBuilder UseConverter(Type converter, Type @for)
         {
-            TypeDescriptor.AddAttributes(@for, new TypeConverterAttribute(use));
+            TypeDescriptor.AddAttributes(@for, new TypeConverterAttribute(converter));
             return this;
         }
 
