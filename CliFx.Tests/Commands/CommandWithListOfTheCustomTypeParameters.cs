@@ -8,6 +8,6 @@ namespace CliFx.Tests.Commands
     public class CommandWithListOfTheCustomTypeParameters : SelfSerializeCommandBase
     {
         [CommandOption("custom-type")]
-        public List<CustomType> Properties { get; set; }
+        public List<CustomType>? Properties { get; set; }
     }
 }
