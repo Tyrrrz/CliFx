@@ -17,6 +17,8 @@ namespace CliFx.Domain
 
         public bool IsScalar => TryGetEnumerableArgumentUnderlyingType() == null;
 
+        protected Type? Converter { get; set; }
+
         protected CommandArgumentSchema(PropertyInfo? property, string? description)
         {
             Property = property;
@@ -62,6 +64,9 @@ namespace CliFx.Domain
                 var parseMethod = targetType.GetStaticParseMethod();
                 if (parseMethod != null)
                     return parseMethod.Invoke(null, new object[] {value!});
+
+                if (Converter != null)
+                    return InstanceOf(Converter).ConvertFrom(value!);
             }
             catch (Exception ex)
             {
@@ -113,6 +118,11 @@ namespace CliFx.Domain
                 return ConvertNonScalar(values, targetType, enumerableUnderlyingType);
             }
         }
+
+        private IConverter InstanceOf(Type type) =>
+            type.Implements(typeof(IConverter))
+                ? (IConverter)Activator.CreateInstance(type)
+                : throw new ArgumentException();
 
         public void BindOn(ICommand command, IReadOnlyList<string> values) =>
             Property?.SetValue(command, Convert(values));

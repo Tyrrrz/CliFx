@@ -38,6 +38,11 @@ namespace CliFx.Attributes
         public string? EnvironmentVariableName { get; set; }
 
         /// <summary>
+        /// Type of a converter to use for the option value evaluating.
+        /// </summary>
+        public Type? Converter { get; set; }
+
+        /// <summary>
         /// Initializes an instance of <see cref="CommandOptionAttribute"/>.
         /// </summary>
         private CommandOptionAttribute(string? name, char? shortName)

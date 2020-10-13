@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text;
 using CliFx.Attributes;
@@ -11,12 +12,9 @@ namespace CliFx.Domain
 
         public string Name { get; }
 
-        public CommandParameterSchema(PropertyInfo? property, int order, string name, string? description)
-            : base(property, description)
-        {
-            Order = order;
-            Name = name;
-        }
+        public CommandParameterSchema(PropertyInfo? property, int order, string name, string? description, Type? converter = null)
+            : base(property, description) =>
+                (Order, Name, Converter) = (order, name, converter);
 
         public string GetUserFacingDisplayString()
         {
@@ -50,7 +48,8 @@ namespace CliFx.Domain
                 property,
                 attribute.Order,
                 name,
-                attribute.Description
+                attribute.Description,
+                attribute.Converter
             );
         }
     }
