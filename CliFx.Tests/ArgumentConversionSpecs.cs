@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
 using CliFx.Tests.Commands;
+using CliFx.Tests.Commands.Converters;
 using CliFx.Tests.Internal;
 using FluentAssertions;
 using Xunit;
@@ -1347,6 +1348,71 @@ namespace CliFx.Tests
             stdErr.GetString().Should().NotBeNullOrWhiteSpace();
 
             _output.WriteLine(stdErr.GetString());
+        }
+
+        [Fact]
+        public async Task Property_of_custom_type_is_bound_when_the_valid_converter_type_is_specified()
+        {
+            // Arrange
+            const string foo = "foo";
+
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+
+            var application = new CliApplicationBuilder()
+                .AddCommand<CommandWithParameterOfCustomType>()
+                .UseConsole(console)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(new[]
+            {
+                "cmd", "--prop", foo
+            });
+
+            // Assert
+            exitCode.Should().Be(0);
+
+            var commandInstance = stdOut.GetString().DeserializeJson<CommandWithParameterOfCustomType>();
+
+            commandInstance.Should().BeEquivalentTo(new CommandWithParameterOfCustomType()
+            {
+                MyProperty = (CustomType) new CustomTypeConverter().ConvertFrom(foo)
+            });
+        }
+
+        [Fact]
+        public async Task Enumerable_of_the_custom_type_is_bound_when_the_valid_converter_type_is_specified()
+        {
+            // Arrange
+            string foo = "foo";
+            string bar = "bar";
+
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+
+            var application = new CliApplicationBuilder()
+                .AddCommand<CommandWithEnumerableOfParametersOfCustomType>()
+                .UseConsole(console)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(new[]
+            {
+                "cmd", "--prop", foo, bar
+            });
+
+            // Assert
+            exitCode.Should().Be(0);
+
+            var commandInstance = stdOut.GetString().DeserializeJson<CommandWithEnumerableOfParametersOfCustomType>();
+
+            commandInstance.Should().BeEquivalentTo(new CommandWithEnumerableOfParametersOfCustomType()
+            {
+                MyProperties = new List<CustomType>
+                {
+                    (CustomType) new CustomTypeConverter().ConvertFrom(foo),
+                    (CustomType) new CustomTypeConverter().ConvertFrom(bar)
+                }
+            });
         }
     }
 }
