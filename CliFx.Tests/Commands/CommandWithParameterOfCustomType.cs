@@ -15,13 +15,13 @@ namespace CliFx.Tests.Commands
     public class CommandWithParameterOfCustomType : SelfSerializeCommandBase
     {
         [CommandOption("prop", Converter = typeof(CustomTypeConverter))]
-        public CustomType MyProperty { get; set; }
+        public CustomType? MyProperty { get; set; }
     }
 
     [Command("cmd")]
     public class CommandWithEnumerableOfParametersOfCustomType : SelfSerializeCommandBase
     {
         [CommandOption("prop", Converter = typeof(CustomTypeConverter))]
-        public List<CustomType> MyProperties { get; set; }
+        public List<CustomType>? MyProperties { get; set; }
     }
 }
