@@ -13,8 +13,12 @@ namespace CliFx.Domain
         public string Name { get; }
 
         public CommandParameterSchema(PropertyInfo? property, int order, string name, string? description, Type? converter = null)
-            : base(property, description) =>
-                (Order, Name, Converter) = (order, name, converter);
+            : base(property, description)
+        {
+            Order = order;
+            Name = name;
+            Converter = converter;
+        }
 
         public string GetUserFacingDisplayString()
         {
