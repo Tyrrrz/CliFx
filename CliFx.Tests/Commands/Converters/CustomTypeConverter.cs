@@ -1,8 +1,6 @@
-﻿using CliFx.Domain;
-
-namespace CliFx.Tests.Commands.Converters
+﻿namespace CliFx.Tests.Commands.Converters
 {
-    public class CustomTypeConverter : IConverter
+    public class CustomTypeConverter : IArgumentValueConverter
     {
         public object ConvertFrom(string value) => 
             new CustomType { SomeValue = value.Length };

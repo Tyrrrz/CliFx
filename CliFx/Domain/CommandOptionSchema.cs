@@ -25,13 +25,12 @@ namespace CliFx.Domain
             bool isRequired,
             string? description,
             Type? converter = null)
-            : base(property, description)
+            : base(property, description, converter)
         {
             Name = name;
             ShortName = shortName;
             EnvironmentVariableName = environmentVariableName;
             IsRequired = isRequired;
-            Converter = converter;
         }
 
         public bool MatchesName(string? name) =>

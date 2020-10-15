@@ -19,10 +19,11 @@ namespace CliFx.Domain
 
         protected Type? Converter { get; set; }
 
-        protected CommandArgumentSchema(PropertyInfo? property, string? description)
+        protected CommandArgumentSchema(PropertyInfo? property, string? description, Type? converter = null)
         {
             Property = property;
             Description = description;
+            Converter = converter;
         }
 
         private Type? TryGetEnumerableArgumentUnderlyingType() =>
@@ -66,7 +67,7 @@ namespace CliFx.Domain
                     return parseMethod.Invoke(null, new object[] {value!});
 
                 if (Converter != null)
-                    return InstanceOf(Converter).ConvertFrom(value!);
+                    return Converter.InstanceOf<IArgumentValueConverter>().ConvertFrom(value!);
             }
             catch (Exception ex)
             {
@@ -118,11 +119,6 @@ namespace CliFx.Domain
                 return ConvertNonScalar(values, targetType, enumerableUnderlyingType);
             }
         }
-
-        private IConverter InstanceOf(Type type) =>
-            type.Implements(typeof(IConverter))
-                ? (IConverter)Activator.CreateInstance(type)
-                : throw new ArgumentException();
 
         public void BindOn(ICommand command, IReadOnlyList<string> values) =>
             Property?.SetValue(command, Convert(values));
