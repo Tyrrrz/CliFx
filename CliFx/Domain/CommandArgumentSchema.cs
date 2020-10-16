@@ -17,10 +17,13 @@ namespace CliFx.Domain
 
         public bool IsScalar => TryGetEnumerableArgumentUnderlyingType() == null;
 
-        protected CommandArgumentSchema(PropertyInfo? property, string? description)
+        protected Type? Converter { get; set; }
+
+        protected CommandArgumentSchema(PropertyInfo? property, string? description, Type? converter = null)
         {
             Property = property;
             Description = description;
+            Converter = converter;
         }
 
         private Type? TryGetEnumerableArgumentUnderlyingType() =>
@@ -62,6 +65,9 @@ namespace CliFx.Domain
                 var parseMethod = targetType.GetStaticParseMethod();
                 if (parseMethod != null)
                     return parseMethod.Invoke(null, new object[] {value!});
+
+                if (Converter != null)
+                    return Converter.InstanceOf<IArgumentValueConverter>().ConvertFrom(value!);
             }
             catch (Exception ex)
             {

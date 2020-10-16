@@ -23,8 +23,9 @@ namespace CliFx.Domain
             char? shortName,
             string? environmentVariableName,
             bool isRequired,
-            string? description)
-            : base(property, description)
+            string? description,
+            Type? converter = null)
+            : base(property, description, converter)
         {
             Name = name;
             ShortName = shortName;
@@ -97,7 +98,8 @@ namespace CliFx.Domain
                 attribute.ShortName,
                 attribute.EnvironmentVariableName,
                 attribute.IsRequired,
-                attribute.Description
+                attribute.Description,
+                attribute.Converter
             );
         }
     }

@@ -56,5 +56,10 @@ namespace CliFx.Internal.Extensions
 
             return array;
         }
+
+        public static T InstanceOf<T>(this Type type) =>
+            type.Implements(typeof(T))
+                ? (T) Activator.CreateInstance(type)
+                : throw new ArgumentException();
     }
 }

@@ -27,6 +27,11 @@ namespace CliFx.Attributes
         public string? Description { get; set; }
 
         /// <summary>
+        /// Type of a converter to use for the parameter value evaluating.
+        /// </summary>
+        public Type? Converter { get; set; }
+
+        /// <summary>
         /// Initializes an instance of <see cref="CommandParameterAttribute"/>.
         /// </summary>
         public CommandParameterAttribute(int order)
