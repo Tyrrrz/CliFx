@@ -105,92 +105,52 @@ namespace CliFx.Domain
             WriteLine();
         }
 
-        private void WriteCommandUsage(CommandSchema command, IReadOnlyList<CommandSchema> childCommands)
-        {
-            WriteOverviewCommandUsage(command, childCommands);
-            foreach (var childCommand in childCommands)
-            {
-                WriteSubCommandUsage(childCommand);
-            }
-
-        }
-
-        private void WriteOverviewCommandUsage(CommandSchema command, IReadOnlyList<CommandSchema> childCommands)
+        private void WriteCommandUsage(
+            CommandSchema command,
+            IReadOnlyList<CommandSchema> childCommands)
         {
             if (!IsEmpty)
                 WriteVerticalMargin();
 
             WriteHeader("Usage");
 
-            // Exe name
-            WriteHorizontalMargin();
-            Write(_metadata.ExecutableName);
+            WriteCommandUsageLineItem(command);
 
+            if (!IsEmpty)
+                WriteVerticalMargin();
+
+            foreach (var childCommand in childCommands)
+            {
+                WriteCommandUsageLineItem(childCommand, compactCommand: false, size: 4);
+            }
+        }
+
+        private void WriteCommandUsageLineItem(
+            CommandSchema command,
+            bool compactCommand = true,
+            int size = 2)
+        {
+            WriteHorizontalMargin(size);
+            if (compactCommand)
+            {
+                // Exe name
+                Write(_metadata.ExecutableName);
+                Write(' ');
+
+            }
             // Command name
             if (!string.IsNullOrWhiteSpace(command.Name))
             {
-                Write(' ');
+                // this is fragile, because we rely that subcommand name consists
+                // of all required tokens
                 Write(ConsoleColor.Cyan, command.Name);
             }
-
             // Child command placeholder
-            if (childCommands.Any())
+            if (compactCommand)
             {
                 Write(' ');
                 Write(ConsoleColor.Cyan, "[command]");
             }
-
-            // Parameters
-            foreach (var parameter in command.Parameters)
-            {
-                Write(' ');
-                Write(parameter.IsScalar
-                    ? $"<{parameter.Name}>"
-                    : $"<{parameter.Name}...>"
-                );
-            }
-
-            // Required options
-            foreach (var option in command.Options.Where(o => o.IsRequired))
-            {
-                Write(' ');
-                Write(ConsoleColor.White, !string.IsNullOrWhiteSpace(option.Name)
-                    ? $"--{option.Name}"
-                    : $"-{option.ShortName}"
-                );
-
-                Write(' ');
-                Write(option.IsScalar
-                    ? "<value>"
-                    : "<values...>"
-                );
-            }
-
-            // Options placeholder
-            Write(' ');
-            Write(ConsoleColor.White, "[options]");
-
-            WriteLine();
-        }
-
-        // TODO: refactor: extract common logic between WriteOverviewCommandUsage and WriteSubCommandUsage
-        private void WriteSubCommandUsage(CommandSchema command)
-        {
-            if (!IsEmpty)
-                WriteVerticalMargin();
-
-            // Exe name
-            WriteHorizontalMargin(size: 4);
-            // TODO: determine short form
-            Write("{app}");
-
-            // Command name
-            if (!string.IsNullOrWhiteSpace(command.Name))
-            {
-                Write(' ');
-                Write(ConsoleColor.Cyan, command.Name);
-            }
-
             // Parameters
             foreach (var parameter in command.Parameters)
             {
@@ -403,10 +363,22 @@ namespace CliFx.Domain
                 WriteApplicationInfo();
 
             WriteCommandDescription(command);
-            WriteCommandUsage(command, root.Commands);
+            WriteCommandUsage(
+                    command, GetUsageCommands(command, root.Commands).ToList());
             WriteCommandParameters(command);
             WriteCommandOptions(command, defaultValues);
             WriteCommandChildren(command, childCommands);
+
+            static IReadOnlyList<CommandSchema> GetUsageCommands(
+                CommandSchema command, IReadOnlyList<CommandSchema> commands) =>
+                command switch
+                {
+                    { IsDefault: true } => commands,
+                    _ => commands.Where(c =>
+                        c.Name?.StartsWith(
+                            command.Name,
+                            StringComparison.OrdinalIgnoreCase) ?? false).ToList(),
+                };
         }
     }
 
