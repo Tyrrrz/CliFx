@@ -355,7 +355,9 @@ namespace CliFx.Domain
             CommandSchema command,
             IReadOnlyDictionary<CommandArgumentSchema, object?> defaultValues)
         {
-            var childCommands = root.GetChildCommands(command.Name);
+            var commandName = command.Name;
+            var childCommands = root.GetChildCommands(commandName);
+            var descendantCommands = root.GetDescendantCommands(commandName);
 
             _console.ResetColor();
 
@@ -363,22 +365,10 @@ namespace CliFx.Domain
                 WriteApplicationInfo();
 
             WriteCommandDescription(command);
-            WriteCommandUsage(
-                    command, GetUsageCommands(command, root.Commands).ToList());
+            WriteCommandUsage(command, descendantCommands);
             WriteCommandParameters(command);
             WriteCommandOptions(command, defaultValues);
             WriteCommandChildren(command, childCommands);
-
-            static IReadOnlyList<CommandSchema> GetUsageCommands(
-                CommandSchema command, IReadOnlyList<CommandSchema> commands) =>
-                command switch
-                {
-                    { IsDefault: true } => commands,
-                    _ => commands.Where(c =>
-                        c.Name?.StartsWith(
-                            command.Name,
-                            StringComparison.OrdinalIgnoreCase) ?? false).ToList(),
-                };
         }
     }
 
