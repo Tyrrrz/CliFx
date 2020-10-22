@@ -105,31 +105,52 @@ namespace CliFx.Domain
             WriteLine();
         }
 
-        private void WriteCommandUsage(CommandSchema command, IReadOnlyList<CommandSchema> childCommands)
+        private void WriteCommandUsage(
+            CommandSchema command,
+            IReadOnlyList<CommandSchema> childCommands)
         {
             if (!IsEmpty)
                 WriteVerticalMargin();
 
             WriteHeader("Usage");
 
-            // Exe name
-            WriteHorizontalMargin();
-            Write(_metadata.ExecutableName);
+            WriteCommandUsageLineItem(command, childCommands.Count > 0);
 
+            if (!IsEmpty)
+                WriteVerticalMargin();
+
+            foreach (var childCommand in childCommands)
+            {
+                WriteCommandUsageLineItem(childCommand, compactCommand: false, size: 4);
+            }
+        }
+
+        private void WriteCommandUsageLineItem(
+            CommandSchema command,
+            bool compactCommand = true,
+            int size = 2)
+        {
+            WriteHorizontalMargin(size);
+            if (compactCommand)
+            {
+                // Exe name
+                Write(_metadata.ExecutableName);
+                Write(' ');
+
+            }
             // Command name
             if (!string.IsNullOrWhiteSpace(command.Name))
             {
-                Write(' ');
+                // this is fragile, because we rely that subcommand name consists
+                // of all required tokens
                 Write(ConsoleColor.Cyan, command.Name);
             }
-
             // Child command placeholder
-            if (childCommands.Any())
+            if (compactCommand)
             {
                 Write(' ');
                 Write(ConsoleColor.Cyan, "[command]");
             }
-
             // Parameters
             foreach (var parameter in command.Parameters)
             {
@@ -334,7 +355,9 @@ namespace CliFx.Domain
             CommandSchema command,
             IReadOnlyDictionary<CommandArgumentSchema, object?> defaultValues)
         {
-            var childCommands = root.GetChildCommands(command.Name);
+            var commandName = command.Name;
+            var childCommands = root.GetChildCommands(commandName);
+            var descendantCommands = root.GetDescendantCommands(commandName);
 
             _console.ResetColor();
 
@@ -342,7 +365,7 @@ namespace CliFx.Domain
                 WriteApplicationInfo();
 
             WriteCommandDescription(command);
-            WriteCommandUsage(command, childCommands);
+            WriteCommandUsage(command, descendantCommands);
             WriteCommandParameters(command);
             WriteCommandOptions(command, defaultValues);
             WriteCommandChildren(command, childCommands);
