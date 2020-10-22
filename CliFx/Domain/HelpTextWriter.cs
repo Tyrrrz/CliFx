@@ -114,7 +114,7 @@ namespace CliFx.Domain
 
             WriteHeader("Usage");
 
-            WriteCommandUsageLineItem(command);
+            WriteCommandUsageLineItem(command, childCommands.Count > 0);
 
             if (!IsEmpty)
                 WriteVerticalMargin();
