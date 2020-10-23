@@ -91,10 +91,12 @@ namespace CliFx.Internal
         {
             var matches = Pattern.Matches(stackTrace).Cast<Match>().ToArray();
 
-            // Ensure success
-            var lastMatch = matches.LastOrDefault();
-            if (lastMatch == null ||
-                lastMatch.Index + lastMatch.Length < stackTrace.Length)
+            // Ensure success (all lines should be parsed)
+            var isSuccess =
+                matches.Length ==
+                stackTrace.Split('\n', StringSplitOptions.RemoveEmptyEntries).Length;
+
+            if (!isSuccess)
             {
                 throw new FormatException("Could not parse stack trace.");
             }
