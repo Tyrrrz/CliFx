@@ -17,6 +17,9 @@ namespace System
 
         public static bool EndsWith(this string str, char c) =>
             str.Length > 0 && str[str.Length - 1] == c;
+
+        public static string[] Split(this string str, char separator, StringSplitOptions splitOptions) =>
+            str.Split(new[] {separator}, splitOptions);
     }
 }
 

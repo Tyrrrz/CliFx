@@ -22,7 +22,6 @@ namespace CliFx
         private readonly ITypeActivator _typeActivator;
 
         private readonly HelpTextWriter _helpTextWriter;
-        private readonly ErrorTextWriter _errorTextWriter;
 
         /// <summary>
         /// Initializes an instance of <see cref="CliApplication"/>.
@@ -37,11 +36,7 @@ namespace CliFx
             _typeActivator = typeActivator;
 
             _helpTextWriter = new HelpTextWriter(metadata, console);
-            _errorTextWriter = new ErrorTextWriter(console);
         }
-
-        private void WriteError(string message) => _console.WithForegroundColor(ConsoleColor.Red, () =>
-            _console.Error.WriteLine(message));
 
         private async ValueTask LaunchAndWaitForDebuggerAsync()
         {
@@ -53,7 +48,9 @@ namespace CliFx
             Debugger.Launch();
 
             while (!Debugger.IsAttached)
+            {
                 await Task.Delay(100);
+            }
         }
 
         private void WriteCommandLineInput(CommandInput input)
@@ -105,9 +102,9 @@ namespace CliFx
         }
 
         private ICommand GetCommandInstance(CommandSchema command) =>
-            command != StubDefaultCommand.Schema
+            command != FallbackDefaultCommand.Schema
                 ? (ICommand) _typeActivator.CreateInstance(command.Type)
-                : new StubDefaultCommand();
+                : new FallbackDefaultCommand();
 
         /// <summary>
         /// Runs the application with specified command line arguments and environment variables, and returns the exit code.
@@ -143,7 +140,7 @@ namespace CliFx
                 var command =
                     root.TryFindCommand(input.CommandName) ??
                     root.TryFindDefaultCommand() ??
-                    StubDefaultCommand.Schema;
+                    FallbackDefaultCommand.Schema;
 
                 // Version option
                 if (command.IsVersionOptionAvailable && input.IsVersionOptionSpecified)
@@ -161,7 +158,7 @@ namespace CliFx
 
                 // Help option
                 if (command.IsHelpOptionAvailable && input.IsHelpOptionSpecified ||
-                    command == StubDefaultCommand.Schema && !input.Parameters.Any() && !input.Options.Any())
+                    command == FallbackDefaultCommand.Schema && !input.Parameters.Any() && !input.Options.Any())
                 {
                     _helpTextWriter.Write(root, command, defaultValues);
                     return ExitCode.Success;
@@ -175,7 +172,10 @@ namespace CliFx
                 // This may throw exceptions which are useful only to the end-user
                 catch (CliFxException ex)
                 {
-                    WriteError(ex.ToString());
+                    _console.WithForegroundColor(ConsoleColor.Red, () =>
+                        _console.Error.WriteLine(ex.ToString())
+                    );
+
                     _helpTextWriter.Write(root, command, defaultValues);
 
                     return ExitCode.FromException(ex);
@@ -190,10 +190,14 @@ namespace CliFx
                 // Swallow command exceptions and route them to the console
                 catch (CommandException ex)
                 {
-                    WriteError(ex.ToString());
+                    _console.WithForegroundColor(ConsoleColor.Red, () =>
+                        _console.Error.WriteLine(ex.ToString())
+                    );
 
                     if (ex.ShowHelp)
+                    {
                         _helpTextWriter.Write(root, command, defaultValues);
+                    }
 
                     return ex.ExitCode;
                 }
@@ -204,7 +208,13 @@ namespace CliFx
             // because we still want the IDE to show them to the developer.
             catch (Exception ex) when (!Debugger.IsAttached)
             {
-                _errorTextWriter.WriteError(ex);
+                _console.WithColors(ConsoleColor.White, ConsoleColor.DarkRed, () =>
+                    _console.Error.Write("ERROR:")
+                );
+
+                _console.Error.Write(" ");
+                _console.WriteException(ex);
+
                 return ExitCode.FromException(ex);
             }
         }
@@ -259,10 +269,11 @@ namespace CliFx
                     : 1;
         }
 
+        // Fallback default command used when none is defined in the application
         [Command]
-        private class StubDefaultCommand : ICommand
+        private class FallbackDefaultCommand : ICommand
         {
-            public static CommandSchema Schema { get; } = CommandSchema.TryResolve(typeof(StubDefaultCommand))!;
+            public static CommandSchema Schema { get; } = CommandSchema.TryResolve(typeof(FallbackDefaultCommand))!;
 
             public ValueTask ExecuteAsync(IConsole console) => default;
         }
