@@ -65,6 +65,33 @@ namespace CliFx.Tests
         }
 
         [Fact]
+        public async Task Help_text_shows_usage_format_which_lists_available_sub_commands()
+        {
+            // Arrange
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+
+            var application = new CliApplicationBuilder()
+                .AddCommand<DefaultCommand>()
+                .AddCommand<NamedCommand>()
+                .AddCommand<NamedSubCommand>()
+                .UseConsole(console)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(new[] {"--help"});
+
+            // Assert
+            exitCode.Should().Be(0);
+            stdOut.GetString().Should().ContainAll(
+                "Usage",
+                "... named",
+                "... named sub"
+            );
+
+            _output.WriteLine(stdOut.GetString());
+        }
+
+        [Fact]
         public async Task Help_text_shows_all_valid_values_for_enum_arguments()
         {
             // Arrange

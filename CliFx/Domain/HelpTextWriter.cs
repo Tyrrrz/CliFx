@@ -105,6 +105,54 @@ namespace CliFx.Domain
             WriteLine();
         }
 
+        private void WriteCommandUsageLineItem(CommandSchema command, bool showChildCommandsPlaceholder)
+        {
+            // Command name
+            if (!string.IsNullOrWhiteSpace(command.Name))
+            {
+                Write(ConsoleColor.Cyan, command.Name);
+                Write(' ');
+            }
+
+            // Child command placeholder
+            if (showChildCommandsPlaceholder)
+            {
+                Write(ConsoleColor.Cyan, "[command]");
+                Write(' ');
+            }
+
+            // Parameters
+            foreach (var parameter in command.Parameters)
+            {
+                Write(parameter.IsScalar
+                    ? $"<{parameter.Name}>"
+                    : $"<{parameter.Name}...>"
+                );
+                Write(' ');
+            }
+
+            // Required options
+            foreach (var option in command.Options.Where(o => o.IsRequired))
+            {
+                Write(ConsoleColor.White, !string.IsNullOrWhiteSpace(option.Name)
+                    ? $"--{option.Name}"
+                    : $"-{option.ShortName}"
+                );
+                Write(' ');
+
+                Write(option.IsScalar
+                    ? "<value>"
+                    : "<values...>"
+                );
+                Write(' ');
+            }
+
+            // Options placeholder
+            Write(ConsoleColor.White, "[options]");
+
+            WriteLine();
+        }
+
         private void WriteCommandUsage(
             CommandSchema command,
             IReadOnlyList<CommandSchema> childCommands)
@@ -114,74 +162,26 @@ namespace CliFx.Domain
 
             WriteHeader("Usage");
 
-            WriteCommandUsageLineItem(command, childCommands.Count > 0);
+            // Exe name
+            WriteHorizontalMargin();
+            Write(_metadata.ExecutableName);
+            Write(' ');
 
-            if (!IsEmpty)
+            // Current command usage
+            WriteCommandUsageLineItem(command, childCommands.Any());
+
+            // Sub commands usage
+            if (childCommands.Any())
+            {
                 WriteVerticalMargin();
 
-            foreach (var childCommand in childCommands)
-            {
-                WriteCommandUsageLineItem(childCommand, compactCommand: false, size: 4);
+                foreach (var childCommand in childCommands)
+                {
+                    WriteHorizontalMargin();
+                    Write("... ");
+                    WriteCommandUsageLineItem(childCommand, false);
+                }
             }
-        }
-
-        private void WriteCommandUsageLineItem(
-            CommandSchema command,
-            bool compactCommand = true,
-            int size = 2)
-        {
-            WriteHorizontalMargin(size);
-            if (compactCommand)
-            {
-                // Exe name
-                Write(_metadata.ExecutableName);
-                Write(' ');
-
-            }
-            // Command name
-            if (!string.IsNullOrWhiteSpace(command.Name))
-            {
-                // this is fragile, because we rely that subcommand name consists
-                // of all required tokens
-                Write(ConsoleColor.Cyan, command.Name);
-            }
-            // Child command placeholder
-            if (compactCommand)
-            {
-                Write(' ');
-                Write(ConsoleColor.Cyan, "[command]");
-            }
-            // Parameters
-            foreach (var parameter in command.Parameters)
-            {
-                Write(' ');
-                Write(parameter.IsScalar
-                    ? $"<{parameter.Name}>"
-                    : $"<{parameter.Name}...>"
-                );
-            }
-
-            // Required options
-            foreach (var option in command.Options.Where(o => o.IsRequired))
-            {
-                Write(' ');
-                Write(ConsoleColor.White, !string.IsNullOrWhiteSpace(option.Name)
-                    ? $"--{option.Name}"
-                    : $"-{option.ShortName}"
-                );
-
-                Write(' ');
-                Write(option.IsScalar
-                    ? "<value>"
-                    : "<values...>"
-                );
-            }
-
-            // Options placeholder
-            Write(' ');
-            Write(ConsoleColor.White, "[options]");
-
-            WriteLine();
         }
 
         private void WriteCommandParameters(CommandSchema command)
@@ -285,7 +285,7 @@ namespace CliFx.Domain
                 if (!option.IsRequired)
                 {
                     var defaultValue = argumentDefaultValues.GetValueOrDefault(option);
-                    var defaultValueFormatted = FormatDefaultValue(defaultValue);
+                    var defaultValueFormatted = TryFormatDefaultValue(defaultValue);
                     if (defaultValueFormatted != null)
                     {
                         Write($"Default: {defaultValueFormatted}.");
@@ -377,7 +377,7 @@ namespace CliFx.Domain
         private static string FormatValidValues(IReadOnlyList<string> values) =>
             values.Select(v => v.Quote()).JoinToString(", ");
 
-        private static string? FormatDefaultValue(object? defaultValue)
+        private static string? TryFormatDefaultValue(object? defaultValue)
         {
             if (defaultValue == null)
                 return null;

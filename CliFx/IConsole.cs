@@ -178,6 +178,12 @@ namespace CliFx
                     {
                         var parameter = stackFrame.Parameters[i];
 
+                        // Separator
+                        if (i > 0)
+                        {
+                            console.Error.Write(", ");
+                        }
+
                         // "IConsole"
                         console.WithForegroundColor(ConsoleColor.Blue, () =>
                             console.Error.Write(parameter.Type)
@@ -191,12 +197,6 @@ namespace CliFx
                             console.WithForegroundColor(ConsoleColor.White, () =>
                                 console.Error.Write(parameter.Name)
                             );
-                        }
-
-                        // Separator
-                        if (stackFrame.Parameters.Count > 1 && i < stackFrame.Parameters.Count - 1)
-                        {
-                            console.Error.Write(", ");
                         }
                     }
 
