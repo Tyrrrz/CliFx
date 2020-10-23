@@ -385,7 +385,7 @@ namespace CliFx.Domain
             // Enumerable
             if (!(defaultValue is string) && defaultValue is IEnumerable defaultValues)
             {
-                var elementType = defaultValues.GetType().GetEnumerableUnderlyingType() ?? typeof(object);
+                var elementType = defaultValues.GetType().TryGetEnumerableUnderlyingType() ?? typeof(object);
 
                 // If the ToString() method is not overriden, the default value can't be formatted nicely
                 if (!elementType.IsToStringOverriden())

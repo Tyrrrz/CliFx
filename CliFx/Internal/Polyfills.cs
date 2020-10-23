@@ -34,7 +34,7 @@ namespace System.Collections.Generic
         }
 
         public static TValue GetValueOrDefault<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dic, TKey key) =>
-            dic.TryGetValue(key, out var result) ? result! : default!;
+            dic.TryGetValue(key!, out var result) ? result! : default!;
     }
 }
 

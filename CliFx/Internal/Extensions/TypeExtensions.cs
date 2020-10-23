@@ -14,9 +14,9 @@ namespace CliFx.Internal.Extensions
 
         public static bool Implements(this Type type, Type interfaceType) => type.GetInterfaces().Contains(interfaceType);
 
-        public static Type? GetNullableUnderlyingType(this Type type) => Nullable.GetUnderlyingType(type);
+        public static Type? TryGetNullableUnderlyingType(this Type type) => Nullable.GetUnderlyingType(type);
 
-        public static Type? GetEnumerableUnderlyingType(this Type type)
+        public static Type? TryGetEnumerableUnderlyingType(this Type type)
         {
             if (type.IsPrimitive)
                 return null;
@@ -29,7 +29,7 @@ namespace CliFx.Internal.Extensions
 
             return type
                 .GetInterfaces()
-                .Select(GetEnumerableUnderlyingType)
+                .Select(TryGetEnumerableUnderlyingType)
                 .Where(t => t != null)
                 .OrderByDescending(t => t != typeof(object)) // prioritize more specific types
                 .FirstOrDefault();
