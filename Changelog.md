@@ -1,3 +1,9 @@
+### v1.5 (23-Oct-2020)
+
+- Added pretty-printing for unhandled exceptions thrown from within the application. This makes the errors easier to parse visually and should help in troubleshooting. This change does not affect `CommandException`, as it already has special treatment. (Thanks [@Mårten Åsberg](https://github.com/89netraM))
+- Added support for custom value converters. You can now create a type that implements `CliFx.IArgumentValueConverter` and specify it as a converter for your parameters or options via the `Converter` named property. This should enable conversion between raw argument values and custom types which are not string-initializable. (Thanks [@Oleksandr Shustov](https://github.com/AlexandrShustov))
+- Improved help text so that it also shows minimal usage examples for child and descendant commands, besides the actual command it was requested on. This should improve user experience for applications with many nested commands. (Thanks [@Nikiforov Alexey](https://github.com/NikiforovAll))
+
 ### v1.4 (20-Aug-2020)
 
 - Added `VirtualConsole.CreateBuffered()` method to simplify test setup when using in-memory backing stores for output and error streams. Please refer to the readme for updated recommendations on how to test applications built with CliFx.
