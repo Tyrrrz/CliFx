@@ -40,6 +40,34 @@ namespace CliFx.Tests
         }
 
         [Fact]
+        public async Task Command_may_throw_a_generic_exception_with_inner_exception_which_exits_and_prints_error_message_and_stack_trace()
+        {
+            // Arrange
+            var (console, stdOut, stdErr) = VirtualConsole.CreateBuffered();
+
+            var application = new CliApplicationBuilder()
+                .AddCommand<GenericInnerExceptionCommand>()
+                .UseConsole(console)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(new[] {"cmd", "-m", "Kaput", "-i", "FooBar"});
+
+            // Assert
+            exitCode.Should().NotBe(0);
+            stdOut.GetString().Should().BeEmpty();
+            stdErr.GetString().Should().ContainAll(
+                "System.Exception:",
+                "FooBar",
+                "Kaput", "at",
+                "CliFx.Tests"
+            );
+
+            _output.WriteLine(stdOut.GetString());
+            _output.WriteLine(stdErr.GetString());
+        }
+
+        [Fact]
         public async Task Command_may_throw_a_specialized_exception_which_exits_with_custom_code_and_prints_minimal_error_details()
         {
             // Arrange

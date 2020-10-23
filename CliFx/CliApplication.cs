@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using CliFx.Attributes;
@@ -275,6 +276,8 @@ namespace CliFx
         {
             public static CommandSchema Schema { get; } = CommandSchema.TryResolve(typeof(FallbackDefaultCommand))!;
 
+            // Never actually executed
+            [ExcludeFromCodeCoverage]
             public ValueTask ExecuteAsync(IConsole console) => default;
         }
     }
