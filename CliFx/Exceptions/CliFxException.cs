@@ -172,6 +172,19 @@ If it's not feasible to fit into these constraints, consider using options inste
             return new CliFxException(message.Trim());
         }
 
+        internal static CliFxException ParametersWithInvalidConverters(
+            CommandSchema command,
+            IReadOnlyList<CommandParameterSchema> invalidParameters)
+        {
+            var message = $@"
+Command '{command.Type.FullName}' is invalid because it contains {invalidParameters.Count} parameter(s) with invalid converters:
+{invalidParameters.JoinToString(Environment.NewLine)}
+
+Specified converter must implement {typeof(IArgumentValueConverter).FullName}.";
+
+            return new CliFxException(message.Trim());
+        }
+
         internal static CliFxException OptionsWithNoName(
             CommandSchema command,
             IReadOnlyList<CommandOptionSchema> invalidOptions)
@@ -240,6 +253,19 @@ Command '{command.Type.FullName}' is invalid because it contains {invalidOptions
 
 Options cannot share the same environment variable as a fallback.
 Environment variable names are not case-sensitive.";
+
+            return new CliFxException(message.Trim());
+        }
+
+        internal static CliFxException OptionsWithInvalidConverters(
+            CommandSchema command,
+            IReadOnlyList<CommandOptionSchema> invalidOptions)
+        {
+            var message = $@"
+Command '{command.Type.FullName}' is invalid because it contains {invalidOptions.Count} option(s) with invalid converters:
+{invalidOptions.JoinToString(Environment.NewLine)}
+
+Specified converter must implement {typeof(IArgumentValueConverter).FullName}.";
 
             return new CliFxException(message.Trim());
         }

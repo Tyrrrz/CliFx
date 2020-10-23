@@ -12,8 +12,13 @@ namespace CliFx.Domain
 
         public string Name { get; }
 
-        public CommandParameterSchema(PropertyInfo? property, int order, string name, string? description, Type? converter = null)
-            : base(property, description, converter)
+        public CommandParameterSchema(
+            PropertyInfo? property,
+            int order,
+            string name,
+            string? description,
+            Type? converterType)
+            : base(property, description, converterType)
         {
             Order = order;
             Name = name;

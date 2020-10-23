@@ -27,7 +27,8 @@ namespace CliFx.Attributes
         public string? Description { get; set; }
 
         /// <summary>
-        /// Type of a converter to use for the parameter value evaluating.
+        /// Type of converter to use when mapping the argument value.
+        /// Converter must implement <see cref="IArgumentValueConverter"/>.
         /// </summary>
         public Type? Converter { get; set; }
 

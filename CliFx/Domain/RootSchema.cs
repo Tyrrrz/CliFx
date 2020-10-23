@@ -114,6 +114,18 @@ namespace CliFx.Domain
                     nonLastNonScalarParameter
                 );
             }
+
+            var invalidConverterParameters = command.Parameters
+                .Where(p => p.ConverterType != null && !p.ConverterType.Implements(typeof(IArgumentValueConverter)))
+                .ToArray();
+
+            if (invalidConverterParameters.Any())
+            {
+                throw CliFxException.ParametersWithInvalidConverters(
+                    command,
+                    invalidConverterParameters
+                );
+            }
         }
 
         private static void ValidateOptions(CommandSchema command)
@@ -182,6 +194,18 @@ namespace CliFx.Domain
                     command,
                     duplicateEnvironmentVariableNameGroup.Key,
                     duplicateEnvironmentVariableNameGroup.ToArray()
+                );
+            }
+
+            var invalidConverterOptions = command.Options
+                .Where(o => o.ConverterType != null && !o.ConverterType.Implements(typeof(IArgumentValueConverter)))
+                .ToArray();
+
+            if (invalidConverterOptions.Any())
+            {
+                throw CliFxException.OptionsWithInvalidConverters(
+                    command,
+                    invalidConverterOptions
                 );
             }
         }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
 using CliFx.Tests.Commands;
-using CliFx.Tests.Commands.Converters;
 using CliFx.Tests.Internal;
 using FluentAssertions;
 using Xunit;
@@ -18,7 +17,7 @@ namespace CliFx.Tests
         public ArgumentConversionSpecs(ITestOutputHelper output) => _output = output;
 
         [Fact]
-        public async Task Property_of_type_object_is_bound_directly_from_the_argument_value()
+        public async Task Argument_value_can_be_bound_to_object()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -46,7 +45,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_type_object_array_is_bound_directly_from_the_argument_values()
+        public async Task Argument_values_can_be_bound_to_array_of_object()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -74,7 +73,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_type_string_is_bound_directly_from_the_argument_value()
+        public async Task Argument_value_can_be_bound_to_string()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -102,7 +101,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_type_string_array_is_bound_directly_from_the_argument_values()
+        public async Task Argument_values_can_be_bound_to_array_of_string()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -130,7 +129,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_type_string_IEnumerable_is_bound_directly_from_the_argument_values()
+        public async Task Argument_values_can_be_bound_to_IEnumerable_of_string()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -158,7 +157,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_type_string_IReadOnlyList_is_bound_directly_from_the_argument_values()
+        public async Task Argument_values_can_be_bound_to_IReadOnlyList_of_string()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -186,7 +185,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_type_string_List_is_bound_directly_from_the_argument_values()
+        public async Task Argument_values_can_be_bound_to_List_of_string()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -214,7 +213,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_type_string_HashSet_is_bound_directly_from_the_argument_values()
+        public async Task Argument_values_can_be_bound_to_HashSet_of_string()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -242,7 +241,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_type_bool_is_bound_as_true_if_the_argument_value_is_true()
+        public async Task Argument_value_can_be_bound_to_boolean_as_true_if_the_value_is_true()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -270,7 +269,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_type_bool_is_bound_as_false_if_the_argument_value_is_false()
+        public async Task Argument_value_can_be_bound_to_boolean_as_false_if_the_value_is_false()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -298,7 +297,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_type_bool_is_bound_as_true_if_the_argument_value_is_not_set()
+        public async Task Argument_value_can_be_bound_to_boolean_as_true_if_the_value_is_not_set()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -326,7 +325,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_type_char_is_bound_directly_from_the_argument_value_if_it_contains_only_one_character()
+        public async Task Argument_value_can_be_bound_to_char_if_the_value_contains_a_single_character()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -354,7 +353,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_type_sbyte_is_bound_by_parsing_the_argument_value()
+        public async Task Argument_value_can_be_bound_to_sbyte()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -382,7 +381,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_type_byte_is_bound_by_parsing_the_argument_value()
+        public async Task Argument_value_can_be_bound_to_byte()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -410,7 +409,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_type_short_is_bound_by_parsing_the_argument_value()
+        public async Task Argument_value_can_be_bound_to_short()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -438,7 +437,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_type_ushort_is_bound_by_parsing_the_argument_value()
+        public async Task Argument_value_can_be_bound_to_ushort()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -466,7 +465,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_type_int_is_bound_by_parsing_the_argument_value()
+        public async Task Argument_value_can_be_bound_to_int()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -494,7 +493,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_type_nullable_int_is_bound_by_parsing_the_argument_value_if_it_is_set()
+        public async Task Argument_value_can_be_bound_to_nullable_of_int_as_actual_value_if_it_is_set()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -522,7 +521,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_type_nullable_int_is_bound_as_null_if_the_argument_value_is_not_set()
+        public async Task Argument_value_can_be_bound_to_nullable_of_int_as_null_if_it_is_not_set()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -550,7 +549,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_type_int_array_is_bound_by_parsing_the_argument_values()
+        public async Task Argument_values_can_be_bound_to_array_of_int()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -578,7 +577,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_type_nullable_int_array_is_bound_by_parsing_the_argument_values()
+        public async Task Argument_values_can_be_bound_to_array_of_nullable_of_int()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -606,7 +605,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_type_uint_is_bound_by_parsing_the_argument_value()
+        public async Task Argument_value_can_be_bound_to_uint()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -634,7 +633,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_type_long_is_bound_by_parsing_the_argument_value()
+        public async Task Argument_value_can_be_bound_to_long()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -662,7 +661,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_type_ulong_is_bound_by_parsing_the_argument_value()
+        public async Task Argument_value_can_be_bound_to_ulong()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -690,7 +689,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_type_float_is_bound_by_parsing_the_argument_value()
+        public async Task Argument_value_can_be_bound_to_float()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -718,7 +717,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_type_double_is_bound_by_parsing_the_argument_value()
+        public async Task Argument_value_can_be_bound_to_double()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -746,7 +745,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_type_decimal_is_bound_by_parsing_the_argument_value()
+        public async Task Argument_value_can_be_bound_to_decimal()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -774,7 +773,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_type_DateTime_is_bound_by_parsing_the_argument_value()
+        public async Task Argument_value_can_be_bound_to_DateTime()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -802,7 +801,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_type_DateTimeOffset_is_bound_by_parsing_the_argument_value()
+        public async Task Argument_value_can_be_bound_to_DateTimeOffset()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -830,7 +829,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_type_TimeSpan_is_bound_by_parsing_the_argument_value()
+        public async Task Argument_value_can_be_bound_to_TimeSpan()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -858,7 +857,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_type_nullable_TimeSpan_is_bound_by_parsing_the_argument_value_if_it_is_set()
+        public async Task Argument_value_can_be_bound_to_nullable_of_TimeSpan_as_actual_value_if_it_is_set()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -886,7 +885,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_type_nullable_TimeSpan_is_bound_as_null_if_the_argument_value_is_not_set()
+        public async Task Argument_value_can_be_bound_to_nullable_of_TimeSpan_as_null_if_it_is_not_set()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -914,7 +913,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_an_enum_type_is_bound_by_parsing_the_argument_value_as_name()
+        public async Task Argument_value_can_be_bound_to_an_enum_type_by_name()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -942,7 +941,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_an_enum_type_is_bound_by_parsing_the_argument_value_as_id()
+        public async Task Argument_value_can_be_bound_to_an_enum_type_by_id()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -970,7 +969,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_a_nullable_enum_type_is_bound_by_parsing_the_argument_value_as_name_if_it_is_set()
+        public async Task Argument_value_can_be_bound_to_nullable_of_enum_type_by_name_if_it_is_set()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -998,7 +997,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_a_nullable_enum_type_is_bound_by_parsing_the_argument_value_as_id_if_it_is_set()
+        public async Task Argument_value_can_be_bound_to_nullable_of_enum_type_by_id_if_it_is_set()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -1026,7 +1025,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_a_nullable_enum_type_is_bound_as_null_if_the_argument_value_is_not_set()
+        public async Task Argument_value_can_be_bound_to_nullable_of_enum_type_as_null_if_it_is_not_set()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -1054,7 +1053,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_an_enum_array_type_is_bound_by_parsing_the_argument_values_as_names()
+        public async Task Argument_values_can_be_bound_to_array_of_enum_type_by_names()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -1082,7 +1081,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_an_enum_array_type_is_bound_by_parsing_the_argument_values_as_ids()
+        public async Task Argument_values_can_be_bound_to_array_of_enum_type_by_ids()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -1110,7 +1109,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_an_enum_array_type_is_bound_by_parsing_the_argument_values_as_either_names_or_ids()
+        public async Task Argument_values_can_be_bound_to_array_of_enum_type_by_either_names_or_ids()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -1138,7 +1137,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_a_type_that_has_a_constructor_accepting_a_string_is_bound_by_invoking_the_constructor_with_the_argument_value()
+        public async Task Argument_value_can_be_bound_to_a_custom_type_if_it_has_a_constructor_accepting_a_string()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -1166,7 +1165,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_an_array_of_type_that_has_a_constructor_accepting_a_string_is_bound_by_invoking_the_constructor_with_the_argument_values()
+        public async Task Argument_values_can_be_bound_to_array_of_custom_type_if_it_has_a_constructor_accepting_a_string()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -1198,7 +1197,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_a_type_that_has_a_static_Parse_method_accepting_a_string_is_bound_by_invoking_the_method()
+        public async Task Argument_value_can_be_bound_to_a_custom_type_if_it_has_a_static_Parse_method()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -1226,7 +1225,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_a_type_that_has_a_static_Parse_method_accepting_a_string_and_format_provider_is_bound_by_invoking_the_method()
+        public async Task Argument_value_can_be_bound_to_a_custom_type_if_it_has_a_static_Parse_method_with_format_provider()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -1255,55 +1254,72 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_of_custom_type_must_be_string_initializable_in_order_to_be_bound()
+        public async Task Argument_value_can_be_bound_to_a_custom_type_if_a_converter_has_been_specified()
         {
             // Arrange
-            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
-                .AddCommand<UnsupportedArgumentTypesCommand>()
+                .AddCommand<SupportedArgumentTypesCommand>()
                 .UseConsole(console)
                 .Build();
 
             // Act
             var exitCode = await application.RunAsync(new[]
             {
-                "cmd", "--str-non-initializable", "foobar"
+                "cmd", "--convertible", "13"
             });
 
-            // Assert
-            exitCode.Should().NotBe(0);
-            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
-            _output.WriteLine(stdErr.GetString());
+            // Assert
+            exitCode.Should().Be(0);
+
+            commandInstance.Should().BeEquivalentTo(new SupportedArgumentTypesCommand
+            {
+                Convertible =
+                    (SupportedArgumentTypesCommand.CustomConvertible)
+                    new SupportedArgumentTypesCommand.CustomConvertibleConverter().ConvertFrom("13")
+            });
         }
 
         [Fact]
-        public async Task Property_of_custom_type_that_implements_IEnumerable_can_only_be_bound_if_that_type_has_a_constructor_accepting_an_array()
+        public async Task Argument_values_can_be_bound_to_array_of_custom_type_if_a_converter_has_been_specified()
         {
             // Arrange
-            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
-                .AddCommand<UnsupportedArgumentTypesCommand>()
+                .AddCommand<SupportedArgumentTypesCommand>()
                 .UseConsole(console)
                 .Build();
 
             // Act
             var exitCode = await application.RunAsync(new[]
             {
-                "cmd", "--str-enumerable-non-initializable", "foobar"
+                "cmd", "--convertible-array", "13", "42"
             });
 
-            // Assert
-            exitCode.Should().NotBe(0);
-            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
 
-            _output.WriteLine(stdErr.GetString());
+            // Assert
+            exitCode.Should().Be(0);
+
+            commandInstance.Should().BeEquivalentTo(new SupportedArgumentTypesCommand
+            {
+                ConvertibleArray = new[]
+                {
+                    (SupportedArgumentTypesCommand.CustomConvertible)
+                    new SupportedArgumentTypesCommand.CustomConvertibleConverter().ConvertFrom("13"),
+
+                    (SupportedArgumentTypesCommand.CustomConvertible)
+                    new SupportedArgumentTypesCommand.CustomConvertibleConverter().ConvertFrom("42")
+                }
+            });
         }
 
         [Fact]
-        public async Task Property_of_non_nullable_type_can_only_be_bound_if_the_argument_value_is_set()
+        public async Task Argument_value_can_only_be_bound_to_non_nullable_type_if_it_is_set()
         {
             // Arrange
             var (console, _, stdErr) = VirtualConsole.CreateBuffered();
@@ -1327,7 +1343,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Property_must_have_a_type_that_implements_IEnumerable_in_order_to_be_bound_from_multiple_argument_values()
+        public async Task Argument_values_can_only_be_bound_to_a_type_that_implements_IEnumerable()
         {
             // Arrange
             var (console, _, stdErr) = VirtualConsole.CreateBuffered();
@@ -1348,71 +1364,6 @@ namespace CliFx.Tests
             stdErr.GetString().Should().NotBeNullOrWhiteSpace();
 
             _output.WriteLine(stdErr.GetString());
-        }
-
-        [Fact]
-        public async Task Property_of_custom_type_is_bound_when_the_valid_converter_type_is_specified()
-        {
-            // Arrange
-            const string foo = "foo";
-
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
-
-            var application = new CliApplicationBuilder()
-                .AddCommand<CommandWithParameterOfCustomType>()
-                .UseConsole(console)
-                .Build();
-
-            // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--prop", foo
-            });
-
-            // Assert
-            exitCode.Should().Be(0);
-
-            var commandInstance = stdOut.GetString().DeserializeJson<CommandWithParameterOfCustomType>();
-
-            commandInstance.Should().BeEquivalentTo(new CommandWithParameterOfCustomType()
-            {
-                MyProperty = (CustomType) new CustomTypeConverter().ConvertFrom(foo)
-            });
-        }
-
-        [Fact]
-        public async Task Enumerable_of_the_custom_type_is_bound_when_the_valid_converter_type_is_specified()
-        {
-            // Arrange
-            string foo = "foo";
-            string bar = "bar";
-
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
-
-            var application = new CliApplicationBuilder()
-                .AddCommand<CommandWithEnumerableOfParametersOfCustomType>()
-                .UseConsole(console)
-                .Build();
-
-            // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--prop", foo, bar
-            });
-
-            // Assert
-            exitCode.Should().Be(0);
-
-            var commandInstance = stdOut.GetString().DeserializeJson<CommandWithEnumerableOfParametersOfCustomType>();
-
-            commandInstance.Should().BeEquivalentTo(new CommandWithEnumerableOfParametersOfCustomType()
-            {
-                MyProperties = new List<CustomType>
-                {
-                    (CustomType) new CustomTypeConverter().ConvertFrom(foo),
-                    (CustomType) new CustomTypeConverter().ConvertFrom(bar)
-                }
-            });
         }
     }
 }

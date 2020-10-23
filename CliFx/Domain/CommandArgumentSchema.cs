@@ -17,13 +17,13 @@ namespace CliFx.Domain
 
         public bool IsScalar => TryGetEnumerableArgumentUnderlyingType() == null;
 
-        protected Type? Converter { get; set; }
+        public Type? ConverterType { get; }
 
-        protected CommandArgumentSchema(PropertyInfo? property, string? description, Type? converter = null)
+        protected CommandArgumentSchema(PropertyInfo? property, string? description, Type? converterType)
         {
             Property = property;
             Description = description;
-            Converter = converter;
+            ConverterType = converterType;
         }
 
         private Type? TryGetEnumerableArgumentUnderlyingType() =>
@@ -35,6 +35,10 @@ namespace CliFx.Domain
         {
             try
             {
+                // Custom conversion
+                if (ConverterType != null)
+                    return ConverterType.CreateInstance<IArgumentValueConverter>().ConvertFrom(value!);
+
                 // Primitive
                 var primitiveConverter = PrimitiveConverters.GetValueOrDefault(targetType);
                 if (primitiveConverter != null)
@@ -57,17 +61,14 @@ namespace CliFx.Domain
                     return stringConstructor.Invoke(new object[] {value!});
 
                 // String-parseable (with format provider)
-                var parseMethodWithFormatProvider = targetType.GetStaticParseMethod(true);
+                var parseMethodWithFormatProvider = targetType.TryGetStaticParseMethod(true);
                 if (parseMethodWithFormatProvider != null)
                     return parseMethodWithFormatProvider.Invoke(null, new object[] {value!, FormatProvider});
 
                 // String-parseable (without format provider)
-                var parseMethod = targetType.GetStaticParseMethod();
+                var parseMethod = targetType.TryGetStaticParseMethod();
                 if (parseMethod != null)
                     return parseMethod.Invoke(null, new object[] {value!});
-
-                if (Converter != null)
-                    return Converter.InstanceOf<IArgumentValueConverter>().ConvertFrom(value!);
             }
             catch (Exception ex)
             {

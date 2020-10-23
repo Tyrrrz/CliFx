@@ -17,16 +17,19 @@ namespace CliFx.Analyzers
             DiagnosticDescriptors.CliFx0022,
             DiagnosticDescriptors.CliFx0023,
             DiagnosticDescriptors.CliFx0024,
+            DiagnosticDescriptors.CliFx0025,
             DiagnosticDescriptors.CliFx0041,
             DiagnosticDescriptors.CliFx0042,
             DiagnosticDescriptors.CliFx0043,
             DiagnosticDescriptors.CliFx0044,
-            DiagnosticDescriptors.CliFx0045
+            DiagnosticDescriptors.CliFx0045,
+            DiagnosticDescriptors.CliFx0046
         );
 
         private static bool IsScalarType(ITypeSymbol typeSymbol) =>
             KnownSymbols.IsSystemString(typeSymbol) ||
-            !typeSymbol.AllInterfaces.Select(i => i.ConstructedFrom).Any(KnownSymbols.IsSystemCollectionsGenericIEnumerable);
+            !typeSymbol.AllInterfaces.Select(i => i.ConstructedFrom)
+                .Any(KnownSymbols.IsSystemCollectionsGenericIEnumerable);
 
         private static void CheckCommandParameterProperties(
             SymbolAnalysisContext context,
@@ -50,11 +53,18 @@ namespace CliFx.Analyzers
                         .Select(a => a.Value.Value)
                         .FirstOrDefault() as string;
 
+                    var converter = attribute
+                        .NamedArguments
+                        .Where(a => a.Key == "Converter")
+                        .Select(a => a.Value.Value)
+                        .FirstOrDefault() as ITypeSymbol;
+
                     return new
                     {
                         Property = p,
                         Order = order,
-                        Name = name
+                        Name = name,
+                        Converter = converter
                     };
                 })
                 .ToArray();
@@ -69,8 +79,9 @@ namespace CliFx.Analyzers
 
             foreach (var parameter in duplicateOrderParameters)
             {
-                context.ReportDiagnostic(
-                    Diagnostic.Create(DiagnosticDescriptors.CliFx0021, parameter.Property.Locations.First()));
+                context.ReportDiagnostic(Diagnostic.Create(
+                    DiagnosticDescriptors.CliFx0021, parameter.Property.Locations.First()
+                ));
             }
 
             // Duplicate name
@@ -83,8 +94,9 @@ namespace CliFx.Analyzers
 
             foreach (var parameter in duplicateNameParameters)
             {
-                context.ReportDiagnostic(
-                    Diagnostic.Create(DiagnosticDescriptors.CliFx0022, parameter.Property.Locations.First()));
+                context.ReportDiagnostic(Diagnostic.Create(
+                    DiagnosticDescriptors.CliFx0022, parameter.Property.Locations.First()
+                ));
             }
 
             // Multiple non-scalar
@@ -96,8 +108,9 @@ namespace CliFx.Analyzers
             {
                 foreach (var parameter in nonScalarParameters)
                 {
-                    context.ReportDiagnostic(
-                        Diagnostic.Create(DiagnosticDescriptors.CliFx0023, parameter.Property.Locations.First()));
+                    context.ReportDiagnostic(Diagnostic.Create(
+                        DiagnosticDescriptors.CliFx0023, parameter.Property.Locations.First()
+                    ));
                 }
             }
 
@@ -109,8 +122,23 @@ namespace CliFx.Analyzers
 
             if (nonLastNonScalarParameter != null)
             {
-                context.ReportDiagnostic(
-                    Diagnostic.Create(DiagnosticDescriptors.CliFx0024, nonLastNonScalarParameter.Property.Locations.First()));
+                context.ReportDiagnostic(Diagnostic.Create(
+                    DiagnosticDescriptors.CliFx0024, nonLastNonScalarParameter.Property.Locations.First()
+                ));
+            }
+
+            // Invalid converter
+            var invalidConverterParameters = parameters
+                .Where(p =>
+                    p.Converter != null &&
+                    !p.Converter.AllInterfaces.Any(KnownSymbols.IsArgumentValueConverterInterface))
+                .ToArray();
+
+            foreach (var parameter in invalidConverterParameters)
+            {
+                context.ReportDiagnostic(Diagnostic.Create(
+                    DiagnosticDescriptors.CliFx0025, parameter.Property.Locations.First()
+                ));
             }
         }
 
@@ -143,12 +171,19 @@ namespace CliFx.Analyzers
                         .Select(a => a.Value.Value)
                         .FirstOrDefault() as string;
 
+                    var converter = attribute
+                        .NamedArguments
+                        .Where(a => a.Key == "Converter")
+                        .Select(a => a.Value.Value)
+                        .FirstOrDefault() as ITypeSymbol;
+
                     return new
                     {
                         Property = p,
                         Name = name,
                         ShortName = shortName,
-                        EnvironmentVariableName = envVarName
+                        EnvironmentVariableName = envVarName,
+                        Converter = converter
                     };
                 })
                 .ToArray();
@@ -160,8 +195,9 @@ namespace CliFx.Analyzers
 
             foreach (var option in noNameOptions)
             {
-                context.ReportDiagnostic(
-                    Diagnostic.Create(DiagnosticDescriptors.CliFx0041, option.Property.Locations.First()));
+                context.ReportDiagnostic(Diagnostic.Create(
+                    DiagnosticDescriptors.CliFx0041, option.Property.Locations.First()
+                ));
             }
 
             // Too short name
@@ -171,8 +207,9 @@ namespace CliFx.Analyzers
 
             foreach (var option in invalidNameLengthOptions)
             {
-                context.ReportDiagnostic(
-                    Diagnostic.Create(DiagnosticDescriptors.CliFx0042, option.Property.Locations.First()));
+                context.ReportDiagnostic(Diagnostic.Create(
+                    DiagnosticDescriptors.CliFx0042, option.Property.Locations.First()
+                ));
             }
 
             // Duplicate name
@@ -185,8 +222,9 @@ namespace CliFx.Analyzers
 
             foreach (var option in duplicateNameOptions)
             {
-                context.ReportDiagnostic(
-                    Diagnostic.Create(DiagnosticDescriptors.CliFx0043, option.Property.Locations.First()));
+                context.ReportDiagnostic(Diagnostic.Create(
+                    DiagnosticDescriptors.CliFx0043, option.Property.Locations.First()
+                ));
             }
 
             // Duplicate name
@@ -199,8 +237,9 @@ namespace CliFx.Analyzers
 
             foreach (var option in duplicateShortNameOptions)
             {
-                context.ReportDiagnostic(
-                    Diagnostic.Create(DiagnosticDescriptors.CliFx0044, option.Property.Locations.First()));
+                context.ReportDiagnostic(Diagnostic.Create(
+                    DiagnosticDescriptors.CliFx0044, option.Property.Locations.First()
+                ));
             }
 
             // Duplicate environment variable name
@@ -213,8 +252,23 @@ namespace CliFx.Analyzers
 
             foreach (var option in duplicateEnvironmentVariableNameOptions)
             {
-                context.ReportDiagnostic(
-                    Diagnostic.Create(DiagnosticDescriptors.CliFx0045, option.Property.Locations.First()));
+                context.ReportDiagnostic(Diagnostic.Create(
+                    DiagnosticDescriptors.CliFx0045, option.Property.Locations.First()
+                ));
+            }
+
+            // Invalid converter
+            var invalidConverterOptions = options
+                .Where(o =>
+                    o.Converter != null &&
+                    !o.Converter.AllInterfaces.Any(KnownSymbols.IsArgumentValueConverterInterface))
+                .ToArray();
+
+            foreach (var option in invalidConverterOptions)
+            {
+                context.ReportDiagnostic(Diagnostic.Create(
+                    DiagnosticDescriptors.CliFx0046, option.Property.Locations.First()
+                ));
             }
         }
 
@@ -252,10 +306,12 @@ namespace CliFx.Analyzers
                 var isAlmostValidCommandType = implementsCommandInterface ^ hasCommandAttribute;
 
                 if (isAlmostValidCommandType && !implementsCommandInterface)
-                    context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.CliFx0001, namedTypeSymbol.Locations.First()));
+                    context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.CliFx0001,
+                        namedTypeSymbol.Locations.First()));
 
                 if (isAlmostValidCommandType && !hasCommandAttribute)
-                    context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.CliFx0002, namedTypeSymbol.Locations.First()));
+                    context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.CliFx0002,
+                        namedTypeSymbol.Locations.First()));
 
                 return;
             }

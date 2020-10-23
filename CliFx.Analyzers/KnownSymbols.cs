@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis;
 
 namespace CliFx.Analyzers
 {
-    public static class KnownSymbols
+    internal static class KnownSymbols
     {
         public static bool IsSystemString(ISymbol symbol) =>
             symbol.DisplayNameMatches("string") ||
@@ -24,6 +24,9 @@ namespace CliFx.Analyzers
 
         public static bool IsCommandInterface(ISymbol symbol) =>
             symbol.DisplayNameMatches("CliFx.ICommand");
+
+        public static bool IsArgumentValueConverterInterface(ISymbol symbol) =>
+            symbol.DisplayNameMatches("CliFx.IArgumentValueConverter");
 
         public static bool IsCommandAttribute(ISymbol symbol) =>
             symbol.DisplayNameMatches("CliFx.Attributes.CommandAttribute");

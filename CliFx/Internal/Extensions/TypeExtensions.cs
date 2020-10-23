@@ -8,6 +8,8 @@ namespace CliFx.Internal.Extensions
 {
     internal static class TypeExtensions
     {
+        public static T CreateInstance<T>(this Type type) => (T) Activator.CreateInstance(type);
+
         public static bool Implements(this Type type, Type interfaceType) => type.GetInterfaces().Contains(interfaceType);
 
         public static Type? GetNullableUnderlyingType(this Type type) => Nullable.GetUnderlyingType(type);
@@ -31,11 +33,14 @@ namespace CliFx.Internal.Extensions
                 .FirstOrDefault();
         }
 
-        public static MethodInfo GetToStringMethod(this Type type) => type.GetMethod(nameof(ToString), Type.EmptyTypes);
+        public static MethodInfo GetToStringMethod(this Type type) =>
+            // ToString() with no params always exists
+            type.GetMethod(nameof(ToString), Type.EmptyTypes)!;
 
-        public static bool IsToStringOverriden(this Type type) => type.GetToStringMethod() != typeof(object).GetToStringMethod();
+        public static bool IsToStringOverriden(this Type type) =>
+            type.GetToStringMethod() != typeof(object).GetToStringMethod();
 
-        public static MethodInfo GetStaticParseMethod(this Type type, bool withFormatProvider = false)
+        public static MethodInfo? TryGetStaticParseMethod(this Type type, bool withFormatProvider = false)
         {
             var argumentTypes = withFormatProvider
                 ? new[] {typeof(string), typeof(IFormatProvider)}
@@ -56,10 +61,5 @@ namespace CliFx.Internal.Extensions
 
             return array;
         }
-
-        public static T InstanceOf<T>(this Type type) =>
-            type.Implements(typeof(T))
-                ? (T) Activator.CreateInstance(type)
-                : throw new ArgumentException();
     }
 }

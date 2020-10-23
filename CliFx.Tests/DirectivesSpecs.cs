@@ -29,7 +29,8 @@ namespace CliFx.Tests
             // Act
             var exitCode = await application.RunAsync(
                 new[] {"[preview]", "named", "param", "-abc", "--option", "foo"},
-                new Dictionary<string, string>());
+                new Dictionary<string, string>()
+            );
 
             // Assert
             exitCode.Should().Be(0);
