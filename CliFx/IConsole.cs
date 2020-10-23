@@ -160,13 +160,11 @@ namespace CliFx
                 foreach (var stackFrame in StackFrame.ParseMany(exception.StackTrace))
                 {
                     console.Error.Write(indentationShared + indentationLocal);
-
-                    // "at"
-                    console.Error.Write(stackFrame.Prefix + " ");
+                    console.Error.Write("at ");
 
                     // "CliFx.Demo.Commands.BookAddCommand."
                     console.WithForegroundColor(ConsoleColor.DarkGray, () =>
-                        console.Error.Write(stackFrame.ParentType)
+                        console.Error.Write(stackFrame.ParentType + ".")
                     );
 
                     // "ExecuteAsync"
@@ -176,47 +174,62 @@ namespace CliFx
 
                     console.Error.Write("(");
 
-                    foreach (var parameter in stackFrame.Parameters)
+                    for (var i = 0; i < stackFrame.Parameters.Count; i++)
                     {
+                        var parameter = stackFrame.Parameters[i];
+
                         // "IConsole"
                         console.WithForegroundColor(ConsoleColor.Blue, () =>
                             console.Error.Write(parameter.Type)
                         );
 
-                        // "console"
-                        console.WithForegroundColor(ConsoleColor.White, () =>
-                            console.Error.Write(parameter.Name)
-                        );
-
-                        // ", '
-                        if (parameter.Separator != null)
+                        if (!string.IsNullOrWhiteSpace(parameter.Name))
                         {
-                            console.Error.Write(parameter.Separator);
+                            console.Error.Write(" ");
+
+                            // "console"
+                            console.WithForegroundColor(ConsoleColor.White, () =>
+                                console.Error.Write(parameter.Name)
+                            );
+                        }
+
+                        // Separator
+                        if (stackFrame.Parameters.Count > 1 && i < stackFrame.Parameters.Count - 1)
+                        {
+                            console.Error.Write(", ");
                         }
                     }
 
                     console.Error.Write(") ");
 
-                    // "in"
-                    console.Error.Write(stackFrame.LocationPrefix);
-                    console.Error.Write("\n" + indentationShared + indentationLocal + indentationLocal);
+                    // Location
+                    if (!string.IsNullOrWhiteSpace(stackFrame.FilePath))
+                    {
+                        console.Error.Write("in");
+                        console.Error.Write("\n" + indentationShared + indentationLocal + indentationLocal);
 
-                    // "E:\Projects\Softdev\CliFx\CliFx.Demo\Commands\"
-                    console.WithForegroundColor(ConsoleColor.DarkGray, () =>
-                        console.Error.Write(stackFrame.DirectoryPath)
-                    );
+                        // "E:\Projects\Softdev\CliFx\CliFx.Demo\Commands\"
+                        var stackFrameDirectoryPath = Path.GetDirectoryName(stackFrame.FilePath);
+                        console.WithForegroundColor(ConsoleColor.DarkGray, () =>
+                            console.Error.Write(stackFrameDirectoryPath + Path.DirectorySeparatorChar)
+                        );
 
-                    // "BookAddCommand.cs"
-                    console.WithForegroundColor(ConsoleColor.Yellow, () =>
-                        console.Error.Write(stackFrame.FileName)
-                    );
+                        // "BookAddCommand.cs"
+                        var stackFrameFileName = Path.GetFileName(stackFrame.FilePath);
+                        console.WithForegroundColor(ConsoleColor.Yellow, () =>
+                            console.Error.Write(stackFrameFileName)
+                        );
 
-                    console.Error.Write(":");
+                        if (!string.IsNullOrWhiteSpace(stackFrame.LineNumber))
+                        {
+                            console.Error.Write(":");
 
-                    // "35"
-                    console.WithForegroundColor(ConsoleColor.Blue, () =>
-                        console.Error.Write(stackFrame.LineNumber)
-                    );
+                            // "35"
+                            console.WithForegroundColor(ConsoleColor.Blue, () =>
+                                console.Error.Write(stackFrame.LineNumber)
+                            );
+                        }
+                    }
 
                     console.Error.WriteLine();
                 }

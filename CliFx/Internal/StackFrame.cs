@@ -10,121 +10,110 @@ namespace CliFx.Internal
     {
         public string Type { get; }
 
-        public string Name { get; }
+        public string? Name { get; }
 
-        public string? Separator { get; }
-
-        public StackFrameParameter(
-            string type,
-            string name,
-            string? separator)
+        public StackFrameParameter(string type, string? name)
         {
             Type = type;
             Name = name;
-            Separator = separator;
         }
     }
 
     internal partial class StackFrame
     {
-        public string Prefix { get; }
-
         public string ParentType { get; }
 
         public string MethodName { get; }
 
         public IReadOnlyList<StackFrameParameter> Parameters { get; }
 
-        public string LocationPrefix { get; }
+        public string? FilePath { get; }
 
-        public string DirectoryPath { get; }
-
-        public string FileName { get; }
-
-        public string LineNumber { get; }
+        public string? LineNumber { get; }
 
         public StackFrame(
-            string prefix,
             string parentType,
             string methodName,
             IReadOnlyList<StackFrameParameter> parameters,
-            string locationPrefix,
-            string directoryPath,
-            string fileName,
-            string lineNumber)
+            string? filePath,
+            string? lineNumber)
         {
-            Prefix = prefix;
             ParentType = parentType;
             MethodName = methodName;
             Parameters = parameters;
-            LocationPrefix = locationPrefix;
-            DirectoryPath = directoryPath;
-            FileName = fileName;
+            FilePath = filePath;
             LineNumber = lineNumber;
         }
     }
 
     internal partial class StackFrame
     {
-        private static readonly Regex MethodMatcher =
-            new Regex(@"(?<prefix>\S+) (?<name>.*?)(?<methodName>[^\.]+)\(");
+        private const string Space = @"[\x20\t]";
+        private const string NotSpace = @"[^\x20\t]";
 
-        private static readonly Regex ParameterMatcher =
-            new Regex(@"(?<type>.+? )(?<name>.+?)(?:(?<separator>, )|\))");
+        // Taken from https://github.com/atifaziz/StackTraceParser
+        private static readonly Regex Pattern = new Regex(@"
+            ^
+            " + Space + @"*
+            \w+ " + Space + @"+
+            (?<frame>
+                (?<type> " + NotSpace + @"+ ) \.
+                (?<method> " + NotSpace + @"+? ) " + Space + @"*
+                (?<params>  \( ( " + Space + @"* \)
+                               |                    (?<pt> .+?) " + Space + @"+ (?<pn> .+?)
+                                 (, " + Space + @"* (?<pt> .+?) " + Space + @"+ (?<pn> .+?) )* \) ) )
+                ( " + Space + @"+
+                    ( # Microsoft .NET stack traces
+                    \w+ " + Space + @"+
+                    (?<file> ( [a-z] \: # Windows rooted path starting with a drive letter
+                             | / )      # *nix rooted path starting with a forward-slash
+                             .+? )
+                    \: \w+ " + Space + @"+
+                    (?<line> [0-9]+ ) \p{P}?
+                    | # Mono stack traces
+                    \[0x[0-9a-f]+\] " + Space + @"+ \w+ " + Space + @"+
+                    <(?<file> [^>]+ )>
+                    :(?<line> [0-9]+ )
+                    )
+                )?
+            )
+            \s*
+            $",
+            RegexOptions.IgnoreCase |
+            RegexOptions.Multiline |
+            RegexOptions.ExplicitCapture |
+            RegexOptions.CultureInvariant |
+            RegexOptions.IgnorePatternWhitespace,
+            TimeSpan.FromSeconds(5)
+        );
 
-        private static readonly Regex FileMatcher =
-            new Regex(@"(?<prefix>\S+?) (?<path>.*?)(?<file>[^\\/]+?(?:\.\w*)?):[^:]+? (?<line>\d+).*");
-
-        public static StackFrame Parse(string stackFrame)
+        public static IEnumerable<StackFrame> ParseMany(string stackTrace)
         {
-            var methodMatch = MethodMatcher.Match(stackFrame);
+            var matches = Pattern.Matches(stackTrace).Cast<Match>().ToArray();
 
-            var parameterMatches = ParameterMatcher.Matches(stackFrame, methodMatch.Index + methodMatch.Length)
-                .Cast<Match>()
-                .ToArray();
-
-            var fileMatch = FileMatcher.Match(
-                stackFrame,
-                parameterMatches.Length switch
-                {
-                    0 => methodMatch.Index + methodMatch.Length + 1,
-                    _ => parameterMatches[parameterMatches.Length - 1].Index +
-                         parameterMatches[parameterMatches.Length - 1].Length
-                }
-            );
-
-            // Ensure everything was parsed successfully
-            var isSuccessful =
-                methodMatch.Success &&
-                parameterMatches.All(m => m.Success) &&
-                fileMatch.Success &&
-                fileMatch.Index + fileMatch.Length == stackFrame.Length;
-
-            if (!isSuccessful)
+            // Ensure success
+            var lastMatch = matches.LastOrDefault();
+            if (lastMatch == null ||
+                lastMatch.Index + lastMatch.Length < stackTrace.Length)
             {
-                throw new FormatException("Failed to parse stack frame.");
+                throw new FormatException("Could not parse stack trace.");
             }
 
-            var parameters = parameterMatches
-                .Select(match => new StackFrameParameter(
-                    match.Groups["type"].Value,
-                    match.Groups["name"].Value,
-                    match.Groups["separator"].Value.NullIfWhiteSpace()
-                )).ToArray();
-
-            return new StackFrame(
-                methodMatch.Groups["prefix"].Value,
-                methodMatch.Groups["name"].Value,
-                methodMatch.Groups["methodName"].Value,
-                parameters,
-                fileMatch.Groups["prefix"].Value,
-                fileMatch.Groups["path"].Value,
-                fileMatch.Groups["file"].Value,
-                fileMatch.Groups["line"].Value
-            );
+            return from m in matches
+                select m.Groups
+                into groups
+                let pt = groups["pt"].Captures
+                let pn = groups["pn"].Captures
+                select new StackFrame(
+                    groups["type"].Value,
+                    groups["method"].Value,
+                    (
+                        from i in Enumerable.Range(0, pt.Count)
+                        select new StackFrameParameter(pt[i].Value, pn[i].Value.NullIfWhiteSpace())
+                    ).ToArray(),
+                    groups["file"].Value.NullIfWhiteSpace(),
+                    groups["line"].Value.NullIfWhiteSpace()
+                );
         }
-
-        public static IReadOnlyList<StackFrame> ParseMany(string stackTrace) =>
-            stackTrace.Split('\n', StringSplitOptions.RemoveEmptyEntries).Select(Parse).ToArray();
     }
 }
