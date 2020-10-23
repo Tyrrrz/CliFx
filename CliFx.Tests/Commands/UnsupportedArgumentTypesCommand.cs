@@ -8,11 +8,11 @@ namespace CliFx.Tests.Commands
     [Command("cmd")]
     public partial class UnsupportedArgumentTypesCommand : SelfSerializeCommandBase
     {
-        [CommandOption("str-non-initializable")]
-        public CustomType? StringNonInitializable { get; set; }
+        [CommandOption("custom")]
+        public CustomType? CustomNonConvertible { get; set; }
 
-        [CommandOption("str-enumerable-non-initializable")]
-        public CustomEnumerable<string>? StringEnumerableNonInitializable { get; set; }
+        [CommandOption("custom-enumerable")]
+        public CustomEnumerable<string>? CustomEnumerableNonConvertible { get; set; }
     }
 
     public partial class UnsupportedArgumentTypesCommand

@@ -913,7 +913,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Argument_value_can_be_bound_to_an_enum_type_by_name()
+        public async Task Argument_value_can_be_bound_to_enum_type_by_name()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -941,7 +941,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Argument_value_can_be_bound_to_an_enum_type_by_id()
+        public async Task Argument_value_can_be_bound_to_enum_type_by_id()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -1319,6 +1319,54 @@ namespace CliFx.Tests
         }
 
         [Fact]
+        public async Task Argument_value_can_only_be_bound_if_the_target_type_is_supported()
+        {
+            // Arrange
+            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
+
+            var application = new CliApplicationBuilder()
+                .AddCommand<UnsupportedArgumentTypesCommand>()
+                .UseConsole(console)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(new[]
+            {
+                "cmd", "--custom"
+            });
+
+            // Assert
+            exitCode.Should().NotBe(0);
+            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
+
+            _output.WriteLine(stdErr.GetString());
+        }
+
+        [Fact]
+        public async Task Argument_value_can_only_be_bound_if_the_provided_value_can_be_converted_to_the_target_type()
+        {
+            // Arrange
+            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
+
+            var application = new CliApplicationBuilder()
+                .AddCommand<SupportedArgumentTypesCommand>()
+                .UseConsole(console)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(new[]
+            {
+                "cmd", "--int", "foo"
+            });
+
+            // Assert
+            exitCode.Should().NotBe(0);
+            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
+
+            _output.WriteLine(stdErr.GetString());
+        }
+
+        [Fact]
         public async Task Argument_value_can_only_be_bound_to_non_nullable_type_if_it_is_set()
         {
             // Arrange
@@ -1357,6 +1405,30 @@ namespace CliFx.Tests
             var exitCode = await application.RunAsync(new[]
             {
                 "cmd", "--int", "1", "2", "3"
+            });
+
+            // Assert
+            exitCode.Should().NotBe(0);
+            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
+
+            _output.WriteLine(stdErr.GetString());
+        }
+
+        [Fact]
+        public async Task Argument_values_can_only_be_bound_to_a_type_that_implements_IEnumerable_and_can_be_converted_from_an_array()
+        {
+            // Arrange
+            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
+
+            var application = new CliApplicationBuilder()
+                .AddCommand<UnsupportedArgumentTypesCommand>()
+                .UseConsole(console)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(new[]
+            {
+                "cmd", "--custom-enumerable"
             });
 
             // Assert

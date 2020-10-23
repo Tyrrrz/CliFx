@@ -275,11 +275,8 @@ namespace CliFx.Analyzers
         private static void CheckCommandType(SymbolAnalysisContext context)
         {
             // Named type: MyCommand
-            if (!(context.Symbol is INamedTypeSymbol namedTypeSymbol))
-                return;
-
-            // Only classes
-            if (namedTypeSymbol.TypeKind != TypeKind.Class)
+            if (!(context.Symbol is INamedTypeSymbol namedTypeSymbol) ||
+                namedTypeSymbol.TypeKind != TypeKind.Class)
                 return;
 
             // Implements ICommand?

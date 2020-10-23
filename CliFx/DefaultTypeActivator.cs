@@ -1,5 +1,6 @@
 ﻿using System;
 using CliFx.Exceptions;
+using CliFx.Internal.Extensions;
 
 namespace CliFx
 {
@@ -13,7 +14,7 @@ namespace CliFx
         {
             try
             {
-                return Activator.CreateInstance(type);
+                return type.CreateInstance();
             }
             catch (Exception ex)
             {

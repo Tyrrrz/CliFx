@@ -8,7 +8,9 @@ namespace CliFx.Internal.Extensions
 {
     internal static class TypeExtensions
     {
-        public static T CreateInstance<T>(this Type type) => (T) Activator.CreateInstance(type);
+        public static object CreateInstance(this Type type) => Activator.CreateInstance(type);
+
+        public static T CreateInstance<T>(this Type type) => (T) type.CreateInstance();
 
         public static bool Implements(this Type type, Type interfaceType) => type.GetInterfaces().Contains(interfaceType);
 

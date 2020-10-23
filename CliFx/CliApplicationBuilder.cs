@@ -165,9 +165,9 @@ namespace CliFx
         /// </summary>
         public CliApplication Build()
         {
-            _title ??= TryGetDefaultTitle() ?? "App";
-            _executableName ??= TryGetDefaultExecutableName() ?? "app";
-            _versionText ??= TryGetDefaultVersionText() ?? "v1.0";
+            _title ??= GetDefaultTitle();
+            _executableName ??= GetDefaultExecutableName();
+            _versionText ??= GetDefaultVersionText();
             _console ??= new SystemConsole();
             _typeActivator ??= new DefaultTypeActivator();
 
@@ -185,23 +185,29 @@ namespace CliFx
         // Entry assembly is null in tests
         private static Assembly? EntryAssembly => LazyEntryAssembly.Value;
 
-        private static string? TryGetDefaultTitle() => EntryAssembly?.GetName().Name;
+        private static string GetDefaultTitle() => EntryAssembly?.GetName().Name?? "App";
 
-        private static string? TryGetDefaultExecutableName()
+        private static string GetDefaultExecutableName()
         {
             var entryAssemblyLocation = EntryAssembly?.Location;
 
             // The assembly can be an executable or a dll, depending on how it was packaged
-            var isDll = string.Equals(Path.GetExtension(entryAssemblyLocation), ".dll", StringComparison.OrdinalIgnoreCase);
+            var isDll = string.Equals(
+                Path.GetExtension(entryAssemblyLocation),
+                ".dll",
+                StringComparison.OrdinalIgnoreCase
+            );
 
-            return isDll
+            var name = isDll
                 ? "dotnet " + Path.GetFileName(entryAssemblyLocation)
                 : Path.GetFileNameWithoutExtension(entryAssemblyLocation);
+
+            return name ?? "app";
         }
 
-        private static string? TryGetDefaultVersionText() =>
+        private static string GetDefaultVersionText() =>
             EntryAssembly != null
                 ? $"v{EntryAssembly.GetName().Version.ToSemanticString()}"
-                : null;
+                : "v1.0";
     }
 }
