@@ -65,7 +65,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Help_text_shows_usage_format_which_lists_available_sub_commands()
+        public async Task Help_text_shows_commands_list_with_description_and_usage_info()
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -78,14 +78,16 @@ namespace CliFx.Tests
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[] {"--help"});
+            var exitCode = await application.RunAsync(new[] { "--help" });
 
             // Assert
             exitCode.Should().Be(0);
             stdOut.GetString().Should().ContainAll(
-                "Usage",
-                "... named",
-                "... named sub"
+                "Commands",
+                "Named command description",
+                "named [options]",
+                "Named sub command description",
+                "named sub [options]"
             );
 
             _output.WriteLine(stdOut.GetString());
