@@ -302,14 +302,15 @@ namespace CliFx.Domain
                     : descendantCommand.Name!;
 
                 // Description
-                WriteHorizontalMargin();
+                
                 if (!string.IsNullOrWhiteSpace(descendantCommand.Description))
                 {
+                    WriteHorizontalMargin();
                     Write(descendantCommand.Description);
+                    WriteVerticalMargin();
                 }
 
                 // Name
-                WriteVerticalMargin();
                 WriteHorizontalMargin(4);
                 WriteCommandUsageLineItem(descendantCommand, false);
 
