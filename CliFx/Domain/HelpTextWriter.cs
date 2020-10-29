@@ -318,7 +318,6 @@ namespace CliFx.Domain
             }
 
             // Child command help tip
-            WriteVerticalMargin();
             Write("You can run `");
             Write(_metadata.ExecutableName);
 
