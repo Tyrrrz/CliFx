@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
@@ -24,8 +25,9 @@ namespace CliFx.Domain
             string? environmentVariableName,
             bool isRequired,
             string? description,
-            Type? converter = null)
-            : base(property, description, converter)
+            Type? converter = null,
+            Type[]? validators = null)
+            : base(property, description, converter, validators)
         {
             Name = name;
             ShortName = shortName;
@@ -99,7 +101,8 @@ namespace CliFx.Domain
                 attribute.EnvironmentVariableName,
                 attribute.IsRequired,
                 attribute.Description,
-                attribute.Converter
+                attribute.Converter,
+                attribute.Validators
             );
         }
     }

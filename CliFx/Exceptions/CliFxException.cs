@@ -389,5 +389,13 @@ Unrecognized options provided:
 
             return new CliFxException(message.Trim());
         }
+
+        internal static CliFxException ValueValidationFailed(CommandArgumentSchema argument, IEnumerable<string> errors)
+        {
+            var message = $@"
+The validation of the provided value for {argument.Property!.Name} is failed because: {errors.JoinToString(Environment.NewLine)}";
+
+            return new CliFxException(message.Trim());
+        }
     }
 }

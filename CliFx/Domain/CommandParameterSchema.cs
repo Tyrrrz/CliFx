@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text;
@@ -12,8 +13,14 @@ namespace CliFx.Domain
 
         public string Name { get; }
 
-        public CommandParameterSchema(PropertyInfo? property, int order, string name, string? description, Type? converter = null)
-            : base(property, description, converter)
+        public CommandParameterSchema(
+            PropertyInfo? property,
+            int order,
+            string name,
+            string? description,
+            Type? converter = null,
+            Type[]? validators = null)
+            : base(property, description, converter, validators)
         {
             Order = order;
             Name = name;
@@ -52,7 +59,8 @@ namespace CliFx.Domain
                 attribute.Order,
                 name,
                 attribute.Description,
-                attribute.Converter
+                attribute.Converter,
+                attribute.Validators
             );
         }
     }
