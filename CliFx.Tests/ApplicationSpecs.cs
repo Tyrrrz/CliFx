@@ -253,6 +253,26 @@ namespace CliFx.Tests
         }
 
         [Fact]
+        public async Task Command_parameter_custom_validator_must_implement_the_corresponding_interface()
+        {
+            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
+
+            var application = new CliApplicationBuilder()
+                .AddCommand<InvalidCustomValidatorParameterCommand>()
+                .UseConsole(console)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(Array.Empty<string>());
+
+            // Assert
+            exitCode.Should().NotBe(0);
+            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
+
+            _output.WriteLine(stdErr.GetString());
+        }
+
+        [Fact]
         public async Task Command_options_must_have_names_that_are_not_empty()
         {
             var (console, _, stdErr) = VirtualConsole.CreateBuffered();
@@ -399,6 +419,26 @@ namespace CliFx.Tests
 
             var application = new CliApplicationBuilder()
                 .AddCommand<InvalidCustomConverterOptionCommand>()
+                .UseConsole(console)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(Array.Empty<string>());
+
+            // Assert
+            exitCode.Should().NotBe(0);
+            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
+
+            _output.WriteLine(stdErr.GetString());
+        }
+
+        [Fact]
+        public async Task Command_option_custom_validator_must_implement_the_corresponding_interface()
+        {
+            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
+
+            var application = new CliApplicationBuilder()
+                .AddCommand<InvalidCustomValidatorOptionCommand>()
                 .UseConsole(console)
                 .Build();
 
