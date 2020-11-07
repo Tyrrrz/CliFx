@@ -148,6 +148,30 @@ public class MyCommand : ICommand
             yield return new object[]
             {
                 new AnalyzerTestCase(
+                    "Parameter with valid converter",
+                    Analyzer.SupportedDiagnostics,
+
+                    // language=cs
+                    @"
+public class MyConverter : IArgumentValueConverter
+{
+    public object ConvertFrom(string value) => value;
+}
+
+[Command]
+public class MyCommand : ICommand
+{
+    [CommandParameter(0, Converter = typeof(MyConverter))]
+    public string Param { get; set; }
+    
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}"
+                )
+            };
+
+            yield return new object[]
+            {
+                new AnalyzerTestCase(
                     "Option with a proper name",
                     Analyzer.SupportedDiagnostics,
 
@@ -157,7 +181,7 @@ public class MyCommand : ICommand
 public class MyCommand : ICommand
 {
     [CommandOption(""foo"")]
-    public string Param { get; set; }
+    public string Option { get; set; }
 
     public ValueTask ExecuteAsync(IConsole console) => default;
 }"
@@ -176,7 +200,7 @@ public class MyCommand : ICommand
 public class MyCommand : ICommand
 {
     [CommandOption(""foo"", 'f')]
-    public string Param { get; set; }
+    public string Option { get; set; }
 
     public ValueTask ExecuteAsync(IConsole console) => default;
 }"
@@ -195,10 +219,10 @@ public class MyCommand : ICommand
 public class MyCommand : ICommand
 {
     [CommandOption(""foo"")]
-    public string ParamA { get; set; }
+    public string OptionA { get; set; }
     
     [CommandOption(""bar"")]
-    public string ParamB { get; set; }
+    public string OptionB { get; set; }
 
     public ValueTask ExecuteAsync(IConsole console) => default;
 }"
@@ -217,10 +241,10 @@ public class MyCommand : ICommand
 public class MyCommand : ICommand
 {
     [CommandOption('f')]
-    public string ParamA { get; set; }
+    public string OptionA { get; set; }
     
     [CommandOption('x')]
-    public string ParamB { get; set; }
+    public string OptionB { get; set; }
 
     public ValueTask ExecuteAsync(IConsole console) => default;
 }"
@@ -239,11 +263,35 @@ public class MyCommand : ICommand
 public class MyCommand : ICommand
 {
     [CommandOption('a', EnvironmentVariableName = ""env_var_a"")]
-    public string ParamA { get; set; }
+    public string OptionA { get; set; }
     
     [CommandOption('b', EnvironmentVariableName = ""env_var_b"")]
-    public string ParamB { get; set; }
+    public string OptionB { get; set; }
 
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}"
+                )
+            };
+
+            yield return new object[]
+            {
+                new AnalyzerTestCase(
+                    "Option with valid converter",
+                    Analyzer.SupportedDiagnostics,
+
+                    // language=cs
+                    @"
+public class MyConverter : IArgumentValueConverter
+{
+    public object ConvertFrom(string value) => value;
+}
+
+[Command]
+public class MyCommand : ICommand
+{
+    [CommandOption('o', Converter = typeof(MyConverter))]
+    public string Option { get; set; }
+    
     public ValueTask ExecuteAsync(IConsole console) => default;
 }"
                 )
@@ -374,6 +422,30 @@ public class MyCommand : ICommand
             yield return new object[]
             {
                 new AnalyzerTestCase(
+                    "Parameter with invalid converter",
+                    DiagnosticDescriptors.CliFx0025,
+
+                    // language=cs
+                    @"
+public class MyConverter
+{
+    public object ConvertFrom(string value) => value;
+}
+
+[Command]
+public class MyCommand : ICommand
+{
+    [CommandParameter(0, Converter = typeof(MyConverter))]
+    public string Param { get; set; }
+    
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}"
+                )
+            };
+
+            yield return new object[]
+            {
+                new AnalyzerTestCase(
                     "Option with an empty name",
                     DiagnosticDescriptors.CliFx0041,
 
@@ -383,7 +455,7 @@ public class MyCommand : ICommand
 public class MyCommand : ICommand
 {
     [CommandOption("""")]
-    public string Param { get; set; }
+    public string Option { get; set; }
 
     public ValueTask ExecuteAsync(IConsole console) => default;
 }"
@@ -402,7 +474,7 @@ public class MyCommand : ICommand
 public class MyCommand : ICommand
 {
     [CommandOption(""a"")]
-    public string Param { get; set; }
+    public string Option { get; set; }
 
     public ValueTask ExecuteAsync(IConsole console) => default;
 }"
@@ -421,10 +493,10 @@ public class MyCommand : ICommand
 public class MyCommand : ICommand
 {
     [CommandOption(""foo"")]
-    public string ParamA { get; set; }
+    public string OptionA { get; set; }
     
     [CommandOption(""foo"")]
-    public string ParamB { get; set; }
+    public string OptionB { get; set; }
 
     public ValueTask ExecuteAsync(IConsole console) => default;
 }"
@@ -443,10 +515,10 @@ public class MyCommand : ICommand
 public class MyCommand : ICommand
 {
     [CommandOption('f')]
-    public string ParamA { get; set; }
+    public string OptionA { get; set; }
     
     [CommandOption('f')]
-    public string ParamB { get; set; }
+    public string OptionB { get; set; }
 
     public ValueTask ExecuteAsync(IConsole console) => default;
 }"
@@ -465,11 +537,35 @@ public class MyCommand : ICommand
 public class MyCommand : ICommand
 {
     [CommandOption('a', EnvironmentVariableName = ""env_var"")]
-    public string ParamA { get; set; }
+    public string OptionA { get; set; }
     
     [CommandOption('b', EnvironmentVariableName = ""env_var"")]
-    public string ParamB { get; set; }
+    public string OptionB { get; set; }
 
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}"
+                )
+            };
+
+            yield return new object[]
+            {
+                new AnalyzerTestCase(
+                    "Option with invalid converter",
+                    DiagnosticDescriptors.CliFx0046,
+
+                    // language=cs
+                    @"
+public class MyConverter
+{
+    public object ConvertFrom(string value) => value;
+}
+
+[Command]
+public class MyCommand : ICommand
+{
+    [CommandOption('o', Converter = typeof(MyConverter))]
+    public string Option { get; set; }
+    
     public ValueTask ExecuteAsync(IConsole console) => default;
 }"
                 )

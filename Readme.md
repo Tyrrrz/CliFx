@@ -6,6 +6,8 @@
 [![Downloads](https://img.shields.io/nuget/dt/CliFx.svg)](https://nuget.org/packages/CliFx)
 [![Donate](https://img.shields.io/badge/donate-$$$-purple.svg)](https://tyrrrz.me/donate)
 
+**Project status: active**.
+
 CliFx is a simple to use, yet powerful framework for building command line applications. Its primary goal is to completely take over the user input layer, letting you forget about the infrastructure and instead focus on writing your application. This framework uses a declarative class-first approach for defining commands, avoiding excessive boilerplate code and complex configurations.
 
 ## Download
@@ -249,6 +251,7 @@ Parameters and options can have different underlying types:
 - String-initializable types
   - Types with a constructor that accepts a single `string` parameter (`FileInfo`, `DirectoryInfo`, etc.)
   - Types with a static method `Parse` that accepts a single `string` parameter (and optionally `IFormatProvider`)
+- Any other type if a custom converter is specified
 - Nullable versions of all above types (`decimal?`, `TimeSpan?`, etc.)
 - Collections of all above types
   - Array types (`T[]`)
@@ -257,7 +260,58 @@ Parameters and options can have different underlying types:
 
 When defining a parameter of an enumerable type, keep in mind that it has to be the only such parameter and it must be the last in order. Options, on the other hand, don't have this limitation.
 
-Example command with an array-backed parameter:
+- Example command with a custom converter:
+
+```c#
+// Maps 2D vectors from AxB notation
+public class VectorConverter : IArgumentValueConverter
+{
+    public object ConvertFrom(string value)
+    {
+        var components = value.Split('x', 'X', ';');
+        var x = int.Parse(components[0], CultureInfo.InvariantCulture);
+        var y = int.Parse(components[1], CultureInfo.InvariantCulture);
+        return new Vector2(x, y);
+    }
+}
+
+[Command]
+public class SurfaceCalculatorCommand : ICommand
+{
+    // Custom converter is used to map raw argument values
+    [CommandParameter(0, Converter = typeof(VectorConverter))]
+    public Vector2 PointA { get; set; }
+
+    [CommandParameter(1, Converter = typeof(VectorConverter))]
+    public Vector2 PointB { get; set; }
+
+    [CommandParameter(2, Converter = typeof(VectorConverter))]
+    public Vector2 PointC { get; set; }
+
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        var a = (PointB - PointA).Length();
+        var b = (PointC - PointB).Length();
+        var c = (PointA - PointC).Length();
+
+        // Heron's formula
+        var p = (a + b + c) / 2;
+        var surface = Math.Sqrt(p * (p - a) * (p - b) * (p - c));
+
+        console.Output.WriteLine($"Triangle surface area: {surface}");
+
+        return default;
+    }
+}
+```
+
+```sh
+> myapp.exe 0x0 0x18 24x0
+
+Triangle surface area: 216
+```
+
+- Example command with an array-backed parameter:
 
 ```c#
 [Command]

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
+using CliFx.Internal;
 
 namespace CliFx
 {
@@ -85,7 +86,10 @@ namespace CliFx
         /// <summary>
         /// Sets console foreground color, executes specified action, and sets the color back to the original value.
         /// </summary>
-        public static void WithForegroundColor(this IConsole console, ConsoleColor foregroundColor, Action action)
+        public static void WithForegroundColor(
+            this IConsole console,
+            ConsoleColor foregroundColor,
+            Action action)
         {
             var lastColor = console.ForegroundColor;
             console.ForegroundColor = foregroundColor;
@@ -98,7 +102,10 @@ namespace CliFx
         /// <summary>
         /// Sets console background color, executes specified action, and sets the color back to the original value.
         /// </summary>
-        public static void WithBackgroundColor(this IConsole console, ConsoleColor backgroundColor, Action action)
+        public static void WithBackgroundColor(
+            this IConsole console,
+            ConsoleColor backgroundColor,
+            Action action)
         {
             var lastColor = console.BackgroundColor;
             console.BackgroundColor = backgroundColor;
@@ -111,7 +118,133 @@ namespace CliFx
         /// <summary>
         /// Sets console foreground and background colors, executes specified action, and sets the colors back to the original values.
         /// </summary>
-        public static void WithColors(this IConsole console, ConsoleColor foregroundColor, ConsoleColor backgroundColor, Action action) =>
+        public static void WithColors(
+            this IConsole console,
+            ConsoleColor foregroundColor,
+            ConsoleColor backgroundColor,
+            Action action) =>
             console.WithForegroundColor(foregroundColor, () => console.WithBackgroundColor(backgroundColor, action));
+
+        private static void WriteException(
+            this IConsole console,
+            Exception exception,
+            int indentLevel)
+        {
+            var exceptionType = exception.GetType();
+
+            var indentationShared = new string(' ', 4 * indentLevel);
+            var indentationLocal = new string(' ', 2);
+
+            // Fully qualified exception type
+            console.Error.Write(indentationShared);
+            console.WithForegroundColor(ConsoleColor.DarkGray, () =>
+                console.Error.Write(exceptionType.Namespace + ".")
+            );
+            console.WithForegroundColor(ConsoleColor.White, () =>
+                console.Error.Write(exceptionType.Name)
+            );
+            console.Error.Write(": ");
+
+            // Exception message
+            console.WithForegroundColor(ConsoleColor.Red, () => console.Error.WriteLine(exception.Message));
+
+            // Recurse into inner exceptions
+            if (exception.InnerException != null)
+            {
+                console.WriteException(exception.InnerException, indentLevel + 1);
+            }
+
+            // Try to parse and pretty-print the stack trace
+            try
+            {
+                foreach (var stackFrame in StackFrame.ParseMany(exception.StackTrace))
+                {
+                    console.Error.Write(indentationShared + indentationLocal);
+                    console.Error.Write("at ");
+
+                    // "CliFx.Demo.Commands.BookAddCommand."
+                    console.WithForegroundColor(ConsoleColor.DarkGray, () =>
+                        console.Error.Write(stackFrame.ParentType + ".")
+                    );
+
+                    // "ExecuteAsync"
+                    console.WithForegroundColor(ConsoleColor.Yellow, () =>
+                        console.Error.Write(stackFrame.MethodName)
+                    );
+
+                    console.Error.Write("(");
+
+                    for (var i = 0; i < stackFrame.Parameters.Count; i++)
+                    {
+                        var parameter = stackFrame.Parameters[i];
+
+                        // Separator
+                        if (i > 0)
+                        {
+                            console.Error.Write(", ");
+                        }
+
+                        // "IConsole"
+                        console.WithForegroundColor(ConsoleColor.Blue, () =>
+                            console.Error.Write(parameter.Type)
+                        );
+
+                        if (!string.IsNullOrWhiteSpace(parameter.Name))
+                        {
+                            console.Error.Write(" ");
+
+                            // "console"
+                            console.WithForegroundColor(ConsoleColor.White, () =>
+                                console.Error.Write(parameter.Name)
+                            );
+                        }
+                    }
+
+                    console.Error.Write(") ");
+
+                    // Location
+                    if (!string.IsNullOrWhiteSpace(stackFrame.FilePath))
+                    {
+                        console.Error.Write("in");
+                        console.Error.Write("\n" + indentationShared + indentationLocal + indentationLocal);
+
+                        // "E:\Projects\Softdev\CliFx\CliFx.Demo\Commands\"
+                        var stackFrameDirectoryPath = Path.GetDirectoryName(stackFrame.FilePath);
+                        console.WithForegroundColor(ConsoleColor.DarkGray, () =>
+                            console.Error.Write(stackFrameDirectoryPath + Path.DirectorySeparatorChar)
+                        );
+
+                        // "BookAddCommand.cs"
+                        var stackFrameFileName = Path.GetFileName(stackFrame.FilePath);
+                        console.WithForegroundColor(ConsoleColor.Yellow, () =>
+                            console.Error.Write(stackFrameFileName)
+                        );
+
+                        if (!string.IsNullOrWhiteSpace(stackFrame.LineNumber))
+                        {
+                            console.Error.Write(":");
+
+                            // "35"
+                            console.WithForegroundColor(ConsoleColor.Blue, () =>
+                                console.Error.Write(stackFrame.LineNumber)
+                            );
+                        }
+                    }
+
+                    console.Error.WriteLine();
+                }
+            }
+            // If any point of parsing has failed - print the stack trace without any formatting
+            catch
+            {
+                console.Error.WriteLine(exception.StackTrace);
+            }
+        }
+
+        //Should this be public?
+        internal static void WriteException(
+            this IConsole console,
+            Exception exception) =>
+            console.WriteException(exception, 0);
     }
 }

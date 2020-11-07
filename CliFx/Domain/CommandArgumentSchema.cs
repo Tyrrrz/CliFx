@@ -17,61 +17,70 @@ namespace CliFx.Domain
 
         public bool IsScalar => TryGetEnumerableArgumentUnderlyingType() == null;
 
-        protected Type? Converter { get; set; }
+        public Type? ConverterType { get; }
 
         private readonly Type[]? _validators;
 
-        protected CommandArgumentSchema(PropertyInfo? property, string? description, Type? converter = null, Type[]? validators = null)
+        protected CommandArgumentSchema(PropertyInfo? property, string? description, Type? converterType = null, Type[]? validators = null)
         {
             Property = property;
             Description = description;
-            Converter = converter;
+            ConverterType = converterType;
 
             _validators = validators;
         }
 
         private Type? TryGetEnumerableArgumentUnderlyingType() =>
             Property != null && Property.PropertyType != typeof(string)
-                ? Property.PropertyType.GetEnumerableUnderlyingType()
+                ? Property.PropertyType.TryGetEnumerableUnderlyingType()
                 : null;
 
         private object? ConvertScalar(string? value, Type targetType)
         {
             try
             {
-                // Primitive
+                // Custom conversion (always takes highest priority)
+                if (ConverterType != null)
+                    return ConverterType.CreateInstance<IArgumentValueConverter>().ConvertFrom(value!);
+
+                // No conversion necessary
+                if (targetType == typeof(object) || targetType == typeof(string))
+                    return value;
+
+                // Bool conversion (special case)
+                if (targetType == typeof(bool))
+                    return string.IsNullOrWhiteSpace(value) || bool.Parse(value);
+
+                // Primitive conversion
                 var primitiveConverter = PrimitiveConverters.GetValueOrDefault(targetType);
-                if (primitiveConverter != null)
+                if (primitiveConverter != null && !string.IsNullOrWhiteSpace(value))
                     return primitiveConverter(value);
 
-                // Enum
-                if (targetType.IsEnum)
+                // Enum conversion
+                if (targetType.IsEnum && !string.IsNullOrWhiteSpace(value))
                     return Enum.Parse(targetType, value, true);
 
-                // Nullable
-                var nullableUnderlyingType = targetType.GetNullableUnderlyingType();
+                // Nullable<T> conversion
+                var nullableUnderlyingType = targetType.TryGetNullableUnderlyingType();
                 if (nullableUnderlyingType != null)
                     return !string.IsNullOrWhiteSpace(value)
                         ? ConvertScalar(value, nullableUnderlyingType)
                         : null;
 
-                // String-constructible
+                // String-constructible conversion
                 var stringConstructor = targetType.GetConstructor(new[] {typeof(string)});
                 if (stringConstructor != null)
                     return stringConstructor.Invoke(new object[] {value!});
 
-                // String-parseable (with format provider)
-                var parseMethodWithFormatProvider = targetType.GetStaticParseMethod(true);
+                // String-parseable conversion (with format provider)
+                var parseMethodWithFormatProvider = targetType.TryGetStaticParseMethod(true);
                 if (parseMethodWithFormatProvider != null)
                     return parseMethodWithFormatProvider.Invoke(null, new object[] {value!, FormatProvider});
 
-                // String-parseable (without format provider)
-                var parseMethod = targetType.GetStaticParseMethod();
+                // String-parseable conversion (without format provider)
+                var parseMethod = targetType.TryGetStaticParseMethod();
                 if (parseMethod != null)
                     return parseMethod.Invoke(null, new object[] {value!});
-
-                if (Converter != null)
-                    return Converter.InstanceOf<IArgumentValueConverter>().ConvertFrom(value!);
             }
             catch (Exception ex)
             {
@@ -81,7 +90,10 @@ namespace CliFx.Domain
             throw CliFxException.CannotConvertToType(this, value, targetType);
         }
 
-        private object ConvertNonScalar(IReadOnlyList<string> values, Type targetEnumerableType, Type targetElementType)
+        private object ConvertNonScalar(
+            IReadOnlyList<string> values,
+            Type targetEnumerableType,
+            Type targetElementType)
         {
             var array = values
                 .Select(v => ConvertScalar(v, targetElementType))
@@ -143,7 +155,7 @@ namespace CliFx.Domain
                 return Array.Empty<string>();
 
             var underlyingType =
-                Property.PropertyType.GetNullableUnderlyingType() ??
+                Property.PropertyType.TryGetNullableUnderlyingType() ??
                 Property.PropertyType;
 
             // Enum
@@ -177,12 +189,9 @@ namespace CliFx.Domain
     {
         private static readonly IFormatProvider FormatProvider = CultureInfo.InvariantCulture;
 
-        private static readonly IReadOnlyDictionary<Type, Func<string?, object?>> PrimitiveConverters =
-            new Dictionary<Type, Func<string?, object?>>
+        private static readonly IReadOnlyDictionary<Type, Func<string, object?>> PrimitiveConverters =
+            new Dictionary<Type, Func<string, object?>>
             {
-                [typeof(object)] = v => v,
-                [typeof(string)] = v => v,
-                [typeof(bool)] = v => string.IsNullOrWhiteSpace(v) || bool.Parse(v),
                 [typeof(char)] = v => v.Single(),
                 [typeof(sbyte)] = v => sbyte.Parse(v, FormatProvider),
                 [typeof(byte)] = v => byte.Parse(v, FormatProvider),

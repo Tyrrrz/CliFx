@@ -105,7 +105,57 @@ namespace CliFx.Domain
             WriteLine();
         }
 
-        private void WriteCommandUsage(CommandSchema command, IReadOnlyList<CommandSchema> childCommands)
+        private void WriteCommandUsageLineItem(CommandSchema command, bool showChildCommandsPlaceholder)
+        {
+            // Command name
+            if (!string.IsNullOrWhiteSpace(command.Name))
+            {
+                Write(ConsoleColor.Cyan, command.Name);
+                Write(' ');
+            }
+
+            // Child command placeholder
+            if (showChildCommandsPlaceholder)
+            {
+                Write(ConsoleColor.Cyan, "[command]");
+                Write(' ');
+            }
+
+            // Parameters
+            foreach (var parameter in command.Parameters)
+            {
+                Write(parameter.IsScalar
+                    ? $"<{parameter.Name}>"
+                    : $"<{parameter.Name}...>"
+                );
+                Write(' ');
+            }
+
+            // Required options
+            foreach (var option in command.Options.Where(o => o.IsRequired))
+            {
+                Write(ConsoleColor.White, !string.IsNullOrWhiteSpace(option.Name)
+                    ? $"--{option.Name}"
+                    : $"-{option.ShortName}"
+                );
+                Write(' ');
+
+                Write(option.IsScalar
+                    ? "<value>"
+                    : "<values...>"
+                );
+                Write(' ');
+            }
+
+            // Options placeholder
+            Write(ConsoleColor.White, "[options]");
+
+            WriteLine();
+        }
+
+        private void WriteCommandUsage(
+            CommandSchema command,
+            IReadOnlyList<CommandSchema> childCommands)
         {
             if (!IsEmpty)
                 WriteVerticalMargin();
@@ -115,52 +165,10 @@ namespace CliFx.Domain
             // Exe name
             WriteHorizontalMargin();
             Write(_metadata.ExecutableName);
-
-            // Command name
-            if (!string.IsNullOrWhiteSpace(command.Name))
-            {
-                Write(' ');
-                Write(ConsoleColor.Cyan, command.Name);
-            }
-
-            // Child command placeholder
-            if (childCommands.Any())
-            {
-                Write(' ');
-                Write(ConsoleColor.Cyan, "[command]");
-            }
-
-            // Parameters
-            foreach (var parameter in command.Parameters)
-            {
-                Write(' ');
-                Write(parameter.IsScalar
-                    ? $"<{parameter.Name}>"
-                    : $"<{parameter.Name}...>"
-                );
-            }
-
-            // Required options
-            foreach (var option in command.Options.Where(o => o.IsRequired))
-            {
-                Write(' ');
-                Write(ConsoleColor.White, !string.IsNullOrWhiteSpace(option.Name)
-                    ? $"--{option.Name}"
-                    : $"-{option.ShortName}"
-                );
-
-                Write(' ');
-                Write(option.IsScalar
-                    ? "<value>"
-                    : "<values...>"
-                );
-            }
-
-            // Options placeholder
             Write(' ');
-            Write(ConsoleColor.White, "[options]");
 
-            WriteLine();
+            // Current command usage
+            WriteCommandUsageLineItem(command, childCommands.Any());
         }
 
         private void WriteCommandParameters(CommandSchema command)
@@ -264,7 +272,7 @@ namespace CliFx.Domain
                 if (!option.IsRequired)
                 {
                     var defaultValue = argumentDefaultValues.GetValueOrDefault(option);
-                    var defaultValueFormatted = FormatDefaultValue(defaultValue);
+                    var defaultValueFormatted = TryFormatDefaultValue(defaultValue);
                     if (defaultValueFormatted != null)
                     {
                         Write($"Default: {defaultValueFormatted}.");
@@ -277,9 +285,9 @@ namespace CliFx.Domain
 
         private void WriteCommandChildren(
             CommandSchema command,
-            IReadOnlyList<CommandSchema> childCommands)
+            IReadOnlyList<CommandSchema> descendantCommands)
         {
-            if (!childCommands.Any())
+            if (!descendantCommands.Any())
                 return;
 
             if (!IsEmpty)
@@ -287,28 +295,29 @@ namespace CliFx.Domain
 
             WriteHeader("Commands");
 
-            foreach (var childCommand in childCommands)
+            foreach (var descendantCommand in descendantCommands)
             {
                 var relativeCommandName = !string.IsNullOrWhiteSpace(command.Name)
-                    ? childCommand.Name!.Substring(command.Name.Length).Trim()
-                    : childCommand.Name!;
-
-                // Name
-                WriteHorizontalMargin();
-                Write(ConsoleColor.Cyan, relativeCommandName);
+                    ? descendantCommand.Name!.Substring(command.Name.Length).Trim()
+                    : descendantCommand.Name!;
 
                 // Description
-                if (!string.IsNullOrWhiteSpace(childCommand.Description))
+                
+                if (!string.IsNullOrWhiteSpace(descendantCommand.Description))
                 {
-                    WriteColumnMargin();
-                    Write(childCommand.Description);
+                    WriteHorizontalMargin();
+                    Write(descendantCommand.Description);
+                    WriteVerticalMargin();
                 }
+
+                // Name
+                WriteHorizontalMargin(4);
+                WriteCommandUsageLineItem(descendantCommand, false);
 
                 WriteLine();
             }
 
             // Child command help tip
-            WriteVerticalMargin();
             Write("You can run `");
             Write(_metadata.ExecutableName);
 
@@ -334,7 +343,8 @@ namespace CliFx.Domain
             CommandSchema command,
             IReadOnlyDictionary<CommandArgumentSchema, object?> defaultValues)
         {
-            var childCommands = root.GetChildCommands(command.Name);
+            var commandName = command.Name;
+            var descendantCommands = root.GetDescendantCommands(commandName);
 
             _console.ResetColor();
 
@@ -342,10 +352,10 @@ namespace CliFx.Domain
                 WriteApplicationInfo();
 
             WriteCommandDescription(command);
-            WriteCommandUsage(command, childCommands);
+            WriteCommandUsage(command, descendantCommands);
             WriteCommandParameters(command);
             WriteCommandOptions(command, defaultValues);
-            WriteCommandChildren(command, childCommands);
+            WriteCommandChildren(command, descendantCommands);
         }
     }
 
@@ -354,7 +364,7 @@ namespace CliFx.Domain
         private static string FormatValidValues(IReadOnlyList<string> values) =>
             values.Select(v => v.Quote()).JoinToString(", ");
 
-        private static string? FormatDefaultValue(object? defaultValue)
+        private static string? TryFormatDefaultValue(object? defaultValue)
         {
             if (defaultValue == null)
                 return null;
@@ -362,7 +372,7 @@ namespace CliFx.Domain
             // Enumerable
             if (!(defaultValue is string) && defaultValue is IEnumerable defaultValues)
             {
-                var elementType = defaultValues.GetType().GetEnumerableUnderlyingType() ?? typeof(object);
+                var elementType = defaultValues.GetType().TryGetEnumerableUnderlyingType() ?? typeof(object);
 
                 // If the ToString() method is not overriden, the default value can't be formatted nicely
                 if (!elementType.IsToStringOverriden())

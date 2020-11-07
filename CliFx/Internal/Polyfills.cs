@@ -17,6 +17,9 @@ namespace System
 
         public static bool EndsWith(this string str, char c) =>
             str.Length > 0 && str[str.Length - 1] == c;
+
+        public static string[] Split(this string str, char separator, StringSplitOptions splitOptions) =>
+            str.Split(new[] {separator}, splitOptions);
     }
 }
 
@@ -31,7 +34,7 @@ namespace System.Collections.Generic
         }
 
         public static TValue GetValueOrDefault<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dic, TKey key) =>
-            dic.TryGetValue(key, out var result) ? result! : default!;
+            dic.TryGetValue(key!, out var result) ? result! : default!;
     }
 }
 

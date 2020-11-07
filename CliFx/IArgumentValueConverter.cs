@@ -1,7 +1,7 @@
 ﻿namespace CliFx
 {
     /// <summary>
-    /// Used as an interface for implementing custom parameter/option converters.
+    /// Implements custom conversion logic that maps an argument value to a domain type.
     /// </summary>
     public interface IArgumentValueConverter
     {

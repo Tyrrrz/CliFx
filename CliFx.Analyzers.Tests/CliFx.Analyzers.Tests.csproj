@@ -12,7 +12,7 @@
 
   <ItemGroup>
     <PackageReference Include="Gu.Roslyn.Asserts" Version="3.3.1" />
-    <PackageReference Include="GitHubActionsTestLogger" Version="1.1.1" />
+    <PackageReference Include="GitHubActionsTestLogger" Version="1.1.2" />
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.4.0" />

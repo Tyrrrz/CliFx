@@ -28,7 +28,11 @@
         /// <summary>
         /// Initializes an instance of <see cref="ApplicationMetadata"/>.
         /// </summary>
-        public ApplicationMetadata(string title, string executableName, string versionText, string? description)
+        public ApplicationMetadata(
+            string title,
+            string executableName,
+            string versionText,
+            string? description)
         {
             Title = title;
             ExecutableName = executableName;

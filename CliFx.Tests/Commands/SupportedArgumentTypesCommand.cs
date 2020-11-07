@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using CliFx.Attributes;
 using Newtonsoft.Json;
 
@@ -84,6 +84,9 @@ namespace CliFx.Tests.Commands
         [CommandOption("str-parseable-format")]
         public CustomStringParseableWithFormatProvider? StringParseableWithFormatProvider { get; set; }
 
+        [CommandOption("convertible", Converter = typeof(CustomConvertibleConverter))]
+        public CustomConvertible? Convertible { get; set; }
+
         [CommandOption("obj-array")]
         public object[]? ObjectArray { get; set; }
 
@@ -101,6 +104,9 @@ namespace CliFx.Tests.Commands
 
         [CommandOption("str-constructible-array")]
         public CustomStringConstructible[]? StringConstructibleArray { get; set; }
+
+        [CommandOption("convertible-array", Converter = typeof(CustomConvertibleConverter))]
+        public CustomConvertible[]? ConvertibleArray { get; set; }
 
         [CommandOption("str-enumerable")]
         public IEnumerable<string>? StringEnumerable { get; set; }
@@ -150,6 +156,19 @@ namespace CliFx.Tests.Commands
 
             public static CustomStringParseableWithFormatProvider Parse(string value, IFormatProvider formatProvider) =>
                 new CustomStringParseableWithFormatProvider(value + " " + formatProvider);
+        }
+
+        public class CustomConvertible
+        {
+            public int Value { get; }
+
+            public CustomConvertible(int value) => Value = value;
+        }
+
+        public class CustomConvertibleConverter : IArgumentValueConverter
+        {
+            public object ConvertFrom(string value) =>
+                new CustomConvertible(int.Parse(value, CultureInfo.InvariantCulture));
         }
     }
 }
