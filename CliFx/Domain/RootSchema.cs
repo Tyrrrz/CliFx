@@ -126,6 +126,18 @@ namespace CliFx.Domain
                     invalidConverterParameters
                 );
             }
+
+            var invalidValidatorParameters = command.Parameters
+                .Where(p => p.ValidatorTypes != null && !p.ValidatorTypes.All(x => x.Implements(typeof(IArgumentValueValidator))))
+                .ToArray();
+
+            if (invalidValidatorParameters.Any())
+            {
+                throw CliFxException.ParametersWithInvalidValidators(
+                    command,
+                    invalidValidatorParameters
+                );
+            }
         }
 
         private static void ValidateOptions(CommandSchema command)
@@ -206,6 +218,18 @@ namespace CliFx.Domain
                 throw CliFxException.OptionsWithInvalidConverters(
                     command,
                     invalidConverterOptions
+                );
+            }
+
+            var invalidValidatorOptions = command.Options
+                .Where(o => o.ValidatorTypes != null && !o.ValidatorTypes.All(x => x.Implements(typeof(IArgumentValueValidator))))
+                .ToArray();
+
+            if (invalidValidatorOptions.Any())
+            {
+                throw CliFxException.OptionsWithInvalidValidators(
+                    command,
+                    invalidValidatorOptions
                 );
             }
         }

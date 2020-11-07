@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text;
@@ -19,8 +18,8 @@ namespace CliFx.Domain
             string name,
             string? description,
             Type? converterType = null,
-            Type[]? validators = null)
-            : base(property, description, converterType, validators)
+            Type[]? validatorTypes = null)
+            : base(property, description, converterType, validatorTypes)
         {
             Order = order;
             Name = name;

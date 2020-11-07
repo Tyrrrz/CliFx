@@ -185,6 +185,19 @@ Specified converter must implement {typeof(IArgumentValueConverter).FullName}.";
             return new CliFxException(message.Trim());
         }
 
+        internal static CliFxException ParametersWithInvalidValidators(
+            CommandSchema command,
+            IReadOnlyList<CommandParameterSchema> invalidParameters)
+        {
+            var message = $@"
+Command '{command.Type.FullName}' is invalid because it contains {invalidParameters.Count} parameter(s) with invalid value validators:
+{invalidParameters.JoinToString(Environment.NewLine)}
+
+Specified validator(s) must inherit from {typeof(ArgumentValueValidator<>).FullName}.";
+
+            return new CliFxException(message.Trim());
+        }
+
         internal static CliFxException OptionsWithNoName(
             CommandSchema command,
             IReadOnlyList<CommandOptionSchema> invalidOptions)
@@ -266,6 +279,19 @@ Command '{command.Type.FullName}' is invalid because it contains {invalidOptions
 {invalidOptions.JoinToString(Environment.NewLine)}
 
 Specified converter must implement {typeof(IArgumentValueConverter).FullName}.";
+
+            return new CliFxException(message.Trim());
+        }
+
+        internal static CliFxException OptionsWithInvalidValidators(
+            CommandSchema command,
+            IReadOnlyList<CommandOptionSchema> invalidOptions)
+        {
+            var message = $@"
+Command '{command.Type.FullName}' is invalid because it contains {invalidOptions.Count} option(s) with invalid validators:
+{invalidOptions.JoinToString(Environment.NewLine)}
+
+Specified validators must inherit from {typeof(IArgumentValueValidator).FullName}.";
 
             return new CliFxException(message.Trim());
         }

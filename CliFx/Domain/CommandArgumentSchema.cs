@@ -19,7 +19,7 @@ namespace CliFx.Domain
 
         public Type? ConverterType { get; }
 
-        private readonly Type[]? _validators;
+        public readonly Type[]? ValidatorTypes;
 
         protected CommandArgumentSchema(PropertyInfo? property, string? description, Type? converterType = null, Type[]? validators = null)
         {
@@ -27,7 +27,7 @@ namespace CliFx.Domain
             Description = description;
             ConverterType = converterType;
 
-            _validators = validators;
+            ValidatorTypes = validators;
         }
 
         private Type? TryGetEnumerableArgumentUnderlyingType() =>
@@ -140,7 +140,7 @@ namespace CliFx.Domain
         {
             var value = Convert(values);
 
-            if (_validators.NotEmpty())
+            if (ValidatorTypes.NotEmpty())
                 Validate(value);
 
             Property?.SetValue(command, value);
@@ -171,9 +171,9 @@ namespace CliFx.Domain
                 return;
 
             var failed = new List<ValidationResult>();
-            foreach (var validator in _validators!)
+            foreach (var validator in ValidatorTypes!)
             {
-                var result = validator.InstanceOf<IArgumentValueValidator>().Validate(value!);
+                var result = validator.CreateInstance<IArgumentValueValidator>().Validate(value!);
                 if (result.IsValid)
                     continue;
 

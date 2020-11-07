@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
@@ -26,8 +25,8 @@ namespace CliFx.Domain
             bool isRequired,
             string? description,
             Type? converterType = null,
-            Type[]? validators = null)
-            : base(property, description, converterType, validators)
+            Type[]? validatorTypes = null)
+            : base(property, description, converterType, validatorTypes)
         {
             Name = name;
             ShortName = shortName;
@@ -110,9 +109,9 @@ namespace CliFx.Domain
     internal partial class CommandOptionSchema
     {
         public static CommandOptionSchema HelpOption { get; } =
-            new CommandOptionSchema(null, "help", 'h', null, false, "Shows help text.", null);
+            new CommandOptionSchema(null, "help", 'h', null, false, "Shows help text.", converterType: null, validatorTypes: null);
 
         public static CommandOptionSchema VersionOption { get; } =
-            new CommandOptionSchema(null, "version", null, null, false, "Shows version information.", null);
+            new CommandOptionSchema(null, "version", null, null, false, "Shows version information.", converterType: null, validatorTypes: null);
     }
 }
