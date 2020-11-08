@@ -26,7 +26,6 @@ namespace CliFx.Domain
             Property = property;
             Description = description;
             ConverterType = converterType;
-
             ValidatorTypes = validators;
         }
 
