@@ -33,6 +33,11 @@ namespace CliFx.Attributes
         public Type? Converter { get; set; }
 
         /// <summary>
+        /// Type of a converter to use for the option value evaluating.
+        /// </summary>
+        public Type[]? Validators { get; set; }
+
+        /// <summary>
         /// Initializes an instance of <see cref="CommandParameterAttribute"/>.
         /// </summary>
         public CommandParameterAttribute(int order)

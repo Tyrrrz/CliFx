@@ -17,8 +17,9 @@ namespace CliFx.Domain
             int order,
             string name,
             string? description,
-            Type? converterType)
-            : base(property, description, converterType)
+            Type? converterType = null,
+            Type[]? validatorTypes = null)
+            : base(property, description, converterType, validatorTypes)
         {
             Order = order;
             Name = name;
@@ -57,7 +58,8 @@ namespace CliFx.Domain
                 attribute.Order,
                 name,
                 attribute.Description,
-                attribute.Converter
+                attribute.Converter,
+                attribute.Validators
             );
         }
     }

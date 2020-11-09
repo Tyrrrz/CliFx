@@ -19,11 +19,14 @@ namespace CliFx.Domain
 
         public Type? ConverterType { get; }
 
-        protected CommandArgumentSchema(PropertyInfo? property, string? description, Type? converterType)
+        public readonly Type[]? ValidatorTypes;
+
+        protected CommandArgumentSchema(PropertyInfo? property, string? description, Type? converterType = null, Type[]? validators = null)
         {
             Property = property;
             Description = description;
             ConverterType = converterType;
+            ValidatorTypes = validators;
         }
 
         private Type? TryGetEnumerableArgumentUnderlyingType() =>
@@ -132,8 +135,15 @@ namespace CliFx.Domain
             }
         }
 
-        public void BindOn(ICommand command, IReadOnlyList<string> values) =>
-            Property?.SetValue(command, Convert(values));
+        public void BindOn(ICommand command, IReadOnlyList<string> values)
+        {
+            var value = Convert(values);
+
+            if (ValidatorTypes.NotEmpty())
+                Validate(value);
+
+            Property?.SetValue(command, value);
+        }
 
         public void BindOn(ICommand command, params string[] values) =>
             BindOn(command, (IReadOnlyList<string>) values);
@@ -152,6 +162,25 @@ namespace CliFx.Domain
                 return Enum.GetNames(underlyingType);
 
             return Array.Empty<string>();
+        }
+
+        private void Validate(object? value)
+        {
+            if (value is null)
+                return;
+
+            var failed = new List<ValidationResult>();
+            foreach (var validator in ValidatorTypes!)
+            {
+                var result = validator.CreateInstance<IArgumentValueValidator>().Validate(value!);
+                if (result.IsValid)
+                    continue;
+
+                failed.Add(result);
+            }
+
+            if (failed.NotEmpty())
+                throw CliFxException.ValueValidationFailed(this, failed.Select(x => x.ErrorMessage!));
         }
     }
 

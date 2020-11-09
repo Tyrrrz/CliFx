@@ -24,8 +24,9 @@ namespace CliFx.Domain
             string? environmentVariableName,
             bool isRequired,
             string? description,
-            Type? converterType)
-            : base(property, description, converterType)
+            Type? converterType = null,
+            Type[]? validatorTypes = null)
+            : base(property, description, converterType, validatorTypes)
         {
             Name = name;
             ShortName = shortName;
@@ -99,7 +100,8 @@ namespace CliFx.Domain
                 attribute.EnvironmentVariableName,
                 attribute.IsRequired,
                 attribute.Description,
-                attribute.Converter
+                attribute.Converter,
+                attribute.Validators
             );
         }
     }
@@ -107,9 +109,9 @@ namespace CliFx.Domain
     internal partial class CommandOptionSchema
     {
         public static CommandOptionSchema HelpOption { get; } =
-            new CommandOptionSchema(null, "help", 'h', null, false, "Shows help text.", null);
+            new CommandOptionSchema(null, "help", 'h', null, false, "Shows help text.", converterType: null, validatorTypes: null);
 
         public static CommandOptionSchema VersionOption { get; } =
-            new CommandOptionSchema(null, "version", null, null, false, "Shows version information.", null);
+            new CommandOptionSchema(null, "version", null, null, false, "Shows version information.", converterType: null, validatorTypes: null);
     }
 }
