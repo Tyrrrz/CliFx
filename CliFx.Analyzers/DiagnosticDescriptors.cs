@@ -53,6 +53,13 @@ namespace CliFx.Analyzers
                 "Usage", DiagnosticSeverity.Error, true
             );
 
+        public static readonly DiagnosticDescriptor CliFx0026 =
+            new DiagnosticDescriptor(nameof(CliFx0026),
+                "Parameter validator must implement 'CliFx.ArgumentValueValidator<T>'",
+                "Parameter validator must implement 'CliFx.ArgumentValueValidator<T>'",
+                "Usage", DiagnosticSeverity.Error, true
+            );
+
         public static readonly DiagnosticDescriptor CliFx0041 =
             new DiagnosticDescriptor(nameof(CliFx0041),
                 "Option must have a name or short name specified",
@@ -92,6 +99,13 @@ namespace CliFx.Analyzers
             new DiagnosticDescriptor(nameof(CliFx0046),
                 "Option converter must implement 'CliFx.IArgumentValueConverter'",
                 "Option converter must implement 'CliFx.IArgumentValueConverter'",
+                "Usage", DiagnosticSeverity.Error, true
+            );
+
+        public static readonly DiagnosticDescriptor CliFx0047 =
+            new DiagnosticDescriptor(nameof(CliFx0047),
+                "Option validator must implement 'CliFx.ArgumentValueValidator<T>'",
+                "Option validator must implement 'CliFx.ArgumentValueValidator<T>'",
                 "Usage", DiagnosticSeverity.Error, true
             );
 

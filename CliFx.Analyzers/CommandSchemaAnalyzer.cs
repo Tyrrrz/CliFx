@@ -18,12 +18,14 @@ namespace CliFx.Analyzers
             DiagnosticDescriptors.CliFx0023,
             DiagnosticDescriptors.CliFx0024,
             DiagnosticDescriptors.CliFx0025,
+            DiagnosticDescriptors.CliFx0026,
             DiagnosticDescriptors.CliFx0041,
             DiagnosticDescriptors.CliFx0042,
             DiagnosticDescriptors.CliFx0043,
             DiagnosticDescriptors.CliFx0044,
             DiagnosticDescriptors.CliFx0045,
-            DiagnosticDescriptors.CliFx0046
+            DiagnosticDescriptors.CliFx0046,
+            DiagnosticDescriptors.CliFx0047
         );
 
         private static bool IsScalarType(ITypeSymbol typeSymbol) =>
@@ -57,14 +59,24 @@ namespace CliFx.Analyzers
                         .NamedArguments
                         .Where(a => a.Key == "Converter")
                         .Select(a => a.Value.Value)
-                        .FirstOrDefault() as ITypeSymbol;
+                        .Cast<ITypeSymbol?>()
+                        .FirstOrDefault();
+
+                    var validators = attribute
+                        .NamedArguments
+                        .Where(a => a.Key == "Validators")
+                        .SelectMany(a => a.Value.Values)
+                        .Select(c => c.Value)
+                        .Cast<ITypeSymbol>()
+                        .ToArray();
 
                     return new
                     {
                         Property = p,
                         Order = order,
                         Name = name,
-                        Converter = converter
+                        Converter = converter,
+                        Validators = validators
                     };
                 })
                 .ToArray();
@@ -140,6 +152,18 @@ namespace CliFx.Analyzers
                     DiagnosticDescriptors.CliFx0025, parameter.Property.Locations.First()
                 ));
             }
+
+            // Invalid validators
+            var invalidValidatorsParameters = parameters
+                .Where(p => !p.Validators.All(v => v.AllInterfaces.Any(KnownSymbols.IsArgumentValueValidatorInterface)))
+                .ToArray();
+
+            foreach (var parameter in invalidValidatorsParameters)
+            {
+                context.ReportDiagnostic(Diagnostic.Create(
+                    DiagnosticDescriptors.CliFx0026, parameter.Property.Locations.First()
+                ));
+            }
         }
 
         private static void CheckCommandOptionProperties(
@@ -175,7 +199,16 @@ namespace CliFx.Analyzers
                         .NamedArguments
                         .Where(a => a.Key == "Converter")
                         .Select(a => a.Value.Value)
-                        .FirstOrDefault() as ITypeSymbol;
+                        .Cast<ITypeSymbol>()
+                        .FirstOrDefault();
+
+                    var validators = attribute
+                        .NamedArguments
+                        .Where(a => a.Key == "Validators")
+                        .SelectMany(a => a.Value.Values)
+                        .Select(c => c.Value)
+                        .Cast<ITypeSymbol>()
+                        .ToArray();
 
                     return new
                     {
@@ -183,7 +216,8 @@ namespace CliFx.Analyzers
                         Name = name,
                         ShortName = shortName,
                         EnvironmentVariableName = envVarName,
-                        Converter = converter
+                        Converter = converter,
+                        Validators = validators
                     };
                 })
                 .ToArray();
@@ -268,6 +302,18 @@ namespace CliFx.Analyzers
             {
                 context.ReportDiagnostic(Diagnostic.Create(
                     DiagnosticDescriptors.CliFx0046, option.Property.Locations.First()
+                ));
+            }
+
+            // Invalid validators
+            var invalidValidatorsOptions = options
+                .Where(p => !p.Validators.All(v => v.AllInterfaces.Any(KnownSymbols.IsArgumentValueValidatorInterface)))
+                .ToArray();
+
+            foreach (var option in invalidValidatorsOptions)
+            {
+                context.ReportDiagnostic(Diagnostic.Create(
+                    DiagnosticDescriptors.CliFx0047, option.Property.Locations.First()
                 ));
             }
         }

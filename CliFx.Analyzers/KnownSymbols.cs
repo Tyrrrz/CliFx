@@ -28,6 +28,9 @@ namespace CliFx.Analyzers
         public static bool IsArgumentValueConverterInterface(ISymbol symbol) =>
             symbol.DisplayNameMatches("CliFx.IArgumentValueConverter");
 
+        public static bool IsArgumentValueValidatorInterface(ISymbol symbol) =>
+            symbol.DisplayNameMatches("CliFx.IArgumentValueValidator");
+
         public static bool IsCommandAttribute(ISymbol symbol) =>
             symbol.DisplayNameMatches("CliFx.Attributes.CommandAttribute");
 

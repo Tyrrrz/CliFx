@@ -172,6 +172,30 @@ public class MyCommand : ICommand
             yield return new object[]
             {
                 new AnalyzerTestCase(
+                    "Parameter with valid validator",
+                    Analyzer.SupportedDiagnostics,
+
+                    // language=cs
+                    @"
+public class MyValidator : ArgumentValueValidator<string>
+{
+    public ValidationResult Validate(string value) => ValidationResult.Ok();
+}
+
+[Command]
+public class MyCommand : ICommand
+{
+    [CommandParameter(0, Validators = new[] {typeof(MyValidator)})]
+    public string Param { get; set; }
+    
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}"
+                )
+            };
+
+            yield return new object[]
+            {
+                new AnalyzerTestCase(
                     "Option with a proper name",
                     Analyzer.SupportedDiagnostics,
 
@@ -290,6 +314,30 @@ public class MyConverter : IArgumentValueConverter
 public class MyCommand : ICommand
 {
     [CommandOption('o', Converter = typeof(MyConverter))]
+    public string Option { get; set; }
+    
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}"
+                )
+            };
+
+            yield return new object[]
+            {
+                new AnalyzerTestCase(
+                    "Option with valid validator",
+                    Analyzer.SupportedDiagnostics,
+
+                    // language=cs
+                    @"
+public class MyValidator : ArgumentValueValidator<string>
+{
+    public ValidationResult Validate(string value) => ValidationResult.Ok();
+}
+
+[Command]
+public class MyCommand : ICommand
+{
+    [CommandOption('o', Validators = new[] {typeof(MyValidator)})]
     public string Option { get; set; }
     
     public ValueTask ExecuteAsync(IConsole console) => default;
@@ -446,6 +494,30 @@ public class MyCommand : ICommand
             yield return new object[]
             {
                 new AnalyzerTestCase(
+                    "Parameter with invalid validator",
+                    DiagnosticDescriptors.CliFx0026,
+
+                    // language=cs
+                    @"
+public class MyValidator
+{
+    public ValidationResult Validate(string value) => ValidationResult.Ok();
+}
+
+[Command]
+public class MyCommand : ICommand
+{
+    [CommandParameter(0, Validators = new[] {typeof(MyValidator)})]
+    public string Param { get; set; }
+    
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}"
+                )
+            };
+
+            yield return new object[]
+            {
+                new AnalyzerTestCase(
                     "Option with an empty name",
                     DiagnosticDescriptors.CliFx0041,
 
@@ -564,6 +636,30 @@ public class MyConverter
 public class MyCommand : ICommand
 {
     [CommandOption('o', Converter = typeof(MyConverter))]
+    public string Option { get; set; }
+    
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}"
+                )
+            };
+
+            yield return new object[]
+            {
+                new AnalyzerTestCase(
+                    "Option with invalid validator",
+                    DiagnosticDescriptors.CliFx0047,
+
+                    // language=cs
+                    @"
+public class MyValidator
+{
+    public ValidationResult Validate(string value) => ValidationResult.Ok();
+}
+
+[Command]
+public class MyCommand : ICommand
+{
+    [CommandOption('o', Validators = new[] {typeof(MyValidator)})]
     public string Option { get; set; }
     
     public ValueTask ExecuteAsync(IConsole console) => default;
