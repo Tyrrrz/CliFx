@@ -15,7 +15,7 @@ namespace CliFx.Attributes
 
         /// <summary>
         /// Type of converter to use when mapping the argument value.
-        /// Converter must implement <see cref="IArgumentValueConverter"/>.
+        /// Converter must derive from <see cref="ArgumentValueConverter{T}"/>.
         /// </summary>
         public Type? Converter { get; set; }
 

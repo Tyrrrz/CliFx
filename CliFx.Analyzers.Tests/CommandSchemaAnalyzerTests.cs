@@ -153,9 +153,9 @@ public class MyCommand : ICommand
 
                     // language=cs
                     @"
-public class MyConverter : IArgumentValueConverter
+public class MyConverter : ArgumentValueConverter<string>
 {
-    public object ConvertFrom(string value) => value;
+    public string ConvertFrom(string value) => value;
 }
 
 [Command]
@@ -305,9 +305,9 @@ public class MyCommand : ICommand
 
                     // language=cs
                     @"
-public class MyConverter : IArgumentValueConverter
+public class MyConverter : ArgumentValueConverter<string>
 {
-    public object ConvertFrom(string value) => value;
+    public string ConvertFrom(string value) => value;
 }
 
 [Command]

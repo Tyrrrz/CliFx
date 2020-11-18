@@ -165,9 +165,9 @@ namespace CliFx.Tests.Commands
             public CustomConvertible(int value) => Value = value;
         }
 
-        public class CustomConvertibleConverter : IArgumentValueConverter
+        public class CustomConvertibleConverter : ArgumentValueConverter<CustomConvertible>
         {
-            public object ConvertFrom(string value) =>
+            public override CustomConvertible ConvertFrom(string value) =>
                 new CustomConvertible(int.Parse(value, CultureInfo.InvariantCulture));
         }
     }

@@ -181,7 +181,7 @@ If it's not feasible to fit into these constraints, consider using options inste
 Command '{command.Type.FullName}' is invalid because it contains {invalidParameters.Count} parameter(s) with invalid converters:
 {invalidParameters.JoinToString(Environment.NewLine)}
 
-Specified converter must implement {typeof(IArgumentValueConverter).FullName}.";
+Specified converter must implement {typeof(ArgumentValueConverter<>).FullName}.";
 
             return new CliFxException(message.Trim());
         }
@@ -279,7 +279,7 @@ Environment variable names are not case-sensitive.";
 Command '{command.Type.FullName}' is invalid because it contains {invalidOptions.Count} option(s) with invalid converters:
 {invalidOptions.JoinToString(Environment.NewLine)}
 
-Specified converter must implement {typeof(IArgumentValueConverter).FullName}.";
+Specified converter must implement {typeof(ArgumentValueConverter<>).FullName}.";
 
             return new CliFxException(message.Trim());
         }
@@ -292,7 +292,7 @@ Specified converter must implement {typeof(IArgumentValueConverter).FullName}.";
 Command '{command.Type.FullName}' is invalid because it contains {invalidOptions.Count} option(s) with invalid validators:
 {invalidOptions.JoinToString(Environment.NewLine)}
 
-Specified validators must inherit from {typeof(IArgumentValueValidator).FullName}.";
+Specified validators must inherit from {typeof(ArgumentValueValidator<>).FullName}.";
 
             return new CliFxException(message.Trim());
         }
