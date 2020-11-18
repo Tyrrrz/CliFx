@@ -28,7 +28,7 @@ namespace CliFx.Demo
         public static async Task<int> Main() =>
             await new CliApplicationBuilder()
                 .AddCommandsFromThisAssembly()
-                .UseTypeActivator(GetServiceProvider().GetService)
+                .UseTypeActivator(GetServiceProvider().GetRequiredService)
                 .Build()
                 .RunAsync();
     }

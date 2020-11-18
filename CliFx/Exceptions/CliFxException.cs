@@ -36,7 +36,8 @@ namespace CliFx.Exceptions
     {
         internal static CliFxException DefaultActivatorFailed(Type type, Exception? innerException = null)
         {
-            var configureActivatorMethodName = $"{nameof(CliApplicationBuilder)}.{nameof(CliApplicationBuilder.UseTypeActivator)}(...)";
+            var configureActivatorMethodName =
+                $"{nameof(CliApplicationBuilder)}.{nameof(CliApplicationBuilder.UseTypeActivator)}(...)";
 
             var message = $@"
 Failed to create an instance of type '{type.FullName}'.
@@ -193,7 +194,7 @@ Specified converter must implement {typeof(IArgumentValueConverter).FullName}.";
 Command '{command.Type.FullName}' is invalid because it contains {invalidParameters.Count} parameter(s) with invalid value validators:
 {invalidParameters.JoinToString(Environment.NewLine)}
 
-Specified validator(s) must inherit from {typeof(ArgumentValueValidator<>).FullName}.";
+Specified validators must inherit from {typeof(ArgumentValueValidator<>).FullName}.";
 
             return new CliFxException(message.Trim());
         }
@@ -424,7 +425,8 @@ Missing values for one or more required options:
             return new CliFxException(message.Trim());
         }
 
-        internal static CliFxException UnrecognizedParametersProvided(IReadOnlyList<CommandParameterInput> parameterInputs)
+        internal static CliFxException UnrecognizedParametersProvided(
+            IReadOnlyList<CommandParameterInput> parameterInputs)
         {
             var message = $@"
 Unrecognized parameters provided:
@@ -442,12 +444,35 @@ Unrecognized options provided:
             return new CliFxException(message.Trim());
         }
 
-        internal static CliFxException ValueValidationFailed(CommandArgumentSchema argument, IEnumerable<string> errors)
+        internal static CliFxException ValidationFailed(
+            CommandParameterSchema parameter,
+            IReadOnlyList<ValidationResult> failedResults)
         {
             var message = $@"
-The validation of the provided value for {argument.Property!.Name} is failed because: {errors.JoinToString(Environment.NewLine)}";
+Value provided for parameter {parameter.GetUserFacingDisplayString()}:
+{failedResults.Select(r => r.ErrorMessage).JoinToString(Environment.NewLine)}";
 
             return new CliFxException(message.Trim());
         }
+
+        internal static CliFxException ValidationFailed(
+            CommandOptionSchema option,
+            IReadOnlyList<ValidationResult> failedResults)
+        {
+            var message = $@"
+Value provided for option {option.GetUserFacingDisplayString()}:
+{failedResults.Select(r => r.ErrorMessage).JoinToString(Environment.NewLine)}";
+
+            return new CliFxException(message.Trim());
+        }
+
+        internal static CliFxException ValidationFailed(
+            CommandArgumentSchema argument,
+            IReadOnlyList<ValidationResult> failedResults) => argument switch
+        {
+            CommandParameterSchema parameter => ValidationFailed(parameter, failedResults),
+            CommandOptionSchema option => ValidationFailed(option, failedResults),
+            _ => throw new ArgumentOutOfRangeException(nameof(argument))
+        };
     }
 }

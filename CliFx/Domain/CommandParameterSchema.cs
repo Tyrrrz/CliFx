@@ -17,8 +17,8 @@ namespace CliFx.Domain
             int order,
             string name,
             string? description,
-            Type? converterType = null,
-            Type[]? validatorTypes = null)
+            Type? converterType,
+            Type[] validatorTypes)
             : base(property, description, converterType, validatorTypes)
         {
             Order = order;

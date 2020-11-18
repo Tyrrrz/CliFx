@@ -6,7 +6,7 @@ namespace CliFx.Attributes
     /// Annotates a property that defines a command parameter.
     /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
-    public class CommandParameterAttribute : Attribute
+    public class CommandParameterAttribute : CommandArgumentAttribute
     {
         /// <summary>
         /// Order of this parameter compared to other parameters.
@@ -20,22 +20,6 @@ namespace CliFx.Attributes
         /// If this isn't specified, property name is used instead.
         /// </summary>
         public string? Name { get; set; }
-
-        /// <summary>
-        /// Parameter description, which is used in help text.
-        /// </summary>
-        public string? Description { get; set; }
-
-        /// <summary>
-        /// Type of converter to use when mapping the argument value.
-        /// Converter must implement <see cref="IArgumentValueConverter"/>.
-        /// </summary>
-        public Type? Converter { get; set; }
-
-        /// <summary>
-        /// Type of a converter to use for the option value evaluating.
-        /// </summary>
-        public Type[]? Validators { get; set; }
 
         /// <summary>
         /// Initializes an instance of <see cref="CommandParameterAttribute"/>.

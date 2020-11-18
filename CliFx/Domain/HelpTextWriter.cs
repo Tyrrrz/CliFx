@@ -283,7 +283,7 @@ namespace CliFx.Domain
             }
         }
 
-        private void WriteCommandChildren(
+        private void WriteCommandDescendants(
             CommandSchema command,
             IReadOnlyList<CommandSchema> descendantCommands)
         {
@@ -297,12 +297,7 @@ namespace CliFx.Domain
 
             foreach (var descendantCommand in descendantCommands)
             {
-                var relativeCommandName = !string.IsNullOrWhiteSpace(command.Name)
-                    ? descendantCommand.Name!.Substring(command.Name.Length).Trim()
-                    : descendantCommand.Name!;
-
                 // Description
-                
                 if (!string.IsNullOrWhiteSpace(descendantCommand.Description))
                 {
                     WriteHorizontalMargin();
@@ -310,7 +305,7 @@ namespace CliFx.Domain
                     WriteVerticalMargin();
                 }
 
-                // Name
+                // Usage
                 WriteHorizontalMargin(4);
                 WriteCommandUsageLineItem(descendantCommand, false);
 
@@ -355,7 +350,7 @@ namespace CliFx.Domain
             WriteCommandUsage(command, descendantCommands);
             WriteCommandParameters(command);
             WriteCommandOptions(command, defaultValues);
-            WriteCommandChildren(command, descendantCommands);
+            WriteCommandDescendants(command, descendantCommands);
         }
     }
 

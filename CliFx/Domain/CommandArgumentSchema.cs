@@ -19,14 +19,18 @@ namespace CliFx.Domain
 
         public Type? ConverterType { get; }
 
-        public readonly Type[]? ValidatorTypes;
+        public Type[] ValidatorTypes { get; }
 
-        protected CommandArgumentSchema(PropertyInfo? property, string? description, Type? converterType = null, Type[]? validators = null)
+        protected CommandArgumentSchema(
+            PropertyInfo? property,
+            string? description,
+            Type? converterType,
+            Type[] validatorTypes)
         {
             Property = property;
             Description = description;
             ConverterType = converterType;
-            ValidatorTypes = validators;
+            ValidatorTypes = validatorTypes;
         }
 
         private Type? TryGetEnumerableArgumentUnderlyingType() =>
@@ -135,12 +139,28 @@ namespace CliFx.Domain
             }
         }
 
+        private void Validate(object? value)
+        {
+            if (value is null)
+                return;
+
+            var validators = ValidatorTypes
+                .Select(t => t.CreateInstance<IArgumentValueValidator>())
+                .ToArray();
+
+            var failedValidations = validators
+                .Select(v => v.Validate(value))
+                .Where(result => !result.IsValid)
+                .ToArray();
+
+            if (failedValidations.Any())
+                throw CliFxException.ValidationFailed(this, failedValidations);
+        }
+
         public void BindOn(ICommand command, IReadOnlyList<string> values)
         {
             var value = Convert(values);
-
-            if (ValidatorTypes.NotEmpty())
-                Validate(value);
+            Validate(value);
 
             Property?.SetValue(command, value);
         }
@@ -162,25 +182,6 @@ namespace CliFx.Domain
                 return Enum.GetNames(underlyingType);
 
             return Array.Empty<string>();
-        }
-
-        private void Validate(object? value)
-        {
-            if (value is null)
-                return;
-
-            var failed = new List<ValidationResult>();
-            foreach (var validator in ValidatorTypes!)
-            {
-                var result = validator.CreateInstance<IArgumentValueValidator>().Validate(value!);
-                if (result.IsValid)
-                    continue;
-
-                failed.Add(result);
-            }
-
-            if (failed.NotEmpty())
-                throw CliFxException.ValueValidationFailed(this, failed.Select(x => x.ErrorMessage!));
         }
     }
 

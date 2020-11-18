@@ -128,7 +128,7 @@ namespace CliFx.Domain
             }
 
             var invalidValidatorParameters = command.Parameters
-                .Where(p => p.ValidatorTypes != null && !p.ValidatorTypes.All(x => x.Implements(typeof(IArgumentValueValidator))))
+                .Where(p => !p.ValidatorTypes.All(x => x.Implements(typeof(IArgumentValueValidator))))
                 .ToArray();
 
             if (invalidValidatorParameters.Any())
@@ -222,7 +222,7 @@ namespace CliFx.Domain
             }
 
             var invalidValidatorOptions = command.Options
-                .Where(o => o.ValidatorTypes != null && !o.ValidatorTypes.All(x => x.Implements(typeof(IArgumentValueValidator))))
+                .Where(o => !o.ValidatorTypes.All(x => x.Implements(typeof(IArgumentValueValidator))))
                 .ToArray();
 
             if (invalidValidatorOptions.Any())

@@ -6,7 +6,7 @@ namespace CliFx.Attributes
     /// Annotates a property that defines a command option.
     /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
-    public class CommandOptionAttribute : Attribute
+    public class CommandOptionAttribute : CommandArgumentAttribute
     {
         /// <summary>
         /// Option name (must be longer than a single character).
@@ -28,25 +28,9 @@ namespace CliFx.Attributes
         public bool IsRequired { get; set; }
 
         /// <summary>
-        /// Option description, which is used in help text.
-        /// </summary>
-        public string? Description { get; set; }
-
-        /// <summary>
         /// Environment variable that will be used as fallback if no option value is specified.
         /// </summary>
         public string? EnvironmentVariableName { get; set; }
-
-        /// <summary>
-        /// Type of converter to use when mapping the argument value.
-        /// Converter must implement <see cref="IArgumentValueConverter"/>.
-        /// </summary>
-        public Type? Converter { get; set; }
-
-        /// <summary>
-        /// Type of a converter to use for the option value evaluating.
-        /// </summary>
-        public Type[]? Validators { get; set; }
 
         /// <summary>
         /// Initializes an instance of <see cref="CommandOptionAttribute"/>.
