@@ -161,7 +161,9 @@ namespace CliFx.Domain
                 var argument = commandLineArguments[index];
 
                 // Name
-                if (argument.StartsWith("--", StringComparison.Ordinal))
+                if (argument.StartsWith("--", StringComparison.Ordinal) &&
+                    argument.Length > 2 &&
+                    char.IsLetter(argument[2]))
                 {
                     // Flush previous
                     if (!string.IsNullOrWhiteSpace(currentOptionAlias))
@@ -171,7 +173,9 @@ namespace CliFx.Domain
                     currentOptionValues = new List<string>();
                 }
                 // Short name
-                else if (argument.StartsWith('-'))
+                else if (argument.StartsWith('-') &&
+                         argument.Length > 1 &&
+                         char.IsLetter(argument[1]))
                 {
                     foreach (var alias in argument.Substring(1))
                     {

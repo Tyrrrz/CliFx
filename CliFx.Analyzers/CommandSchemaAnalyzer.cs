@@ -7,6 +7,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace CliFx.Analyzers
 {
+    // TODO: split into multiple analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class CommandSchemaAnalyzer : DiagnosticAnalyzer
     {
@@ -25,7 +26,9 @@ namespace CliFx.Analyzers
             DiagnosticDescriptors.CliFx0044,
             DiagnosticDescriptors.CliFx0045,
             DiagnosticDescriptors.CliFx0046,
-            DiagnosticDescriptors.CliFx0047
+            DiagnosticDescriptors.CliFx0047,
+            DiagnosticDescriptors.CliFx0048,
+            DiagnosticDescriptors.CliFx0049
         );
 
         private static bool IsScalarType(ITypeSymbol typeSymbol) =>
@@ -307,13 +310,37 @@ namespace CliFx.Analyzers
 
             // Invalid validators
             var invalidValidatorsOptions = options
-                .Where(p => !p.Validators.All(v => v.AllInterfaces.Any(KnownSymbols.IsArgumentValueValidatorInterface)))
+                .Where(o => !o.Validators.All(v => v.AllInterfaces.Any(KnownSymbols.IsArgumentValueValidatorInterface)))
                 .ToArray();
 
             foreach (var option in invalidValidatorsOptions)
             {
                 context.ReportDiagnostic(Diagnostic.Create(
                     DiagnosticDescriptors.CliFx0047, option.Property.Locations.First()
+                ));
+            }
+
+            // Non-letter first character in name
+            var nonLetterFirstCharacterInNameOptions = options
+                .Where(o => !string.IsNullOrWhiteSpace(o.Name) && !char.IsLetter(o.Name[0]))
+                .ToArray();
+
+            foreach (var option in nonLetterFirstCharacterInNameOptions)
+            {
+                context.ReportDiagnostic(Diagnostic.Create(
+                    DiagnosticDescriptors.CliFx0048, option.Property.Locations.First()
+                ));
+            }
+
+            // Non-letter short name
+            var nonLetterShortNameOptions = options
+                .Where(o => o.ShortName != null && !char.IsLetter(o.ShortName.Value))
+                .ToArray();
+
+            foreach (var option in nonLetterShortNameOptions)
+            {
+                context.ReportDiagnostic(Diagnostic.Create(
+                    DiagnosticDescriptors.CliFx0049, option.Property.Locations.First()
                 ));
             }
         }

@@ -666,6 +666,44 @@ public class MyCommand : ICommand
 }"
                 )
             };
+
+            yield return new object[]
+            {
+                new AnalyzerTestCase(
+                    "Option with a name that doesn't start with a letter character",
+                    DiagnosticDescriptors.CliFx0048,
+
+                    // language=cs
+                    @"
+[Command]
+public class MyCommand : ICommand
+{
+    [CommandOption(""0foo"")]
+    public string Option { get; set; }
+
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}"
+                )
+            };
+
+            yield return new object[]
+            {
+                new AnalyzerTestCase(
+                    "Option with a short name that isn't a letter character",
+                    DiagnosticDescriptors.CliFx0049,
+
+                    // language=cs
+                    @"
+[Command]
+public class MyCommand : ICommand
+{
+    [CommandOption('0')]
+    public string Option { get; set; }
+
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}"
+                )
+            };
         }
 
         [Theory]

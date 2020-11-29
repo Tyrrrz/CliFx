@@ -109,6 +109,20 @@ namespace CliFx.Analyzers
                 "Usage", DiagnosticSeverity.Error, true
             );
 
+        public static readonly DiagnosticDescriptor CliFx0048 =
+            new DiagnosticDescriptor(nameof(CliFx0048),
+                "Option name must begin with a letter character.",
+                "Option name must begin with a letter character.",
+                "Usage", DiagnosticSeverity.Error, true
+            );
+
+        public static readonly DiagnosticDescriptor CliFx0049 =
+            new DiagnosticDescriptor(nameof(CliFx0049),
+                "Option short name must be a letter character.",
+                "Option short name must be a letter character.",
+                "Usage", DiagnosticSeverity.Error, true
+            );
+
         public static readonly DiagnosticDescriptor CliFx0100 =
             new DiagnosticDescriptor(nameof(CliFx0100),
                 "Use the provided IConsole abstraction instead of System.Console to ensure that the command can be tested in isolation",

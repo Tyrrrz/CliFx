@@ -232,6 +232,30 @@ namespace CliFx.Domain
                     invalidValidatorOptions
                 );
             }
+
+            var nonLetterFirstCharacterInNameOptions = command.Options
+                .Where(o => !string.IsNullOrWhiteSpace(o.Name) && !char.IsLetter(o.Name[0]))
+                .ToArray();
+
+            if (nonLetterFirstCharacterInNameOptions.Any())
+            {
+                throw CliFxException.OptionsWithNonLetterCharacterName(
+                    command,
+                    nonLetterFirstCharacterInNameOptions
+                );
+            }
+
+            var nonLetterShortNameOptions = command.Options
+                .Where(o => o.ShortName != null && !char.IsLetter(o.ShortName.Value))
+                .ToArray();
+
+            if (nonLetterShortNameOptions.Any())
+            {
+                throw CliFxException.OptionsWithNonLetterCharacterShortName(
+                    command,
+                    nonLetterShortNameOptions
+                );
+            }
         }
 
         private static void ValidateCommands(IReadOnlyList<CommandSchema> commands)

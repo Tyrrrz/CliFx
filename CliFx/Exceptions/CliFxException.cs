@@ -296,6 +296,32 @@ Specified validators must inherit from {typeof(ArgumentValueValidator<>).FullNam
 
             return new CliFxException(message.Trim());
         }
+
+        internal static CliFxException OptionsWithNonLetterCharacterName(
+            CommandSchema command,
+            IReadOnlyList<CommandOptionSchema> invalidOptions)
+        {
+            var message = $@"
+Command '{command.Type.FullName}' is invalid because it contains one or more options whose names don't start with a letter character:
+{invalidOptions.JoinToString(Environment.NewLine)}
+
+Option names must start with a letter character (i.e. not a digit and not a special character).";
+
+            return new CliFxException(message.Trim());
+        }
+
+        internal static CliFxException OptionsWithNonLetterCharacterShortName(
+            CommandSchema command,
+            IReadOnlyList<CommandOptionSchema> invalidOptions)
+        {
+            var message = $@"
+Command '{command.Type.FullName}' is invalid because it contains one or more options whose short names are not letter characters:
+{invalidOptions.JoinToString(Environment.NewLine)}
+
+Option short names must be letter characters (i.e. not digits and not special characters).";
+
+            return new CliFxException(message.Trim());
+        }
     }
 
     // End-user-facing exceptions

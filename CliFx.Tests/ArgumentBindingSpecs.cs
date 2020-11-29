@@ -192,6 +192,34 @@ namespace CliFx.Tests
         }
 
         [Fact]
+        public async Task Argument_that_begins_with_a_dash_is_not_parsed_as_option_name_if_it_does_not_start_with_a_letter_character()
+        {
+            // Arrange
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+
+            var application = new CliApplicationBuilder()
+                .AddCommand<SupportedArgumentTypesCommand>()
+                .UseConsole(console)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(new[]
+            {
+                "cmd", "--int", "-13"
+            });
+
+            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
+
+            // Assert
+            exitCode.Should().Be(0);
+
+            commandInstance.Should().BeEquivalentTo(new SupportedArgumentTypesCommand
+            {
+                Int = -13
+            });
+        }
+
+        [Fact]
         public async Task All_provided_option_arguments_must_be_bound_to_corresponding_properties()
         {
             // Arrange

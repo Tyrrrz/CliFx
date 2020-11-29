@@ -451,5 +451,45 @@ namespace CliFx.Tests
 
             _output.WriteLine(stdErr.GetString());
         }
+
+        [Fact]
+        public async Task Command_options_must_have_names_that_start_with_a_letter_character()
+        {
+            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
+
+            var application = new CliApplicationBuilder()
+                .AddCommand<NonLetterCharacterNameCommand>()
+                .UseConsole(console)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(Array.Empty<string>());
+
+            // Assert
+            exitCode.Should().NotBe(0);
+            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
+
+            _output.WriteLine(stdErr.GetString());
+        }
+
+        [Fact]
+        public async Task Command_options_must_have_short_names_that_are_letter_characters()
+        {
+            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
+
+            var application = new CliApplicationBuilder()
+                .AddCommand<NonLetterCharacterShortNameCommand>()
+                .UseConsole(console)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(Array.Empty<string>());
+
+            // Assert
+            exitCode.Should().NotBe(0);
+            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
+
+            _output.WriteLine(stdErr.GetString());
+        }
     }
 }
