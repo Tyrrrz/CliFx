@@ -169,6 +169,19 @@ namespace CliFx.Domain
 
             // Current command usage
             WriteCommandUsageLineItem(command, childCommands.Any());
+
+            // Sub commands usage
+            if (childCommands.Any())
+            {
+                WriteVerticalMargin();
+
+                foreach (var childCommand in childCommands)
+                {
+                    WriteHorizontalMargin();
+                    Write("... ");
+                    WriteCommandUsageLineItem(childCommand, false);
+                }
+            }
         }
 
         private void WriteCommandParameters(CommandSchema command)
@@ -283,11 +296,11 @@ namespace CliFx.Domain
             }
         }
 
-        private void WriteCommandDescendants(
+        private void WriteCommandChildren(
             CommandSchema command,
-            IReadOnlyList<CommandSchema> descendantCommands)
+            IReadOnlyList<CommandSchema> childCommands)
         {
-            if (!descendantCommands.Any())
+            if (!childCommands.Any())
                 return;
 
             if (!IsEmpty)
@@ -295,24 +308,28 @@ namespace CliFx.Domain
 
             WriteHeader("Commands");
 
-            foreach (var descendantCommand in descendantCommands)
+            foreach (var childCommand in childCommands)
             {
-                // Description
-                if (!string.IsNullOrWhiteSpace(descendantCommand.Description))
-                {
-                    WriteHorizontalMargin();
-                    Write(descendantCommand.Description);
-                    WriteVerticalMargin();
-                }
+                var relativeCommandName = !string.IsNullOrWhiteSpace(command.Name)
+                    ? childCommand.Name!.Substring(command.Name.Length).Trim()
+                    : childCommand.Name!;
 
-                // Usage
-                WriteHorizontalMargin(4);
-                WriteCommandUsageLineItem(descendantCommand, false);
+                // Name
+                WriteHorizontalMargin();
+                Write(ConsoleColor.Cyan, relativeCommandName);
+
+                // Description
+                if (!string.IsNullOrWhiteSpace(childCommand.Description))
+                {
+                    WriteColumnMargin();
+                    Write(childCommand.Description);
+                }
 
                 WriteLine();
             }
 
             // Child command help tip
+            WriteVerticalMargin();
             Write("You can run `");
             Write(_metadata.ExecutableName);
 
@@ -339,6 +356,7 @@ namespace CliFx.Domain
             IReadOnlyDictionary<CommandArgumentSchema, object?> defaultValues)
         {
             var commandName = command.Name;
+            var childCommands = root.GetChildCommands(commandName);
             var descendantCommands = root.GetDescendantCommands(commandName);
 
             _console.ResetColor();
@@ -350,7 +368,7 @@ namespace CliFx.Domain
             WriteCommandUsage(command, descendantCommands);
             WriteCommandParameters(command);
             WriteCommandOptions(command, defaultValues);
-            WriteCommandDescendants(command, descendantCommands);
+            WriteCommandChildren(command, childCommands);
         }
     }
 
