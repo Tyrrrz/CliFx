@@ -264,9 +264,9 @@ When defining a parameter of an enumerable type, keep in mind that it has to be 
 
 ```c#
 // Maps 2D vectors from AxB notation
-public class VectorConverter : IArgumentValueConverter
+public class VectorConverter : ArgumentValueConverter<Vector2>
 {
-    public object ConvertFrom(string value)
+    public override Vector2 ConvertFrom(string value)
     {
         var components = value.Split('x', 'X', ';');
         var x = int.Parse(components[0], CultureInfo.InvariantCulture);

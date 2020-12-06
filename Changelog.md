@@ -1,3 +1,9 @@
+### v1.6 (06-Dec-2020)
+
+- Added support for custom value validators. You can now create a type that inherits from `CliFx.ArgumentValueValidator<T>` to implement reusable validation logic for command arguments. To use a validator, include it in the `Validators` property on the `CommandOption` or `CommandParameter` attribute. (Thanks [@Oleksandr Shustov](https://github.com/AlexandrShustov))
+- Added `CliFx.ArgumentValueConverter<T>` class that you can inherit from to implement custom value converters. `CliFx.IArgumentValueConverter` interface is still available, but it is recommended to inherit from the generic class instead, due to the type safety it provides. The interface may become internal or get removed in one of the future major versions.
+- Updated requirements for option names and short names: short names now must be letter characters (lowercase or uppercase), while names must now start with a letter character. This means option names can no longer start with a digit or a special character. This change makes it possible to pass negative number values without the need to quote them, i.e. `--my-number -5`.
+
 ### v1.5 (23-Oct-2020)
 
 - Added pretty-printing for unhandled exceptions thrown from within the application. This makes the errors easier to parse visually and should help in troubleshooting. This change does not affect `CommandException`, as it already has special treatment. (Thanks [@Mårten Åsberg](https://github.com/89netraM))
