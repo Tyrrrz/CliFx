@@ -138,7 +138,16 @@ namespace CliFx.Domain
             {
                 var argument = commandLineArguments[index];
 
-                if (argument.StartsWith('-'))
+                var isOptionArgument =
+                    argument.StartsWith("--", StringComparison.OrdinalIgnoreCase) &&
+                    argument.Length > 2 &&
+                    char.IsLetter(argument[2]) ||
+                    argument.StartsWith('-') &&
+                    argument.Length > 1 &&
+                    char.IsLetter(argument[1]);
+
+                // Break on the first encountered option
+                if (isOptionArgument)
                     break;
 
                 result.Add(new CommandParameterInput(argument));
