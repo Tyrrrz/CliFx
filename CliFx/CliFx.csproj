@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="../CliFx.props" />
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.1;netstandard2.0</TargetFrameworks>
@@ -13,14 +12,8 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <DebugType>embedded</DebugType>
     <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);CopyAnalyzerToPackage</TargetsForTfmSpecificContentInPackage>
-  </PropertyGroup>
-
-  <!-- Disable nullability warnings on older frameworks because there is no nullability info for BCL -->
-  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-    <Nullable>annotations</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
