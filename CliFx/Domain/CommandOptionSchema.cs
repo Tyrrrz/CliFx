@@ -108,7 +108,7 @@ namespace CliFx.Domain
 
     internal partial class CommandOptionSchema
     {
-        public static CommandOptionSchema HelpOption { get; } = new CommandOptionSchema(
+        public static CommandOptionSchema HelpOption { get; } = new(
             null,
             "help",
             'h',
@@ -119,7 +119,7 @@ namespace CliFx.Domain
             Array.Empty<Type>()
         );
 
-        public static CommandOptionSchema VersionOption { get; } = new CommandOptionSchema(
+        public static CommandOptionSchema VersionOption { get; } = new(
             null,
             "version",
             null,

@@ -57,6 +57,6 @@ namespace CliFx.Utilities
         /// <summary>
         /// Creates a <see cref="ProgressTicker"/> bound to this console.
         /// </summary>
-        public static ProgressTicker CreateProgressTicker(this IConsole console) => new ProgressTicker(console);
+        public static ProgressTicker CreateProgressTicker(this IConsole console) => new(console);
     }
 }

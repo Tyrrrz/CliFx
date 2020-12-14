@@ -27,12 +27,12 @@
         /// <summary>
         /// Creates successful result, meaning that the validation has passed.
         /// </summary>
-        public static ValidationResult Ok() => new ValidationResult();
+        public static ValidationResult Ok() => new();
 
         /// <summary>
         /// Creates an error result, meaning that the validation has failed.
         /// </summary>
-        public static ValidationResult Error(string message) => new ValidationResult(message);
+        public static ValidationResult Error(string message) => new(message);
     }
 
     internal interface IArgumentValueValidator

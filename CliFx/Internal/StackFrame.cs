@@ -52,7 +52,7 @@ namespace CliFx.Internal
         private const string NotSpace = @"[^\x20\t]";
 
         // Taken from https://github.com/atifaziz/StackTraceParser
-        private static readonly Regex Pattern = new Regex(@"
+        private static readonly Regex Pattern = new(@"
             ^
             " + Space + @"*
             \w+ " + Space + @"+

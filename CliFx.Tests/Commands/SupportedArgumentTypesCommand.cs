@@ -144,7 +144,7 @@ namespace CliFx.Tests.Commands
             [JsonConstructor]
             private CustomStringParseable(string value) => Value = value;
 
-            public static CustomStringParseable Parse(string value) => new CustomStringParseable(value);
+            public static CustomStringParseable Parse(string value) => new(value);
         }
 
         public class CustomStringParseableWithFormatProvider
@@ -155,7 +155,7 @@ namespace CliFx.Tests.Commands
             private CustomStringParseableWithFormatProvider(string value) => Value = value;
 
             public static CustomStringParseableWithFormatProvider Parse(string value, IFormatProvider formatProvider) =>
-                new CustomStringParseableWithFormatProvider(value + " " + formatProvider);
+                new(value + " " + formatProvider);
         }
 
         public class CustomConvertible
@@ -168,7 +168,7 @@ namespace CliFx.Tests.Commands
         public class CustomConvertibleConverter : ArgumentValueConverter<CustomConvertible>
         {
             public override CustomConvertible ConvertFrom(string value) =>
-                new CustomConvertible(int.Parse(value, CultureInfo.InvariantCulture));
+                new(int.Parse(value, CultureInfo.InvariantCulture));
         }
     }
 }

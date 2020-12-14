@@ -13,7 +13,7 @@ namespace CliFx
     /// </summary>
     public partial class CliApplicationBuilder
     {
-        private readonly HashSet<Type> _commandTypes = new HashSet<Type>();
+        private readonly HashSet<Type> _commandTypes = new();
 
         private bool _isDebugModeAllowed = true;
         private bool _isPreviewModeAllowed = true;
@@ -180,7 +180,7 @@ namespace CliFx
 
     public partial class CliApplicationBuilder
     {
-        private static readonly Lazy<Assembly?> LazyEntryAssembly = new Lazy<Assembly?>(Assembly.GetEntryAssembly);
+        private static readonly Lazy<Assembly?> LazyEntryAssembly = new(Assembly.GetEntryAssembly);
 
         // Entry assembly is null in tests
         private static Assembly? EntryAssembly => LazyEntryAssembly.Value;

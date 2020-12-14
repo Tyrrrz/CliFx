@@ -11,7 +11,7 @@ namespace CliFx.Internal.Extensions
                 ? str
                 : null;
 
-        public static string Repeat(this char c, int count) => new string(c, count);
+        public static string Repeat(this char c, int count) => new(c, count);
 
         public static string AsString(this char c) => c.Repeat(1);
 

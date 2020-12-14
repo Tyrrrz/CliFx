@@ -47,9 +47,9 @@ namespace CliFx.Demo.Commands
 
     public partial class BookAddCommand
     {
-        private static readonly Random Random = new Random();
+        private static readonly Random Random = new();
 
-        private static DateTimeOffset CreateRandomDate() => new DateTimeOffset(
+        private static DateTimeOffset CreateRandomDate() => new(
             Random.Next(1800, 2020),
             Random.Next(1, 12),
             Random.Next(1, 28),
@@ -58,7 +58,7 @@ namespace CliFx.Demo.Commands
             Random.Next(1, 59),
             TimeSpan.Zero);
 
-        private static Isbn CreateRandomIsbn() => new Isbn(
+        private static Isbn CreateRandomIsbn() => new(
             Random.Next(0, 999),
             Random.Next(0, 99),
             Random.Next(0, 99999),

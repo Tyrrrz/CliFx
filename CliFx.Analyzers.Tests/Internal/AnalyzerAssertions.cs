@@ -102,6 +102,6 @@ Produced: {string.Join(", ", producedIds)}
 
     internal static class AnalyzerAssertionsExtensions
     {
-        public static AnalyzerAssertions Should(this DiagnosticAnalyzer analyzer) => new AnalyzerAssertions(analyzer);
+        public static AnalyzerAssertions Should(this DiagnosticAnalyzer analyzer) => new(analyzer);
     }
 }

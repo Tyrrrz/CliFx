@@ -243,7 +243,7 @@ namespace CliFx.Domain
 
     internal partial class CommandInput
     {
-        public static CommandInput Empty { get; } = new CommandInput(
+        public static CommandInput Empty { get; } = new(
             Array.Empty<CommandDirectiveInput>(),
             null,
             Array.Empty<CommandParameterInput>(),
