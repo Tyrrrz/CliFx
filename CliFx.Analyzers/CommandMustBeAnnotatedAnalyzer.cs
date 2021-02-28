@@ -8,12 +8,13 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace CliFx.Analyzers
 {
+    // TODO: merge with CommandMustImplementInterfaceAnalyzer?
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class CommandMustBeAnnotatedAnalyzer : DiagnosticAnalyzer
     {
         private static DiagnosticDescriptor DiagnosticDescriptor { get; } = new(
             "CliFx_CommandMustBeAnnotated",
-            "Command must be annotated with the Command attribute",
+            "Command must be annotated with `CommandAttribute`",
             "Type must be annotated with `CliFx.CommandAttribute` in order to be a valid command.",
             "CliFx", DiagnosticSeverity.Error, true
         );

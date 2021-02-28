@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Linq;
 using CliFx.Analyzers.ObjectModel;
 using Microsoft.CodeAnalysis;
@@ -10,17 +9,23 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace CliFx.Analyzers
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class ParameterNameMustBeUniqueAnalyzer : DiagnosticAnalyzer
+    public class ParameterMustBeSoleIfNonScalarAnalyzer : DiagnosticAnalyzer
     {
         private static DiagnosticDescriptor DiagnosticDescriptor { get; } = new(
-            "CliFx_ParameterNameMustBeUnique",
-            "Parameter name must be unique",
-            "Specified parameter name is not unique in the command.",
+            "CliFx_ParameterMustBeSoleIfNonScalar",
+            "Only one parameter per command can have non-scalar type",
+            "Specified parameter is not the only non-scalar parameter in the command.",
             "CliFx", DiagnosticSeverity.Error, true
         );
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
             ImmutableArray.Create(DiagnosticDescriptor);
+
+        private static bool IsScalar(ITypeSymbol type) =>
+            KnownSymbols.IsSystemString(type) ||
+            !type.AllInterfaces
+                .Select(i => i.ConstructedFrom)
+                .Any(KnownSymbols.IsSystemCollectionsGenericIEnumerable);
 
         private static void Analyze(SyntaxNodeAnalysisContext context)
         {
@@ -31,8 +36,10 @@ namespace CliFx.Analyzers
             if (property is null)
                 return;
 
-            var parameter = CommandParameterSymbol.TryResolve(property);
-            if (parameter is null)
+            if (!CommandParameterSymbol.IsParameterProperty(property))
+                return;
+
+            if (IsScalar(property.Type))
                 return;
 
             var otherProperties = property
@@ -44,11 +51,10 @@ namespace CliFx.Analyzers
 
             foreach (var otherProperty in otherProperties)
             {
-                var otherParameter = CommandParameterSymbol.TryResolve(otherProperty);
-                if (otherParameter is null)
+                if (!CommandParameterSymbol.IsParameterProperty(otherProperty))
                     continue;
 
-                if (string.Equals(parameter.Name, otherParameter.Name, StringComparison.OrdinalIgnoreCase))
+                if (!IsScalar(otherProperty.Type))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(
                         DiagnosticDescriptor,

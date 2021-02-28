@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Linq;
 using CliFx.Analyzers.ObjectModel;
 using Microsoft.CodeAnalysis;
@@ -10,12 +9,12 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace CliFx.Analyzers
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class ParameterNameMustBeUniqueAnalyzer : DiagnosticAnalyzer
+    public class ParameterConverterMustBeValidAnalyzer : DiagnosticAnalyzer
     {
         private static DiagnosticDescriptor DiagnosticDescriptor { get; } = new(
-            "CliFx_ParameterNameMustBeUnique",
-            "Parameter name must be unique",
-            "Specified parameter name is not unique in the command.",
+            "CliFx_ParameterConverterMustBeValid",
+            "Parameter converter type must implement `IArgumentValueConverter`",
+            "Type must implement `CliFx.IArgumentValueConverter` in order to be used as converter.",
             "CliFx", DiagnosticSeverity.Error, true
         );
 
@@ -35,26 +34,15 @@ namespace CliFx.Analyzers
             if (parameter is null)
                 return;
 
-            var otherProperties = property
-                .ContainingType
-                .GetMembers()
-                .OfType<IPropertySymbol>()
-                .Where(m => !m.Equals(property, SymbolEqualityComparer.Default))
-                .ToArray();
+            if (parameter.ConverterType is null)
+                return;
 
-            foreach (var otherProperty in otherProperties)
+            if (!parameter.ConverterType.AllInterfaces.Any(KnownSymbols.IsArgumentValueConverterInterface))
             {
-                var otherParameter = CommandParameterSymbol.TryResolve(otherProperty);
-                if (otherParameter is null)
-                    continue;
-
-                if (string.Equals(parameter.Name, otherParameter.Name, StringComparison.OrdinalIgnoreCase))
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(
-                        DiagnosticDescriptor,
-                        propertyDeclaration.GetLocation()
-                    ));
-                }
+                context.ReportDiagnostic(Diagnostic.Create(
+                    DiagnosticDescriptor,
+                    propertyDeclaration.GetLocation()
+                ));
             }
         }
 

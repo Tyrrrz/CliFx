@@ -13,8 +13,8 @@ namespace CliFx.Analyzers
     {
         private static DiagnosticDescriptor DiagnosticDescriptor { get; } = new(
             "CliFx_CommandMustImplementInterface",
-            "Command must implement the ICommand interface",
-            "Type must implement the `CliFx.ICommand` interface in order to be a valid command.",
+            "Command must implement `ICommand`",
+            "Type must implement `CliFx.ICommand` in order to be a valid command.",
             "CliFx", DiagnosticSeverity.Error, true
         );
 

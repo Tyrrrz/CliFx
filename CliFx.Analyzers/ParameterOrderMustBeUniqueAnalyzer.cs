@@ -14,7 +14,7 @@ namespace CliFx.Analyzers
         private static DiagnosticDescriptor DiagnosticDescriptor { get; } = new(
             "CliFx_ParameterOrderMustBeUnique",
             "Parameter order must be unique",
-            "Specified parameter order is not unique within the command.",
+            "Specified parameter order is not unique in the command.",
             "CliFx", DiagnosticSeverity.Error, true
         );
 
@@ -30,8 +30,8 @@ namespace CliFx.Analyzers
             if (property is null)
                 return;
 
-            var parameterSchema = CommandParameterSymbol.TryResolve(property);
-            if (parameterSchema is null)
+            var parameter = CommandParameterSymbol.TryResolve(property);
+            if (parameter is null)
                 return;
 
             var otherProperties = property
@@ -43,11 +43,11 @@ namespace CliFx.Analyzers
 
             foreach (var otherProperty in otherProperties)
             {
-                var otherParameterSchema = CommandParameterSymbol.TryResolve(otherProperty);
-                if (otherParameterSchema is null)
+                var otherParameter = CommandParameterSymbol.TryResolve(otherProperty);
+                if (otherParameter is null)
                     continue;
 
-                if (parameterSchema.Order == otherParameterSchema.Order)
+                if (parameter.Order == otherParameter.Order)
                 {
                     context.ReportDiagnostic(Diagnostic.Create(
                         DiagnosticDescriptor,

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Linq;
 using CliFx.Analyzers.ObjectModel;
 using Microsoft.CodeAnalysis;
@@ -10,17 +9,23 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace CliFx.Analyzers
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class ParameterNameMustBeUniqueAnalyzer : DiagnosticAnalyzer
+    public class ParameterMustBeLastIfNonScalarAnalyzer : DiagnosticAnalyzer
     {
         private static DiagnosticDescriptor DiagnosticDescriptor { get; } = new(
-            "CliFx_ParameterNameMustBeUnique",
-            "Parameter name must be unique",
-            "Specified parameter name is not unique in the command.",
+            "CliFx_ParameterMustBeLastIfNonScalar",
+            "Non-scalar parameter must be last in order",
+            "Specified non-scalar parameter does not have the highest order in the command.",
             "CliFx", DiagnosticSeverity.Error, true
         );
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
             ImmutableArray.Create(DiagnosticDescriptor);
+
+        private static bool IsScalar(ITypeSymbol type) =>
+            KnownSymbols.IsSystemString(type) ||
+            !type.AllInterfaces
+                .Select(i => i.ConstructedFrom)
+                .Any(KnownSymbols.IsSystemCollectionsGenericIEnumerable);
 
         private static void Analyze(SyntaxNodeAnalysisContext context)
         {
@@ -29,6 +34,9 @@ namespace CliFx.Analyzers
 
             var property = context.SemanticModel.GetDeclaredSymbol(propertyDeclaration);
             if (property is null)
+                return;
+
+            if (IsScalar(property.Type))
                 return;
 
             var parameter = CommandParameterSymbol.TryResolve(property);
@@ -48,7 +56,7 @@ namespace CliFx.Analyzers
                 if (otherParameter is null)
                     continue;
 
-                if (string.Equals(parameter.Name, otherParameter.Name, StringComparison.OrdinalIgnoreCase))
+                if (otherParameter.Order > parameter.Order)
                 {
                     context.ReportDiagnostic(Diagnostic.Create(
                         DiagnosticDescriptor,
