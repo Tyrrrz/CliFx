@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using System;
+using System.Collections.Immutable;
 using System.Linq;
 using CliFx.Analyzers.ObjectModel;
 using Microsoft.CodeAnalysis;
@@ -9,12 +10,12 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace CliFx.Analyzers
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class ParameterOrderMustBeUniqueAnalyzer : DiagnosticAnalyzer
+    public class ParameterNameMustBeUniqueAnalyzer : DiagnosticAnalyzer
     {
         private static DiagnosticDescriptor DiagnosticDescriptor { get; } = new(
-            "CliFx_ParameterOrderMustBeUnique",
-            "Parameter order must be unique",
-            "Specified parameter order is not unique within the command.",
+            "CliFx_ParameterNameMustBeUnique",
+            "Parameter name must be unique",
+            "Specified parameter is not unique within the command.",
             "CliFx", DiagnosticSeverity.Error, true
         );
 
@@ -47,7 +48,7 @@ namespace CliFx.Analyzers
                 if (otherParameterSchema is null)
                     continue;
 
-                if (parameterSchema.Order == otherParameterSchema.Order)
+                if (string.Equals(parameterSchema.Name, otherParameterSchema.Name, StringComparison.OrdinalIgnoreCase))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(
                         DiagnosticDescriptor,

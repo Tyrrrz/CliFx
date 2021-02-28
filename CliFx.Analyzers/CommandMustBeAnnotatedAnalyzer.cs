@@ -14,7 +14,7 @@ namespace CliFx.Analyzers
         private static DiagnosticDescriptor DiagnosticDescriptor { get; } = new(
             "CliFx_CommandMustBeAnnotated",
             "Command must be annotated with the Command attribute",
-            "The type must be annotated with `CliFx.CommandAttribute` in order to be a valid command.",
+            "Type must be annotated with `CliFx.CommandAttribute` in order to be a valid command.",
             "CliFx", DiagnosticSeverity.Error, true
         );
 

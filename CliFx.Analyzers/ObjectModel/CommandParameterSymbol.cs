@@ -29,6 +29,11 @@ namespace CliFx.Analyzers.ObjectModel
 
     internal partial class CommandParameterSymbol
     {
+        private static AttributeData? TryGetParameterAttribute(IPropertySymbol property) =>
+            property
+                .GetAttributes()
+                .FirstOrDefault(a => KnownSymbols.IsCommandParameterAttribute(a.AttributeClass));
+
         private static CommandParameterSymbol FromAttribute(AttributeData attribute)
         {
             var order = (int) attribute
@@ -62,14 +67,15 @@ namespace CliFx.Analyzers.ObjectModel
 
         public static CommandParameterSymbol? TryResolve(IPropertySymbol property)
         {
-            var attribute = property
-                .GetAttributes()
-                .FirstOrDefault(a => KnownSymbols.IsCommandParameterAttribute(a.AttributeClass));
+            var attribute = TryGetParameterAttribute(property);
 
             if (attribute is null)
                 return null;
 
             return FromAttribute(attribute);
         }
+
+        public static bool IsParameterProperty(IPropertySymbol property) =>
+            TryGetParameterAttribute(property) is not null;
     }
 }
