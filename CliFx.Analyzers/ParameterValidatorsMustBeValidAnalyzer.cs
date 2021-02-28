@@ -1,6 +1,7 @@
 ﻿using System.Collections.Immutable;
 using System.Linq;
 using CliFx.Analyzers.ObjectModel;
+using CliFx.Analyzers.Utils.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -12,7 +13,7 @@ namespace CliFx.Analyzers
     public class ParameterValidatorsMustBeValidAnalyzer : DiagnosticAnalyzer
     {
         private static DiagnosticDescriptor DiagnosticDescriptor { get; } = new(
-            "CliFx_ParameterValidatorsMustBeValid",
+            "CliFx_" + nameof(ParameterValidatorsMustBeValidAnalyzer).TrimEnd("Analyzer"),
             "Parameter validator type must derive from `CliFx.ArgumentValueValidator<T>`",
             "Type must implement `CliFx.CliFx.ArgumentValueValidator<T>` in order to be used as a validator.",
             "CliFx", DiagnosticSeverity.Error, true

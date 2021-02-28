@@ -1,6 +1,7 @@
 ﻿using System.Collections.Immutable;
 using System.Linq;
 using CliFx.Analyzers.ObjectModel;
+using CliFx.Analyzers.Utils.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -12,7 +13,7 @@ namespace CliFx.Analyzers
     public class ParameterConverterMustBeValidAnalyzer : DiagnosticAnalyzer
     {
         private static DiagnosticDescriptor DiagnosticDescriptor { get; } = new(
-            "CliFx_ParameterConverterMustBeValid",
+            "CliFx_" + nameof(ParameterConverterMustBeValidAnalyzer).TrimEnd("Analyzer"),
             "Parameter converter type must implement `IArgumentValueConverter`",
             "Type must implement `CliFx.IArgumentValueConverter` in order to be used as converter.",
             "CliFx", DiagnosticSeverity.Error, true

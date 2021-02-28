@@ -1,6 +1,7 @@
 ﻿using System.Collections.Immutable;
 using System.Linq;
 using CliFx.Analyzers.ObjectModel;
+using CliFx.Analyzers.Utils.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -12,7 +13,7 @@ namespace CliFx.Analyzers
     public class ParameterMustBeLastIfNonScalarAnalyzer : DiagnosticAnalyzer
     {
         private static DiagnosticDescriptor DiagnosticDescriptor { get; } = new(
-            "CliFx_ParameterMustBeLastIfNonScalar",
+            "CliFx_" + nameof(ParameterMustBeLastIfNonScalarAnalyzer).TrimEnd("Analyzer"),
             "Non-scalar parameter must be last in order",
             "Specified non-scalar parameter does not have the highest order in the command.",
             "CliFx", DiagnosticSeverity.Error, true

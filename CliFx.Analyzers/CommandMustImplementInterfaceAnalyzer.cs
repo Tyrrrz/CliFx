@@ -1,6 +1,7 @@
 ﻿using System.Collections.Immutable;
 using System.Linq;
 using CliFx.Analyzers.ObjectModel;
+using CliFx.Analyzers.Utils.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -12,7 +13,7 @@ namespace CliFx.Analyzers
     public class CommandMustImplementInterfaceAnalyzer : DiagnosticAnalyzer
     {
         private static DiagnosticDescriptor DiagnosticDescriptor { get; } = new(
-            "CliFx_CommandMustImplementInterface",
+            "CliFx_" + nameof(CommandMustImplementInterfaceAnalyzer).TrimEnd("Analyzer"),
             "Command must implement `ICommand`",
             "Type must implement `CliFx.ICommand` in order to be a valid command.",
             "CliFx", DiagnosticSeverity.Error, true

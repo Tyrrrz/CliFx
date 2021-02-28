@@ -1,6 +1,7 @@
 ﻿using System.Collections.Immutable;
 using System.Linq;
 using CliFx.Analyzers.ObjectModel;
+using CliFx.Analyzers.Utils.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -12,7 +13,7 @@ namespace CliFx.Analyzers
     public class SystemConsoleShouldBeAvoidedAnalyzer : DiagnosticAnalyzer
     {
         private static DiagnosticDescriptor DiagnosticDescriptor { get; } = new(
-            "CliFx_SystemConsoleShouldBeAvoided",
+            "CliFx_" + nameof(SystemConsoleShouldBeAvoidedAnalyzer).TrimEnd("Analyzer"),
             "Avoid referencing `System.Console` inside a command",
             "Use the provided `CliFx.IConsole` abstraction instead of `System.Console` to ensure that the command can be tested in isolation.",
             "CliFx", DiagnosticSeverity.Warning, true

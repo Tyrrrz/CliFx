@@ -2,6 +2,7 @@
 using System.Collections.Immutable;
 using System.Linq;
 using CliFx.Analyzers.ObjectModel;
+using CliFx.Analyzers.Utils.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -13,7 +14,7 @@ namespace CliFx.Analyzers
     public class ParameterNameMustBeUniqueAnalyzer : DiagnosticAnalyzer
     {
         private static DiagnosticDescriptor DiagnosticDescriptor { get; } = new(
-            "CliFx_ParameterNameMustBeUnique",
+            "CliFx_" + nameof(ParameterNameMustBeUniqueAnalyzer).TrimEnd("Analyzer"),
             "Parameter name must be unique",
             "Specified parameter name is not unique in the command.",
             "CliFx", DiagnosticSeverity.Error, true

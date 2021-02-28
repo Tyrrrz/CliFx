@@ -4,9 +4,9 @@ using Xunit;
 
 namespace CliFx.Analyzers.Tests
 {
-    public class ParameterMustBeSoleIfNonScalarAnalyzerTests
+    public class ParameterMustBeSingleIfNonScalarAnalyzerTests
     {
-        private static DiagnosticAnalyzer Analyzer { get; } = new ParameterMustBeSoleIfNonScalarAnalyzer();
+        private static DiagnosticAnalyzer Analyzer { get; } = new ParameterMustBeSingleIfNonScalarAnalyzer();
 
         [Fact]
         public void Analyzer_reports_an_error_if_more_than_one_non_scalar_parameters_are_defined()

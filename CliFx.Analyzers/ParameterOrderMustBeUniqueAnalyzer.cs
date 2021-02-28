@@ -1,6 +1,7 @@
 ﻿using System.Collections.Immutable;
 using System.Linq;
 using CliFx.Analyzers.ObjectModel;
+using CliFx.Analyzers.Utils.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -12,7 +13,7 @@ namespace CliFx.Analyzers
     public class ParameterOrderMustBeUniqueAnalyzer : DiagnosticAnalyzer
     {
         private static DiagnosticDescriptor DiagnosticDescriptor { get; } = new(
-            "CliFx_ParameterOrderMustBeUnique",
+            "CliFx_" + nameof(ParameterOrderMustBeUniqueAnalyzer).TrimEnd("Analyzer"),
             "Parameter order must be unique",
             "Specified parameter order is not unique in the command.",
             "CliFx", DiagnosticSeverity.Error, true

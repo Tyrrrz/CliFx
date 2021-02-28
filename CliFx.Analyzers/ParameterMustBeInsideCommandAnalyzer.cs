@@ -1,6 +1,7 @@
 ﻿using System.Collections.Immutable;
 using System.Linq;
 using CliFx.Analyzers.ObjectModel;
+using CliFx.Analyzers.Utils.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -12,7 +13,7 @@ namespace CliFx.Analyzers
     public class ParameterMustBeInsideCommandAnalyzer : DiagnosticAnalyzer
     {
         private static DiagnosticDescriptor DiagnosticDescriptor { get; } = new(
-            "CliFx_ParameterMustBeInsideCommand",
+            "CliFx_" + nameof(ParameterMustBeInsideCommandAnalyzer).TrimEnd("Analyzer"),
             "Parameter must be defined inside a command",
             "Specified parameter is defined in a type which is not a command.",
             "CliFx", DiagnosticSeverity.Error, true

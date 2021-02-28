@@ -1,6 +1,7 @@
 ﻿using System.Collections.Immutable;
 using System.Linq;
 using CliFx.Analyzers.ObjectModel;
+using CliFx.Analyzers.Utils.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -9,10 +10,10 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace CliFx.Analyzers
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class ParameterMustBeSoleIfNonScalarAnalyzer : DiagnosticAnalyzer
+    public class ParameterMustBeSingleIfNonScalarAnalyzer : DiagnosticAnalyzer
     {
         private static DiagnosticDescriptor DiagnosticDescriptor { get; } = new(
-            "CliFx_ParameterMustBeSoleIfNonScalar",
+            "CliFx_" + nameof(ParameterMustBeSingleIfNonScalarAnalyzer).TrimEnd("Analyzer"),
             "Only one parameter per command can have non-scalar type",
             "Specified parameter is not the only non-scalar parameter in the command.",
             "CliFx", DiagnosticSeverity.Error, true
