@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Gu.Roslyn.Asserts" Version="3.3.1" />
     <PackageReference Include="GitHubActionsTestLogger" Version="1.1.2" />
     <PackageReference Include="FluentAssertions" Version="5.10.3" />

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.1;netstandard2.0</TargetFrameworks>
     <Authors>$(Company)</Authors>
-    <Description>Declarative framework for CLI applications</Description>
+    <Description>Declarative framework for building command line applications</Description>
     <PackageTags>command line executable interface framework parser arguments net core</PackageTags>
     <PackageProjectUrl>https://github.com/Tyrrrz/CliFx</PackageProjectUrl>
     <PackageReleaseNotes>https://github.com/Tyrrrz/CliFx/blob/master/Changelog.md</PackageReleaseNotes>

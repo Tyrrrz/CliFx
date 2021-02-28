@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.CodeAnalysis;
 
-namespace CliFx.Analyzers.Internal
+namespace CliFx.Analyzers.Utils.Extensions
 {
     internal static class RoslynExtensions
     {

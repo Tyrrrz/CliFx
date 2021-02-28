@@ -1,7 +1,7 @@
-﻿using CliFx.Analyzers.Internal;
+﻿using CliFx.Analyzers.Utils.Extensions;
 using Microsoft.CodeAnalysis;
 
-namespace CliFx.Analyzers
+namespace CliFx.Analyzers.ObjectModel
 {
     internal static class KnownSymbols
     {
@@ -19,7 +19,7 @@ namespace CliFx.Analyzers
         public static bool IsSystemConsole(ISymbol symbol) =>
             symbol.DisplayNameMatches("System.Console");
 
-        public static bool IsConsoleInterface(ISymbol symbol) =>
+        public static bool IsCliFxConsoleInterface(ISymbol symbol) =>
             symbol.DisplayNameMatches("CliFx.IConsole");
 
         public static bool IsCommandInterface(ISymbol symbol) =>
