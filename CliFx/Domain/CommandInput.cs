@@ -86,8 +86,10 @@ namespace CliFx.Domain
             {
                 var argument = commandLineArguments[index];
 
-                if (!argument.StartsWith('[') || !argument.EndsWith(']'))
+                if (!CommandDirectiveInput.IsDirective(argument))
+                {
                     break;
+                }
 
                 var name = argument.Substring(1, argument.Length - 2);
                 result.Add(new CommandDirectiveInput(name));
@@ -138,13 +140,7 @@ namespace CliFx.Domain
             {
                 var argument = commandLineArguments[index];
 
-                var isOptionArgument =
-                    argument.StartsWith("--", StringComparison.OrdinalIgnoreCase) &&
-                    argument.Length > 2 &&
-                    char.IsLetter(argument[2]) ||
-                    argument.StartsWith('-') &&
-                    argument.Length > 1 &&
-                    char.IsLetter(argument[1]);
+                var isOptionArgument = CommandOptionInput.IsOptionParameter(argument);
 
                 // Break on the first encountered option
                 if (isOptionArgument)

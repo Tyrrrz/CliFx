@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using CliFx.Internal.Extensions;
@@ -32,5 +33,15 @@ namespace CliFx.Domain
 
         [ExcludeFromCodeCoverage]
         public override string ToString() => $"{GetRawAlias()} {GetRawValues()}";
+        public static bool IsOptionParameter(string argument)
+        {
+            return
+                    argument.StartsWith("--", StringComparison.OrdinalIgnoreCase) &&
+                    argument.Length > 2 &&
+                    char.IsLetter(argument[2]) ||
+                    argument.StartsWith('-') &&
+                    argument.Length > 1 &&
+                    char.IsLetter(argument[1]);
+        }
     }
 }

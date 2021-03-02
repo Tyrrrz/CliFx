@@ -13,6 +13,16 @@ namespace CliFx.Domain
 
         public CommandDirectiveInput(string name) => Name = name;
 
+        internal static bool IsDirective(string argument)
+        {
+            if (!argument.StartsWith('[') || !argument.EndsWith(']'))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         [ExcludeFromCodeCoverage]
         public override string ToString() => $"[{Name}]";
     }
