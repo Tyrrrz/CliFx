@@ -1,0 +1,92 @@
+﻿using System.Collections.Generic;
+using Microsoft.CodeAnalysis;
+using System.Linq;
+
+namespace CliFx.Analyzers.ObjectModel
+{
+    internal partial class CommandOptionSymbol : ICommandArgumentSymbol
+    {
+        public string? Name { get; }
+
+        public char? ShortName { get; }
+
+        public string? EnvironmentVariableName { get; }
+
+        public ITypeSymbol? ConverterType { get; }
+
+        public IReadOnlyList<ITypeSymbol> ValidatorTypes { get; }
+
+        public CommandOptionSymbol(
+            string? name,
+            char? shortName,
+            string? environmentVariableName,
+            ITypeSymbol? converterType,
+            IReadOnlyList<ITypeSymbol> validatorTypes)
+        {
+            Name = name;
+            ShortName = shortName;
+            EnvironmentVariableName = environmentVariableName;
+            ConverterType = converterType;
+            ValidatorTypes = validatorTypes;
+        }
+    }
+
+    internal partial class CommandOptionSymbol
+    {
+        private static AttributeData? TryGetOptionAttribute(IPropertySymbol property) =>
+            property
+                .GetAttributes()
+                .FirstOrDefault(a => KnownSymbols.IsCommandOptionAttribute(a.AttributeClass));
+
+        private static CommandOptionSymbol FromAttribute(AttributeData attribute)
+        {
+            var name = attribute
+                .ConstructorArguments
+                .Where(a => KnownSymbols.IsSystemString(a.Type))
+                .Select(a => a.Value)
+                .FirstOrDefault() as string;
+
+            var shortName = attribute
+                .ConstructorArguments
+                .Where(a => KnownSymbols.IsSystemChar(a.Type))
+                .Select(a => a.Value)
+                .FirstOrDefault() as char?;
+
+            var environmentVariableName = attribute
+                .NamedArguments
+                .Where(a => a.Key == "EnvironmentVariableName")
+                .Select(a => a.Value.Value)
+                .FirstOrDefault() as string;
+
+            var converter = attribute
+                .NamedArguments
+                .Where(a => a.Key == "Converter")
+                .Select(a => a.Value.Value)
+                .Cast<ITypeSymbol?>()
+                .FirstOrDefault();
+
+            var validators = attribute
+                .NamedArguments
+                .Where(a => a.Key == "Validators")
+                .SelectMany(a => a.Value.Values)
+                .Select(c => c.Value)
+                .Cast<ITypeSymbol>()
+                .ToArray();
+
+            return new CommandOptionSymbol(name, shortName, environmentVariableName, converter, validators);
+        }
+
+        public static CommandOptionSymbol? TryResolve(IPropertySymbol property)
+        {
+            var attribute = TryGetOptionAttribute(property);
+
+            if (attribute is null)
+                return null;
+
+            return FromAttribute(attribute);
+        }
+
+        public static bool IsOptionProperty(IPropertySymbol property) =>
+            TryGetOptionAttribute(property) is not null;
+    }
+}

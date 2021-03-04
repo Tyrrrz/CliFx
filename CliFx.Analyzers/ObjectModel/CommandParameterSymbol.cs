@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 
 namespace CliFx.Analyzers.ObjectModel
 {
-    internal partial class CommandParameterSymbol
+    internal partial class CommandParameterSymbol : ICommandArgumentSymbol
     {
         public int Order { get; }
 

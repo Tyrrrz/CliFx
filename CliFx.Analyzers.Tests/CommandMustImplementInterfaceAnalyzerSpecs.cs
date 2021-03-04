@@ -4,7 +4,7 @@ using Xunit;
 
 namespace CliFx.Analyzers.Tests
 {
-    public class CommandMustImplementInterfaceAnalyzerTests
+    public class CommandMustImplementInterfaceAnalyzerSpecs
     {
         private static DiagnosticAnalyzer Analyzer { get; } = new CommandMustImplementInterfaceAnalyzer();
 

@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Immutable;
-using System.Linq;
+﻿using System.Linq;
 using CliFx.Analyzers.ObjectModel;
-using CliFx.Analyzers.Utils.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -10,20 +7,16 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace CliFx.Analyzers
 {
-    [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class ParameterNameMustBeUniqueAnalyzer : DiagnosticAnalyzer
+    public class ParameterMustHaveUniqueOrderAnalyzer : AnalyzerBase
     {
-        private static DiagnosticDescriptor DiagnosticDescriptor { get; } = new(
-            "CliFx_" + nameof(ParameterNameMustBeUniqueAnalyzer).TrimEnd("Analyzer"),
-            "Parameter name must be unique",
-            "Specified parameter name is not unique in the command.",
-            "CliFx", DiagnosticSeverity.Error, true
-        );
+        public ParameterMustHaveUniqueOrderAnalyzer()
+            : base(
+                "Parameter order must be unique",
+                "Specified parameter order is not unique in the command.")
+        {
+        }
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-            ImmutableArray.Create(DiagnosticDescriptor);
-
-        private static void Analyze(SyntaxNodeAnalysisContext context)
+        private void Analyze(SyntaxNodeAnalysisContext context)
         {
             if (context.Node is not PropertyDeclarationSyntax propertyDeclaration)
                 return;
@@ -49,21 +42,16 @@ namespace CliFx.Analyzers
                 if (otherParameter is null)
                     continue;
 
-                if (string.Equals(parameter.Name, otherParameter.Name, StringComparison.OrdinalIgnoreCase))
+                if (parameter.Order == otherParameter.Order)
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(
-                        DiagnosticDescriptor,
-                        propertyDeclaration.GetLocation()
-                    ));
+                    context.ReportDiagnostic(CreateDiagnostic(propertyDeclaration.GetLocation()));
                 }
             }
         }
 
         public override void Initialize(AnalysisContext context)
         {
-            context.EnableConcurrentExecution();
-            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
-
+            base.Initialize(context);
             context.RegisterSyntaxNodeAction(Analyze, SyntaxKind.PropertyDeclaration);
         }
     }

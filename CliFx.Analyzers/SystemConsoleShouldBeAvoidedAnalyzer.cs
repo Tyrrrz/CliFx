@@ -1,7 +1,5 @@
-﻿using System.Collections.Immutable;
-using System.Linq;
+﻿using System.Linq;
 using CliFx.Analyzers.ObjectModel;
-using CliFx.Analyzers.Utils.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -9,20 +7,17 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace CliFx.Analyzers
 {
-    [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class SystemConsoleShouldBeAvoidedAnalyzer : DiagnosticAnalyzer
+    public class SystemConsoleShouldBeAvoidedAnalyzer : AnalyzerBase
     {
-        private static DiagnosticDescriptor DiagnosticDescriptor { get; } = new(
-            "CliFx_" + nameof(SystemConsoleShouldBeAvoidedAnalyzer).TrimEnd("Analyzer"),
-            "Avoid referencing `System.Console` inside a command",
-            "Use the provided `CliFx.IConsole` abstraction instead of `System.Console` to ensure that the command can be tested in isolation.",
-            "CliFx", DiagnosticSeverity.Warning, true
-        );
+        public SystemConsoleShouldBeAvoidedAnalyzer()
+            : base(
+                "Avoid referencing `System.Console` inside a command",
+                "Use the provided `CliFx.IConsole` abstraction instead of `System.Console` to ensure that the command can be tested in isolation.",
+                DiagnosticSeverity.Warning)
+        {
+        }
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-            ImmutableArray.Create(DiagnosticDescriptor);
-
-        private static MemberAccessExpressionSyntax? TryGetSystemConsoleMemberAccess(
+        private MemberAccessExpressionSyntax? TryGetSystemConsoleMemberAccess(
             SyntaxNodeAnalysisContext context,
             SyntaxNode node)
         {
@@ -47,7 +42,7 @@ namespace CliFx.Analyzers
             return null;
         }
 
-        private static void Analyze(SyntaxNodeAnalysisContext context)
+        private void Analyze(SyntaxNodeAnalysisContext context)
         {
             // Try to get a member access on System.Console in the current expression,
             // or in any of its inner expressions.
@@ -67,18 +62,13 @@ namespace CliFx.Analyzers
 
             if (isConsoleInterfaceAvailable)
             {
-                context.ReportDiagnostic(Diagnostic.Create(
-                    DiagnosticDescriptor,
-                    systemConsoleMemberAccess.GetLocation()
-                ));
+                context.ReportDiagnostic(CreateDiagnostic(systemConsoleMemberAccess.GetLocation()));
             }
         }
 
         public override void Initialize(AnalysisContext context)
         {
-            context.EnableConcurrentExecution();
-            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
-
+            base.Initialize(context);
             context.RegisterSyntaxNodeAction(Analyze, SyntaxKind.SimpleMemberAccessExpression);
         }
     }

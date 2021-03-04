@@ -4,12 +4,12 @@ using Xunit;
 
 namespace CliFx.Analyzers.Tests
 {
-    public class SystemConsoleShouldBeAvoidedAnalyzerTests
+    public class OptionMustHaveValidNameAnalyzerSpecs
     {
-        private static DiagnosticAnalyzer Analyzer { get; } = new SystemConsoleShouldBeAvoidedAnalyzer();
+        private static DiagnosticAnalyzer Analyzer { get; } = new OptionMustHaveValidNameAnalyzer();
 
         [Fact]
-        public void Analyzer_reports_an_error_if_a_command_calls_a_method_on_SystemConsole()
+        public void Analyzer_reports_an_error_if_an_option_has_a_name_which_is_too_short()
         {
             // Arrange
             // language=cs
@@ -17,11 +17,10 @@ namespace CliFx.Analyzers.Tests
 [Command]
 public class MyCommand : ICommand
 {
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        Console.WriteLine(""Hello world"");
-        return default;
-    }
+    [CommandOption(""f"")]
+    public string Foo { get; set; }
+    
+    public ValueTask ExecuteAsync(IConsole console) => default;
 }";
 
             // Act & assert
@@ -29,7 +28,7 @@ public class MyCommand : ICommand
         }
 
         [Fact]
-        public void Analyzer_reports_an_error_if_a_command_accesses_a_property_on_SystemConsole()
+        public void Analyzer_reports_an_error_if_an_option_has_a_name_that_starts_with_a_non_letter_character()
         {
             // Arrange
             // language=cs
@@ -37,30 +36,10 @@ public class MyCommand : ICommand
 [Command]
 public class MyCommand : ICommand
 {
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        Console.ForegroundColor = ConsoleColor.Black;
-        return default;
-    }
-}";
-            // Act & assert
-            Analyzer.Should().ProduceDiagnostics(code);
-        }
-
-        [Fact]
-        public void Analyzer_reports_an_error_if_a_command_calls_a_method_on_a_property_of_SystemConsole()
-        {
-            // Arrange
-            // language=cs
-            const string code = @"
-[Command]
-public class MyCommand : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        Console.Error.WriteLine(""Hello world"");
-        return default;
-    }
+    [CommandOption(""1foo"")]
+    public string Foo { get; set; }
+    
+    public ValueTask ExecuteAsync(IConsole console) => default;
 }";
 
             // Act & assert
@@ -68,7 +47,7 @@ public class MyCommand : ICommand
         }
 
         [Fact]
-        public void Analyzer_does_not_report_an_error_if_a_command_interacts_with_the_console_through_IConsole()
+        public void Analyzer_does_not_report_an_error_if_an_option_has_a_valid_name()
         {
             // Arrange
             // language=cs
@@ -76,11 +55,10 @@ public class MyCommand : ICommand
 [Command]
 public class MyCommand : ICommand
 {
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(""Hello world"");
-        return default;
-    }
+    [CommandOption(""foo"")]
+    public string Foo { get; set; }
+    
+    public ValueTask ExecuteAsync(IConsole console) => default;
 }";
 
             // Act & assert
@@ -88,7 +66,7 @@ public class MyCommand : ICommand
         }
 
         [Fact]
-        public void Analyzer_does_not_report_an_error_if_IConsole_is_not_available_in_the_current_method()
+        public void Analyzer_does_not_report_an_error_if_an_option_does_not_have_a_name()
         {
             // Arrange
             // language=cs
@@ -96,7 +74,26 @@ public class MyCommand : ICommand
 [Command]
 public class MyCommand : ICommand
 {
-    public void SomeOtherMethod() => Console.WriteLine(""Test"");
+    [CommandOption('f')]
+    public string Foo { get; set; }
+    
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}";
+
+            // Act & assert
+            Analyzer.Should().NotProduceDiagnostics(code);
+        }
+
+        [Fact]
+        public void Analyzer_does_not_report_an_error_on_a_property_that_is_not_an_option()
+        {
+            // Arrange
+            // language=cs
+            const string code = @"
+[Command]
+public class MyCommand : ICommand
+{
+    public string Foo { get; set; }
 
     public ValueTask ExecuteAsync(IConsole console) => default;
 }";

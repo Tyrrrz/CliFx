@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using CliFx.Analyzers.ObjectModel;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -7,20 +8,14 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace CliFx.Analyzers
 {
-    public class ParameterMustBeSingleIfNonScalarAnalyzer : AnalyzerBase
+    public class OptionMustHaveUniqueEnvironmentVariableNameAnalyzer : AnalyzerBase
     {
-        public ParameterMustBeSingleIfNonScalarAnalyzer()
+        public OptionMustHaveUniqueEnvironmentVariableNameAnalyzer()
             : base(
-                "Only one parameter per command can have non-scalar type",
-                "Specified parameter is not the only non-scalar parameter in the command.")
+                "Option environment variable name must be unique within its command",
+                "Option environment variable name must be unique within its command")
         {
         }
-
-        private static bool IsScalar(ITypeSymbol type) =>
-            KnownSymbols.IsSystemString(type) ||
-            !type.AllInterfaces
-                .Select(i => i.ConstructedFrom)
-                .Any(KnownSymbols.IsSystemCollectionsGenericIEnumerable);
 
         private void Analyze(SyntaxNodeAnalysisContext context)
         {
@@ -31,10 +26,11 @@ namespace CliFx.Analyzers
             if (property is null)
                 return;
 
-            if (!CommandParameterSymbol.IsParameterProperty(property))
+            var option = CommandOptionSymbol.TryResolve(property);
+            if (option is null)
                 return;
 
-            if (IsScalar(property.Type))
+            if (string.IsNullOrWhiteSpace(option.EnvironmentVariableName))
                 return;
 
             var otherProperties = property
@@ -46,10 +42,15 @@ namespace CliFx.Analyzers
 
             foreach (var otherProperty in otherProperties)
             {
-                if (!CommandParameterSymbol.IsParameterProperty(otherProperty))
+                var otherOption = CommandOptionSymbol.TryResolve(otherProperty);
+                if (otherOption is null)
                     continue;
 
-                if (!IsScalar(otherProperty.Type))
+                if (string.IsNullOrWhiteSpace(otherOption.EnvironmentVariableName))
+                    continue;
+
+                if (string.Equals(option.EnvironmentVariableName, otherOption.EnvironmentVariableName,
+                    StringComparison.OrdinalIgnoreCase))
                 {
                     context.ReportDiagnostic(CreateDiagnostic(propertyDeclaration.GetLocation()));
                 }

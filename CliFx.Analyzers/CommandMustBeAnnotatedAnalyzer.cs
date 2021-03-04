@@ -1,28 +1,21 @@
-﻿using System.Collections.Immutable;
-using System.Linq;
+﻿using System.Linq;
 using CliFx.Analyzers.ObjectModel;
-using CliFx.Analyzers.Utils.Extensions;
-using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace CliFx.Analyzers
 {
-    [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class CommandMustBeAnnotatedAnalyzer : DiagnosticAnalyzer
+    public class CommandMustBeAnnotatedAnalyzer : AnalyzerBase
     {
-        private static DiagnosticDescriptor DiagnosticDescriptor { get; } = new(
-            "CliFx_" + nameof(CommandMustBeAnnotatedAnalyzer).TrimEnd("Analyzer"),
-            "Command must be annotated with `CommandAttribute`",
-            "Type must be annotated with `CliFx.CommandAttribute` in order to be a valid command.",
-            "CliFx", DiagnosticSeverity.Error, true
-        );
+        public CommandMustBeAnnotatedAnalyzer()
+            : base(
+                "Command must be annotated with `CommandAttribute`",
+                "Type must be annotated with `CliFx.CommandAttribute` in order to be a valid command.")
+        {
+        }
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-            ImmutableArray.Create(DiagnosticDescriptor);
-
-        private static void Analyze(SyntaxNodeAnalysisContext context)
+        private void Analyze(SyntaxNodeAnalysisContext context)
         {
             if (context.Node is not ClassDeclarationSyntax classDeclaration)
                 return;
@@ -50,18 +43,13 @@ namespace CliFx.Analyzers
             // then it's very likely a user error.
             if (implementsCommandInterface && !hasCommandAttribute)
             {
-                context.ReportDiagnostic(Diagnostic.Create(
-                    DiagnosticDescriptor,
-                    classDeclaration.GetLocation()
-                ));
+                context.ReportDiagnostic(CreateDiagnostic(classDeclaration.GetLocation()));
             }
         }
 
         public override void Initialize(AnalysisContext context)
         {
-            context.EnableConcurrentExecution();
-            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
-
+            base.Initialize(context);
             context.RegisterSyntaxNodeAction(Analyze, SyntaxKind.ClassDeclaration);
         }
     }

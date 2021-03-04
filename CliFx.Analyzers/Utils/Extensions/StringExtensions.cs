@@ -10,7 +10,7 @@ namespace CliFx.Analyzers.Utils.Extensions
             StringComparison comparison = StringComparison.Ordinal)
         {
             while (str.EndsWith(sub, comparison))
-                str = str.Substring(sub.Length);
+                str = str.Substring(0, str.Length - sub.Length);
 
             return str;
         }

@@ -7,20 +7,14 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace CliFx.Analyzers
 {
-    public class ParameterMustBeSingleIfNonScalarAnalyzer : AnalyzerBase
+    public class OptionMustHaveUniqueShortNameAnalyzer : AnalyzerBase
     {
-        public ParameterMustBeSingleIfNonScalarAnalyzer()
+        public OptionMustHaveUniqueShortNameAnalyzer()
             : base(
-                "Only one parameter per command can have non-scalar type",
-                "Specified parameter is not the only non-scalar parameter in the command.")
+                "Option short name must be unique within its command",
+                "Option short name must be unique within its command")
         {
         }
-
-        private static bool IsScalar(ITypeSymbol type) =>
-            KnownSymbols.IsSystemString(type) ||
-            !type.AllInterfaces
-                .Select(i => i.ConstructedFrom)
-                .Any(KnownSymbols.IsSystemCollectionsGenericIEnumerable);
 
         private void Analyze(SyntaxNodeAnalysisContext context)
         {
@@ -31,10 +25,11 @@ namespace CliFx.Analyzers
             if (property is null)
                 return;
 
-            if (!CommandParameterSymbol.IsParameterProperty(property))
+            var option = CommandOptionSymbol.TryResolve(property);
+            if (option is null)
                 return;
 
-            if (IsScalar(property.Type))
+            if (option.ShortName is null)
                 return;
 
             var otherProperties = property
@@ -46,10 +41,14 @@ namespace CliFx.Analyzers
 
             foreach (var otherProperty in otherProperties)
             {
-                if (!CommandParameterSymbol.IsParameterProperty(otherProperty))
+                var otherOption = CommandOptionSymbol.TryResolve(otherProperty);
+                if (otherOption is null)
                     continue;
 
-                if (!IsScalar(otherProperty.Type))
+                if (otherOption.ShortName is null)
+                    continue;
+
+                if (option.ShortName == otherOption.ShortName)
                 {
                     context.ReportDiagnostic(CreateDiagnostic(propertyDeclaration.GetLocation()));
                 }

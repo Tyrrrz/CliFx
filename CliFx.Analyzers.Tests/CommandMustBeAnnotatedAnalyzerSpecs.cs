@@ -6,7 +6,7 @@ using Xunit;
 
 namespace CliFx.Analyzers.Tests
 {
-    public class CommandMustBeAnnotatedAnalyzerTests
+    public class CommandMustBeAnnotatedAnalyzerSpecs
     {
         private static DiagnosticAnalyzer Analyzer { get; } = new CommandMustBeAnnotatedAnalyzer();
 
@@ -26,7 +26,7 @@ public class MyCommand : ICommand
         }
 
         [Fact]
-        public void Analyzer_does_not_report_an_error_on_a_command_implemented_as_an_abstract_class()
+        public void Analyzer_does_not_report_an_error_if_a_command_is_implemented_as_an_abstract_class()
         {
             // Arrange
             // language=cs
