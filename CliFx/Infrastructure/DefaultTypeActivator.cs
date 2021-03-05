@@ -2,7 +2,7 @@
 using CliFx.Exceptions;
 using CliFx.Utils.Extensions;
 
-namespace CliFx
+namespace CliFx.Infrastructure
 {
     /// <summary>
     /// Type activator that uses the standard <see cref="Activator"/> class to instantiate objects.

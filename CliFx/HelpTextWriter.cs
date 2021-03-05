@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using CliFx.Infrastructure;
+using CliFx.Schema;
 using CliFx.Utils.Extensions;
 
 namespace CliFx
@@ -37,7 +39,8 @@ namespace CliFx
 
         private void Write(ConsoleColor foregroundColor, string value)
         {
-            _console.WithForegroundColor(foregroundColor, () => Write(value));
+            using (_console.WithForegroundColor(foregroundColor))
+                Write(value);
         }
 
         private void WriteLine()

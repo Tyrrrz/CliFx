@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using CliFx.Infrastructure;
 using CliWrap;
 using CliWrap.Buffered;
 using FluentAssertions;

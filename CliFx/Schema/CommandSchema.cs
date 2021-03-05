@@ -7,9 +7,10 @@ using System.Reflection;
 using System.Text;
 using CliFx.Attributes;
 using CliFx.Exceptions;
+using CliFx.Parsing;
 using CliFx.Utils.Extensions;
 
-namespace CliFx
+namespace CliFx.Schema
 {
     internal partial class CommandSchema
     {

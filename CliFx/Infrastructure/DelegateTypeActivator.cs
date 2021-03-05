@@ -1,7 +1,7 @@
 ﻿using System;
 using CliFx.Exceptions;
 
-namespace CliFx
+namespace CliFx.Infrastructure
 {
     /// <summary>
     /// Type activator that uses the specified delegate to instantiate objects.

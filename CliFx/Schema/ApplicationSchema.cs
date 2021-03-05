@@ -4,7 +4,7 @@ using System.Linq;
 using CliFx.Exceptions;
 using CliFx.Utils.Extensions;
 
-namespace CliFx
+namespace CliFx.Schema
 {
     internal partial class ApplicationSchema
     {

@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using CliFx.Infrastructure;
 using Newtonsoft.Json;
 
 namespace CliFx.Tests.Commands

@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using CliFx.Attributes;
+using CliFx.Infrastructure;
 
 namespace CliFx.Benchmarks
 {

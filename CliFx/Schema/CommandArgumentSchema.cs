@@ -6,7 +6,7 @@ using System.Reflection;
 using CliFx.Exceptions;
 using CliFx.Utils.Extensions;
 
-namespace CliFx
+namespace CliFx.Schema
 {
     internal abstract partial class CommandArgumentSchema
     {

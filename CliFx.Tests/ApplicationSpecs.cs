@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using CliFx.Infrastructure;
 using CliFx.Tests.Commands;
 using CliFx.Tests.Commands.Invalid;
 using FluentAssertions;

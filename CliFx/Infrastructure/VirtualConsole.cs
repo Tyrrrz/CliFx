@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading;
 
-namespace CliFx
+namespace CliFx.Infrastructure
 {
     /// <summary>
     /// Implementation of <see cref="IConsole"/> that routes all data to preconfigured streams.

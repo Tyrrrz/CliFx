@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CliFx
+namespace CliFx.Infrastructure
 {
     /// <summary>
     /// Abstraction for a service that can instantiate objects at runtime.

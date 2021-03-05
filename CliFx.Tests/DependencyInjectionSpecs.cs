@@ -1,4 +1,5 @@
 ﻿using CliFx.Exceptions;
+using CliFx.Infrastructure;
 using CliFx.Tests.Commands;
 using FluentAssertions;
 using Xunit;

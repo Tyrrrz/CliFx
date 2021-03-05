@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using CliFx.Attributes;
 
-namespace CliFx
+namespace CliFx.Schema
 {
     internal partial class CommandOptionSchema : CommandArgumentSchema
     {

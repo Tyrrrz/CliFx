@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using CliFx.Attributes;
+using CliFx.Infrastructure;
+using CliFx.Schema;
 using CliFx.Utils.Extensions;
 
 namespace CliFx

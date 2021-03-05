@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading;
 
-namespace CliFx
+namespace CliFx.Infrastructure
 {
     public class BufferedVirtualConsole : VirtualConsole, IDisposable
     {

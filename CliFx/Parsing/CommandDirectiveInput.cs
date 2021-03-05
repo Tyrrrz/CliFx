@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 
-namespace CliFx
+namespace CliFx.Parsing
 {
     internal class CommandDirectiveInput
     {

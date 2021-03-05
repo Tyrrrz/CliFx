@@ -7,6 +7,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using CliFx.Attributes;
 using CliFx.Exceptions;
+using CliFx.Infrastructure;
+using CliFx.Parsing;
+using CliFx.Schema;
 using CliFx.Utils;
 
 namespace CliFx
@@ -44,8 +47,8 @@ namespace CliFx
         {
             var processId = ProcessEx.GetCurrentProcessId();
 
-            _console.WithForegroundColor(ConsoleColor.Green, () =>
-                _console.Output.WriteLine($"Attach debugger to PID {processId} to continue."));
+            using (_console.WithForegroundColor(ConsoleColor.Green))
+                _console.Output.WriteLine($"Attach debugger to PID {processId} to continue.");
 
             Debugger.Launch();
 
@@ -60,8 +63,8 @@ namespace CliFx
             // Command name
             if (!string.IsNullOrWhiteSpace(input.CommandName))
             {
-                _console.WithForegroundColor(ConsoleColor.Cyan, () =>
-                    _console.Output.Write(input.CommandName));
+                using (_console.WithForegroundColor(ConsoleColor.Cyan))
+                    _console.Output.Write(input.CommandName);
 
                 _console.Output.Write(' ');
             }
@@ -71,8 +74,8 @@ namespace CliFx
             {
                 _console.Output.Write('<');
 
-                _console.WithForegroundColor(ConsoleColor.White, () =>
-                    _console.Output.Write(parameter));
+                using (_console.WithForegroundColor(ConsoleColor.White))
+                    _console.Output.Write(parameter);
 
                 _console.Output.Write('>');
                 _console.Output.Write(' ');
@@ -83,7 +86,7 @@ namespace CliFx
             {
                 _console.Output.Write('[');
 
-                _console.WithForegroundColor(ConsoleColor.White, () =>
+                using (_console.WithForegroundColor(ConsoleColor.White))
                 {
                     // Alias
                     _console.Output.Write(option.GetRawAlias());
@@ -94,7 +97,7 @@ namespace CliFx
                         _console.Output.Write(' ');
                         _console.Output.Write(option.GetRawValues());
                     }
-                });
+                }
 
                 _console.Output.Write(']');
                 _console.Output.Write(' ');
@@ -174,9 +177,8 @@ namespace CliFx
                 // This may throw exceptions which are useful only to the end-user
                 catch (CliFxException ex)
                 {
-                    _console.WithForegroundColor(ConsoleColor.Red, () =>
-                        _console.Error.WriteLine(ex.ToString())
-                    );
+                    using (_console.WithBackgroundColor(ConsoleColor.Red))
+                        _console.Error.WriteLine(ex.ToString());
 
                     _helpTextWriter.Write(root, command, defaultValues);
 
@@ -192,9 +194,8 @@ namespace CliFx
                 // Swallow command exceptions and route them to the console
                 catch (CommandException ex)
                 {
-                    _console.WithForegroundColor(ConsoleColor.Red, () =>
-                        _console.Error.WriteLine(ex.ToString())
-                    );
+                    using (_console.WithForegroundColor(ConsoleColor.Red))
+                        _console.Error.WriteLine(ex.ToString());
 
                     if (ex.ShowHelp)
                     {
@@ -210,9 +211,8 @@ namespace CliFx
             // because we still want the IDE to show them to the developer.
             catch (Exception ex) when (!Debugger.IsAttached)
             {
-                _console.WithColors(ConsoleColor.White, ConsoleColor.DarkRed, () =>
-                    _console.Error.Write("ERROR:")
-                );
+                using (_console.WithColors(ConsoleColor.White, ConsoleColor.DarkRed))
+                    _console.Error.Write("ERROR:");
 
                 _console.Error.Write(" ");
                 _console.WriteException(ex);

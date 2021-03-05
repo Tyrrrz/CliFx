@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using CliFx.Infrastructure;
 using CliFx.Tests.Commands;
 using CliWrap;
 using CliWrap.Buffered;

@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using CliFx.Schema;
 using CliFx.Utils.Extensions;
 
-namespace CliFx
+namespace CliFx.Parsing
 {
     internal class CommandOptionInput
     {

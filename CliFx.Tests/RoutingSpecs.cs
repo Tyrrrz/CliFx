@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using CliFx.Infrastructure;
 using CliFx.Tests.Commands;
 using FluentAssertions;
 using Xunit;

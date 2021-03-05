@@ -3,7 +3,7 @@ using System.IO;
 using System.Threading;
 using CliFx.Utils;
 
-namespace CliFx
+namespace CliFx.Infrastructure
 {
     /// <summary>
     /// Abstraction for interacting with the console.
@@ -84,46 +84,50 @@ namespace CliFx
     public static class ConsoleExtensions
     {
         /// <summary>
-        /// Sets console foreground color, executes specified action, and sets the color back to the original value.
+        /// Sets the specified foreground color and returns an <see cref="IDisposable"/>
+        /// that will reset the color back to its previous value.
         /// </summary>
-        public static void WithForegroundColor(
-            this IConsole console,
-            ConsoleColor foregroundColor,
-            Action action)
+        public static IDisposable WithForegroundColor(this IConsole console, ConsoleColor foregroundColor)
         {
             var lastColor = console.ForegroundColor;
             console.ForegroundColor = foregroundColor;
 
-            action();
-
-            console.ForegroundColor = lastColor;
+            return Disposable.Create(() => console.ForegroundColor = lastColor);
         }
 
         /// <summary>
-        /// Sets console background color, executes specified action, and sets the color back to the original value.
+        /// Sets the specified background color and returns an <see cref="IDisposable"/>
+        /// that will reset the color back to its previous value.
         /// </summary>
-        public static void WithBackgroundColor(
-            this IConsole console,
-            ConsoleColor backgroundColor,
-            Action action)
+        public static IDisposable WithBackgroundColor(this IConsole console, ConsoleColor backgroundColor)
         {
             var lastColor = console.BackgroundColor;
             console.BackgroundColor = backgroundColor;
 
-            action();
-
-            console.BackgroundColor = lastColor;
+            return Disposable.Create(() => console.BackgroundColor = lastColor);
         }
 
         /// <summary>
-        /// Sets console foreground and background colors, executes specified action, and sets the colors back to the original values.
+        /// Sets the specified foreground and background colors and returns an <see cref="IDisposable"/>
+        /// that will reset the colors back to their previous values.
         /// </summary>
-        public static void WithColors(
+        public static IDisposable WithColors(
             this IConsole console,
             ConsoleColor foregroundColor,
-            ConsoleColor backgroundColor,
-            Action action) =>
-            console.WithForegroundColor(foregroundColor, () => console.WithBackgroundColor(backgroundColor, action));
+            ConsoleColor backgroundColor)
+        {
+            var lastForegroundColor = console.ForegroundColor;
+            console.ForegroundColor = foregroundColor;
+
+            var lastBackgroundColor = console.BackgroundColor;
+            console.BackgroundColor = backgroundColor;
+
+            return Disposable.Create(() =>
+            {
+                console.ForegroundColor = lastForegroundColor;
+                console.BackgroundColor = lastBackgroundColor;
+            });
+        }
 
         private static void WriteException(
             this IConsole console,
@@ -137,16 +141,18 @@ namespace CliFx
 
             // Fully qualified exception type
             console.Error.Write(indentationShared);
-            console.WithForegroundColor(ConsoleColor.DarkGray, () =>
-                console.Error.Write(exceptionType.Namespace + ".")
-            );
-            console.WithForegroundColor(ConsoleColor.White, () =>
-                console.Error.Write(exceptionType.Name)
-            );
+
+            using (console.WithForegroundColor(ConsoleColor.DarkGray))
+                console.Error.Write(exceptionType.Namespace + ".");
+
+            using (console.WithForegroundColor(ConsoleColor.White))
+                console.Error.Write(exceptionType.Name);
+
             console.Error.Write(": ");
 
             // Exception message
-            console.WithForegroundColor(ConsoleColor.Red, () => console.Error.WriteLine(exception.Message));
+            using (console.WithForegroundColor(ConsoleColor.Red))
+                console.Error.WriteLine(exception.Message);
 
             // Recurse into inner exceptions
             if (exception.InnerException is not null)
@@ -163,14 +169,12 @@ namespace CliFx
                     console.Error.Write("at ");
 
                     // "CliFx.Demo.Commands.BookAddCommand."
-                    console.WithForegroundColor(ConsoleColor.DarkGray, () =>
-                        console.Error.Write(stackFrame.ParentType + ".")
-                    );
+                    using (console.WithForegroundColor(ConsoleColor.DarkGray))
+                        console.Error.Write(stackFrame.ParentType + ".");
 
                     // "ExecuteAsync"
-                    console.WithForegroundColor(ConsoleColor.Yellow, () =>
-                        console.Error.Write(stackFrame.MethodName)
-                    );
+                    using (console.WithForegroundColor(ConsoleColor.Yellow))
+                        console.Error.Write(stackFrame.MethodName);
 
                     console.Error.Write("(");
 
@@ -185,18 +189,16 @@ namespace CliFx
                         }
 
                         // "IConsole"
-                        console.WithForegroundColor(ConsoleColor.Blue, () =>
-                            console.Error.Write(parameter.Type)
-                        );
+                        using (console.WithForegroundColor(ConsoleColor.Blue))
+                            console.Error.Write(parameter.Type);
 
                         if (!string.IsNullOrWhiteSpace(parameter.Name))
                         {
                             console.Error.Write(" ");
 
                             // "console"
-                            console.WithForegroundColor(ConsoleColor.White, () =>
-                                console.Error.Write(parameter.Name)
-                            );
+                            using (console.WithForegroundColor(ConsoleColor.White))
+                                console.Error.Write(parameter.Name);
                         }
                     }
 
@@ -209,25 +211,26 @@ namespace CliFx
                         console.Error.Write("\n" + indentationShared + indentationLocal + indentationLocal);
 
                         // "E:\Projects\Softdev\CliFx\CliFx.Demo\Commands\"
-                        var stackFrameDirectoryPath = Path.GetDirectoryName(stackFrame.FilePath);
-                        console.WithForegroundColor(ConsoleColor.DarkGray, () =>
-                            console.Error.Write(stackFrameDirectoryPath + Path.DirectorySeparatorChar)
-                        );
+                        using (console.WithForegroundColor(ConsoleColor.DarkGray))
+                        {
+                            var stackFrameDirectoryPath = Path.GetDirectoryName(stackFrame.FilePath);
+                            console.Error.Write(stackFrameDirectoryPath + Path.DirectorySeparatorChar);
+                        }
 
                         // "BookAddCommand.cs"
-                        var stackFrameFileName = Path.GetFileName(stackFrame.FilePath);
-                        console.WithForegroundColor(ConsoleColor.Yellow, () =>
-                            console.Error.Write(stackFrameFileName)
-                        );
+                        using (console.WithForegroundColor(ConsoleColor.Yellow))
+                        {
+                            var stackFrameFileName = Path.GetFileName(stackFrame.FilePath);
+                            console.Error.Write(stackFrameFileName);
+                        }
 
                         if (!string.IsNullOrWhiteSpace(stackFrame.LineNumber))
                         {
                             console.Error.Write(":");
 
                             // "35"
-                            console.WithForegroundColor(ConsoleColor.Blue, () =>
-                                console.Error.Write(stackFrame.LineNumber)
-                            );
+                            using (console.WithForegroundColor(ConsoleColor.Blue))
+                                console.Error.Write(stackFrame.LineNumber);
                         }
                     }
 
@@ -241,10 +244,8 @@ namespace CliFx
             }
         }
 
-        //Should this be public?
-        internal static void WriteException(
-            this IConsole console,
-            Exception exception) =>
+        // Should this be public?
+        internal static void WriteException(this IConsole console, Exception exception) =>
             console.WriteException(exception, 0);
     }
 }

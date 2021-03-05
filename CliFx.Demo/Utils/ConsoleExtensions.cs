@@ -1,5 +1,6 @@
 ﻿using System;
 using CliFx.Demo.Domain;
+using CliFx.Infrastructure;
 
 namespace CliFx.Demo.Utils
 {

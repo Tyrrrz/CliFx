@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using CliFx.Utils.Extensions;
 
-namespace CliFx
+namespace CliFx.Parsing
 {
     internal partial class CommandInput
     {
