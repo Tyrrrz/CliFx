@@ -129,10 +129,7 @@ namespace CliFx.Infrastructure
             });
         }
 
-        private static void WriteException(
-            this IConsole console,
-            Exception exception,
-            int indentLevel)
+        private static void WriteException(this IConsole console, Exception exception, int indentLevel)
         {
             var exceptionType = exception.GetType();
 

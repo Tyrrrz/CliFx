@@ -12,7 +12,7 @@ namespace CliFx.Demo.Commands
         private readonly LibraryProvider _libraryProvider;
 
         [CommandParameter(0, Name = "title", Description = "Book title.")]
-        public string Title { get; set; } = "";
+        public string Title { get; init; } = "";
 
         public BookRemoveCommand(LibraryProvider libraryProvider)
         {

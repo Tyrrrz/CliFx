@@ -20,17 +20,14 @@ namespace CliFx.Demo.Commands
         {
             var library = _libraryProvider.GetLibrary();
 
-            var isFirst = true;
-            foreach (var book in library.Books)
+            for (var i = 0; i < library.Books.Count; i++)
             {
-                // Margin
-                if (!isFirst)
-                {
+                // Add margin
+                if (i != 0)
                     console.Output.WriteLine();
-                    isFirst = false;
-                }
 
                 // Render book
+                var book = library.Books[i];
                 console.RenderBook(book);
             }
 
