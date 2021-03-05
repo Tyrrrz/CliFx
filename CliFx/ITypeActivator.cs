@@ -3,7 +3,7 @@
 namespace CliFx
 {
     /// <summary>
-    /// Abstraction for a service that can initialize objects at runtime.
+    /// Abstraction for a service that can instantiate objects at runtime.
     /// </summary>
     public interface ITypeActivator
     {

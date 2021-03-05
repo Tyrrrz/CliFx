@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using CliFx.Demo.Commands;
-using CliFx.Demo.Services;
+using CliFx.Demo.Domain;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CliFx.Demo
@@ -14,7 +14,7 @@ namespace CliFx.Demo
             var services = new ServiceCollection();
 
             // Register services
-            services.AddSingleton<LibraryService>();
+            services.AddSingleton<LibraryProvider>();
 
             // Register commands
             services.AddTransient<BookCommand>();

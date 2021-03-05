@@ -2,7 +2,6 @@
 using System.IO;
 using System.Threading.Tasks;
 using CliFx.Tests.Commands;
-using CliFx.Tests.Internal;
 using CliWrap;
 using CliWrap.Buffered;
 using FluentAssertions;

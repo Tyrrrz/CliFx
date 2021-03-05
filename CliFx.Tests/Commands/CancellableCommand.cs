@@ -16,7 +16,7 @@ namespace CliFx.Tests.Commands
             {
                 await Task.Delay(
                     TimeSpan.FromSeconds(3),
-                    console.GetCancellationToken()
+                    console.RegisterCancellation()
                 );
 
                 console.Output.WriteLine(CompletionOutputText);

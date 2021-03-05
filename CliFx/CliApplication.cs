@@ -6,9 +6,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using CliFx.Attributes;
-using CliFx.Domain;
 using CliFx.Exceptions;
-using CliFx.Internal;
+using CliFx.Utils;
 
 namespace CliFx
 {
@@ -28,8 +27,10 @@ namespace CliFx
         /// Initializes an instance of <see cref="CliApplication"/>.
         /// </summary>
         public CliApplication(
-            ApplicationMetadata metadata, ApplicationConfiguration configuration,
-            IConsole console, ITypeActivator typeActivator)
+            ApplicationMetadata metadata,
+            ApplicationConfiguration configuration,
+            IConsole console,
+            ITypeActivator typeActivator)
         {
             _metadata = metadata;
             _configuration = configuration;
@@ -121,7 +122,7 @@ namespace CliFx
         {
             try
             {
-                var root = RootSchema.Resolve(_configuration.CommandTypes);
+                var root = ApplicationSchema.Resolve(_configuration.CommandTypes);
                 var input = CommandInput.Parse(commandLineArguments, root.GetCommandNames());
 
                 // Debug mode
@@ -260,16 +261,6 @@ namespace CliFx
 
     public partial class CliApplication
     {
-        private static class ExitCode
-        {
-            public const int Success = 0;
-
-            public static int FromException(Exception ex) =>
-                ex is CommandException cmdEx
-                    ? cmdEx.ExitCode
-                    : 1;
-        }
-
         // Fallback default command used when none is defined in the application
         [Command]
         private class FallbackDefaultCommand : ICommand

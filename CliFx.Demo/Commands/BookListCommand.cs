@@ -1,31 +1,33 @@
 ﻿using System.Threading.Tasks;
 using CliFx.Attributes;
-using CliFx.Demo.Internal;
-using CliFx.Demo.Services;
+using CliFx.Demo.Domain;
+using CliFx.Demo.Utils;
 
 namespace CliFx.Demo.Commands
 {
     [Command("book list", Description = "List all books in the library.")]
     public class BookListCommand : ICommand
     {
-        private readonly LibraryService _libraryService;
+        private readonly LibraryProvider _libraryProvider;
 
-        public BookListCommand(LibraryService libraryService)
+        public BookListCommand(LibraryProvider libraryProvider)
         {
-            _libraryService = libraryService;
+            _libraryProvider = libraryProvider;
         }
 
         public ValueTask ExecuteAsync(IConsole console)
         {
-            var library = _libraryService.GetLibrary();
+            var library = _libraryProvider.GetLibrary();
 
             var isFirst = true;
             foreach (var book in library.Books)
             {
                 // Margin
                 if (!isFirst)
+                {
                     console.Output.WriteLine();
-                isFirst = false;
+                    isFirst = false;
+                }
 
                 // Render book
                 console.RenderBook(book);

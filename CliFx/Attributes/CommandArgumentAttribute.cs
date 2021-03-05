@@ -3,7 +3,7 @@
 namespace CliFx.Attributes
 {
     /// <summary>
-    /// Properties shared by parameter and option arguments.
+    /// Properties shared by parameter and option attributes.
     /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
     public abstract class CommandArgumentAttribute : Attribute

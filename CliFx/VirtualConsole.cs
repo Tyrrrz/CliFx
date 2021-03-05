@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
-using CliFx.Utilities;
 
 namespace CliFx
 {
@@ -52,7 +51,7 @@ namespace CliFx
         public int CursorTop { get; set; }
 
         /// <inheritdoc />
-        public CancellationToken GetCancellationToken() => _cancellationToken;
+        public CancellationToken RegisterCancellation() => _cancellationToken;
 
         /// <summary>
         /// Initializes an instance of <see cref="VirtualConsole"/>.
@@ -94,33 +93,13 @@ namespace CliFx
     public partial class VirtualConsole
     {
         private static StreamReader WrapInput(Stream? stream) =>
-            stream != null
+            stream is not null
                 ? new StreamReader(Stream.Synchronized(stream), Console.InputEncoding, false)
                 : StreamReader.Null;
 
         private static StreamWriter WrapOutput(Stream? stream) =>
-            stream != null
+            stream is not null
                 ? new StreamWriter(Stream.Synchronized(stream), Console.OutputEncoding) {AutoFlush = true}
                 : StreamWriter.Null;
-
-        /// <summary>
-        /// Creates a <see cref="VirtualConsole"/> that uses in-memory output and error streams.
-        /// Use the exposed streams to easily get the current output.
-        /// </summary>
-        public static (VirtualConsole console, MemoryStreamWriter output, MemoryStreamWriter error) CreateBuffered(
-            CancellationToken cancellationToken = default)
-        {
-            // Memory streams don't need to be disposed
-            var output = new MemoryStreamWriter(Console.OutputEncoding);
-            var error = new MemoryStreamWriter(Console.OutputEncoding);
-
-            var console = new VirtualConsole(
-                output: output,
-                error: error,
-                cancellationToken: cancellationToken
-            );
-
-            return (console, output, error);
-        }
     }
 }

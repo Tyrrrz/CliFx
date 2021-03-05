@@ -1,11 +1,11 @@
 ﻿using System;
 using CliFx.Exceptions;
-using CliFx.Internal.Extensions;
+using CliFx.Utils.Extensions;
 
 namespace CliFx
 {
     /// <summary>
-    /// Type activator that uses the <see cref="Activator"/> class to instantiate objects.
+    /// Type activator that uses the standard <see cref="Activator"/> class to instantiate objects.
     /// </summary>
     public class DefaultTypeActivator : ITypeActivator
     {

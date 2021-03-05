@@ -16,7 +16,7 @@ namespace CliFx.Tests
         public async Task Command_may_throw_a_generic_exception_which_exits_and_prints_error_message_and_stack_trace()
         {
             // Arrange
-            var (console, stdOut, stdErr) = VirtualConsole.CreateBuffered();
+            using var console = new BufferedVirtualConsole();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<GenericExceptionCommand>()
@@ -26,17 +26,21 @@ namespace CliFx.Tests
             // Act
             var exitCode = await application.RunAsync(new[] {"cmd", "-m", "Kaput"});
 
+            var stdOut = console.ReadOutputString();
+            var stdErr = console.ReadErrorString();
+
             // Assert
             exitCode.Should().NotBe(0);
-            stdOut.GetString().Should().BeEmpty();
-            stdErr.GetString().Should().ContainAll(
+
+            stdOut.Should().BeEmpty();
+            stdErr.Should().ContainAll(
                 "System.Exception:",
                 "Kaput", "at",
                 "CliFx.Tests"
             );
 
-            _output.WriteLine(stdOut.GetString());
-            _output.WriteLine(stdErr.GetString());
+            _output.WriteLine(stdOut);
+            _output.WriteLine(stdErr);
         }
 
         [Fact]

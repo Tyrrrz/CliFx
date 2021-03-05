@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
-using CliFx.Internal;
+using CliFx.Utils;
 
 namespace CliFx
 {
@@ -75,7 +75,7 @@ namespace CliFx
         /// - Cancellation can only be deferred once, subsequent requests to cancel by the user will result in instant termination.<br/>
         /// - Any code executing prior to calling this method is not cancellation-aware and as such will terminate instantly when cancellation is requested.
         /// </remarks>
-        CancellationToken GetCancellationToken();
+        CancellationToken RegisterCancellation();
     }
 
     /// <summary>
@@ -149,7 +149,7 @@ namespace CliFx
             console.WithForegroundColor(ConsoleColor.Red, () => console.Error.WriteLine(exception.Message));
 
             // Recurse into inner exceptions
-            if (exception.InnerException != null)
+            if (exception.InnerException is not null)
             {
                 console.WriteException(exception.InnerException, indentLevel + 1);
             }

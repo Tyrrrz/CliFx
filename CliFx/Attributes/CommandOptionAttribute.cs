@@ -9,26 +9,32 @@ namespace CliFx.Attributes
     public class CommandOptionAttribute : CommandArgumentAttribute
     {
         /// <summary>
-        /// Option name (must be longer than a single character).
+        /// Option name.
+        /// </summary>
+        /// <remarks>
+        /// Must contain at least two characters and start with a letter.
         /// Either <see cref="Name"/> or <see cref="ShortName"/> must be set.
         /// All options in a command must have different names (comparison is not case-sensitive).
-        /// </summary>
+        /// </remarks>
         public string? Name { get; }
 
         /// <summary>
-        /// Option short name (single character).
+        /// Option short name.
+        /// </summary>
+        /// <remarks>
         /// Either <see cref="Name"/> or <see cref="ShortName"/> must be set.
         /// All options in a command must have different short names (comparison is case-sensitive).
-        /// </summary>
+        /// </remarks>
         public char? ShortName { get; }
 
         /// <summary>
-        /// Whether an option is required.
+        /// Whether the option is required.
         /// </summary>
         public bool IsRequired { get; set; }
 
         /// <summary>
-        /// Environment variable that will be used as fallback if no option value is specified.
+        /// Environment variable that will be used as fallback if
+        /// the value isn't explicitly specified in the arguments.
         /// </summary>
         public string? EnvironmentVariableName { get; set; }
 

@@ -71,9 +71,9 @@ namespace CliFx
         }
 
         /// <inheritdoc />
-        public CancellationToken GetCancellationToken()
+        public CancellationToken RegisterCancellation()
         {
-            if (_cancellationTokenSource != null)
+            if (_cancellationTokenSource is not null)
                 return _cancellationTokenSource.Token;
 
             var cts = new CancellationTokenSource();
@@ -95,12 +95,12 @@ namespace CliFx
     public partial class SystemConsole
     {
         private static StreamReader WrapInput(Stream? stream) =>
-            stream != null
+            stream is not null
                 ? new StreamReader(Stream.Synchronized(stream), Console.InputEncoding, false)
                 : StreamReader.Null;
 
         private static StreamWriter WrapOutput(Stream? stream) =>
-            stream != null
+            stream is not null
                 ? new StreamWriter(Stream.Synchronized(stream), Console.OutputEncoding) {AutoFlush = true}
                 : StreamWriter.Null;
     }

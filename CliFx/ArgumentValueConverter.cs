@@ -1,27 +1,18 @@
 ﻿namespace CliFx
 {
-    /// <summary>
-    /// Implements custom conversion logic that maps an argument value to a domain type.
-    /// </summary>
-    /// <remarks>
-    /// This type is public for legacy reasons.
-    /// Please derive from <see cref="ArgumentValueConverter{T}"/> instead.
-    /// </remarks>
-    public interface IArgumentValueConverter
+    // Used internally to simplify usage from reflection
+    internal interface IArgumentValueConverter
     {
-        /// <summary>
-        /// Converts an input value to object of required type.
-        /// </summary>
         public object ConvertFrom(string value);
     }
 
     /// <summary>
-    /// A base type for custom argument converters.
+    /// Base type for custom argument converters.
     /// </summary>
     public abstract class ArgumentValueConverter<T> : IArgumentValueConverter
     {
         /// <summary>
-        /// Converts an input value to object of required type.
+        /// Converts the input value to the target type.
         /// </summary>
         public abstract T ConvertFrom(string value);
 

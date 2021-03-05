@@ -10,14 +10,17 @@ namespace CliFx.Attributes
     {
         /// <summary>
         /// Order of this parameter compared to other parameters.
-        /// All parameters in a command must have different order.
-        /// Parameter whose type is a non-scalar (e.g. array), must be the last in order and only one such parameter is allowed.
         /// </summary>
+        /// <remarks>
+        /// All parameters in a command must have different order.
+        /// Parameter whose type is a non-scalar (e.g. array), must be the last in order.
+        /// Only one non-scalar parameter is allowed in a command.
+        /// </remarks>
         public int Order { get; }
 
         /// <summary>
         /// Parameter name, which is only used in help text.
-        /// If this isn't specified, property name is used instead.
+        /// If this isn't specified, parameter name is inferred from the property name.
         /// </summary>
         public string? Name { get; set; }
 

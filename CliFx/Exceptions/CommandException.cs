@@ -3,7 +3,7 @@
 namespace CliFx.Exceptions
 {
     /// <summary>
-    /// Thrown when a command cannot proceed with normal execution due to an error.
+    /// Thrown when a command cannot proceed with its execution due to an error.
     /// Use this exception if you want to report an error that occured during the execution of a command.
     /// This exception also allows specifying exit code which will be returned to the calling process.
     /// </summary>
@@ -26,9 +26,6 @@ namespace CliFx.Exceptions
         /// <summary>
         /// Initializes an instance of <see cref="CommandException"/>.
         /// </summary>
-        /// <remarks>
-        /// On Unix systems an exit code is 8-bit unsigned integer so it's strongly recommended to use values between 1 and 255 to avoid overflow.
-        /// </remarks>
         public CommandException(string? message, Exception? innerException, int exitCode = DefaultExitCode, bool showHelp = false)
             : base(message, innerException)
         {
@@ -42,9 +39,6 @@ namespace CliFx.Exceptions
         /// <summary>
         /// Initializes an instance of <see cref="CommandException"/>.
         /// </summary>
-        /// <remarks>
-        /// On Unix systems an exit code is 8-bit unsigned integer so it's strongly recommended to use values between 1 and 255 to avoid overflow.
-        /// </remarks>
         public CommandException(string? message, int exitCode = DefaultExitCode, bool showHelp = false)
             : this(message, null, exitCode, showHelp)
         {
@@ -53,9 +47,6 @@ namespace CliFx.Exceptions
         /// <summary>
         /// Initializes an instance of <see cref="CommandException"/>.
         /// </summary>
-        /// <remarks>
-        /// On Unix systems an exit code is 8-bit unsigned integer so it's strongly recommended to use values between 1 and 255 to avoid overflow.
-        /// </remarks>
         public CommandException(int exitCode = DefaultExitCode, bool showHelp = false)
             : this(null, exitCode, showHelp)
         {

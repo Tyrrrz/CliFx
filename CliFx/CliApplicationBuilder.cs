@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using CliFx.Domain;
-using CliFx.Internal.Extensions;
+using CliFx.Attributes;
+using CliFx.Utils.Extensions;
 
 namespace CliFx
 {
@@ -53,7 +53,9 @@ namespace CliFx
 
         /// <summary>
         /// Adds commands from the specified assembly to the application.
-        /// Only adds public valid command types.
+        ///
+        /// Only adds public non-abstract types that implement <see cref="ICommand"/>
+        /// and are annotated by <see cref="CommandAttribute"/>.
         /// </summary>
         public CliApplicationBuilder AddCommandsFrom(Assembly commandAssembly)
         {
@@ -65,7 +67,9 @@ namespace CliFx
 
         /// <summary>
         /// Adds commands from the specified assemblies to the application.
-        /// Only adds public valid command types.
+        ///
+        /// Only adds public non-abstract types that implement <see cref="ICommand"/>
+        /// and are annotated by <see cref="CommandAttribute"/>.
         /// </summary>
         public CliApplicationBuilder AddCommandsFrom(IEnumerable<Assembly> commandAssemblies)
         {
@@ -77,12 +81,14 @@ namespace CliFx
 
         /// <summary>
         /// Adds commands from the calling assembly to the application.
-        /// Only adds public valid command types.
+        ///
+        /// Only adds public non-abstract types that implement <see cref="ICommand"/>
+        /// and are annotated by <see cref="CommandAttribute"/>.
         /// </summary>
         public CliApplicationBuilder AddCommandsFromThisAssembly() => AddCommandsFrom(Assembly.GetCallingAssembly());
 
         /// <summary>
-        /// Specifies whether debug mode (enabled with [debug] directive) is allowed in the application.
+        /// Specifies whether debug mode (enabled with the [debug] directive) is allowed in the application.
         /// </summary>
         public CliApplicationBuilder AllowDebugMode(bool isAllowed = true)
         {
@@ -91,7 +97,7 @@ namespace CliFx
         }
 
         /// <summary>
-        /// Specifies whether preview mode (enabled with [preview] directive) is allowed in the application.
+        /// Specifies whether preview mode (enabled with the [preview] directive) is allowed in the application.
         /// </summary>
         public CliApplicationBuilder AllowPreviewMode(bool isAllowed = true)
         {
@@ -206,7 +212,7 @@ namespace CliFx
         }
 
         private static string GetDefaultVersionText() =>
-            EntryAssembly != null
+            EntryAssembly is not null
                 ? $"v{EntryAssembly.GetName().Version.ToSemanticString()}"
                 : "v1.0";
     }
