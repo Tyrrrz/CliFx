@@ -27,5 +27,23 @@ namespace CliFx.Internal.Extensions
             obj is IFormattable formattable
                 ? formattable.ToString(format, formatProvider)
                 : obj.ToString();
+
+        public static string PascalToKebabCase(this string str)
+        {
+            if (string.IsNullOrEmpty(str))
+                return str;
+
+            var sb = new StringBuilder();
+            var chars = str.ToCharArray();
+            for (int i = 0; i < chars.Length; ++i)
+            {
+                if (i > 0 && char.IsUpper(chars[i]))
+                    sb.Append('-');
+
+                sb.Append(char.ToLower(chars[i]));
+            }
+
+            return sb.ToString();
+        }
     }
 }

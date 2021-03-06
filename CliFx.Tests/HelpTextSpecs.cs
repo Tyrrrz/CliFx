@@ -176,5 +176,32 @@ namespace CliFx.Tests
 
             _output.WriteLine(stdOut.GetString());
         }
+
+        [Fact]
+        public async Task Help_text_shows_generated_command_oiption_names_when_option_name_isnt_provided()
+        {
+            // Arrange
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+
+            var application = new CliApplicationBuilder()
+                .AddCommand<WithGeneratedOptionNamesCommand>()
+                .UseConsole(console)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(new[] { "cmd", "--help" });
+
+            // Assert
+            exitCode.Should().Be(0);
+            stdOut.GetString().Should().ContainAll(
+                "--option <value>",
+                "Options",
+                "--option",
+                "--another-option",
+                "-n"
+            );
+
+            _output.WriteLine(stdOut.GetString());
+        }
     }
 }

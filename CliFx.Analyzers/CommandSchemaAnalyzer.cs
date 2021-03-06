@@ -20,7 +20,6 @@ namespace CliFx.Analyzers
             DiagnosticDescriptors.CliFx0024,
             DiagnosticDescriptors.CliFx0025,
             DiagnosticDescriptors.CliFx0026,
-            DiagnosticDescriptors.CliFx0041,
             DiagnosticDescriptors.CliFx0042,
             DiagnosticDescriptors.CliFx0043,
             DiagnosticDescriptors.CliFx0044,
@@ -225,21 +224,20 @@ namespace CliFx.Analyzers
                 })
                 .ToArray();
 
-            // No name
-            var noNameOptions = options
-                .Where(o => string.IsNullOrWhiteSpace(o.Name) && o.ShortName == null)
-                .ToArray();
-
-            foreach (var option in noNameOptions)
-            {
-                context.ReportDiagnostic(Diagnostic.Create(
-                    DiagnosticDescriptors.CliFx0041, option.Property.Locations.First()
-                ));
-            }
-
             // Too short name
             var invalidNameLengthOptions = options
-                .Where(o => !string.IsNullOrWhiteSpace(o.Name) && o.Name.Length <= 1)
+                .Where(o => {
+
+                    // Option has an explicit name and it is too short
+                    if (!string.IsNullOrWhiteSpace(o.Name) && o.Name.Length <= 1)
+                        return true;
+
+                    // Option doesn't have an explicit name or short name and the resulting generated name would be too short
+                    if (string.IsNullOrEmpty(o.Name) && !o.ShortName.HasValue && o.Property.Name.Length >= 1)
+                        return true;
+
+                    return false;
+                })
                 .ToArray();
 
             foreach (var option in invalidNameLengthOptions)

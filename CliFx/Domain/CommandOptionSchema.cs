@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using CliFx.Attributes;
+using CliFx.Internal.Extensions;
 
 namespace CliFx.Domain
 {
@@ -92,6 +93,10 @@ namespace CliFx.Domain
 
             // The user may mistakenly specify dashes, thinking it's required, so trim them
             var name = attribute.Name?.TrimStart('-');
+
+            // If neither command option's name nor short name are provided generate a regular name based on property's name
+            if (string.IsNullOrEmpty(name) && !attribute.ShortName.HasValue)
+                name = property.Name.PascalToKebabCase();
 
             return new CommandOptionSchema(
                 property,

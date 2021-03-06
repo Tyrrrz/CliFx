@@ -273,26 +273,6 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Command_options_must_have_names_that_are_not_empty()
-        {
-            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
-
-            var application = new CliApplicationBuilder()
-                .AddCommand<EmptyOptionNameCommand>()
-                .UseConsole(console)
-                .Build();
-
-            // Act
-            var exitCode = await application.RunAsync(Array.Empty<string>());
-
-            // Assert
-            exitCode.Should().NotBe(0);
-            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
-
-            _output.WriteLine(stdErr.GetString());
-        }
-
-        [Fact]
         public async Task Command_options_must_have_names_that_are_longer_than_one_character()
         {
             var (console, _, stdErr) = VirtualConsole.CreateBuffered();

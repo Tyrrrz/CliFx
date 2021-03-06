@@ -60,13 +60,6 @@ namespace CliFx.Analyzers
                 "Usage", DiagnosticSeverity.Error, true
             );
 
-        public static readonly DiagnosticDescriptor CliFx0041 =
-            new(nameof(CliFx0041),
-                "Option must have a name or short name specified",
-                "Option must have a name or short name specified",
-                "Usage", DiagnosticSeverity.Error, true
-            );
-
         public static readonly DiagnosticDescriptor CliFx0042 =
             new(nameof(CliFx0042),
                 "Option name must be at least 2 characters long",

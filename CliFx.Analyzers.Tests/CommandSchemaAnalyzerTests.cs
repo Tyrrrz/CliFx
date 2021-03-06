@@ -518,25 +518,6 @@ public class MyCommand : ICommand
             yield return new object[]
             {
                 new AnalyzerTestCase(
-                    "Option with an empty name",
-                    DiagnosticDescriptors.CliFx0041,
-
-                    // language=cs
-                    @"
-[Command]
-public class MyCommand : ICommand
-{
-    [CommandOption("""")]
-    public string Option { get; set; }
-
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}"
-                )
-            };
-
-            yield return new object[]
-            {
-                new AnalyzerTestCase(
                     "Option with a name which is too short",
                     DiagnosticDescriptors.CliFx0042,
 
@@ -547,6 +528,25 @@ public class MyCommand : ICommand
 {
     [CommandOption(""a"")]
     public string Option { get; set; }
+
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}"
+                )
+            };
+
+            yield return new object[]
+            {
+                new AnalyzerTestCase(
+                    "Option with a generated name which is too short",
+                    DiagnosticDescriptors.CliFx0042,
+
+                    // language=cs
+                    @"
+[Command]
+public class MyCommand : ICommand
+{
+    [CommandOption]
+    public string A { get; set; }
 
     public ValueTask ExecuteAsync(IConsole console) => default;
 }"

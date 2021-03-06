@@ -114,6 +114,31 @@ namespace CliFx.Tests
         }
 
         [Fact]
+        public async Task Property_annotated_as_an_option_without_especifying_a_name_must_be_set_when_using_the_generated_name()
+        {
+            // Arrange
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+
+            var application = new CliApplicationBuilder()
+                .AddCommand<WithGeneratedOptionNamesCommand>()
+                .UseConsole(console)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(new[]
+            {
+                "cmd", "--option", "foo", "--another-option", "bar"
+            });
+
+            var commandInstance = stdOut.GetString().DeserializeJson<WithGeneratedOptionNamesCommand>();
+
+            // Assert
+            exitCode.Should().Be(0);
+            commandInstance.Option.Should().Be("foo");
+            commandInstance.AnotherOption.Should().Be("bar");
+        }
+
+        [Fact]
         public async Task Property_annotated_as_parameter_is_bound_directly_from_argument_value_according_to_the_order()
         {
             // Arrange
