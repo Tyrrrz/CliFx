@@ -1,4 +1,4 @@
-﻿namespace CliFx
+﻿namespace CliFx.Extensibility
 {
     // Used internally to simplify usage from reflection
     internal interface IArgumentValueValidator

@@ -1,4 +1,5 @@
 ﻿using System;
+using CliFx.Extensibility;
 
 namespace CliFx.Attributes
 {

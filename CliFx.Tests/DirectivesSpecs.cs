@@ -19,7 +19,7 @@ namespace CliFx.Tests
         public async Task Preview_directive_can_be_specified_to_print_provided_arguments_as_they_were_parsed()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<NamedCommand>()

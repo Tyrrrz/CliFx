@@ -5,9 +5,9 @@ using System.Threading;
 namespace CliFx.Infrastructure
 {
     /// <summary>
-    /// Implementation of <see cref="IConsole"/> that wraps the default system console.
+    /// Implementation of <see cref="IConsole"/> that represents the real system console.
     /// </summary>
-    public partial class SystemConsole : IConsole
+    public class SystemConsole : IConsole
     {
         private CancellationTokenSource? _cancellationTokenSource;
 
@@ -48,9 +48,9 @@ namespace CliFx.Infrastructure
         /// </summary>
         public SystemConsole()
         {
-            Input = WrapInput(Console.OpenStandardInput());
-            Output = WrapOutput(Console.OpenStandardOutput());
-            Error = WrapOutput(Console.OpenStandardError());
+            Input = ConsoleStream.WrapInput(Console.OpenStandardInput());
+            Output = ConsoleStream.WrapOutput(Console.OpenStandardOutput());
+            Error = ConsoleStream.WrapOutput(Console.OpenStandardError());
         }
 
         /// <inheritdoc />
@@ -90,18 +90,5 @@ namespace CliFx.Infrastructure
 
             return (_cancellationTokenSource = cts).Token;
         }
-    }
-
-    public partial class SystemConsole
-    {
-        private static StreamReader WrapInput(Stream? stream) =>
-            stream is not null
-                ? new StreamReader(Stream.Synchronized(stream), Console.InputEncoding, false)
-                : StreamReader.Null;
-
-        private static StreamWriter WrapOutput(Stream? stream) =>
-            stream is not null
-                ? new StreamWriter(Stream.Synchronized(stream), Console.OutputEncoding) {AutoFlush = true}
-                : StreamWriter.Null;
     }
 }

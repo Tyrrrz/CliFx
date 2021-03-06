@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using CliFx.Exceptions;
+using CliFx.Extensibility;
 using CliFx.Utils.Extensions;
 
 namespace CliFx.Schema

@@ -29,7 +29,9 @@ namespace CliFx.Benchmarks
                     }
                 };
 
-                command.Handler = CommandHandler.Create(typeof(SystemCommandLineCommand).GetMethod(nameof(ExecuteHandler)));
+                command.Handler = CommandHandler.Create(
+                    typeof(SystemCommandLineCommand).GetMethod(nameof(ExecuteHandler))!
+                );
 
                 return command.InvokeAsync(args);
             }

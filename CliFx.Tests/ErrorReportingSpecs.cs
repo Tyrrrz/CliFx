@@ -17,7 +17,7 @@ namespace CliFx.Tests
         public async Task Command_may_throw_a_generic_exception_which_exits_and_prints_error_message_and_stack_trace()
         {
             // Arrange
-            using var console = new BufferedVirtualConsole();
+            using var console = new InMemoryConsole();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<GenericExceptionCommand>()
@@ -48,7 +48,7 @@ namespace CliFx.Tests
         public async Task Command_may_throw_a_generic_exception_with_inner_exception_which_exits_and_prints_error_message_and_stack_trace()
         {
             // Arrange
-            var (console, stdOut, stdErr) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, stdErr) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<GenericInnerExceptionCommand>()
@@ -76,7 +76,7 @@ namespace CliFx.Tests
         public async Task Command_may_throw_a_specialized_exception_which_exits_with_custom_code_and_prints_minimal_error_details()
         {
             // Arrange
-            var (console, stdOut, stdErr) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, stdErr) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<CommandExceptionCommand>()
@@ -99,7 +99,7 @@ namespace CliFx.Tests
         public async Task Command_may_throw_a_specialized_exception_without_error_message_which_exits_and_prints_full_error_details()
         {
             // Arrange
-            var (console, stdOut, stdErr) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, stdErr) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<CommandExceptionCommand>()
@@ -126,7 +126,7 @@ namespace CliFx.Tests
         public async Task Command_may_throw_a_specialized_exception_which_exits_and_prints_help_text()
         {
             // Arrange
-            var (console, stdOut, stdErr) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, stdErr) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<CommandExceptionCommand>()
@@ -153,7 +153,7 @@ namespace CliFx.Tests
         public async Task Command_shows_help_text_on_invalid_user_input()
         {
             // Arrange
-            var (console, stdOut, stdErr) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, stdErr) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<DefaultCommand>()

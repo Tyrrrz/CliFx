@@ -21,7 +21,9 @@ namespace CliFx.Analyzers
                 "CliFx_" + GetType().Name.TrimEnd("Analyzer"),
                 diagnosticTitle,
                 diagnosticMessage,
-                "CliFx", diagnosticSeverity, true
+                "CliFx",
+                diagnosticSeverity,
+                true
             );
 
             SupportedDiagnostics = ImmutableArray.Create(SupportedDiagnostic);

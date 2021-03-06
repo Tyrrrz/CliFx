@@ -4,7 +4,7 @@ using CliFx.Exceptions;
 namespace CliFx.Infrastructure
 {
     /// <summary>
-    /// Type activator that uses the specified delegate to instantiate objects.
+    /// Implementation of <see cref="ITypeActivator"/> that uses the specified delegate to instantiate objects.
     /// </summary>
     public class DelegateTypeActivator : ITypeActivator
     {

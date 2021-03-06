@@ -265,7 +265,7 @@ namespace CliFx
         [Command]
         private class FallbackDefaultCommand : ICommand
         {
-            public static CommandSchema Schema { get; } = CommandSchema.TryResolve(typeof(FallbackDefaultCommand))!;
+            public static CommandSchema Schema { get; } = CommandSchema.Resolve(typeof(FallbackDefaultCommand));
 
             // Never actually executed
             [ExcludeFromCodeCoverage]

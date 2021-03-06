@@ -253,5 +253,8 @@ namespace CliFx.Schema
                 options!
             );
         }
+
+        public static CommandSchema Resolve(Type type) =>
+            TryResolve(type) ?? throw CliFxException.InvalidCommandType(type);
     }
 }

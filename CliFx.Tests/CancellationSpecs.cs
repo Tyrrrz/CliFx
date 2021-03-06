@@ -17,7 +17,7 @@ namespace CliFx.Tests
 
             // Arrange
             using var cts = new CancellationTokenSource();
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered(cts.Token);
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered(cts.Token);
 
             var application = new CliApplicationBuilder()
                 .AddCommand<CancellableCommand>()

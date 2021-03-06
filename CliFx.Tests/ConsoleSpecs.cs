@@ -36,7 +36,7 @@ namespace CliFx.Tests
             using var stdOut = new MemoryStream();
             using var stdErr = new MemoryStream();
 
-            var console = new VirtualConsole(
+            var console = new RedirectedConsole(
                 input: stdIn,
                 output: stdOut,
                 error: stdErr

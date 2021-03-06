@@ -20,7 +20,7 @@ namespace CliFx.Tests
         public async Task Argument_value_can_be_bound_to_object()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -48,7 +48,7 @@ namespace CliFx.Tests
         public async Task Argument_values_can_be_bound_to_array_of_object()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -76,7 +76,7 @@ namespace CliFx.Tests
         public async Task Argument_value_can_be_bound_to_string()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -104,7 +104,7 @@ namespace CliFx.Tests
         public async Task Argument_values_can_be_bound_to_array_of_string()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -132,7 +132,7 @@ namespace CliFx.Tests
         public async Task Argument_values_can_be_bound_to_IEnumerable_of_string()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -160,7 +160,7 @@ namespace CliFx.Tests
         public async Task Argument_values_can_be_bound_to_IReadOnlyList_of_string()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -188,7 +188,7 @@ namespace CliFx.Tests
         public async Task Argument_values_can_be_bound_to_List_of_string()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -216,7 +216,7 @@ namespace CliFx.Tests
         public async Task Argument_values_can_be_bound_to_HashSet_of_string()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -244,7 +244,7 @@ namespace CliFx.Tests
         public async Task Argument_value_can_be_bound_to_boolean_as_true_if_the_value_is_true()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -272,7 +272,7 @@ namespace CliFx.Tests
         public async Task Argument_value_can_be_bound_to_boolean_as_false_if_the_value_is_false()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -300,7 +300,7 @@ namespace CliFx.Tests
         public async Task Argument_value_can_be_bound_to_boolean_as_true_if_the_value_is_not_set()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -328,7 +328,7 @@ namespace CliFx.Tests
         public async Task Argument_value_can_be_bound_to_char_if_the_value_contains_a_single_character()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -356,7 +356,7 @@ namespace CliFx.Tests
         public async Task Argument_value_can_be_bound_to_sbyte()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -384,7 +384,7 @@ namespace CliFx.Tests
         public async Task Argument_value_can_be_bound_to_byte()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -412,7 +412,7 @@ namespace CliFx.Tests
         public async Task Argument_value_can_be_bound_to_short()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -440,7 +440,7 @@ namespace CliFx.Tests
         public async Task Argument_value_can_be_bound_to_ushort()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -468,7 +468,7 @@ namespace CliFx.Tests
         public async Task Argument_value_can_be_bound_to_int()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -496,7 +496,7 @@ namespace CliFx.Tests
         public async Task Argument_value_can_be_bound_to_nullable_of_int_as_actual_value_if_it_is_set()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -524,7 +524,7 @@ namespace CliFx.Tests
         public async Task Argument_value_can_be_bound_to_nullable_of_int_as_null_if_it_is_not_set()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -552,7 +552,7 @@ namespace CliFx.Tests
         public async Task Argument_values_can_be_bound_to_array_of_int()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -580,7 +580,7 @@ namespace CliFx.Tests
         public async Task Argument_values_can_be_bound_to_array_of_nullable_of_int()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -608,7 +608,7 @@ namespace CliFx.Tests
         public async Task Argument_value_can_be_bound_to_uint()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -636,7 +636,7 @@ namespace CliFx.Tests
         public async Task Argument_value_can_be_bound_to_long()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -664,7 +664,7 @@ namespace CliFx.Tests
         public async Task Argument_value_can_be_bound_to_ulong()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -692,7 +692,7 @@ namespace CliFx.Tests
         public async Task Argument_value_can_be_bound_to_float()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -720,7 +720,7 @@ namespace CliFx.Tests
         public async Task Argument_value_can_be_bound_to_double()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -748,7 +748,7 @@ namespace CliFx.Tests
         public async Task Argument_value_can_be_bound_to_decimal()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -776,7 +776,7 @@ namespace CliFx.Tests
         public async Task Argument_value_can_be_bound_to_DateTime()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -804,7 +804,7 @@ namespace CliFx.Tests
         public async Task Argument_value_can_be_bound_to_DateTimeOffset()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -832,7 +832,7 @@ namespace CliFx.Tests
         public async Task Argument_value_can_be_bound_to_TimeSpan()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -860,7 +860,7 @@ namespace CliFx.Tests
         public async Task Argument_value_can_be_bound_to_nullable_of_TimeSpan_as_actual_value_if_it_is_set()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -888,7 +888,7 @@ namespace CliFx.Tests
         public async Task Argument_value_can_be_bound_to_nullable_of_TimeSpan_as_null_if_it_is_not_set()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -916,7 +916,7 @@ namespace CliFx.Tests
         public async Task Argument_value_can_be_bound_to_enum_type_by_name()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -944,7 +944,7 @@ namespace CliFx.Tests
         public async Task Argument_value_can_be_bound_to_enum_type_by_id()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -972,7 +972,7 @@ namespace CliFx.Tests
         public async Task Argument_value_can_be_bound_to_nullable_of_enum_type_by_name_if_it_is_set()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -1000,7 +1000,7 @@ namespace CliFx.Tests
         public async Task Argument_value_can_be_bound_to_nullable_of_enum_type_by_id_if_it_is_set()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -1028,7 +1028,7 @@ namespace CliFx.Tests
         public async Task Argument_value_can_be_bound_to_nullable_of_enum_type_as_null_if_it_is_not_set()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -1056,7 +1056,7 @@ namespace CliFx.Tests
         public async Task Argument_values_can_be_bound_to_array_of_enum_type_by_names()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -1084,7 +1084,7 @@ namespace CliFx.Tests
         public async Task Argument_values_can_be_bound_to_array_of_enum_type_by_ids()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -1112,7 +1112,7 @@ namespace CliFx.Tests
         public async Task Argument_values_can_be_bound_to_array_of_enum_type_by_either_names_or_ids()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -1140,7 +1140,7 @@ namespace CliFx.Tests
         public async Task Argument_value_can_be_bound_to_a_custom_type_if_it_has_a_constructor_accepting_a_string()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -1168,7 +1168,7 @@ namespace CliFx.Tests
         public async Task Argument_values_can_be_bound_to_array_of_custom_type_if_it_has_a_constructor_accepting_a_string()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -1200,7 +1200,7 @@ namespace CliFx.Tests
         public async Task Argument_value_can_be_bound_to_a_custom_type_if_it_has_a_static_Parse_method()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -1228,7 +1228,7 @@ namespace CliFx.Tests
         public async Task Argument_value_can_be_bound_to_a_custom_type_if_it_has_a_static_Parse_method_with_format_provider()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -1257,7 +1257,7 @@ namespace CliFx.Tests
         public async Task Argument_value_can_be_bound_to_a_custom_type_if_a_converter_has_been_specified()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -1287,7 +1287,7 @@ namespace CliFx.Tests
         public async Task Argument_values_can_be_bound_to_array_of_custom_type_if_a_converter_has_been_specified()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -1322,7 +1322,7 @@ namespace CliFx.Tests
         public async Task Argument_value_can_only_be_bound_if_the_target_type_is_supported()
         {
             // Arrange
-            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
+            var (console, _, stdErr) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<UnsupportedArgumentTypesCommand>()
@@ -1346,7 +1346,7 @@ namespace CliFx.Tests
         public async Task Argument_value_can_only_be_bound_if_the_provided_value_can_be_converted_to_the_target_type()
         {
             // Arrange
-            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
+            var (console, _, stdErr) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -1370,7 +1370,7 @@ namespace CliFx.Tests
         public async Task Argument_value_can_only_be_bound_to_non_nullable_type_if_it_is_set()
         {
             // Arrange
-            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
+            var (console, _, stdErr) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -1394,7 +1394,7 @@ namespace CliFx.Tests
         public async Task Argument_values_can_only_be_bound_to_a_type_that_implements_IEnumerable()
         {
             // Arrange
-            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
+            var (console, _, stdErr) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -1418,7 +1418,7 @@ namespace CliFx.Tests
         public async Task Argument_values_can_only_be_bound_to_a_type_that_implements_IEnumerable_and_can_be_converted_from_an_array()
         {
             // Arrange
-            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
+            var (console, _, stdErr) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<UnsupportedArgumentTypesCommand>()

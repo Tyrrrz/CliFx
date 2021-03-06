@@ -53,7 +53,7 @@ namespace CliFx.Tests
         [Fact]
         public async Task Option_only_uses_an_environment_variable_as_fallback_if_the_name_matches_case_sensitively()
         {
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<WithEnvironmentVariablesCommand>()
@@ -83,7 +83,7 @@ namespace CliFx.Tests
         [Fact]
         public async Task Option_of_non_scalar_type_can_use_an_environment_variable_as_fallback_and_extract_multiple_values()
         {
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<WithEnvironmentVariablesCommand>()
@@ -112,7 +112,7 @@ namespace CliFx.Tests
         [Fact]
         public async Task Option_of_scalar_type_can_use_an_environment_variable_as_fallback_regardless_of_separators()
         {
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<WithEnvironmentVariablesCommand>()

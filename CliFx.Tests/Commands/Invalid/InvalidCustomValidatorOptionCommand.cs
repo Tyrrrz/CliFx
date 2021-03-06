@@ -1,4 +1,5 @@
 ﻿using CliFx.Attributes;
+using CliFx.Extensibility;
 
 namespace CliFx.Tests.Commands.Invalid
 {

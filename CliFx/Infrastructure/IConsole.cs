@@ -6,7 +6,7 @@ using CliFx.Utils;
 namespace CliFx.Infrastructure
 {
     /// <summary>
-    /// Abstraction for interacting with the console.
+    /// Abstraction for the console layer.
     /// </summary>
     public interface IConsole
     {

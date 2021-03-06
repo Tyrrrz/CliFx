@@ -5,11 +5,11 @@ using System.Threading;
 namespace CliFx.Infrastructure
 {
     /// <summary>
-    /// Implementation of <see cref="IConsole"/> that routes all data to preconfigured streams.
-    /// Does not leak to system console in any way.
-    /// Use this class as a substitute for system console when running tests.
+    /// Implementation of <see cref="IConsole"/> that uses provided standard input, output, and error streams
+    /// instead of the ones exposed by the system console.
+    /// This implementation is designed for use in tests.
     /// </summary>
-    public partial class VirtualConsole : IConsole
+    public class RedirectedConsole : IConsole
     {
         private readonly CancellationToken _cancellationToken;
 
@@ -54,10 +54,10 @@ namespace CliFx.Infrastructure
         public CancellationToken RegisterCancellation() => _cancellationToken;
 
         /// <summary>
-        /// Initializes an instance of <see cref="VirtualConsole"/>.
+        /// Initializes an instance of <see cref="RedirectedConsole"/>.
         /// Use named parameters to specify the streams you want to override.
         /// </summary>
-        public VirtualConsole(
+        public RedirectedConsole(
             StreamReader? input = null, bool isInputRedirected = true,
             StreamWriter? output = null, bool isOutputRedirected = true,
             StreamWriter? error = null, bool isErrorRedirected = true,
@@ -73,33 +73,20 @@ namespace CliFx.Infrastructure
         }
 
         /// <summary>
-        /// Initializes an instance of <see cref="VirtualConsole"/>.
+        /// Initializes an instance of <see cref="RedirectedConsole"/>.
         /// Use named parameters to specify the streams you want to override.
         /// </summary>
-        public VirtualConsole(
+        public RedirectedConsole(
             Stream? input = null, bool isInputRedirected = true,
             Stream? output = null, bool isOutputRedirected = true,
             Stream? error = null, bool isErrorRedirected = true,
             CancellationToken cancellationToken = default)
             : this(
-                WrapInput(input), isInputRedirected,
-                WrapOutput(output), isOutputRedirected,
-                WrapOutput(error), isErrorRedirected,
+                ConsoleStream.WrapInput(input), isInputRedirected,
+                ConsoleStream.WrapOutput(output), isOutputRedirected,
+                ConsoleStream.WrapOutput(error), isErrorRedirected,
                 cancellationToken)
         {
         }
-    }
-
-    public partial class VirtualConsole
-    {
-        private static StreamReader WrapInput(Stream? stream) =>
-            stream is not null
-                ? new StreamReader(Stream.Synchronized(stream), Console.InputEncoding, false)
-                : StreamReader.Null;
-
-        private static StreamWriter WrapOutput(Stream? stream) =>
-            stream is not null
-                ? new StreamWriter(Stream.Synchronized(stream), Console.OutputEncoding) {AutoFlush = true}
-                : StreamWriter.Null;
     }
 }

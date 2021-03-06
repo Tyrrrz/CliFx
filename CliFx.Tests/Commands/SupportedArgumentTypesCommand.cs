@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using CliFx.Attributes;
+using CliFx.Extensibility;
 using Newtonsoft.Json;
 
 namespace CliFx.Tests.Commands

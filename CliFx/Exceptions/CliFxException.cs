@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CliFx.Attributes;
+using CliFx.Extensibility;
 using CliFx.Parsing;
 using CliFx.Schema;
 using CliFx.Utils.Extensions;

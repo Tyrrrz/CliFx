@@ -4,7 +4,12 @@ using System.Threading;
 
 namespace CliFx.Infrastructure
 {
-    public class BufferedVirtualConsole : VirtualConsole, IDisposable
+    /// <summary>
+    /// Implementation of <see cref="IConsole"/> that uses in-memory standard input, output, and error streams
+    /// instead of the ones exposed by the system console.
+    /// This implementation is designed for use in tests.
+    /// </summary>
+    public class InMemoryConsole : RedirectedConsole, IDisposable
     {
         private MemoryStream InputStream => (MemoryStream) Input.BaseStream;
 
@@ -13,9 +18,9 @@ namespace CliFx.Infrastructure
         private MemoryStream ErrorStream => (MemoryStream) Error.BaseStream;
 
         /// <summary>
-        /// Initializes an instance of <see cref="BufferedVirtualConsole"/>.
+        /// Initializes an instance of <see cref="InMemoryConsole"/>.
         /// </summary>
-        public BufferedVirtualConsole(CancellationToken cancellationToken = default)
+        public InMemoryConsole(CancellationToken cancellationToken = default)
             : base(
                 new MemoryStream(), true,
                 new MemoryStream(), true,
@@ -29,8 +34,13 @@ namespace CliFx.Infrastructure
         /// </summary>
         public void WriteInput(byte[] data)
         {
+            // TODO: is this safe?
+            var lastPosition = InputStream.Position;
+
             InputStream.Write(data);
             InputStream.Flush();
+
+            InputStream.Position = lastPosition;
         }
 
         /// <summary>

@@ -17,7 +17,7 @@ namespace CliFx.Tests
         public async Task Help_text_shows_usage_format_which_lists_all_parameters()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<WithParametersCommand>()
@@ -41,7 +41,7 @@ namespace CliFx.Tests
         public async Task Help_text_shows_usage_format_which_lists_all_required_options()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<WithRequiredOptionsCommand>()
@@ -69,7 +69,7 @@ namespace CliFx.Tests
         public async Task Help_text_shows_usage_format_which_lists_available_sub_commands()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<DefaultCommand>()
@@ -96,7 +96,7 @@ namespace CliFx.Tests
         public async Task Help_text_shows_all_valid_values_for_enum_arguments()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<WithEnumArgumentsCommand>()
@@ -123,7 +123,7 @@ namespace CliFx.Tests
         public async Task Help_text_shows_environment_variable_names_for_options_that_have_them_defined()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<WithEnvironmentVariablesCommand>()
@@ -148,7 +148,7 @@ namespace CliFx.Tests
         public async Task Help_text_shows_default_values_for_non_required_options()
         {
             // Arrange
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<WithDefaultValuesCommand>()
