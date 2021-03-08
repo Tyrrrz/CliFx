@@ -23,20 +23,20 @@ namespace CliFx.Domain.Suggest
 
             for (; state.Index < state.Arguments.Count; state.Index++)
             {
-                state.Command = string.Join(" ", state.Arguments.Take(state.Index + 1));
-
-                bool isLastArgument = state.Index == state.Arguments.Count - 1;
+                state.CommandCandidate = string.Join(" ", state.Arguments.Take(state.Index + 1));
 
                 // not an exact match to an existing command, return best command suggestions
-                if (!_allCommands.Contains(state.Command, StringComparer.OrdinalIgnoreCase))
+                if (!_allCommands.Contains(state.CommandCandidate, StringComparer.OrdinalIgnoreCase))
                 {
                     StopProcessing = true;
-                    state.Suggestions = isLastArgument ? _allCommands.Where(c => c.StartsWith(state.Command, StringComparison.OrdinalIgnoreCase)) : NoSuggestions();
+                    state.Suggestions = state.IsLastArgument() 
+                                            ? _allCommands.Where(c => c.StartsWith(state.CommandCandidate, StringComparison.OrdinalIgnoreCase))
+                                            : NoSuggestions();
                     return;
                 }
 
                 // exact match found, do we need to look at next argument?
-                if (isLastArgument)
+                if (state.IsLastArgument())
                 {
                     StopProcessing = true;
                     state.Suggestions = NoSuggestions();

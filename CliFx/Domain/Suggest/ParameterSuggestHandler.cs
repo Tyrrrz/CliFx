@@ -18,7 +18,7 @@ namespace CliFx.Domain.Suggest
         public override void Execute(SuggestState state)
         {
             // handle parameter suggestions
-            var commandSchema = _schema.TryFindCommand(state.Command);
+            var commandSchema = _schema.TryFindCommand(state.CommandCandidate);
             var parameterSchemas = new Queue<CommandParameterSchema>(commandSchema?.Parameters.OrderBy(p => p.Order));
 
             CommandParameterSchema? parameterSchema = null;
@@ -50,8 +50,7 @@ namespace CliFx.Domain.Suggest
                     break;
                 }
 
-                bool isLastArgument = state.Index == state.Arguments.Count - 1;
-                if (isLastArgument)
+                if (state.IsLastArgument())
                 {
                     StopProcessing = true;
                     state.Suggestions = Enum.GetNames(targetType)
