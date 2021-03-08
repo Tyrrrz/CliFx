@@ -16,9 +16,12 @@ namespace CliFx.Tests
         private readonly ITestOutputHelper _output;
 
         public SuggestionSpecs(ITestOutputHelper output) => _output = output;
-
-        [Fact]
-        public async Task Suggestion_directive_is_recognized_and_returns_zero_suggestions_for_non_matching_commands()
+        [Theory]
+        [InlineData(new[] { "[suggest]" }, new[] { "named" })]
+        [InlineData(new[] { "[suggest]", "n" }, new[] { "named" })]
+        [InlineData(new[] { "[suggest]", "named" }, new[] { "" })]
+        [InlineData(new[] { "[suggest]", "named_badly" }, new string[] { "" })]
+        public async Task Suggestion_directive_returns_good_command_suggestions(string[] input, string[] expected)
         {
             // Arrange
             var (console, stdOut, _) = VirtualConsole.CreateBuffered();
@@ -31,13 +34,16 @@ namespace CliFx.Tests
 
             // Act
             var exitCode = await application.RunAsync(
-                new[] { "[suggest]", "unnamed" },
+                input,
                 new Dictionary<string, string>()
             );
 
             // Assert
             exitCode.Should().Be(0);
-            stdOut.GetString().Should().BeEmpty();
+            var outputSet = stdOut.GetString().Split("\n").ToHashSet();
+            var expectedSet = expected.ToHashSet();
+
+            outputSet.Should().BeEquivalentTo(expectedSet);
 
             _output.WriteLine(stdOut.GetString());
         }
