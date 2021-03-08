@@ -66,23 +66,21 @@ namespace CliFx.Infrastructure
         int CursorTop { get; set; }
 
         /// <summary>
-        /// Registers a handler for the interrupt signal (i.e. Ctrl+C) on the console
-        /// and returns a token representing the cancellation request.
-        ///
-        /// You can use this token to perform graceful termination in a command.
-        ///
+        /// Registers a handler for the interrupt signal (Ctrl+C) on the console
+        /// and returns a token representing a potential cancellation request.
         /// Subsequent calls to this method have no effect and return the original token.
         /// </summary>
         /// <remarks>
         /// Calling this method effectively makes the command cancellation-aware, which
-        /// means that it becomes responsible for correctly processing and handling
-        /// user's cancellation request.
+        /// means that sending an interrupt signal won't immediately terminate the application,
+        /// but will instead trigger a token that the command can use to perform graceful
+        /// cancellation.
         ///
-        /// If the user sends an interrupt signal before the command receives the cancellation
-        /// token, the application will terminate instantly.
+        /// If the user sends an interrupt signal before this method is called, the application
+        /// will terminate immediately.
         ///
         /// If the user sends a second interrupt signal after the first one, the application
-        /// will terminate instantly regardless of whether the command is cancellation-aware.
+        /// will terminate immediately, regardless of whether the command is cancellation-aware.
         /// </remarks>
         CancellationToken RegisterCancellation();
     }
@@ -94,7 +92,7 @@ namespace CliFx.Infrastructure
     {
         /// <summary>
         /// Sets the specified foreground color and returns an <see cref="IDisposable"/>
-        /// that will reset the color back to its previous value.
+        /// that will reset the color back to its previous value upon disposing.
         /// </summary>
         public static IDisposable WithForegroundColor(this IConsole console, ConsoleColor foregroundColor)
         {
@@ -106,7 +104,7 @@ namespace CliFx.Infrastructure
 
         /// <summary>
         /// Sets the specified background color and returns an <see cref="IDisposable"/>
-        /// that will reset the color back to its previous value.
+        /// that will reset the color back to its previous value upon disposing.
         /// </summary>
         public static IDisposable WithBackgroundColor(this IConsole console, ConsoleColor backgroundColor)
         {
@@ -118,7 +116,7 @@ namespace CliFx.Infrastructure
 
         /// <summary>
         /// Sets the specified foreground and background colors and returns an <see cref="IDisposable"/>
-        /// that will reset the colors back to their previous values.
+        /// that will reset the colors back to their previous values upon disposing.
         /// </summary>
         public static IDisposable WithColors(
             this IConsole console,
