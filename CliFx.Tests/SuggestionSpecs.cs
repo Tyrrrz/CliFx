@@ -84,5 +84,70 @@ namespace CliFx.Tests
 
             _output.WriteLine(stdOut.GetString());
         }
+
+        [Theory]
+        [InlineData(new[] { "[suggest]", "cmd", "paramter" }, new string[] {})]
+        public async Task Suggestion_directive_ignores_parameters(string[] input, string[] expected)
+        {
+            // Arrange
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+
+            var application = new CliApplicationBuilder()
+                .AddCommand<WithParametersCommand>()
+                .UseConsole(console)
+                .AllowSuggestMode()
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(
+                input,
+                new Dictionary<string, string>()
+            );
+
+            // Assert
+            exitCode.Should().Be(0);
+            var outputSet = stdOut.GetString().Split(Environment.NewLine).Where(p => !string.IsNullOrWhiteSpace(p)).ToHashSet();
+            var expectedSet = expected.ToHashSet();
+
+            outputSet.Should().BeEquivalentTo(expectedSet);
+
+            _output.WriteLine(stdOut.GetString());
+        }
+
+        [Theory]
+        // [InlineData(new[] { "[suggest]", "cmd", " " }, new string[] { "Value1", "Value2", "Value3"})] // spaces eaten by Environment.GetCommandLineArgs, can't implement.
+        [InlineData(new[] { "[suggest]", "cmd", "v" }, new string[] { "Value", "Value1", "Value2", "Value3" })]
+        [InlineData(new[] { "[suggest]", "cmd", "Value" }, new string[] { "Value", "Value1", "Value2", "Value3" })]
+        [InlineData(new[] { "[suggest]", "cmd", "Value4" }, new string[] {  })]
+        [InlineData(new[] { "[suggest]", "cmd", "Value", "c" }, new string[] { "Custom", "Custom1", "Custom2", "Custom3" })]
+        [InlineData(new[] { "[suggest]", "cmd", "Value", "Custom4" }, new string[] { })]
+        [InlineData(new[] { "[suggest]", "cmd", "Value", "Custom4", "a" }, new string[] { })]
+        [InlineData(new[] { "[suggest]", "cmd", "Value", "Custom4", "a", "b" }, new string[] { })]
+        public async Task Suggestion_directive_suggests_enum_parameters(string[] input, string[] expected)
+        {
+            // Arrange
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+
+            var application = new CliApplicationBuilder()
+                .AddCommand<WithEnumParametersCommand>()
+                .UseConsole(console)
+                .AllowSuggestMode()
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(
+                input,
+                new Dictionary<string, string>()
+            );
+
+            // Assert
+            exitCode.Should().Be(0);
+            var outputSet = stdOut.GetString().Split(Environment.NewLine).Where(p => !string.IsNullOrWhiteSpace(p)).ToHashSet();
+            var expectedSet = expected.ToHashSet();
+
+            outputSet.Should().BeEquivalentTo(expectedSet);
+
+            _output.WriteLine(stdOut.GetString());
+        }
     }
 }
