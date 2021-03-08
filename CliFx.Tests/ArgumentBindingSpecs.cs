@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using CliFx.Infrastructure;
 using CliFx.Tests.Commands;
+using CliFx.Tests.Utils;
 using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
@@ -17,7 +18,7 @@ namespace CliFx.Tests
         public async Task Property_annotated_as_an_option_can_be_bound_from_multiple_values_even_if_the_inputs_use_mixed_naming()
         {
             // Arrange
-            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
+            using var console = new FakeInMemoryConsole();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<WithStringArrayOptionCommand>()
@@ -30,7 +31,9 @@ namespace CliFx.Tests
                 "cmd", "--opt", "foo", "-o", "bar", "--opt", "baz"
             });
 
-            var commandInstance = stdOut.GetString().DeserializeJson<WithStringArrayOptionCommand>();
+            var stdOut = console.ReadOutputString();
+
+            var commandInstance = stdOut.DeserializeJson<WithStringArrayOptionCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -45,7 +48,7 @@ namespace CliFx.Tests
         public async Task Property_annotated_as_a_required_option_must_always_be_set()
         {
             // Arrange
-            var (console, _, stdErr) = RedirectedConsole.CreateBuffered();
+            using var console = new FakeInMemoryConsole();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<WithSingleRequiredOptionCommand>()
@@ -58,18 +61,21 @@ namespace CliFx.Tests
                 "cmd", "--opt-a", "foo"
             });
 
+            var stdErr = console.ReadErrorString();
+
             // Assert
             exitCode.Should().NotBe(0);
-            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
 
-            _output.WriteLine(stdErr.GetString());
+            stdErr.Should().NotBeNullOrWhiteSpace();
+
+            _output.WriteLine(stdErr);
         }
 
         [Fact]
         public async Task Property_annotated_as_a_required_option_must_always_be_bound_to_some_value()
         {
             // Arrange
-            var (console, _, stdErr) = RedirectedConsole.CreateBuffered();
+            using var console = new FakeInMemoryConsole();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<WithSingleRequiredOptionCommand>()
@@ -82,18 +88,21 @@ namespace CliFx.Tests
                 "cmd", "--opt-a"
             });
 
+            var stdErr = console.ReadErrorString();
+
             // Assert
             exitCode.Should().NotBe(0);
-            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
 
-            _output.WriteLine(stdErr.GetString());
+            stdErr.Should().NotBeNullOrWhiteSpace();
+
+            _output.WriteLine(stdErr);
         }
 
         [Fact]
         public async Task Property_annotated_as_a_required_option_must_always_be_bound_to_at_least_one_value_if_it_expects_multiple_values()
         {
             // Arrange
-            var (console, _, stdErr) = RedirectedConsole.CreateBuffered();
+            using var console = new FakeInMemoryConsole();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<WithRequiredOptionsCommand>()
@@ -106,18 +115,21 @@ namespace CliFx.Tests
                 "cmd", "--opt-a", "foo"
             });
 
+            var stdErr = console.ReadErrorString();
+
             // Assert
             exitCode.Should().NotBe(0);
-            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
 
-            _output.WriteLine(stdErr.GetString());
+            stdErr.Should().NotBeNullOrWhiteSpace();
+
+            _output.WriteLine(stdErr);
         }
 
         [Fact]
         public async Task Property_annotated_as_parameter_is_bound_directly_from_argument_value_according_to_the_order()
         {
             // Arrange
-            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
+            using var console = new FakeInMemoryConsole();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<WithParametersCommand>()
@@ -130,7 +142,7 @@ namespace CliFx.Tests
                 "cmd", "foo", "13", "bar", "baz"
             });
 
-            var commandInstance = stdOut.GetString().DeserializeJson<WithParametersCommand>();
+            var commandInstance = console.ReadOutputString().DeserializeJson<WithParametersCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -147,7 +159,7 @@ namespace CliFx.Tests
         public async Task Property_annotated_as_parameter_must_always_be_bound_to_some_value()
         {
             // Arrange
-            var (console, _, stdErr) = RedirectedConsole.CreateBuffered();
+            using var console = new FakeInMemoryConsole();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<WithSingleParameterCommand>()
@@ -160,18 +172,21 @@ namespace CliFx.Tests
                 "cmd"
             });
 
+            var stdErr = console.ReadErrorString();
+
             // Assert
             exitCode.Should().NotBe(0);
-            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
 
-            _output.WriteLine(stdErr.GetString());
+            stdErr.Should().NotBeNullOrWhiteSpace();
+
+            _output.WriteLine(stdErr);
         }
 
         [Fact]
         public async Task Property_annotated_as_parameter_must_always_be_bound_to_at_least_one_value_if_it_expects_multiple_values()
         {
             // Arrange
-            var (console, _, stdErr) = RedirectedConsole.CreateBuffered();
+            using var console = new FakeInMemoryConsole();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<WithParametersCommand>()
@@ -184,18 +199,21 @@ namespace CliFx.Tests
                 "cmd", "foo", "13"
             });
 
+            var stdErr = console.ReadErrorString();
+
             // Assert
             exitCode.Should().NotBe(0);
-            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
 
-            _output.WriteLine(stdErr.GetString());
+            stdErr.Should().NotBeNullOrWhiteSpace();
+
+            _output.WriteLine(stdErr);
         }
 
         [Fact]
         public async Task Argument_that_begins_with_a_dash_is_not_parsed_as_option_name_if_it_does_not_start_with_a_letter_character()
         {
             // Arrange
-            var (console, stdOut, _) = RedirectedConsole.CreateBuffered();
+            using var console = new FakeInMemoryConsole();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -208,7 +226,7 @@ namespace CliFx.Tests
                 "cmd", "--int", "-13"
             });
 
-            var commandInstance = stdOut.GetString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -223,7 +241,7 @@ namespace CliFx.Tests
         public async Task All_provided_option_arguments_must_be_bound_to_corresponding_properties()
         {
             // Arrange
-            var (console, _, stdErr) = RedirectedConsole.CreateBuffered();
+            using var console = new FakeInMemoryConsole();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -236,18 +254,21 @@ namespace CliFx.Tests
                 "cmd", "--non-existing-option", "13"
             });
 
+            var stdErr = console.ReadErrorString();
+
             // Assert
             exitCode.Should().NotBe(0);
-            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
 
-            _output.WriteLine(stdErr.GetString());
+            stdErr.Should().NotBeNullOrWhiteSpace();
+
+            _output.WriteLine(stdErr);
         }
 
         [Fact]
         public async Task All_provided_parameter_arguments_must_be_bound_to_corresponding_properties()
         {
             // Arrange
-            var (console, _, stdErr) = RedirectedConsole.CreateBuffered();
+            using var console = new FakeInMemoryConsole();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
@@ -260,11 +281,14 @@ namespace CliFx.Tests
                 "cnd", "non-existing-parameter"
             });
 
+            var stdErr = console.ReadErrorString();
+
             // Assert
             exitCode.Should().NotBe(0);
-            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
 
-            _output.WriteLine(stdErr.GetString());
+            stdErr.Should().NotBeNullOrWhiteSpace();
+
+            _output.WriteLine(stdErr);
         }
     }
 }

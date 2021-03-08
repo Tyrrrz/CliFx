@@ -1,12 +1,10 @@
 ﻿// ReSharper disable CheckNamespace
-// ReSharper disable RedundantUsingDirective
-
-// Polyfills to bridge the missing APIs in older versions of the framework/standard.
-
-using System;
-using System.Collections.Generic;
 
 #if NETSTANDARD2_0
+using System;
+using System.Collections.Generic;
+using System.IO;
+
 internal static partial class PolyfillExtensions
 {
     public static bool StartsWith(this string str, char c) =>
@@ -30,6 +28,13 @@ internal static partial class PolyfillExtensions
     public static TValue GetValueOrDefault<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dic, TKey key) =>
         dic.TryGetValue(key!, out var result) ? result! : default!;
 }
+
+internal static partial class PolyfillExtensions
+{
+    public static void Write(this Stream stream, byte[] buffer) =>
+        stream.Write(buffer, 0, buffer.Length);
+}
+
 
 namespace System.Linq
 {

@@ -29,26 +29,21 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public void Fake_implementation_of_console_can_be_used_to_execute_commands_in_isolation()
+        public void Fake_implementation_of_console_does_not_leak_to_real_console()
         {
-            // Arrange
-            using var stdIn = new MemoryStream(Console.InputEncoding.GetBytes("input"));
-            using var stdOut = new MemoryStream();
-            using var stdErr = new MemoryStream();
+            // TODO: test at higher level?
 
-            var console = new RedirectedConsole(
-                input: stdIn,
-                output: stdOut,
-                error: stdErr
-            );
+            // Arrange
+            using var console = new FakeInMemoryConsole();
 
             // Act
+            console.WriteInput("input");
             console.Output.Write("output");
             console.Error.Write("error");
 
-            var stdInData = console.Input.ReadToEnd();
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray());
-            var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray());
+            var stdIn = console.Input.ReadToEnd();
+            var stdOut = console.ReadOutputString();
+            var stdErr = console.ReadErrorString();
 
             console.ResetColor();
             console.ForegroundColor = ConsoleColor.DarkMagenta;
@@ -57,9 +52,9 @@ namespace CliFx.Tests
             console.CursorTop = 24;
 
             // Assert
-            stdInData.Should().Be("input");
-            stdOutData.Should().Be("output");
-            stdErrData.Should().Be("error");
+            stdIn.Should().Be("input");
+            stdOut.Should().Be("output");
+            stdErr.Should().Be("error");
 
             console.Input.Should().NotBeSameAs(Console.In);
             console.Output.Should().NotBeSameAs(Console.Out);

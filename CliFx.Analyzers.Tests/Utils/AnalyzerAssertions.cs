@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using FluentAssertions.Execution;
 using FluentAssertions.Primitives;
@@ -20,29 +22,61 @@ namespace CliFx.Analyzers.Tests.Utils
 
         private IReadOnlyList<Diagnostic> GetProducedDiagnostics(string sourceCode)
         {
-            var compilationOptions = new CSharpCompilationOptions(OutputKind.ConsoleApplication);
+            var result = new List<Diagnostic>();
 
-            // Wrap code with default using directive
+            var analyzers = ImmutableArray.Create(Subject);
+
             var wrappedSourceCode = $@"
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using CliFx;
+using CliFx.Infrastructure;
 using CliFx.Attributes;
 using CliFx.Exceptions;
-using CliFx.Utilities
+using CliFx.Extensibility;
 
 {sourceCode}".Trim();
 
-            // Infer metadata references
             var metadataReferences = MetadataReferences
                 .Transitive(typeof(CliApplication).Assembly)
                 .ToArray();
 
-            return Analyze
-                .GetDiagnostics(Subject, new[] {wrappedSourceCode}, compilationOptions, metadataReferences)
-                .SelectMany(d => d)
-                .ToArray();
+            // Library to avoid having to define a static Main() method
+            var compilationOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
+
+            var solution = CodeFactory.CreateSolution(wrappedSourceCode, compilationOptions, metadataReferences);
+
+            foreach (var project in solution.Projects)
+            {
+                var compilation =
+                    project.GetCompilationAsync().GetAwaiter().GetResult() ??
+                    throw new InvalidOperationException("Failed to compile project.");
+
+                // Ensure there are no compilation errors
+                var compilationErrors = compilation
+                    .GetDiagnostics()
+                    .Where(diagnostic => diagnostic.Severity >= DiagnosticSeverity.Error)
+                    .ToArray();
+
+                foreach (var compilationError in compilationErrors)
+                {
+                    throw new InvalidOperationException(
+                        "Failed to compile project:" + Environment.NewLine +
+                        compilationError
+                    );
+                }
+
+                // Get analyzer-specific diagnostics
+                var analyzerDiagnostics = compilation
+                    .WithAnalyzers(analyzers, project.AnalyzerOptions)
+                    .GetAnalyzerDiagnosticsAsync(analyzers, default)
+                    .GetAwaiter().GetResult();
+
+                result.AddRange(analyzerDiagnostics);
+            }
+
+            return result;
         }
 
         public void ProduceDiagnostics(string sourceCode)

@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis;
 
 namespace CliFx.Analyzers.ObjectModel
 {
+    // TODO: move this out?
     internal static class KnownSymbols
     {
         public static bool IsSystemString(ISymbol symbol) =>
@@ -20,16 +21,16 @@ namespace CliFx.Analyzers.ObjectModel
             symbol.DisplayNameMatches("System.Console");
 
         public static bool IsCliFxConsoleInterface(ISymbol symbol) =>
-            symbol.DisplayNameMatches("CliFx.IConsole");
+            symbol.DisplayNameMatches("CliFx.Infrastructure.IConsole");
 
         public static bool IsCommandInterface(ISymbol symbol) =>
             symbol.DisplayNameMatches("CliFx.ICommand");
 
         public static bool IsArgumentValueConverterInterface(ISymbol symbol) =>
-            symbol.DisplayNameMatches("CliFx.IArgumentValueConverter");
+            symbol.DisplayNameMatches("CliFx.Extensibility.IArgumentValueConverter");
 
         public static bool IsArgumentValueValidatorInterface(ISymbol symbol) =>
-            symbol.DisplayNameMatches("CliFx.IArgumentValueValidator");
+            symbol.DisplayNameMatches("CliFx.Extensibility.IArgumentValueValidator");
 
         public static bool IsCommandAttribute(ISymbol symbol) =>
             symbol.DisplayNameMatches("CliFx.Attributes.CommandAttribute");

@@ -7,11 +7,11 @@ using Xunit.Abstractions;
 
 namespace CliFx.Tests
 {
-    public class DependencyInjectionSpecs
+    public class TypeActivationSpecs
     {
         private readonly ITestOutputHelper _output;
 
-        public DependencyInjectionSpecs(ITestOutputHelper output) => _output = output;
+        public TypeActivationSpecs(ITestOutputHelper output) => _output = output;
 
         [Fact]
         public void Default_type_activator_can_initialize_a_command_if_it_has_a_parameterless_constructor()

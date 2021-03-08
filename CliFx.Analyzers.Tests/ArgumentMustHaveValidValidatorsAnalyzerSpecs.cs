@@ -40,7 +40,7 @@ public class MyCommand : ICommand
             const string code = @"
 public class MyValidator : ArgumentValueValidator<string>
 {
-    public ValidationResult Validate(string value) => ValidationResult.Ok();
+    public override ValidationResult Validate(string value) => ValidationResult.Ok();
 }
 
 [Command]
@@ -107,7 +107,7 @@ public class MyCommand : ICommand
             const string code = @"
 public class MyValidator : ArgumentValueValidator<string>
 {
-    public ValidationResult Validate(string value) => ValidationResult.Ok();
+    public override ValidationResult Validate(string value) => ValidationResult.Ok();
 }
 
 [Command]

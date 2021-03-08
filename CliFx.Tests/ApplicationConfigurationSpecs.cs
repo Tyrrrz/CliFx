@@ -1,35 +1,35 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using CliFx.Infrastructure;
 using CliFx.Tests.Commands;
-using CliFx.Tests.Commands.Invalid;
 using FluentAssertions;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace CliFx.Tests
 {
-    public class ApplicationSpecs
+    public class ApplicationConfigurationSpecs
     {
-        private readonly ITestOutputHelper _output;
-
-        public ApplicationSpecs(ITestOutputHelper output) => _output = output;
-
         [Fact]
-        public void Application_can_be_created_with_a_default_configuration()
+        public async Task Application_can_be_created_with_the_default_configuration()
         {
             // Act
             var app = new CliApplicationBuilder()
                 .AddCommandsFromThisAssembly()
                 .Build();
 
+            var exitCode = await app.RunAsync(
+                Array.Empty<string>(),
+                new Dictionary<string, string>()
+            );
+
             // Assert
-            app.Should().NotBeNull();
+            exitCode.Should().Be(0);
         }
 
         [Fact]
-        public void Application_can_be_created_with_a_custom_configuration()
+        public async Task Application_can_be_created_with_a_customized_configuration()
         {
             // Act
             var app = new CliApplicationBuilder()
@@ -44,31 +44,17 @@ namespace CliFx.Tests
                 .UseExecutableName("test")
                 .UseVersionText("test")
                 .UseDescription("test")
-                .UseConsole(new RedirectedConsole(Stream.Null))
+                .UseConsole(new FakeConsole(Stream.Null))
                 .UseTypeActivator(Activator.CreateInstance!)
                 .Build();
 
-            // Assert
-            app.Should().NotBeNull();
-        }
-
-        [Fact]
-        public async Task At_least_one_command_must_be_defined_in_an_application()
-        {
-            var (console, _, stdErr) = RedirectedConsole.CreateBuffered();
-
-            var application = new CliApplicationBuilder()
-                .UseConsole(console)
-                .Build();
-
-            // Act
-            var exitCode = await application.RunAsync(Array.Empty<string>());
+            var exitCode = await app.RunAsync(
+                Array.Empty<string>(),
+                new Dictionary<string, string>()
+            );
 
             // Assert
-            exitCode.Should().NotBe(0);
-            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
-
-            _output.WriteLine(stdErr.GetString());
+            exitCode.Should().Be(0);
         }
     }
 }

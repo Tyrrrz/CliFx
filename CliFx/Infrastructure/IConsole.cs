@@ -66,14 +66,23 @@ namespace CliFx.Infrastructure
         int CursorTop { get; set; }
 
         /// <summary>
-        /// Defers the application termination in case of a cancellation request and returns the token that represents it.
-        /// Subsequent calls to this method return the same token.
+        /// Registers a handler for the interrupt signal (i.e. Ctrl+C) on the console
+        /// and returns a token representing the cancellation request.
+        ///
+        /// You can use this token to perform graceful termination in a command.
+        ///
+        /// Subsequent calls to this method have no effect and return the original token.
         /// </summary>
         /// <remarks>
-        /// When working with <see cref="SystemConsole"/>:<br/>
-        /// - Cancellation can be requested by the user by pressing Ctrl+C.<br/>
-        /// - Cancellation can only be deferred once, subsequent requests to cancel by the user will result in instant termination.<br/>
-        /// - Any code executing prior to calling this method is not cancellation-aware and as such will terminate instantly when cancellation is requested.
+        /// Calling this method effectively makes the command cancellation-aware, which
+        /// means that it becomes responsible for correctly processing and handling
+        /// user's cancellation request.
+        ///
+        /// If the user sends an interrupt signal before the command receives the cancellation
+        /// token, the application will terminate instantly.
+        ///
+        /// If the user sends a second interrupt signal after the first one, the application
+        /// will terminate instantly regardless of whether the command is cancellation-aware.
         /// </remarks>
         CancellationToken RegisterCancellation();
     }

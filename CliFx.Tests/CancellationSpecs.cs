@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
 using CliFx.Infrastructure;
 using CliFx.Tests.Commands;
@@ -13,11 +12,11 @@ namespace CliFx.Tests
         [Fact]
         public async Task Command_can_perform_additional_cleanup_if_cancellation_is_requested()
         {
-            // Can't test it with a real console because CliWrap can't send Ctrl+C
+            // TODO: test at higher level?
+            // Can't test it with a real console because CliWrap can't send Ctrl+C (yet)
 
             // Arrange
-            using var cts = new CancellationTokenSource();
-            var (console, stdOut, _) = RedirectedConsole.CreateBuffered(cts.Token);
+            using var console = new FakeInMemoryConsole();
 
             var application = new CliApplicationBuilder()
                 .AddCommand<CancellableCommand>()
@@ -25,13 +24,14 @@ namespace CliFx.Tests
                 .Build();
 
             // Act
-            cts.CancelAfter(TimeSpan.FromSeconds(0.2));
+            console.RequestCancellation(TimeSpan.FromSeconds(0.2));
 
             var exitCode = await application.RunAsync(new[] {"cmd"});
+            var stdOut = console.ReadOutputString();
 
             // Assert
             exitCode.Should().NotBe(0);
-            stdOut.GetString().Trim().Should().Be(CancellableCommand.CancellationOutputText);
+            stdOut.Trim().Should().Be(CancellableCommand.CancellationOutputText);
         }
     }
 }

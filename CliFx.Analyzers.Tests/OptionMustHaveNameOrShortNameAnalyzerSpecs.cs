@@ -17,7 +17,7 @@ namespace CliFx.Analyzers.Tests
 [Command]
 public class MyCommand : ICommand
 {
-    [CommandOption(name: null, shortName: null)]
+    [CommandOption(null)]
     public string Foo { get; set; }
     
     public ValueTask ExecuteAsync(IConsole console) => default;
