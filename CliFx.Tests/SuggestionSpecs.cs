@@ -149,5 +149,40 @@ namespace CliFx.Tests
 
             _output.WriteLine(stdOut.GetString());
         }
+
+        [Theory]
+        [InlineData(new[] { "[suggest]", "-" }, new string[] { "-h", "--help" })]
+        [InlineData(new[] { "[suggest]", "--" }, new string[] { "--help" })]
+        [InlineData(new[] { "[suggest]", "cmd", "-" }, new string[] { "-a", "-b", "-c", "-h", "--opt-aa", "--opt-bb", "--opt-cc", "--help" })]
+        [InlineData(new[] { "[suggest]", "cmd", "--" }, new string[] { "--opt-aa", "--opt-bb", "--opt-cc", "--help" })]
+        [InlineData(new[] { "[suggest]", "cmd", "--opt-a" }, new string[] { "--opt-aa" })]
+        [InlineData(new[] { "[suggest]", "cmd", "--opt-aa" }, new string[] { "--opt-aa" })]
+        [InlineData(new[] { "[suggest]", "cmd", "--opt-d" }, new string[] { })]
+        public async Task Suggestion_directive_suggests_options(string[] input, string[] expected)
+        {
+            // Arrange
+            var (console, stdOut, _) = VirtualConsole.CreateBuffered();
+
+            var application = new CliApplicationBuilder()
+                .AddCommand<WithSuggestedOptionsCommand>()
+                .UseConsole(console)
+                .AllowSuggestMode()
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(
+                input,
+                new Dictionary<string, string>()
+            );
+
+            // Assert
+            exitCode.Should().Be(0);
+            var outputSet = stdOut.GetString().Split(Environment.NewLine).Where(p => !string.IsNullOrWhiteSpace(p)).ToHashSet();
+            var expectedSet = expected.ToHashSet();
+
+            outputSet.Should().BeEquivalentTo(expectedSet);
+
+            _output.WriteLine(stdOut.GetString());
+        }
     }
 }
