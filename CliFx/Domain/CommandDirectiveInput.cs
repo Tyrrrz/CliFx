@@ -11,6 +11,8 @@ namespace CliFx.Domain
 
         public bool IsPreviewDirective => string.Equals(Name, "preview", StringComparison.OrdinalIgnoreCase);
 
+        public bool IsSuggestDirective => string.Equals(Name, "suggest", StringComparison.OrdinalIgnoreCase);
+
         public CommandDirectiveInput(string name) => Name = name;
 
         internal static bool IsDirective(string argument)

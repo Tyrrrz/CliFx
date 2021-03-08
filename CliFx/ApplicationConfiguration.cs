@@ -24,16 +24,23 @@ namespace CliFx
         public bool IsPreviewModeAllowed { get; }
 
         /// <summary>
+        /// Whether suggest mode is allowed in this application. Enables command line auto-completion.
+        /// </summary>
+        public bool IsSuggestModeAllowed { get; }
+
+        /// <summary>
         /// Initializes an instance of <see cref="ApplicationConfiguration"/>.
         /// </summary>
         public ApplicationConfiguration(
             IReadOnlyList<Type> commandTypes,
             bool isDebugModeAllowed,
-            bool isPreviewModeAllowed)
+            bool isPreviewModeAllowed,
+            bool isSuggestModeAllowed )
         {
             CommandTypes = commandTypes;
             IsDebugModeAllowed = isDebugModeAllowed;
             IsPreviewModeAllowed = isPreviewModeAllowed;
+            IsSuggestModeAllowed = isSuggestModeAllowed;
         }
     }
 }

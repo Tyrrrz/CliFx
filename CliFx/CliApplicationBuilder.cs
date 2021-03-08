@@ -17,6 +17,7 @@ namespace CliFx
 
         private bool _isDebugModeAllowed = true;
         private bool _isPreviewModeAllowed = true;
+        private bool _isSuggestModeAllowed = true;
         private string? _title;
         private string? _executableName;
         private string? _versionText;
@@ -100,6 +101,15 @@ namespace CliFx
         }
 
         /// <summary>
+        /// Specifies whether suggest mode (enabled with [suggest] directive) is allowed in the application.
+        /// </summary>
+        public CliApplicationBuilder AllowSuggestMode(bool isAllowed = true)
+        {
+            _isSuggestModeAllowed = isAllowed;
+            return this;
+        }
+
+        /// <summary>
         /// Sets application title, which appears in the help text.
         /// </summary>
         public CliApplicationBuilder UseTitle(string title)
@@ -172,7 +182,7 @@ namespace CliFx
             _typeActivator ??= new DefaultTypeActivator();
 
             var metadata = new ApplicationMetadata(_title, _executableName, _versionText, _description);
-            var configuration = new ApplicationConfiguration(_commandTypes.ToArray(), _isDebugModeAllowed, _isPreviewModeAllowed);
+            var configuration = new ApplicationConfiguration(_commandTypes.ToArray(), _isDebugModeAllowed, _isPreviewModeAllowed, _isSuggestModeAllowed);
 
             return new CliApplication(metadata, configuration, _console, _typeActivator);
         }

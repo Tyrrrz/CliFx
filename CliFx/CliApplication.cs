@@ -137,6 +137,12 @@ namespace CliFx
                     return ExitCode.Success;
                 }
 
+                // Suggestion mode
+                if (_configuration.IsSuggestModeAllowed && input.IsSuggestDirectiveSpecified)
+                {
+                    return ExitCode.Success;
+                }
+
                 // Try to get the command matching the input or fallback to default
                 var command =
                     root.TryFindCommand(input.CommandName) ??

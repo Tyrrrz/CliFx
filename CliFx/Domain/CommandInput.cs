@@ -21,6 +21,8 @@ namespace CliFx.Domain
 
         public bool IsPreviewDirectiveSpecified => Directives.Any(d => d.IsPreviewDirective);
 
+        public bool IsSuggestDirectiveSpecified => Directives.Any(d => d.IsSuggestDirective);
+
         public bool IsHelpOptionSpecified => Options.Any(o => o.IsHelpOption);
 
         public bool IsVersionOptionSpecified => Options.Any(o => o.IsVersionOption);
