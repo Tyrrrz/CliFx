@@ -92,7 +92,7 @@ namespace CliFx.Infrastructure
     {
         /// <summary>
         /// Sets the specified foreground color and returns an <see cref="IDisposable"/>
-        /// that will reset the color back to its previous value upon disposing.
+        /// that will reset the color back to its previous value upon disposal.
         /// </summary>
         public static IDisposable WithForegroundColor(this IConsole console, ConsoleColor foregroundColor)
         {
@@ -104,7 +104,7 @@ namespace CliFx.Infrastructure
 
         /// <summary>
         /// Sets the specified background color and returns an <see cref="IDisposable"/>
-        /// that will reset the color back to its previous value upon disposing.
+        /// that will reset the color back to its previous value upon disposal.
         /// </summary>
         public static IDisposable WithBackgroundColor(this IConsole console, ConsoleColor backgroundColor)
         {
@@ -116,7 +116,7 @@ namespace CliFx.Infrastructure
 
         /// <summary>
         /// Sets the specified foreground and background colors and returns an <see cref="IDisposable"/>
-        /// that will reset the colors back to their previous values upon disposing.
+        /// that will reset the colors back to their previous values upon disposal.
         /// </summary>
         public static IDisposable WithColors(
             this IConsole console,
