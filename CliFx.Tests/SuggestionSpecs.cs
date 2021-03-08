@@ -20,8 +20,8 @@ namespace CliFx.Tests
         [Theory]
         [InlineData(new[] { "[suggest]" }, new[] { "named" })]
         [InlineData(new[] { "[suggest]", "n" }, new[] { "named" })]
-        [InlineData(new[] { "[suggest]", "named" }, new[] { "" })]
-        [InlineData(new[] { "[suggest]", "named_badly" }, new string[] { "" })]
+        [InlineData(new[] { "[suggest]", "named" }, new string[] { })]
+        [InlineData(new[] { "[suggest]", "named_badly" }, new string[] { })]
         public async Task Suggestion_directive_returns_command_suggestions(string[] input, string[] expected)
         {
             // Arrange
@@ -41,7 +41,7 @@ namespace CliFx.Tests
 
             // Assert
             exitCode.Should().Be(0);
-            var outputSet = stdOut.GetString().Split("\n").ToHashSet();
+            var outputSet = stdOut.GetString().Split(Environment.NewLine).Where(p=>!string.IsNullOrWhiteSpace(p)).ToHashSet();
             var expectedSet = expected.ToHashSet();
 
             outputSet.Should().BeEquivalentTo(expectedSet);
@@ -53,10 +53,10 @@ namespace CliFx.Tests
         [Theory]
         [InlineData(new[] { "[suggest]" }, new[] { "named", "named sub" })]
         [InlineData(new[] { "[suggest]", "n" }, new[] { "named", "named sub" })]
-        [InlineData(new[] { "[suggest]", "named" }, new[] { "" })]
-        [InlineData(new[] { "[suggest]", "named_badly" }, new string[] { "" })]
+        [InlineData(new[] { "[suggest]", "named" }, new string[] {})]
+        [InlineData(new[] { "[suggest]", "named_badly" }, new string[] {})]
         [InlineData(new[] { "[suggest]", "named s" }, new string[] { "named sub" })]
-        [InlineData(new[] { "[suggest]", "named sub" }, new string[] { "" })]
+        [InlineData(new[] { "[suggest]", "named sub" }, new string[] {})]
         public async Task Suggestion_directive_returns_subcommand_suggestions(string[] input, string[] expected)
         {
             // Arrange
@@ -77,7 +77,7 @@ namespace CliFx.Tests
 
             // Assert
             exitCode.Should().Be(0);
-            var outputSet = stdOut.GetString().Split("\n").ToHashSet();
+            var outputSet = stdOut.GetString().Split(Environment.NewLine).Where(p =>!string.IsNullOrWhiteSpace(p)).ToHashSet();
             var expectedSet = expected.ToHashSet();
 
             outputSet.Should().BeEquivalentTo(expectedSet);

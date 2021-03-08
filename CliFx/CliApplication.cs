@@ -142,7 +142,7 @@ namespace CliFx
                 {
                     new SuggestionService(root)
                             .GetSuggestions(commandLineArguments).ToList()
-                            .ForEach(s => _console.Output.Write(s));
+                            .ForEach(s => _console.Output.WriteLine(s));
 
                     return ExitCode.Success;
                 }
