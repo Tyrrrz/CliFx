@@ -19,7 +19,9 @@ namespace CliFx.Domain.Suggest
         {
             // handle parameter suggestions
             var commandSchema = _schema.TryFindCommand(state.CommandCandidate);
-            var parameterSchemas = new Queue<CommandParameterSchema>(commandSchema?.Parameters.OrderBy(p => p.Order));
+            var parameterSchemas = commandSchema == null
+                                        ? new Queue<CommandParameterSchema>()
+                                        : new Queue<CommandParameterSchema>(commandSchema?.Parameters.OrderBy(p => p.Order));
 
             CommandParameterSchema? parameterSchema = null;
             if (parameterSchemas.Count != 0)
@@ -45,12 +47,7 @@ namespace CliFx.Domain.Suggest
 
                 // skip parameters we can't give suggestions for (enums, mainly)
                 var targetType = parameterSchema?.Property?.PropertyType;
-                if (targetType?.IsEnum != true)
-                {
-                    break;
-                }
-
-                if (state.IsLastArgument())
+                if (targetType?.IsEnum == true && state.IsLastArgument())
                 {
                     StopProcessing = true;
                     state.Suggestions = Enum.GetNames(targetType)

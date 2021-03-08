@@ -25,6 +25,11 @@ namespace CliFx.Domain.Suggest
             {
                 state.CommandCandidate = string.Join(" ", state.Arguments.Take(state.Index + 1));
 
+                if(state.CommandCandidate.StartsWith("-"))
+                {
+                    return;
+                }
+
                 // not an exact match to an existing command, return best command suggestions
                 if (!_allCommands.Contains(state.CommandCandidate, StringComparer.OrdinalIgnoreCase))
                 {

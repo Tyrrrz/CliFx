@@ -16,33 +16,30 @@ namespace CliFx.Domain.Suggest
         public override void Execute(SuggestState data)
         {
             var commandSchema = _schema.TryFindCommand(data.CommandCandidate);
-            var optionSchemas = new List<CommandOptionSchema>(commandSchema?.Options);
 
-            if( data.Index <= data.Arguments.Count - 1)
+            // hack: handle edge case where --help and -h are applicable but there is no command available.
+            var names = new[] { "help" }
+                            .Concat(commandSchema == null ? new string[] { } : commandSchema.Options?.Select(p => p.Name))
+                            .Distinct();
+            var shortNames = new[] { "h" }
+                            .Concat(commandSchema == null ? new string[] { } : commandSchema.Options?.Select(p => p.ShortName?.ToString()))
+                            .Distinct();
+
+            // hack: skip to the last argument. 
+            data.Index = data.Arguments.Count - 1;
+            var optionArg = data.Arguments.ElementAt(data.Index);
+
+            if (optionArg.StartsWith("--"))
             {
-                data.Index = data.Arguments.Count - 1;
+                var option = optionArg.Substring(2);
+                data.Suggestions = names.Where(n => n?.StartsWith(option) == true).Select(p => $"--{p}");
             }
-
-            for (; data.Index < data.Arguments.Count; data.Index++)
+            else if (optionArg.StartsWith("-"))
             {
-                var optionArg = data.Arguments.ElementAt(data.Index);
-
-                if (optionArg.StartsWith("--"))
-                {
-                    var option = optionArg.Substring(2);
-                    data.Suggestions = optionSchemas.Where(o => o?.Name?.StartsWith(option) == true).Select(p => $"--{p.Name}");
-                    StopProcessing = true;
-                    break;
-                }
-
-                if (optionArg.StartsWith("-"))
-                {
-                    data.Suggestions = optionSchemas.Select(p => $"-{p.ShortName}")
-                                    .Concat(optionSchemas.Select(p=> $"--{p.Name}") );
-                    StopProcessing = true;
-                    break;
-                }
+                data.Suggestions = shortNames.Select(p => $"-{p}")
+                                .Concat(names.Select(p=> $"--{p}") );
             }
+            StopProcessing = true;
         }
     }
 }
