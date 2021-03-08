@@ -2,7 +2,8 @@
 
 namespace CliFx.Domain.Suggest
 {
-    internal class SuggestionData
+    internal class SuggestState
+
     {
         public string Command { get; set; } = "";
         public int Index { get; set; }

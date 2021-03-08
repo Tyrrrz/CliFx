@@ -21,7 +21,7 @@ namespace CliFx.Domain.Suggest
         {
             var states = new List<ISuggestHandler>();
 
-            var data = new SuggestionData
+            var data = new SuggestState
             {
                 Arguments = commandLineArguments.Where(arg => !CommandDirectiveInput.IsDirective(arg)).ToList(),
             };

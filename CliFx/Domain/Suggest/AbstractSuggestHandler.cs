@@ -8,7 +8,7 @@ namespace CliFx.Domain.Suggest
 
         public IEnumerable<string> Suggestions { get; protected set; } = new List<string>();
 
-        public abstract void Execute(SuggestionData data);
+        public abstract void Execute(SuggestState state);
 
         public IEnumerable<string> NoSuggestions()
         {

@@ -9,6 +9,6 @@ namespace CliFx.Domain.Suggest
     internal interface ISuggestHandler
     {
         bool StopProcessing { get; }
-        void Execute(SuggestionData data);
+        void Execute(SuggestState state);
     }
 }

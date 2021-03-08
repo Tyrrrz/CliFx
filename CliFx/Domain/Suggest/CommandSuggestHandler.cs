@@ -13,25 +13,25 @@ namespace CliFx.Domain.Suggest
             _allCommands = allCommands;
         }
 
-        public override void Execute(SuggestionData data)
+        public override void Execute(SuggestState state)
         {
-            if (data.Arguments.Count == 0)
+            if (state.Arguments.Count == 0)
             {
                 StopProcessing = true;
-                data.Suggestions = _allCommands;
+                state.Suggestions = _allCommands;
             }
 
-            for (; data.Index < data.Arguments.Count; data.Index++)
+            for (; state.Index < state.Arguments.Count; state.Index++)
             {
-                data.Command = string.Join(" ", data.Arguments.Take(data.Index + 1));
+                state.Command = string.Join(" ", state.Arguments.Take(state.Index + 1));
 
-                bool isLastArgument = data.Index == data.Arguments.Count - 1;
+                bool isLastArgument = state.Index == state.Arguments.Count - 1;
 
                 // not an exact match to an existing command, return best command suggestions
-                if (!_allCommands.Contains(data.Command, StringComparer.OrdinalIgnoreCase))
+                if (!_allCommands.Contains(state.Command, StringComparer.OrdinalIgnoreCase))
                 {
                     StopProcessing = true;
-                    data.Suggestions = isLastArgument ? _allCommands.Where(c => c.StartsWith(data.Command, StringComparison.OrdinalIgnoreCase)) : NoSuggestions();
+                    state.Suggestions = isLastArgument ? _allCommands.Where(c => c.StartsWith(state.Command, StringComparison.OrdinalIgnoreCase)) : NoSuggestions();
                     return;
                 }
 
@@ -39,19 +39,19 @@ namespace CliFx.Domain.Suggest
                 if (isLastArgument)
                 {
                     StopProcessing = true;
-                    data.Suggestions = NoSuggestions();
+                    state.Suggestions = NoSuggestions();
                     return;
                 }
 
                 // is the next argument a possible sub command candidate?
-                var subCommandCandidate = string.Join(" ", data.Arguments.Take(data.Index + 2));
+                var subCommandCandidate = string.Join(" ", state.Arguments.Take(state.Index + 2));
                 if (_allCommands.Any(c => c.StartsWith(subCommandCandidate, StringComparison.OrdinalIgnoreCase)))
                 {
                     continue;
                 }
 
                 // next argument is likely to be a parameter or option
-                data.Index++;
+                state.Index++;
                 break;
             }
         }
