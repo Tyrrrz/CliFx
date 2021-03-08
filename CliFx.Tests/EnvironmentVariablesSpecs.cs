@@ -68,6 +68,7 @@ namespace CliFx.Tests
         [Fact]
         public async Task Option_of_non_scalar_type_relies_on_the_path_separator_to_extract_multiple_values()
         {
+            // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<WithEnvironmentVariablesCommand>()
                 .UseConsole(_console)
@@ -95,6 +96,7 @@ namespace CliFx.Tests
         [Fact]
         public async Task Option_of_scalar_type_ignores_path_separators()
         {
+            // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<WithEnvironmentVariablesCommand>()
                 .UseConsole(_console)
@@ -122,6 +124,7 @@ namespace CliFx.Tests
         [Fact]
         public async Task Environment_variables_are_matched_case_sensitively()
         {
+            // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<WithEnvironmentVariablesCommand>()
                 .UseConsole(_console)

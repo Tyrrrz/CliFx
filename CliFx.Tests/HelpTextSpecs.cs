@@ -27,7 +27,6 @@ namespace CliFx.Tests
         public async Task Help_text_shows_command_usage_format_which_lists_all_parameters()
         {
             // Arrange
-
             var application = new CliApplicationBuilder()
                 .AddCommand<WithParametersCommand>()
                 .UseConsole(_console)
@@ -76,7 +75,6 @@ namespace CliFx.Tests
         public async Task Help_text_shows_usage_format_which_lists_all_available_sub_commands()
         {
             // Arrange
-
             var application = new CliApplicationBuilder()
                 .AddCommand<DefaultCommand>()
                 .AddCommand<NamedCommand>()

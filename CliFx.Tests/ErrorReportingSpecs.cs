@@ -52,7 +52,6 @@ namespace CliFx.Tests
         public async Task Throwing_a_generic_exception_that_contains_an_inner_exception_exits_with_a_detailed_error_message()
         {
             // Arrange
-
             var application = new CliApplicationBuilder()
                 .AddCommand<GenericInnerExceptionCommand>()
                 .UseConsole(_console)

@@ -27,7 +27,6 @@ namespace CliFx.Tests
         public async Task Default_command_is_executed_if_provided_arguments_do_not_match_any_named_command()
         {
             // Arrange
-
             var application = new CliApplicationBuilder()
                 .AddCommand<DefaultCommand>()
                 .AddCommand<NamedCommand>()
