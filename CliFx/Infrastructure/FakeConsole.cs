@@ -51,9 +51,6 @@ namespace CliFx.Infrastructure
         /// <inheritdoc />
         public int CursorTop { get; set; }
 
-        /// <inheritdoc />
-        public CancellationToken RegisterCancellation() => _cancellationTokenSource.Token;
-
         /// <summary>
         /// Initializes an instance of <see cref="FakeConsole"/>.
         /// </summary>
@@ -71,6 +68,9 @@ namespace CliFx.Infrastructure
             : this(ConsoleStream.WrapInput(input), ConsoleStream.WrapOutput(output), ConsoleStream.WrapOutput(error))
         {
         }
+
+        /// <inheritdoc />
+        public CancellationToken RegisterCancellation() => _cancellationTokenSource.Token;
 
         /// <summary>
         /// Sends a cancellation signal to the currently executing command.
