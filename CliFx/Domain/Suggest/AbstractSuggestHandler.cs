@@ -6,8 +6,6 @@ namespace CliFx.Domain.Suggest
     {
         public bool StopProcessing { get; protected set; }
 
-        public IEnumerable<string> Suggestions { get; protected set; } = new List<string>();
-
         public abstract void Execute(SuggestState state);
 
         public IEnumerable<string> NoSuggestions()

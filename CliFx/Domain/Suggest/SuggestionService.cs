@@ -28,7 +28,8 @@ namespace CliFx.Domain.Suggest
 
             foreach (var state in new ISuggestHandler[] {
                                 new CommandSuggestHandler(_allCommands),
-                                new ParameterSuggestHandler(_schema) })
+                                new ParameterSuggestHandler(_schema), 
+                                new OptionSuggestHandler(_schema)})
             {
                 state.Execute(data);
                 if (state.StopProcessing)
