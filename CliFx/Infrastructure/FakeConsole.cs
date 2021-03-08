@@ -10,7 +10,7 @@ namespace CliFx.Infrastructure
     /// <remarks>
     /// This implementation is designed for usage in tests.
     /// </remarks>
-    public class FakeConsole : IFakeConsole, IDisposable
+    public class FakeConsole : IConsole, IDisposable
     {
         private readonly CancellationTokenSource _cancellationTokenSource = new();
 
@@ -72,7 +72,13 @@ namespace CliFx.Infrastructure
         {
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Sends a cancellation signal to the currently executing command.
+        /// </summary>
+        /// <remarks>
+        /// If the command is not cancellation-aware (i.e. it doesn't call <see cref="IConsole.RegisterCancellation"/>),
+        /// this method will not have any effect.
+        /// </remarks>
         public void RequestCancellation(TimeSpan delay)
         {
             // Avoid unnecessary creation of a timer
@@ -86,10 +92,10 @@ namespace CliFx.Infrastructure
             }
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc cref="RequestCancellation(System.TimeSpan)" />
         public void RequestCancellation() => RequestCancellation(TimeSpan.Zero);
 
         /// <inheritdoc />
-        public void Dispose() => _cancellationTokenSource.Dispose();
+        public virtual void Dispose() => _cancellationTokenSource.Dispose();
     }
 }

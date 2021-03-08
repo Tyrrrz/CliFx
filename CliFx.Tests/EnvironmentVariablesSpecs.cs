@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using CliFx.Infrastructure;
@@ -8,11 +9,24 @@ using CliWrap;
 using CliWrap.Buffered;
 using FluentAssertions;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace CliFx.Tests
 {
-    public class EnvironmentVariablesSpecs
+    public class EnvironmentVariablesSpecs : IDisposable
     {
+        private readonly ITestOutputHelper _testOutput;
+        private readonly FakeInMemoryConsole _console = new();
+
+        public EnvironmentVariablesSpecs(ITestOutputHelper testOutput) =>
+            _testOutput = testOutput;
+
+        public void Dispose()
+        {
+            _console.DumpToTestOutput(_testOutput);
+            _console.Dispose();
+        }
+
         // This test uses a real application to make sure environment variables are actually read correctly
         [Fact]
         public async Task Option_can_fall_back_to_an_environment_variable()
@@ -54,11 +68,9 @@ namespace CliFx.Tests
         [Fact]
         public async Task Option_of_non_scalar_type_relies_on_the_path_separator_to_extract_multiple_values()
         {
-            using var console = new FakeInMemoryConsole();
-
             var application = new CliApplicationBuilder()
                 .AddCommand<WithEnvironmentVariablesCommand>()
-                .UseConsole(console)
+                .UseConsole(_console)
                 .Build();
 
             // Act
@@ -70,11 +82,10 @@ namespace CliFx.Tests
                 }
             );
 
-            var commandInstance = console.ReadOutputString().DeserializeJson<WithEnvironmentVariablesCommand>();
+            var commandInstance = _console.ReadOutputString().DeserializeJson<WithEnvironmentVariablesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
-
             commandInstance.Should().BeEquivalentTo(new WithEnvironmentVariablesCommand
             {
                 OptB = new[] {"foo", "bar"}
@@ -84,11 +95,9 @@ namespace CliFx.Tests
         [Fact]
         public async Task Option_of_scalar_type_ignores_path_separators()
         {
-            using var console = new FakeInMemoryConsole();
-
             var application = new CliApplicationBuilder()
                 .AddCommand<WithEnvironmentVariablesCommand>()
-                .UseConsole(console)
+                .UseConsole(_console)
                 .Build();
 
             // Act
@@ -100,11 +109,10 @@ namespace CliFx.Tests
                 }
             );
 
-            var commandInstance = console.ReadOutputString().DeserializeJson<WithEnvironmentVariablesCommand>();
+            var commandInstance = _console.ReadOutputString().DeserializeJson<WithEnvironmentVariablesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
-
             commandInstance.Should().BeEquivalentTo(new WithEnvironmentVariablesCommand
             {
                 OptA = $"foo{Path.PathSeparator}bar"
@@ -114,11 +122,9 @@ namespace CliFx.Tests
         [Fact]
         public async Task Environment_variables_are_matched_case_sensitively()
         {
-            using var console = new FakeInMemoryConsole();
-
             var application = new CliApplicationBuilder()
                 .AddCommand<WithEnvironmentVariablesCommand>()
-                .UseConsole(console)
+                .UseConsole(_console)
                 .Build();
 
             // Act
@@ -131,11 +137,10 @@ namespace CliFx.Tests
                 }
             );
 
-            var commandInstance = console.ReadOutputString().DeserializeJson<WithEnvironmentVariablesCommand>();
+            var commandInstance = _console.ReadOutputString().DeserializeJson<WithEnvironmentVariablesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
-
             commandInstance.Should().BeEquivalentTo(new WithEnvironmentVariablesCommand
             {
                 OptA = "correct"

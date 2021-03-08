@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Threading;
+﻿using System.IO;
 
 namespace CliFx.Infrastructure
 {
@@ -11,74 +9,27 @@ namespace CliFx.Infrastructure
     /// <remarks>
     /// This implementation is designed for usage in tests.
     /// </remarks>
-    public class FakeInMemoryConsole : IFakeConsole, IDisposable
+    public class FakeInMemoryConsole : FakeConsole
     {
-        private readonly MemoryStream _inputStream = new();
-        private readonly MemoryStream _outputStream = new();
-        private readonly MemoryStream _errorStream = new();
+        private readonly MemoryStream _input;
+        private readonly MemoryStream _output;
+        private readonly MemoryStream _error;
 
-        private readonly IFakeConsole _innerConsole;
-
-        /// <inheritdoc />
-        public StreamReader Input => _innerConsole.Input;
-
-        /// <inheritdoc />
-        public bool IsInputRedirected => _innerConsole.IsInputRedirected;
-
-        /// <inheritdoc />
-        public StreamWriter Output => _innerConsole.Output;
-
-        /// <inheritdoc />
-        public bool IsOutputRedirected => _innerConsole.IsOutputRedirected;
-
-        /// <inheritdoc />
-        public StreamWriter Error => _innerConsole.Error;
-
-        /// <inheritdoc />
-        public bool IsErrorRedirected => _innerConsole.IsErrorRedirected;
-
-        /// <inheritdoc />
-        public ConsoleColor ForegroundColor
+        private FakeInMemoryConsole(MemoryStream input, MemoryStream output, MemoryStream error)
+            : base(input, output, error)
         {
-            get => _innerConsole.ForegroundColor;
-            set => _innerConsole.ForegroundColor = value;
+            _input = input;
+            _output = output;
+            _error = error;
         }
-
-        /// <inheritdoc />
-        public ConsoleColor BackgroundColor
-        {
-            get => _innerConsole.BackgroundColor;
-            set => _innerConsole.BackgroundColor = value;
-        }
-
-        /// <inheritdoc />
-        public void ResetColor()
-        {
-            _innerConsole.ResetColor();
-        }
-
-        /// <inheritdoc />
-        public int CursorLeft
-        {
-            get => _innerConsole.CursorLeft;
-            set => _innerConsole.CursorLeft = value;
-        }
-
-        /// <inheritdoc />
-        public int CursorTop
-        {
-            get => _innerConsole.CursorTop;
-            set => _innerConsole.CursorTop = value;
-        }
-
-        /// <inheritdoc />
-        public CancellationToken RegisterCancellation() => _innerConsole.RegisterCancellation();
 
         /// <summary>
         /// Initializes an instance of <see cref="FakeInMemoryConsole"/>.
         /// </summary>
-        public FakeInMemoryConsole() =>
-            _innerConsole = new FakeConsole(_inputStream, _outputStream, _errorStream);
+        public FakeInMemoryConsole()
+            : this(new MemoryStream(), new MemoryStream(), new MemoryStream())
+        {
+        }
 
         /// <summary>
         /// Writes data to the input stream.
@@ -86,19 +37,19 @@ namespace CliFx.Infrastructure
         public void WriteInput(byte[] data)
         {
             // TODO: is this safe?
-            var lastPosition = _inputStream.Position;
+            var lastPosition = _input.Position;
 
-            _inputStream.Write(data);
-            _inputStream.Flush();
+            _input.Write(data);
+            _input.Flush();
 
-            _inputStream.Position = lastPosition;
+            _input.Position = lastPosition;
         }
 
         /// <summary>
         /// Writes data to the input stream.
         /// </summary>
         public void WriteInput(string data) => WriteInput(
-            _innerConsole.Input.CurrentEncoding.GetBytes(data)
+            Input.CurrentEncoding.GetBytes(data)
         );
 
         /// <summary>
@@ -106,41 +57,37 @@ namespace CliFx.Infrastructure
         /// </summary>
         public byte[] ReadOutputBytes()
         {
-            _outputStream.Flush();
-            return _outputStream.ToArray();
+            _output.Flush();
+            return _output.ToArray();
         }
 
         /// <summary>
         /// Reads the data written to the output stream.
         /// </summary>
-        public string ReadOutputString() => _innerConsole.Output.Encoding.GetString(ReadOutputBytes());
+        public string ReadOutputString() => Output.Encoding.GetString(ReadOutputBytes());
 
         /// <summary>
         /// Reads the data written to the error stream.
         /// </summary>
         public byte[] ReadErrorBytes()
         {
-            _errorStream.Flush();
-            return _errorStream.ToArray();
+            _error.Flush();
+            return _error.ToArray();
         }
 
         /// <summary>
         /// Reads the data written to the error stream.
         /// </summary>
-        public string ReadErrorString() => _innerConsole.Error.Encoding.GetString(ReadErrorBytes());
+        public string ReadErrorString() => Error.Encoding.GetString(ReadErrorBytes());
 
         /// <inheritdoc />
-        public void RequestCancellation(TimeSpan delay) => _innerConsole.RequestCancellation(delay);
-
-        /// <inheritdoc />
-        public void RequestCancellation() => _innerConsole.RequestCancellation();
-
-        /// <inheritdoc />
-        public void Dispose()
+        public override void Dispose()
         {
-            _inputStream.Dispose();
-            _outputStream.Dispose();
-            _errorStream.Dispose();
+            _input.Dispose();
+            _output.Dispose();
+            _error.Dispose();
+
+            base.Dispose();
         }
     }
 }
