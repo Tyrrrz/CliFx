@@ -26,11 +26,16 @@ namespace CliFx
                 return _allCommands;
             }
 
-            var command = nonDirectiveArgs[0];
+            string command = "";
 
-            if (_allCommands.Contains(command))
+            for (int i = 0; i < nonDirectiveArgs.Count; i++)
             {
-                return NoSuggestions();
+                command = string.Join(" ", nonDirectiveArgs.Take(i + 1));
+
+                if (_allCommands.Contains(command, StringComparer.OrdinalIgnoreCase))
+                {
+                    return NoSuggestions();
+                }                
             }
 
             return _allCommands.Where(c => c.StartsWith(command, StringComparison.OrdinalIgnoreCase));
