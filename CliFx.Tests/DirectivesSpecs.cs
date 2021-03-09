@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using CliFx.Infrastructure;
 using CliFx.Tests.Commands;
 using CliFx.Tests.Utils.Extensions;
 using FluentAssertions;
@@ -10,18 +8,11 @@ using Xunit.Abstractions;
 
 namespace CliFx.Tests
 {
-    public class DirectivesSpecs : IDisposable
+    public class DirectivesSpecs : SpecsBase
     {
-        private readonly ITestOutputHelper _testOutput;
-        private readonly FakeInMemoryConsole _console = new();
-
-        public DirectivesSpecs(ITestOutputHelper testOutput) =>
-            _testOutput = testOutput;
-
-        public void Dispose()
+        public DirectivesSpecs(ITestOutputHelper testOutput)
+            : base(testOutput)
         {
-            _console.DumpToTestOutput(_testOutput);
-            _console.Dispose();
         }
 
         [Fact]
@@ -30,7 +21,7 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<NamedCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .AllowPreviewMode()
                 .Build();
 
@@ -40,7 +31,7 @@ namespace CliFx.Tests
                 new Dictionary<string, string>()
             );
 
-            var stdOut = _console.ReadOutputString();
+            var stdOut = FakeConsole.ReadOutputString();
 
             // Assert
             exitCode.Should().Be(0);

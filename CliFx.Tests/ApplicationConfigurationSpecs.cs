@@ -1,27 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using CliFx.Infrastructure;
 using CliFx.Tests.Commands;
-using CliFx.Tests.Utils.Extensions;
 using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace CliFx.Tests
 {
-    public class ApplicationConfigurationSpecs : IDisposable
+    public class ApplicationConfigurationSpecs : SpecsBase
     {
-        private readonly ITestOutputHelper _testOutput;
-        private readonly FakeInMemoryConsole _console = new();
-
-        public ApplicationConfigurationSpecs(ITestOutputHelper testOutput) =>
-            _testOutput = testOutput;
-
-        public void Dispose()
+        public ApplicationConfigurationSpecs(ITestOutputHelper testOutput)
+            : base(testOutput)
         {
-            _console.DumpToTestOutput(_testOutput);
-            _console.Dispose();
         }
 
         [Fact]
@@ -30,7 +21,7 @@ namespace CliFx.Tests
             // Act
             var app = new CliApplicationBuilder()
                 .AddCommandsFromThisAssembly()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             var exitCode = await app.RunAsync(
@@ -58,7 +49,7 @@ namespace CliFx.Tests
                 .UseExecutableName("test")
                 .UseVersionText("test")
                 .UseDescription("test")
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .UseTypeActivator(Activator.CreateInstance!)
                 .Build();
 

@@ -5,11 +5,17 @@ using CliWrap;
 using CliWrap.Buffered;
 using FluentAssertions;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace CliFx.Tests
 {
-    public class ConsoleSpecs
+    public class ConsoleSpecs : SpecsBase
     {
+        public ConsoleSpecs(ITestOutputHelper testOutput)
+            : base(testOutput)
+        {
+        }
+
         [Fact]
         public async Task Real_implementation_of_console_maps_directly_to_system_console()
         {

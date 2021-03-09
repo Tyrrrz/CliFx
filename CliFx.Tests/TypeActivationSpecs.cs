@@ -7,11 +7,12 @@ using Xunit.Abstractions;
 
 namespace CliFx.Tests
 {
-    public class TypeActivationSpecs
+    public class TypeActivationSpecs : SpecsBase
     {
-        private readonly ITestOutputHelper _output;
-
-        public TypeActivationSpecs(ITestOutputHelper output) => _output = output;
+        public TypeActivationSpecs(ITestOutputHelper testOutput)
+            : base(testOutput)
+        {
+        }
 
         [Fact]
         public void Default_type_activator_can_initialize_a_command_if_it_has_a_parameterless_constructor()
@@ -34,7 +35,7 @@ namespace CliFx.Tests
 
             // Act & assert
             var ex = Assert.Throws<CliFxException>(() => activator.CreateInstance(typeof(WithDependenciesCommand)));
-            _output.WriteLine(ex.Message);
+            TestOutput.WriteLine(ex.Message);
         }
 
         [Fact]
@@ -62,7 +63,7 @@ namespace CliFx.Tests
 
             // Act & assert
             var ex = Assert.Throws<CliFxException>(() => activator.CreateInstance(typeof(WithDependenciesCommand)));
-            _output.WriteLine(ex.Message);
+            TestOutput.WriteLine(ex.Message);
         }
     }
 }

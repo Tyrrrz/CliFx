@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using CliFx.Infrastructure;
 using CliFx.Tests.Commands;
 using CliFx.Tests.Utils.Extensions;
 using FluentAssertions;
@@ -9,18 +9,11 @@ using Xunit.Abstractions;
 
 namespace CliFx.Tests
 {
-    public class RoutingSpecs : IDisposable
+    public class RoutingSpecs : SpecsBase
     {
-        private readonly ITestOutputHelper _testOutput;
-        private readonly FakeInMemoryConsole _console = new();
-
-        public RoutingSpecs(ITestOutputHelper testOutput) =>
-            _testOutput = testOutput;
-
-        public void Dispose()
+        public RoutingSpecs(ITestOutputHelper testOutput)
+            : base(testOutput)
         {
-            _console.DumpToTestOutput(_testOutput);
-            _console.Dispose();
         }
 
         [Fact]
@@ -31,13 +24,16 @@ namespace CliFx.Tests
                 .AddCommand<DefaultCommand>()
                 .AddCommand<NamedCommand>()
                 .AddCommand<NamedSubCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(Array.Empty<string>());
+            var exitCode = await application.RunAsync(
+                Array.Empty<string>(),
+                new Dictionary<string, string>()
+            );
 
-            var stdOut = _console.ReadOutputString();
+            var stdOut = FakeConsole.ReadOutputString();
 
             // Assert
             exitCode.Should().Be(0);
@@ -52,13 +48,16 @@ namespace CliFx.Tests
                 .AddCommand<DefaultCommand>()
                 .AddCommand<NamedCommand>()
                 .AddCommand<NamedSubCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[] {"named"});
+            var exitCode = await application.RunAsync(
+                new[] {"named"},
+                new Dictionary<string, string>()
+            );
 
-            var stdOut = _console.ReadOutputString();
+            var stdOut = FakeConsole.ReadOutputString();
 
             // Assert
             exitCode.Should().Be(0);
@@ -73,13 +72,16 @@ namespace CliFx.Tests
                 .AddCommand<DefaultCommand>()
                 .AddCommand<NamedCommand>()
                 .AddCommand<NamedSubCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[] {"named", "sub"});
+            var exitCode = await application.RunAsync(
+                new[] {"named", "sub"},
+                new Dictionary<string, string>()
+            );
 
-            var stdOut = _console.ReadOutputString();
+            var stdOut = FakeConsole.ReadOutputString();
 
             // Assert
             exitCode.Should().Be(0);
@@ -93,14 +95,17 @@ namespace CliFx.Tests
             var application = new CliApplicationBuilder()
                 .AddCommand<NamedCommand>()
                 .AddCommand<NamedSubCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .UseDescription("This will be visible in help")
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(Array.Empty<string>());
+            var exitCode = await application.RunAsync(
+                Array.Empty<string>(),
+                new Dictionary<string, string>()
+            );
 
-            var stdOut = _console.ReadOutputString();
+            var stdOut = FakeConsole.ReadOutputString();
 
             // Assert
             exitCode.Should().Be(0);
@@ -115,13 +120,16 @@ namespace CliFx.Tests
                 .AddCommand<DefaultCommand>()
                 .AddCommand<NamedCommand>()
                 .AddCommand<NamedSubCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[] {"--help"});
+            var exitCode = await application.RunAsync(
+                new[] {"--help"},
+                new Dictionary<string, string>()
+            );
 
-            var stdOut = _console.ReadOutputString();
+            var stdOut = FakeConsole.ReadOutputString();
 
             // Assert
             exitCode.Should().Be(0);
@@ -139,13 +147,16 @@ namespace CliFx.Tests
                 .AddCommand<NamedCommand>()
                 .AddCommand<NamedSubCommand>()
                 .UseDescription("This will be visible in help")
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[] {"--help"});
+            var exitCode = await application.RunAsync(
+                new[] {"--help"},
+                new Dictionary<string, string>()
+            );
 
-            var stdOut = _console.ReadOutputString();
+            var stdOut = FakeConsole.ReadOutputString();
 
             // Assert
             exitCode.Should().Be(0);
@@ -160,13 +171,16 @@ namespace CliFx.Tests
                 .AddCommand<DefaultCommand>()
                 .AddCommand<NamedCommand>()
                 .AddCommand<NamedSubCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[] {"named", "--help"});
+            var exitCode = await application.RunAsync(
+                new[] {"named", "--help"},
+                new Dictionary<string, string>()
+            );
 
-            var stdOut = _console.ReadOutputString();
+            var stdOut = FakeConsole.ReadOutputString();
 
             // Assert
             exitCode.Should().Be(0);
@@ -185,13 +199,16 @@ namespace CliFx.Tests
                 .AddCommand<DefaultCommand>()
                 .AddCommand<NamedCommand>()
                 .AddCommand<NamedSubCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[] {"named", "sub", "--help"});
+            var exitCode = await application.RunAsync(
+                new[] {"named", "sub", "--help"},
+                new Dictionary<string, string>()
+            );
 
-            var stdOut = _console.ReadOutputString();
+            var stdOut = FakeConsole.ReadOutputString();
 
             // Assert
             exitCode.Should().Be(0);
@@ -211,13 +228,16 @@ namespace CliFx.Tests
                 .AddCommand<NamedCommand>()
                 .AddCommand<NamedSubCommand>()
                 .UseVersionText("v6.9")
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[] {"--version"});
+            var exitCode = await application.RunAsync(
+                new[] {"--version"},
+                new Dictionary<string, string>()
+            );
 
-            var stdOut = _console.ReadOutputString();
+            var stdOut = FakeConsole.ReadOutputString();
 
             // Assert
             exitCode.Should().Be(0);

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
-using CliFx.Infrastructure;
 using CliFx.Tests.Commands;
 using CliFx.Tests.Utils.Extensions;
 using FluentAssertions;
@@ -11,18 +10,11 @@ using Xunit.Abstractions;
 
 namespace CliFx.Tests
 {
-    public class ArgumentConversionSpecs : IDisposable
+    public class ValueConversionSpecs : SpecsBase
     {
-        private readonly ITestOutputHelper _testOutput;
-        private readonly FakeInMemoryConsole _console = new();
-
-        public ArgumentConversionSpecs(ITestOutputHelper testOutput) =>
-            _testOutput = testOutput;
-
-        public void Dispose()
+        public ValueConversionSpecs(ITestOutputHelper testOutput)
+            : base(testOutput)
         {
-            _console.DumpToTestOutput(_testOutput);
-            _console.Dispose();
         }
 
         [Fact]
@@ -31,16 +23,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--obj", "value"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--obj", "value"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -56,16 +48,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--obj-array", "foo", "bar"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--obj-array", "foo", "bar"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -81,16 +73,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--str", "value"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--str", "value"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -106,16 +98,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--str-array", "foo", "bar"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--str-array", "foo", "bar"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -131,16 +123,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--str-enumerable", "foo", "bar"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--str-enumerable", "foo", "bar"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -156,16 +148,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--str-read-only-list", "foo", "bar"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--str-read-only-list", "foo", "bar"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -181,16 +173,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--str-list", "foo", "bar"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--str-list", "foo", "bar"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -206,16 +198,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--str-set", "foo", "bar"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--str-set", "foo", "bar"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -231,16 +223,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--bool", "true"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--bool", "true"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -256,16 +248,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--bool", "false"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--bool", "false"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -281,16 +273,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--bool"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--bool"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -306,16 +298,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--char", "a"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--char", "a"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -331,16 +323,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--sbyte", "15"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--sbyte", "15"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -356,16 +348,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--byte", "15"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--byte", "15"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -381,16 +373,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--short", "15"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--short", "15"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -406,16 +398,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--ushort", "15"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--ushort", "15"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -431,16 +423,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--int", "15"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--int", "15"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -456,16 +448,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--int-nullable", "15"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--int-nullable", "15"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -481,16 +473,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--int-nullable"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--int-nullable"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -506,16 +498,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--int-array", "3", "15"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--int-array", "3", "15"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -531,16 +523,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--int-nullable-array", "3", "15"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--int-nullable-array", "3", "15"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -556,16 +548,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--uint", "15"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--uint", "15"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -581,16 +573,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--long", "15"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--long", "15"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -606,16 +598,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--ulong", "15"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--ulong", "15"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -631,16 +623,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--float", "3.14"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--float", "3.14"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -656,16 +648,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--double", "3.14"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--double", "3.14"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -681,16 +673,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--decimal", "3.14"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--decimal", "3.14"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -706,16 +698,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--datetime", "28 Apr 1995"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--datetime", "28 Apr 1995"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -731,16 +723,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--datetime-offset", "28 Apr 1995"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--datetime-offset", "28 Apr 1995"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -756,16 +748,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--timespan", "00:14:59"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--timespan", "00:14:59"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -781,16 +773,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--timespan-nullable", "00:14:59"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--timespan-nullable", "00:14:59"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -806,16 +798,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--timespan-nullable"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--timespan-nullable"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -831,16 +823,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--enum", "value2"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--enum", "value2"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -856,16 +848,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--enum", "2"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--enum", "2"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -881,16 +873,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--enum-nullable", "value3"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--enum-nullable", "value3"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -906,16 +898,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--enum-nullable", "3"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--enum-nullable", "3"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -931,16 +923,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--enum-nullable"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--enum-nullable"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -956,22 +948,23 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--enum-array", "value1", "value3"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--enum-array", "value1", "value3"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
             commandInstance.Should().BeEquivalentTo(new SupportedArgumentTypesCommand
             {
-                EnumArray = new[] {SupportedArgumentTypesCommand.CustomEnum.Value1, SupportedArgumentTypesCommand.CustomEnum.Value3}
+                EnumArray = new[]
+                    {SupportedArgumentTypesCommand.CustomEnum.Value1, SupportedArgumentTypesCommand.CustomEnum.Value3}
             });
         }
 
@@ -981,22 +974,23 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--enum-array", "1", "3"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--enum-array", "1", "3"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
             commandInstance.Should().BeEquivalentTo(new SupportedArgumentTypesCommand
             {
-                EnumArray = new[] {SupportedArgumentTypesCommand.CustomEnum.Value1, SupportedArgumentTypesCommand.CustomEnum.Value3}
+                EnumArray = new[]
+                    {SupportedArgumentTypesCommand.CustomEnum.Value1, SupportedArgumentTypesCommand.CustomEnum.Value3}
             });
         }
 
@@ -1006,22 +1000,23 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--enum-array", "1", "value3"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--enum-array", "1", "value3"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
             commandInstance.Should().BeEquivalentTo(new SupportedArgumentTypesCommand
             {
-                EnumArray = new[] {SupportedArgumentTypesCommand.CustomEnum.Value1, SupportedArgumentTypesCommand.CustomEnum.Value3}
+                EnumArray = new[]
+                    {SupportedArgumentTypesCommand.CustomEnum.Value1, SupportedArgumentTypesCommand.CustomEnum.Value3}
             });
         }
 
@@ -1031,16 +1026,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--str-constructible", "foobar"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--str-constructible", "foobar"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -1056,16 +1051,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--str-constructible-array", "foo", "bar"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--str-constructible-array", "foo", "bar"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -1085,16 +1080,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--str-parseable", "foobar"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--str-parseable", "foobar"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -1110,23 +1105,24 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--str-parseable-format", "foobar"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--str-parseable-format", "foobar"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
             commandInstance.Should().BeEquivalentTo(new SupportedArgumentTypesCommand
             {
                 StringParseableWithFormatProvider =
-                    SupportedArgumentTypesCommand.CustomStringParseableWithFormatProvider.Parse("foobar", CultureInfo.InvariantCulture)
+                    SupportedArgumentTypesCommand.CustomStringParseableWithFormatProvider.Parse("foobar",
+                        CultureInfo.InvariantCulture)
             });
         }
 
@@ -1136,16 +1132,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--convertible", "13"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--convertible", "13"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -1163,16 +1159,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--convertible-array", "13", "42"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--convertible-array", "13", "42"},
+                new Dictionary<string, string>()
+            );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -1195,16 +1191,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<UnsupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--custom"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--custom"},
+                new Dictionary<string, string>()
+            );
 
-            var stdErr = _console.ReadErrorString();
+            var stdErr = FakeConsole.ReadErrorString();
 
             // Assert
             exitCode.Should().NotBe(0);
@@ -1217,16 +1213,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--int", "foo"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--int", "foo"},
+                new Dictionary<string, string>()
+            );
 
-            var stdErr = _console.ReadErrorString();
+            var stdErr = FakeConsole.ReadErrorString();
 
             // Assert
             exitCode.Should().NotBe(0);
@@ -1239,16 +1235,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--int"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--int"},
+                new Dictionary<string, string>()
+            );
 
-            var stdErr = _console.ReadErrorString();
+            var stdErr = FakeConsole.ReadErrorString();
 
             // Assert
             exitCode.Should().NotBe(0);
@@ -1261,16 +1257,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<SupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--int", "1", "2", "3"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--int", "1", "2", "3"},
+                new Dictionary<string, string>()
+            );
 
-            var stdErr = _console.ReadErrorString();
+            var stdErr = FakeConsole.ReadErrorString();
 
             // Assert
             exitCode.Should().NotBe(0);
@@ -1283,16 +1279,16 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<UnsupportedArgumentTypesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[]
-            {
-                "cmd", "--custom-enumerable"
-            });
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--custom-enumerable"},
+                new Dictionary<string, string>()
+            );
 
-            var stdErr = _console.ReadErrorString();
+            var stdErr = FakeConsole.ReadErrorString();
 
             // Assert
             exitCode.Should().NotBe(0);

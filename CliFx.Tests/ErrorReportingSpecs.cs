@@ -1,6 +1,5 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using CliFx.Infrastructure;
 using CliFx.Tests.Commands;
 using CliFx.Tests.Utils.Extensions;
 using FluentAssertions;
@@ -9,18 +8,11 @@ using Xunit.Abstractions;
 
 namespace CliFx.Tests
 {
-    public class ErrorReportingSpecs : IDisposable
+    public class ErrorReportingSpecs : SpecsBase
     {
-        private readonly ITestOutputHelper _testOutput;
-        private readonly FakeInMemoryConsole _console = new();
-
-        public ErrorReportingSpecs(ITestOutputHelper testOutput) =>
-            _testOutput = testOutput;
-
-        public void Dispose()
+        public ErrorReportingSpecs(ITestOutputHelper testOutput)
+            : base(testOutput)
         {
-            _console.DumpToTestOutput(_testOutput);
-            _console.Dispose();
         }
 
         [Fact]
@@ -29,14 +21,17 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<GenericExceptionCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[] {"cmd", "-m", "Kaput"});
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "-m", "Kaput"},
+                new Dictionary<string, string>()
+            );
 
-            var stdOut = _console.ReadOutputString();
-            var stdErr = _console.ReadErrorString();
+            var stdOut = FakeConsole.ReadOutputString();
+            var stdErr = FakeConsole.ReadErrorString();
 
             // Assert
             exitCode.Should().NotBe(0);
@@ -53,14 +48,17 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<GenericInnerExceptionCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[] {"cmd", "-m", "Kaput", "-i", "FooBar"});
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "-m", "Kaput", "-i", "FooBar"},
+                new Dictionary<string, string>()
+            );
 
-            var stdOut = _console.ReadOutputString();
-            var stdErr = _console.ReadErrorString();
+            var stdOut = FakeConsole.ReadOutputString();
+            var stdErr = FakeConsole.ReadErrorString();
 
             // Assert
             exitCode.Should().NotBe(0);
@@ -78,14 +76,17 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<CommandExceptionCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[] {"cmd", "-m", "Kaput", "-c", "69"});
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "-m", "Kaput", "-c", "69"},
+                new Dictionary<string, string>()
+            );
 
-            var stdOut = _console.ReadOutputString();
-            var stdErr = _console.ReadErrorString();
+            var stdOut = FakeConsole.ReadOutputString();
+            var stdErr = FakeConsole.ReadErrorString();
 
             // Assert
             exitCode.Should().Be(69);
@@ -99,14 +100,17 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<CommandExceptionCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[] {"cmd"});
+            var exitCode = await application.RunAsync(
+                new[] {"cmd"},
+                new Dictionary<string, string>()
+            );
 
-            var stdOut = _console.ReadOutputString();
-            var stdErr = _console.ReadErrorString();
+            var stdOut = FakeConsole.ReadOutputString();
+            var stdErr = FakeConsole.ReadErrorString();
 
             // Assert
             exitCode.Should().NotBe(0);
@@ -123,14 +127,17 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<CommandExceptionCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[] {"cmd", "-m", "Kaput", "--show-help"});
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "-m", "Kaput", "--show-help"},
+                new Dictionary<string, string>()
+            );
 
-            var stdOut = _console.ReadOutputString();
-            var stdErr = _console.ReadErrorString();
+            var stdOut = FakeConsole.ReadOutputString();
+            var stdErr = FakeConsole.ReadErrorString();
 
             // Assert
             exitCode.Should().NotBe(0);
@@ -148,14 +155,17 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<DefaultCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[] {"not-a-valid-command", "-r", "foo"});
+            var exitCode = await application.RunAsync(
+                new[] {"not-a-valid-command", "-r", "foo"},
+                new Dictionary<string, string>()
+            );
 
-            var stdOut = _console.ReadOutputString();
-            var stdErr = _console.ReadErrorString();
+            var stdOut = FakeConsole.ReadOutputString();
+            var stdErr = FakeConsole.ReadErrorString();
 
             // Assert
             exitCode.Should().NotBe(0);

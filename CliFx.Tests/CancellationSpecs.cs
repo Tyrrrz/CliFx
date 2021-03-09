@@ -1,26 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using CliFx.Infrastructure;
 using CliFx.Tests.Commands;
-using CliFx.Tests.Utils.Extensions;
 using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace CliFx.Tests
 {
-    public class CancellationSpecs : IDisposable
+    public class CancellationSpecs : SpecsBase
     {
-        private readonly ITestOutputHelper _testOutput;
-        private readonly FakeInMemoryConsole _console = new();
-
-        public CancellationSpecs(ITestOutputHelper testOutput) =>
-            _testOutput = testOutput;
-
-        public void Dispose()
+        public CancellationSpecs(ITestOutputHelper testOutput)
+            : base(testOutput)
         {
-            _console.DumpToTestOutput(_testOutput);
-            _console.Dispose();
         }
 
         [Fact]
@@ -31,14 +23,18 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<CancellableCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            _console.RequestCancellation(TimeSpan.FromSeconds(0.2));
+            FakeConsole.RequestCancellation(TimeSpan.FromSeconds(0.2));
 
-            var exitCode = await application.RunAsync(new[] {"cmd"});
-            var stdOut = _console.ReadOutputString();
+            var exitCode = await application.RunAsync(
+                new[] {"cmd"},
+                new Dictionary<string, string>()
+            );
+
+            var stdOut = FakeConsole.ReadOutputString();
 
             // Assert
             exitCode.Should().NotBe(0);

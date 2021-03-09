@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using CliFx.Infrastructure;
 using CliFx.Tests.Commands;
 using CliFx.Tests.Utils.Extensions;
 using CliWrap;
@@ -13,18 +11,11 @@ using Xunit.Abstractions;
 
 namespace CliFx.Tests
 {
-    public class EnvironmentVariablesSpecs : IDisposable
+    public class EnvironmentVariablesSpecs : SpecsBase
     {
-        private readonly ITestOutputHelper _testOutput;
-        private readonly FakeInMemoryConsole _console = new();
-
-        public EnvironmentVariablesSpecs(ITestOutputHelper testOutput) =>
-            _testOutput = testOutput;
-
-        public void Dispose()
+        public EnvironmentVariablesSpecs(ITestOutputHelper testOutput)
+            : base(testOutput)
         {
-            _console.DumpToTestOutput(_testOutput);
-            _console.Dispose();
         }
 
         // This test uses a real application to make sure environment variables are actually read correctly
@@ -71,7 +62,7 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<WithEnvironmentVariablesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
@@ -83,7 +74,7 @@ namespace CliFx.Tests
                 }
             );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<WithEnvironmentVariablesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<WithEnvironmentVariablesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -99,7 +90,7 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<WithEnvironmentVariablesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
@@ -111,7 +102,7 @@ namespace CliFx.Tests
                 }
             );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<WithEnvironmentVariablesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<WithEnvironmentVariablesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
@@ -127,7 +118,7 @@ namespace CliFx.Tests
             // Arrange
             var application = new CliApplicationBuilder()
                 .AddCommand<WithEnvironmentVariablesCommand>()
-                .UseConsole(_console)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
@@ -140,7 +131,7 @@ namespace CliFx.Tests
                 }
             );
 
-            var commandInstance = _console.ReadOutputString().DeserializeJson<WithEnvironmentVariablesCommand>();
+            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<WithEnvironmentVariablesCommand>();
 
             // Assert
             exitCode.Should().Be(0);
