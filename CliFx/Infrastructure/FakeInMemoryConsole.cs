@@ -36,13 +36,18 @@ namespace CliFx.Infrastructure
         /// </summary>
         public void WriteInput(byte[] data)
         {
-            // TODO: is this safe?
-            var lastPosition = _input.Position;
+            // We want the command to be able to read what we wrote
+            // so we need to seek the stream back to its original
+            // position after we've finished writing.
+            lock (_input)
+            {
+                var lastPosition = _input.Position;
 
-            _input.Write(data);
-            _input.Flush();
+                _input.Write(data);
+                _input.Flush();
 
-            _input.Position = lastPosition;
+                _input.Position = lastPosition;
+            }
         }
 
         /// <summary>
@@ -57,8 +62,11 @@ namespace CliFx.Infrastructure
         /// </summary>
         public byte[] ReadOutputBytes()
         {
-            _output.Flush();
-            return _output.ToArray();
+            lock (_output)
+            {
+                _output.Flush();
+                return _output.ToArray();
+            }
         }
 
         /// <summary>
@@ -71,8 +79,11 @@ namespace CliFx.Infrastructure
         /// </summary>
         public byte[] ReadErrorBytes()
         {
-            _error.Flush();
-            return _error.ToArray();
+            lock (_error)
+            {
+                _error.Flush();
+                return _error.ToArray();
+            }
         }
 
         /// <summary>
