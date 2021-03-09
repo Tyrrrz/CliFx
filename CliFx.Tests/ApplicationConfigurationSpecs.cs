@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using CliFx.Infrastructure;
 using CliFx.Tests.Commands;
-using CliFx.Tests.Utils;
+using CliFx.Tests.Utils.Extensions;
 using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;

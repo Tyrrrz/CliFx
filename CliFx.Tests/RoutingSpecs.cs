@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using CliFx.Infrastructure;
 using CliFx.Tests.Commands;
-using CliFx.Tests.Utils;
+using CliFx.Tests.Utils.Extensions;
 using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
@@ -125,7 +125,7 @@ namespace CliFx.Tests
 
             // Assert
             exitCode.Should().Be(0);
-            stdOut.Should().ContainAll(
+            stdOut.Should().ContainAllInOrder(
                 "Default command description",
                 "Usage"
             );
@@ -170,7 +170,7 @@ namespace CliFx.Tests
 
             // Assert
             exitCode.Should().Be(0);
-            stdOut.Should().ContainAll(
+            stdOut.Should().ContainAllInOrder(
                 "Named command description",
                 "Usage",
                 "named"
@@ -195,7 +195,7 @@ namespace CliFx.Tests
 
             // Assert
             exitCode.Should().Be(0);
-            stdOut.Should().ContainAll(
+            stdOut.Should().ContainAllInOrder(
                 "Named sub command description",
                 "Usage",
                 "named", "sub"

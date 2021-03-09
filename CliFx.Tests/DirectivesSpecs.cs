@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using CliFx.Infrastructure;
 using CliFx.Tests.Commands;
-using CliFx.Tests.Utils;
+using CliFx.Tests.Utils.Extensions;
 using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
@@ -44,7 +44,7 @@ namespace CliFx.Tests
 
             // Assert
             exitCode.Should().Be(0);
-            stdOut.Should().ContainAll(
+            stdOut.Should().ContainAllInOrder(
                 "named", "<param>", "[-a]", "[-b]", "[-c]", "[--option \"foo\"]"
             );
         }

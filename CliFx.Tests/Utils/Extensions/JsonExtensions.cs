@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace CliFx.Tests.Utils
+namespace CliFx.Tests.Utils.Extensions
 {
     internal static class JsonExtensions
     {

@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using CliFx.Infrastructure;
 using CliFx.Tests.Commands;
-using CliFx.Tests.Utils;
+using CliFx.Tests.Utils.Extensions;
 using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
@@ -41,10 +41,9 @@ namespace CliFx.Tests
             // Assert
             exitCode.Should().NotBe(0);
             stdOut.Should().BeEmpty();
-            stdErr.Should().ContainAll(
-                "System.Exception:",
-                "Kaput", "at",
-                "CliFx.Tests"
+            stdErr.Should().ContainAllInOrder(
+                "System.Exception:", "Kaput",
+                "at", "CliFx.Tests"
             );
         }
 
@@ -66,11 +65,10 @@ namespace CliFx.Tests
             // Assert
             exitCode.Should().NotBe(0);
             stdOut.Should().BeEmpty();
-            stdErr.Should().ContainAll(
-                "System.Exception:",
-                "FooBar",
-                "Kaput", "at",
-                "CliFx.Tests"
+            stdErr.Should().ContainAllInOrder(
+                "System.Exception:", "Kaput",
+                "System.Exception:", "FooBar",
+                "at", "CliFx.Tests"
             );
         }
 
@@ -113,10 +111,9 @@ namespace CliFx.Tests
             // Assert
             exitCode.Should().NotBe(0);
             stdOut.Should().BeEmpty();
-            stdErr.Should().ContainAll(
+            stdErr.Should().ContainAllInOrder(
                 "CliFx.Exceptions.CommandException:",
-                "at",
-                "CliFx.Tests"
+                "at", "CliFx.Tests"
             );
         }
 
@@ -137,7 +134,7 @@ namespace CliFx.Tests
 
             // Assert
             exitCode.Should().NotBe(0);
-            stdOut.Should().ContainAll(
+            stdOut.Should().ContainAllInOrder(
                 "Usage",
                 "Options",
                 "-h|--help"
@@ -162,7 +159,7 @@ namespace CliFx.Tests
 
             // Assert
             exitCode.Should().NotBe(0);
-            stdOut.Should().ContainAll(
+            stdOut.Should().ContainAllInOrder(
                 "Usage",
                 "Options",
                 "-h|--help"

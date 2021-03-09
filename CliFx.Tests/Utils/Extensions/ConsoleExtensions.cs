@@ -1,7 +1,7 @@
 ﻿using CliFx.Infrastructure;
 using Xunit.Abstractions;
 
-namespace CliFx.Tests.Utils
+namespace CliFx.Tests.Utils.Extensions
 {
     internal static class ConsoleExtensions
     {

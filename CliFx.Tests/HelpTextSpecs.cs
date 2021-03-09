@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using CliFx.Infrastructure;
 using CliFx.Tests.Commands;
-using CliFx.Tests.Utils;
+using CliFx.Tests.Utils.Extensions;
 using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
@@ -39,7 +39,7 @@ namespace CliFx.Tests
 
             // Assert
             exitCode.Should().Be(0);
-            stdOut.Should().ContainAll(
+            stdOut.Should().ContainAllInOrder(
                 "Usage",
                 "cmd", "<parama>", "<paramb>", "<paramc...>"
             );
@@ -61,13 +61,13 @@ namespace CliFx.Tests
 
             // Assert
             exitCode.Should().Be(0);
-            stdOut.Should().ContainAll(
+            stdOut.Should().ContainAllInOrder(
                 "Usage",
                 "cmd", "--opt-a <value>", "--opt-c <values...>", "[options]",
                 "Options",
-                "* -a|--opt-a",
-                "-b|--opt-b",
-                "* -c|--opt-c"
+                "*", "-a|--opt-a",
+                "*", "-c|--opt-c",
+                "-b|--opt-b"
             );
         }
 
@@ -89,7 +89,7 @@ namespace CliFx.Tests
 
             // Assert
             exitCode.Should().Be(0);
-            stdOut.Should().ContainAll(
+            stdOut.Should().ContainAllInOrder(
                 "Usage",
                 "... named",
                 "... named sub"
@@ -112,12 +112,12 @@ namespace CliFx.Tests
 
             // Assert
             exitCode.Should().Be(0);
-            stdOut.Should().ContainAll(
+            stdOut.Should().ContainAllInOrder(
                 "Parameters",
-                "enum", "Valid values: \"Value1\", \"Value2\", \"Value3\".",
+                "enum", "Valid values:", "Value1", "Value2", "Value3",
                 "Options",
-                "--enum", "Valid values: \"Value1\", \"Value2\", \"Value3\".",
-                "* --required-enum", "Valid values: \"Value1\", \"Value2\", \"Value3\"."
+                "--required-enum", "Valid values:", "Value1", "Value2", "Value3",
+                "--enum", "Valid values:", "Value1", "Value2", "Value3"
             );
         }
 
@@ -137,7 +137,7 @@ namespace CliFx.Tests
 
             // Assert
             exitCode.Should().Be(0);
-            stdOut.Should().ContainAll(
+            stdOut.Should().ContainAllInOrder(
                 "Options",
                 "-a|--opt-a", "Environment variable:", "ENV_OPT_A",
                 "-b|--opt-b", "Environment variable:", "ENV_OPT_B"
@@ -160,19 +160,19 @@ namespace CliFx.Tests
 
             // Assert
             exitCode.Should().Be(0);
-            stdOut.Should().ContainAll(
+            stdOut.Should().ContainAllInOrder(
                 "Options",
-                "--obj", "Default: \"42\"",
-                "--str", "Default: \"foo\"",
-                "--str-empty", "Default: \"\"",
-                "--str-array", "Default: \"foo\" \"bar\" \"baz\"",
-                "--bool", "Default: \"True\"",
-                "--char", "Default: \"t\"",
-                "--int", "Default: \"1337\"",
-                "--int-nullable", "Default: \"1337\"",
-                "--int-array", "Default: \"1\" \"2\" \"3\"",
-                "--timespan", "Default: \"02:03:00\"",
-                "--enum", "Default: \"Value2\""
+                "--obj", "Default:", "42",
+                "--str", "Default:", "foo",
+                "--str-empty", "Default:", "",
+                "--str-array", "Default:", "foo", "bar", "baz",
+                "--bool", "Default:", "True",
+                "--char", "Default:", "t",
+                "--int", "Default:", "1337",
+                "--int-nullable", "Default:", "1337",
+                "--int-array", "Default:", "1", "2", "3",
+                "--timespan", "Default:", "02:03:00",
+                "--enum", "Default:", "Value2"
             );
         }
     }
