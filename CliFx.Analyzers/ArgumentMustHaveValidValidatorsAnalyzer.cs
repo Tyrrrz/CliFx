@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using CliFx.Analyzers.ObjectModel;
+using CliFx.Analyzers.Utils.Extensions;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -10,8 +11,8 @@ namespace CliFx.Analyzers
     {
         public ArgumentMustHaveValidValidatorsAnalyzer()
             : base(
-                $"Parameter and option validators must derive from `{KnownSymbols.CliFxArgumentValueValidatorClass}`",
-                $"All validators specified for this parameter or option must derive from `{KnownSymbols.CliFxArgumentValueValidatorClass}`.")
+                $"Parameter and option validators must derive from `{SymbolNames.CliFxArgumentValueValidatorClass}`",
+                $"All validators specified for this parameter or option must derive from `{SymbolNames.CliFxArgumentValueValidatorClass}`.")
         {
         }
 
@@ -34,9 +35,17 @@ namespace CliFx.Analyzers
 
             foreach (var validatorType in argument.ValidatorTypes)
             {
-                if (!validatorType.AllInterfaces.Any(KnownSymbols.IsArgumentValueValidatorInterface))
+                // We check against an internal interface because checking against a generic class is a pain
+                var validatorImplementsInterface = validatorType
+                    .AllInterfaces
+                    .Any(s => s.DisplayNameMatches(SymbolNames.CliFxArgumentValueValidatorInterface));
+
+                if (!validatorImplementsInterface)
                 {
                     context.ReportDiagnostic(CreateDiagnostic(propertyDeclaration.GetLocation()));
+
+                    // No need to report multiple identical diagnostics on the same node
+                    break;
                 }
             }
         }

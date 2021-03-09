@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 using System.Linq;
+using CliFx.Analyzers.Utils.Extensions;
 
 namespace CliFx.Analyzers.ObjectModel
 {
@@ -36,19 +37,19 @@ namespace CliFx.Analyzers.ObjectModel
         private static AttributeData? TryGetOptionAttribute(IPropertySymbol property) =>
             property
                 .GetAttributes()
-                .FirstOrDefault(a => KnownSymbols.IsCommandOptionAttribute(a.AttributeClass));
+                .FirstOrDefault(a => a.AttributeClass.DisplayNameMatches(SymbolNames.CliFxCommandOptionAttribute));
 
         private static CommandOptionSymbol FromAttribute(AttributeData attribute)
         {
             var name = attribute
                 .ConstructorArguments
-                .Where(a => KnownSymbols.IsSystemString(a.Type))
+                .Where(a => a.Type.DisplayNameMatches("string") || a.Type.DisplayNameMatches("System.String"))
                 .Select(a => a.Value)
                 .FirstOrDefault() as string;
 
             var shortName = attribute
                 .ConstructorArguments
-                .Where(a => KnownSymbols.IsSystemChar(a.Type))
+                .Where(a => a.Type.DisplayNameMatches("char") || a.Type.DisplayNameMatches("System.Char"))
                 .Select(a => a.Value)
                 .FirstOrDefault() as char?;
 

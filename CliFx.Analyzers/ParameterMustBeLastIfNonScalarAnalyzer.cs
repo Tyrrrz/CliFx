@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using CliFx.Analyzers.ObjectModel;
+using CliFx.Analyzers.Utils.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -17,10 +18,11 @@ namespace CliFx.Analyzers
         }
 
         private static bool IsScalar(ITypeSymbol type) =>
-            KnownSymbols.IsSystemString(type) ||
+            type.DisplayNameMatches("string") ||
+            type.DisplayNameMatches("System.String") ||
             !type.AllInterfaces
                 .Select(i => i.ConstructedFrom)
-                .Any(KnownSymbols.IsSystemCollectionsGenericIEnumerable);
+                .Any(s => s.DisplayNameMatches("System.Collections.Generic.IEnumerable<T>"));
 
         private void Analyze(SyntaxNodeAnalysisContext context)
         {

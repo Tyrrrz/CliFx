@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using CliFx.Analyzers.Utils.Extensions;
 using Microsoft.CodeAnalysis;
 
 namespace CliFx.Analyzers.ObjectModel
@@ -32,7 +33,7 @@ namespace CliFx.Analyzers.ObjectModel
         private static AttributeData? TryGetParameterAttribute(IPropertySymbol property) =>
             property
                 .GetAttributes()
-                .FirstOrDefault(a => KnownSymbols.IsCommandParameterAttribute(a.AttributeClass));
+                .FirstOrDefault(a => a.AttributeClass.DisplayNameMatches(SymbolNames.CliFxCommandParameterAttribute));
 
         private static CommandParameterSymbol FromAttribute(AttributeData attribute)
         {

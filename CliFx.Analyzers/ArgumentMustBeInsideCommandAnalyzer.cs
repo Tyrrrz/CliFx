@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using CliFx.Analyzers.ObjectModel;
+using CliFx.Analyzers.Utils.Extensions;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -11,7 +12,7 @@ namespace CliFx.Analyzers
         public ArgumentMustBeInsideCommandAnalyzer()
             : base(
                 "Parameters and options must be defined inside commands",
-                $"This parameter or option must be defined inside a class that implements `{KnownSymbols.CliFxCommandInterface}`.")
+                $"This parameter or option must be defined inside a class that implements `{SymbolNames.CliFxCommandInterface}`.")
         {
         }
 
@@ -34,7 +35,7 @@ namespace CliFx.Analyzers
             var isInsideCommand = property
                 .ContainingType
                 .AllInterfaces
-                .Any(KnownSymbols.IsCommandInterface);
+                .Any(s => s.DisplayNameMatches(SymbolNames.CliFxCommandInterface));
 
             if (!isInsideCommand)
             {

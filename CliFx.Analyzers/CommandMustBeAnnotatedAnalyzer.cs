@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using CliFx.Analyzers.ObjectModel;
+using CliFx.Analyzers.Utils.Extensions;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -10,8 +11,8 @@ namespace CliFx.Analyzers
     {
         public CommandMustBeAnnotatedAnalyzer()
             : base(
-                $"Commands must be annotated with `{KnownSymbols.CliFxCommandAttribute}`",
-                $"This type must be annotated with `{KnownSymbols.CliFxCommandAttribute}` in order to be a valid command.")
+                $"Commands must be annotated with `{SymbolNames.CliFxCommandAttribute}`",
+                $"This type must be annotated with `{SymbolNames.CliFxCommandAttribute}` in order to be a valid command.")
         {
         }
 
@@ -32,12 +33,12 @@ namespace CliFx.Analyzers
 
             var implementsCommandInterface = type
                 .AllInterfaces
-                .Any(KnownSymbols.IsCommandInterface);
+                .Any(s => s.DisplayNameMatches(SymbolNames.CliFxCommandInterface));
 
             var hasCommandAttribute = type
                 .GetAttributes()
                 .Select(a => a.AttributeClass)
-                .Any(KnownSymbols.IsCommandAttribute);
+                .Any(s => s.DisplayNameMatches(SymbolNames.CliFxCommandAttribute));
 
             // If the interface is implemented, but the attribute is missing,
             // then it's very likely a user error.

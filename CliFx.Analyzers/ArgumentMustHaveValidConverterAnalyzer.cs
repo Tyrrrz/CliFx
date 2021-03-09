@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using CliFx.Analyzers.ObjectModel;
+using CliFx.Analyzers.Utils.Extensions;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -10,8 +11,8 @@ namespace CliFx.Analyzers
     {
         public ArgumentMustHaveValidConverterAnalyzer()
             : base(
-                $"Parameter and option converters must derive from `{KnownSymbols.CliFxArgumentValueConverterClass}`",
-                $"Converter specified for this parameter or option must derive from `{KnownSymbols.CliFxArgumentValueConverterClass}`.")
+                $"Parameter and option converters must derive from `{SymbolNames.CliFxArgumentValueConverterClass}`",
+                $"Converter specified for this parameter or option must derive from `{SymbolNames.CliFxArgumentValueConverterClass}`.")
         {
         }
 
@@ -35,7 +36,13 @@ namespace CliFx.Analyzers
             if (argument.ConverterType is null)
                 return;
 
-            if (!argument.ConverterType.AllInterfaces.Any(KnownSymbols.IsArgumentValueConverterInterface))
+            // We check against an internal interface because checking against a generic class is a pain
+            var converterImplementsInterface = argument
+                .ConverterType
+                .AllInterfaces
+                .Any(s => s.DisplayNameMatches(SymbolNames.CliFxArgumentValueConverterInterface));
+
+            if (!converterImplementsInterface)
             {
                 context.ReportDiagnostic(CreateDiagnostic(propertyDeclaration.GetLocation()));
             }
