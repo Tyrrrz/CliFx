@@ -25,9 +25,9 @@ namespace CliFx.Utilities
             int escapeSequenceLength = 0;
             int escapeSequenceEnd = 0;
             bool ignoreSpaces = false;
-            
+
             var tokens = new List<string>();
-            string token = "";
+            StringBuilder tokenBuilder = new StringBuilder();
 
             for (int i = 0; i < s.Length; i++)
             {
@@ -46,17 +46,17 @@ namespace CliFx.Utilities
                             escapeSequenceLength = 0;
                             break;
                         }
-                        
+
                         escapeSequenceLength = j - i;
-                       
+
                         // edge case: \\\\"beta -> \\beta
                         // treat the " as an escape character so that we skip over it
-                        if ( escapeSequenceLength == 4)
+                        if (escapeSequenceLength == 4)
                         {
                             escapeSequenceLength = 6;
                         }
                         // capture the escaped character in our escape sequence
-                        if (escapeSequenceLength % 2 == 1)
+                        else if (escapeSequenceLength % 2 == 1)
                         {
                             escapeSequenceLength++;
                         }
@@ -83,24 +83,23 @@ namespace CliFx.Utilities
                     // edge case: ' ' character is used to divide tokens
                     else if (!characterIsEscaped && s[i] == ' ' && !ignoreSpaces) // todo; expand to all whitespace
                     {
-                        tokens.Add(token);
-                        token = "";
+                        tokens.Add(tokenBuilder.ToString());
+                        tokenBuilder.Clear();
                     }
                     else
                     {
-                        var item = s[i];
-                        token = token + item;
+                        tokenBuilder.Append(s[i]);
                     }
                 }
 
-                if( escapeSequenceLength > 0)
+                if (escapeSequenceLength > 0)
                 {
                     escapeSequenceLength--;
                 }
             }
-            
-            // catch tail token
-            if( token != "")
+
+            var token = tokenBuilder.ToString();
+            if (string.IsNullOrWhiteSpace(token))
             {
                 tokens.Add(token);
             }
