@@ -99,7 +99,7 @@ namespace CliFx.Utilities
             }
 
             var token = tokenBuilder.ToString();
-            if (string.IsNullOrWhiteSpace(token))
+            if (!string.IsNullOrWhiteSpace(token))
             {
                 tokens.Add(token);
             }
