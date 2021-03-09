@@ -10,8 +10,8 @@ namespace CliFx.Analyzers
     {
         public ArgumentMustHaveValidConverterAnalyzer()
             : base(
-                "Parameter converter type must implement `IArgumentValueConverter`",
-                "Type must implement `CliFx.IArgumentValueConverter` in order to be used as converter.")
+                $"Parameter and option converters must derive from `{KnownSymbols.CliFxArgumentValueConverterClass}`",
+                $"Converter specified for this parameter or option must derive from `{KnownSymbols.CliFxArgumentValueConverterClass}`.")
         {
         }
 

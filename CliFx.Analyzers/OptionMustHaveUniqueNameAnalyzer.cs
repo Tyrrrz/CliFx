@@ -12,8 +12,8 @@ namespace CliFx.Analyzers
     {
         public OptionMustHaveUniqueNameAnalyzer()
             : base(
-                "Option name must be unique within its command",
-                "Option name must be unique within its command")
+                "Options must have unique names",
+                "This option's name must be unique within the command (comparison IS NOT case sensitive).")
         {
         }
 

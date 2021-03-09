@@ -10,8 +10,8 @@ namespace CliFx.Analyzers
     {
         public ArgumentMustHaveValidValidatorsAnalyzer()
             : base(
-                "Parameter validator type must derive from `CliFx.ArgumentValueValidator<T>`",
-                "Type must implement `CliFx.CliFx.ArgumentValueValidator<T>` in order to be used as a validator.")
+                $"Parameter and option validators must derive from `{KnownSymbols.CliFxArgumentValueValidatorClass}`",
+                $"All validators specified for this parameter or option must derive from `{KnownSymbols.CliFxArgumentValueValidatorClass}`.")
         {
         }
 

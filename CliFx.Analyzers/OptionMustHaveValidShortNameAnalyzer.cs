@@ -9,8 +9,8 @@ namespace CliFx.Analyzers
     {
         public OptionMustHaveValidShortNameAnalyzer()
             : base(
-                "Option short name must be a letter character",
-                "Option short name must be a letter character")
+                "Option short names must be letter characters",
+                "This option's short name must be a single letter character.")
         {
         }
 

@@ -11,8 +11,8 @@ namespace CliFx.Analyzers
     {
         public ParameterMustBeLastIfNonScalarAnalyzer()
             : base(
-                "Non-scalar parameter must be last in order",
-                "Specified non-scalar parameter does not have the highest order in the command.")
+                "Parameters of non-scalar types must be last in order",
+                "This parameter has a non-scalar type so it must be last in order (its order must be highest within the command).")
         {
         }
 

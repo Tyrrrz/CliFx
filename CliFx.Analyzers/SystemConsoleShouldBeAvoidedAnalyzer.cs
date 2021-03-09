@@ -11,8 +11,8 @@ namespace CliFx.Analyzers
     {
         public SystemConsoleShouldBeAvoidedAnalyzer()
             : base(
-                "Avoid referencing `System.Console` inside a command",
-                "Use the provided `CliFx.IConsole` abstraction instead of `System.Console` to ensure that the command can be tested in isolation.",
+                $"Avoid calling `System.Console` where `{KnownSymbols.CliFxConsoleInterface}` is available",
+                $"Use the provided `{KnownSymbols.CliFxConsoleInterface}` abstraction instead of `System.Console` to ensure that the command can be tested in isolation.",
                 DiagnosticSeverity.Warning)
         {
         }

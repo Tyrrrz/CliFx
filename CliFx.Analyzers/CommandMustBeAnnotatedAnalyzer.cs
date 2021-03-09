@@ -10,8 +10,8 @@ namespace CliFx.Analyzers
     {
         public CommandMustBeAnnotatedAnalyzer()
             : base(
-                "Command must be annotated with `CommandAttribute`",
-                "Type must be annotated with `CliFx.CommandAttribute` in order to be a valid command.")
+                $"Commands must be annotated with `{KnownSymbols.CliFxCommandAttribute}`",
+                $"This type must be annotated with `{KnownSymbols.CliFxCommandAttribute}` in order to be a valid command.")
         {
         }
 

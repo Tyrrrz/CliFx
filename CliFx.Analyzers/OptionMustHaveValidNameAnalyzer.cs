@@ -9,8 +9,8 @@ namespace CliFx.Analyzers
     {
         public OptionMustHaveValidNameAnalyzer()
             : base(
-                "Option name must be at least 2 characters long",
-                "Option name must be at least 2 characters long")
+                "Options must have valid names",
+                "This option's name must be at least 2 characters long and must start with a letter.")
         {
         }
 

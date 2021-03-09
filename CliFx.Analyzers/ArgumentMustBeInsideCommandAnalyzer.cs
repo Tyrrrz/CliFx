@@ -10,8 +10,8 @@ namespace CliFx.Analyzers
     {
         public ArgumentMustBeInsideCommandAnalyzer()
             : base(
-                "Parameter must be defined inside a command",
-                "Specified parameter is defined in a type which is not a command.")
+                "Parameters and options must be defined inside commands",
+                $"This parameter or option must be defined inside a class that implements `{KnownSymbols.CliFxCommandInterface}`.")
         {
         }
 

@@ -11,8 +11,8 @@ namespace CliFx.Analyzers
     {
         public ParameterMustBeSingleIfNonScalarAnalyzer()
             : base(
-                "Only one parameter per command can have non-scalar type",
-                "Specified parameter is not the only non-scalar parameter in the command.")
+                "Parameters of non-scalar types are limited to one per command",
+                "This parameter has a non-scalar type so it must be the only such parameter in the command.")
         {
         }
 

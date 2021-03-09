@@ -9,8 +9,8 @@ namespace CliFx.Analyzers
     {
         public OptionMustHaveNameOrShortNameAnalyzer()
             : base(
-                "Option must have a name or short name specified",
-                "Option must have a name or short name specified")
+                "Options must have either a name or short name specified",
+                "This option must have either a name or short name specified.")
         {
         }
 

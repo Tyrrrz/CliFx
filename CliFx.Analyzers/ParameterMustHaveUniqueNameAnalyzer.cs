@@ -12,8 +12,8 @@ namespace CliFx.Analyzers
     {
         public ParameterMustHaveUniqueNameAnalyzer()
             : base(
-                "Parameter name must be unique",
-                "Specified parameter name is not unique in the command.")
+                "Parameters must have unique names",
+                "This parameter's name must be unique within the command (comparison IS NOT case sensitive).")
         {
         }
 

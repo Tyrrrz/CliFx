@@ -11,8 +11,8 @@ namespace CliFx.Analyzers
     {
         public ParameterMustHaveUniqueOrderAnalyzer()
             : base(
-                "Parameter order must be unique",
-                "Specified parameter order is not unique in the command.")
+                "Parameters must have unique order",
+                "This parameter's order must be unique within the command.")
         {
         }
 

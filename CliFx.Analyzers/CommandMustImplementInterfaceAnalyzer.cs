@@ -10,8 +10,8 @@ namespace CliFx.Analyzers
     {
         public CommandMustImplementInterfaceAnalyzer()
             : base(
-                "Command must implement `ICommand`",
-                "Type must implement `CliFx.ICommand` in order to be a valid command.")
+                $"Commands must implement `{KnownSymbols.CliFxCommandInterface}` interface",
+                $"This type must implement `{KnownSymbols.CliFxCommandInterface}` interface in order to be a valid command.")
         {
         }
 

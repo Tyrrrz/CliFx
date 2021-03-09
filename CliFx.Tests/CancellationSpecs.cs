@@ -26,7 +26,6 @@ namespace CliFx.Tests
         [Fact]
         public async Task Command_can_perform_additional_cleanup_if_cancellation_is_requested()
         {
-            // TODO: test at higher level?
             // Can't test it with a real console because CliWrap can't send Ctrl+C (yet)
 
             // Arrange

@@ -11,8 +11,8 @@ namespace CliFx.Analyzers
     {
         public OptionMustHaveUniqueShortNameAnalyzer()
             : base(
-                "Option short name must be unique within its command",
-                "Option short name must be unique within its command")
+                "Options must have unique short names",
+                "This option's short name must be unique within the command (comparison IS case sensitive).")
         {
         }
 
