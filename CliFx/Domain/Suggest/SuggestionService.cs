@@ -23,7 +23,7 @@ namespace CliFx.Domain.Suggest
 
             var data = new SuggestState
             {
-                Arguments = commandLineArguments.Where(arg => !CommandDirectiveInput.IsDirective(arg)).ToList(),
+                Arguments = commandLineArguments.Where(arg => !CommandDirectiveInput.IsDirective(arg)).Skip(1).ToList(),
             };
 
             foreach (var state in new ISuggestHandler[] {
