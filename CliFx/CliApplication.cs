@@ -142,7 +142,7 @@ namespace CliFx
                 if (_configuration.IsSuggestModeAllowed && input.IsSuggestDirectiveSpecified)
                 {
                     new SuggestionService(root)
-                            .GetSuggestions(commandLineArguments).ToList()
+                            .GetSuggestions(input, commandLineArguments, environmentVariables).ToList()
                             .ForEach(s => _console.Output.WriteLine(s));
 
                     return ExitCode.Success;

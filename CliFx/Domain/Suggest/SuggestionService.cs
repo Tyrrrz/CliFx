@@ -17,16 +17,35 @@ namespace CliFx.Domain.Suggest
             _allCommands = _schema.GetCommandNames();
         }
 
-        public IEnumerable<string> GetSuggestions(IReadOnlyList<string> commandLineArguments)
+        private string GetCommand(CommandInput input, IReadOnlyList<string> commandLineArguments, IReadOnlyDictionary<string,string> environmentVariables)
         {
-            var states = new List<ISuggestHandler>();
+            // Accept command line arguments via environment variable as a workaround to powershell escape sequence shennidgans
+            var commandCacheVariable = input.Options.FirstOrDefault(p => p.Alias == "envvar")?.Values[0];
 
-            var cmd = string.Join(" ", commandLineArguments.Where(arg => !CommandDirectiveInput.IsDirective(arg)));
+            if (commandCacheVariable == null)
+            {
+                // ignore cursor position as we don't know what the original user input string is
+                return string.Join(" ", commandLineArguments.Where(arg => !CommandDirectiveInput.IsDirective(arg)));
+            }
 
+            var command = environmentVariables[commandCacheVariable];
+            var cursorPositionText = input.Options.FirstOrDefault(p => p.Alias == "cursor")?.Values[0];
+            var cursorPosition = command.Length;
+
+            if (int.TryParse(cursorPositionText, out cursorPosition) && cursorPosition < command.Length)
+            {
+                return command.Remove(cursorPosition);
+            }
+            return command;
+        }
+
+        public IEnumerable<string> GetSuggestions(CommandInput input, IReadOnlyList<string> commandLineArguments, IReadOnlyDictionary<string, string> environmentVariables)
+        {
+            string command = GetCommand(input, commandLineArguments, environmentVariables);
 
             var data = new SuggestState
             {
-                Arguments = CliFx.Utilities.CommandLineUtils.GetCommandLineArgsV(cmd).Skip(1).ToArray()
+                Arguments = CliFx.Utilities.CommandLineUtils.GetCommandLineArgsV(command).Skip(1).ToArray()
             };
 
             foreach (var state in new ISuggestHandler[] {
@@ -40,7 +59,6 @@ namespace CliFx.Domain.Suggest
                     break;
                 }
             }
-
             return data.Suggestions;
         }
     }
