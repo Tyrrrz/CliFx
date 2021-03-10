@@ -9,27 +9,46 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace CliFx.Tests.Utils
 {
+    // This class allows us to embed command definitions inside the
+    // tests that use them, by compiling the source code at runtime.
+    // It's a bit of hack but it helps achieve test collocation,
+    // which is really important.
+    // Maybe one day C# will allow us to declare local classes inside
+    // methods and this won't be necessary.
     internal static class DynamicCommandBuilder
     {
         public static Type Compile(string sourceCode)
         {
-            var wrappedSourceCode = $@"
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using CliFx;
-using CliFx.Infrastructure;
-using CliFx.Attributes;
-using CliFx.Exceptions;
-using CliFx.Extensibility;
+            // Get default system namespaces
+            var defaultSystemNamespaces = new[]
+            {
+                "System",
+                "System.Collections.Generic",
+                "System.Threading.Tasks"
+            };
 
-{sourceCode}".Trim();
+            // Get default CliFx namespaces
+            var defaultCliFxNamespaces = typeof(ICommand)
+                .Assembly
+                .GetTypes()
+                .Where(t => t.IsPublic)
+                .Select(t => t.Namespace)
+                .ToArray();
 
+            // Append default imports to the source code
+            var sourceCodeWithUsings =
+                string.Join(Environment.NewLine, defaultSystemNamespaces.Select(n => $"using {n};")) +
+                string.Join(Environment.NewLine, defaultCliFxNamespaces.Select(n => $"using {n};")) +
+                Environment.NewLine +
+                sourceCode;
+
+            // Parse the source code
             var ast = SyntaxFactory.ParseSyntaxTree(
-                SourceText.From(wrappedSourceCode),
+                SourceText.From(sourceCodeWithUsings),
                 CSharpParseOptions.Default
             );
 
+            // Find the command class declaration
             var classDeclaration = ast
                 .GetRoot()
                 .DescendantNodesAndSelf()
@@ -43,22 +62,23 @@ using CliFx.Extensibility;
                 );
             }
 
+            // Extract the class name
             var className = classDeclaration.Identifier.ValueText;
 
-            var references = new[]
-            {
-                MetadataReference.CreateFromFile(Assembly.Load("netstandard").Location),
-                MetadataReference.CreateFromFile(Assembly.Load("System.Runtime").Location),
-                MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
-                MetadataReference.CreateFromFile(typeof(Console).Assembly.Location),
-                MetadataReference.CreateFromFile(typeof(DynamicCommandBuilder).Assembly.Location),
-                MetadataReference.CreateFromFile(typeof(ICommand).Assembly.Location)
-            };
-
+            // Compile the code to IL
             var compilation = CSharpCompilation.Create(
                 "CliFxTests_DynamicAssembly_" + Guid.NewGuid(),
                 new[] {ast},
-                references,
+                new[]
+                {
+                    MetadataReference.CreateFromFile(Assembly.Load("netstandard").Location),
+                    MetadataReference.CreateFromFile(Assembly.Load("System.Runtime").Location),
+                    MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(Console).Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(DynamicCommandBuilder).Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(ICommand).Assembly.Location)
+                },
+                // DLL to avoid having to define the Main() method
                 new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
             );
 
@@ -76,6 +96,7 @@ using CliFx.Extensibility;
                 );
             }
 
+            // Emit the code to an in-memory buffer
             using var buffer = new MemoryStream();
             var emit = compilation.Emit(buffer);
 
@@ -93,8 +114,10 @@ using CliFx.Extensibility;
                 );
             }
 
+            // Load the generated assembly
             var generatedAssembly = Assembly.Load(buffer.ToArray());
 
+            // Find the generated type
             var generatedType =
                 generatedAssembly.GetType(className) ??
                 throw new InvalidOperationException("Cannot find generated type in the output assembly.");
