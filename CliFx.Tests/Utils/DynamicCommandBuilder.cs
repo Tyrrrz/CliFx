@@ -33,6 +33,7 @@ namespace CliFx.Tests.Utils
                 .GetTypes()
                 .Where(t => t.IsPublic)
                 .Select(t => t.Namespace)
+                .Distinct()
                 .ToArray();
 
             // Append default imports to the source code
