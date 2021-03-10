@@ -37,7 +37,7 @@ namespace CliFx.Domain.Suggest
                     break;
                 }
 
-                var parameter = state.Arguments.ElementAt(state.Index);
+                var parameter = state.Arguments[state.Index];
 
                 // stop processing parameters if an option is found
                 if (parameter.StartsWith("-"))

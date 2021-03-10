@@ -25,9 +25,9 @@ namespace CliFx.Domain.Suggest
                             .Concat(commandSchema == null ? new string[] { } : commandSchema.Options?.Select(p => p.ShortName?.ToString()))
                             .Distinct();
 
-            // hack: skip to the last argument. 
+            // hack: skip to the last argument.             
             data.Index = data.Arguments.Count - 1;
-            var optionArg = data.Arguments.ElementAt(data.Index);
+            var optionArg = data.Arguments[data.Index];
 
             if (optionArg.StartsWith("--"))
             {

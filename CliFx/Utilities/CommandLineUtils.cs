@@ -55,9 +55,9 @@ namespace CliFx.Utilities
                         {
                             escapeSequenceLength = 6;
                         }
-                        // capture the escaped character in our escape sequence
-                        else if (escapeSequenceLength % 2 == 1)
+                        else
                         {
+                            // capture the escaped character in our escape sequence
                             escapeSequenceLength++;
                         }
 
