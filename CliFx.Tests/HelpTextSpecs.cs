@@ -184,7 +184,7 @@ public class Command : ICommand
 
             // Act
             var exitCode = await application.RunAsync(
-                new[] {"cmd", "--help"},
+                new[] {"--help"},
                 new Dictionary<string, string>()
             );
 
