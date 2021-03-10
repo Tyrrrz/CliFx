@@ -1,10 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
 namespace CliFx.Tests.Utils
@@ -17,7 +17,7 @@ namespace CliFx.Tests.Utils
     // methods and this won't be necessary.
     internal static class DynamicCommandBuilder
     {
-        public static Type Compile(string sourceCode)
+        public static IReadOnlyList<Type> CompileMany(string sourceCode)
         {
             // Get default system namespaces
             var defaultSystemNamespaces = new[]
@@ -48,23 +48,6 @@ namespace CliFx.Tests.Utils
                 SourceText.From(sourceCodeWithUsings),
                 CSharpParseOptions.Default
             );
-
-            // Find the command class declaration
-            var classDeclaration = ast
-                .GetRoot()
-                .DescendantNodesAndSelf()
-                .OfType<ClassDeclarationSyntax>()
-                .FirstOrDefault();
-
-            if (classDeclaration is null)
-            {
-                throw new InvalidOperationException(
-                    "Provided code does not contain a class declaration"
-                );
-            }
-
-            // Extract the class name
-            var className = classDeclaration.Identifier.ValueText;
 
             // Compile the code to IL
             var compilation = CSharpCompilation.Create(
@@ -118,12 +101,13 @@ namespace CliFx.Tests.Utils
             // Load the generated assembly
             var generatedAssembly = Assembly.Load(buffer.ToArray());
 
-            // Find the generated type
-            var generatedType =
-                generatedAssembly.GetType(className) ??
-                throw new InvalidOperationException("Cannot find generated type in the output assembly.");
-
-            return generatedType;
+            // Return all defined commands
+            return generatedAssembly
+                .GetTypes()
+                .Where(t => t.IsAssignableTo(typeof(ICommand)))
+                .ToArray();
         }
+
+        public static Type Compile(string sourceCode) => CompileMany(sourceCode).Single();
     }
 }

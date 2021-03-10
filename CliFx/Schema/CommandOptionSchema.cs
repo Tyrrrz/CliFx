@@ -97,7 +97,7 @@ namespace CliFx.Schema
                 property,
                 name,
                 attribute.ShortName,
-                attribute.EnvironmentVariableName,
+                attribute.EnvironmentVariable,
                 attribute.IsRequired,
                 attribute.Description,
                 attribute.Converter,
