@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using CliFx.Tests.Commands;
+using CliFx.Tests.Utils;
 using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
@@ -38,17 +38,17 @@ namespace CliFx.Tests
         {
             // Act
             var app = new CliApplicationBuilder()
-                .AddCommand<DefaultCommand>()
-                .AddCommandsFrom(typeof(DefaultCommand).Assembly)
-                .AddCommands(new[] {typeof(DefaultCommand)})
-                .AddCommandsFrom(new[] {typeof(DefaultCommand).Assembly})
+                .AddCommand<NoOpCommand>()
+                .AddCommandsFrom(typeof(NoOpCommand).Assembly)
+                .AddCommands(new[] {typeof(NoOpCommand)})
+                .AddCommandsFrom(new[] {typeof(NoOpCommand).Assembly})
                 .AddCommandsFromThisAssembly()
                 .AllowDebugMode()
                 .AllowPreviewMode()
-                .UseTitle("test")
-                .UseExecutableName("test")
-                .UseVersionText("test")
-                .UseDescription("test")
+                .SetTitle("test")
+                .SetExecutableName("test")
+                .SetVersion("test")
+                .SetDescription("test")
                 .UseConsole(FakeConsole)
                 .UseTypeActivator(Activator.CreateInstance!)
                 .Build();

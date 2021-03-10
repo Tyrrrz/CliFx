@@ -7,17 +7,11 @@ namespace CliFx.Tests.Utils.Extensions
     {
         public static void DumpToTestOutput(this FakeInMemoryConsole console, ITestOutputHelper testOutputHelper)
         {
-            testOutputHelper.WriteLine("-------------------------------");
-
-            testOutputHelper.WriteLine("Captured standard output:");
+            testOutputHelper.WriteLine("[*] Captured standard output:");
             testOutputHelper.WriteLine(console.ReadOutputString());
 
-            testOutputHelper.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-
-            testOutputHelper.WriteLine("Captured standard error:");
+            testOutputHelper.WriteLine("[*] Captured standard error:");
             testOutputHelper.WriteLine(console.ReadErrorString());
-
-            testOutputHelper.WriteLine("-------------------------------");
         }
     }
 }

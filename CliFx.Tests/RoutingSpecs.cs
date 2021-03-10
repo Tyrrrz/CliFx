@@ -96,7 +96,7 @@ namespace CliFx.Tests
                 .AddCommand<NamedCommand>()
                 .AddCommand<NamedSubCommand>()
                 .UseConsole(FakeConsole)
-                .UseDescription("This will be visible in help")
+                .SetDescription("This will be visible in help")
                 .Build();
 
             // Act
@@ -146,7 +146,7 @@ namespace CliFx.Tests
             var application = new CliApplicationBuilder()
                 .AddCommand<NamedCommand>()
                 .AddCommand<NamedSubCommand>()
-                .UseDescription("This will be visible in help")
+                .SetDescription("This will be visible in help")
                 .UseConsole(FakeConsole)
                 .Build();
 
@@ -227,7 +227,7 @@ namespace CliFx.Tests
                 .AddCommand<DefaultCommand>()
                 .AddCommand<NamedCommand>()
                 .AddCommand<NamedSubCommand>()
-                .UseVersionText("v6.9")
+                .SetVersion("v6.9")
                 .UseConsole(FakeConsole)
                 .Build();
 

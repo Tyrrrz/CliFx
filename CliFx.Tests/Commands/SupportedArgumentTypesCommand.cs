@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Globalization;
 using CliFx.Attributes;
 using CliFx.Extensibility;
+using CliFx.Tests.Utils;
 using Newtonsoft.Json;
 
 namespace CliFx.Tests.Commands
 {
     [Command("cmd")]
-    public partial class SupportedArgumentTypesCommand : SelfSerializeCommandBase
+    public partial class SupportedArgumentTypesCommand : SelfSerializingCommandBase
     {
         [CommandOption("obj")]
         public object? Object { get; set; } = 42;

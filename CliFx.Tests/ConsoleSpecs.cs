@@ -29,8 +29,8 @@ namespace CliFx.Tests
             var result = await command.ExecuteBufferedAsync();
 
             // Assert
-            result.StandardOutput.TrimEnd().Should().Be("Hello world");
-            result.StandardError.TrimEnd().Should().Be("Hello world");
+            result.StandardOutput.Trim().Should().Be("Hello world");
+            result.StandardError.Trim().Should().Be("Hello world");
         }
 
         [Fact]

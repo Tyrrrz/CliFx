@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using CliFx.Attributes;
+using CliFx.Tests.Utils;
 
 namespace CliFx.Tests.Commands
 {
     [Command("cmd")]
-    public class WithRequiredOptionsCommand : SelfSerializeCommandBase
+    public class WithRequiredOptionsCommand : SelfSerializingCommandBase
     {
         [CommandOption("opt-a", 'a', IsRequired = true)]
         public string? OptA { get; set; }

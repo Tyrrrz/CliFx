@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using CliFx.Tests.Commands;
+using CliFx.Tests.Utils;
 using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
@@ -16,13 +16,36 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Command_can_perform_additional_cleanup_if_cancellation_is_requested()
+        public async Task Command_can_receive_cancellation_signal_from_the_console()
         {
-            // Can't test it with a real console because CliWrap can't send Ctrl+C (yet)
-
             // Arrange
+            var commandType = DynamicCommandBuilder.Compile(
+                // language=cs
+                @"
+[Command]
+public class Command : ICommand
+{
+    public async ValueTask ExecuteAsync(IConsole console)
+    {
+        try
+        {
+            await Task.Delay(
+                TimeSpan.FromSeconds(3),
+                console.RegisterCancellation()
+            );
+
+            console.Output.WriteLine(""Completed successfully"");
+        }
+        catch (OperationCanceledException)
+        {
+            console.Output.WriteLine(""Cancelled"");
+            throw;
+        }
+    }
+}");
+
             var application = new CliApplicationBuilder()
-                .AddCommand<CancellableCommand>()
+                .AddCommand(commandType)
                 .UseConsole(FakeConsole)
                 .Build();
 
@@ -30,7 +53,7 @@ namespace CliFx.Tests
             FakeConsole.RequestCancellation(TimeSpan.FromSeconds(0.2));
 
             var exitCode = await application.RunAsync(
-                new[] {"cmd"},
+                Array.Empty<string>(),
                 new Dictionary<string, string>()
             );
 
@@ -38,7 +61,7 @@ namespace CliFx.Tests
 
             // Assert
             exitCode.Should().NotBe(0);
-            stdOut.Trim().Should().Be(CancellableCommand.CancellationOutputText);
+            stdOut.Trim().Should().Be("Cancelled");
         }
     }
 }

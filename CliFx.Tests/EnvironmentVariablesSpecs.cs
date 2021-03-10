@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using CliFx.Tests.Commands;
+using CliFx.Tests.Utils;
 using CliFx.Tests.Utils.Extensions;
 using CliWrap;
 using CliWrap.Buffered;
@@ -60,85 +61,135 @@ namespace CliFx.Tests
         public async Task Option_of_non_scalar_type_relies_on_the_path_separator_to_extract_multiple_values()
         {
             // Arrange
+            var commandType = DynamicCommandBuilder.Compile(
+                // language=cs
+                @"
+[Command]
+public class Command : ICommand
+{
+    [CommandOption(""foo"", EnvironmentVariableName = ""ENV_FOO"")]
+    public IReadOnlyList<string>? Foo { get; set; }
+    
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        foreach (var i in Foo)
+        {
+            console.Output.WriteLine(i);
+        }
+        
+        return default;
+    }
+}
+");
+
             var application = new CliApplicationBuilder()
-                .AddCommand<WithEnvironmentVariablesCommand>()
+                .AddCommand(commandType)
                 .UseConsole(FakeConsole)
                 .Build();
 
             // Act
             var exitCode = await application.RunAsync(
-                new[] {"cmd"},
+                Array.Empty<string>(),
                 new Dictionary<string, string>
                 {
-                    ["ENV_OPT_B"] = $"foo{Path.PathSeparator}bar"
+                    ["ENV_FOO"] = $"bar{Path.PathSeparator}baz"
                 }
             );
 
-            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<WithEnvironmentVariablesCommand>();
+            var stdOut = FakeConsole.ReadOutputString();
 
             // Assert
             exitCode.Should().Be(0);
-            commandInstance.Should().BeEquivalentTo(new WithEnvironmentVariablesCommand
-            {
-                OptB = new[] {"foo", "bar"}
-            });
+            stdOut.Should().ConsistOfLines(
+                "bar",
+                "baz"
+            );
         }
 
         [Fact]
         public async Task Option_of_scalar_type_ignores_path_separators()
         {
             // Arrange
+            var commandType = DynamicCommandBuilder.Compile(
+                // language=cs
+                @"
+[Command]
+public class Command : ICommand
+{
+    [CommandOption(""foo"", EnvironmentVariableName = ""ENV_FOO"")]
+    public string? Foo { get; set; }
+    
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(Foo);
+        return default;
+    }
+}
+");
+
             var application = new CliApplicationBuilder()
-                .AddCommand<WithEnvironmentVariablesCommand>()
+                .AddCommand(commandType)
                 .UseConsole(FakeConsole)
                 .Build();
 
             // Act
             var exitCode = await application.RunAsync(
-                new[] {"cmd"},
+                Array.Empty<string>(),
                 new Dictionary<string, string>
                 {
-                    ["ENV_OPT_A"] = $"foo{Path.PathSeparator}bar"
+                    ["ENV_FOO"] = $"bar{Path.PathSeparator}baz"
                 }
             );
 
-            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<WithEnvironmentVariablesCommand>();
+            var stdOut = FakeConsole.ReadOutputString();
 
             // Assert
             exitCode.Should().Be(0);
-            commandInstance.Should().BeEquivalentTo(new WithEnvironmentVariablesCommand
-            {
-                OptA = $"foo{Path.PathSeparator}bar"
-            });
+            stdOut.Trim().Should().Be($"bar{Path.PathSeparator}baz");
         }
 
         [Fact]
         public async Task Environment_variables_are_matched_case_sensitively()
         {
             // Arrange
+            var commandType = DynamicCommandBuilder.Compile(
+                // language=cs
+                @"
+[Command]
+public class Command : ICommand
+{
+    [CommandOption(""foo"", EnvironmentVariableName = ""ENV_FOO"")]
+    public string? Foo { get; set; }
+    
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(Foo);
+        return default;
+    }
+}
+");
+
             var application = new CliApplicationBuilder()
-                .AddCommand<WithEnvironmentVariablesCommand>()
+                .AddCommand(commandType)
                 .UseConsole(FakeConsole)
                 .Build();
 
             // Act
             var exitCode = await application.RunAsync(
-                new[] {"cmd"},
+                Array.Empty<string>(),
                 new Dictionary<string, string>
                 {
-                    ["ENV_opt_A"] = "incorrect",
-                    ["ENV_OPT_A"] = "correct"
+                    ["ENV_foo"] = "baz",
+                    ["ENV_FOO"] = "bar",
+                    ["env_FOO"] = "qop"
                 }
             );
 
-            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<WithEnvironmentVariablesCommand>();
+            var stdOut = FakeConsole.ReadOutputString();
 
             // Assert
             exitCode.Should().Be(0);
-            commandInstance.Should().BeEquivalentTo(new WithEnvironmentVariablesCommand
-            {
-                OptA = "correct"
-            });
+            stdOut.Trim().Should().Be("bar");
         }
     }
 }

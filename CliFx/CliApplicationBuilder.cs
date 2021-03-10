@@ -110,7 +110,7 @@ namespace CliFx
         /// <summary>
         /// Sets application title, which appears in the help text.
         /// </summary>
-        public CliApplicationBuilder UseTitle(string title)
+        public CliApplicationBuilder SetTitle(string title)
         {
             _title = title;
             return this;
@@ -119,7 +119,7 @@ namespace CliFx
         /// <summary>
         /// Sets application executable name, which appears in the help text.
         /// </summary>
-        public CliApplicationBuilder UseExecutableName(string executableName)
+        public CliApplicationBuilder SetExecutableName(string executableName)
         {
             _executableName = executableName;
             return this;
@@ -128,16 +128,16 @@ namespace CliFx
         /// <summary>
         /// Sets application version text, which appears in the help text and when the user requests version information.
         /// </summary>
-        public CliApplicationBuilder UseVersionText(string versionText)
+        public CliApplicationBuilder SetVersion(string version)
         {
-            _versionText = versionText;
+            _versionText = version;
             return this;
         }
 
         /// <summary>
         /// Sets application description, which appears in the help text.
         /// </summary>
-        public CliApplicationBuilder UseDescription(string? description)
+        public CliApplicationBuilder SetDescription(string? description)
         {
             _description = description;
             return this;

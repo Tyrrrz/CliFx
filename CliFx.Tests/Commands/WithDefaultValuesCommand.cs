@@ -1,10 +1,11 @@
 ﻿using System;
 using CliFx.Attributes;
+using CliFx.Tests.Utils;
 
 namespace CliFx.Tests.Commands
 {
     [Command("cmd")]
-    public class WithDefaultValuesCommand : SelfSerializeCommandBase
+    public class WithDefaultValuesCommand : SelfSerializingCommandBase
     {
         public enum CustomEnum { Value1, Value2, Value3 };
 

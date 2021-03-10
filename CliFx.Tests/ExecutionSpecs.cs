@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using CliFx.Tests.Dummy.Commands;
+using CliFx.Tests.Utils;
 using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
@@ -20,7 +20,7 @@ namespace CliFx.Tests
         {
             // Arrange
             var application = new CliApplicationBuilder()
-                .AddCommand<HelloWorldCommand>()
+                .AddCommand<NoOpCommand>()
                 .UseConsole(FakeConsole)
                 .Build();
 

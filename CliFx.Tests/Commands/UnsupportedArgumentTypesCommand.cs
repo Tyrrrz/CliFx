@@ -2,11 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using CliFx.Attributes;
+using CliFx.Tests.Utils;
 
 namespace CliFx.Tests.Commands
 {
     [Command("cmd")]
-    public partial class UnsupportedArgumentTypesCommand : SelfSerializeCommandBase
+    public partial class UnsupportedArgumentTypesCommand : SelfSerializingCommandBase
     {
         [CommandOption("custom")]
         public CustomType? CustomNonConvertible { get; set; }

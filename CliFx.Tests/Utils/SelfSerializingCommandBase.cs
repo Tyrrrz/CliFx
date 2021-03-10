@@ -2,12 +2,13 @@
 using CliFx.Infrastructure;
 using Newtonsoft.Json;
 
-namespace CliFx.Tests.Commands
+namespace CliFx.Tests.Utils
 {
-    public abstract class SelfSerializeCommandBase : ICommand
+    public abstract class SelfSerializingCommandBase : ICommand
     {
         public ValueTask ExecuteAsync(IConsole console)
         {
+            // TODO: use STJ?
             console.Output.WriteLine(JsonConvert.SerializeObject(this));
             return default;
         }

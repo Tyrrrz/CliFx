@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using CliFx.Tests.Commands;
+using CliFx.Tests.Utils;
 using CliFx.Tests.Utils.Extensions;
 using FluentAssertions;
 using Xunit;
@@ -19,66 +20,109 @@ namespace CliFx.Tests
         public async Task Option_can_be_bound_from_multiple_values_even_if_the_arguments_use_mixed_naming()
         {
             // Arrange
+            var commandType = DynamicCommandBuilder.Compile(
+                // language=cs
+                @"
+[Command]
+public class Command : ICommand
+{
+    [CommandOption(""foo"", 'f')]
+    public IReadOnlyList<string>? Foo { get; set; }
+    
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        foreach (var i in Foo)
+            console.Output.WriteLine(i);
+            
+        return default;
+    }
+}");
+
             var application = new CliApplicationBuilder()
-                .AddCommand<WithStringArrayOptionCommand>()
+                .AddCommand(commandType)
                 .UseConsole(FakeConsole)
                 .Build();
 
             // Act
             var exitCode = await application.RunAsync(
-                new[] {"cmd", "--opt", "foo", "-o", "bar", "--opt", "baz"},
+                new[] {"--foo", "one", "-f", "two", "--foo", "three"},
                 new Dictionary<string, string>()
             );
 
             var stdOut = FakeConsole.ReadOutputString();
 
-            var commandInstance = stdOut.DeserializeJson<WithStringArrayOptionCommand>();
-
             // Assert
             exitCode.Should().Be(0);
-            commandInstance.Should().BeEquivalentTo(new WithStringArrayOptionCommand
-            {
-                Opt = new[] {"foo", "bar", "baz"}
-            });
+            stdOut.Should().ConsistOfLines(
+                "one",
+                "two",
+                "three"
+            );
         }
 
         [Fact]
         public async Task Argument_that_begins_with_a_dash_followed_by_a_non_letter_character_is_parsed_as_a_value()
         {
             // Arrange
+            var commandType = DynamicCommandBuilder.Compile(
+                // language=cs
+                @"
+[Command]
+public class Command : ICommand
+{
+    [CommandOption(""foo"")]
+    public int? Foo { get; set; }
+    
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(Foo);
+            
+        return default;
+    }
+}");
+
             var application = new CliApplicationBuilder()
-                .AddCommand<SupportedArgumentTypesCommand>()
+                .AddCommand(commandType)
                 .UseConsole(FakeConsole)
                 .Build();
 
             // Act
             var exitCode = await application.RunAsync(
-                new[] {"cmd", "--int", "-13"},
+                new[] {"--foo", "-13"},
                 new Dictionary<string, string>()
             );
 
-            var commandInstance = FakeConsole.ReadOutputString().DeserializeJson<SupportedArgumentTypesCommand>();
+            var stdOut = FakeConsole.ReadOutputString();
 
             // Assert
             exitCode.Should().Be(0);
-            commandInstance.Should().BeEquivalentTo(new SupportedArgumentTypesCommand
-            {
-                Int = -13
-            });
+            stdOut.Trim().Should().Be("-13");
         }
 
         [Fact]
         public async Task Binding_fails_if_a_required_option_has_not_been_provided()
         {
             // Arrange
+            var commandType = DynamicCommandBuilder.Compile(
+                // language=cs
+                @"
+[Command]
+public class Command : ICommand
+{
+    [CommandOption(""foo"", IsRequired = true)]
+    public string? Foo { get; set; }
+    
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}");
+
             var application = new CliApplicationBuilder()
-                .AddCommand<WithSingleRequiredOptionCommand>()
+                .AddCommand(commandType)
                 .UseConsole(FakeConsole)
                 .Build();
 
             // Act
             var exitCode = await application.RunAsync(
-                new[] {"cmd", "--opt-a", "foo"},
+                Array.Empty<string>(),
                 new Dictionary<string, string>()
             );
 
@@ -93,14 +137,26 @@ namespace CliFx.Tests
         public async Task Binding_fails_if_a_required_option_has_been_provided_with_an_empty_value()
         {
             // Arrange
+            var commandType = DynamicCommandBuilder.Compile(
+                // language=cs
+                @"
+[Command]
+public class Command : ICommand
+{
+    [CommandOption(""foo"", IsRequired = true)]
+    public string? Foo { get; set; }
+    
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}");
+
             var application = new CliApplicationBuilder()
-                .AddCommand<WithSingleRequiredOptionCommand>()
+                .AddCommand(commandType)
                 .UseConsole(FakeConsole)
                 .Build();
 
             // Act
             var exitCode = await application.RunAsync(
-                new[] {"cmd", "--opt-b"},
+                new[] {"--foo"},
                 new Dictionary<string, string>()
             );
 
@@ -115,14 +171,26 @@ namespace CliFx.Tests
         public async Task Binding_fails_if_a_required_option_of_non_scalar_type_has_not_been_provided_with_at_least_one_value()
         {
             // Arrange
+            var commandType = DynamicCommandBuilder.Compile(
+                // language=cs
+                @"
+[Command]
+public class Command : ICommand
+{
+    [CommandOption(""foo"", IsRequired = true)]
+    public IReadOnlyList<string>? Foo { get; set; }
+    
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}");
+
             var application = new CliApplicationBuilder()
-                .AddCommand<WithRequiredOptionsCommand>()
+                .AddCommand(commandType)
                 .UseConsole(FakeConsole)
                 .Build();
 
             // Act
             var exitCode = await application.RunAsync(
-                new[] {"cmd", "--opt-a", "foo"},
+                new[] {"--foo"},
                 new Dictionary<string, string>()
             );
 
@@ -137,14 +205,26 @@ namespace CliFx.Tests
         public async Task Binding_fails_if_one_of_the_provided_option_names_is_not_recognized()
         {
             // Arrange
+            var commandType = DynamicCommandBuilder.Compile(
+                // language=cs
+                @"
+[Command]
+public class Command : ICommand
+{
+    [CommandOption(""foo"")]
+    public string? Foo { get; set; }
+    
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}");
+
             var application = new CliApplicationBuilder()
-                .AddCommand<SupportedArgumentTypesCommand>()
+                .AddCommand(commandType)
                 .UseConsole(FakeConsole)
                 .Build();
 
             // Act
             var exitCode = await application.RunAsync(
-                new[] {"cmd", "--non-existing-option", "13"},
+                new[] {"--foo", "one", "--bar", "two"},
                 new Dictionary<string, string>()
             );
 

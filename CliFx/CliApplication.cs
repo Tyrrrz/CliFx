@@ -150,7 +150,7 @@ namespace CliFx
                 // Version option
                 if (command.IsVersionOptionAvailable && input.IsVersionOptionSpecified)
                 {
-                    _console.Output.WriteLine(_metadata.VersionText);
+                    _console.Output.WriteLine(_metadata.Version);
                     return ExitCode.Success;
                 }
 

@@ -51,19 +51,20 @@ using CliFx.Extensibility;
             {
                 var compilation =
                     project.GetCompilationAsync().GetAwaiter().GetResult() ??
-                    throw new InvalidOperationException("Failed to compile project.");
+                    throw new InvalidOperationException("Failed to compile code.");
 
                 // Ensure there are no compilation errors
                 var compilationErrors = compilation
                     .GetDiagnostics()
-                    .Where(diagnostic => diagnostic.Severity >= DiagnosticSeverity.Error)
+                    .Where(d => d.Severity >= DiagnosticSeverity.Error)
                     .ToArray();
 
-                foreach (var compilationError in compilationErrors)
+                if (compilationErrors.Any())
                 {
                     throw new InvalidOperationException(
-                        "Failed to compile project:" + Environment.NewLine +
-                        compilationError
+                        "Failed to compile code." +
+                        Environment.NewLine +
+                        string.Join(Environment.NewLine, compilationErrors.Select(e => e.ToString()))
                     );
                 }
 

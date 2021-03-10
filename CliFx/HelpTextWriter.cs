@@ -81,7 +81,7 @@ namespace CliFx
             // Title and version
             Write(ConsoleColor.Yellow, _metadata.Title);
             Write(' ');
-            Write(ConsoleColor.Yellow, _metadata.VersionText);
+            Write(ConsoleColor.Yellow, _metadata.Version);
             WriteLine();
 
             // Description
