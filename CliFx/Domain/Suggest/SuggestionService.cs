@@ -1,8 +1,8 @@
-﻿using CliFx.Domain;
+﻿using CliFx.Utilities;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace CliFx.Domain.Suggest
 {
@@ -23,14 +23,15 @@ namespace CliFx.Domain.Suggest
 
             var cmd = string.Join(" ", commandLineArguments.Where(arg => !CommandDirectiveInput.IsDirective(arg)));
 
+
             var data = new SuggestState
             {
-                Arguments = CommandLineUtils.GetCommandLineArgsV(cmd).Skip(1).ToArray()
+                Arguments = CliFx.Utilities.CommandLineUtils.GetCommandLineArgsV(cmd).Skip(1).ToArray()
             };
 
             foreach (var state in new ISuggestHandler[] {
                                 new CommandSuggestHandler(_allCommands),
-                                new ParameterSuggestHandler(_schema), 
+                                new ParameterSuggestHandler(_schema),
                                 new OptionSuggestHandler(_schema)})
             {
                 state.Execute(data);
