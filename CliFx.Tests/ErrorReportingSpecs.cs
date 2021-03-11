@@ -17,7 +17,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Throwing_a_generic_exception_exits_with_a_detailed_error_message()
+        public async Task Throwing_an_exception_exits_with_a_detailed_error_message()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -55,7 +55,7 @@ public class Command : ICommand
         }
 
         [Fact]
-        public async Task Throwing_a_generic_exception_that_contains_an_inner_exception_exits_with_a_detailed_error_message()
+        public async Task Throwing_an_exception_that_contains_an_inner_exception_exits_with_a_detailed_error_message()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
