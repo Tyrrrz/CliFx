@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Reflection;
 using FluentAssertions.Execution;
 using FluentAssertions.Primitives;
-using Gu.Roslyn.Asserts;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis.Text;
 
 namespace CliFx.Analyzers.Tests.Utils
 {
@@ -20,64 +21,81 @@ namespace CliFx.Analyzers.Tests.Utils
         {
         }
 
-        private IReadOnlyList<Diagnostic> GetProducedDiagnostics(string sourceCode)
+        private Compilation Compile(string sourceCode)
         {
-            var result = new List<Diagnostic>();
+            // Get default system namespaces
+            var defaultSystemNamespaces = new[]
+            {
+                "System",
+                "System.Collections.Generic",
+                "System.Threading.Tasks"
+            };
 
-            var analyzers = ImmutableArray.Create(Subject);
-
-            var wrappedSourceCode = $@"
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using CliFx;
-using CliFx.Infrastructure;
-using CliFx.Attributes;
-using CliFx.Exceptions;
-using CliFx.Extensibility;
-
-{sourceCode}".Trim();
-
-            var metadataReferences = MetadataReferences
-                .Transitive(typeof(CliApplication).Assembly)
+            // Get default CliFx namespaces
+            var defaultCliFxNamespaces = typeof(ICommand)
+                .Assembly
+                .GetTypes()
+                .Where(t => t.IsPublic)
+                .Select(t => t.Namespace)
+                .Distinct()
                 .ToArray();
 
-            // Library to avoid having to define a static Main() method
-            var compilationOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
+            // Append default imports to the source code
+            var sourceCodeWithUsings =
+                string.Join(Environment.NewLine, defaultSystemNamespaces.Select(n => $"using {n};")) +
+                string.Join(Environment.NewLine, defaultCliFxNamespaces.Select(n => $"using {n};")) +
+                Environment.NewLine +
+                sourceCode;
 
-            var solution = CodeFactory.CreateSolution(wrappedSourceCode, compilationOptions, metadataReferences);
+            // Parse the source code
+            var ast = SyntaxFactory.ParseSyntaxTree(
+                SourceText.From(sourceCodeWithUsings),
+                CSharpParseOptions.Default
+            );
 
-            foreach (var project in solution.Projects)
-            {
-                var compilation =
-                    project.GetCompilationAsync().GetAwaiter().GetResult() ??
-                    throw new InvalidOperationException("Failed to compile code.");
-
-                // Ensure there are no compilation errors
-                var compilationErrors = compilation
-                    .GetDiagnostics()
-                    .Where(d => d.Severity >= DiagnosticSeverity.Error)
-                    .ToArray();
-
-                if (compilationErrors.Any())
+            // Compile the code to IL
+            var compilation = CSharpCompilation.Create(
+                "CliFxTests_DynamicAssembly_" + Guid.NewGuid(),
+                new[] {ast},
+                new[]
                 {
-                    throw new InvalidOperationException(
-                        "Failed to compile code." +
-                        Environment.NewLine +
-                        string.Join(Environment.NewLine, compilationErrors.Select(e => e.ToString()))
-                    );
-                }
+                    MetadataReference.CreateFromFile(Assembly.Load("netstandard").Location),
+                    MetadataReference.CreateFromFile(Assembly.Load("System.Runtime").Location),
+                    MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(Console).Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(ICommand).Assembly.Location)
+                },
+                // DLL to avoid having to define the Main() method
+                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+            );
 
-                // Get analyzer-specific diagnostics
-                var analyzerDiagnostics = compilation
-                    .WithAnalyzers(analyzers, project.AnalyzerOptions)
-                    .GetAnalyzerDiagnosticsAsync(analyzers, default)
-                    .GetAwaiter().GetResult();
+            var compilationErrors = compilation
+                .GetDiagnostics()
+                .Where(d => d.Severity >= DiagnosticSeverity.Error)
+                .ToArray();
 
-                result.AddRange(analyzerDiagnostics);
+            if (compilationErrors.Any())
+            {
+                throw new InvalidOperationException(
+                    "Failed to compile code." +
+                    Environment.NewLine +
+                    string.Join(Environment.NewLine, compilationErrors.Select(e => e.ToString()))
+                );
             }
 
-            return result;
+            return compilation;
+        }
+
+        private IReadOnlyList<Diagnostic> GetProducedDiagnostics(string sourceCode)
+        {
+            var analyzers = ImmutableArray.Create(Subject);
+            var compilation = Compile(sourceCode);
+
+            return compilation
+                .WithAnalyzers(analyzers)
+                .GetAnalyzerDiagnosticsAsync(analyzers, default)
+                .GetAwaiter()
+                .GetResult();
         }
 
         public void ProduceDiagnostics(string sourceCode)

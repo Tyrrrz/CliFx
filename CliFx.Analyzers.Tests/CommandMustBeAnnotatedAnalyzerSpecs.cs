@@ -1,6 +1,4 @@
-﻿using System.Collections.Immutable;
-using CliFx.Analyzers.Tests.Utils;
-using Microsoft.CodeAnalysis;
+﻿using CliFx.Analyzers.Tests.Utils;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Xunit;
 
