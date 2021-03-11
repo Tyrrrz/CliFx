@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using CliFx.Tests.Commands;
+using CliFx.Tests.Utils;
 using CliFx.Tests.Utils.Extensions;
 using FluentAssertions;
 using Xunit;
@@ -19,14 +20,25 @@ namespace CliFx.Tests
         public async Task Throwing_a_generic_exception_exits_with_a_detailed_error_message()
         {
             // Arrange
+            var commandType = DynamicCommandBuilder.Compile(
+                // language=cs
+                @"
+[Command]
+public class Command : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console) =>
+        throw new Exception(""Something went wrong"");
+}
+");
+
             var application = new CliApplicationBuilder()
-                .AddCommand<GenericExceptionCommand>()
+                .AddCommand(commandType)
                 .UseConsole(FakeConsole)
                 .Build();
 
             // Act
             var exitCode = await application.RunAsync(
-                new[] {"cmd", "-m", "Kaput"},
+                Array.Empty<string>(),
                 new Dictionary<string, string>()
             );
 
@@ -37,8 +49,8 @@ namespace CliFx.Tests
             exitCode.Should().NotBe(0);
             stdOut.Should().BeEmpty();
             stdErr.Should().ContainAllInOrder(
-                "System.Exception:", "Kaput",
-                "at", "CliFx.Tests"
+                "System.Exception", "Something went wrong",
+                "at", "CliFx."
             );
         }
 
@@ -46,14 +58,25 @@ namespace CliFx.Tests
         public async Task Throwing_a_generic_exception_that_contains_an_inner_exception_exits_with_a_detailed_error_message()
         {
             // Arrange
+            var commandType = DynamicCommandBuilder.Compile(
+                // language=cs
+                @"
+[Command]
+public class Command : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console) =>
+        throw new Exception(""Something went wrong"", new Exception(""Another exception""));
+}
+");
+
             var application = new CliApplicationBuilder()
-                .AddCommand<GenericInnerExceptionCommand>()
+                .AddCommand(commandType)
                 .UseConsole(FakeConsole)
                 .Build();
 
             // Act
             var exitCode = await application.RunAsync(
-                new[] {"cmd", "-m", "Kaput", "-i", "FooBar"},
+                Array.Empty<string>(),
                 new Dictionary<string, string>()
             );
 
@@ -64,24 +87,35 @@ namespace CliFx.Tests
             exitCode.Should().NotBe(0);
             stdOut.Should().BeEmpty();
             stdErr.Should().ContainAllInOrder(
-                "System.Exception:", "Kaput",
-                "System.Exception:", "FooBar",
-                "at", "CliFx.Tests"
+                "System.Exception", "Something went wrong",
+                "System.Exception", "Another exception",
+                "at", "CliFx."
             );
         }
 
         [Fact]
-        public async Task Throwing_a_specialized_exception_exits_with_the_provided_code_and_custom_message()
+        public async Task Throwing_a_command_exception_exits_with_the_provided_code_and_custom_message()
         {
             // Arrange
+            var commandType = DynamicCommandBuilder.Compile(
+                // language=cs
+                @"
+[Command]
+public class Command : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console) =>
+        throw new CommandException(""Something went wrong"", 69);
+}
+");
+
             var application = new CliApplicationBuilder()
-                .AddCommand<CommandExceptionCommand>()
+                .AddCommand(commandType)
                 .UseConsole(FakeConsole)
                 .Build();
 
             // Act
             var exitCode = await application.RunAsync(
-                new[] {"cmd", "-m", "Kaput", "-c", "69"},
+                Array.Empty<string>(),
                 new Dictionary<string, string>()
             );
 
@@ -91,21 +125,32 @@ namespace CliFx.Tests
             // Assert
             exitCode.Should().Be(69);
             stdOut.Should().BeEmpty();
-            stdErr.Trim().Should().Be("Kaput");
+            stdErr.Trim().Should().Be("Something went wrong");
         }
 
         [Fact]
-        public async Task Throwing_a_specialized_exception_without_a_custom_message_exits_with_detailed_error_message()
+        public async Task Throwing_a_command_exception_without_a_custom_message_exits_with_detailed_error_message()
         {
             // Arrange
+            var commandType = DynamicCommandBuilder.Compile(
+                // language=cs
+                @"
+[Command]
+public class Command : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console) =>
+        throw new CommandException(69);
+}
+");
+
             var application = new CliApplicationBuilder()
-                .AddCommand<CommandExceptionCommand>()
+                .AddCommand(commandType)
                 .UseConsole(FakeConsole)
                 .Build();
 
             // Act
             var exitCode = await application.RunAsync(
-                new[] {"cmd"},
+                Array.Empty<string>(),
                 new Dictionary<string, string>()
             );
 
@@ -113,26 +158,37 @@ namespace CliFx.Tests
             var stdErr = FakeConsole.ReadErrorString();
 
             // Assert
-            exitCode.Should().NotBe(0);
+            exitCode.Should().Be(69);
             stdOut.Should().BeEmpty();
             stdErr.Should().ContainAllInOrder(
-                "CliFx.Exceptions.CommandException:",
-                "at", "CliFx.Tests"
+                "CliFx.Exceptions.CommandException",
+                "at", "CliFx."
             );
         }
 
         [Fact]
-        public async Task Throwing_a_specialized_exception_may_optionally_print_help_text()
+        public async Task Throwing_a_command_exception_may_optionally_print_help_text()
         {
             // Arrange
+            var commandType = DynamicCommandBuilder.Compile(
+                // language=cs
+                @"
+[Command]
+public class Command : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console) =>
+        throw new CommandException(""Something went wrong"", 69, true);
+}
+");
+
             var application = new CliApplicationBuilder()
-                .AddCommand<CommandExceptionCommand>()
+                .AddCommand(commandType)
                 .UseConsole(FakeConsole)
                 .Build();
 
             // Act
             var exitCode = await application.RunAsync(
-                new[] {"cmd", "-m", "Kaput", "--show-help"},
+                Array.Empty<string>(),
                 new Dictionary<string, string>()
             );
 
@@ -140,13 +196,13 @@ namespace CliFx.Tests
             var stdErr = FakeConsole.ReadErrorString();
 
             // Assert
-            exitCode.Should().NotBe(0);
+            exitCode.Should().Be(69);
             stdOut.Should().ContainAllInOrder(
                 "Usage",
                 "Options",
                 "-h|--help"
             );
-            stdErr.Trim().Should().Be("Kaput");
+            stdErr.Trim().Should().Be("Something went wrong");
         }
 
         [Fact]
@@ -154,13 +210,13 @@ namespace CliFx.Tests
         {
             // Arrange
             var application = new CliApplicationBuilder()
-                .AddCommand<DefaultCommand>()
+                .AddCommand<NoOpCommand>()
                 .UseConsole(FakeConsole)
                 .Build();
 
             // Act
             var exitCode = await application.RunAsync(
-                new[] {"not-a-valid-command", "-r", "foo"},
+                new[] {"invalid-command", "--invalid-option"},
                 new Dictionary<string, string>()
             );
 
