@@ -9,12 +9,13 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace CliFx.Tests.Utils
 {
-    // This class allows us to embed command definitions inside the
-    // tests that use them, by compiling the source code at runtime.
-    // It's a bit of hack but it helps achieve test collocation,
-    // which is really important.
-    // Maybe one day C# will allow us to declare local classes inside
-    // methods and this won't be necessary.
+    // This class uses Roslyn to compile commands dynamically.
+    // It allows us to collocate tests and their commands more
+    // easily, which helps a lot when reasoning about them.
+    // Unfortunately, this comes at a cost of static typing,
+    // but this is a trade off I'm willing to take.
+    // Maybe one day C# will allow declaring classes inside
+    // methods and doing this will no longer be necessary.
     internal static class DynamicCommandBuilder
     {
         public static IReadOnlyList<Type> CompileMany(string sourceCode)
@@ -102,12 +103,33 @@ namespace CliFx.Tests.Utils
             var generatedAssembly = Assembly.Load(buffer.ToArray());
 
             // Return all defined commands
-            return generatedAssembly
+            var commandTypes = generatedAssembly
                 .GetTypes()
                 .Where(t => t.IsAssignableTo(typeof(ICommand)))
                 .ToArray();
+
+            if (commandTypes.Length <= 0)
+            {
+                throw new InvalidOperationException(
+                    "There are no command definitions in the provide source code."
+                );
+            }
+
+            return commandTypes;
         }
 
-        public static Type Compile(string sourceCode) => CompileMany(sourceCode).Single();
+        public static Type Compile(string sourceCode)
+        {
+            var commandTypes = CompileMany(sourceCode);
+
+            if (commandTypes.Count > 1)
+            {
+                throw new InvalidOperationException(
+                    "There are more than one command definitions in the provide source code."
+                );
+            }
+
+            return commandTypes.Single();
+        }
     }
 }

@@ -184,6 +184,7 @@ public class Command : ICommand
             var application = new CliApplicationBuilder()
                 .AddCommand(commandType)
                 .UseConsole(FakeConsole)
+                .SetDescription("This will be in help text")
                 .Build();
 
             // Act
@@ -197,11 +198,7 @@ public class Command : ICommand
 
             // Assert
             exitCode.Should().Be(69);
-            stdOut.Should().ContainAllInOrder(
-                "Usage",
-                "Options",
-                "-h|--help"
-            );
+            stdOut.Should().Contain("This will be in help text");
             stdErr.Trim().Should().Be("Something went wrong");
         }
 
@@ -212,6 +209,7 @@ public class Command : ICommand
             var application = new CliApplicationBuilder()
                 .AddCommand<NoOpCommand>()
                 .UseConsole(FakeConsole)
+                .SetDescription("This will be in help text")
                 .Build();
 
             // Act
@@ -225,11 +223,7 @@ public class Command : ICommand
 
             // Assert
             exitCode.Should().NotBe(0);
-            stdOut.Should().ContainAllInOrder(
-                "Usage",
-                "Options",
-                "-h|--help"
-            );
+            stdOut.Should().Contain("This will be in help text");
             stdErr.Should().NotBeNullOrWhiteSpace();
         }
     }

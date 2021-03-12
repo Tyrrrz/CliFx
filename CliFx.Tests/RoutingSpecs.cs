@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using CliFx.Tests.Commands;
+using CliFx.Tests.Utils;
 using CliFx.Tests.Utils.Extensions;
 using FluentAssertions;
 using Xunit;
@@ -20,10 +20,42 @@ namespace CliFx.Tests
         public async Task Default_command_is_executed_if_provided_arguments_do_not_match_any_named_command()
         {
             // Arrange
+            var commandTypes = DynamicCommandBuilder.CompileMany(
+                // language=cs
+                @"
+[Command]
+public class DefaultCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(""default"");
+        return default;
+    }
+}
+
+[Command(""cmd"")]
+public class NamedCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(""cmd"");
+        return default;
+    }
+}
+
+[Command(""cmd sub"")]
+public class SubCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(""cmd sub"");
+        return default;
+    }
+}
+");
+
             var application = new CliApplicationBuilder()
-                .AddCommand<DefaultCommand>()
-                .AddCommand<NamedCommand>()
-                .AddCommand<NamedSubCommand>()
+                .AddCommands(commandTypes)
                 .UseConsole(FakeConsole)
                 .Build();
 
@@ -37,23 +69,55 @@ namespace CliFx.Tests
 
             // Assert
             exitCode.Should().Be(0);
-            stdOut.Trim().Should().Be(DefaultCommand.ExpectedOutputText);
+            stdOut.Trim().Should().Be("default");
         }
 
         [Fact]
         public async Task Specific_named_command_is_executed_if_provided_arguments_match_its_name()
         {
             // Arrange
+            var commandTypes = DynamicCommandBuilder.CompileMany(
+                // language=cs
+                @"
+[Command]
+public class DefaultCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(""default"");
+        return default;
+    }
+}
+
+[Command(""cmd"")]
+public class NamedCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(""cmd"");
+        return default;
+    }
+}
+
+[Command(""cmd sub"")]
+public class SubCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(""cmd sub"");
+        return default;
+    }
+}
+");
+
             var application = new CliApplicationBuilder()
-                .AddCommand<DefaultCommand>()
-                .AddCommand<NamedCommand>()
-                .AddCommand<NamedSubCommand>()
+                .AddCommands(commandTypes)
                 .UseConsole(FakeConsole)
                 .Build();
 
             // Act
             var exitCode = await application.RunAsync(
-                new[] {"named"},
+                new[] {"cmd"},
                 new Dictionary<string, string>()
             );
 
@@ -61,23 +125,55 @@ namespace CliFx.Tests
 
             // Assert
             exitCode.Should().Be(0);
-            stdOut.Trim().Should().Be(NamedCommand.ExpectedOutputText);
+            stdOut.Trim().Should().Be("cmd");
         }
 
         [Fact]
         public async Task Specific_named_sub_command_is_executed_if_provided_arguments_match_its_name()
         {
             // Arrange
+            var commandTypes = DynamicCommandBuilder.CompileMany(
+                // language=cs
+                @"
+[Command]
+public class DefaultCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(""default"");
+        return default;
+    }
+}
+
+[Command(""cmd"")]
+public class NamedCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(""cmd"");
+        return default;
+    }
+}
+
+[Command(""cmd sub"")]
+public class SubCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(""cmd sub"");
+        return default;
+    }
+}
+");
+
             var application = new CliApplicationBuilder()
-                .AddCommand<DefaultCommand>()
-                .AddCommand<NamedCommand>()
-                .AddCommand<NamedSubCommand>()
+                .AddCommands(commandTypes)
                 .UseConsole(FakeConsole)
                 .Build();
 
             // Act
             var exitCode = await application.RunAsync(
-                new[] {"named", "sub"},
+                new[] {"cmd", "sub"},
                 new Dictionary<string, string>()
             );
 
@@ -85,18 +181,41 @@ namespace CliFx.Tests
 
             // Assert
             exitCode.Should().Be(0);
-            stdOut.Trim().Should().Be(NamedSubCommand.ExpectedOutputText);
+            stdOut.Trim().Should().Be("cmd sub");
         }
 
         [Fact]
         public async Task Help_text_is_printed_if_no_arguments_were_provided_and_default_command_is_not_defined()
         {
             // Arrange
+            var commandTypes = DynamicCommandBuilder.CompileMany(
+                // language=cs
+                @"
+[Command(""cmd"")]
+public class NamedCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(""cmd"");
+        return default;
+    }
+}
+
+[Command(""cmd sub"")]
+public class SubCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(""cmd sub"");
+        return default;
+    }
+}
+");
+
             var application = new CliApplicationBuilder()
-                .AddCommand<NamedCommand>()
-                .AddCommand<NamedSubCommand>()
+                .AddCommands(commandTypes)
                 .UseConsole(FakeConsole)
-                .SetDescription("This will be visible in help")
+                .SetDescription("This will be in help text")
                 .Build();
 
             // Act
@@ -109,17 +228,49 @@ namespace CliFx.Tests
 
             // Assert
             exitCode.Should().Be(0);
-            stdOut.Should().Contain("This will be visible in help");
+            stdOut.Should().Contain("This will be in help text");
         }
 
         [Fact]
         public async Task Help_text_is_printed_if_provided_arguments_contain_the_help_option()
         {
             // Arrange
+            var commandTypes = DynamicCommandBuilder.CompileMany(
+                // language=cs
+                @"
+[Command(Description = ""Description of default command"")]
+public class DefaultCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(""default"");
+        return default;
+    }
+}
+
+[Command(""cmd"")]
+public class NamedCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(""cmd"");
+        return default;
+    }
+}
+
+[Command(""cmd sub"")]
+public class SubCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(""cmd sub"");
+        return default;
+    }
+}
+");
+
             var application = new CliApplicationBuilder()
-                .AddCommand<DefaultCommand>()
-                .AddCommand<NamedCommand>()
-                .AddCommand<NamedSubCommand>()
+                .AddCommands(commandTypes)
                 .UseConsole(FakeConsole)
                 .Build();
 
@@ -133,21 +284,41 @@ namespace CliFx.Tests
 
             // Assert
             exitCode.Should().Be(0);
-            stdOut.Should().ContainAllInOrder(
-                "Default command description",
-                "Usage"
-            );
+            stdOut.Should().Contain("Description of default command");
         }
 
         [Fact]
         public async Task Help_text_is_printed_if_provided_arguments_contain_the_help_option_even_if_default_command_is_not_defined()
         {
             // Arrange
+            var commandTypes = DynamicCommandBuilder.CompileMany(
+                // language=cs
+                @"
+[Command(""cmd"")]
+public class NamedCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(""cmd"");
+        return default;
+    }
+}
+
+[Command(""cmd sub"")]
+public class SubCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(""cmd sub"");
+        return default;
+    }
+}
+");
+
             var application = new CliApplicationBuilder()
-                .AddCommand<NamedCommand>()
-                .AddCommand<NamedSubCommand>()
-                .SetDescription("This will be visible in help")
+                .AddCommands(commandTypes)
                 .UseConsole(FakeConsole)
+                .SetDescription("This will be in help text")
                 .Build();
 
             // Act
@@ -160,23 +331,55 @@ namespace CliFx.Tests
 
             // Assert
             exitCode.Should().Be(0);
-            stdOut.Should().Contain("This will be visible in help");
+            stdOut.Should().Contain("This will be in help text");
         }
 
         [Fact]
         public async Task Help_text_for_a_specific_named_command_is_printed_if_provided_arguments_match_its_name_and_contain_the_help_option()
         {
             // Arrange
+            var commandTypes = DynamicCommandBuilder.CompileMany(
+                // language=cs
+                @"
+[Command]
+public class DefaultCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(""default"");
+        return default;
+    }
+}
+
+[Command(""cmd"", Description = ""Description of named command"")]
+public class NamedCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(""cmd"");
+        return default;
+    }
+}
+
+[Command(""cmd sub"")]
+public class SubCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(""cmd sub"");
+        return default;
+    }
+}
+");
+
             var application = new CliApplicationBuilder()
-                .AddCommand<DefaultCommand>()
-                .AddCommand<NamedCommand>()
-                .AddCommand<NamedSubCommand>()
+                .AddCommands(commandTypes)
                 .UseConsole(FakeConsole)
                 .Build();
 
             // Act
             var exitCode = await application.RunAsync(
-                new[] {"named", "--help"},
+                new[] {"cmd", "--help"},
                 new Dictionary<string, string>()
             );
 
@@ -184,27 +387,55 @@ namespace CliFx.Tests
 
             // Assert
             exitCode.Should().Be(0);
-            stdOut.Should().ContainAllInOrder(
-                "Named command description",
-                "Usage",
-                "named"
-            );
+            stdOut.Should().Contain("Description of named command");
         }
 
         [Fact]
         public async Task Help_text_for_a_specific_named_sub_command_is_printed_if_provided_arguments_match_its_name_and_contain_the_help_option()
         {
             // Arrange
+            var commandTypes = DynamicCommandBuilder.CompileMany(
+                // language=cs
+                @"
+[Command]
+public class DefaultCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(""default"");
+        return default;
+    }
+}
+
+[Command(""cmd"")]
+public class NamedCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(""cmd"");
+        return default;
+    }
+}
+
+[Command(""cmd sub"", Description = ""Description of named command"")]
+public class SubCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(""cmd sub"");
+        return default;
+    }
+}
+");
+
             var application = new CliApplicationBuilder()
-                .AddCommand<DefaultCommand>()
-                .AddCommand<NamedCommand>()
-                .AddCommand<NamedSubCommand>()
+                .AddCommands(commandTypes)
                 .UseConsole(FakeConsole)
                 .Build();
 
             // Act
             var exitCode = await application.RunAsync(
-                new[] {"named", "sub", "--help"},
+                new[] {"cmd", "sub", "--help"},
                 new Dictionary<string, string>()
             );
 
@@ -212,11 +443,7 @@ namespace CliFx.Tests
 
             // Assert
             exitCode.Should().Be(0);
-            stdOut.Should().ContainAllInOrder(
-                "Named sub command description",
-                "Usage",
-                "named", "sub"
-            );
+            stdOut.Should().Contain("Description of named command");
         }
 
         [Fact]
@@ -224,9 +451,7 @@ namespace CliFx.Tests
         {
             // Arrange
             var application = new CliApplicationBuilder()
-                .AddCommand<DefaultCommand>()
-                .AddCommand<NamedCommand>()
-                .AddCommand<NamedSubCommand>()
+                .AddCommand<NoOpCommand>()
                 .SetVersion("v6.9")
                 .UseConsole(FakeConsole)
                 .Build();
