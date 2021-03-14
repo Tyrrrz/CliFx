@@ -14,8 +14,6 @@
     <Nullable>annotations</Nullable>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
-    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-  </PropertyGroup>
+  <!-- Note: ContinuousIntegrationBuild is not enabled because it breaks coverage reporting -->
 
 </Project>
