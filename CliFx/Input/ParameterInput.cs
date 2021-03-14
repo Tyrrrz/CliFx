@@ -1,12 +1,12 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace CliFx.Parsing
+namespace CliFx.Input
 {
-    internal class CommandParameterInput
+    internal class ParameterInput
     {
         public string Value { get; }
 
-        public CommandParameterInput(string value) => Value = value;
+        public ParameterInput(string value) => Value = value;
 
         [ExcludeFromCodeCoverage]
         public override string ToString() => Value;

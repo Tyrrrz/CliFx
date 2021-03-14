@@ -4,8 +4,8 @@ using CliFx.Infrastructure;
 
 namespace CliFx.Tests.Dummy.Commands
 {
-    [Command]
-    public class HelloWorldCommand : ICommand
+    [Command("env-test")]
+    public class EnvironmentTestCommand : ICommand
     {
         [CommandOption("target", EnvironmentVariable = "ENV_TARGET")]
         public string Target { get; set; } = "World";

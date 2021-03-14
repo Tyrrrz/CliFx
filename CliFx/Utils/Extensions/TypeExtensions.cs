@@ -36,13 +36,6 @@ namespace CliFx.Utils.Extensions
                 .FirstOrDefault();
         }
 
-        public static MethodInfo GetToStringMethod(this Type type) =>
-            // ToString() with no params always exists
-            type.GetMethod(nameof(ToString), Type.EmptyTypes)!;
-
-        public static bool IsToStringOverriden(this Type type) =>
-            type.GetToStringMethod() != typeof(object).GetToStringMethod();
-
         public static MethodInfo? TryGetStaticParseMethod(this Type type, bool withFormatProvider = false)
         {
             var argumentTypes = withFormatProvider
@@ -64,5 +57,32 @@ namespace CliFx.Utils.Extensions
 
             return array;
         }
+
+        public static bool IsToStringOverriden(this Type type) =>
+            type.GetMethod(nameof(ToString), Type.EmptyTypes) !=
+            typeof(object).GetMethod(nameof(ToString), Type.EmptyTypes);
+
+        // Types supported by `Convert.ChangeType(...)`
+        private static readonly HashSet<Type> ConvertibleTypes = new()
+        {
+            typeof(bool),
+            typeof(char),
+            typeof(sbyte),
+            typeof(byte),
+            typeof(short),
+            typeof(ushort),
+            typeof(int),
+            typeof(uint),
+            typeof(long),
+            typeof(ulong),
+            typeof(float),
+            typeof(double),
+            typeof(decimal),
+            typeof(DateTime),
+            typeof(string),
+            typeof(object)
+        };
+
+        public static bool IsConvertible(this Type type) => ConvertibleTypes.Contains(type);
     }
 }

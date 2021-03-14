@@ -9,14 +9,14 @@ namespace CliFx.Analyzers.Tests
         private static DiagnosticAnalyzer Analyzer { get; } = new ArgumentMustHaveValidValidatorsAnalyzer();
 
         [Fact]
-        public void Analyzer_reports_an_error_if_one_of_the_specified_parameter_validators_does_not_derive_from_ArgumentValueValidator()
+        public void Analyzer_reports_an_error_if_one_of_the_specified_parameter_validators_does_not_derive_from_ArgumentValidator()
         {
             // Arrange
             // language=cs
             const string code = @"
 public class MyValidator
 {
-    public ValidationResult Validate(string value) => ValidationResult.Ok();
+    public void Validate(string value) {}
 }
 
 [Command]
@@ -33,14 +33,14 @@ public class MyCommand : ICommand
         }
 
         [Fact]
-        public void Analyzer_does_not_report_an_error_if_all_specified_parameter_validators_derive_from_ArgumentValueValidator()
+        public void Analyzer_does_not_report_an_error_if_all_specified_parameter_validators_derive_from_ArgumentValidator()
         {
             // Arrange
             // language=cs
             const string code = @"
-public class MyValidator : ArgumentValueValidator<string>
+public class MyValidator : ArgumentValidator<string>
 {
-    public override ValidationResult Validate(string value) => ValidationResult.Ok();
+    public override void Validate(string value) {}
 }
 
 [Command]
@@ -76,14 +76,14 @@ public class MyCommand : ICommand
         }
 
         [Fact]
-        public void Analyzer_reports_an_error_if_one_of_the_specified_option_validators_does_not_derive_from_ArgumentValueValidator()
+        public void Analyzer_reports_an_error_if_one_of_the_specified_option_validators_does_not_derive_from_ArgumentValidator()
         {
             // Arrange
             // language=cs
             const string code = @"
 public class MyValidator
 {
-    public ValidationResult Validate(string value) => ValidationResult.Ok();
+    public void Validate(string value) {}
 }
 
 [Command]
@@ -100,14 +100,14 @@ public class MyCommand : ICommand
         }
 
         [Fact]
-        public void Analyzer_does_not_report_an_error_if_all_specified_option_validators_derive_from_ArgumentValueValidator()
+        public void Analyzer_does_not_report_an_error_if_all_specified_option_validators_derive_from_ArgumentValidator()
         {
             // Arrange
             // language=cs
             const string code = @"
-public class MyValidator : ArgumentValueValidator<string>
+public class MyValidator : ArgumentValidator<string>
 {
-    public override ValidationResult Validate(string value) => ValidationResult.Ok();
+    public override void Validate(string value) {}
 }
 
 [Command]

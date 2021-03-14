@@ -25,7 +25,8 @@ namespace CliFx.Tests.Utils
             {
                 "System",
                 "System.Collections.Generic",
-                "System.Threading.Tasks"
+                "System.Threading.Tasks",
+                "System.Globalization"
             };
 
             // Get default CliFx namespaces

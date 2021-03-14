@@ -17,7 +17,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Throwing_an_exception_exits_with_a_detailed_error_message()
+        public async Task Command_can_throw_an_exception_which_exits_with_a_stacktrace()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -55,7 +55,7 @@ public class Command : ICommand
         }
 
         [Fact]
-        public async Task Throwing_an_exception_that_contains_an_inner_exception_exits_with_a_detailed_error_message()
+        public async Task Command_can_throw_an_exception_with_an_inner_exception_which_exits_with_a_stacktrace()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -94,7 +94,7 @@ public class Command : ICommand
         }
 
         [Fact]
-        public async Task Throwing_a_command_exception_exits_with_the_provided_code_and_custom_message()
+        public async Task Command_can_throw_a_special_exception_which_exits_with_specified_code_and_message()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -129,7 +129,7 @@ public class Command : ICommand
         }
 
         [Fact]
-        public async Task Throwing_a_command_exception_without_a_custom_message_exits_with_detailed_error_message()
+        public async Task Command_can_throw_a_special_exception_without_message_which_exits_with_a_stacktrace()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -139,7 +139,7 @@ public class Command : ICommand
 public class Command : ICommand
 {
     public ValueTask ExecuteAsync(IConsole console) =>
-        throw new CommandException(69);
+        throw new CommandException(null, 69);
 }
 ");
 
@@ -167,7 +167,7 @@ public class Command : ICommand
         }
 
         [Fact]
-        public async Task Throwing_a_command_exception_may_optionally_print_help_text()
+        public async Task Command_can_throw_a_special_exception_which_prints_help_text_before_exiting()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -200,31 +200,6 @@ public class Command : ICommand
             exitCode.Should().Be(69);
             stdOut.Should().Contain("This will be in help text");
             stdErr.Trim().Should().Be("Something went wrong");
-        }
-
-        [Fact]
-        public async Task Failing_on_invalid_user_input_prints_help_text()
-        {
-            // Arrange
-            var application = new CliApplicationBuilder()
-                .AddCommand<NoOpCommand>()
-                .UseConsole(FakeConsole)
-                .SetDescription("This will be in help text")
-                .Build();
-
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"invalid-command", "--invalid-option"},
-                new Dictionary<string, string>()
-            );
-
-            var stdOut = FakeConsole.ReadOutputString();
-            var stdErr = FakeConsole.ReadErrorString();
-
-            // Assert
-            exitCode.Should().NotBe(0);
-            stdOut.Should().Contain("This will be in help text");
-            stdErr.Should().NotBeNullOrWhiteSpace();
         }
     }
 }

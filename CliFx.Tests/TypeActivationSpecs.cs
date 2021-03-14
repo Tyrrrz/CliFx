@@ -1,7 +1,7 @@
 ﻿using System;
-using CliFx.Exceptions;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using CliFx.Infrastructure;
-using CliFx.Tests.Commands;
 using CliFx.Tests.Utils;
 using FluentAssertions;
 using Xunit;
@@ -17,51 +17,149 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public void Default_type_activator_can_initialize_a_type_if_it_has_a_parameterless_constructor()
+        public async Task Default_type_activator_can_initialize_a_type_if_it_has_a_parameterless_constructor()
         {
             // Arrange
-            var activator = new DefaultTypeActivator();
+            var commandType = DynamicCommandBuilder.Compile(
+                // language=cs
+                @"
+[Command]
+public class Command : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(""foo"");
+        return default;
+    }
+}");
+
+            var application = new CliApplicationBuilder()
+                .AddCommand(commandType)
+                .UseConsole(FakeConsole)
+                .UseTypeActivator(new DefaultTypeActivator())
+                .Build();
 
             // Act
-            var obj = activator.CreateInstance(typeof(NoOpCommand));
+            var exitCode = await application.RunAsync(
+                Array.Empty<string>(),
+                new Dictionary<string, string>()
+            );
+
+            var stdOut = FakeConsole.ReadOutputString();
 
             // Assert
-            obj.Should().BeOfType<NoOpCommand>();
+            exitCode.Should().Be(0);
+            stdOut.Trim().Should().Be("foo");
         }
 
         [Fact]
-        public void Default_type_activator_cannot_initialize_a_type_if_it_does_not_have_a_parameterless_constructor()
+        public async Task Default_type_activator_fails_if_the_type_does_not_have_a_parameterless_constructor()
         {
             // Arrange
-            var activator = new DefaultTypeActivator();
+            var commandType = DynamicCommandBuilder.Compile(
+                // language=cs
+                @"
+[Command]
+public class Command : ICommand
+{
+    public Command(string foo) {}
 
-            // Act & assert
-            var ex = Assert.Throws<CliFxException>(() => activator.CreateInstance(typeof(CliApplication)));
-            TestOutput.WriteLine(ex.Message);
-        }
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}");
 
-        [Fact]
-        public void Delegate_type_activator_can_initialize_a_type_using_a_custom_function()
-        {
-            // Arrange
-            var activator = new DelegateTypeActivator(t => Activator.CreateInstance(t)!);
+            var application = new CliApplicationBuilder()
+                .AddCommand(commandType)
+                .UseConsole(FakeConsole)
+                .UseTypeActivator(new DefaultTypeActivator())
+                .Build();
 
             // Act
-            var obj = activator.CreateInstance(typeof(NoOpCommand));
+            var exitCode = await application.RunAsync(
+                Array.Empty<string>(),
+                new Dictionary<string, string>()
+            );
+
+            var stdErr = FakeConsole.ReadErrorString();
 
             // Assert
-            obj.Should().BeOfType<NoOpCommand>();
+            exitCode.Should().NotBe(0);
+            stdErr.Should().Contain("Failed to create an instance of type");
         }
 
         [Fact]
-        public void Delegate_type_activator_throws_if_the_underlying_function_returns_null()
+        public async Task Delegate_type_activator_can_initialize_a_type_using_a_custom_function()
         {
             // Arrange
-            var activator = new DelegateTypeActivator(_ => null!);
+            var commandType = DynamicCommandBuilder.Compile(
+                // language=cs
+                @"
+[Command]
+public class Command : ICommand
+{
+    private readonly string _foo;
 
-            // Act & assert
-            var ex = Assert.Throws<CliFxException>(() => activator.CreateInstance(typeof(NoOpCommand)));
-            TestOutput.WriteLine(ex.Message);
+    public Command(string foo) => _foo = foo;
+
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(_foo);
+        return default;
+    }
+}");
+
+            var application = new CliApplicationBuilder()
+                .AddCommand(commandType)
+                .UseConsole(FakeConsole)
+                .UseTypeActivator(type => Activator.CreateInstance(type, "hello world")!)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(
+                Array.Empty<string>(),
+                new Dictionary<string, string>()
+            );
+
+            var stdOut = FakeConsole.ReadOutputString();
+
+            // Assert
+            exitCode.Should().Be(0);
+            stdOut.Trim().Should().Be("hello world");
+        }
+
+        [Fact]
+        public async Task Delegate_type_activator_fails_if_the_underlying_function_returns_null()
+        {
+            // Arrange
+            var commandType = DynamicCommandBuilder.Compile(
+                // language=cs
+                @"
+[Command]
+public class Command : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(""foo"");
+        return default;
+    }
+}");
+
+            var application = new CliApplicationBuilder()
+                .AddCommand(commandType)
+                .UseConsole(FakeConsole)
+                .UseTypeActivator(_ => null!)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(
+                Array.Empty<string>(),
+                new Dictionary<string, string>()
+            );
+
+            var stdErr = FakeConsole.ReadErrorString();
+
+            // Assert
+            exitCode.Should().NotBe(0);
+            stdErr.Should().Contain("Failed to create an instance of type");
         }
     }
 }

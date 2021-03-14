@@ -11,8 +11,8 @@ namespace CliFx.Analyzers
     {
         public ArgumentMustHaveValidConverterAnalyzer()
             : base(
-                $"Parameter and option converters must derive from `{SymbolNames.CliFxArgumentValueConverterClass}`",
-                $"Converter specified for this parameter or option must derive from `{SymbolNames.CliFxArgumentValueConverterClass}`.")
+                $"Parameter and option converters must derive from `{SymbolNames.CliFxArgumentConverterClass}`",
+                $"Converter specified for this parameter or option must derive from `{SymbolNames.CliFxArgumentConverterClass}`.")
         {
         }
 
@@ -26,7 +26,7 @@ namespace CliFx.Analyzers
                 return;
 
             var argument =
-                (ICommandArgumentSymbol)
+                (ICommandMemberSymbol)
                 CommandParameterSymbol.TryResolve(property) ??
                 CommandOptionSymbol.TryResolve(property);
 
@@ -40,7 +40,7 @@ namespace CliFx.Analyzers
             var converterImplementsInterface = argument
                 .ConverterType
                 .AllInterfaces
-                .Any(s => s.DisplayNameMatches(SymbolNames.CliFxArgumentValueConverterInterface));
+                .Any(s => s.DisplayNameMatches(SymbolNames.CliFxArgumentConverterInterface));
 
             if (!converterImplementsInterface)
             {

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using CliFx.Tests.Commands;
 using CliFx.Tests.Utils;
 using CliFx.Tests.Utils.Extensions;
 using FluentAssertions;
@@ -17,7 +16,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Preview_directive_can_be_specified_to_print_provided_arguments_as_they_were_parsed()
+        public async Task Preview_directive_can_be_specified_to_print_parsed_arguments()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(

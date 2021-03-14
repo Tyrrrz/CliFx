@@ -6,35 +6,36 @@ namespace CliFx.Attributes
     /// Annotates a property that defines a command option.
     /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
-    public class CommandOptionAttribute : CommandArgumentAttribute
+    public class CommandOptionAttribute : CommandMemberAttribute
     {
         /// <summary>
-        /// Option name.
+        /// Option's name.
         /// </summary>
         /// <remarks>
         /// Must contain at least two characters and start with a letter.
         /// Either <see cref="Name"/> or <see cref="ShortName"/> must be set.
-        /// All options in a command must have different names (comparison is not case-sensitive).
+        /// All options in a command must have unique names (comparison IS NOT case-sensitive).
         /// </remarks>
         public string? Name { get; }
 
         /// <summary>
-        /// Option short name.
+        /// Option's short name.
         /// </summary>
         /// <remarks>
         /// Either <see cref="Name"/> or <see cref="ShortName"/> must be set.
-        /// All options in a command must have different short names (comparison is case-sensitive).
+        /// All options in a command must have unique short names (comparison IS case-sensitive).
         /// </remarks>
         public char? ShortName { get; }
 
         /// <summary>
-        /// Whether the option is required.
+        /// Whether this option is required.
+        /// If an option is required, the user will get an error if they don't set it.
         /// </summary>
         public bool IsRequired { get; set; }
 
         /// <summary>
-        /// Environment variable that will be used as fallback if
-        /// the value isn't explicitly specified in the arguments.
+        /// Environment variable whose value will be used as a fallback if the option
+        /// has not been explicitly set through command line arguments.
         /// </summary>
         public string? EnvironmentVariable { get; set; }
 

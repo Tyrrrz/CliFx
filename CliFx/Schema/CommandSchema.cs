@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Text;
 using CliFx.Attributes;
 using CliFx.Exceptions;
-using CliFx.Parsing;
+using CliFx.Input;
 using CliFx.Utils.Extensions;
 
 namespace CliFx.Schema
@@ -22,20 +22,20 @@ namespace CliFx.Schema
 
         public string? Description { get; }
 
-        public IReadOnlyList<CommandParameterSchema> Parameters { get; }
+        public IReadOnlyList<ParameterSchema> Parameters { get; }
 
-        public IReadOnlyList<CommandOptionSchema> Options { get; }
+        public IReadOnlyList<OptionSchema> Options { get; }
 
-        public bool IsHelpOptionAvailable => Options.Contains(CommandOptionSchema.HelpOption);
+        public bool IsHelpOptionAvailable => Options.Contains(OptionSchema.HelpOption);
 
-        public bool IsVersionOptionAvailable => Options.Contains(CommandOptionSchema.VersionOption);
+        public bool IsVersionOptionAvailable => Options.Contains(OptionSchema.VersionOption);
 
         public CommandSchema(
             Type type,
             string? name,
             string? description,
-            IReadOnlyList<CommandParameterSchema> parameters,
-            IReadOnlyList<CommandOptionSchema> options)
+            IReadOnlyList<ParameterSchema> parameters,
+            IReadOnlyList<OptionSchema> options)
         {
             Type = type;
             Name = name;
@@ -49,7 +49,7 @@ namespace CliFx.Schema
                 ? string.Equals(name, Name, StringComparison.OrdinalIgnoreCase)
                 : string.IsNullOrWhiteSpace(name);
 
-        public IEnumerable<CommandArgumentSchema> GetArguments()
+        public IEnumerable<MemberSchema> GetArguments()
         {
             foreach (var parameter in Parameters)
                 yield return parameter;
@@ -58,9 +58,9 @@ namespace CliFx.Schema
                 yield return option;
         }
 
-        public IReadOnlyDictionary<CommandArgumentSchema, object?> GetArgumentValues(ICommand instance)
+        public IReadOnlyDictionary<MemberSchema, object?> GetArgumentValues(ICommand instance)
         {
-            var result = new Dictionary<CommandArgumentSchema, object?>();
+            var result = new Dictionary<MemberSchema, object?>();
 
             foreach (var argument in GetArguments())
             {
@@ -75,7 +75,7 @@ namespace CliFx.Schema
             return result;
         }
 
-        private void BindParameters(ICommand instance, IReadOnlyList<CommandParameterInput> parameterInputs)
+        private void BindParameters(ICommand instance, IReadOnlyList<ParameterInput> parameterInputs)
         {
             // All inputs must be bound
             var remainingParameterInputs = parameterInputs.ToList();
@@ -126,7 +126,7 @@ namespace CliFx.Schema
 
         private void BindOptions(
             ICommand instance,
-            IReadOnlyList<CommandOptionInput> optionInputs,
+            IReadOnlyList<OptionInput> optionInputs,
             IReadOnlyDictionary<string, string> environmentVariables)
         {
             // All inputs must be bound
@@ -154,7 +154,7 @@ namespace CliFx.Schema
             foreach (var option in Options)
             {
                 var inputs = optionInputs
-                    .Where(i => option.MatchesNameOrShortName(i.Alias))
+                    .Where(i => option.MatchesNameOrShortName(i.Identifier))
                     .ToArray();
 
                 // Skip if the inputs weren't provided for this option
@@ -231,16 +231,16 @@ namespace CliFx.Schema
             var name = attribute?.Name;
 
             var builtInOptions = string.IsNullOrWhiteSpace(name)
-                ? new[] {CommandOptionSchema.HelpOption, CommandOptionSchema.VersionOption}
-                : new[] {CommandOptionSchema.HelpOption};
+                ? new[] {OptionSchema.HelpOption, OptionSchema.VersionOption}
+                : new[] {OptionSchema.HelpOption};
 
             var parameters = type.GetProperties()
-                .Select(CommandParameterSchema.TryResolve)
+                .Select(ParameterSchema.TryResolve)
                 .Where(p => p is not null)
                 .ToArray();
 
             var options = type.GetProperties()
-                .Select(CommandOptionSchema.TryResolve)
+                .Select(OptionSchema.TryResolve)
                 .Where(o => o is not null)
                 .Concat(builtInOptions)
                 .ToArray();

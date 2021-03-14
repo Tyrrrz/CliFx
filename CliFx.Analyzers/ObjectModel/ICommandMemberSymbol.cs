@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis;
 
 namespace CliFx.Analyzers.ObjectModel
 {
-    internal interface ICommandArgumentSymbol
+    internal interface ICommandMemberSymbol
     {
         ITypeSymbol? ConverterType { get; }
 

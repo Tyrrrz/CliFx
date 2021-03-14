@@ -3,99 +3,33 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using CliFx.Infrastructure;
 using CliFx.Schema;
 using CliFx.Utils.Extensions;
 
 namespace CliFx
 {
-    internal partial class HelpTextWriter
+    internal partial class ConsoleFormatter
     {
-        private readonly ApplicationMetadata _metadata;
-        private readonly IConsole _console;
-
-        private int _column;
-        private int _row;
-
-        private bool IsEmpty => _column == 0 && _row == 0;
-
-        public HelpTextWriter(ApplicationMetadata metadata, IConsole console)
-        {
-            _metadata = metadata;
-            _console = console;
-        }
-
-        private void Write(char value)
-        {
-            _console.Output.Write(value);
-            _column++;
-        }
-
-        private void Write(string value)
-        {
-            _console.Output.Write(value);
-            _column += value.Length;
-        }
-
-        private void Write(ConsoleColor foregroundColor, string value)
-        {
-            using (_console.WithForegroundColor(foregroundColor))
-                Write(value);
-        }
-
-        private void WriteLine()
-        {
-            _console.Output.WriteLine();
-            _column = 0;
-            _row++;
-        }
-
-        private void WriteVerticalMargin(int size = 1)
-        {
-            for (var i = 0; i < size; i++)
-                WriteLine();
-        }
-
-        private void WriteHorizontalMargin(int size = 2)
-        {
-            for (var i = 0; i < size; i++)
-                Write(' ');
-        }
-
-        private void WriteColumnMargin(int columnSize = 20, int offsetSize = 2)
-        {
-            if (_column + offsetSize < columnSize)
-                WriteHorizontalMargin(columnSize - _column);
-            else
-                WriteHorizontalMargin(offsetSize);
-        }
-
-        private void WriteHeader(string text)
-        {
-            Write(ConsoleColor.Magenta, text);
-            WriteLine();
-        }
-
-        private void WriteApplicationInfo()
+        private void WriteApplicationInfo(ApplicationMetadata applicationMetadata)
         {
             // Title and version
-            Write(ConsoleColor.Yellow, _metadata.Title);
+            Write(ConsoleColor.Yellow, applicationMetadata.Title);
             Write(' ');
-            Write(ConsoleColor.Yellow, _metadata.Version);
+            Write(ConsoleColor.Yellow, applicationMetadata.Version);
             WriteLine();
 
             // Description
-            if (!string.IsNullOrWhiteSpace(_metadata.Description))
+            if (!string.IsNullOrWhiteSpace(applicationMetadata.Description))
             {
                 WriteHorizontalMargin();
-                Write(_metadata.Description);
+                Write(applicationMetadata.Description);
                 WriteLine();
             }
         }
 
-        private void WriteCommandDescription(CommandSchema command)
+        private void WriteCommandDescription(CommandSchema commandSchema)
         {
-            if (string.IsNullOrWhiteSpace(command.Description))
+            if (string.IsNullOrWhiteSpace(commandSchema.Description))
                 return;
 
             if (!IsEmpty)
@@ -104,16 +38,16 @@ namespace CliFx
             WriteHeader("Description");
 
             WriteHorizontalMargin();
-            Write(command.Description);
+            Write(commandSchema.Description);
             WriteLine();
         }
 
-        private void WriteCommandUsageLineItem(CommandSchema command, bool showChildCommandsPlaceholder)
+        private void WriteCommandUsageLineItem(CommandSchema commandSchema, bool showChildCommandsPlaceholder)
         {
             // Command name
-            if (!string.IsNullOrWhiteSpace(command.Name))
+            if (!string.IsNullOrWhiteSpace(commandSchema.Name))
             {
-                Write(ConsoleColor.Cyan, command.Name);
+                Write(ConsoleColor.Cyan, commandSchema.Name);
                 Write(' ');
             }
 
@@ -125,7 +59,7 @@ namespace CliFx
             }
 
             // Parameters
-            foreach (var parameter in command.Parameters)
+            foreach (var parameter in commandSchema.Parameters)
             {
                 Write(parameter.IsScalar
                     ? $"<{parameter.Name}>"
@@ -135,7 +69,7 @@ namespace CliFx
             }
 
             // Required options
-            foreach (var option in command.Options.Where(o => o.IsRequired))
+            foreach (var option in commandSchema.Options.Where(o => o.IsRequired))
             {
                 Write(ConsoleColor.White, !string.IsNullOrWhiteSpace(option.Name)
                     ? $"--{option.Name}"
@@ -157,8 +91,9 @@ namespace CliFx
         }
 
         private void WriteCommandUsage(
-            CommandSchema command,
-            IReadOnlyList<CommandSchema> childCommands)
+            ApplicationMetadata applicationMetadata,
+            CommandSchema commandSchema,
+            IReadOnlyList<CommandSchema> childCommandSchemas)
         {
             if (!IsEmpty)
                 WriteVerticalMargin();
@@ -167,18 +102,18 @@ namespace CliFx
 
             // Exe name
             WriteHorizontalMargin();
-            Write(_metadata.ExecutableName);
+            Write(applicationMetadata.ExecutableName);
             Write(' ');
 
             // Current command usage
-            WriteCommandUsageLineItem(command, childCommands.Any());
+            WriteCommandUsageLineItem(commandSchema, childCommandSchemas.Any());
 
             // Sub commands usage
-            if (childCommands.Any())
+            if (childCommandSchemas.Any())
             {
                 WriteVerticalMargin();
 
-                foreach (var childCommand in childCommands)
+                foreach (var childCommand in childCommandSchemas)
                 {
                     WriteHorizontalMargin();
                     Write("... ");
@@ -187,9 +122,9 @@ namespace CliFx
             }
         }
 
-        private void WriteCommandParameters(CommandSchema command)
+        private void WriteCommandParameters(CommandSchema commandSchema)
         {
-            if (!command.Parameters.Any())
+            if (!commandSchema.Parameters.Any())
                 return;
 
             if (!IsEmpty)
@@ -197,7 +132,7 @@ namespace CliFx
 
             WriteHeader("Parameters");
 
-            foreach (var parameter in command.Parameters.OrderBy(p => p.Order))
+            foreach (var parameter in commandSchema.Parameters.OrderBy(p => p.Order))
             {
                 Write(ConsoleColor.Red, "* ");
                 Write(ConsoleColor.White, $"{parameter.Name}");
@@ -223,15 +158,15 @@ namespace CliFx
         }
 
         private void WriteCommandOptions(
-            CommandSchema command,
-            IReadOnlyDictionary<CommandArgumentSchema, object?> argumentDefaultValues)
+            CommandSchema commandSchema,
+            IReadOnlyDictionary<MemberSchema, object?> defaultValues)
         {
             if (!IsEmpty)
                 WriteVerticalMargin();
 
             WriteHeader("Options");
 
-            foreach (var option in command.Options.OrderByDescending(o => o.IsRequired))
+            foreach (var option in commandSchema.Options.OrderByDescending(o => o.IsRequired))
             {
                 if (option.IsRequired)
                 {
@@ -287,7 +222,7 @@ namespace CliFx
                 // Default value
                 if (!option.IsRequired)
                 {
-                    var defaultValue = argumentDefaultValues.GetValueOrDefault(option);
+                    var defaultValue = defaultValues.GetValueOrDefault(option);
                     var defaultValueFormatted = TryFormatDefaultValue(defaultValue);
                     if (defaultValueFormatted is not null)
                     {
@@ -300,10 +235,11 @@ namespace CliFx
         }
 
         private void WriteCommandChildren(
-            CommandSchema command,
-            IReadOnlyList<CommandSchema> childCommands)
+            ApplicationMetadata applicationMetadata,
+            CommandSchema commandSchema,
+            IReadOnlyList<CommandSchema> childCommandSchemas)
         {
-            if (!childCommands.Any())
+            if (!childCommandSchemas.Any())
                 return;
 
             if (!IsEmpty)
@@ -311,10 +247,10 @@ namespace CliFx
 
             WriteHeader("Commands");
 
-            foreach (var childCommand in childCommands)
+            foreach (var childCommand in childCommandSchemas)
             {
-                var relativeCommandName = !string.IsNullOrWhiteSpace(command.Name)
-                    ? childCommand.Name!.Substring(command.Name.Length).Trim()
+                var relativeCommandName = !string.IsNullOrWhiteSpace(commandSchema.Name)
+                    ? childCommand.Name!.Substring(commandSchema.Name.Length).Trim()
                     : childCommand.Name!;
 
                 // Name
@@ -334,12 +270,12 @@ namespace CliFx
             // Child command help tip
             WriteVerticalMargin();
             Write("You can run `");
-            Write(_metadata.ExecutableName);
+            Write(applicationMetadata.ExecutableName);
 
-            if (!string.IsNullOrWhiteSpace(command.Name))
+            if (!string.IsNullOrWhiteSpace(commandSchema.Name))
             {
                 Write(' ');
-                Write(ConsoleColor.Cyan, command.Name);
+                Write(ConsoleColor.Cyan, commandSchema.Name);
             }
 
             Write(' ');
@@ -353,30 +289,27 @@ namespace CliFx
             WriteLine();
         }
 
-        public void Write(
-            ApplicationSchema application,
-            CommandSchema command,
-            IReadOnlyDictionary<CommandArgumentSchema, object?> defaultValues)
+        public void WriteHelpText(
+            ApplicationMetadata applicationMetadata,
+            ApplicationSchema applicationSchema,
+            CommandSchema commandSchema,
+            IReadOnlyDictionary<MemberSchema, object?> defaultValues)
         {
-            var commandName = command.Name;
-            var childCommands = application.GetChildCommands(commandName);
-            var descendantCommands = application.GetDescendantCommands(commandName);
+            var commandName = commandSchema.Name;
+            var childCommands = applicationSchema.GetChildCommands(commandName);
+            var descendantCommands = applicationSchema.GetDescendantCommands(commandName);
 
-            _console.ResetColor();
+            if (commandSchema.IsDefault)
+                WriteApplicationInfo(applicationMetadata);
 
-            if (command.IsDefault)
-                WriteApplicationInfo();
-
-            WriteCommandDescription(command);
-            WriteCommandUsage(command, descendantCommands);
-            WriteCommandParameters(command);
-            WriteCommandOptions(command, defaultValues);
-            WriteCommandChildren(command, childCommands);
+            WriteCommandDescription(commandSchema);
+            WriteCommandUsage(applicationMetadata, commandSchema, descendantCommands);
+            WriteCommandParameters(commandSchema);
+            WriteCommandOptions(commandSchema, defaultValues);
+            WriteCommandChildren(applicationMetadata, commandSchema, childCommands);
         }
-    }
 
-    internal partial class HelpTextWriter
-    {
+        // TODO: move
         private static string FormatValidValues(IReadOnlyList<string> values) =>
             values.Select(v => v.Quote()).JoinToString(", ");
 

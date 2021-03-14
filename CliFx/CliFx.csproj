@@ -29,7 +29,8 @@
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
   </ItemGroup>
 
-  <!-- The following item group and target ensure that the analyzer project is copied into the output NuGet package -->
+  <!-- The following item group and target ensure that the analyzer assembly is embedded into the output NuGet package -->
+
   <ItemGroup>
     <ProjectReference Include="..\CliFx.Analyzers\CliFx.Analyzers.csproj" ReferenceOutputAssembly="true" IncludeAssets="CliFx.Analyzers.dll" />
   </ItemGroup>

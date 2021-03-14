@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -8,9 +7,10 @@ using System.Threading.Tasks;
 using CliFx.Attributes;
 using CliFx.Exceptions;
 using CliFx.Infrastructure;
-using CliFx.Parsing;
+using CliFx.Input;
 using CliFx.Schema;
 using CliFx.Utils;
+using CliFx.Utils.Extensions;
 
 namespace CliFx
 {
@@ -19,12 +19,18 @@ namespace CliFx
     /// </summary>
     public partial class CliApplication
     {
-        private readonly ApplicationMetadata _metadata;
-        private readonly ApplicationConfiguration _configuration;
+        /// <summary>
+        /// Application metadata.
+        /// </summary>
+        public ApplicationMetadata Metadata { get; }
+
+        /// <summary>
+        /// Application configuration.
+        /// </summary>
+        public ApplicationConfiguration Configuration { get; }
+
         private readonly IConsole _console;
         private readonly ITypeActivator _typeActivator;
-
-        private readonly HelpTextWriter _helpTextWriter;
 
         /// <summary>
         /// Initializes an instance of <see cref="CliApplication"/>.
@@ -35,12 +41,10 @@ namespace CliFx
             IConsole console,
             ITypeActivator typeActivator)
         {
-            _metadata = metadata;
-            _configuration = configuration;
+            Metadata = metadata;
+            Configuration = configuration;
             _console = console;
             _typeActivator = typeActivator;
-
-            _helpTextWriter = new HelpTextWriter(metadata, console);
         }
 
         private async ValueTask LaunchAndWaitForDebuggerAsync()
@@ -48,7 +52,11 @@ namespace CliFx
             var processId = ProcessEx.GetCurrentProcessId();
 
             using (_console.WithForegroundColor(ConsoleColor.Green))
-                _console.Output.WriteLine($"Attach debugger to PID {processId} to continue.");
+            {
+                _console.Output.WriteLine(
+                    $"Attach debugger to PID {processId} to continue."
+                );
+            }
 
             Debugger.Launch();
 
@@ -58,66 +66,20 @@ namespace CliFx
             }
         }
 
-        private void WriteCommandLineInput(CommandInput input)
-        {
-            // Command name
-            if (!string.IsNullOrWhiteSpace(input.CommandName))
-            {
-                using (_console.WithForegroundColor(ConsoleColor.Cyan))
-                    _console.Output.Write(input.CommandName);
-
-                _console.Output.Write(' ');
-            }
-
-            // Parameters
-            foreach (var parameter in input.Parameters)
-            {
-                _console.Output.Write('<');
-
-                using (_console.WithForegroundColor(ConsoleColor.White))
-                    _console.Output.Write(parameter);
-
-                _console.Output.Write('>');
-                _console.Output.Write(' ');
-            }
-
-            // Options
-            foreach (var option in input.Options)
-            {
-                _console.Output.Write('[');
-
-                using (_console.WithForegroundColor(ConsoleColor.White))
-                {
-                    // Alias
-                    _console.Output.Write(option.GetRawAlias());
-
-                    // Values
-                    if (option.Values.Any())
-                    {
-                        _console.Output.Write(' ');
-                        _console.Output.Write(option.GetRawValues());
-                    }
-                }
-
-                _console.Output.Write(']');
-                _console.Output.Write(' ');
-            }
-
-            _console.Output.WriteLine();
-        }
-
         private ICommand GetCommandInstance(CommandSchema command) =>
             command != FallbackDefaultCommand.Schema
                 ? (ICommand) _typeActivator.CreateInstance(command.Type)
                 : new FallbackDefaultCommand();
 
         /// <summary>
-        /// Runs the application with specified command line arguments and environment variables, and returns the exit code.
+        /// Runs the application with the specified command line arguments and environment variables.
+        /// Returns an exit code which indicates whether the application completed successfully.
         /// </summary>
         /// <remarks>
-        /// If a <see cref="CommandException"/> is thrown during command execution, it will be handled and routed to the console.
-        /// Additionally, if the debugger is not attached (i.e. the app is running in production), all other exceptions thrown within
-        /// this method will be handled and routed to the console as well.
+        /// When running WITHOUT debugger (i.e. in production), this method swallows all exceptions and
+        /// reports them to the console.
+        /// When running WITH debugger (i.e. while developing), this method only swallows
+        /// <see cref="CommandException"/>.
         /// </remarks>
         public async ValueTask<int> RunAsync(
             IReadOnlyList<string> commandLineArguments,
@@ -125,20 +87,24 @@ namespace CliFx
         {
             try
             {
-                var root = ApplicationSchema.Resolve(_configuration.CommandTypes);
+                // Console colors may have already been overriden by the parent process,
+                // so we need to reset it to make sure that everything we write looks nice.
+                _console.ResetColor();
+
+                var root = ApplicationSchema.Resolve(Configuration.CommandTypes);
                 var input = CommandInput.Parse(commandLineArguments, root.GetCommandNames());
 
                 // Debug mode
-                if (_configuration.IsDebugModeAllowed && input.IsDebugDirectiveSpecified)
+                if (Configuration.IsDebugModeAllowed && input.IsDebugDirectiveSpecified)
                 {
                     await LaunchAndWaitForDebuggerAsync();
                 }
 
                 // Preview mode
-                if (_configuration.IsPreviewModeAllowed && input.IsPreviewDirectiveSpecified)
+                if (Configuration.IsPreviewModeAllowed && input.IsPreviewDirectiveSpecified)
                 {
-                    WriteCommandLineInput(input);
-                    return ExitCode.Success;
+                    _console.WriteCommandInput(input);
+                    return 0;
                 }
 
                 // Try to get the command matching the input or fallback to default
@@ -150,8 +116,8 @@ namespace CliFx
                 // Version option
                 if (command.IsVersionOptionAvailable && input.IsVersionOptionSpecified)
                 {
-                    _console.Output.WriteLine(_metadata.Version);
-                    return ExitCode.Success;
+                    _console.Output.WriteLine(Metadata.Version);
+                    return 0;
                 }
 
                 // Get command instance (also used in help text)
@@ -165,41 +131,35 @@ namespace CliFx
                 if (command.IsHelpOptionAvailable && input.IsHelpOptionSpecified ||
                     command == FallbackDefaultCommand.Schema && !input.Parameters.Any() && !input.Options.Any())
                 {
-                    _helpTextWriter.Write(root, command, defaultValues);
-                    return ExitCode.Success;
+                    _console.WriteHelpText(Metadata, root, command, defaultValues);
+                    return 0;
                 }
 
-                // Bind arguments
                 try
                 {
                     command.Bind(instance, input, environmentVariables);
-                }
-                // This may throw exceptions which are useful only to the end-user
-                catch (CliFxException ex)
-                {
-                    using (_console.WithBackgroundColor(ConsoleColor.Red))
-                        _console.Error.WriteLine(ex.ToString());
 
-                    _helpTextWriter.Write(root, command, defaultValues);
-
-                    return ExitCode.FromException(ex);
-                }
-
-                // Execute the command
-                try
-                {
                     await instance.ExecuteAsync(_console);
-                    return ExitCode.Success;
+
+                    return 0;
                 }
                 // Swallow command exceptions and route them to the console
-                catch (CommandException ex)
+                catch (CliFxException ex)
                 {
-                    using (_console.WithForegroundColor(ConsoleColor.Red))
-                        _console.Error.WriteLine(ex.ToString());
+                    // If the message is set, don't print the whole stack trace
+                    if (!string.IsNullOrWhiteSpace(ex.ActualMessage))
+                    {
+                        using (_console.WithForegroundColor(ConsoleColor.Red))
+                            _console.Error.WriteLine(ex.ActualMessage);
+                    }
+                    else
+                    {
+                        _console.WriteException(ex);
+                    }
 
                     if (ex.ShowHelp)
                     {
-                        _helpTextWriter.Write(root, command, defaultValues);
+                        _console.WriteHelpText(Metadata, root, command, defaultValues);
                     }
 
                     return ex.ExitCode;
@@ -211,52 +171,47 @@ namespace CliFx
             // because we still want the IDE to show them to the developer.
             catch (Exception ex) when (!Debugger.IsAttached)
             {
-                using (_console.WithColors(ConsoleColor.White, ConsoleColor.DarkRed))
-                    _console.Error.Write("ERROR:");
-
-                _console.Error.Write(" ");
                 _console.WriteException(ex);
-
-                return ExitCode.FromException(ex);
+                return 1;
             }
         }
 
         /// <summary>
-        /// Runs the application with specified command line arguments and returns the exit code.
-        /// Environment variables are retrieved automatically.
+        /// Runs the application with the specified command line arguments.
+        /// Environment variables are resolved automatically.
+        /// Returns an exit code which indicates whether the application completed successfully.
         /// </summary>
         /// <remarks>
-        /// If a <see cref="CommandException"/> is thrown during command execution, it will be handled and routed to the console.
-        /// Additionally, if the debugger is not attached (i.e. the app is running in production), all other exceptions thrown within
-        /// this method will be handled and routed to the console as well.
+        /// When running WITHOUT debugger (i.e. in production), this method swallows all exceptions and
+        /// reports them to the console.
+        /// When running WITH debugger (i.e. while developing), this method only swallows
+        /// <see cref="CommandException"/>.
         /// </remarks>
-        public async ValueTask<int> RunAsync(IReadOnlyList<string> commandLineArguments)
-        {
-            // Environment variable names are case-insensitive on Windows but are case-sensitive on Linux and macOS
-            var environmentVariables = Environment.GetEnvironmentVariables()
-                .Cast<DictionaryEntry>()
-                .ToDictionary(e => (string) e.Key, e => (string) e.Value, StringComparer.Ordinal);
-
-            return await RunAsync(commandLineArguments, environmentVariables);
-        }
+        public async ValueTask<int> RunAsync(IReadOnlyList<string> commandLineArguments) => await RunAsync(
+            commandLineArguments,
+            // Use case-sensitive comparison because environment variables are
+            // case-sensitive on Linux and macOS.
+            Environment
+                .GetEnvironmentVariables()
+                .ToDictionary<string, string>(StringComparer.Ordinal)
+        );
 
         /// <summary>
-        /// Runs the application and returns the exit code.
-        /// Command line arguments and environment variables are retrieved automatically.
+        /// Runs the application.
+        /// Command line arguments and environment variables are resolved automatically.
+        /// Returns an exit code which indicates whether the application completed successfully.
         /// </summary>
         /// <remarks>
-        /// If a <see cref="CommandException"/> is thrown during command execution, it will be handled and routed to the console.
-        /// Additionally, if the debugger is not attached (i.e. the app is running in production), all other exceptions thrown within
-        /// this method will be handled and routed to the console as well.
+        /// When running WITHOUT debugger (i.e. in production), this method swallows all exceptions and
+        /// reports them to the console.
+        /// When running WITH debugger (i.e. while developing), this method only swallows
+        /// <see cref="CommandException"/>.
         /// </remarks>
-        public async ValueTask<int> RunAsync()
-        {
-            var commandLineArguments = Environment.GetCommandLineArgs()
-                .Skip(1)
-                .ToArray();
-
-            return await RunAsync(commandLineArguments);
-        }
+        public async ValueTask<int> RunAsync() => await RunAsync(
+            Environment.GetCommandLineArgs()
+                .Skip(1) // first element is the file path
+                .ToArray()
+        );
     }
 
     public partial class CliApplication

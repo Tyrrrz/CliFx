@@ -16,7 +16,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Command_can_receive_cancellation_signal_from_the_console()
+        public async Task Command_can_register_to_receive_a_cancellation_signal_from_the_console()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(

@@ -11,8 +11,8 @@ namespace CliFx.Analyzers
     {
         public ArgumentMustHaveValidValidatorsAnalyzer()
             : base(
-                $"Parameter and option validators must derive from `{SymbolNames.CliFxArgumentValueValidatorClass}`",
-                $"All validators specified for this parameter or option must derive from `{SymbolNames.CliFxArgumentValueValidatorClass}`.")
+                $"Parameter and option validators must derive from `{SymbolNames.CliFxArgumentValidatorClass}`",
+                $"All validators specified for this parameter or option must derive from `{SymbolNames.CliFxArgumentValidatorClass}`.")
         {
         }
 
@@ -26,7 +26,7 @@ namespace CliFx.Analyzers
                 return;
 
             var argument =
-                (ICommandArgumentSymbol)
+                (ICommandMemberSymbol)
                 CommandParameterSymbol.TryResolve(property) ??
                 CommandOptionSymbol.TryResolve(property);
 
@@ -38,7 +38,7 @@ namespace CliFx.Analyzers
                 // We check against an internal interface because checking against a generic class is a pain
                 var validatorImplementsInterface = validatorType
                     .AllInterfaces
-                    .Any(s => s.DisplayNameMatches(SymbolNames.CliFxArgumentValueValidatorInterface));
+                    .Any(s => s.DisplayNameMatches(SymbolNames.CliFxArgumentValidatorInterface));
 
                 if (!validatorImplementsInterface)
                 {

@@ -16,7 +16,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Parameter_is_bound_directly_from_argument_value_according_to_its_order()
+        public async Task Parameter_is_bound_from_an_argument_matching_its_order()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -29,12 +29,12 @@ public class Command : ICommand
     public string? Foo { get; set; }
     
     [CommandParameter(1)]
-    public int? Bar { get; set; }
+    public string? Bar { get; set; }
 
     public ValueTask ExecuteAsync(IConsole console)
     {
-        console.Output.WriteLine(Foo);
-        console.Output.WriteLine(Bar);
+        console.Output.WriteLine(""Foo = "" + Foo);
+        console.Output.WriteLine(""Bar = "" + Bar);
         
         return default;
     }
@@ -47,7 +47,7 @@ public class Command : ICommand
 
             // Act
             var exitCode = await application.RunAsync(
-                new[] {"one", "2"},
+                new[] {"one", "two"},
                 new Dictionary<string, string>()
             );
 
@@ -56,13 +56,13 @@ public class Command : ICommand
             // Assert
             exitCode.Should().Be(0);
             stdOut.Should().ConsistOfLines(
-                "one",
-                "2"
+                "Foo = one",
+                "Bar = two"
             );
         }
 
         [Fact]
-        public async Task Binding_fails_if_one_of_the_parameters_has_not_been_provided()
+        public async Task Parameter_of_non_scalar_type_is_bound_from_remaining_non_option_arguments()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -75,7 +75,65 @@ public class Command : ICommand
     public string? Foo { get; set; }
     
     [CommandParameter(1)]
-    public int? Bar { get; set; }
+    public string? Bar { get; set; }
+    
+    [CommandParameter(2)]
+    public IReadOnlyList<string>? Baz { get; set; }
+    
+    [CommandOption(""boo"")]
+    public string? Boo { get; set; }
+
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(""Foo = "" + Foo);
+        console.Output.WriteLine(""Bar = "" + Bar);
+        
+        foreach (var i in Baz)
+            console.Output.WriteLine(""Baz = "" + i);
+        
+        return default;
+    }
+}");
+
+            var application = new CliApplicationBuilder()
+                .AddCommand(commandType)
+                .UseConsole(FakeConsole)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(
+                new[] {"one", "two", "three", "four", "five", "--boo", "xxx"},
+                new Dictionary<string, string>()
+            );
+
+            var stdOut = FakeConsole.ReadOutputString();
+
+            // Assert
+            exitCode.Should().Be(0);
+            stdOut.Should().ConsistOfLines(
+                "Foo = one",
+                "Bar = two",
+                "Baz = three",
+                "Baz = four",
+                "Baz = five"
+            );
+        }
+
+        [Fact]
+        public async Task Parameter_binding_fails_if_one_of_the_parameters_has_not_been_provided()
+        {
+            // Arrange
+            var commandType = DynamicCommandBuilder.Compile(
+                // language=cs
+                @"
+[Command]
+public class Command : ICommand
+{
+    [CommandParameter(0)]
+    public string? Foo { get; set; }
+    
+    [CommandParameter(1)]
+    public string? Bar { get; set; }
 
     public ValueTask ExecuteAsync(IConsole console) => default;
 }");
@@ -99,7 +157,7 @@ public class Command : ICommand
         }
 
         [Fact]
-        public async Task Binding_fails_if_a_parameter_of_non_scalar_type_has_not_been_provided_with_at_least_one_value()
+        public async Task Parameter_binding_fails_if_a_parameter_of_non_scalar_type_has_not_been_provided_with_at_least_one_value()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -136,7 +194,7 @@ public class Command : ICommand
         }
 
         [Fact]
-        public async Task Binding_fails_if_one_of_the_provided_parameters_is_unexpected()
+        public async Task Parameter_binding_fails_if_one_of_the_provided_parameters_is_unexpected()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -149,7 +207,7 @@ public class Command : ICommand
     public string? Foo { get; set; }
     
     [CommandParameter(1)]
-    public int? Bar { get; set; }
+    public string? Bar { get; set; }
 
     public ValueTask ExecuteAsync(IConsole console) => default;
 }");
@@ -161,7 +219,7 @@ public class Command : ICommand
 
             // Act
             var exitCode = await application.RunAsync(
-                new[] {"one", "2", "uno"},
+                new[] {"one", "two", "three"},
                 new Dictionary<string, string>()
             );
 

@@ -5,8 +5,8 @@ using CliFx.Utils.Extensions;
 namespace CliFx.Infrastructure
 {
     /// <summary>
-    /// Implementation of <see cref="ITypeActivator"/> that instantiates objects
-    /// through their parameterless constructors.
+    /// Implementation of <see cref="ITypeActivator"/> that instantiates an object
+    /// by using its parameterless constructor.
     /// </summary>
     public class DefaultTypeActivator : ITypeActivator
     {

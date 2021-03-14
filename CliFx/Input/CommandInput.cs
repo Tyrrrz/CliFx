@@ -5,17 +5,18 @@ using System.Linq;
 using System.Text;
 using CliFx.Utils.Extensions;
 
-namespace CliFx.Parsing
+namespace CliFx.Input
 {
+    // TODO: shoehorn environment variables in here?
     internal partial class CommandInput
     {
-        public IReadOnlyList<CommandDirectiveInput> Directives { get; }
+        public IReadOnlyList<DirectiveInput> Directives { get; }
 
         public string? CommandName { get; }
 
-        public IReadOnlyList<CommandParameterInput> Parameters { get; }
+        public IReadOnlyList<ParameterInput> Parameters { get; }
 
-        public IReadOnlyList<CommandOptionInput> Options { get; }
+        public IReadOnlyList<OptionInput> Options { get; }
 
         public bool IsDebugDirectiveSpecified => Directives.Any(d => d.IsDebugDirective);
 
@@ -26,10 +27,10 @@ namespace CliFx.Parsing
         public bool IsVersionOptionSpecified => Options.Any(o => o.IsVersionOption);
 
         public CommandInput(
-            IReadOnlyList<CommandDirectiveInput> directives,
+            IReadOnlyList<DirectiveInput> directives,
             string? commandName,
-            IReadOnlyList<CommandParameterInput> parameters,
-            IReadOnlyList<CommandOptionInput> options)
+            IReadOnlyList<ParameterInput> parameters,
+            IReadOnlyList<OptionInput> options)
         {
             Directives = directives;
             CommandName = commandName;
@@ -76,11 +77,11 @@ namespace CliFx.Parsing
 
     internal partial class CommandInput
     {
-        private static IReadOnlyList<CommandDirectiveInput> ParseDirectives(
+        private static IReadOnlyList<DirectiveInput> ParseDirectives(
             IReadOnlyList<string> commandLineArguments,
             ref int index)
         {
-            var result = new List<CommandDirectiveInput>();
+            var result = new List<DirectiveInput>();
 
             for (; index < commandLineArguments.Count; index++)
             {
@@ -90,7 +91,7 @@ namespace CliFx.Parsing
                     break;
 
                 var name = argument.Substring(1, argument.Length - 2);
-                result.Add(new CommandDirectiveInput(name));
+                result.Add(new DirectiveInput(name));
             }
 
             return result;
@@ -128,11 +129,11 @@ namespace CliFx.Parsing
             return commandName;
         }
 
-        private static IReadOnlyList<CommandParameterInput> ParseParameters(
+        private static IReadOnlyList<ParameterInput> ParseParameters(
             IReadOnlyList<string> commandLineArguments,
             ref int index)
         {
-            var result = new List<CommandParameterInput>();
+            var result = new List<ParameterInput>();
 
             for (; index < commandLineArguments.Count; index++)
             {
@@ -150,17 +151,17 @@ namespace CliFx.Parsing
                 if (isOptionArgument)
                     break;
 
-                result.Add(new CommandParameterInput(argument));
+                result.Add(new ParameterInput(argument));
             }
 
             return result;
         }
 
-        private static IReadOnlyList<CommandOptionInput> ParseOptions(
+        private static IReadOnlyList<OptionInput> ParseOptions(
             IReadOnlyList<string> commandLineArguments,
             ref int index)
         {
-            var result = new List<CommandOptionInput>();
+            var result = new List<OptionInput>();
 
             var currentOptionAlias = default(string?);
             var currentOptionValues = new List<string>();
@@ -176,7 +177,7 @@ namespace CliFx.Parsing
                 {
                     // Flush previous
                     if (!string.IsNullOrWhiteSpace(currentOptionAlias))
-                        result.Add(new CommandOptionInput(currentOptionAlias, currentOptionValues));
+                        result.Add(new OptionInput(currentOptionAlias, currentOptionValues));
 
                     currentOptionAlias = argument.Substring(2);
                     currentOptionValues = new List<string>();
@@ -190,7 +191,7 @@ namespace CliFx.Parsing
                     {
                         // Flush previous
                         if (!string.IsNullOrWhiteSpace(currentOptionAlias))
-                            result.Add(new CommandOptionInput(currentOptionAlias, currentOptionValues));
+                            result.Add(new OptionInput(currentOptionAlias, currentOptionValues));
 
                         currentOptionAlias = alias.AsString();
                         currentOptionValues = new List<string>();
@@ -205,7 +206,7 @@ namespace CliFx.Parsing
 
             // Flush last option
             if (!string.IsNullOrWhiteSpace(currentOptionAlias))
-                result.Add(new CommandOptionInput(currentOptionAlias, currentOptionValues));
+                result.Add(new OptionInput(currentOptionAlias, currentOptionValues));
 
             return result;
         }
@@ -244,10 +245,10 @@ namespace CliFx.Parsing
     internal partial class CommandInput
     {
         public static CommandInput Empty { get; } = new(
-            Array.Empty<CommandDirectiveInput>(),
+            Array.Empty<DirectiveInput>(),
             null,
-            Array.Empty<CommandParameterInput>(),
-            Array.Empty<CommandOptionInput>()
+            Array.Empty<ParameterInput>(),
+            Array.Empty<OptionInput>()
         );
     }
 }

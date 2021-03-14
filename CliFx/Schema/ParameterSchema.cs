@@ -6,13 +6,13 @@ using CliFx.Attributes;
 
 namespace CliFx.Schema
 {
-    internal partial class CommandParameterSchema : CommandArgumentSchema
+    internal partial class ParameterSchema : MemberSchema
     {
         public int Order { get; }
 
         public string Name { get; }
 
-        public CommandParameterSchema(
+        public ParameterSchema(
             PropertyInfo? property,
             int order,
             string name,
@@ -43,9 +43,9 @@ namespace CliFx.Schema
         public override string ToString() => GetInternalDisplayString();
     }
 
-    internal partial class CommandParameterSchema
+    internal partial class ParameterSchema
     {
-        public static CommandParameterSchema? TryResolve(PropertyInfo property)
+        public static ParameterSchema? TryResolve(PropertyInfo property)
         {
             var attribute = property.GetCustomAttribute<CommandParameterAttribute>();
             if (attribute is null)
@@ -53,7 +53,7 @@ namespace CliFx.Schema
 
             var name = attribute.Name ?? property.Name.ToLowerInvariant();
 
-            return new CommandParameterSchema(
+            return new ParameterSchema(
                 property,
                 attribute.Order,
                 name,

@@ -16,7 +16,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Application_can_be_created_with_the_default_configuration()
+        public async Task Application_can_be_created_with_minimal_configuration()
         {
             // Act
             var app = new CliApplicationBuilder()
@@ -34,7 +34,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Application_can_be_created_with_a_customized_configuration()
+        public async Task Application_can_be_created_with_a_fully_customized_configuration()
         {
             // Act
             var app = new CliApplicationBuilder()

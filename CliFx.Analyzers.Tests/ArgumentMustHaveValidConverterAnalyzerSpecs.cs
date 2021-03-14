@@ -9,14 +9,14 @@ namespace CliFx.Analyzers.Tests
         private static DiagnosticAnalyzer Analyzer { get; } = new ArgumentMustHaveValidConverterAnalyzer();
 
         [Fact]
-        public void Analyzer_reports_an_error_if_the_specified_parameter_converter_does_not_derive_from_ArgumentValueConverter()
+        public void Analyzer_reports_an_error_if_the_specified_parameter_converter_does_not_derive_from_ArgumentConverter()
         {
             // Arrange
             // language=cs
             const string code = @"
 public class MyConverter
 {
-    public string ConvertFrom(string value) => value;
+    public string Convert(string value) => value;
 }
 
 [Command]
@@ -33,14 +33,14 @@ public class MyCommand : ICommand
         }
 
         [Fact]
-        public void Analyzer_does_not_report_an_error_if_the_specified_parameter_converter_derives_from_ArgumentValueConverter()
+        public void Analyzer_does_not_report_an_error_if_the_specified_parameter_converter_derives_from_ArgumentConverter()
         {
             // Arrange
             // language=cs
             const string code = @"
-public class MyConverter : ArgumentValueConverter<string>
+public class MyConverter : ArgumentConverter<string>
 {
-    public override string ConvertFrom(string value) => value;
+    public override string Convert(string value) => value;
 }
 
 [Command]
@@ -76,14 +76,14 @@ public class MyCommand : ICommand
         }
 
         [Fact]
-        public void Analyzer_reports_an_error_if_the_specified_option_converter_does_not_derive_from_ArgumentValueConverter()
+        public void Analyzer_reports_an_error_if_the_specified_option_converter_does_not_derive_from_ArgumentConverter()
         {
             // Arrange
             // language=cs
             const string code = @"
 public class MyConverter
 {
-    public string ConvertFrom(string value) => value;
+    public string Convert(string value) => value;
 }
 
 [Command]
@@ -100,14 +100,14 @@ public class MyCommand : ICommand
         }
 
         [Fact]
-        public void Analyzer_does_not_report_an_error_if_the_specified_option_converter_derives_from_ArgumentValueConverter()
+        public void Analyzer_does_not_report_an_error_if_the_specified_option_converter_derives_from_ArgumentConverter()
         {
             // Arrange
             // language=cs
             const string code = @"
-public class MyConverter : ArgumentValueConverter<string>
+public class MyConverter : ArgumentConverter<string>
 {
-    public override string ConvertFrom(string value) => value;
+    public override string Convert(string value) => value;
 }
 
 [Command]

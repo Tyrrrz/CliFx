@@ -7,7 +7,7 @@ using CliFx.Attributes;
 
 namespace CliFx.Schema
 {
-    internal partial class CommandOptionSchema : CommandArgumentSchema
+    internal partial class OptionSchema : MemberSchema
     {
         public string? Name { get; }
 
@@ -17,7 +17,7 @@ namespace CliFx.Schema
 
         public bool IsRequired { get; }
 
-        public CommandOptionSchema(
+        public OptionSchema(
             PropertyInfo? property,
             string? name,
             char? shortName,
@@ -82,9 +82,9 @@ namespace CliFx.Schema
         public override string ToString() => GetInternalDisplayString();
     }
 
-    internal partial class CommandOptionSchema
+    internal partial class OptionSchema
     {
-        public static CommandOptionSchema? TryResolve(PropertyInfo property)
+        public static OptionSchema? TryResolve(PropertyInfo property)
         {
             var attribute = property.GetCustomAttribute<CommandOptionAttribute>();
             if (attribute is null)
@@ -93,7 +93,7 @@ namespace CliFx.Schema
             // The user may mistakenly specify dashes, thinking it's required, so trim them
             var name = attribute.Name?.TrimStart('-');
 
-            return new CommandOptionSchema(
+            return new OptionSchema(
                 property,
                 name,
                 attribute.ShortName,
@@ -106,9 +106,9 @@ namespace CliFx.Schema
         }
     }
 
-    internal partial class CommandOptionSchema
+    internal partial class OptionSchema
     {
-        public static CommandOptionSchema HelpOption { get; } = new(
+        public static OptionSchema HelpOption { get; } = new(
             null,
             "help",
             'h',
@@ -119,7 +119,7 @@ namespace CliFx.Schema
             Array.Empty<Type>()
         );
 
-        public static CommandOptionSchema VersionOption { get; } = new(
+        public static OptionSchema VersionOption { get; } = new(
             null,
             "version",
             null,

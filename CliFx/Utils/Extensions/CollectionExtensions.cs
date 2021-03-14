@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CliFx.Utils.Extensions
 {
@@ -9,5 +11,12 @@ namespace CliFx.Utils.Extensions
             foreach (var item in items)
                 source.Remove(item);
         }
+
+        public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(
+            this IDictionary dictionary,
+            IEqualityComparer<TKey> comparer) =>
+            dictionary
+                .Cast<DictionaryEntry>()
+                .ToDictionary(entry => (TKey) entry.Key, entry => (TValue) entry.Value, comparer)!;
     }
 }

@@ -5,7 +5,7 @@ using CliFx.Analyzers.Utils.Extensions;
 
 namespace CliFx.Analyzers.ObjectModel
 {
-    internal partial class CommandOptionSymbol : ICommandArgumentSymbol
+    internal partial class CommandOptionSymbol : ICommandMemberSymbol
     {
         public string? Name { get; }
 

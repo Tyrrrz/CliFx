@@ -12,53 +12,99 @@ using Xunit.Abstractions;
 
 namespace CliFx.Tests
 {
-    public class EnvironmentVariablesSpecs : SpecsBase
+    public class EnvironmentSpecs : SpecsBase
     {
-        public EnvironmentVariablesSpecs(ITestOutputHelper testOutput)
+        public EnvironmentSpecs(ITestOutputHelper testOutput)
             : base(testOutput)
         {
         }
 
-        // This test uses a real application to make sure environment variables are actually read correctly
         [Fact]
         public async Task Option_can_fall_back_to_an_environment_variable()
         {
             // Arrange
-            var command = Cli.Wrap("dotnet")
-                .WithArguments(a => a
-                    .Add(Dummy.Program.Location))
-                .WithEnvironmentVariables(e => e
-                    .Set("ENV_TARGET", "Mars"));
+            var commandType = DynamicCommandBuilder.Compile(
+                // language=cs
+                @"
+[Command]
+public class Command : ICommand
+{
+    [CommandOption(""foo"", EnvironmentVariable = ""ENV_FOO"")]
+    public string? Foo { get; set; }
+    
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(Foo);
+        return default;
+    }
+}
+");
+
+            var application = new CliApplicationBuilder()
+                .AddCommand(commandType)
+                .UseConsole(FakeConsole)
+                .Build();
 
             // Act
-            var stdOut = await command.ExecuteBufferedAsync().Select(r => r.StandardOutput);
+            var exitCode = await application.RunAsync(
+                Array.Empty<string>(),
+                new Dictionary<string, string>
+                {
+                    ["ENV_FOO"] = "bar"
+                }
+            );
+
+            var stdOut = FakeConsole.ReadOutputString();
 
             // Assert
-            stdOut.Trim().Should().Be("Hello Mars!");
+            exitCode.Should().Be(0);
+            stdOut.Trim().Should().Be("bar");
         }
 
-        // This test uses a real application to make sure environment variables are actually read correctly
         [Fact]
-        public async Task Option_does_not_fall_back_to_an_environment_variable_if_the_value_is_provided_through_arguments()
+        public async Task Option_does_not_fall_back_to_an_environment_variable_if_a_value_is_provided_through_arguments()
         {
             // Arrange
-            var command = Cli.Wrap("dotnet")
-                .WithArguments(a => a
-                    .Add(Dummy.Program.Location)
-                    .Add("--target")
-                    .Add("Jupiter"))
-                .WithEnvironmentVariables(e => e
-                    .Set("ENV_TARGET", "Mars"));
+            var commandType = DynamicCommandBuilder.Compile(
+                // language=cs
+                @"
+[Command]
+public class Command : ICommand
+{
+    [CommandOption(""foo"", EnvironmentVariable = ""ENV_FOO"")]
+    public string? Foo { get; set; }
+    
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(Foo);
+        return default;
+    }
+}
+");
+
+            var application = new CliApplicationBuilder()
+                .AddCommand(commandType)
+                .UseConsole(FakeConsole)
+                .Build();
 
             // Act
-            var stdOut = await command.ExecuteBufferedAsync().Select(r => r.StandardOutput);
+            var exitCode = await application.RunAsync(
+                new[] {"--foo", "baz"},
+                new Dictionary<string, string>
+                {
+                    ["ENV_FOO"] = "bar"
+                }
+            );
+
+            var stdOut = FakeConsole.ReadOutputString();
 
             // Assert
-            stdOut.Trim().Should().Be("Hello Jupiter!");
+            exitCode.Should().Be(0);
+            stdOut.Trim().Should().Be("baz");
         }
 
         [Fact]
-        public async Task Option_of_non_scalar_type_relies_on_the_path_separator_to_extract_multiple_values()
+        public async Task Option_of_non_scalar_type_can_receive_multiple_values_from_an_environment_variable()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -73,9 +119,7 @@ public class Command : ICommand
     public ValueTask ExecuteAsync(IConsole console)
     {
         foreach (var i in Foo)
-        {
             console.Output.WriteLine(i);
-        }
         
         return default;
     }
@@ -107,7 +151,7 @@ public class Command : ICommand
         }
 
         [Fact]
-        public async Task Option_of_scalar_type_ignores_path_separators()
+        public async Task Option_of_scalar_type_always_receives_a_single_value_from_an_environment_variable()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -190,6 +234,27 @@ public class Command : ICommand
             // Assert
             exitCode.Should().Be(0);
             stdOut.Trim().Should().Be("bar");
+        }
+
+        [Fact]
+        public async Task Environment_variables_are_extracted_automatically()
+        {
+            // Ensures that the environment variables are properly obtained from
+            // System.Environment when they are not provided explicitly to CliApplication.
+
+            // Arrange
+            var command = Cli.Wrap("dotnet")
+                .WithArguments(a => a
+                    .Add(Dummy.Program.Location)
+                    .Add("env-test"))
+                .WithEnvironmentVariables(e => e
+                    .Set("ENV_TARGET", "Mars"));
+
+            // Act
+            var result = await command.ExecuteBufferedAsync();
+
+            // Assert
+            result.StandardOutput.Trim().Should().Be("Hello Mars!");
         }
     }
 }

@@ -3,11 +3,11 @@
 namespace CliFx.Infrastructure
 {
     /// <summary>
-    /// Implementation of <see cref="IConsole"/> that uses fake standard input, output, and error streams
-    /// backed by in-memory stores.
+    /// Implementation of <see cref="IConsole"/> that uses fake
+    /// standard input, output, and error streams backed by in-memory stores.
     /// </summary>
     /// <remarks>
-    /// This implementation is designed for usage in tests.
+    /// Use this implementation in tests to verify how a command interacts with the console.
     /// </remarks>
     public class FakeInMemoryConsole : FakeConsole
     {

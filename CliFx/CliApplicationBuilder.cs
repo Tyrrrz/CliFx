@@ -11,7 +11,7 @@ using CliFx.Utils.Extensions;
 namespace CliFx
 {
     /// <summary>
-    /// Builds an instance of <see cref="CliApplication"/>.
+    /// Builder for <see cref="CliApplication"/>.
     /// </summary>
     public partial class CliApplicationBuilder
     {
@@ -27,7 +27,7 @@ namespace CliFx
         private ITypeActivator? _typeActivator;
 
         /// <summary>
-        /// Adds a command of specified type to the application.
+        /// Adds a command to the application.
         /// </summary>
         public CliApplicationBuilder AddCommand(Type commandType)
         {
@@ -37,7 +37,7 @@ namespace CliFx
         }
 
         /// <summary>
-        /// Adds a command of specified type to the application.
+        /// Adds a command the application.
         /// </summary>
         public CliApplicationBuilder AddCommand<TCommand>() where TCommand : ICommand =>
             AddCommand(typeof(TCommand));
@@ -55,10 +55,11 @@ namespace CliFx
 
         /// <summary>
         /// Adds commands from the specified assembly to the application.
-        ///
-        /// Only adds public non-abstract types that implement <see cref="ICommand"/>
-        /// and are annotated by <see cref="CommandAttribute"/>.
         /// </summary>
+        /// <remarks>
+        /// This method looks for public non-abstract classes that implement <see cref="ICommand"/>
+        /// and are annotated by <see cref="CommandAttribute"/>.
+        /// </remarks>
         public CliApplicationBuilder AddCommandsFrom(Assembly commandAssembly)
         {
             foreach (var commandType in commandAssembly.ExportedTypes.Where(CommandSchema.IsCommandType))
@@ -69,10 +70,11 @@ namespace CliFx
 
         /// <summary>
         /// Adds commands from the specified assemblies to the application.
-        ///
-        /// Only adds public non-abstract types that implement <see cref="ICommand"/>
-        /// and are annotated by <see cref="CommandAttribute"/>.
         /// </summary>
+        /// <remarks>
+        /// This method looks for public non-abstract classes that implement <see cref="ICommand"/>
+        /// and are annotated by <see cref="CommandAttribute"/>.
+        /// </remarks>
         public CliApplicationBuilder AddCommandsFrom(IEnumerable<Assembly> commandAssemblies)
         {
             foreach (var commandAssembly in commandAssemblies)
@@ -83,10 +85,11 @@ namespace CliFx
 
         /// <summary>
         /// Adds commands from the calling assembly to the application.
-        ///
-        /// Only adds public non-abstract types that implement <see cref="ICommand"/>
-        /// and are annotated by <see cref="CommandAttribute"/>.
         /// </summary>
+        /// <remarks>
+        /// This method looks for public non-abstract classes that implement <see cref="ICommand"/>
+        /// and are annotated by <see cref="CommandAttribute"/>.
+        /// </remarks>
         public CliApplicationBuilder AddCommandsFromThisAssembly() => AddCommandsFrom(Assembly.GetCallingAssembly());
 
         /// <summary>
@@ -108,7 +111,7 @@ namespace CliFx
         }
 
         /// <summary>
-        /// Sets application title, which appears in the help text.
+        /// Sets application title, which is shown in the help text.
         /// </summary>
         public CliApplicationBuilder SetTitle(string title)
         {
@@ -117,7 +120,7 @@ namespace CliFx
         }
 
         /// <summary>
-        /// Sets application executable name, which appears in the help text.
+        /// Sets application executable name, which is shown in the help text.
         /// </summary>
         public CliApplicationBuilder SetExecutableName(string executableName)
         {
@@ -126,7 +129,8 @@ namespace CliFx
         }
 
         /// <summary>
-        /// Sets application version text, which appears in the help text and when the user requests version information.
+        /// Sets application version, which is shown in the help text or
+        /// when the user specifies the version option.
         /// </summary>
         public CliApplicationBuilder SetVersion(string version)
         {
@@ -135,7 +139,7 @@ namespace CliFx
         }
 
         /// <summary>
-        /// Sets application description, which appears in the help text.
+        /// Sets application description, which is shown in the help text.
         /// </summary>
         public CliApplicationBuilder SetDescription(string? description)
         {
@@ -168,38 +172,49 @@ namespace CliFx
             UseTypeActivator(new DelegateTypeActivator(typeActivator));
 
         /// <summary>
-        /// Creates an instance of <see cref="CliApplication"/> using configured parameters.
-        /// Default values are used in place of parameters that were not specified.
+        /// Creates an instance of <see cref="CliApplication"/>.
         /// </summary>
         public CliApplication Build()
         {
-            _title ??= GetDefaultTitle();
-            _executableName ??= GetDefaultExecutableName();
-            _versionText ??= GetDefaultVersionText();
-            _console ??= new SystemConsole();
-            _typeActivator ??= new DefaultTypeActivator();
+            var metadata = new ApplicationMetadata(
+                _title ?? GetDefaultTitle(),
+                _executableName ?? GetDefaultExecutableName(),
+                _versionText ?? GetDefaultVersionText(),
+                _description
+            );
 
-            var metadata = new ApplicationMetadata(_title, _executableName, _versionText, _description);
-            var configuration = new ApplicationConfiguration(_commandTypes.ToArray(), _isDebugModeAllowed, _isPreviewModeAllowed);
+            var configuration = new ApplicationConfiguration(
+                _commandTypes.ToArray(),
+                _isDebugModeAllowed,
+                _isPreviewModeAllowed
+            );
 
-            return new CliApplication(metadata, configuration, _console, _typeActivator);
+            return new CliApplication(
+                metadata,
+                configuration,
+                _console ?? new SystemConsole(),
+                _typeActivator ?? new DefaultTypeActivator()
+            );
         }
     }
 
     public partial class CliApplicationBuilder
     {
-        private static readonly Lazy<Assembly?> LazyEntryAssembly = new(Assembly.GetEntryAssembly);
+        private static readonly Lazy<Assembly?> EntryAssemblyLazy = new(Assembly.GetEntryAssembly);
 
         // Entry assembly is null in tests
-        private static Assembly? EntryAssembly => LazyEntryAssembly.Value;
+        private static Assembly? EntryAssembly => EntryAssemblyLazy.Value;
 
-        private static string GetDefaultTitle() => EntryAssembly?.GetName().Name?? "App";
+        private static string GetDefaultTitle() =>
+            EntryAssembly?.GetName().Name ?? "App";
 
         private static string GetDefaultExecutableName()
         {
             var entryAssemblyLocation = EntryAssembly?.Location;
+            if (string.IsNullOrWhiteSpace(entryAssemblyLocation))
+                return "app";
 
-            // The assembly can be an executable or a dll, depending on how it was packaged
+            // The assembly can be an .exe or a .dll, depending on how it was packaged
             var isDll = string.Equals(
                 Path.GetExtension(entryAssemblyLocation),
                 ".dll",
@@ -210,12 +225,12 @@ namespace CliFx
                 ? "dotnet " + Path.GetFileName(entryAssemblyLocation)
                 : Path.GetFileNameWithoutExtension(entryAssemblyLocation);
 
-            return name ?? "app";
+            return name;
         }
 
         private static string GetDefaultVersionText() =>
             EntryAssembly is not null
-                ? $"v{EntryAssembly.GetName().Version.ToSemanticString()}"
+                ? "v" + EntryAssembly.GetName().Version.ToSemanticString()
                 : "v1.0";
     }
 }

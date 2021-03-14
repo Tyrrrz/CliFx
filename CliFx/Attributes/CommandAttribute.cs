@@ -9,19 +9,19 @@ namespace CliFx.Attributes
     public class CommandAttribute : Attribute
     {
         /// <summary>
-        /// Command name.
+        /// Command's name.
         /// </summary>
         /// <remarks>
-        /// A command with no name is treated as a default command, i.e. it will get executed if
-        /// the user does not specify the command name in the arguments.
+        /// Command can have no name, in which case it's treated as the default command.
         ///
-        /// All commands registered in an application must have different names.
+        /// All commands registered in an application must have unique names (comparison IS NOT case-sensitive).
         /// Only one command without a name is allowed in an application.
         /// </remarks>
         public string? Name { get; }
 
         /// <summary>
-        /// Command description, which is used in help text.
+        /// Command description.
+        /// This is shown to the user in the help text.
         /// </summary>
         public string? Description { get; set; }
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using CliFx.Tests.Utils;
 using CliFx.Tests.Utils.Extensions;
@@ -16,7 +17,278 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Help_text_shows_command_usage_format_which_lists_all_parameters()
+        public async Task Help_text_is_printed_if_no_arguments_are_provided_and_a_default_command_is_not_defined()
+        {
+            // Arrange
+            var application = new CliApplicationBuilder()
+                .UseConsole(FakeConsole)
+                .SetDescription("This will be in help text")
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(
+                Array.Empty<string>(),
+                new Dictionary<string, string>()
+            );
+
+            var stdOut = FakeConsole.ReadOutputString();
+
+            // Assert
+            exitCode.Should().Be(0);
+            stdOut.Should().Contain("This will be in help text");
+        }
+
+        [Fact]
+        public async Task Help_text_is_printed_if_provided_arguments_contain_the_help_option()
+        {
+            // Arrange
+            var commandTypes = DynamicCommandBuilder.CompileMany(
+                // language=cs
+                @"
+[Command]
+public class DefaultCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(""default"");
+        return default;
+    }
+}
+");
+
+            var application = new CliApplicationBuilder()
+                .AddCommands(commandTypes)
+                .UseConsole(FakeConsole)
+                .SetDescription("This will be in help text")
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(
+                new[] {"--help"},
+                new Dictionary<string, string>()
+            );
+
+            var stdOut = FakeConsole.ReadOutputString();
+
+            // Assert
+            exitCode.Should().Be(0);
+            stdOut.Should().Contain("This will be in help text");
+        }
+
+        [Fact]
+        public async Task Help_text_is_printed_if_provided_arguments_contain_the_help_option_even_if_a_default_command_is_not_defined()
+        {
+            // Arrange
+            var commandTypes = DynamicCommandBuilder.CompileMany(
+                // language=cs
+                @"
+[Command(""cmd"")]
+public class NamedCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(""cmd"");
+        return default;
+    }
+}
+
+[Command(""cmd sub"")]
+public class SubCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(""cmd sub"");
+        return default;
+    }
+}
+");
+
+            var application = new CliApplicationBuilder()
+                .AddCommands(commandTypes)
+                .UseConsole(FakeConsole)
+                .SetDescription("This will be in help text")
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(
+                new[] {"--help"},
+                new Dictionary<string, string>()
+            );
+
+            var stdOut = FakeConsole.ReadOutputString();
+
+            // Assert
+            exitCode.Should().Be(0);
+            stdOut.Should().Contain("This will be in help text");
+        }
+
+        [Fact]
+        public async Task Help_text_for_a_specific_named_command_is_printed_if_provided_arguments_match_its_name_and_contain_the_help_option()
+        {
+            // Arrange
+            var commandTypes = DynamicCommandBuilder.CompileMany(
+                // language=cs
+                @"
+[Command]
+public class DefaultCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(""default"");
+        return default;
+    }
+}
+
+[Command(""cmd"", Description = ""Description of named command"")]
+public class NamedCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(""cmd"");
+        return default;
+    }
+}
+
+[Command(""cmd sub"")]
+public class SubCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(""cmd sub"");
+        return default;
+    }
+}
+");
+
+            var application = new CliApplicationBuilder()
+                .AddCommands(commandTypes)
+                .UseConsole(FakeConsole)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--help"},
+                new Dictionary<string, string>()
+            );
+
+            var stdOut = FakeConsole.ReadOutputString();
+
+            // Assert
+            exitCode.Should().Be(0);
+            stdOut.Should().Contain("Description of named command");
+        }
+
+        [Fact]
+        public async Task Help_text_for_a_specific_named_sub_command_is_printed_if_provided_arguments_match_its_name_and_contain_the_help_option()
+        {
+            // Arrange
+            var commandTypes = DynamicCommandBuilder.CompileMany(
+                // language=cs
+                @"
+[Command]
+public class DefaultCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(""default"");
+        return default;
+    }
+}
+
+[Command(""cmd"")]
+public class NamedCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(""cmd"");
+        return default;
+    }
+}
+
+[Command(""cmd sub"", Description = ""Description of sub command"")]
+public class SubCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(""cmd sub"");
+        return default;
+    }
+}
+");
+
+            var application = new CliApplicationBuilder()
+                .AddCommands(commandTypes)
+                .UseConsole(FakeConsole)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "sub", "--help"},
+                new Dictionary<string, string>()
+            );
+
+            var stdOut = FakeConsole.ReadOutputString();
+
+            // Assert
+            exitCode.Should().Be(0);
+            stdOut.Should().Contain("Description of sub command");
+        }
+
+        [Fact]
+        public async Task Help_text_is_printed_on_invalid_user_input()
+        {
+            // Arrange
+            var application = new CliApplicationBuilder()
+                .AddCommand<NoOpCommand>()
+                .UseConsole(FakeConsole)
+                .SetDescription("This will be in help text")
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(
+                new[] {"invalid-command", "--invalid-option"},
+                new Dictionary<string, string>()
+            );
+
+            var stdOut = FakeConsole.ReadOutputString();
+            var stdErr = FakeConsole.ReadErrorString();
+
+            // Assert
+            exitCode.Should().NotBe(0);
+            stdOut.Should().Contain("This will be in help text");
+            stdErr.Should().NotBeNullOrWhiteSpace();
+        }
+
+        [Fact]
+        public async Task Help_text_shows_application_metadata()
+        {
+            // Arrange
+            var application = new CliApplicationBuilder()
+                .UseConsole(FakeConsole)
+                .SetTitle("App title")
+                .SetDescription("App description")
+                .SetVersion("App version")
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(
+                new[] {"--help"},
+                new Dictionary<string, string>()
+            );
+
+            var stdOut = FakeConsole.ReadOutputString();
+
+            // Assert
+            exitCode.Should().Be(0);
+            stdOut.Should().ContainAll(
+                "App title",
+                "App description",
+                "App version"
+            );
+        }
+
+        [Fact]
+        public async Task Help_text_shows_usage_format_which_lists_all_parameters()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -60,7 +332,7 @@ public class Command : ICommand
         }
 
         [Fact]
-        public async Task Help_text_shows_command_usage_format_which_lists_all_required_options()
+        public async Task Help_text_shows_usage_format_which_lists_all_required_options()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -156,7 +428,50 @@ public class SubCommand : ICommand
         }
 
         [Fact]
-        public async Task Help_text_shows_all_valid_values_for_enum_arguments()
+        public async Task Help_text_shows_description_for_available_parameters_and_options()
+        {
+            // Arrange
+            var commandType = DynamicCommandBuilder.Compile(
+                // language=cs
+                @"
+[Command]
+public class Command : ICommand
+{
+    [CommandParameter(0, Description = ""Description of foo"")]
+    public string? Foo { get; set; }
+    
+    [CommandOption(""bar"", Description = ""Description of bar"")]
+    public string? Bar { get; set; }
+    
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}
+");
+
+            var application = new CliApplicationBuilder()
+                .AddCommand(commandType)
+                .UseConsole(FakeConsole)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(
+                new[] {"--help"},
+                new Dictionary<string, string>()
+            );
+
+            var stdOut = FakeConsole.ReadOutputString();
+
+            // Assert
+            exitCode.Should().Be(0);
+            stdOut.Should().ContainAllInOrder(
+                "Parameters",
+                "foo", "Description of foo",
+                "Options",
+                "--bar", "Description of bar"
+            );
+        }
+
+        [Fact]
+        public async Task Help_text_shows_all_valid_values_for_enum_parameters_and_options()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -263,7 +578,7 @@ public class Command : ICommand
     public string? Bar { get; set; } = ""hello"";
 
     [CommandOption(""baz"")]
-    public IReadOnlyList<string>? Baz { get; set; } = new []{""one"", ""two"", ""three""};
+    public IReadOnlyList<string>? Baz { get; set; } = new[] {""one"", ""two"", ""three""};
 
     [CommandOption(""qwe"")]
     public bool Qwe { get; set; } = true;
@@ -277,8 +592,8 @@ public class Command : ICommand
     [CommandOption(""lol"")]
     public CustomEnum Lol { get; set; } = CustomEnum.Two;
     
-    [CommandOption(""hm"", IsRequired = true)]
-    public string? Hm { get; set; } = ""not printed"";
+    [CommandOption(""hmm"", IsRequired = true)]
+    public string? Hmm { get; set; } = ""not printed"";
     
     public ValueTask ExecuteAsync(IConsole console) => default;
 }
@@ -310,6 +625,29 @@ public class Command : ICommand
                 "--lol", "Default:", "Two"
             );
             stdOut.Should().NotContain("not printed");
+        }
+
+        [Fact]
+        public async Task Version_text_is_printed_if_provided_arguments_contain_the_version_option()
+        {
+            // Arrange
+            var application = new CliApplicationBuilder()
+                .AddCommand<NoOpCommand>()
+                .SetVersion("v6.9")
+                .UseConsole(FakeConsole)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(
+                new[] {"--version"},
+                new Dictionary<string, string>()
+            );
+
+            var stdOut = FakeConsole.ReadOutputString();
+
+            // Assert
+            exitCode.Should().Be(0);
+            stdOut.Trim().Should().Be("v6.9");
         }
     }
 }
