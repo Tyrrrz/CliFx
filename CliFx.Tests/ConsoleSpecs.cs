@@ -20,8 +20,8 @@ namespace CliFx.Tests
         [Fact]
         public async Task Real_console_maps_directly_to_system_console()
         {
-            // Can't verify console output of ourselves, so using
-            // an external process for this test.
+            // Can't verify our own console output, so using an
+            // external process for this test.
 
             // Arrange
             var command = "Hello world" | Cli.Wrap("dotnet")

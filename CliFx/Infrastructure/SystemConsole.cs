@@ -7,7 +7,7 @@ namespace CliFx.Infrastructure
     /// <summary>
     /// Implementation of <see cref="IConsole"/> that represents the real system console.
     /// </summary>
-    public class SystemConsole : IConsole
+    public class SystemConsole : IConsole, IDisposable
     {
         private CancellationTokenSource? _cancellationTokenSource;
 
@@ -80,7 +80,7 @@ namespace CliFx.Infrastructure
 
             Console.CancelKeyPress += (_, args) =>
             {
-                // If cancellation hasn't been requested yet - cancel shutdown and fire the token
+                // Don't delay cancellation more than once
                 if (!cts.IsCancellationRequested)
                 {
                     args.Cancel = true;
@@ -89,6 +89,15 @@ namespace CliFx.Infrastructure
             };
 
             return (_cancellationTokenSource = cts).Token;
+        }
+
+        /// <inheritdoc />
+        public void Dispose()
+        {
+            _cancellationTokenSource?.Dispose();
+            Input.Dispose();
+            Output.Dispose();
+            Error.Dispose();
         }
     }
 }
