@@ -91,6 +91,7 @@ If you're experiencing problems, please refer to the readme for a quickstart exa
         }
     }
 
+    // TODO: refactor
     // End-user-facing exceptions
     // Avoid internal details and fix recommendations here
     public partial class CliFxException

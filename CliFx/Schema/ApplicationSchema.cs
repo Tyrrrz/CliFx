@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CliFx.Exceptions;
-using CliFx.Extensibility;
 using CliFx.Utils.Extensions;
 
 namespace CliFx.Schema
@@ -62,10 +60,8 @@ namespace CliFx.Schema
 
     internal partial class ApplicationSchema
     {
-        public static ApplicationSchema Resolve(IReadOnlyList<Type> commandTypes)
-        {
-            var commands = commandTypes.Select(CommandSchema.Resolve).ToArray();
-            return new ApplicationSchema(commands);
-        }
+        public static ApplicationSchema Resolve(IReadOnlyList<Type> commandTypes) => new(
+            commandTypes.Select(CommandSchema.Resolve).ToArray()
+        );
     }
 }

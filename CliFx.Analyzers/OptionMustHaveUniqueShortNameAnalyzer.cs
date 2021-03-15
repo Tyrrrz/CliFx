@@ -7,6 +7,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace CliFx.Analyzers
 {
+    [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class OptionMustHaveUniqueShortNameAnalyzer : AnalyzerBase
     {
         public OptionMustHaveUniqueShortNameAnalyzer()

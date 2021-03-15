@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -24,7 +25,7 @@ namespace CliFx.Schema
             bool isRequired,
             string? description,
             Type? converterType,
-            Type[] validatorTypes)
+            IReadOnlyList<Type> validatorTypes)
             : base(property, description, converterType, validatorTypes)
         {
             Name = name;
@@ -49,6 +50,7 @@ namespace CliFx.Schema
             !string.IsNullOrWhiteSpace(EnvironmentVariable) &&
             string.Equals(EnvironmentVariable, environmentVariableName, StringComparison.Ordinal);
 
+        // TODO: move?
         public string GetUserFacingDisplayString()
         {
             var buffer = new StringBuilder();

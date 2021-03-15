@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
-using CliFx.Attributes;
 using CliFx.Exceptions;
+using CliFx.Formatting;
 using CliFx.Infrastructure;
 using CliFx.Input;
 using CliFx.Schema;
@@ -17,7 +16,7 @@ namespace CliFx
     /// <summary>
     /// Command line application facade.
     /// </summary>
-    public partial class CliApplication
+    public class CliApplication
     {
         /// <summary>
         /// Application metadata.
@@ -32,6 +31,8 @@ namespace CliFx
         private readonly IConsole _console;
         private readonly ITypeActivator _typeActivator;
 
+        private readonly CommandBinder _commandBinder;
+
         /// <summary>
         /// Initializes an instance of <see cref="CliApplication"/>.
         /// </summary>
@@ -45,19 +46,40 @@ namespace CliFx
             Configuration = configuration;
             _console = console;
             _typeActivator = typeActivator;
+
+            _commandBinder = new CommandBinder(typeActivator);
         }
 
-        private async ValueTask LaunchAndWaitForDebuggerAsync()
-        {
-            var processId = ProcessEx.GetCurrentProcessId();
+        private bool IsDebugModeEnabled(CommandInput commandInput) =>
+            Configuration.IsDebugModeAllowed && commandInput.IsDebugDirectiveSpecified;
 
+        private bool IsPreviewModeEnabled(CommandInput commandInput) =>
+            Configuration.IsPreviewModeAllowed && commandInput.IsPreviewDirectiveSpecified;
+
+        private bool ShouldShowHelpText(CommandSchema commandSchema, CommandInput commandInput) =>
+            commandSchema.IsHelpOptionAvailable && commandInput.IsHelpOptionSpecified ||
+            // Show help text also in case the fallback default command is
+            // executed without any arguments.
+            commandSchema == FallbackDefaultCommand.Schema &&
+            string.IsNullOrWhiteSpace(commandInput.CommandName) &&
+            !commandInput.Parameters.Any() &&
+            !commandInput.Options.Any();
+
+        private bool ShouldShowVersionText(CommandSchema commandSchema, CommandInput commandInput) =>
+            commandSchema.IsVersionOptionAvailable && commandInput.IsVersionOptionSpecified;
+
+        private async ValueTask PromptDebuggerAsync()
+        {
             using (_console.WithForegroundColor(ConsoleColor.Green))
             {
+                var processId = ProcessEx.GetCurrentProcessId();
+
                 _console.Output.WriteLine(
                     $"Attach debugger to PID {processId} to continue."
                 );
             }
 
+            // Try to also launch debugger ourselves (only works if VS is installed)
             Debugger.Launch();
 
             while (!Debugger.IsAttached)
@@ -66,10 +88,84 @@ namespace CliFx
             }
         }
 
-        private ICommand GetCommandInstance(CommandSchema command) =>
-            command != FallbackDefaultCommand.Schema
-                ? (ICommand) _typeActivator.CreateInstance(command.Type)
-                : new FallbackDefaultCommand();
+        private async ValueTask<int> RunAsync(ApplicationSchema applicationSchema, CommandInput commandInput)
+        {
+            // Handle debug directive
+            if (IsDebugModeEnabled(commandInput))
+            {
+                await PromptDebuggerAsync();
+            }
+
+            // Handle preview directive
+            if (IsPreviewModeEnabled(commandInput))
+            {
+                ConsoleFormatter.WriteCommandInput(_console, commandInput);
+                return 0;
+            }
+
+            // Try to get the command schema that matches the input
+            var commandSchema =
+                applicationSchema.TryFindCommand(commandInput.CommandName) ??
+                applicationSchema.TryFindDefaultCommand() ??
+                FallbackDefaultCommand.Schema;
+
+            // Activate command instance
+            var commandInstance = 0 switch
+            {
+                // Special case for fallback command (bypass type activator)
+                _ when commandSchema == FallbackDefaultCommand.Schema => new FallbackDefaultCommand(),
+                _ => (ICommand) _typeActivator.CreateInstance(commandSchema.Type)
+            };
+
+            // Extract default values (needs to be done before the instance is mutated)
+            var commandDefaultValues = commandSchema.GetValues(commandInstance);
+
+            // Assemble help context
+            var helpContext = new HelpContext(
+                Metadata,
+                applicationSchema,
+                commandSchema,
+                commandDefaultValues
+            );
+
+            // Handle help option
+            if (ShouldShowHelpText(commandSchema, commandInput))
+            {
+                ConsoleFormatter.WriteHelpText(_console, helpContext);
+                return 0;
+            }
+
+            // Handle version option
+            if (ShouldShowVersionText(commandSchema, commandInput))
+            {
+                _console.Output.WriteLine(Metadata.Version);
+                return 0;
+            }
+
+            // Starting from this point, we may produce exceptions that are meant for the
+            // end user of the application (i.e. invalid input, command exception, etc).
+            // Catch these exceptions here, print them to the console, and don't let them
+            // propagate further.
+            try
+            {
+                // Bind and execute command
+                _commandBinder.Bind(commandSchema, commandInput, commandInstance);
+                await commandInstance.ExecuteAsync(_console);
+
+                return 0;
+            }
+            catch (CliFxException ex)
+            {
+                ConsoleFormatter.WriteException(_console, ex);
+
+                if (ex.ShowHelp)
+                {
+                    ConsoleFormatter.WriteHelpText(_console, helpContext);
+                }
+
+                return ex.ExitCode;
+            }
+        }
 
         /// <summary>
         /// Runs the application with the specified command line arguments and environment variables.
@@ -78,8 +174,6 @@ namespace CliFx
         /// <remarks>
         /// When running WITHOUT debugger (i.e. in production), this method swallows all exceptions and
         /// reports them to the console.
-        /// When running WITH debugger (i.e. while developing), this method only swallows
-        /// <see cref="CommandException"/>.
         /// </remarks>
         public async ValueTask<int> RunAsync(
             IReadOnlyList<string> commandLineArguments,
@@ -88,90 +182,30 @@ namespace CliFx
             try
             {
                 // Console colors may have already been overriden by the parent process,
-                // so we need to reset it to make sure that everything we write looks nice.
+                // so we need to reset it to make sure that everything we write looks properly.
                 _console.ResetColor();
 
-                var root = ApplicationSchema.Resolve(Configuration.CommandTypes);
-                var input = CommandInput.Parse(commandLineArguments, root.GetCommandNames());
+                var applicationSchema = ApplicationSchema.Resolve(Configuration.CommandTypes);
 
-                // Debug mode
-                if (Configuration.IsDebugModeAllowed && input.IsDebugDirectiveSpecified)
-                {
-                    await LaunchAndWaitForDebuggerAsync();
-                }
+                var commandInput = CommandInput.Parse(
+                    commandLineArguments,
+                    environmentVariables,
+                    applicationSchema.GetCommandNames()
+                );
 
-                // Preview mode
-                if (Configuration.IsPreviewModeAllowed && input.IsPreviewDirectiveSpecified)
-                {
-                    _console.WriteCommandInput(input);
-                    return 0;
-                }
-
-                // Try to get the command matching the input or fallback to default
-                var command =
-                    root.TryFindCommand(input.CommandName) ??
-                    root.TryFindDefaultCommand() ??
-                    FallbackDefaultCommand.Schema;
-
-                // Version option
-                if (command.IsVersionOptionAvailable && input.IsVersionOptionSpecified)
-                {
-                    _console.Output.WriteLine(Metadata.Version);
-                    return 0;
-                }
-
-                // Get command instance (also used in help text)
-                var instance = GetCommandInstance(command);
-
-                // To avoid instantiating the command twice, we need to get default values
-                // before the arguments are bound to the properties
-                var defaultValues = command.GetArgumentValues(instance);
-
-                // Help option
-                if (command.IsHelpOptionAvailable && input.IsHelpOptionSpecified ||
-                    command == FallbackDefaultCommand.Schema && !input.Parameters.Any() && !input.Options.Any())
-                {
-                    _console.WriteHelpText(Metadata, root, command, defaultValues);
-                    return 0;
-                }
-
-                try
-                {
-                    command.Bind(instance, input, environmentVariables);
-
-                    await instance.ExecuteAsync(_console);
-
-                    return 0;
-                }
-                // Swallow command exceptions and route them to the console
-                catch (CliFxException ex)
-                {
-                    // If the message is set, don't print the whole stack trace
-                    if (!string.IsNullOrWhiteSpace(ex.ActualMessage))
-                    {
-                        using (_console.WithForegroundColor(ConsoleColor.Red))
-                            _console.Error.WriteLine(ex.ActualMessage);
-                    }
-                    else
-                    {
-                        _console.WriteException(ex);
-                    }
-
-                    if (ex.ShowHelp)
-                    {
-                        _console.WriteHelpText(Metadata, root, command, defaultValues);
-                    }
-
-                    return ex.ExitCode;
-                }
+                return await RunAsync(applicationSchema, commandInput);
             }
-            // To prevent the app from showing the annoying Windows troubleshooting dialog,
-            // we handle all exceptions and route them to the console nicely.
-            // However, we don't want to swallow unhandled exceptions when the debugger is attached,
-            // because we still want the IDE to show them to the developer.
+            // To prevent the app from showing the annoying troubleshooting dialog on Windows,
+            // we handle all exceptions ourselves and print them to the console.
+            //
+            // We only want to do that if the app is running in production, which we infer
+            // based on whether a debugger is attached to the process.
+            //
+            // When not running in production, we want the IDE to show exceptions to the
+            // developer, so we don't swallow them in that case.
             catch (Exception ex) when (!Debugger.IsAttached)
             {
-                _console.WriteException(ex);
+                ConsoleFormatter.WriteException(_console, ex);
                 return 1;
             }
         }
@@ -184,13 +218,11 @@ namespace CliFx
         /// <remarks>
         /// When running WITHOUT debugger (i.e. in production), this method swallows all exceptions and
         /// reports them to the console.
-        /// When running WITH debugger (i.e. while developing), this method only swallows
-        /// <see cref="CommandException"/>.
         /// </remarks>
         public async ValueTask<int> RunAsync(IReadOnlyList<string> commandLineArguments) => await RunAsync(
             commandLineArguments,
             // Use case-sensitive comparison because environment variables are
-            // case-sensitive on Linux and macOS.
+            // case-sensitive on Linux and macOS (but not on Windows).
             Environment
                 .GetEnvironmentVariables()
                 .ToDictionary<string, string>(StringComparer.Ordinal)
@@ -204,27 +236,11 @@ namespace CliFx
         /// <remarks>
         /// When running WITHOUT debugger (i.e. in production), this method swallows all exceptions and
         /// reports them to the console.
-        /// When running WITH debugger (i.e. while developing), this method only swallows
-        /// <see cref="CommandException"/>.
         /// </remarks>
         public async ValueTask<int> RunAsync() => await RunAsync(
             Environment.GetCommandLineArgs()
                 .Skip(1) // first element is the file path
                 .ToArray()
         );
-    }
-
-    public partial class CliApplication
-    {
-        // Fallback default command used when none is defined in the application
-        [Command]
-        private class FallbackDefaultCommand : ICommand
-        {
-            public static CommandSchema Schema { get; } = CommandSchema.Resolve(typeof(FallbackDefaultCommand));
-
-            // Never actually executed
-            [ExcludeFromCodeCoverage]
-            public ValueTask ExecuteAsync(IConsole console) => default;
-        }
     }
 }

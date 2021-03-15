@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using CliFx.Exceptions;
 using CliFx.Tests.Utils;
 using FluentAssertions;
 using Xunit;
@@ -9,9 +8,9 @@ using Xunit.Abstractions;
 
 namespace CliFx.Tests
 {
-    public class ApplicationConfigurationSpecs : SpecsBase
+    public class ApplicationSpecs : SpecsBase
     {
-        public ApplicationConfigurationSpecs(ITestOutputHelper testOutput)
+        public ApplicationSpecs(ITestOutputHelper testOutput)
             : base(testOutput)
         {
         }
@@ -68,7 +67,7 @@ namespace CliFx.Tests
         {
             // Act
             var app = new CliApplicationBuilder()
-                .AddCommand(typeof(ApplicationConfigurationSpecs))
+                .AddCommand(typeof(ApplicationSpecs))
                 .UseConsole(FakeConsole)
                 .Build();
 

@@ -5,7 +5,6 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace CliFx.Analyzers
 {
-    [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public abstract class AnalyzerBase : DiagnosticAnalyzer
     {
         public DiagnosticDescriptor SupportedDiagnostic { get; }

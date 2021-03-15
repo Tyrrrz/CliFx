@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using FluentAssertions.Execution;
 using FluentAssertions.Primitives;
 using Microsoft.CodeAnalysis;
@@ -100,35 +101,69 @@ namespace CliFx.Analyzers.Tests.Utils
 
         public void ProduceDiagnostics(string sourceCode)
         {
+            var expectedDiagnostics = Subject.SupportedDiagnostics;
             var producedDiagnostics = GetProducedDiagnostics(sourceCode);
 
-            var expectedIds = Subject.SupportedDiagnostics.Select(d => d.Id).Distinct().OrderBy(d => d).ToArray();
-            var producedIds = producedDiagnostics.Select(d => d.Id).Distinct().OrderBy(d => d).ToArray();
+            var expectedDiagnosticIds = expectedDiagnostics.Select(d => d.Id).Distinct().ToArray();
+            var producedDiagnosticIds = producedDiagnostics.Select(d => d.Id).Distinct().ToArray();
 
-            var result = expectedIds.Intersect(producedIds).Count() == expectedIds.Length;
+            var result =
+                expectedDiagnosticIds.Intersect(producedDiagnosticIds).Count() ==
+                expectedDiagnosticIds.Length;
 
-            Execute.Assertion.ForCondition(result).FailWith($@"
-Expected and produced diagnostics do not match.
+            Execute.Assertion.ForCondition(result).FailWith(() =>
+            {
+                var buffer = new StringBuilder();
 
-Expected: {string.Join(", ", expectedIds)}
-Produced: {(producedIds.Any() ? string.Join(", ", producedIds) : "<none>")}
-".Trim());
+                buffer.AppendLine("Expected and produced diagnostics do not match.");
+                buffer.AppendLine();
+
+                buffer.AppendLine("Expected diagnostics:");
+
+                foreach (var expectedDiagnostic in expectedDiagnostics)
+                {
+                    buffer.Append("  - ");
+                    buffer.Append(expectedDiagnostic.Id);
+                    buffer.AppendLine();
+                }
+
+                buffer.AppendLine();
+
+                buffer.AppendLine("Produced diagnostics:");
+
+                foreach (var producedDiagnostic in producedDiagnostics)
+                {
+                    buffer.Append("  - ");
+                    buffer.Append(producedDiagnostic);
+                }
+
+                return new FailReason(buffer.ToString());
+            });
         }
 
         public void NotProduceDiagnostics(string sourceCode)
         {
             var producedDiagnostics = GetProducedDiagnostics(sourceCode);
 
-            var expectedIds = Subject.SupportedDiagnostics.Select(d => d.Id).Distinct().OrderBy(d => d).ToArray();
-            var producedIds = producedDiagnostics.Select(d => d.Id).Distinct().OrderBy(d => d).ToArray();
+            var result = !producedDiagnostics.Any();
 
-            var result = !expectedIds.Intersect(producedIds).Any();
+            Execute.Assertion.ForCondition(result).FailWith(() =>
+            {
+                var buffer = new StringBuilder();
 
-            Execute.Assertion.ForCondition(result).FailWith($@"
-Expected no produced diagnostics.
+                buffer.AppendLine("Expected no produced diagnostics.");
+                buffer.AppendLine();
 
-Produced: {string.Join(", ", producedIds)}
-".Trim());
+                buffer.AppendLine("Produced diagnostics:");
+
+                foreach (var producedDiagnostic in producedDiagnostics)
+                {
+                    buffer.Append("  - ");
+                    buffer.Append(producedDiagnostic);
+                }
+
+                return new FailReason(buffer.ToString());
+            });
         }
     }
 

@@ -5,16 +5,17 @@ using CliFx.Utils.Extensions;
 
 namespace CliFx.Input
 {
-    // TODO: shoehorn environment variables in here?
     internal partial class CommandInput
     {
-        public IReadOnlyList<DirectiveInput> Directives { get; }
-
         public string? CommandName { get; }
+
+        public IReadOnlyList<DirectiveInput> Directives { get; }
 
         public IReadOnlyList<ParameterInput> Parameters { get; }
 
         public IReadOnlyList<OptionInput> Options { get; }
+
+        public IReadOnlyList<EnvironmentVariableInput> EnvironmentVariables { get; }
 
         public bool IsDebugDirectiveSpecified => Directives.Any(d => d.IsDebugDirective);
 
@@ -25,20 +26,24 @@ namespace CliFx.Input
         public bool IsVersionOptionSpecified => Options.Any(o => o.IsVersionOption);
 
         public CommandInput(
-            IReadOnlyList<DirectiveInput> directives,
             string? commandName,
+            IReadOnlyList<DirectiveInput> directives,
             IReadOnlyList<ParameterInput> parameters,
-            IReadOnlyList<OptionInput> options)
+            IReadOnlyList<OptionInput> options,
+            IReadOnlyList<EnvironmentVariableInput> environmentVariables)
         {
-            Directives = directives;
             CommandName = commandName;
+            Directives = directives;
             Parameters = parameters;
             Options = options;
+            EnvironmentVariables = environmentVariables;
         }
     }
 
     internal partial class CommandInput
     {
+        // TODO: cleanup below
+
         private static IReadOnlyList<DirectiveInput> ParseDirectives(
             IReadOnlyList<string> commandLineArguments,
             ref int index)
@@ -101,16 +106,18 @@ namespace CliFx.Input
             {
                 var argument = commandLineArguments[index];
 
-                var isOptionArgument =
+                var isOptionName =
                     argument.StartsWith("--", StringComparison.OrdinalIgnoreCase) &&
                     argument.Length > 2 &&
-                    char.IsLetter(argument[2]) ||
+                    char.IsLetter(argument[2]);
+
+                var isOptionShortName =
                     argument.StartsWith('-') &&
                     argument.Length > 1 &&
                     char.IsLetter(argument[1]);
 
                 // Break on the first encountered option
-                if (isOptionArgument)
+                if (isOptionName || isOptionShortName)
                     break;
 
                 result.Add(new ParameterInput(argument));
@@ -173,34 +180,47 @@ namespace CliFx.Input
             return result;
         }
 
-        public static CommandInput Parse(IReadOnlyList<string> commandLineArguments, IReadOnlyList<string> availableCommandNames)
+        public static CommandInput Parse(
+            IReadOnlyList<string> commandLineArguments,
+            IReadOnlyDictionary<string, string> environmentVariables,
+            IReadOnlyList<string> availableCommandNames)
         {
             var availableCommandNamesSet = availableCommandNames.ToHashSet(StringComparer.OrdinalIgnoreCase);
 
             var index = 0;
 
-            var directives = ParseDirectives(
+            var parsedDirectives = ParseDirectives(
                 commandLineArguments,
                 ref index
             );
 
-            var commandName = ParseCommandName(
+            var parsedCommandName = ParseCommandName(
                 commandLineArguments,
                 availableCommandNamesSet,
                 ref index
             );
 
-            var parameters = ParseParameters(
+            var parsedParameters = ParseParameters(
                 commandLineArguments,
                 ref index
             );
 
-            var options = ParseOptions(
+            var parsedOptions = ParseOptions(
                 commandLineArguments,
                 ref index
             );
 
-            return new CommandInput(directives, commandName, parameters, options);
+            var parsedEnvironmentVariables = environmentVariables
+                .Select(kvp => new EnvironmentVariableInput(kvp.Key, kvp.Value))
+                .ToArray();
+
+            return new CommandInput(
+                parsedCommandName,
+                parsedDirectives,
+                parsedParameters,
+                parsedOptions,
+                parsedEnvironmentVariables
+            );
         }
     }
 }

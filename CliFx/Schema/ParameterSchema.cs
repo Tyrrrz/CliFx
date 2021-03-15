@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using CliFx.Attributes;
@@ -17,7 +18,7 @@ namespace CliFx.Schema
             string name,
             string? description,
             Type? converterType,
-            Type[] validatorTypes)
+            IReadOnlyList<Type> validatorTypes)
             : base(property, description, converterType, validatorTypes)
         {
             Order = order;

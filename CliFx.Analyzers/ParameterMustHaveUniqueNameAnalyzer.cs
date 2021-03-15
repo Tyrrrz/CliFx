@@ -8,6 +8,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace CliFx.Analyzers
 {
+    [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class ParameterMustHaveUniqueNameAnalyzer : AnalyzerBase
     {
         public ParameterMustHaveUniqueNameAnalyzer()

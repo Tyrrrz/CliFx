@@ -1,12 +1,14 @@
 ﻿using System.Linq;
 using CliFx.Analyzers.ObjectModel;
 using CliFx.Analyzers.Utils.Extensions;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace CliFx.Analyzers
 {
+    [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class ArgumentMustHaveValidConverterAnalyzer : AnalyzerBase
     {
         public ArgumentMustHaveValidConverterAnalyzer()

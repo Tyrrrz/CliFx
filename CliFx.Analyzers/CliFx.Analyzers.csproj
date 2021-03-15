@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Nullable>annotations</Nullable>
+    <NoWarn>$(NoWarn);RS1025;RS1026</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
