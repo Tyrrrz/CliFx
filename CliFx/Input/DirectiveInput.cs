@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace CliFx.Input
 {
@@ -14,8 +13,5 @@ namespace CliFx.Input
             string.Equals(Name, "preview", StringComparison.OrdinalIgnoreCase);
 
         public DirectiveInput(string name) => Name = name;
-
-        [ExcludeFromCodeCoverage]
-        public override string ToString() => $"[{Name}]";
     }
 }

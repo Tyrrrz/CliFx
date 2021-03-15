@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text;
 using CliFx.Attributes;
@@ -36,11 +35,6 @@ namespace CliFx.Schema
 
             return buffer.ToString();
         }
-
-        public string GetInternalDisplayString() => $"{Property?.Name ?? "<implicit>"} ([{Order}] {GetUserFacingDisplayString()})";
-
-        [ExcludeFromCodeCoverage]
-        public override string ToString() => GetInternalDisplayString();
     }
 
     internal partial class ParameterSchema

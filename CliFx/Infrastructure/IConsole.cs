@@ -119,16 +119,13 @@ namespace CliFx.Infrastructure
             ConsoleColor foregroundColor,
             ConsoleColor backgroundColor)
         {
-            var lastForegroundColor = console.ForegroundColor;
-            console.ForegroundColor = foregroundColor;
-
-            var lastBackgroundColor = console.BackgroundColor;
-            console.BackgroundColor = backgroundColor;
+            var foregroundColorRegistration = console.WithForegroundColor(foregroundColor);
+            var backgroundColorRegistration = console.WithBackgroundColor(backgroundColor);
 
             return Disposable.Create(() =>
             {
-                console.ForegroundColor = lastForegroundColor;
-                console.BackgroundColor = lastBackgroundColor;
+                foregroundColorRegistration.Dispose();
+                backgroundColorRegistration.Dispose();
             });
         }
     }

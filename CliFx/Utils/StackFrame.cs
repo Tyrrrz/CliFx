@@ -98,7 +98,13 @@ namespace CliFx.Utils
 
             if (!isSuccess)
             {
-                throw new FormatException("Could not parse stack trace.");
+                // If parsing fails, we include the original stacktrace in the
+                // exception so that it's shown to the user.
+                throw new FormatException(
+                    "Could not parse stacktrace:" +
+                    Environment.NewLine +
+                    stackTrace
+                );
             }
 
             return from m in matches

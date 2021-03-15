@@ -10,12 +10,15 @@ using Microsoft.CodeAnalysis.Text;
 namespace CliFx.Tests.Utils
 {
     // This class uses Roslyn to compile commands dynamically.
-    // It allows us to collocate tests and their commands more
+    //
+    // It allows us to collocate commands with tests more
     // easily, which helps a lot when reasoning about them.
     // Unfortunately, this comes at a cost of static typing,
-    // but this is a trade off I'm willing to take.
+    // but this is still a worthwhile trade off.
+    //
     // Maybe one day C# will allow declaring classes inside
     // methods and doing this will no longer be necessary.
+    // Language proposal: https://github.com/dotnet/csharplang/discussions/130
     internal static class DynamicCommandBuilder
     {
         public static IReadOnlyList<Type> CompileMany(string sourceCode)

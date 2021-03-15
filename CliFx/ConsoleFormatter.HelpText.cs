@@ -213,9 +213,9 @@ namespace CliFx
                 }
 
                 // Environment variable
-                if (!string.IsNullOrWhiteSpace(option.EnvironmentVariableName))
+                if (!string.IsNullOrWhiteSpace(option.EnvironmentVariable))
                 {
-                    Write($"Environment variable: \"{option.EnvironmentVariableName}\".");
+                    Write($"Environment variable: \"{option.EnvironmentVariable}\".");
                     Write(' ');
                 }
 

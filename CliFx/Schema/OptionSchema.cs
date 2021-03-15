@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -13,7 +12,7 @@ namespace CliFx.Schema
 
         public char? ShortName { get; }
 
-        public string? EnvironmentVariableName { get; }
+        public string? EnvironmentVariable { get; }
 
         public bool IsRequired { get; }
 
@@ -21,7 +20,7 @@ namespace CliFx.Schema
             PropertyInfo? property,
             string? name,
             char? shortName,
-            string? environmentVariableName,
+            string? environmentVariable,
             bool isRequired,
             string? description,
             Type? converterType,
@@ -30,7 +29,7 @@ namespace CliFx.Schema
         {
             Name = name;
             ShortName = shortName;
-            EnvironmentVariableName = environmentVariableName;
+            EnvironmentVariable = environmentVariable;
             IsRequired = isRequired;
         }
 
@@ -46,9 +45,9 @@ namespace CliFx.Schema
             MatchesName(alias) ||
             alias.Length == 1 && MatchesShortName(alias.Single());
 
-        public bool MatchesEnvironmentVariableName(string environmentVariableName) =>
-            !string.IsNullOrWhiteSpace(EnvironmentVariableName) &&
-            string.Equals(EnvironmentVariableName, environmentVariableName, StringComparison.Ordinal);
+        public bool MatchesEnvironmentVariable(string environmentVariableName) =>
+            !string.IsNullOrWhiteSpace(EnvironmentVariable) &&
+            string.Equals(EnvironmentVariable, environmentVariableName, StringComparison.Ordinal);
 
         public string GetUserFacingDisplayString()
         {
@@ -75,11 +74,6 @@ namespace CliFx.Schema
 
             return buffer.ToString();
         }
-
-        public string GetInternalDisplayString() => $"{Property?.Name ?? "<implicit>"} ('{GetUserFacingDisplayString()}')";
-
-        [ExcludeFromCodeCoverage]
-        public override string ToString() => GetInternalDisplayString();
     }
 
     internal partial class OptionSchema

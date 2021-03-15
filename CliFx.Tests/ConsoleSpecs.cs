@@ -84,6 +84,10 @@ public class Command : ICommand
             // This fails because tests don't spawn a console window
             //Console.CursorLeft.Should().NotBe(42);
             //Console.CursorTop.Should().NotBe(24);
+
+            FakeConsole.IsInputRedirected.Should().BeTrue();
+            FakeConsole.IsOutputRedirected.Should().BeTrue();
+            FakeConsole.IsErrorRedirected.Should().BeTrue();
         }
 
         [Fact]

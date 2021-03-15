@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
 using CliFx.Utils.Extensions;
 
 namespace CliFx.Input
@@ -36,42 +34,6 @@ namespace CliFx.Input
             CommandName = commandName;
             Parameters = parameters;
             Options = options;
-        }
-
-        [ExcludeFromCodeCoverage]
-        public override string ToString()
-        {
-            var buffer = new StringBuilder();
-
-            foreach (var directive in Directives)
-            {
-                buffer
-                    .AppendIfNotEmpty(' ')
-                    .Append(directive);
-            }
-
-            if (!string.IsNullOrWhiteSpace(CommandName))
-            {
-                buffer
-                    .AppendIfNotEmpty(' ')
-                    .Append(CommandName);
-            }
-
-            foreach (var parameter in Parameters)
-            {
-                buffer
-                    .AppendIfNotEmpty(' ')
-                    .Append(parameter);
-            }
-
-            foreach (var option in Options)
-            {
-                buffer
-                    .AppendIfNotEmpty(' ')
-                    .Append(option);
-            }
-
-            return buffer.ToString();
         }
     }
 
@@ -240,15 +202,5 @@ namespace CliFx.Input
 
             return new CommandInput(directives, commandName, parameters, options);
         }
-    }
-
-    internal partial class CommandInput
-    {
-        public static CommandInput Empty { get; } = new(
-            Array.Empty<DirectiveInput>(),
-            null,
-            Array.Empty<ParameterInput>(),
-            Array.Empty<OptionInput>()
-        );
     }
 }

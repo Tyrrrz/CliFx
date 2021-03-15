@@ -11,8 +11,6 @@ namespace CliFx.Analyzers.ObjectModel
 
         public char? ShortName { get; }
 
-        public string? EnvironmentVariableName { get; }
-
         public ITypeSymbol? ConverterType { get; }
 
         public IReadOnlyList<ITypeSymbol> ValidatorTypes { get; }
@@ -20,13 +18,11 @@ namespace CliFx.Analyzers.ObjectModel
         public CommandOptionSymbol(
             string? name,
             char? shortName,
-            string? environmentVariableName,
             ITypeSymbol? converterType,
             IReadOnlyList<ITypeSymbol> validatorTypes)
         {
             Name = name;
             ShortName = shortName;
-            EnvironmentVariableName = environmentVariableName;
             ConverterType = converterType;
             ValidatorTypes = validatorTypes;
         }
@@ -53,12 +49,6 @@ namespace CliFx.Analyzers.ObjectModel
                 .Select(a => a.Value)
                 .FirstOrDefault() as char?;
 
-            var environmentVariableName = attribute
-                .NamedArguments
-                .Where(a => a.Key == "EnvironmentVariableName")
-                .Select(a => a.Value.Value)
-                .FirstOrDefault() as string;
-
             var converter = attribute
                 .NamedArguments
                 .Where(a => a.Key == "Converter")
@@ -74,7 +64,7 @@ namespace CliFx.Analyzers.ObjectModel
                 .Cast<ITypeSymbol>()
                 .ToArray();
 
-            return new CommandOptionSymbol(name, shortName, environmentVariableName, converter, validators);
+            return new CommandOptionSymbol(name, shortName, converter, validators);
         }
 
         public static CommandOptionSymbol? TryResolve(IPropertySymbol property)

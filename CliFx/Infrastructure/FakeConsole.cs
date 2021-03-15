@@ -80,21 +80,18 @@ namespace CliFx.Infrastructure
         /// If the command is not cancellation-aware (i.e. it doesn't call <see cref="IConsole.RegisterCancellation"/>),
         /// this method will not have any effect.
         /// </remarks>
-        public void RequestCancellation(TimeSpan delay)
+        public void RequestCancellation(TimeSpan? delay = null)
         {
             // Avoid unnecessary creation of a timer
-            if (delay > TimeSpan.Zero)
+            if (delay is not null && delay > TimeSpan.Zero)
             {
-                _cancellationTokenSource.CancelAfter(delay);
+                _cancellationTokenSource.CancelAfter(delay.Value);
             }
             else
             {
                 _cancellationTokenSource.Cancel();
             }
         }
-
-        /// <inheritdoc cref="RequestCancellation(System.TimeSpan)" />
-        public void RequestCancellation() => RequestCancellation(TimeSpan.Zero);
 
         /// <inheritdoc />
         public virtual void Dispose() => _cancellationTokenSource.Dispose();

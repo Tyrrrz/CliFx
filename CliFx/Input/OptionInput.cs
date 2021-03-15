@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using CliFx.Schema;
 using CliFx.Utils.Extensions;
@@ -26,14 +25,11 @@ namespace CliFx.Input
 
         public string GetFormattedIdentifier() => Identifier switch
         {
-            {Length: 0} => Identifier,
-            {Length: 1} => $"-{Identifier}",
-            _ => $"--{Identifier}"
+            {Length: >= 2} => "--" + Identifier,
+            _ => '-' + Identifier
         };
 
+        // TODO: move?
         public string GetFormattedValues() => Values.Select(v => v.Quote()).JoinToString(" ");
-
-        [ExcludeFromCodeCoverage]
-        public override string ToString() => $"{GetFormattedIdentifier()} {GetFormattedValues()}";
     }
 }

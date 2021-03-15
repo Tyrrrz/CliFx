@@ -14,6 +14,7 @@ namespace CliFx.Schema
     internal abstract class MemberSchema
     {
         // Property can be null on the implicit help and version options
+        // TODO: do something about it?
         public PropertyInfo? Property { get; }
 
         public string? Description { get; }

@@ -17,7 +17,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Help_text_is_printed_if_no_arguments_are_provided_and_a_default_command_is_not_defined()
+        public async Task Help_text_is_printed_if_no_arguments_are_provided_and_the_default_command_is_not_defined()
         {
             // Arrange
             var application = new CliApplicationBuilder()
@@ -76,7 +76,7 @@ public class DefaultCommand : ICommand
         }
 
         [Fact]
-        public async Task Help_text_is_printed_if_provided_arguments_contain_the_help_option_even_if_a_default_command_is_not_defined()
+        public async Task Help_text_is_printed_if_provided_arguments_contain_the_help_option_even_if_the_default_command_is_not_defined()
         {
             // Arrange
             var commandTypes = DynamicCommandBuilder.CompileMany(
@@ -379,7 +379,7 @@ public class Command : ICommand
             );
         }
 
-        [Fact]
+        [Fact] // TODO: should it?
         public async Task Help_text_shows_usage_format_which_lists_all_available_sub_commands()
         {
             // Arrange
@@ -428,7 +428,7 @@ public class SubCommand : ICommand
         }
 
         [Fact]
-        public async Task Help_text_shows_description_for_available_parameters_and_options()
+        public async Task Help_text_shows_all_available_parameters_and_options()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -437,7 +437,7 @@ public class SubCommand : ICommand
 [Command]
 public class Command : ICommand
 {
-    [CommandParameter(0, Description = ""Description of foo"")]
+    [CommandParameter(0, Name = ""foo"", Description = ""Description of foo"")]
     public string? Foo { get; set; }
     
     [CommandOption(""bar"", Description = ""Description of bar"")]
@@ -467,6 +467,140 @@ public class Command : ICommand
                 "foo", "Description of foo",
                 "Options",
                 "--bar", "Description of bar"
+            );
+        }
+
+        [Fact]
+        public async Task Help_text_shows_the_implicit_help_and_version_options_on_the_default_command()
+        {
+            // Arrange
+            var commandType = DynamicCommandBuilder.Compile(
+                // language=cs
+                @"
+[Command]
+public class Command : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}
+");
+
+            var application = new CliApplicationBuilder()
+                .AddCommand(commandType)
+                .UseConsole(FakeConsole)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(
+                new[] {"--help"},
+                new Dictionary<string, string>()
+            );
+
+            var stdOut = FakeConsole.ReadOutputString();
+
+            // Assert
+            exitCode.Should().Be(0);
+            stdOut.Should().ContainAllInOrder(
+                "Options",
+                "-h", "--help", "Shows help text",
+                "--version", "Shows version information"
+            );
+        }
+
+        [Fact]
+        public async Task Help_text_shows_the_implicit_help_option_but_not_the_version_option_on_a_named_command()
+        {
+            // Arrange
+            var commandType = DynamicCommandBuilder.Compile(
+                // language=cs
+                @"
+[Command(""cmd"")]
+public class Command : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}
+");
+
+            var application = new CliApplicationBuilder()
+                .AddCommand(commandType)
+                .UseConsole(FakeConsole)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(
+                new[] {"cmd", "--help"},
+                new Dictionary<string, string>()
+            );
+
+            var stdOut = FakeConsole.ReadOutputString();
+
+            // Assert
+            exitCode.Should().Be(0);
+            stdOut.Should().ContainAllInOrder(
+                "Options",
+                "-h", "--help", "Shows help text"
+            );
+            stdOut.Should().NotContainAny(
+                "--version", "Shows version information"
+            );
+        }
+
+        [Fact]
+        public async Task Help_text_shows_all_available_sub_commands()
+        {
+            // Arrange
+            var commandTypes = DynamicCommandBuilder.CompileMany(
+                // language=cs
+                @"
+[Command(Description = ""Description of default command"")]
+public class DefaultCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(""default"");
+        return default;
+    }
+}
+
+[Command(""cmd one"", Description = ""Description of one command"")]
+public class NamedCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(""cmd"");
+        return default;
+    }
+}
+
+[Command(""cmd two"", Description = ""Description of another command"")]
+public class SubCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(""cmd sub"");
+        return default;
+    }
+}
+");
+
+            var application = new CliApplicationBuilder()
+                .AddCommands(commandTypes)
+                .UseConsole(FakeConsole)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(
+                new[] {"--help"},
+                new Dictionary<string, string>()
+            );
+
+            var stdOut = FakeConsole.ReadOutputString();
+
+            // Assert
+            exitCode.Should().Be(0);
+            stdOut.Should().ContainAllInOrder(
+                "Commands",
+                "cmd one", "Description of one command",
+                "cmd two", "Description of another command"
             );
         }
 

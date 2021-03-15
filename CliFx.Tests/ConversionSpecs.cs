@@ -137,7 +137,7 @@ public class Command : ICommand
         }
 
         [Fact]
-        public async Task Argument_can_be_converted_to_a_boolean_implicitly()
+        public async Task Argument_can_be_converted_to_a_boolean_with_implicit_value()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -578,7 +578,7 @@ public class Command : ICommand
 public class CustomConverter : ArgumentConverter<int>
 {
     public override int Convert(string argument) =>
-        int.Parse(argument) * 5;
+        argument.Length;
 }
 
 [Command]
@@ -601,7 +601,7 @@ public class Command : ICommand
 
             // Act
             var exitCode = await application.RunAsync(
-                new[] {"-f", "123"},
+                new[] {"-f", "hello world"},
                 new Dictionary<string, string>()
             );
 
@@ -609,7 +609,7 @@ public class Command : ICommand
 
             // Assert
             exitCode.Should().Be(0);
-            stdOut.Trim().Should().Be("615");
+            stdOut.Trim().Should().Be("11");
         }
 
         [Fact]

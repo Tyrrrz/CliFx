@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using CliFx.Attributes;
 using CliFx.Exceptions;
 using CliFx.Input;
@@ -138,7 +136,7 @@ namespace CliFx.Schema
             // Environment variables
             foreach (var (name, value) in environmentVariables)
             {
-                var option = Options.FirstOrDefault(o => o.MatchesEnvironmentVariableName(name));
+                var option = Options.FirstOrDefault(o => o.MatchesEnvironmentVariable(name));
                 if (option is null)
                     continue;
 
@@ -188,29 +186,6 @@ namespace CliFx.Schema
             BindParameters(instance, input.Parameters);
             BindOptions(instance, input.Options, environmentVariables);
         }
-
-        public string GetInternalDisplayString()
-        {
-            var buffer = new StringBuilder();
-
-            // Type
-            buffer.Append(Type.FullName);
-
-            // Name
-            buffer
-                .Append(' ')
-                .Append('(')
-                .Append(IsDefault
-                    ? "<default command>"
-                    : $"'{Name}'"
-                )
-                .Append(')');
-
-            return buffer.ToString();
-        }
-
-        [ExcludeFromCodeCoverage]
-        public override string ToString() => GetInternalDisplayString();
     }
 
     internal partial class CommandSchema
