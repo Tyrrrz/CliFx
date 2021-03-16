@@ -7,16 +7,14 @@ namespace CliFx.Input
     {
         public string Name { get; }
 
-        public string RawValue { get; }
+        public string Value { get; }
 
-        public EnvironmentVariableInput(string name, string rawValue)
+        public EnvironmentVariableInput(string name, string value)
         {
             Name = name;
-            RawValue = rawValue;
+            Value = value;
         }
 
-        public string GetValue() => RawValue;
-
-        public IReadOnlyList<string> GetValues() => RawValue.Split(Path.PathSeparator);
+        public IReadOnlyList<string> SplitValues() => Value.Split(Path.PathSeparator);
     }
 }

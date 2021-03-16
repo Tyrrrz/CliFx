@@ -4,6 +4,7 @@ using CliFx.Infrastructure;
 
 namespace CliFx.Formatting
 {
+    // TODO: rework
     internal partial class ConsoleFormatter
     {
         private readonly IConsole _console;

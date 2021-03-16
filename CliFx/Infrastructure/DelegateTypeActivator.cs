@@ -17,7 +17,21 @@ namespace CliFx.Infrastructure
         public DelegateTypeActivator(Func<Type, object> func) => _func = func;
 
         /// <inheritdoc />
-        public object CreateInstance(Type type) =>
-            _func(type) ?? throw CliFxException.DelegateActivatorReturnedNull(type);
+        public object CreateInstance(Type type)
+        {
+            var instance = _func(type);
+
+            if (instance is null)
+            {
+                throw CliFxException.InternalError($@"
+Failed to create an instance of type `{type.FullName}`, received <null> instead.
+To fix this, ensure that the provided type activator is configured correctly, as it's not expected to return <null>.
+If you are using a dependency container, this error may signify that the specified type has not been registered."
+                    .Trim()
+                );
+            }
+
+            return instance;
+        }
     }
 }

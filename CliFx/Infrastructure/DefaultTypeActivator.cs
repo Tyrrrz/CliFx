@@ -18,7 +18,12 @@ namespace CliFx.Infrastructure
             }
             catch (Exception ex)
             {
-                throw CliFxException.DefaultActivatorFailed(type, ex);
+                throw CliFxException.InternalError($@"
+Failed to create an instance of type `{type.FullName}`.
+The type must have a public parameterless constructor in order to be instantiated by the default activator.
+To fix this, either add a parameterless constructor or configure a custom activator.".Trim(),
+                    ex
+                );
             }
         }
     }

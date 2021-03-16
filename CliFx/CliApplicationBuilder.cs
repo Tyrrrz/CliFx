@@ -202,11 +202,17 @@ namespace CliFx
     {
         private static readonly Lazy<Assembly?> EntryAssemblyLazy = new(Assembly.GetEntryAssembly);
 
-        // Entry assembly is null in tests
+        // Entry assembly can be null, for example in tests
         private static Assembly? EntryAssembly => EntryAssemblyLazy.Value;
 
-        private static string GetDefaultTitle() =>
-            EntryAssembly?.GetName().Name ?? "App";
+        private static string GetDefaultTitle()
+        {
+            var entryAssemblyName = EntryAssembly?.GetName().Name;
+            if (string.IsNullOrWhiteSpace(entryAssemblyName))
+                return "App";
+
+            return entryAssemblyName;
+        }
 
         private static string GetDefaultExecutableName()
         {

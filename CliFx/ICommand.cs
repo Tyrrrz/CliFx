@@ -12,8 +12,8 @@ namespace CliFx
         /// Executes the command using the specified implementation of <see cref="IConsole"/>.
         /// </summary>
         /// <remarks>
-        /// If the execution of the command is not asynchronous,
-        /// simply end the method with <code>return default;</code>
+        /// If the execution of the command is not asynchronous, simply end the method with
+        /// <code>return default;</code>
         /// </remarks>
         ValueTask ExecuteAsync(IConsole console);
     }

@@ -577,8 +577,8 @@ public class Command : ICommand
                 @"
 public class CustomConverter : ArgumentConverter<int>
 {
-    public override int Convert(string argument) =>
-        argument.Length;
+    public override int Convert(string rawValue) =>
+        rawValue.Length;
 }
 
 [Command]

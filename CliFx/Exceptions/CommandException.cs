@@ -12,7 +12,7 @@ namespace CliFx.Exceptions
         /// Initializes an instance of <see cref="CommandException"/>.
         /// </summary>
         public CommandException(
-            string? message,
+            string message,
             int exitCode = DefaultExitCode,
             bool showHelp = false,
             Exception? innerException = null)

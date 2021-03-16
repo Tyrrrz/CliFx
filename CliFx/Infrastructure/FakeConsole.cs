@@ -5,8 +5,8 @@ using System.Threading;
 namespace CliFx.Infrastructure
 {
     /// <summary>
-    /// Implementation of <see cref="IConsole"/> that uses the provided
-    /// fake standard input, output, and error streams.
+    /// Implementation of <see cref="IConsole"/> that uses the provided fake
+    /// standard input, output, and error streams.
     /// </summary>
     /// <remarks>
     /// Use this implementation in tests to verify how a command interacts with the console.

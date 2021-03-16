@@ -132,7 +132,7 @@ namespace CliFx.Input
         {
             var result = new List<OptionInput>();
 
-            var currentOptionAlias = default(string?);
+            var currentOptionIdentifier = default(string?);
             var currentOptionValues = new List<string>();
 
             for (; index < commandLineArguments.Count; index++)
@@ -145,10 +145,10 @@ namespace CliFx.Input
                     char.IsLetter(argument[2]))
                 {
                     // Flush previous
-                    if (!string.IsNullOrWhiteSpace(currentOptionAlias))
-                        result.Add(new OptionInput(currentOptionAlias, currentOptionValues));
+                    if (!string.IsNullOrWhiteSpace(currentOptionIdentifier))
+                        result.Add(new OptionInput(currentOptionIdentifier, currentOptionValues));
 
-                    currentOptionAlias = argument.Substring(2);
+                    currentOptionIdentifier = argument.Substring(2);
                     currentOptionValues = new List<string>();
                 }
                 // Short name
@@ -159,23 +159,23 @@ namespace CliFx.Input
                     foreach (var alias in argument.Substring(1))
                     {
                         // Flush previous
-                        if (!string.IsNullOrWhiteSpace(currentOptionAlias))
-                            result.Add(new OptionInput(currentOptionAlias, currentOptionValues));
+                        if (!string.IsNullOrWhiteSpace(currentOptionIdentifier))
+                            result.Add(new OptionInput(currentOptionIdentifier, currentOptionValues));
 
-                        currentOptionAlias = alias.AsString();
+                        currentOptionIdentifier = alias.AsString();
                         currentOptionValues = new List<string>();
                     }
                 }
                 // Value
-                else if (!string.IsNullOrWhiteSpace(currentOptionAlias))
+                else if (!string.IsNullOrWhiteSpace(currentOptionIdentifier))
                 {
                     currentOptionValues.Add(argument);
                 }
             }
 
             // Flush last option
-            if (!string.IsNullOrWhiteSpace(currentOptionAlias))
-                result.Add(new OptionInput(currentOptionAlias, currentOptionValues));
+            if (!string.IsNullOrWhiteSpace(currentOptionIdentifier))
+                result.Add(new OptionInput(currentOptionIdentifier, currentOptionValues));
 
             return result;
         }

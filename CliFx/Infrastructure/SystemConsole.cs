@@ -95,6 +95,7 @@ namespace CliFx.Infrastructure
         public void Dispose()
         {
             _cancellationTokenSource?.Dispose();
+
             Input.Dispose();
             Output.Dispose();
             Error.Dispose();

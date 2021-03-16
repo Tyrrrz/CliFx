@@ -2,6 +2,7 @@
 using System.Linq;
 using CliFx.Infrastructure;
 using CliFx.Input;
+using CliFx.Utils.Extensions;
 
 namespace CliFx.Formatting
 {
@@ -36,10 +37,10 @@ namespace CliFx.Formatting
                 formatter.Write(ConsoleColor.White, option.GetFormattedIdentifier());
 
                 // Value(s)
-                if (option.Values.Any())
+                foreach (var value in option.Values)
                 {
                     formatter.Write(' ');
-                    formatter.Write(ConsoleColor.White, option.GetFormattedValues());
+                    formatter.Write(value.Quote());
                 }
 
                 formatter.Write(']');

@@ -11,6 +11,7 @@ using CliFx.Utils.Extensions;
 
 namespace CliFx
 {
+    // TODO: cleanup
     internal class CommandBinder
     {
         private static readonly IFormatProvider FormatProvider = CultureInfo.InvariantCulture;
@@ -22,9 +23,9 @@ namespace CliFx
             _typeActivator = typeActivator;
         }
 
-        private object? ConvertScalar(
+        private object? ConvertSingle(
             MemberSchema memberSchema,
-            string? value,
+            string? rawValue,
             Type targetType)
         {
             var converter = memberSchema.ConverterType is not null
@@ -34,73 +35,75 @@ namespace CliFx
             return 0 switch
             {
                 // Custom converter
-                _ when converter is not null => converter.Convert(value),
+                _ when converter is not null => converter.Convert(rawValue),
 
                 // Assignable from string (string, object, etc)
-                _ when targetType.IsAssignableFrom(typeof(string)) => value,
+                _ when targetType.IsAssignableFrom(typeof(string)) => rawValue,
 
                 // Boolean (special case)
-                _ when targetType == typeof(bool) => string.IsNullOrWhiteSpace(value) || bool.Parse(value),
+                _ when targetType == typeof(bool) => string.IsNullOrWhiteSpace(rawValue) || bool.Parse(rawValue),
 
                 // Primitive types
-                _ when targetType.IsConvertible() => Convert.ChangeType(value, targetType, FormatProvider),
-                _ when targetType == typeof(DateTimeOffset) => DateTimeOffset.Parse(value, FormatProvider),
-                _ when targetType == typeof(TimeSpan) => TimeSpan.Parse(value, FormatProvider),
+                _ when targetType.IsConvertible() => Convert.ChangeType(rawValue, targetType, FormatProvider),
+                _ when targetType == typeof(DateTimeOffset) => DateTimeOffset.Parse(rawValue, FormatProvider),
+                _ when targetType == typeof(TimeSpan) => TimeSpan.Parse(rawValue, FormatProvider),
 
                 // Enum types (allow null reference exceptions here, they will be caught)
-                _ when targetType.IsEnum => Enum.Parse(targetType, value!, true),
+                _ when targetType.IsEnum => Enum.Parse(targetType, rawValue!, true),
 
                 // Nullable value types
                 _ when targetType.TryGetNullableUnderlyingType() is { } nullableUnderlyingType =>
-                    !string.IsNullOrWhiteSpace(value)
-                        ? ConvertScalar(memberSchema, value, nullableUnderlyingType)
+                    !string.IsNullOrWhiteSpace(rawValue)
+                        ? ConvertSingle(memberSchema, rawValue, nullableUnderlyingType)
                         : null,
 
                 // String-constructible (FileInfo, DirectoryInfo, etc)
                 _ when targetType.GetConstructor(new[] {typeof(string)}) is { } stringConstructor =>
-                    stringConstructor.Invoke(new object?[] {value}),
+                    stringConstructor.Invoke(new object?[] {rawValue}),
 
                 // String-parseable (Guid, IpAddress, etc)
                 _ when targetType.TryGetStaticParseMethod(true) is { } parseMethod =>
-                    parseMethod.Invoke(null, new object?[] {value, FormatProvider}),
+                    parseMethod.Invoke(null, new object?[] {rawValue, FormatProvider}),
                 _ when targetType.TryGetStaticParseMethod() is { } parseMethod =>
-                    parseMethod.Invoke(null, new object?[] {value}),
+                    parseMethod.Invoke(null, new object?[] {rawValue}),
 
                 // No conversion available
-                _ => throw CliFxException.CannotConvertToType(memberSchema, value, targetType)
+                _ => throw CliFxException.CannotConvertToType(memberSchema, rawValue, targetType)
             };
         }
 
-        private object? ConvertNonScalar(
+        private object? ConvertMultiple(
             MemberSchema memberSchema,
-            IReadOnlyList<string> values,
+            IReadOnlyList<string> rawValues,
             Type targetEnumerableType,
             Type targetElementType)
         {
-            var array = values
-                .Select(v => ConvertScalar(memberSchema, v, targetElementType))
+            var array = rawValues
+                .Select(v => ConvertSingle(memberSchema, v, targetElementType))
                 .ToNonGenericArray(targetElementType);
 
             var arrayType = array.GetType();
 
-            return 0 switch
+            // Assignable from an array (T[], IReadOnlyList<T>, etc)
+            if (targetEnumerableType.IsAssignableFrom(arrayType))
             {
-                // Assignable from an array (T[], IReadOnlyList<T>, etc)
-                _ when targetEnumerableType.IsAssignableFrom(arrayType) => array,
+                return array;
+            }
 
-                // Array-constructible (List<T>, HashSet<T>, etc)
-                _ when targetEnumerableType.GetConstructor(new[] {arrayType}) is { } arrayConstructor =>
-                    arrayConstructor.Invoke(new object?[] {array}),
+            // Array-constructible (List<T>, HashSet<T>, etc)
+            var arrayConstructor = targetEnumerableType.GetConstructor(new[] {arrayType});
+            if (arrayConstructor is not null)
+            {
+                return arrayConstructor.Invoke(new object?[] {array});
+            }
 
-                // No conversion available
-                _ => throw CliFxException.CannotConvertNonScalar(memberSchema, values, targetEnumerableType)
-            };
+            throw CliFxException.CannotConvertNonScalar(memberSchema, rawValues, targetEnumerableType);
         }
 
         private void BindMember(
             MemberSchema memberSchema,
             ICommand commandInstance,
-            IReadOnlyList<string> values)
+            IReadOnlyList<string> rawValues)
         {
             if (memberSchema.Property is null)
                 return;
@@ -114,14 +117,14 @@ namespace CliFx
                 _ when
                     targetType != typeof(string) &&
                     targetType.TryGetEnumerableUnderlyingType() is { } enumerableUnderlyingType =>
-                    ConvertNonScalar(memberSchema, values, targetType, enumerableUnderlyingType),
+                    ConvertMultiple(memberSchema, rawValues, targetType, enumerableUnderlyingType),
 
                 // Scalar
-                _ when values.Count <= 1 =>
-                    ConvertScalar(memberSchema, values.SingleOrDefault(), targetType),
+                _ when rawValues.Count <= 1 =>
+                    ConvertSingle(memberSchema, rawValues.SingleOrDefault(), targetType),
 
                 // Mismatch (scalar but too many values)
-                _ => throw CliFxException.CannotConvertMultipleValuesToNonScalar(memberSchema, values)
+                _ => throw CliFxException.CannotConvertMultipleValuesToNonScalar(memberSchema, rawValues)
             };
 
             // Validate
@@ -135,125 +138,115 @@ namespace CliFx
         }
 
         private void BindParameters(
-            CommandSchema commandSchema,
             CommandInput commandInput,
+            CommandSchema commandSchema,
             ICommand commandInstance)
         {
-            // Keep track of remaining inputs to make sure that
-            // all parameters have been bound.
+            // Ensure there are no unexpected parameters or missing parameters
             var remainingParameterInputs = commandInput.Parameters.ToList();
+            var remainingParameterSchemas = commandSchema.Parameters.ToList();
 
-            // Scalar parameters
-            var scalarParameters = commandSchema
-                .Parameters
-                .OrderBy(p => p.Order)
-                .TakeWhile(p => p.IsScalar)
-                .ToArray();
+            var position = 0;
 
-            for (var i = 0; i < scalarParameters.Length; i++)
+            foreach (var parameterSchema in commandSchema.Parameters.OrderBy(p => p.Order))
             {
-                var parameterSchema = scalarParameters[i];
+                // Check bounds
+                if (position >= commandInput.Parameters.Count)
+                    break;
 
-                var scalarInput = i < commandInput.Parameters.Count
-                    ? commandInput.Parameters[i]
-                    : throw CliFxException.ParameterNotSet(parameterSchema);
+                // Scalar - take one input at current position
+                if (parameterSchema.IsScalar)
+                {
+                    var parameterInput = commandInput.Parameters[position];
 
-                BindMember(parameterSchema, commandInstance, new[] {scalarInput.Value});
-                remainingParameterInputs.Remove(scalarInput);
+                    var rawValues = new[] {parameterInput.Value}; // TODO: possible to avoid creating array?
+                    BindMember(parameterSchema, commandInstance, rawValues);
+
+                    position++;
+
+                    remainingParameterInputs.Remove(parameterInput);
+                }
+                // Non-scalar - take all remaining inputs starting at current position
+                else
+                {
+                    var parameterInputs = commandInput.Parameters.Skip(position).ToArray();
+
+                    var rawValues = parameterInputs.Select(p => p.Value).ToArray();
+                    BindMember(parameterSchema, commandInstance, rawValues);
+
+                    position += parameterInputs.Length;
+
+                    remainingParameterInputs.RemoveRange(parameterInputs);
+                }
+
+                remainingParameterSchemas.Remove(parameterSchema);
             }
 
-            // Non-scalar parameter (only one is allowed)
-            var nonScalarParameter = commandSchema
-                .Parameters
-                .OrderBy(p => p.Order)
-                .FirstOrDefault(p => !p.IsScalar);
-
-            if (nonScalarParameter is not null)
-            {
-                var nonScalarValues = commandInput.Parameters
-                    .Skip(scalarParameters.Length)
-                    .Select(p => p.Value)
-                    .ToArray();
-
-                // Parameters are required by default so a non-scalar parameter must
-                // be bound to at least one value.
-                if (!nonScalarValues.Any())
-                    throw CliFxException.ParameterNotSet(nonScalarParameter);
-
-                BindMember(nonScalarParameter, commandInstance, nonScalarValues);
-                remainingParameterInputs.Clear();
-            }
-
-            // Ensure all inputs were bound
             if (remainingParameterInputs.Any())
                 throw CliFxException.UnrecognizedParametersProvided(remainingParameterInputs);
+
+            // TODO: fix exception
+            if (remainingParameterSchemas.Any())
+                throw CliFxException.ParameterNotSet(remainingParameterSchemas.First());
         }
 
         private void BindOptions(
-            CommandSchema commandSchema,
             CommandInput commandInput,
+            CommandSchema commandSchema,
             ICommand commandInstance)
         {
-            // Keep track of remaining inputs to make sure that
-            // all options have been bound.
+            // Ensure there are no unrecognized options or missing required options
             var remainingOptionInputs = commandInput.Options.ToList();
+            var remainingRequiredOptionSchemas = commandSchema.Options.Where(o => o.IsRequired).ToList();
 
-            // Keep track of remaining unset required options
-            var unsetRequiredOptionSchemas = commandSchema.Options.Where(o => o.IsRequired).ToList();
-
-            // Environment variables
-            foreach (var environmentVariableInput in commandInput.EnvironmentVariables)
-            {
-                var optionSchema = commandSchema
-                    .Options
-                    .FirstOrDefault(o => o.MatchesEnvironmentVariable(environmentVariableInput.Name));
-
-                if (optionSchema is null)
-                    continue;
-
-                var values = optionSchema.IsScalar
-                    ? new[] {environmentVariableInput.GetValue()}
-                    : environmentVariableInput.GetValues();
-
-                BindMember(optionSchema, commandInstance, values);
-                unsetRequiredOptionSchemas.Remove(optionSchema);
-            }
-
-            // Direct input
             foreach (var optionSchema in commandSchema.Options)
             {
-                var inputs = commandInput
+                var optionInputs = commandInput
                     .Options
-                    .Where(i => optionSchema.MatchesNameOrShortName(i.Identifier))
+                    .Where(o => optionSchema.MatchesNameOrShortName(o.Identifier))
                     .ToArray();
 
-                // Skip if the inputs weren't provided for this option
-                if (!inputs.Any())
-                    continue;
+                var environmentVariableInput = commandInput
+                    .EnvironmentVariables
+                    .FirstOrDefault(e => optionSchema.MatchesEnvironmentVariable(e.Name));
 
-                var inputValues = inputs.SelectMany(i => i.Values).ToArray();
-                BindMember(optionSchema, commandInstance, inputValues);
+                var rawValues = 0 switch
+                {
+                    // Direct input
+                    _ when optionInputs.Any() => optionInputs.SelectMany(o => o.Values).ToArray(),
 
-                remainingOptionInputs.RemoveRange(inputs);
+                    // Environment variable input
+                    _ when environmentVariableInput is not null => optionSchema.IsScalar
+                        ? new[] {environmentVariableInput.Value}
+                        : environmentVariableInput.SplitValues(),
 
-                // Required option implies that the value has to be set and also be non-empty
-                if (inputValues.Any())
-                    unsetRequiredOptionSchemas.Remove(optionSchema);
+                    // No input
+                    _ => Array.Empty<string>()
+                };
+
+                BindMember(optionSchema, commandInstance, rawValues);
+
+                remainingOptionInputs.RemoveRange(optionInputs);
+
+                // Required options require at least one value to be set
+                if (rawValues.Any())
+                    remainingRequiredOptionSchemas.Remove(optionSchema);
             }
 
-            // Ensure all inputs were bound
             if (remainingOptionInputs.Any())
                 throw CliFxException.UnrecognizedOptionsProvided(remainingOptionInputs);
 
-            // Ensure all required options were set
-            if (unsetRequiredOptionSchemas.Any())
-                throw CliFxException.RequiredOptionsNotSet(unsetRequiredOptionSchemas);
+            if (remainingRequiredOptionSchemas.Any())
+                throw CliFxException.RequiredOptionsNotSet(remainingRequiredOptionSchemas);
         }
 
-        public void Bind(CommandSchema commandSchema, CommandInput commandInput, ICommand commandInstance)
+        public void Bind(
+            CommandInput commandInput,
+            CommandSchema commandSchema,
+            ICommand commandInstance)
         {
-            BindParameters(commandSchema, commandInput, commandInstance);
-            BindOptions(commandSchema, commandInput, commandInstance);
+            BindParameters(commandInput, commandSchema, commandInstance);
+            BindOptions(commandInput, commandSchema, commandInstance);
         }
     }
 }

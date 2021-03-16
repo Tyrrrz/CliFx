@@ -33,7 +33,7 @@ namespace CliFx.Exceptions
         /// Initializes an instance of <see cref="CliFxException"/>.
         /// </summary>
         public CliFxException(
-            string? message,
+            string message,
             int exitCode = DefaultExitCode,
             bool showHelp = false,
             Exception? innerException = null)
@@ -45,50 +45,17 @@ namespace CliFx.Exceptions
         }
     }
 
-    // Internal exceptions
-    // Provide more diagnostic information here
     public partial class CliFxException
     {
-        internal static CliFxException DefaultActivatorFailed(Type type, Exception? innerException = null)
-        {
-            var configureActivatorMethodName =
-                $"{nameof(CliApplicationBuilder)}.{nameof(CliApplicationBuilder.UseTypeActivator)}(...)";
+        // Internal errors don't show help because they're meant for the developer
+        // and not the end-user of the application.
+        internal static CliFxException InternalError(string message, Exception? innerException = null) =>
+            new(message, DefaultExitCode, false, innerException);
 
-            var message = $@"
-Failed to create an instance of type '{type.FullName}'.
-The type must have a public parameterless constructor in order to be instantiated by the default activator.
-
-To fix this, either make sure this type has a public parameterless constructor, or configure a custom activator using {configureActivatorMethodName}. 
-Refer to the readme to learn how to integrate a dependency container of your choice to act as a type activator.";
-
-            return new CliFxException(message.Trim(), innerException: innerException);
-        }
-
-        internal static CliFxException DelegateActivatorReturnedNull(Type type)
-        {
-            var message = $@"
-Failed to create an instance of type '{type.FullName}', received <null> instead.
-
-To fix this, ensure that the provided type activator was configured correctly, as it's not expected to return <null>.
-If you are using a dependency container, this error may signify that the type wasn't registered.";
-
-            return new CliFxException(message.Trim());
-        }
-
-        internal static CliFxException InvalidCommandType(Type type)
-        {
-            var message = $@"
-Command '{type.FullName}' is not a valid command type.
-
-In order to be a valid command type, it must:
-- Not be an abstract class
-- Implement {typeof(ICommand).FullName}
-- Be annotated with {typeof(CommandAttribute).FullName}
-
-If you're experiencing problems, please refer to the readme for a quickstart example.";
-
-            return new CliFxException(message.Trim());
-        }
+        // User errors are typically caused by invalid input and they're meant for
+        // the end-user, so we want to show help.
+        internal static CliFxException UserError(string message, Exception? innerException = null) =>
+            new(message, DefaultExitCode, true, innerException);
     }
 
     // TODO: refactor

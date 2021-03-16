@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using CliFx.Schema;
-using CliFx.Utils.Extensions;
 
 namespace CliFx.Input
 {
@@ -28,8 +26,5 @@ namespace CliFx.Input
             {Length: >= 2} => "--" + Identifier,
             _ => '-' + Identifier
         };
-
-        // TODO: move?
-        public string GetFormattedValues() => Values.Select(v => v.Quote()).JoinToString(" ");
     }
 }

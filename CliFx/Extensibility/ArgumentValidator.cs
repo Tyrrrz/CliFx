@@ -14,7 +14,7 @@ namespace CliFx.Extensibility
     public abstract class ArgumentValidator<T> : IArgumentValidator
     {
         /// <summary>
-        /// Validates the value bound to a parameter or option.
+        /// Validates the value bound to a parameter or an option.
         /// </summary>
         /// <remarks>
         /// Throw <see cref="CommandException"/> to signal validation failure.

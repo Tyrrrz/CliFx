@@ -110,22 +110,16 @@ namespace CliFx
                 FallbackDefaultCommand.Schema;
 
             // Activate command instance
-            var commandInstance = 0 switch
-            {
-                // Special case for fallback command (bypass type activator)
-                _ when commandSchema == FallbackDefaultCommand.Schema => new FallbackDefaultCommand(),
-                _ => (ICommand) _typeActivator.CreateInstance(commandSchema.Type)
-            };
-
-            // Extract default values (needs to be done before the instance is mutated)
-            var commandDefaultValues = commandSchema.GetValues(commandInstance);
+            var commandInstance = commandSchema == FallbackDefaultCommand.Schema
+                ? new FallbackDefaultCommand() // bypass activator for fallback command
+                : (ICommand) _typeActivator.CreateInstance(commandSchema.Type);
 
             // Assemble help context
             var helpContext = new HelpContext(
                 Metadata,
                 applicationSchema,
                 commandSchema,
-                commandDefaultValues
+                commandSchema.GetValues(commandInstance)
             );
 
             // Handle help option
@@ -149,7 +143,7 @@ namespace CliFx
             try
             {
                 // Bind and execute command
-                _commandBinder.Bind(commandSchema, commandInput, commandInstance);
+                _commandBinder.Bind(commandInput, commandSchema, commandInstance);
                 await commandInstance.ExecuteAsync(_console);
 
                 return 0;

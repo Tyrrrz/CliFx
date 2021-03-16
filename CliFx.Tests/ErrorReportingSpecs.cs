@@ -139,7 +139,7 @@ public class Command : ICommand
 public class Command : ICommand
 {
     public ValueTask ExecuteAsync(IConsole console) =>
-        throw new CommandException(null, 69);
+        throw new CommandException("""", 69);
 }
 ");
 

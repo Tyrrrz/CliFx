@@ -114,7 +114,25 @@ namespace CliFx.Schema
             );
         }
 
-        public static CommandSchema Resolve(Type type) =>
-            TryResolve(type) ?? throw CliFxException.InvalidCommandType(type);
+        public static CommandSchema Resolve(Type type)
+        {
+            var schema = TryResolve(type);
+
+            if (schema is null)
+            {
+                throw CliFxException.InternalError($@"
+Command `{type.FullName}` is not a valid command type.
+
+In order to be a valid command type, it must:
+- Implement {typeof(ICommand).FullName}
+- Be annotated with {typeof(CommandAttribute).FullName}
+- Not be an abstract class
+
+If you're experiencing problems, please refer to the readme for the quickstart example.".Trim()
+                );
+            }
+
+            return schema;
+        }
     }
 }

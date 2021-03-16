@@ -16,7 +16,7 @@ namespace CliFx.Analyzers.Tests
             const string code = @"
 public class MyConverter
 {
-    public string Convert(string value) => value;
+    public string Convert(string rawValue) => rawValue;
 }
 
 [Command]
@@ -40,7 +40,7 @@ public class MyCommand : ICommand
             const string code = @"
 public class MyConverter : ArgumentConverter<string>
 {
-    public override string Convert(string value) => value;
+    public override string Convert(string rawValue) => rawValue;
 }
 
 [Command]
@@ -83,7 +83,7 @@ public class MyCommand : ICommand
             const string code = @"
 public class MyConverter
 {
-    public string Convert(string value) => value;
+    public string Convert(string rawValue) => rawValue;
 }
 
 [Command]
@@ -107,7 +107,7 @@ public class MyCommand : ICommand
             const string code = @"
 public class MyConverter : ArgumentConverter<string>
 {
-    public override string Convert(string value) => value;
+    public override string Convert(string rawValue) => rawValue;
 }
 
 [Command]

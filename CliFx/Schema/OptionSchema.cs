@@ -42,9 +42,9 @@ namespace CliFx.Schema
             ShortName is not null &&
             ShortName == shortName;
 
-        public bool MatchesNameOrShortName(string alias) =>
-            MatchesName(alias) ||
-            alias.Length == 1 && MatchesShortName(alias.Single());
+        public bool MatchesNameOrShortName(string identifier) =>
+            MatchesName(identifier) ||
+            identifier.Length == 1 && MatchesShortName(identifier.Single());
 
         public bool MatchesEnvironmentVariable(string environmentVariableName) =>
             !string.IsNullOrWhiteSpace(EnvironmentVariable) &&
