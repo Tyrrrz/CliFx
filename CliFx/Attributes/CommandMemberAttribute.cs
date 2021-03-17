@@ -20,7 +20,7 @@ namespace CliFx.Attributes
         /// a value expected by the underlying property.
         /// </summary>
         /// <remarks>
-        /// Converter must derive from <see cref="ArgumentConverter{T}"/>.
+        /// Converter must derive from <see cref="BindingConverter{T}"/>.
         /// </remarks>
         public Type? Converter { get; set; }
 
@@ -29,7 +29,7 @@ namespace CliFx.Attributes
         /// property, after it has been bound.
         /// </summary>
         /// <remarks>
-        /// Validators must derive from <see cref="ArgumentValidator{T}"/>.
+        /// Validators must derive from <see cref="BindingValidator{T}"/>.
         /// </remarks>
         public Type[] Validators { get; set; } = Array.Empty<Type>();
     }

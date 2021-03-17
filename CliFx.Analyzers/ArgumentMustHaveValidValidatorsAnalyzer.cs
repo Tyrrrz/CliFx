@@ -13,8 +13,8 @@ namespace CliFx.Analyzers
     {
         public ArgumentMustHaveValidValidatorsAnalyzer()
             : base(
-                $"Parameter and option validators must derive from `{SymbolNames.CliFxArgumentValidatorClass}`",
-                $"All validators specified for this parameter or option must derive from `{SymbolNames.CliFxArgumentValidatorClass}`.")
+                $"Parameter and option validators must derive from `{SymbolNames.CliFxBindingValidatorClass}`",
+                $"All validators specified for this parameter or option must derive from `{SymbolNames.CliFxBindingValidatorClass}`.")
         {
         }
 
@@ -40,7 +40,7 @@ namespace CliFx.Analyzers
                 // We check against an internal interface because checking against a generic class is a pain
                 var validatorImplementsInterface = validatorType
                     .AllInterfaces
-                    .Any(s => s.DisplayNameMatches(SymbolNames.CliFxArgumentValidatorInterface));
+                    .Any(s => s.DisplayNameMatches(SymbolNames.CliFxBindingValidatorInterface));
 
                 if (!validatorImplementsInterface)
                 {

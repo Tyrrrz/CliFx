@@ -36,9 +36,9 @@ namespace CliFx.Infrastructure
         /// </summary>
         public void WriteInput(byte[] data)
         {
-            // We want the command to be able to read what we wrote
+            // We want the consumer to be able to read what we wrote
             // so we need to seek the stream back to its original
-            // position after we've finished writing.
+            // position after we finish writing.
             lock (_input)
             {
                 var lastPosition = _input.Position;

@@ -575,7 +575,7 @@ public class Command : ICommand
             var commandType = DynamicCommandBuilder.Compile(
                 // language=cs
                 @"
-public class CustomConverter : ArgumentConverter<int>
+public class CustomConverter : BindingConverter<int>
 {
     public override int Convert(string rawValue) =>
         rawValue.Length;
@@ -865,12 +865,12 @@ public class Command : ICommand
             var commandType = DynamicCommandBuilder.Compile(
                 // language=cs
                 @"
-public class ValidatorA : ArgumentValidator<int>
+public class ValidatorA : BindingValidator<int>
 {
     public override void Validate(int value) {}
 }
 
-public class ValidatorB : ArgumentValidator<int>
+public class ValidatorB : BindingValidator<int>
 {
     public override void Validate(int value) =>
         throw new CommandException(""Hello world"");

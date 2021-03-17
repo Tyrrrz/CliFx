@@ -45,11 +45,11 @@ namespace CliFx.Schema
                 Property.PropertyType.TryGetNullableUnderlyingType() ??
                 Property.PropertyType;
 
-            return 0 switch
-            {
-                _ when underlyingType.IsEnum => Enum.GetNames(underlyingType),
-                _ => Array.Empty<object?>()
-            };
+            // Only works for enums now
+            if (underlyingType.IsEnum)
+                return Enum.GetNames(underlyingType);
+
+            return Array.Empty<object?>();
         }
     }
 }

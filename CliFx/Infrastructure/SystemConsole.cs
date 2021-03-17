@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Threading;
 
 namespace CliFx.Infrastructure
@@ -12,19 +11,19 @@ namespace CliFx.Infrastructure
         private CancellationTokenSource? _cancellationTokenSource;
 
         /// <inheritdoc />
-        public StreamReader Input { get; }
+        public ConsoleReader Input { get; }
 
         /// <inheritdoc />
         public bool IsInputRedirected => Console.IsInputRedirected;
 
         /// <inheritdoc />
-        public StreamWriter Output { get; }
+        public ConsoleWriter Output { get; }
 
         /// <inheritdoc />
         public bool IsOutputRedirected => Console.IsOutputRedirected;
 
         /// <inheritdoc />
-        public StreamWriter Error { get; }
+        public ConsoleWriter Error { get; }
 
         /// <inheritdoc />
         public bool IsErrorRedirected => Console.IsErrorRedirected;
@@ -48,9 +47,9 @@ namespace CliFx.Infrastructure
         /// </summary>
         public SystemConsole()
         {
-            Input = ConsoleStream.WrapInput(Console.OpenStandardInput());
-            Output = ConsoleStream.WrapOutput(Console.OpenStandardOutput());
-            Error = ConsoleStream.WrapOutput(Console.OpenStandardError());
+            Input = ConsoleReader.Create(this, Console.OpenStandardInput());
+            Output = ConsoleWriter.Create(this, Console.OpenStandardOutput());
+            Error = ConsoleWriter.Create(this, Console.OpenStandardError());
         }
 
         /// <inheritdoc />

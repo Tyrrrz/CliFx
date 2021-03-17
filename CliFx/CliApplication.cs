@@ -99,7 +99,7 @@ namespace CliFx
             // Handle preview directive
             if (IsPreviewModeEnabled(commandInput))
             {
-                ConsoleFormatter.WriteCommandInput(_console, commandInput);
+                _console.WriteCommandInput(commandInput);
                 return 0;
             }
 
@@ -111,7 +111,7 @@ namespace CliFx
 
             // Activate command instance
             var commandInstance = commandSchema == FallbackDefaultCommand.Schema
-                ? new FallbackDefaultCommand() // bypass activator for fallback command
+                ? new FallbackDefaultCommand() // bypass activator
                 : (ICommand) _typeActivator.CreateInstance(commandSchema.Type);
 
             // Assemble help context
@@ -125,7 +125,7 @@ namespace CliFx
             // Handle help option
             if (ShouldShowHelpText(commandSchema, commandInput))
             {
-                ConsoleFormatter.WriteHelpText(_console, helpContext);
+                _console.WriteHelpText(helpContext);
                 return 0;
             }
 
@@ -150,11 +150,11 @@ namespace CliFx
             }
             catch (CliFxException ex)
             {
-                ConsoleFormatter.WriteException(_console, ex);
+                _console.WriteException(ex);
 
                 if (ex.ShowHelp)
                 {
-                    ConsoleFormatter.WriteHelpText(_console, helpContext);
+                    _console.WriteHelpText(helpContext);
                 }
 
                 return ex.ExitCode;
@@ -199,7 +199,7 @@ namespace CliFx
             // developer, so we don't swallow them in that case.
             catch (Exception ex) when (!Debugger.IsAttached)
             {
-                ConsoleFormatter.WriteException(_console, ex);
+                _console.WriteException(ex);
                 return 1;
             }
         }

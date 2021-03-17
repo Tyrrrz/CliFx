@@ -9,7 +9,7 @@ namespace CliFx.Analyzers.Tests
         private static DiagnosticAnalyzer Analyzer { get; } = new ArgumentMustHaveValidValidatorsAnalyzer();
 
         [Fact]
-        public void Analyzer_reports_an_error_if_one_of_the_specified_parameter_validators_does_not_derive_from_ArgumentValidator()
+        public void Analyzer_reports_an_error_if_one_of_the_specified_parameter_validators_does_not_derive_from_BindingValidator()
         {
             // Arrange
             // language=cs
@@ -33,12 +33,12 @@ public class MyCommand : ICommand
         }
 
         [Fact]
-        public void Analyzer_does_not_report_an_error_if_all_specified_parameter_validators_derive_from_ArgumentValidator()
+        public void Analyzer_does_not_report_an_error_if_all_specified_parameter_validators_derive_from_BindingValidator()
         {
             // Arrange
             // language=cs
             const string code = @"
-public class MyValidator : ArgumentValidator<string>
+public class MyValidator : BindingValidator<string>
 {
     public override void Validate(string value) {}
 }
@@ -76,7 +76,7 @@ public class MyCommand : ICommand
         }
 
         [Fact]
-        public void Analyzer_reports_an_error_if_one_of_the_specified_option_validators_does_not_derive_from_ArgumentValidator()
+        public void Analyzer_reports_an_error_if_one_of_the_specified_option_validators_does_not_derive_from_BindingValidator()
         {
             // Arrange
             // language=cs
@@ -100,12 +100,12 @@ public class MyCommand : ICommand
         }
 
         [Fact]
-        public void Analyzer_does_not_report_an_error_if_all_specified_option_validators_derive_from_ArgumentValidator()
+        public void Analyzer_does_not_report_an_error_if_all_specified_option_validators_derive_from_BindingValidator()
         {
             // Arrange
             // language=cs
             const string code = @"
-public class MyValidator : ArgumentValidator<string>
+public class MyValidator : BindingValidator<string>
 {
     public override void Validate(string value) {}
 }

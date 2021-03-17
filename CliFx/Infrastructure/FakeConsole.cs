@@ -16,19 +16,19 @@ namespace CliFx.Infrastructure
         private readonly CancellationTokenSource _cancellationTokenSource = new();
 
         /// <inheritdoc />
-        public StreamReader Input { get; }
+        public ConsoleReader Input { get; }
 
         /// <inheritdoc />
         public bool IsInputRedirected => true;
 
         /// <inheritdoc />
-        public StreamWriter Output { get; }
+        public ConsoleWriter Output { get; }
 
         /// <inheritdoc />
         public bool IsOutputRedirected => true;
 
         /// <inheritdoc />
-        public StreamWriter Error { get; }
+        public ConsoleWriter Error { get; }
 
         /// <inheritdoc />
         public bool IsErrorRedirected => true;
@@ -55,19 +55,11 @@ namespace CliFx.Infrastructure
         /// <summary>
         /// Initializes an instance of <see cref="FakeConsole"/>.
         /// </summary>
-        public FakeConsole(StreamReader? input = null, StreamWriter? output = null, StreamWriter? error = null)
-        {
-            Input = input ?? StreamReader.Null;
-            Output = output ?? StreamWriter.Null;
-            Error = error ?? StreamWriter.Null;
-        }
-
-        /// <summary>
-        /// Initializes an instance of <see cref="FakeConsole"/>.
-        /// </summary>
         public FakeConsole(Stream? input = null, Stream? output = null, Stream? error = null)
-            : this(ConsoleStream.WrapInput(input), ConsoleStream.WrapOutput(output), ConsoleStream.WrapOutput(error))
         {
+            Input = ConsoleReader.Create(this, input);
+            Output = ConsoleWriter.Create(this, output);
+            Error = ConsoleWriter.Create(this, error);
         }
 
         /// <inheritdoc />

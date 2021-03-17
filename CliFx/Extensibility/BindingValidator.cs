@@ -3,7 +3,7 @@
 namespace CliFx.Extensibility
 {
     // Used internally to simplify usage from reflection
-    internal interface IArgumentValidator
+    internal interface IBindingValidator
     {
         void Validate(object? value);
     }
@@ -11,7 +11,7 @@ namespace CliFx.Extensibility
     /// <summary>
     /// Base type for custom validators.
     /// </summary>
-    public abstract class ArgumentValidator<T> : IArgumentValidator
+    public abstract class BindingValidator<T> : IBindingValidator
     {
         /// <summary>
         /// Validates the value bound to a parameter or an option.
@@ -21,6 +21,6 @@ namespace CliFx.Extensibility
         /// </remarks>
         public abstract void Validate(T value);
 
-        void IArgumentValidator.Validate(object? value) => Validate((T) value!);
+        void IBindingValidator.Validate(object? value) => Validate((T) value!);
     }
 }

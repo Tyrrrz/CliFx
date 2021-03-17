@@ -28,48 +28,81 @@ namespace CliFx
             string? rawValue,
             Type targetType)
         {
-            var converter = memberSchema.ConverterType is not null
-                ? (IArgumentConverter) _typeActivator.CreateInstance(memberSchema.ConverterType)
-                : null;
-
-            return 0 switch
+            // Custom converter
+            if (memberSchema.ConverterType is not null)
             {
-                // Custom converter
-                _ when converter is not null => converter.Convert(rawValue),
+                var converter = (IBindingConverter) _typeActivator.CreateInstance(memberSchema.ConverterType);
+                return converter.Convert(rawValue);
+            }
 
-                // Assignable from string (string, object, etc)
-                _ when targetType.IsAssignableFrom(typeof(string)) => rawValue,
+            // Assignable from string (e.g. string itself, object, etc)
+            if (targetType.IsAssignableFrom(typeof(string)))
+            {
+                return rawValue;
+            }
 
-                // Boolean (special case)
-                _ when targetType == typeof(bool) => string.IsNullOrWhiteSpace(rawValue) || bool.Parse(rawValue),
+            // Special case for bool
+            if (targetType == typeof(bool))
+            {
+                return string.IsNullOrWhiteSpace(rawValue) || bool.Parse(rawValue);
+            }
 
-                // Primitive types
-                _ when targetType.IsConvertible() => Convert.ChangeType(rawValue, targetType, FormatProvider),
-                _ when targetType == typeof(DateTimeOffset) => DateTimeOffset.Parse(rawValue, FormatProvider),
-                _ when targetType == typeof(TimeSpan) => TimeSpan.Parse(rawValue, FormatProvider),
+            // IConvertible primitives (int, double, char, etc)
+            if (targetType.IsConvertible())
+            {
+                return Convert.ChangeType(rawValue, targetType, FormatProvider);
+            }
 
-                // Enum types (allow null reference exceptions here, they will be caught)
-                _ when targetType.IsEnum => Enum.Parse(targetType, rawValue!, true),
+            // Special case for DateTimeOffset
+            if (targetType == typeof(DateTimeOffset))
+            {
+                return DateTimeOffset.Parse(rawValue, FormatProvider);
+            }
 
-                // Nullable value types
-                _ when targetType.TryGetNullableUnderlyingType() is { } nullableUnderlyingType =>
-                    !string.IsNullOrWhiteSpace(rawValue)
-                        ? ConvertSingle(memberSchema, rawValue, nullableUnderlyingType)
-                        : null,
+            // Special case for TimeSpan
+            if (targetType == typeof(TimeSpan))
+            {
+                return TimeSpan.Parse(rawValue, FormatProvider);
+            }
 
-                // String-constructible (FileInfo, DirectoryInfo, etc)
-                _ when targetType.GetConstructor(new[] {typeof(string)}) is { } stringConstructor =>
-                    stringConstructor.Invoke(new object?[] {rawValue}),
+            // Enum
+            if (targetType.IsEnum)
+            {
+                // Null reference exception will be handled upstream
+                return Enum.Parse(targetType, rawValue!, true);
+            }
 
-                // String-parseable (Guid, IpAddress, etc)
-                _ when targetType.TryGetStaticParseMethod(true) is { } parseMethod =>
-                    parseMethod.Invoke(null, new object?[] {rawValue, FormatProvider}),
-                _ when targetType.TryGetStaticParseMethod() is { } parseMethod =>
-                    parseMethod.Invoke(null, new object?[] {rawValue}),
+            // Nullable<T>
+            var nullableUnderlyingType = targetType.TryGetNullableUnderlyingType();
+            if (nullableUnderlyingType is not null)
+            {
+                return !string.IsNullOrWhiteSpace(rawValue)
+                    ? ConvertSingle(memberSchema, rawValue, nullableUnderlyingType)
+                    : null;
+            }
 
-                // No conversion available
-                _ => throw CliFxException.CannotConvertToType(memberSchema, rawValue, targetType)
-            };
+            // String-constructible (FileInfo, etc)
+            var stringConstructor = targetType.GetConstructor(new[] {typeof(string)});
+            if (stringConstructor is not null)
+            {
+                return stringConstructor.Invoke(new object?[] {rawValue});
+            }
+
+            // String-parseable (with IFormatProvider)
+            var parseMethodWithFormatProvider = targetType.TryGetStaticParseMethod(true);
+            if (parseMethodWithFormatProvider is not null)
+            {
+                return parseMethodWithFormatProvider.Invoke(null, new object?[] {rawValue, FormatProvider});
+            }
+
+            // String-parseable (without IFormatProvider)
+            var parseMethod = targetType.TryGetStaticParseMethod();
+            if (parseMethod is not null)
+            {
+                return parseMethod.Invoke(null, new object?[] {rawValue});
+            }
+
+            throw CliFxException.CannotConvertToType(memberSchema, rawValue, targetType);
         }
 
         private object? ConvertMultiple(
@@ -100,6 +133,28 @@ namespace CliFx
             throw CliFxException.CannotConvertNonScalar(memberSchema, rawValues, targetEnumerableType);
         }
 
+        private object? ConvertMember(
+            MemberSchema memberSchema,
+            Type targetType,
+            IReadOnlyList<string> rawValues)
+        {
+            // Non-scalar
+            var enumerableUnderlyingType = targetType.TryGetEnumerableUnderlyingType();
+            if (targetType != typeof(string) && enumerableUnderlyingType is not null)
+            {
+                return ConvertMultiple(memberSchema, rawValues, targetType, enumerableUnderlyingType);
+            }
+
+            // Scalar
+            if (rawValues.Count <= 1)
+            {
+                return ConvertSingle(memberSchema, rawValues.SingleOrDefault(), targetType);
+            }
+
+            // Mismatch (scalar but too many values)
+            throw CliFxException.CannotConvertMultipleValuesToNonScalar(memberSchema, rawValues);
+        }
+
         private void BindMember(
             MemberSchema memberSchema,
             ICommand commandInstance,
@@ -111,26 +166,12 @@ namespace CliFx
             var targetType = memberSchema.Property.PropertyType;
 
             // Convert
-            var convertedValue = 0 switch
-            {
-                // Non-scalar
-                _ when
-                    targetType != typeof(string) &&
-                    targetType.TryGetEnumerableUnderlyingType() is { } enumerableUnderlyingType =>
-                    ConvertMultiple(memberSchema, rawValues, targetType, enumerableUnderlyingType),
-
-                // Scalar
-                _ when rawValues.Count <= 1 =>
-                    ConvertSingle(memberSchema, rawValues.SingleOrDefault(), targetType),
-
-                // Mismatch (scalar but too many values)
-                _ => throw CliFxException.CannotConvertMultipleValuesToNonScalar(memberSchema, rawValues)
-            };
+            var convertedValue = ConvertMember(memberSchema, targetType, rawValues);
 
             // Validate
             foreach (var validatorType in memberSchema.ValidatorTypes)
             {
-                var validator = (IArgumentValidator) _typeActivator.CreateInstance(validatorType);
+                var validator = (IBindingValidator) _typeActivator.CreateInstance(validatorType);
                 validator.Validate(convertedValue);
             }
 

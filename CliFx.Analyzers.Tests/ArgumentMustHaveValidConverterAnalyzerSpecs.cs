@@ -9,7 +9,7 @@ namespace CliFx.Analyzers.Tests
         private static DiagnosticAnalyzer Analyzer { get; } = new ArgumentMustHaveValidConverterAnalyzer();
 
         [Fact]
-        public void Analyzer_reports_an_error_if_the_specified_parameter_converter_does_not_derive_from_ArgumentConverter()
+        public void Analyzer_reports_an_error_if_the_specified_parameter_converter_does_not_derive_from_BindingConverter()
         {
             // Arrange
             // language=cs
@@ -33,12 +33,12 @@ public class MyCommand : ICommand
         }
 
         [Fact]
-        public void Analyzer_does_not_report_an_error_if_the_specified_parameter_converter_derives_from_ArgumentConverter()
+        public void Analyzer_does_not_report_an_error_if_the_specified_parameter_converter_derives_from_BindingConverter()
         {
             // Arrange
             // language=cs
             const string code = @"
-public class MyConverter : ArgumentConverter<string>
+public class MyConverter : BindingConverter<string>
 {
     public override string Convert(string rawValue) => rawValue;
 }
@@ -76,7 +76,7 @@ public class MyCommand : ICommand
         }
 
         [Fact]
-        public void Analyzer_reports_an_error_if_the_specified_option_converter_does_not_derive_from_ArgumentConverter()
+        public void Analyzer_reports_an_error_if_the_specified_option_converter_does_not_derive_from_BindingConverter()
         {
             // Arrange
             // language=cs
@@ -100,12 +100,12 @@ public class MyCommand : ICommand
         }
 
         [Fact]
-        public void Analyzer_does_not_report_an_error_if_the_specified_option_converter_derives_from_ArgumentConverter()
+        public void Analyzer_does_not_report_an_error_if_the_specified_option_converter_derives_from_BindingConverter()
         {
             // Arrange
             // language=cs
             const string code = @"
-public class MyConverter : ArgumentConverter<string>
+public class MyConverter : BindingConverter<string>
 {
     public override string Convert(string rawValue) => rawValue;
 }

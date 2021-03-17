@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Threading;
 using CliFx.Utils;
 
@@ -13,7 +12,7 @@ namespace CliFx.Infrastructure
         /// <summary>
         /// Input stream (stdin).
         /// </summary>
-        StreamReader Input { get; }
+        ConsoleReader Input { get; }
 
         /// <summary>
         /// Whether the input stream is redirected.
@@ -23,7 +22,7 @@ namespace CliFx.Infrastructure
         /// <summary>
         /// Output stream (stdout).
         /// </summary>
-        StreamWriter Output { get; }
+        ConsoleWriter Output { get; }
 
         /// <summary>
         /// Whether the output stream is redirected.
@@ -33,7 +32,7 @@ namespace CliFx.Infrastructure
         /// <summary>
         /// Error stream (stderr).
         /// </summary>
-        StreamWriter Error { get; }
+        ConsoleWriter Error { get; }
 
         /// <summary>
         /// Whether the error stream is redirected.
