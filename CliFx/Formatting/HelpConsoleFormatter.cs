@@ -19,6 +19,12 @@ namespace CliFx.Formatting
             _context = context;
         }
 
+        public void WriteHeader(string text)
+        {
+            Write(ConsoleColor.Magenta, text);
+            WriteLine();
+        }
+
         private void WriteApplicationInfo()
         {
             // Title and version
@@ -28,12 +34,12 @@ namespace CliFx.Formatting
             WriteLine();
 
             // Description
-            if (!string.IsNullOrWhiteSpace(_context.ApplicationMetadata.Description))
-            {
-                WriteHorizontalMargin();
-                Write(_context.ApplicationMetadata.Description);
-                WriteLine();
-            }
+            if (string.IsNullOrWhiteSpace(_context.ApplicationMetadata.Description))
+                return;
+
+            WriteHorizontalMargin();
+            Write(_context.ApplicationMetadata.Description);
+            WriteLine();
         }
 
         private void WriteCommandDescription()

@@ -128,7 +128,7 @@ In order to be a valid command type, it must:
 - Be annotated with {typeof(CommandAttribute).FullName}
 - Not be an abstract class
 
-If you're experiencing problems, please refer to the readme for the quickstart example.".Trim()
+If you're experiencing problems, please refer to the readme for the quickstart example."
                 );
             }
 

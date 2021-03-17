@@ -65,11 +65,5 @@ namespace CliFx.Formatting
             else
                 WriteHorizontalMargin(offsetSize);
         }
-
-        public void WriteHeader(string text)
-        {
-            Write(ConsoleColor.Magenta, text);
-            WriteLine();
-        }
     }
 }

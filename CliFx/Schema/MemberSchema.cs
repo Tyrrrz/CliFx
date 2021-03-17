@@ -51,5 +51,7 @@ namespace CliFx.Schema
 
             return Array.Empty<object?>();
         }
+
+        public abstract string GetUserFacingDisplayString();
     }
 }

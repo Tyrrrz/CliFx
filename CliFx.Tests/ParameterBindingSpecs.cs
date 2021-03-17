@@ -153,7 +153,7 @@ public class Command : ICommand
 
             // Assert
             exitCode.Should().NotBe(0);
-            stdErr.Should().Contain("Missing value for parameter");
+            stdErr.Should().Contain("Missing values for one or more parameters");
         }
 
         [Fact]
@@ -190,7 +190,7 @@ public class Command : ICommand
 
             // Assert
             exitCode.Should().NotBe(0);
-            stdErr.Should().Contain("Missing value for parameter");
+            stdErr.Should().Contain("Missing values for one or more parameters");
         }
 
         [Fact]
@@ -227,7 +227,7 @@ public class Command : ICommand
 
             // Assert
             exitCode.Should().NotBe(0);
-            stdErr.Should().Contain("Unrecognized parameters provided");
+            stdErr.Should().Contain("Unexpected parameters provided");
         }
     }
 }

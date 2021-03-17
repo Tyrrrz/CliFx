@@ -25,7 +25,7 @@ namespace CliFx.Schema
             Name = name;
         }
 
-        public string GetUserFacingDisplayString()
+        public override string GetUserFacingDisplayString()
         {
             var buffer = new StringBuilder();
 

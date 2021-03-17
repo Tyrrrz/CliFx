@@ -102,7 +102,10 @@ namespace CliFx
                 return parseMethod.Invoke(null, new object?[] {rawValue});
             }
 
-            throw CliFxException.CannotConvertToType(memberSchema, rawValue, targetType);
+            // TODO: not GetUserFacingDisplayString
+            throw CliFxException.InternalError($@"
+{(memberSchema is ParameterSchema ? "Parameter" : "Option")} {memberSchema.GetUserFacingDisplayString()} has an unsupported type."
+            );
         }
 
         private object? ConvertMultiple(
@@ -130,7 +133,11 @@ namespace CliFx
                 return arrayConstructor.Invoke(new object?[] {array});
             }
 
-            throw CliFxException.CannotConvertNonScalar(memberSchema, rawValues, targetEnumerableType);
+            // TODO: not GetUserFacingDisplayString
+            throw CliFxException.InternalError($@"
+{(memberSchema is ParameterSchema ? "Parameter" : "Option")} {memberSchema.GetUserFacingDisplayString()} has an unsupported type.
+Non-scalar type must be assignable from an array or have a public constructor that accepts an array."
+            );
         }
 
         private object? ConvertMember(
@@ -152,7 +159,10 @@ namespace CliFx
             }
 
             // Mismatch (scalar but too many values)
-            throw CliFxException.CannotConvertMultipleValuesToNonScalar(memberSchema, rawValues);
+            throw CliFxException.UserError($@"
+{(memberSchema is ParameterSchema ? "Parameter" : "Option")} {memberSchema.GetUserFacingDisplayString()} expects a single value, but provided with multiple:
+{rawValues.Select(v => v.Quote()).JoinToString(" ")}"
+            );
         }
 
         private void BindMember(
@@ -224,11 +234,21 @@ namespace CliFx
             }
 
             if (remainingParameterInputs.Any())
-                throw CliFxException.UnrecognizedParametersProvided(remainingParameterInputs);
+            {
+                throw CliFxException.UserError($@"
+Unexpected parameters provided:
+{remainingParameterInputs.Select(p => p.Value).JoinToString(Environment.NewLine)}"
+                );
+            }
 
             // TODO: fix exception
             if (remainingParameterSchemas.Any())
-                throw CliFxException.ParameterNotSet(remainingParameterSchemas.First());
+            {
+                throw CliFxException.UserError($@"
+Missing values for one or more parameters:
+{remainingParameterSchemas.Select(o => o.GetUserFacingDisplayString()).JoinToString(Environment.NewLine)}"
+                );
+            }
         }
 
         private void BindOptions(
@@ -275,10 +295,20 @@ namespace CliFx
             }
 
             if (remainingOptionInputs.Any())
-                throw CliFxException.UnrecognizedOptionsProvided(remainingOptionInputs);
+            {
+                throw CliFxException.UserError($@"
+Unrecognized options provided:
+{remainingOptionInputs.Select(o => o.GetFormattedIdentifier()).JoinToString(Environment.NewLine)}"
+                );
+            }
 
             if (remainingRequiredOptionSchemas.Any())
-                throw CliFxException.RequiredOptionsNotSet(remainingRequiredOptionSchemas);
+            {
+                throw CliFxException.UserError($@"
+Missing values for one or more required options:
+{remainingRequiredOptionSchemas.Select(o => o.GetUserFacingDisplayString()).JoinToString(Environment.NewLine)}"
+                );
+            }
         }
 
         public void Bind(

@@ -51,7 +51,7 @@ namespace CliFx.Schema
             string.Equals(EnvironmentVariable, environmentVariableName, StringComparison.Ordinal);
 
         // TODO: move?
-        public string GetUserFacingDisplayString()
+        public override string GetUserFacingDisplayString()
         {
             var buffer = new StringBuilder();
 
