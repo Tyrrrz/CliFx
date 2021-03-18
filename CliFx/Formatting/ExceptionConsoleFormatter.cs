@@ -8,12 +8,9 @@ namespace CliFx.Formatting
 {
     internal class ExceptionConsoleFormatter : ConsoleFormatter
     {
-        private readonly Exception _exception;
-
-        public ExceptionConsoleFormatter(ConsoleWriter consoleWriter, Exception exception)
+        public ExceptionConsoleFormatter(ConsoleWriter consoleWriter)
             : base(consoleWriter)
         {
-            _exception = exception;
         }
 
         private void WriteStackFrame(StackFrame stackFrame, int indentLevel)
@@ -108,12 +105,12 @@ namespace CliFx.Formatting
             }
         }
 
-        public void WriteException()
+        public void WriteException(Exception exception)
         {
             // Domain exceptions should be printed with minimal information
             // because they are meant for the user of the application,
             // not the user of the library.
-            if (_exception is CliFxException cliFxException &&
+            if (exception is CliFxException cliFxException &&
                 !string.IsNullOrWhiteSpace(cliFxException.ActualMessage))
             {
                 Write(ConsoleColor.Red, cliFxException.ActualMessage);
@@ -124,7 +121,7 @@ namespace CliFx.Formatting
             {
                 Write(ConsoleColor.White, ConsoleColor.DarkRed, "ERROR");
                 WriteLine();
-                WriteException(_exception, 0);
+                WriteException(exception, 0);
             }
         }
     }
@@ -132,6 +129,6 @@ namespace CliFx.Formatting
     internal static class ExceptionConsoleFormatterExtensions
     {
         public static void WriteException(this IConsole console, Exception exception) =>
-            new ExceptionConsoleFormatter(console.Error, exception).WriteException();
+            new ExceptionConsoleFormatter(console.Error).WriteException(exception);
     }
 }

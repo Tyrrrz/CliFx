@@ -7,25 +7,22 @@ namespace CliFx.Formatting
 {
     internal class CommandInputConsoleFormatter : ConsoleFormatter
     {
-        private readonly CommandInput _commandInput;
-
-        public CommandInputConsoleFormatter(ConsoleWriter consoleWriter, CommandInput commandInput)
+        public CommandInputConsoleFormatter(ConsoleWriter consoleWriter)
             : base(consoleWriter)
         {
-            _commandInput = commandInput;
         }
 
-        public void WriteCommandInput()
+        public void WriteCommandInput(CommandInput commandInput)
         {
             // Command name
-            if (!string.IsNullOrWhiteSpace(_commandInput.CommandName))
+            if (!string.IsNullOrWhiteSpace(commandInput.CommandName))
             {
-                Write(ConsoleColor.Cyan, _commandInput.CommandName);
+                Write(ConsoleColor.Cyan, commandInput.CommandName);
                 Write(' ');
             }
 
             // Parameters
-            foreach (var parameter in _commandInput.Parameters)
+            foreach (var parameter in commandInput.Parameters)
             {
                 Write('<');
                 Write(ConsoleColor.White, parameter.Value);
@@ -34,7 +31,7 @@ namespace CliFx.Formatting
             }
 
             // Options
-            foreach (var option in _commandInput.Options)
+            foreach (var option in commandInput.Options)
             {
                 Write('[');
 
@@ -59,6 +56,6 @@ namespace CliFx.Formatting
     internal static class CommandInputConsoleFormatterExtensions
     {
         public static void WriteCommandInput(this IConsole console, CommandInput commandInput) =>
-            new CommandInputConsoleFormatter(console.Output, commandInput).WriteCommandInput();
+            new CommandInputConsoleFormatter(console.Output).WriteCommandInput(commandInput);
     }
 }
