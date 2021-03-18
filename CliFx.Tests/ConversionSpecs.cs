@@ -26,7 +26,7 @@ namespace CliFx.Tests
 public class Command : ICommand
 {
     [CommandOption('f')]
-    public string? Foo { get; set; }
+    public string Foo { get; set; }
 
     public ValueTask ExecuteAsync(IConsole console)
     {
@@ -64,7 +64,7 @@ public class Command : ICommand
 public class Command : ICommand
 {
     [CommandOption('f')]
-    public object? Foo { get; set; }
+    public object Foo { get; set; }
 
     public ValueTask ExecuteAsync(IConsole console)
     {
@@ -867,13 +867,12 @@ public class Command : ICommand
                 @"
 public class ValidatorA : BindingValidator<int>
 {
-    public override void Validate(int value) {}
+    public override BindingValidationError Validate(int value) => Ok();
 }
 
 public class ValidatorB : BindingValidator<int>
 {
-    public override void Validate(int value) =>
-        throw new CommandException(""Hello world"");
+    public override BindingValidationError Validate(int value) => Error(""Hello world"");
 }
 
 [Command]

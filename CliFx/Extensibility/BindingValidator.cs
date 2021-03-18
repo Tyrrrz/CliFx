@@ -5,7 +5,7 @@ namespace CliFx.Extensibility
     // Used internally to simplify usage from reflection
     internal interface IBindingValidator
     {
-        void Validate(object? value);
+        BindingValidationError? Validate(object? value);
     }
 
     /// <summary>
@@ -14,13 +14,24 @@ namespace CliFx.Extensibility
     public abstract class BindingValidator<T> : IBindingValidator
     {
         /// <summary>
+        /// Returns a successful validation result.
+        /// </summary>
+        protected BindingValidationError? Ok() => null;
+
+        /// <summary>
+        /// Returns a non-successful validation result.
+        /// </summary>
+        protected BindingValidationError Error(string message) => new(message);
+
+        /// <summary>
         /// Validates the value bound to a parameter or an option.
         /// </summary>
         /// <remarks>
-        /// Throw <see cref="CommandException"/> to signal validation failure.
+        /// You can use helper methods <see cref="Ok"/> and <see cref="Error"/> to
+        /// express the validation result.
         /// </remarks>
-        public abstract void Validate(T value);
+        public abstract BindingValidationError? Validate(T value);
 
-        void IBindingValidator.Validate(object? value) => Validate((T) value!);
+        BindingValidationError? IBindingValidator.Validate(object? value) => Validate((T) value!);
     }
 }

@@ -30,7 +30,7 @@ namespace CliFx.Tests
 public class Command : ICommand
 {
     [CommandOption(""foo"", EnvironmentVariable = ""ENV_FOO"")]
-    public string? Foo { get; set; }
+    public string Foo { get; set; }
     
     public ValueTask ExecuteAsync(IConsole console)
     {
@@ -72,7 +72,7 @@ public class Command : ICommand
 public class Command : ICommand
 {
     [CommandOption(""foo"", EnvironmentVariable = ""ENV_FOO"")]
-    public string? Foo { get; set; }
+    public string Foo { get; set; }
     
     public ValueTask ExecuteAsync(IConsole console)
     {
@@ -114,7 +114,7 @@ public class Command : ICommand
 public class Command : ICommand
 {
     [CommandOption(""foo"", EnvironmentVariable = ""ENV_FOO"")]
-    public IReadOnlyList<string>? Foo { get; set; }
+    public IReadOnlyList<string> Foo { get; set; }
     
     public ValueTask ExecuteAsync(IConsole console)
     {
@@ -161,7 +161,7 @@ public class Command : ICommand
 public class Command : ICommand
 {
     [CommandOption(""foo"", EnvironmentVariable = ""ENV_FOO"")]
-    public string? Foo { get; set; }
+    public string Foo { get; set; }
     
     public ValueTask ExecuteAsync(IConsole console)
     {
@@ -203,7 +203,7 @@ public class Command : ICommand
 public class Command : ICommand
 {
     [CommandOption(""foo"", EnvironmentVariable = ""ENV_FOO"")]
-    public string? Foo { get; set; }
+    public string Foo { get; set; }
     
     public ValueTask ExecuteAsync(IConsole console)
     {

@@ -26,10 +26,10 @@ namespace CliFx.Tests
 public class Command : ICommand
 {
     [CommandParameter(0)]
-    public string? Foo { get; set; }
+    public string Foo { get; set; }
     
     [CommandParameter(1)]
-    public string? Bar { get; set; }
+    public string Bar { get; set; }
 
     public ValueTask ExecuteAsync(IConsole console)
     {
@@ -72,16 +72,16 @@ public class Command : ICommand
 public class Command : ICommand
 {
     [CommandParameter(0)]
-    public string? Foo { get; set; }
+    public string Foo { get; set; }
     
     [CommandParameter(1)]
-    public string? Bar { get; set; }
+    public string Bar { get; set; }
     
     [CommandParameter(2)]
-    public IReadOnlyList<string>? Baz { get; set; }
+    public IReadOnlyList<string> Baz { get; set; }
     
     [CommandOption(""boo"")]
-    public string? Boo { get; set; }
+    public string Boo { get; set; }
 
     public ValueTask ExecuteAsync(IConsole console)
     {
@@ -130,10 +130,10 @@ public class Command : ICommand
 public class Command : ICommand
 {
     [CommandParameter(0)]
-    public string? Foo { get; set; }
+    public string Foo { get; set; }
     
     [CommandParameter(1)]
-    public string? Bar { get; set; }
+    public string Bar { get; set; }
 
     public ValueTask ExecuteAsync(IConsole console) => default;
 }");
@@ -167,10 +167,10 @@ public class Command : ICommand
 public class Command : ICommand
 {
     [CommandParameter(0)]
-    public string? Foo { get; set; }
+    public string Foo { get; set; }
     
     [CommandParameter(1)]
-    public IReadOnlyList<string>? Bar { get; set; }
+    public IReadOnlyList<string> Bar { get; set; }
     
     public ValueTask ExecuteAsync(IConsole console) => default;
 }");
@@ -204,10 +204,10 @@ public class Command : ICommand
 public class Command : ICommand
 {
     [CommandParameter(0)]
-    public string? Foo { get; set; }
+    public string Foo { get; set; }
     
     [CommandParameter(1)]
-    public string? Bar { get; set; }
+    public string Bar { get; set; }
 
     public ValueTask ExecuteAsync(IConsole console) => default;
 }");

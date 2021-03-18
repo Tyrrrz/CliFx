@@ -159,7 +159,7 @@ namespace CliFx
                     return ConvertSingle(memberSchema, rawValues.SingleOrDefault(), targetType);
                 }
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not CliFxException)
             {
                 throw CliFxException.UserError(
                     $"{memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} cannot be bound from provided value(s):" +
@@ -179,6 +179,31 @@ namespace CliFx
             );
         }
 
+        private void ValidateMember(
+            IMemberSchema memberSchema,
+            object? convertedValue)
+        {
+            var errors = new List<BindingValidationError>();
+
+            foreach (var validatorType in memberSchema.ValidatorTypes)
+            {
+                var validator = (IBindingValidator) _typeActivator.CreateInstance(validatorType);
+                var error = validator.Validate(convertedValue);
+
+                if (error is not null)
+                    errors.Add(error);
+            }
+
+            if (errors.Any())
+            {
+                throw CliFxException.UserError(
+                    $"{memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} cannot be bound from provided value(s):" +
+                    Environment.NewLine +
+                    errors.Select(e => "- " + e.Message).JoinToString(Environment.NewLine)
+                );
+            }
+        }
+
         private void BindMember(
             IMemberSchema memberSchema,
             ICommand commandInstance,
@@ -186,15 +211,8 @@ namespace CliFx
         {
             var targetType = memberSchema.Property.Type;
 
-            // Convert
             var convertedValue = ConvertMember(memberSchema, targetType, rawValues);
-
-            // Validate
-            foreach (var validatorType in memberSchema.ValidatorTypes)
-            {
-                var validator = (IBindingValidator) _typeActivator.CreateInstance(validatorType);
-                validator.Validate(convertedValue);
-            }
+            ValidateMember(memberSchema, convertedValue);
 
             memberSchema.Property.SetValue(commandInstance, convertedValue);
         }
