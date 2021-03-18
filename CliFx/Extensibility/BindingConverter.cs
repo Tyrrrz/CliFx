@@ -6,6 +6,7 @@
         public object? Convert(string? rawValue);
     }
 
+    // TODO: how do we handle non-scalars?
     /// <summary>
     /// Base type for custom converters.
     /// </summary>

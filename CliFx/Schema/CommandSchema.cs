@@ -14,13 +14,13 @@ namespace CliFx.Schema
 
         public string? Name { get; }
 
-        public bool IsDefault => string.IsNullOrWhiteSpace(Name);
-
         public string? Description { get; }
 
         public IReadOnlyList<ParameterSchema> Parameters { get; }
 
         public IReadOnlyList<OptionSchema> Options { get; }
+
+        public bool IsDefault => string.IsNullOrWhiteSpace(Name);
 
         public bool IsHelpOptionAvailable => Options.Contains(OptionSchema.HelpOption);
 
@@ -45,26 +45,18 @@ namespace CliFx.Schema
                 ? string.Equals(name, Name, StringComparison.OrdinalIgnoreCase)
                 : string.IsNullOrWhiteSpace(name);
 
-        public IReadOnlyDictionary<MemberSchema, object?> GetValues(ICommand instance)
+        public IReadOnlyDictionary<IMemberSchema, object?> GetValues(ICommand instance)
         {
-            var result = new Dictionary<MemberSchema, object?>();
+            var result = new Dictionary<IMemberSchema, object?>();
 
             foreach (var parameterSchema in Parameters)
             {
-                // Skip implicit parameters
-                if (parameterSchema.Property is null)
-                    continue;
-
                 var value = parameterSchema.Property.GetValue(instance);
                 result[parameterSchema] = value;
             }
 
             foreach (var optionSchema in Options)
             {
-                // Skip implicit parameters
-                if (optionSchema.Property is null)
-                    continue;
-
                 var value = optionSchema.Property.GetValue(instance);
                 result[optionSchema] = value;
             }
@@ -90,27 +82,27 @@ namespace CliFx.Schema
 
             var name = attribute?.Name;
 
-            var implicitOptions = string.IsNullOrWhiteSpace(name)
+            var implicitOptionSchemas = string.IsNullOrWhiteSpace(name)
                 ? new[] {OptionSchema.HelpOption, OptionSchema.VersionOption}
                 : new[] {OptionSchema.HelpOption};
 
-            var parameters = type.GetProperties()
+            var parameterSchemas = type.GetProperties()
                 .Select(ParameterSchema.TryResolve)
                 .Where(p => p is not null)
                 .ToArray();
 
-            var options = type.GetProperties()
+            var optionSchemas = type.GetProperties()
                 .Select(OptionSchema.TryResolve)
                 .Where(o => o is not null)
-                .Concat(implicitOptions)
+                .Concat(implicitOptionSchemas)
                 .ToArray();
 
             return new CommandSchema(
                 type,
                 name,
                 attribute?.Description,
-                parameters!,
-                options!
+                parameterSchemas!,
+                optionSchemas!
             );
         }
 
@@ -124,11 +116,11 @@ namespace CliFx.Schema
 Command `{type.FullName}` is not a valid command type.
 
 In order to be a valid command type, it must:
-- Implement {typeof(ICommand).FullName}
-- Be annotated with {typeof(CommandAttribute).FullName}
+- Implement `{typeof(ICommand).FullName}`
+- Be annotated with `{typeof(CommandAttribute).FullName}`
 - Not be an abstract class
 
-If you're experiencing problems, please refer to the readme for the quickstart example."
+If you're experiencing problems, please refer to the readme for examples."
                 );
             }
 

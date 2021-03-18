@@ -11,13 +11,13 @@ namespace CliFx.Formatting
 
         public CommandSchema CommandSchema { get; }
 
-        public IReadOnlyDictionary<MemberSchema, object?> CommandDefaultValues { get; }
+        public IReadOnlyDictionary<IMemberSchema, object?> CommandDefaultValues { get; }
 
         public HelpContext(
             ApplicationMetadata applicationMetadata,
             ApplicationSchema applicationSchema,
             CommandSchema commandSchema,
-            IReadOnlyDictionary<MemberSchema, object?> commandDefaultValues)
+            IReadOnlyDictionary<IMemberSchema, object?> commandDefaultValues)
         {
             ApplicationMetadata = applicationMetadata;
             ApplicationSchema = applicationSchema;

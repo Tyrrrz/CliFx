@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using CliFx.Utils.Extensions;
 
 namespace CliFx.Input
@@ -42,23 +43,23 @@ namespace CliFx.Input
 
     internal partial class CommandInput
     {
-        // TODO: cleanup below
-
         private static IReadOnlyList<DirectiveInput> ParseDirectives(
             IReadOnlyList<string> commandLineArguments,
             ref int index)
         {
             var result = new List<DirectiveInput>();
 
+            // Consume all consecutive directive arguments
             for (; index < commandLineArguments.Count; index++)
             {
                 var argument = commandLineArguments[index];
 
+                // Break on the first non-directive argument
                 if (!argument.StartsWith('[') || !argument.EndsWith(']'))
                     break;
 
-                var name = argument.Substring(1, argument.Length - 2);
-                result.Add(new DirectiveInput(name));
+                var directiveName = argument.Substring(1, argument.Length - 2);
+                result.Add(new DirectiveInput(directiveName));
             }
 
             return result;
@@ -69,27 +70,30 @@ namespace CliFx.Input
             ISet<string> commandNames,
             ref int index)
         {
-            var buffer = new List<string>();
-
+            var potentialCommandNameComponents = new List<string>();
             var commandName = default(string?);
+
             var lastIndex = index;
 
-            // We need to look ahead to see if we can match as many consecutive arguments to a command name as possible
+            // Append arguments to a buffer until we find the longest sequence
+            // that represents a valid command name.
             for (var i = index; i < commandLineArguments.Count; i++)
             {
                 var argument = commandLineArguments[i];
-                buffer.Add(argument);
 
-                var potentialCommandName = buffer.JoinToString(" ");
+                potentialCommandNameComponents.Add(argument);
 
+                var potentialCommandName = potentialCommandNameComponents.JoinToString(" ");
                 if (commandNames.Contains(potentialCommandName))
                 {
+                    // Record the position but continue the loop in case
+                    // we find a longer (more specific) match.
                     commandName = potentialCommandName;
                     lastIndex = i;
                 }
             }
 
-            // Update the index only if command name was found in the arguments
+            // Move the index to the position where the command name ended
             if (!string.IsNullOrWhiteSpace(commandName))
                 index = lastIndex + 1;
 
@@ -102,22 +106,23 @@ namespace CliFx.Input
         {
             var result = new List<ParameterInput>();
 
+            // Consume all arguments until first option identifier
             for (; index < commandLineArguments.Count; index++)
             {
                 var argument = commandLineArguments[index];
 
-                var isOptionName =
-                    argument.StartsWith("--", StringComparison.OrdinalIgnoreCase) &&
+                var isOptionIdentifier =
+                    // Name
+                    argument.StartsWith("--", StringComparison.Ordinal) &&
                     argument.Length > 2 &&
-                    char.IsLetter(argument[2]);
-
-                var isOptionShortName =
+                    char.IsLetter(argument[2]) ||
+                    // Short name
                     argument.StartsWith('-') &&
                     argument.Length > 1 &&
                     char.IsLetter(argument[1]);
 
-                // Break on the first encountered option
-                if (isOptionName || isOptionShortName)
+                // Break on first option identifier
+                if (isOptionIdentifier)
                     break;
 
                 result.Add(new ParameterInput(argument));
@@ -132,9 +137,10 @@ namespace CliFx.Input
         {
             var result = new List<OptionInput>();
 
-            var currentOptionIdentifier = default(string?);
-            var currentOptionValues = new List<string>();
+            var lastOptionIdentifier = default(string?);
+            var lastOptionValues = new List<string>();
 
+            // Consume and group all remaining arguments into options
             for (; index < commandLineArguments.Count; index++)
             {
                 var argument = commandLineArguments[index];
@@ -145,11 +151,11 @@ namespace CliFx.Input
                     char.IsLetter(argument[2]))
                 {
                     // Flush previous
-                    if (!string.IsNullOrWhiteSpace(currentOptionIdentifier))
-                        result.Add(new OptionInput(currentOptionIdentifier, currentOptionValues));
+                    if (!string.IsNullOrWhiteSpace(lastOptionIdentifier))
+                        result.Add(new OptionInput(lastOptionIdentifier, lastOptionValues));
 
-                    currentOptionIdentifier = argument.Substring(2);
-                    currentOptionValues = new List<string>();
+                    lastOptionIdentifier = argument.Substring(2);
+                    lastOptionValues = new List<string>();
                 }
                 // Short name
                 else if (argument.StartsWith('-') &&
@@ -159,23 +165,23 @@ namespace CliFx.Input
                     foreach (var alias in argument.Substring(1))
                     {
                         // Flush previous
-                        if (!string.IsNullOrWhiteSpace(currentOptionIdentifier))
-                            result.Add(new OptionInput(currentOptionIdentifier, currentOptionValues));
+                        if (!string.IsNullOrWhiteSpace(lastOptionIdentifier))
+                            result.Add(new OptionInput(lastOptionIdentifier, lastOptionValues));
 
-                        currentOptionIdentifier = alias.AsString();
-                        currentOptionValues = new List<string>();
+                        lastOptionIdentifier = alias.AsString();
+                        lastOptionValues = new List<string>();
                     }
                 }
                 // Value
-                else if (!string.IsNullOrWhiteSpace(currentOptionIdentifier))
+                else if (!string.IsNullOrWhiteSpace(lastOptionIdentifier))
                 {
-                    currentOptionValues.Add(argument);
+                    lastOptionValues.Add(argument);
                 }
             }
 
             // Flush last option
-            if (!string.IsNullOrWhiteSpace(currentOptionIdentifier))
-                result.Add(new OptionInput(currentOptionIdentifier, currentOptionValues));
+            if (!string.IsNullOrWhiteSpace(lastOptionIdentifier))
+                result.Add(new OptionInput(lastOptionIdentifier, lastOptionValues));
 
             return result;
         }
@@ -185,8 +191,6 @@ namespace CliFx.Input
             IReadOnlyDictionary<string, string> environmentVariables,
             IReadOnlyList<string> availableCommandNames)
         {
-            var availableCommandNamesSet = availableCommandNames.ToHashSet(StringComparer.OrdinalIgnoreCase);
-
             var index = 0;
 
             var parsedDirectives = ParseDirectives(
@@ -196,7 +200,7 @@ namespace CliFx.Input
 
             var parsedCommandName = ParseCommandName(
                 commandLineArguments,
-                availableCommandNamesSet,
+                availableCommandNames.ToHashSet(StringComparer.OrdinalIgnoreCase),
                 ref index
             );
 

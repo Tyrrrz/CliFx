@@ -855,7 +855,7 @@ public class Command : ICommand
 
             // Assert
             exitCode.Should().NotBe(0);
-            stdErr.Should().Contain("Can't convert value");
+            stdErr.Should().Contain("unsupported type");
         }
 
         [Fact]

@@ -96,12 +96,12 @@ namespace CliFx.Formatting
 
             // Non-thrown exceptions (e.g. inner exceptions) have no stacktrace
             if (!string.IsNullOrWhiteSpace(exception.StackTrace))
-                return;
-
-            // Parse and pretty-print the stacktrace
-            foreach (var stackFrame in StackFrame.ParseMany(exception.StackTrace))
             {
-                WriteStackFrame(stackFrame, indentLevel);
+                // Parse and pretty-print the stacktrace
+                foreach (var stackFrame in StackFrame.ParseMany(exception.StackTrace))
+                {
+                    WriteStackFrame(stackFrame, indentLevel);
+                }
             }
         }
 
@@ -114,6 +114,7 @@ namespace CliFx.Formatting
                 !string.IsNullOrWhiteSpace(cliFxException.ActualMessage))
             {
                 Write(ConsoleColor.Red, cliFxException.ActualMessage);
+                WriteLine();
             }
             // All other exceptions most likely indicate an actual bug
             // and should include stacktrace and other detailed information.

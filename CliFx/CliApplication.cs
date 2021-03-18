@@ -154,6 +154,7 @@ namespace CliFx
 
                 if (ex.ShowHelp)
                 {
+                    _console.Output.WriteLine();
                     _console.WriteHelpText(helpContext);
                 }
 

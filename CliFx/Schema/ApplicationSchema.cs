@@ -26,17 +26,36 @@ namespace CliFx.Schema
             Commands.FirstOrDefault(c => c.MatchesName(commandName));
 
         private IReadOnlyList<CommandSchema> GetDescendantCommands(
-            IReadOnlyList<CommandSchema> potentialParentCommands,
-            string? parentCommandName) =>
-            potentialParentCommands
-                // Default commands can't be children of anything
-                .Where(c => !string.IsNullOrWhiteSpace(c.Name))
-                // Command can't be its own child
-                .Where(c => !c.MatchesName(parentCommandName))
-                .Where(c =>
+            IReadOnlyList<CommandSchema> potentialParentCommandSchemas,
+            string? parentCommandName)
+        {
+            var result = new List<CommandSchema>();
+
+            foreach (var potentialParentCommandSchema in potentialParentCommandSchemas)
+            {
+                // Default commands can't be descendant of anything
+                if (string.IsNullOrWhiteSpace(potentialParentCommandSchema.Name))
+                    continue;
+
+                // Command can't be its own descendant
+                if (potentialParentCommandSchema.MatchesName(parentCommandName))
+                    continue;
+
+                var isDescendant =
+                    // Every command is a descendant of the default command
                     string.IsNullOrWhiteSpace(parentCommandName) ||
-                    c.Name!.StartsWith(parentCommandName + ' ', StringComparison.OrdinalIgnoreCase))
-                .ToArray();
+                    // Otherwise a command is a descendant if it starts with the same name segments
+                    potentialParentCommandSchema.Name.StartsWith(
+                        parentCommandName + ' ',
+                        StringComparison.OrdinalIgnoreCase
+                    );
+
+                if (isDescendant)
+                    result.Add(potentialParentCommandSchema);
+            }
+
+            return result;
+        }
 
         public IReadOnlyList<CommandSchema> GetDescendantCommands(string? parentCommandName) =>
             GetDescendantCommands(Commands, parentCommandName);
@@ -44,14 +63,14 @@ namespace CliFx.Schema
         public IReadOnlyList<CommandSchema> GetChildCommands(string? parentCommandName)
         {
             var descendants = GetDescendantCommands(parentCommandName);
-
-            // Filter out descendants of descendants, leave only children
             var result = new List<CommandSchema>(descendants);
 
+            // Filter out descendants of descendants, leave only children
             foreach (var descendant in descendants)
             {
-                var descendantDescendants = GetDescendantCommands(descendants, descendant.Name);
-                result.RemoveRange(descendantDescendants);
+                result.RemoveRange(
+                    GetDescendantCommands(descendants, descendant.Name)
+                );
             }
 
             return result;

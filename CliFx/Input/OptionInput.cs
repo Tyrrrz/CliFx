@@ -10,10 +10,10 @@ namespace CliFx.Input
         public IReadOnlyList<string> Values { get; }
 
         public bool IsHelpOption =>
-            OptionSchema.HelpOption.MatchesNameOrShortName(Identifier);
+            OptionSchema.HelpOption.MatchesIdentifier(Identifier);
 
         public bool IsVersionOption =>
-            OptionSchema.VersionOption.MatchesNameOrShortName(Identifier);
+            OptionSchema.VersionOption.MatchesIdentifier(Identifier);
 
         public OptionInput(string identifier, IReadOnlyList<string> values)
         {

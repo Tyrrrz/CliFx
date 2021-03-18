@@ -77,7 +77,7 @@ namespace CliFx.Formatting
             // Parameters
             foreach (var parameter in commandSchema.Parameters)
             {
-                Write(parameter.IsScalar
+                Write(parameter.Property.IsScalar()
                     ? $"<{parameter.Name}>"
                     : $"<{parameter.Name}...>"
                 );
@@ -93,7 +93,7 @@ namespace CliFx.Formatting
                 );
                 Write(' ');
 
-                Write(option.IsScalar
+                Write(option.Property.IsScalar()
                     ? "<value>"
                     : "<values...>"
                 );
@@ -108,7 +108,9 @@ namespace CliFx.Formatting
 
         private void WriteCommandUsage()
         {
-            var childCommandSchemas = _context.ApplicationSchema.GetChildCommands(_context.CommandSchema.Name);
+            var descendantCommandSchemas = _context
+                .ApplicationSchema
+                .GetDescendantCommands(_context.CommandSchema.Name);
 
             if (!IsEmpty)
                 WriteVerticalMargin();
@@ -121,14 +123,14 @@ namespace CliFx.Formatting
             Write(' ');
 
             // Current command usage
-            WriteCommandUsageLineItem(_context.CommandSchema, childCommandSchemas.Any());
+            WriteCommandUsageLineItem(_context.CommandSchema, descendantCommandSchemas.Any());
 
             // Sub commands usage
-            if (childCommandSchemas.Any())
+            if (descendantCommandSchemas.Any())
             {
                 WriteVerticalMargin();
 
-                foreach (var childCommand in childCommandSchemas)
+                foreach (var childCommand in descendantCommandSchemas)
                 {
                     WriteHorizontalMargin();
                     Write("... ");
@@ -162,7 +164,7 @@ namespace CliFx.Formatting
                 }
 
                 // Valid values
-                var validValues = parameter.GetValidValues();
+                var validValues = parameter.Property.GetValidValues();
                 if (validValues.Any())
                 {
                     Write($"Valid values: {FormatValidValues(validValues)}.");
@@ -218,7 +220,7 @@ namespace CliFx.Formatting
                 }
 
                 // Valid values
-                var validValues = option.GetValidValues();
+                var validValues = option.Property.GetValidValues();
                 if (validValues.Any())
                 {
                     Write($"Valid values: {FormatValidValues(validValues)}.");
@@ -249,7 +251,9 @@ namespace CliFx.Formatting
 
         private void WriteCommandChildren()
         {
-            var childCommandSchemas = _context.ApplicationSchema.GetChildCommands(_context.CommandSchema.Name);
+            var childCommandSchemas = _context
+                .ApplicationSchema
+                .GetChildCommands(_context.CommandSchema.Name);
 
             if (!childCommandSchemas.Any())
                 return;

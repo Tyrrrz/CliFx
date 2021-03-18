@@ -1,41 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 using CliFx.Attributes;
 
 namespace CliFx.Schema
 {
-    internal partial class ParameterSchema : MemberSchema
+    internal partial class ParameterSchema : IMemberSchema
     {
+        public IPropertyDescriptor Property { get; }
+
         public int Order { get; }
 
         public string Name { get; }
 
+        public string? Description { get; }
+
+        public Type? ConverterType { get; }
+
+        public IReadOnlyList<Type> ValidatorTypes { get; }
+
         public ParameterSchema(
-            PropertyInfo? property,
+            IPropertyDescriptor property,
             int order,
             string name,
             string? description,
             Type? converterType,
             IReadOnlyList<Type> validatorTypes)
-            : base(property, description, converterType, validatorTypes)
         {
+            Property = property;
             Order = order;
             Name = name;
+            Description = description;
+            ConverterType = converterType;
+            ValidatorTypes = validatorTypes;
         }
 
-        public override string GetUserFacingDisplayString()
-        {
-            var buffer = new StringBuilder();
-
-            buffer
-                .Append('<')
-                .Append(Name)
-                .Append('>');
-
-            return buffer.ToString();
-        }
+        public string GetFormattedIdentifier() => '<' + Name + '>';
     }
 
     internal partial class ParameterSchema
@@ -49,7 +49,7 @@ namespace CliFx.Schema
             var name = attribute.Name ?? property.Name.ToLowerInvariant();
 
             return new ParameterSchema(
-                property,
+                new BindablePropertyDescriptor(property),
                 attribute.Order,
                 name,
                 attribute.Description,

@@ -1,4 +1,5 @@
 ﻿using System;
+using CliFx.Extensibility;
 
 namespace CliFx.Attributes
 {
@@ -6,10 +7,10 @@ namespace CliFx.Attributes
     /// Annotates a property that defines a command parameter.
     /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
-    public class CommandParameterAttribute : CommandMemberAttribute
+    public class CommandParameterAttribute : Attribute
     {
         /// <summary>
-        /// Parameter's order.
+        /// Parameter order.
         /// </summary>
         /// <remarks>
         /// Higher order means the parameter appears later, lower order means
@@ -23,13 +24,37 @@ namespace CliFx.Attributes
         public int Order { get; }
 
         /// <summary>
-        /// Parameter's name.
+        /// Parameter name.
         /// This is shown to the user in the help text.
         /// </summary>
         /// <remarks>
         /// If this isn't specified, parameter name is inferred from the property name.
         /// </remarks>
         public string? Name { get; set; }
+
+        /// <summary>
+        /// Parameter description.
+        /// This is shown to the user in the help text.
+        /// </summary>
+        public string? Description { get; set; }
+
+        /// <summary>
+        /// Custom converter used for mapping the raw command line argument into
+        /// a value expected by the underlying property.
+        /// </summary>
+        /// <remarks>
+        /// Converter must derive from <see cref="BindingConverter{T}"/>.
+        /// </remarks>
+        public Type? Converter { get; set; }
+
+        /// <summary>
+        /// Custom validators used for verifying the value of the underlying
+        /// property, after it has been bound.
+        /// </summary>
+        /// <remarks>
+        /// Validators must derive from <see cref="BindingValidator{T}"/>.
+        /// </remarks>
+        public Type[] Validators { get; set; } = Array.Empty<Type>();
 
         /// <summary>
         /// Initializes an instance of <see cref="CommandParameterAttribute"/>.

@@ -1,4 +1,5 @@
 ﻿using System;
+using CliFx.Extensibility;
 
 namespace CliFx.Attributes
 {
@@ -6,10 +7,10 @@ namespace CliFx.Attributes
     /// Annotates a property that defines a command option.
     /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
-    public class CommandOptionAttribute : CommandMemberAttribute
+    public class CommandOptionAttribute : Attribute
     {
         /// <summary>
-        /// Option's name.
+        /// Option name.
         /// </summary>
         /// <remarks>
         /// Must contain at least two characters and start with a letter.
@@ -19,7 +20,7 @@ namespace CliFx.Attributes
         public string? Name { get; }
 
         /// <summary>
-        /// Option's short name.
+        /// Option short name.
         /// </summary>
         /// <remarks>
         /// Either <see cref="Name"/> or <see cref="ShortName"/> must be set.
@@ -38,6 +39,30 @@ namespace CliFx.Attributes
         /// has not been explicitly set through command line arguments.
         /// </summary>
         public string? EnvironmentVariable { get; set; }
+
+        /// <summary>
+        /// Option description.
+        /// This is shown to the user in the help text.
+        /// </summary>
+        public string? Description { get; set; }
+
+        /// <summary>
+        /// Custom converter used for mapping the raw command line argument into
+        /// a value expected by the underlying property.
+        /// </summary>
+        /// <remarks>
+        /// Converter must derive from <see cref="BindingConverter{T}"/>.
+        /// </remarks>
+        public Type? Converter { get; set; }
+
+        /// <summary>
+        /// Custom validators used for verifying the value of the underlying
+        /// property, after it has been bound.
+        /// </summary>
+        /// <remarks>
+        /// Validators must derive from <see cref="BindingValidator{T}"/>.
+        /// </remarks>
+        public Type[] Validators { get; set; } = Array.Empty<Type>();
 
         /// <summary>
         /// Initializes an instance of <see cref="CommandOptionAttribute"/>.

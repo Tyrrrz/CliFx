@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Text;
 using CliFx.Attributes;
 
 namespace CliFx.Schema
 {
-    internal partial class OptionSchema : MemberSchema
+    internal partial class OptionSchema : IMemberSchema
     {
+        public IPropertyDescriptor Property { get; }
+
         public string? Name { get; }
 
         public char? ShortName { get; }
@@ -17,8 +18,14 @@ namespace CliFx.Schema
 
         public bool IsRequired { get; }
 
+        public string? Description { get; }
+
+        public Type? ConverterType { get; }
+
+        public IReadOnlyList<Type> ValidatorTypes { get; }
+
         public OptionSchema(
-            PropertyInfo? property,
+            IPropertyDescriptor property,
             string? name,
             char? shortName,
             string? environmentVariable,
@@ -26,12 +33,15 @@ namespace CliFx.Schema
             string? description,
             Type? converterType,
             IReadOnlyList<Type> validatorTypes)
-            : base(property, description, converterType, validatorTypes)
         {
+            Property = property;
             Name = name;
             ShortName = shortName;
             EnvironmentVariable = environmentVariable;
             IsRequired = isRequired;
+            Description = description;
+            ConverterType = converterType;
+            ValidatorTypes = validatorTypes;
         }
 
         public bool MatchesName(string? name) =>
@@ -42,36 +52,38 @@ namespace CliFx.Schema
             ShortName is not null &&
             ShortName == shortName;
 
-        public bool MatchesNameOrShortName(string identifier) =>
+        public bool MatchesIdentifier(string identifier) =>
             MatchesName(identifier) ||
-            identifier.Length == 1 && MatchesShortName(identifier.Single());
+            identifier.Length == 1 && MatchesShortName(identifier[0]);
 
         public bool MatchesEnvironmentVariable(string environmentVariableName) =>
             !string.IsNullOrWhiteSpace(EnvironmentVariable) &&
             string.Equals(EnvironmentVariable, environmentVariableName, StringComparison.Ordinal);
 
-        // TODO: move?
-        public override string GetUserFacingDisplayString()
+        public string GetFormattedIdentifier()
         {
             var buffer = new StringBuilder();
 
-            if (!string.IsNullOrWhiteSpace(Name))
-            {
-                buffer
-                    .Append("--")
-                    .Append(Name);
-            }
-
-            if (!string.IsNullOrWhiteSpace(Name) && ShortName is not null)
-            {
-                buffer.Append('|');
-            }
-
+            // Short name
             if (ShortName is not null)
             {
                 buffer
                     .Append('-')
                     .Append(ShortName);
+            }
+
+            // Separator
+            if (!string.IsNullOrWhiteSpace(Name) && ShortName is not null)
+            {
+                buffer.Append('|');
+            }
+
+            // Name
+            if (!string.IsNullOrWhiteSpace(Name))
+            {
+                buffer
+                    .Append("--")
+                    .Append(Name);
             }
 
             return buffer.ToString();
@@ -90,7 +102,7 @@ namespace CliFx.Schema
             var name = attribute.Name?.TrimStart('-');
 
             return new OptionSchema(
-                property,
+                new BindablePropertyDescriptor(property),
                 name,
                 attribute.ShortName,
                 attribute.EnvironmentVariable,
@@ -105,7 +117,7 @@ namespace CliFx.Schema
     internal partial class OptionSchema
     {
         public static OptionSchema HelpOption { get; } = new(
-            null,
+            NullPropertyDescriptor.Instance,
             "help",
             'h',
             null,
@@ -116,7 +128,7 @@ namespace CliFx.Schema
         );
 
         public static OptionSchema VersionOption { get; } = new(
-            null,
+            NullPropertyDescriptor.Instance,
             "version",
             null,
             null,

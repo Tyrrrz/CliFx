@@ -16,7 +16,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Preview_directive_can_be_specified_to_print_parsed_arguments()
+        public async Task Preview_directive_can_be_specified_to_print_command_input()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -38,7 +38,11 @@ public class Command : ICommand
             // Act
             var exitCode = await application.RunAsync(
                 new[] {"[preview]", "cmd", "param", "-abc", "--option", "foo"},
-                new Dictionary<string, string>()
+                new Dictionary<string, string>
+                {
+                    ["ENV_QOP"] = "hello",
+                    ["ENV_KIL"] = "world"
+                }
             );
 
             var stdOut = FakeConsole.ReadOutputString();
@@ -46,7 +50,9 @@ public class Command : ICommand
             // Assert
             exitCode.Should().Be(0);
             stdOut.Should().ContainAllInOrder(
-                "cmd", "<param>", "[-a]", "[-b]", "[-c]", "[--option \"foo\"]"
+                "cmd", "<param>", "[-a]", "[-b]", "[-c]", "[--option \"foo\"]",
+                "ENV_QOP", "=", "\"hello\"",
+                "ENV_KIL", "=", "\"world\""
             );
         }
     }

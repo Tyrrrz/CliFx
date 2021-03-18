@@ -33,6 +33,12 @@ namespace CliFx.Formatting
                 Write(value);
         }
 
+        public void Write(ConsoleColor foregroundColor, char value)
+        {
+            using (_consoleWriter.Console.WithForegroundColor(foregroundColor))
+                Write(value);
+        }
+
         public void Write(ConsoleColor foregroundColor, ConsoleColor backgroundColor, string value)
         {
             using (_consoleWriter.Console.WithColors(foregroundColor, backgroundColor))

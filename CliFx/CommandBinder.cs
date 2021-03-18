@@ -24,7 +24,7 @@ namespace CliFx
         }
 
         private object? ConvertSingle(
-            MemberSchema memberSchema,
+            IMemberSchema memberSchema,
             string? rawValue,
             Type targetType)
         {
@@ -104,12 +104,12 @@ namespace CliFx
 
             // TODO: not GetUserFacingDisplayString
             throw CliFxException.InternalError($@"
-{(memberSchema is ParameterSchema ? "Parameter" : "Option")} {memberSchema.GetUserFacingDisplayString()} has an unsupported type."
+{(memberSchema is ParameterSchema ? "Parameter" : "Option")} {memberSchema.GetFormattedIdentifier()} has an unsupported type."
             );
         }
 
         private object? ConvertMultiple(
-            MemberSchema memberSchema,
+            IMemberSchema memberSchema,
             IReadOnlyList<string> rawValues,
             Type targetEnumerableType,
             Type targetElementType)
@@ -135,45 +135,54 @@ namespace CliFx
 
             // TODO: not GetUserFacingDisplayString
             throw CliFxException.InternalError($@"
-{(memberSchema is ParameterSchema ? "Parameter" : "Option")} {memberSchema.GetUserFacingDisplayString()} has an unsupported type.
+{(memberSchema is ParameterSchema ? "Parameter" : "Option")} {memberSchema.GetFormattedIdentifier()} has an unsupported type.
 Non-scalar type must be assignable from an array or have a public constructor that accepts an array."
             );
         }
 
         private object? ConvertMember(
-            MemberSchema memberSchema,
+            IMemberSchema memberSchema,
             Type targetType,
             IReadOnlyList<string> rawValues)
         {
-            // Non-scalar
-            var enumerableUnderlyingType = targetType.TryGetEnumerableUnderlyingType();
-            if (targetType != typeof(string) && enumerableUnderlyingType is not null)
+            try
             {
-                return ConvertMultiple(memberSchema, rawValues, targetType, enumerableUnderlyingType);
-            }
+                // Non-scalar
+                var enumerableUnderlyingType = targetType.TryGetEnumerableUnderlyingType();
+                if (targetType != typeof(string) && enumerableUnderlyingType is not null)
+                {
+                    return ConvertMultiple(memberSchema, rawValues, targetType, enumerableUnderlyingType);
+                }
 
-            // Scalar
-            if (rawValues.Count <= 1)
+                // Scalar
+                if (rawValues.Count <= 1)
+                {
+                    return ConvertSingle(memberSchema, rawValues.SingleOrDefault(), targetType);
+                }
+            }
+            catch (Exception ex)
             {
-                return ConvertSingle(memberSchema, rawValues.SingleOrDefault(), targetType);
+                throw CliFxException.UserError($@"
+Failed to bind {(memberSchema is ParameterSchema ? "parameter" : "option")} {memberSchema.GetFormattedIdentifier()} from provided value(s):
+{rawValues.Select(v => v.Quote()).JoinToString(" ")}
+
+Error: {ex.Message}", ex
+                );
             }
 
             // Mismatch (scalar but too many values)
             throw CliFxException.UserError($@"
-{(memberSchema is ParameterSchema ? "Parameter" : "Option")} {memberSchema.GetUserFacingDisplayString()} expects a single value, but provided with multiple:
+{(memberSchema is ParameterSchema ? "Parameter" : "Option")} {memberSchema.GetFormattedIdentifier()} expects a single value, but provided with multiple:
 {rawValues.Select(v => v.Quote()).JoinToString(" ")}"
             );
         }
 
         private void BindMember(
-            MemberSchema memberSchema,
+            IMemberSchema memberSchema,
             ICommand commandInstance,
             IReadOnlyList<string> rawValues)
         {
-            if (memberSchema.Property is null)
-                return;
-
-            var targetType = memberSchema.Property.PropertyType;
+            var targetType = memberSchema.Property.Type;
 
             // Convert
             var convertedValue = ConvertMember(memberSchema, targetType, rawValues);
@@ -206,7 +215,7 @@ Non-scalar type must be assignable from an array or have a public constructor th
                     break;
 
                 // Scalar - take one input at current position
-                if (parameterSchema.IsScalar)
+                if (parameterSchema.Property.IsScalar())
                 {
                     var parameterInput = commandInput.Parameters[position];
 
@@ -246,7 +255,7 @@ Unexpected parameters provided:
             {
                 throw CliFxException.UserError($@"
 Missing values for one or more parameters:
-{remainingParameterSchemas.Select(o => o.GetUserFacingDisplayString()).JoinToString(Environment.NewLine)}"
+{remainingParameterSchemas.Select(o => o.GetFormattedIdentifier()).JoinToString(Environment.NewLine)}"
                 );
             }
         }
@@ -264,7 +273,7 @@ Missing values for one or more parameters:
             {
                 var optionInputs = commandInput
                     .Options
-                    .Where(o => optionSchema.MatchesNameOrShortName(o.Identifier))
+                    .Where(o => optionSchema.MatchesIdentifier(o.Identifier))
                     .ToArray();
 
                 var environmentVariableInput = commandInput
@@ -277,7 +286,7 @@ Missing values for one or more parameters:
                     _ when optionInputs.Any() => optionInputs.SelectMany(o => o.Values).ToArray(),
 
                     // Environment variable input
-                    _ when environmentVariableInput is not null => optionSchema.IsScalar
+                    _ when environmentVariableInput is not null => optionSchema.Property.IsScalar()
                         ? new[] {environmentVariableInput.Value}
                         : environmentVariableInput.SplitValues(),
 
@@ -306,7 +315,7 @@ Unrecognized options provided:
             {
                 throw CliFxException.UserError($@"
 Missing values for one or more required options:
-{remainingRequiredOptionSchemas.Select(o => o.GetUserFacingDisplayString()).JoinToString(Environment.NewLine)}"
+{remainingRequiredOptionSchemas.Select(o => o.GetFormattedIdentifier()).JoinToString(Environment.NewLine)}"
                 );
             }
         }
