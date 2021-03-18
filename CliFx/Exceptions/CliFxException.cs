@@ -44,11 +44,11 @@ namespace CliFx.Exceptions
         // Internal errors don't show help because they're meant for the developer
         // and not the end-user of the application.
         internal static CliFxException InternalError(string message, Exception? innerException = null) =>
-            new(message.Trim(), DefaultExitCode, false, innerException);
+            new(message, DefaultExitCode, false, innerException);
 
         // User errors are typically caused by invalid input and they're meant for
         // the end-user, so we want to show help.
         internal static CliFxException UserError(string message, Exception? innerException = null) =>
-            new(message.Trim(), DefaultExitCode, true, innerException);
+            new(message, DefaultExitCode, true, innerException);
     }
 }

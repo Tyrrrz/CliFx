@@ -13,4 +13,14 @@ namespace CliFx.Schema
 
         string GetFormattedIdentifier();
     }
+
+    internal static class MemberSchemaExtensions
+    {
+        public static string GetKind(this IMemberSchema memberSchema) => memberSchema switch
+        {
+            ParameterSchema => "Parameter",
+            OptionSchema => "Option",
+            _ => throw new ArgumentOutOfRangeException(nameof(memberSchema))
+        };
+    }
 }

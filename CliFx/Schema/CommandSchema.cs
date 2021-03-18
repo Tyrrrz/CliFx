@@ -112,15 +112,18 @@ namespace CliFx.Schema
 
             if (schema is null)
             {
-                throw CliFxException.InternalError($@"
-Command `{type.FullName}` is not a valid command type.
-
-In order to be a valid command type, it must:
-- Implement `{typeof(ICommand).FullName}`
-- Be annotated with `{typeof(CommandAttribute).FullName}`
-- Not be an abstract class
-
-If you're experiencing problems, please refer to the readme for examples."
+                throw CliFxException.InternalError(
+                    $"Type `{type.FullName}` is not a valid command type." +
+                    Environment.NewLine +
+                    "In order to be a valid command type, it must:" +
+                    Environment.NewLine +
+                    $"- Implement `{typeof(ICommand).FullName}`" +
+                    Environment.NewLine +
+                    $"- Be annotated with `{typeof(CommandAttribute).FullName}`" +
+                    Environment.NewLine +
+                    "- Not be an abstract class" +
+                    Environment.NewLine + Environment.NewLine +
+                    "If you're experiencing problems, please refer to the readme for examples."
                 );
             }
 
