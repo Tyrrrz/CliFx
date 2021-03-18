@@ -9,12 +9,12 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace CliFx.Analyzers
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class ArgumentMustHaveValidConverterAnalyzer : AnalyzerBase
+    public class ParameterMustBeInsideCommandAnalyzer : AnalyzerBase
     {
-        public ArgumentMustHaveValidConverterAnalyzer()
+        public ParameterMustBeInsideCommandAnalyzer()
             : base(
-                $"Parameter and option converters must derive from `{SymbolNames.CliFxBindingConverterClass}`",
-                $"Converter specified for this parameter or option must derive from `{SymbolNames.CliFxBindingConverterClass}`.")
+                "Parameters must be defined inside commands",
+                $"This parameter must be defined inside a class that implements `{SymbolNames.CliFxCommandInterface}`.")
         {
         }
 
@@ -27,24 +27,18 @@ namespace CliFx.Analyzers
             if (property is null)
                 return;
 
-            var argument =
-                (ICommandMemberSymbol)
-                CommandParameterSymbol.TryResolve(property) ??
-                CommandOptionSymbol.TryResolve(property);
-
-            if (argument is null)
+            if (property.ContainingType.IsAbstract)
                 return;
 
-            if (argument.ConverterType is null)
+            if (!CommandParameterSymbol.IsParameterProperty(property))
                 return;
 
-            // We check against an internal interface because checking against a generic class is a pain
-            var converterImplementsInterface = argument
-                .ConverterType
+            var isInsideCommand = property
+                .ContainingType
                 .AllInterfaces
-                .Any(s => s.DisplayNameMatches(SymbolNames.CliFxBindingConverterInterface));
+                .Any(s => s.DisplayNameMatches(SymbolNames.CliFxCommandInterface));
 
-            if (!converterImplementsInterface)
+            if (!isInsideCommand)
             {
                 context.ReportDiagnostic(CreateDiagnostic(propertyDeclaration.GetLocation()));
             }

@@ -9,7 +9,7 @@ namespace CliFx.Analyzers.Tests
         private static DiagnosticAnalyzer Analyzer { get; } = new CommandMustImplementInterfaceAnalyzer();
 
         [Fact]
-        public void Analyzer_reports_an_error_if_a_command_does_not_implement_IConsole_interface()
+        public void Analyzer_reports_an_error_if_a_command_does_not_implement_ICommand_interface()
         {
             // Arrange
             // language=cs

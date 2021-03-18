@@ -9,12 +9,12 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace CliFx.Analyzers
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class ArgumentMustHaveValidValidatorsAnalyzer : AnalyzerBase
+    public class OptionMustHaveValidValidatorsAnalyzer : AnalyzerBase
     {
-        public ArgumentMustHaveValidValidatorsAnalyzer()
+        public OptionMustHaveValidValidatorsAnalyzer()
             : base(
-                $"Parameter and option validators must derive from `{SymbolNames.CliFxBindingValidatorClass}`",
-                $"All validators specified for this parameter or option must derive from `{SymbolNames.CliFxBindingValidatorClass}`.")
+                $"Option validators must derive from `{SymbolNames.CliFxBindingValidatorClass}`",
+                $"All validators specified for this option must derive from `{SymbolNames.CliFxBindingValidatorClass}`.")
         {
         }
 
@@ -27,15 +27,11 @@ namespace CliFx.Analyzers
             if (property is null)
                 return;
 
-            var argument =
-                (ICommandMemberSymbol)
-                CommandParameterSymbol.TryResolve(property) ??
-                CommandOptionSymbol.TryResolve(property);
-
-            if (argument is null)
+            var option = CommandOptionSymbol.TryResolve(property);
+            if (option is null)
                 return;
 
-            foreach (var validatorType in argument.ValidatorTypes)
+            foreach (var validatorType in option.ValidatorTypes)
             {
                 // We check against an internal interface because checking against a generic class is a pain
                 var validatorImplementsInterface = validatorType
