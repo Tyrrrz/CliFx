@@ -8,11 +8,11 @@ namespace CliFx.Tests.Dummy.Commands
     public class EnvironmentTestCommand : ICommand
     {
         [CommandOption("target", EnvironmentVariable = "ENV_TARGET")]
-        public string Target { get; set; } = "World";
+        public string GreetingTarget { get; set; } = "World";
 
         public ValueTask ExecuteAsync(IConsole console)
         {
-            console.Output.WriteLine($"Hello {Target}!");
+            console.Output.WriteLine($"Hello {GreetingTarget}!");
 
             return default;
         }

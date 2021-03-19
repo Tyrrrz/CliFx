@@ -4,7 +4,7 @@
     <TargetFrameworks>netstandard2.1;netstandard2.0</TargetFrameworks>
     <Authors>$(Company)</Authors>
     <Description>Declarative framework for building command line applications</Description>
-    <PackageTags>command line executable interface framework parser arguments net core</PackageTags>
+    <PackageTags>command line executable interface framework parser arguments cli app application net core</PackageTags>
     <PackageProjectUrl>https://github.com/Tyrrrz/CliFx</PackageProjectUrl>
     <PackageReleaseNotes>https://github.com/Tyrrrz/CliFx/blob/master/Changelog.md</PackageReleaseNotes>
     <PackageIcon>favicon.png</PackageIcon>
@@ -13,7 +13,6 @@
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <DebugType>embedded</DebugType>
-    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);CopyAnalyzerToPackage</TargetsForTfmSpecificContentInPackage>
   </PropertyGroup>
 
   <ItemGroup>
@@ -29,11 +28,15 @@
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
   </ItemGroup>
 
-  <!-- The following item group and target ensure that the analyzer assembly is embedded into the output NuGet package -->
+  <!-- The following elements are responsible for embedding the analyzer assembly within the output NuGet package -->
 
   <ItemGroup>
     <ProjectReference Include="..\CliFx.Analyzers\CliFx.Analyzers.csproj" ReferenceOutputAssembly="true" IncludeAssets="CliFx.Analyzers.dll" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);CopyAnalyzerToPackage</TargetsForTfmSpecificContentInPackage>
+  </PropertyGroup>
 
   <Target Name="CopyAnalyzerToPackage">
     <ItemGroup>

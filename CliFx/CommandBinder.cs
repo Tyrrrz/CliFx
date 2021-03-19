@@ -164,7 +164,7 @@ namespace CliFx
                 throw CliFxException.UserError(
                     $"{memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} cannot be bound from provided value(s):" +
                     Environment.NewLine +
-                    rawValues.Select(v => v.Quote()).JoinToString(" ") +
+                    rawValues.Select(v => v.Quote()).JoinToString(", ") +
                     Environment.NewLine +
                     $"Error: {ex.Message}",
                     ex
@@ -175,7 +175,7 @@ namespace CliFx
             throw CliFxException.UserError(
                 $"{memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} expects a single value, but provided with multiple:" +
                 Environment.NewLine +
-                rawValues.Select(v => v.Quote()).JoinToString(" ")
+                rawValues.Select(v => v.Quote()).JoinToString(", ")
             );
         }
 
