@@ -35,7 +35,9 @@ namespace CliFx.Schema
             ValidatorTypes = validatorTypes;
         }
 
-        public string GetFormattedIdentifier() => '<' + Name + '>';
+        public string GetFormattedIdentifier() => Property.IsScalar()
+            ? $"<{Name}>"
+            : $"<{Name}...>";
     }
 
     internal partial class ParameterSchema

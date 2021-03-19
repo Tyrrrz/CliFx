@@ -27,6 +27,7 @@ namespace CliFx.Demo
 
         public static async Task<int> Main() =>
             await new CliApplicationBuilder()
+                .SetDescription("Demo application showcasing CliFx features.")
                 .AddCommandsFromThisAssembly()
                 .UseTypeActivator(GetServiceProvider().GetRequiredService)
                 .Build()

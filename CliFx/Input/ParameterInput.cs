@@ -6,6 +6,6 @@
 
         public ParameterInput(string value) => Value = value;
 
-        public string GetFormattedIdentifier() => '<' + Value + '>';
+        public string GetFormattedIdentifier() => $"<{Value}>";
     }
 }

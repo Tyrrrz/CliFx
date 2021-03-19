@@ -15,10 +15,10 @@ namespace CliFx.Formatting
         public ConsoleFormatter(ConsoleWriter consoleWriter) =>
             _consoleWriter = consoleWriter;
 
-        public void Write(string value)
+        public void Write(string? value)
         {
             _consoleWriter.Write(value);
-            _column += value.Length;
+            _column += value?.Length ?? 0;
         }
 
         public void Write(char value)
@@ -27,7 +27,7 @@ namespace CliFx.Formatting
             _column++;
         }
 
-        public void Write(ConsoleColor foregroundColor, string value)
+        public void Write(ConsoleColor foregroundColor, string? value)
         {
             using (_consoleWriter.Console.WithForegroundColor(foregroundColor))
                 Write(value);
@@ -39,7 +39,7 @@ namespace CliFx.Formatting
                 Write(value);
         }
 
-        public void Write(ConsoleColor foregroundColor, ConsoleColor backgroundColor, string value)
+        public void Write(ConsoleColor foregroundColor, ConsoleColor backgroundColor, string? value)
         {
             using (_consoleWriter.Console.WithColors(foregroundColor, backgroundColor))
                 Write(value);

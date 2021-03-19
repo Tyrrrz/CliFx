@@ -7,12 +7,12 @@ using CliFx.Infrastructure;
 
 namespace CliFx.Demo.Commands
 {
-    [Command("book", Description = "View, list, add or remove books.")]
+    [Command("book", Description = "Retrieve a book from the library.")]
     public class BookCommand : ICommand
     {
         private readonly LibraryProvider _libraryProvider;
 
-        [CommandParameter(0, Name = "title", Description = "Book title.")]
+        [CommandParameter(0, Name = "title", Description = "Title of the book to retrieve.")]
         public string Title { get; init; } = "";
 
         public BookCommand(LibraryProvider libraryProvider)

@@ -11,7 +11,7 @@ namespace CliFx.Demo.Commands
     {
         private readonly LibraryProvider _libraryProvider;
 
-        [CommandParameter(0, Name = "title", Description = "Book title.")]
+        [CommandParameter(0, Name = "title", Description = "Title of the book to remove.")]
         public string Title { get; init; } = "";
 
         public BookRemoveCommand(LibraryProvider libraryProvider)

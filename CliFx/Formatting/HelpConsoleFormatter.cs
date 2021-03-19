@@ -19,27 +19,114 @@ namespace CliFx.Formatting
             _context = context;
         }
 
-        public void WriteHeader(string text)
+        private void WriteHeader(string text)
         {
-            Write(ConsoleColor.Magenta, text);
+            Write(ConsoleColor.White, text.ToUpperInvariant());
             WriteLine();
+        }
+
+        private void WriteCommandInvocation()
+        {
+            Write(ConsoleColor.DarkGray, _context.ApplicationMetadata.ExecutableName);
+
+            // Command name
+            if (!string.IsNullOrWhiteSpace(_context.CommandSchema.Name))
+            {
+                Write(' ');
+                Write(ConsoleColor.Cyan, _context.CommandSchema.Name);
+            }
         }
 
         private void WriteApplicationInfo()
         {
+            if (!IsEmpty)
+                WriteVerticalMargin();
+
             // Title and version
-            Write(ConsoleColor.Yellow, _context.ApplicationMetadata.Title);
+            Write(ConsoleColor.White, _context.ApplicationMetadata.Title);
             Write(' ');
             Write(ConsoleColor.Yellow, _context.ApplicationMetadata.Version);
             WriteLine();
 
             // Description
-            if (string.IsNullOrWhiteSpace(_context.ApplicationMetadata.Description))
-                return;
+            if (!string.IsNullOrWhiteSpace(_context.ApplicationMetadata.Description))
+            {
+                WriteHorizontalMargin();
+                Write(_context.ApplicationMetadata.Description);
+                WriteLine();
+            }
+        }
 
-            WriteHorizontalMargin();
-            Write(_context.ApplicationMetadata.Description);
-            WriteLine();
+        private void WriteCommandUsage()
+        {
+            if (!IsEmpty)
+                WriteVerticalMargin();
+
+            WriteHeader("Usage");
+
+            // Current command usage
+            {
+                WriteHorizontalMargin();
+
+                WriteCommandInvocation();
+                Write(' ');
+
+                // Parameters
+                foreach (var parameter in _context.CommandSchema.Parameters)
+                {
+                    Write(ConsoleColor.DarkCyan, parameter.Property.IsScalar()
+                        ? $"<{parameter.Name}>"
+                        : $"<{parameter.Name}...>"
+                    );
+                    Write(' ');
+                }
+
+                // Required options
+                foreach (var option in _context.CommandSchema.Options.Where(o => o.IsRequired))
+                {
+                    Write(ConsoleColor.Yellow, !string.IsNullOrWhiteSpace(option.Name)
+                        ? $"--{option.Name}"
+                        : $"-{option.ShortName}"
+                    );
+                    Write(' ');
+
+                    Write(ConsoleColor.White, option.Property.IsScalar()
+                        ? "<value>"
+                        : "<values...>"
+                    );
+                    Write(' ');
+                }
+
+                // Placeholder for non-required options
+                if (_context.CommandSchema.Options.Any(o => !o.IsRequired))
+                {
+                    Write(ConsoleColor.Yellow, "[options]");
+                }
+
+                WriteLine();
+            }
+
+            // Child command usage
+            var childCommandSchemas = _context
+                .ApplicationSchema
+                .GetChildCommands(_context.CommandSchema.Name);
+
+            if (childCommandSchemas.Any())
+            {
+                WriteHorizontalMargin();
+
+                WriteCommandInvocation();
+                Write(' ');
+
+                // Placeholder for child command
+                Write(ConsoleColor.Cyan, "[command]");
+                Write(' ');
+
+                // Placeholder for other arguments
+                Write("[...]");
+
+                WriteLine();
+            }
         }
 
         private void WriteCommandDescription()
@@ -53,90 +140,9 @@ namespace CliFx.Formatting
             WriteHeader("Description");
 
             WriteHorizontalMargin();
+
             Write(_context.CommandSchema.Description);
             WriteLine();
-        }
-
-        // TODO: refactor
-        private void WriteCommandUsageLineItem(CommandSchema commandSchema, bool showChildCommandsPlaceholder)
-        {
-            // Command name
-            if (!string.IsNullOrWhiteSpace(commandSchema.Name))
-            {
-                Write(ConsoleColor.Cyan, commandSchema.Name);
-                Write(' ');
-            }
-
-            // Child command placeholder
-            if (showChildCommandsPlaceholder)
-            {
-                Write(ConsoleColor.Cyan, "[command]");
-                Write(' ');
-            }
-
-            // Parameters
-            foreach (var parameter in commandSchema.Parameters)
-            {
-                Write(parameter.Property.IsScalar()
-                    ? $"<{parameter.Name}>"
-                    : $"<{parameter.Name}...>"
-                );
-                Write(' ');
-            }
-
-            // Required options
-            foreach (var option in commandSchema.Options.Where(o => o.IsRequired))
-            {
-                Write(ConsoleColor.White, !string.IsNullOrWhiteSpace(option.Name)
-                    ? $"--{option.Name}"
-                    : $"-{option.ShortName}"
-                );
-                Write(' ');
-
-                Write(option.Property.IsScalar()
-                    ? "<value>"
-                    : "<values...>"
-                );
-                Write(' ');
-            }
-
-            // Options placeholder
-            Write(ConsoleColor.White, "[options]");
-
-            WriteLine();
-        }
-
-        private void WriteCommandUsage()
-        {
-            var descendantCommandSchemas = _context
-                .ApplicationSchema
-                .GetDescendantCommands(_context.CommandSchema.Name);
-
-            if (!IsEmpty)
-                WriteVerticalMargin();
-
-            WriteHeader("Usage");
-
-            // Exe name
-            WriteHorizontalMargin();
-            Write(_context.ApplicationMetadata.ExecutableName);
-            Write(' ');
-
-            // Current command usage
-            WriteCommandUsageLineItem(_context.CommandSchema, descendantCommandSchemas.Any());
-
-            // Sub commands usage
-            if (descendantCommandSchemas.Any())
-            {
-                WriteVerticalMargin();
-
-                foreach (var childCommand in descendantCommandSchemas)
-                {
-                    WriteHorizontalMargin();
-                    Write("... ");
-                    WriteCommandUsageLineItem(childCommand, false);
-                }
-            }
         }
 
         private void WriteCommandParameters()
@@ -149,25 +155,48 @@ namespace CliFx.Formatting
 
             WriteHeader("Parameters");
 
-            foreach (var parameter in _context.CommandSchema.Parameters.OrderBy(p => p.Order))
+            foreach (var parameterSchema in _context.CommandSchema.Parameters.OrderBy(p => p.Order))
             {
                 Write(ConsoleColor.Red, "* ");
-                Write(ConsoleColor.White, $"{parameter.Name}");
+                Write(ConsoleColor.DarkCyan, $"{parameterSchema.Name}");
 
                 WriteColumnMargin();
 
                 // Description
-                if (!string.IsNullOrWhiteSpace(parameter.Description))
+                if (!string.IsNullOrWhiteSpace(parameterSchema.Description))
                 {
-                    Write(parameter.Description);
+                    Write(parameterSchema.Description);
                     Write(' ');
                 }
 
                 // Valid values
-                var validValues = parameter.Property.GetValidValues();
+                var validValues = parameterSchema.Property.GetValidValues();
                 if (validValues.Any())
                 {
-                    Write($"Valid values: {FormatValidValues(validValues)}.");
+                    Write(ConsoleColor.White, "Valid: ");
+
+                    var isFirst = true;
+                    foreach (var validValue in validValues)
+                    {
+                        if (validValue is null)
+                            continue;
+
+                        if (isFirst)
+                        {
+                            isFirst = false;
+                        }
+                        else
+                        {
+                            Write(", ");
+                        }
+
+                        Write(ConsoleColor.DarkGray, '"');
+                        Write(ConsoleColor.White, validValue.ToString());
+                        Write(ConsoleColor.DarkGray, '"');
+                    }
+
+                    Write('.');
+                    Write(' ');
                 }
 
                 WriteLine();
@@ -181,9 +210,9 @@ namespace CliFx.Formatting
 
             WriteHeader("Options");
 
-            foreach (var option in _context.CommandSchema.Options.OrderByDescending(o => o.IsRequired))
+            foreach (var optionSchema in _context.CommandSchema.Options.OrderByDescending(o => o.IsRequired))
             {
-                if (option.IsRequired)
+                if (optionSchema.IsRequired)
                 {
                     Write(ConsoleColor.Red, "* ");
                 }
@@ -193,55 +222,120 @@ namespace CliFx.Formatting
                 }
 
                 // Short name
-                if (option.ShortName is not null)
+                if (optionSchema.ShortName is not null)
                 {
-                    Write(ConsoleColor.White, $"-{option.ShortName}");
+                    Write(ConsoleColor.Yellow, $"-{optionSchema.ShortName}");
                 }
 
                 // Separator
-                if (!string.IsNullOrWhiteSpace(option.Name) && option.ShortName is not null)
+                if (!string.IsNullOrWhiteSpace(optionSchema.Name) && optionSchema.ShortName is not null)
                 {
                     Write('|');
                 }
 
                 // Name
-                if (!string.IsNullOrWhiteSpace(option.Name))
+                if (!string.IsNullOrWhiteSpace(optionSchema.Name))
                 {
-                    Write(ConsoleColor.White, $"--{option.Name}");
+                    Write(ConsoleColor.Yellow, $"--{optionSchema.Name}");
                 }
 
                 WriteColumnMargin();
 
                 // Description
-                if (!string.IsNullOrWhiteSpace(option.Description))
+                if (!string.IsNullOrWhiteSpace(optionSchema.Description))
                 {
-                    Write(option.Description);
+                    Write(optionSchema.Description);
                     Write(' ');
                 }
 
                 // Valid values
-                var validValues = option.Property.GetValidValues();
+                var validValues = optionSchema.Property.GetValidValues();
                 if (validValues.Any())
                 {
-                    Write($"Valid values: {FormatValidValues(validValues)}.");
+                    Write(ConsoleColor.White, "Valid: ");
+
+                    var isFirst = true;
+                    foreach (var validValue in validValues)
+                    {
+                        if (validValue is null)
+                            continue;
+
+                        if (isFirst)
+                        {
+                            isFirst = false;
+                        }
+                        else
+                        {
+                            Write(", ");
+                        }
+
+                        Write(ConsoleColor.DarkGray, '"');
+                        Write(ConsoleColor.White, validValue.ToString());
+                        Write(ConsoleColor.DarkGray, '"');
+                    }
+
+                    Write('.');
                     Write(' ');
                 }
 
                 // Environment variable
-                if (!string.IsNullOrWhiteSpace(option.EnvironmentVariable))
+                if (!string.IsNullOrWhiteSpace(optionSchema.EnvironmentVariable))
                 {
-                    Write($"Environment variable: \"{option.EnvironmentVariable}\".");
+                    Write(ConsoleColor.White, "Environment variable: ");
+                    Write(optionSchema.EnvironmentVariable);
+                    Write('.');
                     Write(' ');
                 }
 
                 // Default value
-                if (!option.IsRequired)
+                if (!optionSchema.IsRequired)
                 {
-                    var defaultValue = _context.CommandDefaultValues.GetValueOrDefault(option);
-                    var defaultValueFormatted = TryFormatDefaultValue(defaultValue);
-                    if (defaultValueFormatted is not null)
+                    var defaultValue = _context.CommandDefaultValues.GetValueOrDefault(optionSchema);
+                    if (defaultValue is not null)
                     {
-                        Write($"Default: {defaultValueFormatted}.");
+                        // Non-Scalar
+                        if (defaultValue is not string && defaultValue is IEnumerable defaultValues)
+                        {
+                            var elementType =
+                                defaultValues.GetType().TryGetEnumerableUnderlyingType() ??
+                                typeof(object);
+
+                            if (elementType.IsToStringOverriden())
+                            {
+                                Write(ConsoleColor.White, "Default: ");
+
+                                var isFirst = true;
+
+                                foreach (var element in defaultValues)
+                                {
+                                    if (isFirst)
+                                    {
+                                        isFirst = false;
+                                    }
+                                    else
+                                    {
+                                        Write(", ");
+                                    }
+
+                                    Write(ConsoleColor.DarkGray, '"');
+                                    Write(element.ToString(CultureInfo.InvariantCulture));
+                                    Write(ConsoleColor.DarkGray, '"');
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (defaultValue.GetType().IsToStringOverriden())
+                            {
+                                Write(ConsoleColor.White, "Default: ");
+
+                                Write(ConsoleColor.DarkGray, '"');
+                                Write(defaultValue.ToString(CultureInfo.InvariantCulture));
+                                Write(ConsoleColor.DarkGray, '"');
+                            }
+                        }
+
+                        Write('.');
                     }
                 }
 
@@ -263,21 +357,61 @@ namespace CliFx.Formatting
 
             WriteHeader("Commands");
 
-            foreach (var childCommand in childCommandSchemas)
+            foreach (var childCommandSchema in childCommandSchemas)
             {
-                var relativeCommandName = !string.IsNullOrWhiteSpace(_context.CommandSchema.Name)
-                    ? childCommand.Name!.Substring(_context.CommandSchema.Name.Length).Trim()
-                    : childCommand.Name!;
-
                 // Name
                 WriteHorizontalMargin();
-                Write(ConsoleColor.Cyan, relativeCommandName);
+                Write(
+                    ConsoleColor.Cyan,
+                    // Relative to current command
+                    childCommandSchema
+                        .Name?
+                        .Substring(_context.CommandSchema.Name?.Length ?? 0)
+                        .Trim()
+                );
+
+                WriteColumnMargin();
 
                 // Description
-                if (!string.IsNullOrWhiteSpace(childCommand.Description))
+                if (!string.IsNullOrWhiteSpace(childCommandSchema.Description))
                 {
-                    WriteColumnMargin();
-                    Write(childCommand.Description);
+                    Write(childCommandSchema.Description);
+                    Write(' ');
+                }
+
+                // Child commands of child command
+                var grandChildCommandSchemas = _context
+                    .ApplicationSchema
+                    .GetChildCommands(childCommandSchema.Name);
+
+                if (grandChildCommandSchemas.Any())
+                {
+                    Write(ConsoleColor.White, "Subcommands: ");
+
+                    var isFirst = true;
+
+                    foreach (var grandChildCommandSchema in grandChildCommandSchemas)
+                    {
+                        if (isFirst)
+                        {
+                            isFirst = false;
+                        }
+                        else
+                        {
+                            Write(", ");
+                        }
+
+                        Write(
+                            ConsoleColor.Cyan,
+                            // Relative to current command (not the parent)
+                            grandChildCommandSchema
+                                .Name?
+                                .Substring(_context.CommandSchema.Name?.Length ?? 0)
+                                .Trim()
+                        );
+                    }
+
+                    Write('.');
                 }
 
                 WriteLine();
@@ -286,20 +420,11 @@ namespace CliFx.Formatting
             // Child command help tip
             WriteVerticalMargin();
             Write("You can run `");
-            Write(_context.ApplicationMetadata.ExecutableName);
-
-            if (!string.IsNullOrWhiteSpace(_context.CommandSchema.Name))
-            {
-                Write(' ');
-                Write(ConsoleColor.Cyan, _context.CommandSchema.Name);
-            }
-
+            WriteCommandInvocation();
             Write(' ');
             Write(ConsoleColor.Cyan, "[command]");
-
             Write(' ');
             Write(ConsoleColor.White, "--help");
-
             Write("` to show help on a specific command.");
 
             WriteLine();
@@ -308,49 +433,11 @@ namespace CliFx.Formatting
         public void WriteHelpText()
         {
             WriteApplicationInfo();
-            WriteCommandDescription();
             WriteCommandUsage();
+            WriteCommandDescription();
             WriteCommandParameters();
             WriteCommandOptions();
             WriteCommandChildren();
-        }
-
-        // TODO: move
-        private static string FormatValidValues(IReadOnlyList<object?> values) =>
-            values
-                .Select(v => v?.ToString().Quote())
-                .Where(v => v is not null)
-                .JoinToString(", ");
-
-        private static string? TryFormatDefaultValue(object? defaultValue)
-        {
-            if (defaultValue is null)
-                return null;
-
-            // Enumerable
-            if (!(defaultValue is string) && defaultValue is IEnumerable defaultValues)
-            {
-                var elementType = defaultValues.GetType().TryGetEnumerableUnderlyingType() ?? typeof(object);
-
-                // If the ToString() method is not overriden, the default value can't be formatted nicely
-                if (!elementType.IsToStringOverriden())
-                    return null;
-
-                return defaultValues
-                    .Cast<object?>()
-                    .Where(o => o is not null)
-                    .Select(o => o!.ToFormattableString(CultureInfo.InvariantCulture).Quote())
-                    .JoinToString(" ");
-            }
-            // Non-enumerable
-            else
-            {
-                // If the ToString() method is not overriden, the default value can't be formatted nicely
-                if (!defaultValue.GetType().IsToStringOverriden())
-                    return null;
-
-                return defaultValue.ToFormattableString(CultureInfo.InvariantCulture).Quote();
-            }
         }
     }
 

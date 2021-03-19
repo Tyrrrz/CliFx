@@ -113,6 +113,9 @@ namespace CliFx
         /// <summary>
         /// Sets application title, which is shown in the help text.
         /// </summary>
+        /// <remarks>
+        /// By default, application title is inferred from the assembly name.
+        /// </remarks>
         public CliApplicationBuilder SetTitle(string title)
         {
             _title = title;
@@ -122,6 +125,10 @@ namespace CliFx
         /// <summary>
         /// Sets application executable name, which is shown in the help text.
         /// </summary>
+        /// <remarks>
+        /// By default, application executable name is inferred from the assembly file name.
+        /// The file name is also prefixed with `dotnet` if it's a DLL file.
+        /// </remarks>
         public CliApplicationBuilder SetExecutableName(string executableName)
         {
             _executableName = executableName;
@@ -132,6 +139,9 @@ namespace CliFx
         /// Sets application version, which is shown in the help text or
         /// when the user specifies the version option.
         /// </summary>
+        /// <remarks>
+        /// By default, application version is inferred from the assembly version.
+        /// </remarks>
         public CliApplicationBuilder SetVersion(string version)
         {
             _versionText = version;
@@ -172,7 +182,7 @@ namespace CliFx
             UseTypeActivator(new DelegateTypeActivator(typeActivator));
 
         /// <summary>
-        /// Creates an instance of <see cref="CliApplication"/>.
+        /// Creates a configured instance of <see cref="CliApplication"/>.
         /// </summary>
         public CliApplication Build()
         {

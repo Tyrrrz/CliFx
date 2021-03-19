@@ -40,7 +40,7 @@ public class MyCommand : ICommand
             const string code = @"
 public class MyValidator : BindingValidator<string>
 {
-    public override BindingValidationError Validate(string value) => OK();
+    public override BindingValidationError Validate(string value) => Ok();
 }
 
 [Command]

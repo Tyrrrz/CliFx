@@ -19,7 +19,7 @@ namespace CliFx.Utils.Extensions
         public static string JoinToString<T>(this IEnumerable<T> source, string separator) =>
             string.Join(separator, source);
 
-        public static string ToFormattableString(
+        public static string ToString(
             this object obj,
             IFormatProvider? formatProvider = null,
             string? format = null) =>

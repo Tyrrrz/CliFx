@@ -1,6 +1,4 @@
-﻿using CliFx.Exceptions;
-
-namespace CliFx.Extensibility
+﻿namespace CliFx.Extensibility
 {
     // Used internally to simplify usage from reflection
     internal interface IBindingValidator
@@ -25,10 +23,11 @@ namespace CliFx.Extensibility
 
         /// <summary>
         /// Validates the value bound to a parameter or an option.
+        /// Returns <code>null</code> if validation is successful, or an error in case of failure.
         /// </summary>
         /// <remarks>
-        /// You can use helper methods <see cref="Ok"/> and <see cref="Error"/> to
-        /// express the validation result.
+        /// You can use the utility methods <see cref="Ok"/> and <see cref="Error"/> to
+        /// create an appropriate result.
         /// </remarks>
         public abstract BindingValidationError? Validate(T value);
 
