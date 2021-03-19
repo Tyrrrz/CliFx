@@ -173,7 +173,7 @@ namespace CliFx.Formatting
                 var validValues = parameterSchema.Property.GetValidValues();
                 if (validValues.Any())
                 {
-                    Write(ConsoleColor.White, "Valid: ");
+                    Write(ConsoleColor.White, "Choices: ");
 
                     var isFirst = true;
                     foreach (var validValue in validValues)
@@ -252,7 +252,7 @@ namespace CliFx.Formatting
                 var validValues = optionSchema.Property.GetValidValues();
                 if (validValues.Any())
                 {
-                    Write(ConsoleColor.White, "Valid: ");
+                    Write(ConsoleColor.White, "Choices: ");
 
                     var isFirst = true;
                     foreach (var validValue in validValues)

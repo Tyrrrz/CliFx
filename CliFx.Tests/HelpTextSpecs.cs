@@ -730,9 +730,9 @@ public class Command : ICommand
             exitCode.Should().Be(0);
             stdOut.Should().ContainAllInOrder(
                 "PARAMETERS",
-                "foo", "Valid:", "One", "Two", "Three",
+                "foo", "Choices:", "One", "Two", "Three",
                 "OPTIONS",
-                "--bar", "Valid:", "One", "Two", "Three"
+                "--bar", "Choices:", "One", "Two", "Three"
             );
         }
 
