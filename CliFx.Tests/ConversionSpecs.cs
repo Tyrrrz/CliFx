@@ -16,7 +16,7 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Argument_can_be_converted_to_a_string()
+        public async Task Raw_value_can_be_converted_to_a_string()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -54,7 +54,7 @@ public class Command : ICommand
         }
 
         [Fact]
-        public async Task Argument_can_be_converted_to_an_object()
+        public async Task Raw_value_can_be_converted_to_an_object()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -92,7 +92,7 @@ public class Command : ICommand
         }
 
         [Fact]
-        public async Task Argument_can_be_converted_to_a_boolean()
+        public async Task Raw_value_can_be_converted_to_a_boolean()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -111,6 +111,7 @@ public class Command : ICommand
     {
         console.Output.WriteLine(""Foo = "" + Foo);
         console.Output.WriteLine(""Bar = "" + Bar);
+
         return default;
     }
 }
@@ -137,7 +138,7 @@ public class Command : ICommand
         }
 
         [Fact]
-        public async Task Argument_can_be_converted_to_a_boolean_with_implicit_value()
+        public async Task Raw_value_can_be_converted_to_a_boolean_with_implicit_value()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -175,7 +176,7 @@ public class Command : ICommand
         }
 
         [Fact]
-        public async Task Argument_can_be_converted_to_an_integer()
+        public async Task Raw_value_can_be_converted_to_an_integer()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -213,7 +214,7 @@ public class Command : ICommand
         }
 
         [Fact]
-        public async Task Argument_can_be_converted_to_a_double()
+        public async Task Raw_value_can_be_converted_to_a_double()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -251,7 +252,7 @@ public class Command : ICommand
         }
 
         [Fact]
-        public async Task Argument_can_be_converted_to_DateTimeOffset()
+        public async Task Raw_value_can_be_converted_to_DateTimeOffset()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -289,7 +290,7 @@ public class Command : ICommand
         }
 
         [Fact]
-        public async Task Argument_can_be_converted_to_a_TimeSpan()
+        public async Task Raw_value_can_be_converted_to_a_TimeSpan()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -327,7 +328,7 @@ public class Command : ICommand
         }
 
         [Fact]
-        public async Task Argument_can_be_converted_to_an_enum()
+        public async Task Raw_value_can_be_converted_to_an_enum()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -367,7 +368,7 @@ public class Command : ICommand
         }
 
         [Fact]
-        public async Task Argument_can_be_converted_to_a_nullable_integer()
+        public async Task Raw_value_can_be_converted_to_a_nullable_integer()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -386,6 +387,7 @@ public class Command : ICommand
     {
         console.Output.WriteLine(""Foo = "" + Foo);
         console.Output.WriteLine(""Bar = "" + Bar);
+
         return default;
     }
 }
@@ -412,7 +414,7 @@ public class Command : ICommand
         }
 
         [Fact]
-        public async Task Argument_can_be_converted_to_a_nullable_enum()
+        public async Task Raw_value_can_be_converted_to_a_nullable_enum()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -433,6 +435,7 @@ public class Command : ICommand
     {
         console.Output.WriteLine(""Foo = "" + (int?) Foo);
         console.Output.WriteLine(""Bar = "" + (int?) Bar);
+
         return default;
     }
 }
@@ -459,7 +462,7 @@ public class Command : ICommand
         }
 
         [Fact]
-        public async Task Argument_can_be_converted_to_a_type_that_has_a_constructor_accepting_a_string()
+        public async Task Raw_value_can_be_converted_to_a_type_that_has_a_constructor_accepting_a_string()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -504,7 +507,7 @@ public class Command : ICommand
         }
 
         [Fact]
-        public async Task Argument_can_be_converted_to_a_type_that_has_a_static_parse_method()
+        public async Task Raw_value_can_be_converted_to_a_type_that_has_a_static_parse_method()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -543,6 +546,7 @@ public class Command : ICommand
     {
         console.Output.WriteLine(""Foo = "" + Foo.Value);
         console.Output.WriteLine(""Bar = "" + Bar.Value);
+
         return default;
     }
 }
@@ -569,7 +573,7 @@ public class Command : ICommand
         }
 
         [Fact]
-        public async Task Argument_can_be_converted_using_a_custom_converter()
+        public async Task Raw_value_can_be_converted_using_a_custom_converter()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -613,7 +617,7 @@ public class Command : ICommand
         }
 
         [Fact]
-        public async Task Argument_can_be_converted_to_an_array_of_strings()
+        public async Task Raw_value_can_be_converted_to_an_array_of_strings()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -657,7 +661,7 @@ public class Command : ICommand
         }
 
         [Fact]
-        public async Task Argument_can_be_converted_to_a_read_only_list_of_strings()
+        public async Task Raw_value_can_be_converted_to_a_read_only_list_of_strings()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -701,7 +705,7 @@ public class Command : ICommand
         }
 
         [Fact]
-        public async Task Argument_can_be_converted_to_a_list_of_strings()
+        public async Task Raw_value_can_be_converted_to_a_list_of_strings()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -745,7 +749,7 @@ public class Command : ICommand
         }
 
         [Fact]
-        public async Task Argument_can_be_converted_to_an_array_of_integers()
+        public async Task Raw_value_can_be_converted_to_an_array_of_integers()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -789,7 +793,7 @@ public class Command : ICommand
         }
 
         [Fact]
-        public async Task Argument_conversion_fails_if_the_value_cannot_be_converted_to_the_target_type()
+        public async Task Raw_value_conversion_fails_if_the_value_cannot_be_converted_to_the_target_type()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -823,7 +827,7 @@ public class Command : ICommand
         }
 
         [Fact]
-        public async Task Argument_conversion_fails_if_the_target_type_is_not_supported()
+        public async Task Raw_value_conversion_fails_if_the_target_type_is_not_supported()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -859,7 +863,7 @@ public class Command : ICommand
         }
 
         [Fact]
-        public async Task Argument_conversion_fails_if_one_of_the_validators_fail()
+        public async Task Raw_value_conversion_fails_if_one_of_the_validators_fail()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(

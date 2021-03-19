@@ -42,7 +42,7 @@ namespace CliFx.Tests
         public async Task Help_text_is_printed_if_provided_arguments_contain_the_help_option()
         {
             // Arrange
-            var commandTypes = DynamicCommandBuilder.CompileMany(
+            var commandType = DynamicCommandBuilder.Compile(
                 // language=cs
                 @"
 [Command]
@@ -57,7 +57,7 @@ public class DefaultCommand : ICommand
 ");
 
             var application = new CliApplicationBuilder()
-                .AddCommands(commandTypes)
+                .AddCommand(commandType)
                 .UseConsole(FakeConsole)
                 .SetDescription("This will be in help text")
                 .Build();

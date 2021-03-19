@@ -17,7 +17,83 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Option_is_bound_from_a_set_of_arguments_that_match_its_name()
+        public async Task Option_is_bound_from_an_argument_matching_its_name()
+        {
+            // Arrange
+            var commandType = DynamicCommandBuilder.Compile(
+                // language=cs
+                @"
+[Command]
+public class Command : ICommand
+{
+    [CommandOption(""foo"")]
+    public bool Foo { get; set; }
+       
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(Foo);
+        return default;
+    }
+}");
+
+            var application = new CliApplicationBuilder()
+                .AddCommand(commandType)
+                .UseConsole(FakeConsole)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(
+                new[] {"--foo"},
+                new Dictionary<string, string>()
+            );
+
+            var stdOut = FakeConsole.ReadOutputString();
+
+            // Assert
+            exitCode.Should().Be(0);
+            stdOut.Trim().Should().Be("True");
+        }
+
+        [Fact]
+        public async Task Option_is_bound_from_an_argument_matching_its_short_name()
+        {
+            // Arrange
+            var commandType = DynamicCommandBuilder.Compile(
+                // language=cs
+                @"
+[Command]
+public class Command : ICommand
+{
+    [CommandOption('f')]
+    public bool Foo { get; set; }
+       
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(Foo);
+        return default;
+    }
+}");
+
+            var application = new CliApplicationBuilder()
+                .AddCommand(commandType)
+                .UseConsole(FakeConsole)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(
+                new[] {"-f"},
+                new Dictionary<string, string>()
+            );
+
+            var stdOut = FakeConsole.ReadOutputString();
+
+            // Assert
+            exitCode.Should().Be(0);
+            stdOut.Trim().Should().Be("True");
+        }
+
+        [Fact]
+        public async Task Option_is_bound_from_a_set_of_arguments_matching_its_name()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -36,7 +112,7 @@ public class Command : ICommand
     {
         console.Output.WriteLine(""Foo = "" + Foo);
         console.Output.WriteLine(""Bar = "" + Bar);
-            
+
         return default;
     }
 }");
@@ -63,7 +139,7 @@ public class Command : ICommand
         }
 
         [Fact]
-        public async Task Option_is_bound_from_a_set_of_arguments_that_match_its_short_name()
+        public async Task Option_is_bound_from_a_set_of_arguments_matching_its_short_name()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -82,7 +158,7 @@ public class Command : ICommand
     {
         console.Output.WriteLine(""Foo = "" + Foo);
         console.Output.WriteLine(""Bar = "" + Bar);
-            
+
         return default;
     }
 }");
@@ -109,7 +185,7 @@ public class Command : ICommand
         }
 
         [Fact]
-        public async Task Option_is_bound_from_a_stack_of_arguments_if_one_of_them_matches_its_short_name()
+        public async Task Option_is_bound_from_a_stack_of_arguments_matching_its_short_name()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -128,7 +204,7 @@ public class Command : ICommand
     {
         console.Output.WriteLine(""Foo = "" + Foo);
         console.Output.WriteLine(""Bar = "" + Bar);
-            
+
         return default;
     }
 }");
@@ -155,7 +231,7 @@ public class Command : ICommand
         }
 
         [Fact]
-        public async Task Option_of_non_scalar_type_is_bound_from_a_set_of_arguments_that_match_its_name()
+        public async Task Option_of_non_scalar_type_is_bound_from_a_set_of_arguments_matching_its_name()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -171,7 +247,7 @@ public class Command : ICommand
     {
         foreach (var i in Foo)
             console.Output.WriteLine(i);
-            
+
         return default;
     }
 }");
@@ -199,7 +275,7 @@ public class Command : ICommand
         }
 
         [Fact]
-        public async Task Option_of_non_scalar_type_is_bound_from_a_set_of_arguments_that_match_its_short_name()
+        public async Task Option_of_non_scalar_type_is_bound_from_a_set_of_arguments_matching_its_short_name()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -215,7 +291,7 @@ public class Command : ICommand
     {
         foreach (var i in Foo)
             console.Output.WriteLine(i);
-            
+
         return default;
     }
 }");
@@ -243,7 +319,7 @@ public class Command : ICommand
         }
 
         [Fact]
-        public async Task Option_of_non_scalar_type_is_bound_from_multiple_sets_of_arguments_that_match_its_name()
+        public async Task Option_of_non_scalar_type_is_bound_from_multiple_sets_of_arguments_matching_its_name()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -259,7 +335,7 @@ public class Command : ICommand
     {
         foreach (var i in Foo)
             console.Output.WriteLine(i);
-            
+
         return default;
     }
 }");
@@ -287,7 +363,7 @@ public class Command : ICommand
         }
 
         [Fact]
-        public async Task Option_of_non_scalar_type_is_bound_from_multiple_sets_of_arguments_that_match_its_short_name()
+        public async Task Option_of_non_scalar_type_is_bound_from_multiple_sets_of_arguments_matching_its_short_name()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -303,7 +379,7 @@ public class Command : ICommand
     {
         foreach (var i in Foo)
             console.Output.WriteLine(i);
-            
+
         return default;
     }
 }");
@@ -331,7 +407,7 @@ public class Command : ICommand
         }
 
         [Fact]
-        public async Task Option_of_non_scalar_type_is_bound_from_multiple_sets_of_arguments_that_match_its_name_or_short_name()
+        public async Task Option_of_non_scalar_type_is_bound_from_multiple_sets_of_arguments_matching_its_name_or_short_name()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -347,7 +423,7 @@ public class Command : ICommand
     {
         foreach (var i in Foo)
             console.Output.WriteLine(i);
-            
+
         return default;
     }
 }");
@@ -375,6 +451,52 @@ public class Command : ICommand
         }
 
         [Fact]
+        public async Task Option_is_not_bound_if_there_are_no_arguments_matching_its_name_or_short_name()
+        {
+            // Arrange
+            var commandType = DynamicCommandBuilder.Compile(
+                // language=cs
+                @"
+[Command]
+public class Command : ICommand
+{
+    [CommandOption(""foo"")]
+    public string Foo { get; set; }
+    
+    [CommandOption(""bar"")]
+    public string Bar { get; set; } = ""hello"";
+    
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(""Foo = "" + Foo);
+        console.Output.WriteLine(""Bar = "" + Bar);
+
+        return default;
+    }
+}");
+
+            var application = new CliApplicationBuilder()
+                .AddCommand(commandType)
+                .UseConsole(FakeConsole)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(
+                new[] {"--foo", "one"},
+                new Dictionary<string, string>()
+            );
+
+            var stdOut = FakeConsole.ReadOutputString();
+
+            // Assert
+            exitCode.Should().Be(0);
+            stdOut.Should().ConsistOfLines(
+                "Foo = one",
+                "Bar = hello"
+            );
+        }
+
+        [Fact]
         public async Task Option_binding_does_not_consider_a_negative_number_as_an_option_name_or_short_name()
         {
             // Arrange
@@ -390,7 +512,7 @@ public class Command : ICommand
     public ValueTask ExecuteAsync(IConsole console)
     {
         console.Output.WriteLine(Foo);
-            
+
         return default;
     }
 }");

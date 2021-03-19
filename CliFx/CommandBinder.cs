@@ -305,6 +305,10 @@ namespace CliFx
                     .EnvironmentVariables
                     .FirstOrDefault(e => optionSchema.MatchesEnvironmentVariable(e.Name));
 
+                // If no inputs were provided, skip
+                if (!optionInputs.Any() && environmentVariableInput is null)
+                    continue;
+
                 var rawValues = 0 switch
                 {
                     // Direct input
