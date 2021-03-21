@@ -11,22 +11,17 @@ using CliFx.Utils.Extensions;
 
 namespace CliFx
 {
-    // TODO: cleanup
     internal class CommandBinder
     {
-        private static readonly IFormatProvider FormatProvider = CultureInfo.InvariantCulture;
-
         private readonly ITypeActivator _typeActivator;
+        private readonly IFormatProvider _formatProvider = CultureInfo.InvariantCulture;
 
         public CommandBinder(ITypeActivator typeActivator)
         {
             _typeActivator = typeActivator;
         }
 
-        private object? ConvertSingle(
-            IMemberSchema memberSchema,
-            string? rawValue,
-            Type targetType)
+        private object? ConvertSingle(IMemberSchema memberSchema, string? rawValue, Type targetType)
         {
             // Custom converter
             if (memberSchema.ConverterType is not null)
@@ -50,19 +45,19 @@ namespace CliFx
             // IConvertible primitives (int, double, char, etc)
             if (targetType.IsConvertible())
             {
-                return Convert.ChangeType(rawValue, targetType, FormatProvider);
+                return Convert.ChangeType(rawValue, targetType, _formatProvider);
             }
 
             // Special case for DateTimeOffset
             if (targetType == typeof(DateTimeOffset))
             {
-                return DateTimeOffset.Parse(rawValue, FormatProvider);
+                return DateTimeOffset.Parse(rawValue, _formatProvider);
             }
 
             // Special case for TimeSpan
             if (targetType == typeof(TimeSpan))
             {
-                return TimeSpan.Parse(rawValue, FormatProvider);
+                return TimeSpan.Parse(rawValue, _formatProvider);
             }
 
             // Enum
@@ -92,7 +87,7 @@ namespace CliFx
             var parseMethodWithFormatProvider = targetType.TryGetStaticParseMethod(true);
             if (parseMethodWithFormatProvider is not null)
             {
-                return parseMethodWithFormatProvider.Invoke(null, new object?[] {rawValue, FormatProvider});
+                return parseMethodWithFormatProvider.Invoke(null, new object?[] {rawValue, _formatProvider});
             }
 
             // String-parseable (without IFormatProvider)
@@ -145,11 +140,10 @@ namespace CliFx
             );
         }
 
-        private object? ConvertMember(
-            IMemberSchema memberSchema,
-            Type targetType,
-            IReadOnlyList<string> rawValues)
+        private object? ConvertMember(IMemberSchema memberSchema, IReadOnlyList<string> rawValues)
         {
+            var targetType = memberSchema.Property.Type;
+
             try
             {
                 // Non-scalar
@@ -165,7 +159,7 @@ namespace CliFx
                     return ConvertSingle(memberSchema, rawValues.SingleOrDefault(), targetType);
                 }
             }
-            catch (Exception ex) when (ex is not CliFxException)
+            catch (Exception ex) when (ex is not CliFxException) // don't wrap CliFxException
             {
                 throw CliFxException.UserError(
                     $"{memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} cannot be set from provided argument(s):" +
@@ -181,13 +175,11 @@ namespace CliFx
             throw CliFxException.UserError(
                 $"{memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} expects a single argument, but provided with multiple:" +
                 Environment.NewLine +
-                rawValues.Select(v => 'v' + v + 'v').JoinToString(" ")
+                rawValues.Select(v => '<' + v + '>').JoinToString(" ")
             );
         }
 
-        private void ValidateMember(
-            IMemberSchema memberSchema,
-            object? convertedValue)
+        private void ValidateMember(IMemberSchema memberSchema, object? convertedValue)
         {
             var errors = new List<BindingValidationError>();
 
@@ -203,7 +195,7 @@ namespace CliFx
             if (errors.Any())
             {
                 throw CliFxException.UserError(
-                    $"{memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} has been set with an invalid value." +
+                    $"{memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} has been provided with an invalid value." +
                     Environment.NewLine +
                     "Error(s):" +
                     Environment.NewLine +
@@ -212,25 +204,17 @@ namespace CliFx
             }
         }
 
-        private void BindMember(
-            IMemberSchema memberSchema,
-            ICommand commandInstance,
-            IReadOnlyList<string> rawValues)
+        private void BindMember(IMemberSchema memberSchema, ICommand commandInstance, IReadOnlyList<string> rawValues)
         {
-            var targetType = memberSchema.Property.Type;
-
-            var convertedValue = ConvertMember(memberSchema, targetType, rawValues);
+            var convertedValue = ConvertMember(memberSchema, rawValues);
             ValidateMember(memberSchema, convertedValue);
 
             memberSchema.Property.SetValue(commandInstance, convertedValue);
         }
 
-        private void BindParameters(
-            CommandInput commandInput,
-            CommandSchema commandSchema,
-            ICommand commandInstance)
+        private void BindParameters(CommandInput commandInput, CommandSchema commandSchema, ICommand commandInstance)
         {
-            // Ensure there are no unexpected parameters or missing parameters
+            // Ensure there are no unexpected parameters and that all parameters are provided
             var remainingParameterInputs = commandInput.Parameters.ToList();
             var remainingParameterSchemas = commandSchema.Parameters.ToList();
 
@@ -242,19 +226,19 @@ namespace CliFx
                 if (position >= commandInput.Parameters.Count)
                     break;
 
-                // Scalar - take one input at current position
+                // Scalar - take one input at the current position
                 if (parameterSchema.Property.IsScalar())
                 {
                     var parameterInput = commandInput.Parameters[position];
 
-                    var rawValues = new[] {parameterInput.Value}; // TODO: possible to avoid creating array?
+                    var rawValues = new[] {parameterInput.Value};
                     BindMember(parameterSchema, commandInstance, rawValues);
 
                     position++;
 
                     remainingParameterInputs.Remove(parameterInput);
                 }
-                // Non-scalar - take all remaining inputs starting at current position
+                // Non-scalar - take all remaining inputs starting from the current position
                 else
                 {
                     var parameterInputs = commandInput.Parameters.Skip(position).ToArray();
@@ -293,12 +277,9 @@ namespace CliFx
             }
         }
 
-        private void BindOptions(
-            CommandInput commandInput,
-            CommandSchema commandSchema,
-            ICommand commandInstance)
+        private void BindOptions(CommandInput commandInput, CommandSchema commandSchema, ICommand commandInstance)
         {
-            // Ensure there are no unrecognized options or missing required options
+            // Ensure there are no unrecognized options and that all required options are set
             var remainingOptionInputs = commandInput.Options.ToList();
             var remainingRequiredOptionSchemas = commandSchema.Options.Where(o => o.IsRequired).ToList();
 
@@ -313,31 +294,37 @@ namespace CliFx
                     .EnvironmentVariables
                     .FirstOrDefault(e => optionSchema.MatchesEnvironmentVariable(e.Name));
 
-                // If no inputs were provided, skip
-                if (!optionInputs.Any() && environmentVariableInput is null)
-                    continue;
-
-                var rawValues = 0 switch
+                // Direct input
+                if (optionInputs.Any())
                 {
-                    // Direct input
-                    _ when optionInputs.Any() => optionInputs.SelectMany(o => o.Values).ToArray(),
+                    var rawValues = optionInputs.SelectMany(o => o.Values).ToArray();
 
-                    // Environment variable input
-                    _ when environmentVariableInput is not null => optionSchema.Property.IsScalar()
+                    BindMember(optionSchema, commandInstance, rawValues);
+
+                    // Required options require at least one value to be set
+                    if (rawValues.Any())
+                        remainingRequiredOptionSchemas.Remove(optionSchema);
+                }
+                // Environment variable
+                else if (environmentVariableInput is not null)
+                {
+                    var rawValues = optionSchema.Property.IsScalar()
                         ? new[] {environmentVariableInput.Value}
-                        : environmentVariableInput.SplitValues(),
+                        : environmentVariableInput.SplitValues();
 
-                    // No input
-                    _ => Array.Empty<string>()
-                };
+                    BindMember(optionSchema, commandInstance, rawValues);
 
-                BindMember(optionSchema, commandInstance, rawValues);
+                    // Required options require at least one value to be set
+                    if (rawValues.Any())
+                        remainingRequiredOptionSchemas.Remove(optionSchema);
+                }
+                // No input - skip
+                else
+                {
+                    continue;
+                }
 
                 remainingOptionInputs.RemoveRange(optionInputs);
-
-                // Required options require at least one value to be set
-                if (rawValues.Any())
-                    remainingRequiredOptionSchemas.Remove(optionSchema);
             }
 
             if (remainingOptionInputs.Any())
@@ -363,10 +350,7 @@ namespace CliFx
             }
         }
 
-        public void Bind(
-            CommandInput commandInput,
-            CommandSchema commandSchema,
-            ICommand commandInstance)
+        public void Bind(CommandInput commandInput, CommandSchema commandSchema, ICommand commandInstance)
         {
             BindParameters(commandInput, commandSchema, commandInstance);
             BindOptions(commandInput, commandSchema, commandInstance);

@@ -29,7 +29,7 @@ namespace CliFx.Tests
 [Command]
 public class Command : ICommand
 {
-    [CommandOption(""foo"", EnvironmentVariable = ""ENV_FOO"")]
+    [CommandOption(""foo"", IsRequired = true, EnvironmentVariable = ""ENV_FOO"")]
     public string Foo { get; set; }
     
     public ValueTask ExecuteAsync(IConsole console)
