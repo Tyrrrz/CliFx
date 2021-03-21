@@ -27,7 +27,9 @@ namespace CliFx.Tests.Utils
             var defaultSystemNamespaces = new[]
             {
                 "System",
+                "System.Collections",
                 "System.Collections.Generic",
+                "System.Linq",
                 "System.Threading.Tasks",
                 "System.Globalization"
             };
@@ -64,6 +66,7 @@ namespace CliFx.Tests.Utils
                     MetadataReference.CreateFromFile(Assembly.Load("System.Runtime").Location),
                     MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
                     MetadataReference.CreateFromFile(typeof(Console).Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location),
                     MetadataReference.CreateFromFile(typeof(DynamicCommandBuilder).Assembly.Location),
                     MetadataReference.CreateFromFile(typeof(ICommand).Assembly.Location)
                 },

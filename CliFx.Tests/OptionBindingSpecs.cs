@@ -566,7 +566,7 @@ public class Command : ICommand
 
             // Assert
             exitCode.Should().NotBe(0);
-            stdErr.Should().Contain("Missing values for one or more required options");
+            stdErr.Should().Contain("Missing required option(s)");
         }
 
         [Fact]
@@ -600,7 +600,7 @@ public class Command : ICommand
 
             // Assert
             exitCode.Should().NotBe(0);
-            stdErr.Should().Contain("Missing values for one or more required options");
+            stdErr.Should().Contain("Missing required option(s)");
         }
 
         [Fact]
@@ -634,7 +634,7 @@ public class Command : ICommand
 
             // Assert
             exitCode.Should().NotBe(0);
-            stdErr.Should().Contain("Missing values for one or more required options");
+            stdErr.Should().Contain("Missing required option(s)");
         }
 
         [Fact]
@@ -668,7 +668,7 @@ public class Command : ICommand
 
             // Assert
             exitCode.Should().NotBe(0);
-            stdErr.Should().Contain("Unrecognized options provided");
+            stdErr.Should().Contain("Unrecognized option(s)");
         }
 
         [Fact]
@@ -702,7 +702,7 @@ public class Command : ICommand
 
             // Assert
             exitCode.Should().NotBe(0);
-            stdErr.Should().Contain("expects a single value");
+            stdErr.Should().Contain("expects a single argument, but provided with multiple");
         }
     }
 }

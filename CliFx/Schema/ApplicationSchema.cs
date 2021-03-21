@@ -63,9 +63,10 @@ namespace CliFx.Schema
         public IReadOnlyList<CommandSchema> GetChildCommands(string? parentCommandName)
         {
             var descendants = GetDescendantCommands(parentCommandName);
-            var result = new List<CommandSchema>(descendants);
 
-            // Filter out descendants of descendants, leave only children
+            var result = descendants.ToList();
+
+            // Filter out descendants of descendants, leave only direct children
             foreach (var descendant in descendants)
             {
                 result.RemoveRange(

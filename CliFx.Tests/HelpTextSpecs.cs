@@ -744,7 +744,7 @@ public class SecondCommandChildCommand : ICommand
         }
 
         [Fact]
-        public async Task Help_text_shows_all_immediate_child_commands_for_each_child_command()
+        public async Task Help_text_shows_all_immediate_child_commands_of_each_child_command()
         {
             // Arrange
             var commandTypes = DynamicCommandBuilder.CompileMany(

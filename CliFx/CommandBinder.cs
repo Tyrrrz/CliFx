@@ -103,7 +103,11 @@ namespace CliFx
             }
 
             throw CliFxException.InternalError(
-                $"{memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} has an unsupported type."
+                $"{memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} has an unsupported underlying property type." +
+                Environment.NewLine +
+                $"There is no known way to convert a string value into an instance of type `{targetType.FullName}`." +
+                Environment.NewLine +
+                "To fix this, either change the property to use a supported type or configure a custom converter."
             );
         }
 
@@ -133,9 +137,11 @@ namespace CliFx
             }
 
             throw CliFxException.InternalError(
-                $"{memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} has an unsupported non-scalar type." +
+                $"{memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} has an unsupported underlying property type." +
                 Environment.NewLine +
-                "Non-scalar type must be assignable from an array or have a public constructor that accepts an array."
+                $"There is no known way to convert an array of `{targetElementType.FullName}` into an instance of type `{targetEnumerableType.FullName}`." +
+                Environment.NewLine +
+                "To fix this, change the property to use a type which can be assigned from an array or a type that has a constructor which accepts an array."
             );
         }
 
@@ -162,9 +168,9 @@ namespace CliFx
             catch (Exception ex) when (ex is not CliFxException)
             {
                 throw CliFxException.UserError(
-                    $"{memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} cannot be bound from provided value(s):" +
+                    $"{memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} cannot be set from provided argument(s):" +
                     Environment.NewLine +
-                    rawValues.Select(v => v.Quote()).JoinToString(", ") +
+                    rawValues.Select(v => '<' + v + '>').JoinToString(" ") +
                     Environment.NewLine +
                     $"Error: {ex.Message}",
                     ex
@@ -173,9 +179,9 @@ namespace CliFx
 
             // Mismatch (scalar but too many values)
             throw CliFxException.UserError(
-                $"{memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} expects a single value, but provided with multiple:" +
+                $"{memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} expects a single argument, but provided with multiple:" +
                 Environment.NewLine +
-                rawValues.Select(v => v.Quote()).JoinToString(", ")
+                rawValues.Select(v => 'v' + v + 'v').JoinToString(" ")
             );
         }
 
@@ -197,7 +203,9 @@ namespace CliFx
             if (errors.Any())
             {
                 throw CliFxException.UserError(
-                    $"{memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} cannot be bound from provided value(s):" +
+                    $"{memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} has been set with an invalid value." +
+                    Environment.NewLine +
+                    "Error(s):" +
                     Environment.NewLine +
                     errors.Select(e => "- " + e.Message).JoinToString(Environment.NewLine)
                 );
@@ -230,7 +238,7 @@ namespace CliFx
 
             foreach (var parameterSchema in commandSchema.Parameters.OrderBy(p => p.Order))
             {
-                // Check bounds
+                // Break when there are no remaining inputs
                 if (position >= commandInput.Parameters.Count)
                     break;
 
@@ -265,22 +273,22 @@ namespace CliFx
             if (remainingParameterInputs.Any())
             {
                 throw CliFxException.UserError(
-                    "Unexpected parameters provided:" +
+                    "Unexpected parameter(s):" +
                     Environment.NewLine +
                     remainingParameterInputs
                         .Select(p => p.GetFormattedIdentifier())
-                        .JoinToString(Environment.NewLine)
+                        .JoinToString(" ")
                 );
             }
 
             if (remainingParameterSchemas.Any())
             {
                 throw CliFxException.UserError(
-                    "Missing values for one or more parameters:" +
+                    "Missing parameter(s):" +
                     Environment.NewLine +
                     remainingParameterSchemas
                         .Select(o => o.GetFormattedIdentifier())
-                        .JoinToString(Environment.NewLine)
+                        .JoinToString(" ")
                 );
             }
         }
@@ -335,22 +343,22 @@ namespace CliFx
             if (remainingOptionInputs.Any())
             {
                 throw CliFxException.UserError(
-                    "Unrecognized options provided:" +
+                    "Unrecognized option(s):" +
                     Environment.NewLine +
                     remainingOptionInputs
                         .Select(o => o.GetFormattedIdentifier())
-                        .JoinToString(Environment.NewLine)
+                        .JoinToString(", ")
                 );
             }
 
             if (remainingRequiredOptionSchemas.Any())
             {
                 throw CliFxException.UserError(
-                    "Missing values for one or more required options:" +
+                    "Missing required option(s):" +
                     Environment.NewLine +
                     remainingRequiredOptionSchemas
                         .Select(o => o.GetFormattedIdentifier())
-                        .JoinToString(Environment.NewLine)
+                        .JoinToString(", ")
                 );
             }
         }

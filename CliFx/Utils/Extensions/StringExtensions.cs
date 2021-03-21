@@ -14,8 +14,6 @@ namespace CliFx.Utils.Extensions
 
         public static string AsString(this char c) => c.Repeat(1);
 
-        public static string Quote(this string str) => $"\"{str}\"";
-
         public static string JoinToString<T>(this IEnumerable<T> source, string separator) =>
             string.Join(separator, source);
 

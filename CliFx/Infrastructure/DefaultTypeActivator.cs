@@ -21,9 +21,9 @@ namespace CliFx.Infrastructure
                 throw CliFxException.InternalError(
                     $"Failed to create an instance of type `{type.FullName}`." +
                     Environment.NewLine +
-                    "The type must have a public parameterless constructor in order to be instantiated by the default activator." +
+                    "Default type activator is only capable of instantiating a type if it has a public parameterless constructor." +
                     Environment.NewLine +
-                    "To fix this, either add a parameterless constructor or configure a custom activator capable of instantiating this type.",
+                    "To fix this, either add a parameterless constructor to the type or configure a custom activator on the application.",
                     ex
                 );
             }

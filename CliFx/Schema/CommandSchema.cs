@@ -122,9 +122,7 @@ namespace CliFx.Schema
                     Environment.NewLine +
                     $"- Be annotated with `{typeof(CommandAttribute).FullName}`" +
                     Environment.NewLine +
-                    "- Not be an abstract class" +
-                    Environment.NewLine + Environment.NewLine +
-                    "If you're experiencing problems, please refer to the readme for examples."
+                    "- Not be an abstract class"
                 );
             }
 
