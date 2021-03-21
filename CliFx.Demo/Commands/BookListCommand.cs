@@ -28,7 +28,7 @@ namespace CliFx.Demo.Commands
 
                 // Render book
                 var book = library.Books[i];
-                console.RenderBook(book);
+                console.Output.WriteBook(book);
             }
 
             return default;

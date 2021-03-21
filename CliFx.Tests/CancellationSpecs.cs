@@ -31,7 +31,7 @@ public class Command : ICommand
         {
             await Task.Delay(
                 TimeSpan.FromSeconds(3),
-                console.RegisterCancellation()
+                console.RegisterCancellationHandler()
             );
 
             console.Output.WriteLine(""Completed successfully"");

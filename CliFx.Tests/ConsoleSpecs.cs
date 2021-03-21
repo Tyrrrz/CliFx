@@ -54,7 +54,10 @@ public class Command : ICommand
         console.BackgroundColor = ConsoleColor.DarkMagenta;
         console.CursorLeft = 42;
         console.CursorTop = 24;
-        
+
+        console.Output.WriteLine(""Hello "");
+        console.Error.WriteLine(""world!"");
+
         return default;
     }
 }
@@ -105,7 +108,7 @@ public class Command : ICommand
         var input = console.Input.ReadToEnd();
         console.Output.WriteLine(input);
         console.Error.WriteLine(input);
-        
+
         return default;
     }
 }

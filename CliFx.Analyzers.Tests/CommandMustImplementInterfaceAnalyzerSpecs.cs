@@ -25,6 +25,22 @@ public class MyCommand
         }
 
         [Fact]
+        public void Analyzer_does_not_report_an_error_if_a_command_implements_ICommand_interface()
+        {
+            // Arrange
+            // language=cs
+            const string code = @"
+[Command]
+public class MyCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}";
+
+            // Act & assert
+            Analyzer.Should().NotProduceDiagnostics(code);
+        }
+
+        [Fact]
         public void Analyzer_does_not_report_an_error_on_a_class_that_is_not_a_command()
         {
             // Arrange

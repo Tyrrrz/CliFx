@@ -39,7 +39,7 @@ namespace CliFx.Demo.Commands
             _libraryProvider.AddBook(book);
 
             console.Output.WriteLine("Book added.");
-            console.RenderBook(book);
+            console.Output.WriteBook(book);
 
             return default;
         }

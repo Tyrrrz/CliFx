@@ -24,6 +24,22 @@ public class MyCommand : ICommand
         }
 
         [Fact]
+        public void Analyzer_does_not_report_an_error_if_a_command_is_annotated_with_the_command_attribute()
+        {
+            // Arrange
+            // language=cs
+            const string code = @"
+[Command]
+public abstract class MyCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}";
+
+            // Act & assert
+            Analyzer.Should().NotProduceDiagnostics(code);
+        }
+
+        [Fact]
         public void Analyzer_does_not_report_an_error_if_a_command_is_implemented_as_an_abstract_class()
         {
             // Arrange

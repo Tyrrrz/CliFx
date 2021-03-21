@@ -3,7 +3,7 @@
     // Used internally to simplify usage from reflection
     internal interface IBindingConverter
     {
-        public object? Convert(string? rawValue);
+        object? Convert(string? rawValue);
     }
 
     /// <summary>

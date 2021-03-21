@@ -19,14 +19,4 @@
     <ProjectReference Include="..\CliFx\CliFx.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Remove="BenchmarkDotNet.Artifacts\CliFx.Benchmarks.Benchmarks-20210320-020716.log" />
-    <None Remove="BenchmarkDotNet.Artifacts\CliFx.Benchmarks.Benchmarks-20210320-020346.log" />
-    <None Remove="BenchmarkDotNet.Artifacts\CliFx.Benchmarks.Benchmarks-20210320-020311.log" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="BenchmarkDotNet.Artifacts" />
-  </ItemGroup>
-
 </Project>

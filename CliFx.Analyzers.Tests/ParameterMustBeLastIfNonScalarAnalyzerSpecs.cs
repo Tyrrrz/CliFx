@@ -9,7 +9,7 @@ namespace CliFx.Analyzers.Tests
         private static DiagnosticAnalyzer Analyzer { get; } = new ParameterMustBeLastIfNonScalarAnalyzer();
 
         [Fact]
-        public void Analyzer_reports_an_error_if_non_scalar_parameter_is_not_last_in_order()
+        public void Analyzer_reports_an_error_if_a_non_scalar_parameter_is_not_last_in_order()
         {
             // Arrange
             // language=cs
@@ -31,7 +31,7 @@ public class MyCommand : ICommand
         }
 
         [Fact]
-        public void Analyzer_does_not_report_an_error_if_non_scalar_parameter_is_last_in_order()
+        public void Analyzer_does_not_report_an_error_if_a_non_scalar_parameter_is_last_in_order()
         {
             // Arrange
             // language=cs

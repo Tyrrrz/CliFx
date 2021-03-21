@@ -63,13 +63,13 @@ namespace CliFx.Infrastructure
         }
 
         /// <inheritdoc />
-        public CancellationToken RegisterCancellation() => _cancellationTokenSource.Token;
+        public CancellationToken RegisterCancellationHandler() => _cancellationTokenSource.Token;
 
         /// <summary>
         /// Sends a cancellation signal to the currently executing command.
         /// </summary>
         /// <remarks>
-        /// If the command is not cancellation-aware (i.e. it doesn't call <see cref="IConsole.RegisterCancellation"/>),
+        /// If the command is not cancellation-aware (i.e. it doesn't call <see cref="IConsole.RegisterCancellationHandler"/>),
         /// this method will not have any effect.
         /// </remarks>
         public void RequestCancellation(TimeSpan? delay = null)

@@ -70,7 +70,7 @@ namespace CliFx.Infrastructure
         }
 
         /// <inheritdoc />
-        public CancellationToken RegisterCancellation()
+        public CancellationToken RegisterCancellationHandler()
         {
             if (_cancellationTokenSource is not null)
                 return _cancellationTokenSource.Token;

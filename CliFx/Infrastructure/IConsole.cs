@@ -66,18 +66,18 @@ namespace CliFx.Infrastructure
 
         /// <summary>
         /// Registers a handler for the interrupt signal (Ctrl+C) on the console and returns
-        /// a token representing potential cancellation request.
-        /// Subsequent calls to this method have no side-effects and return the original token.
+        /// a token representing the cancellation request.
+        /// Subsequent calls to this method have no side-effects and return the same token.
         /// </summary>
         /// <remarks>
         /// Calling this method effectively makes the command cancellation-aware, which
         /// means that sending an interrupt signal won't immediately terminate the application,
-        /// but will instead trigger a token that the command can use to exit gracefully.
+        /// but will instead trigger a token that the command can use to exit more gracefully.
         ///
         /// If the user sends a second interrupt signal after the first one, the application
-        /// will terminate immediately, regardless of whether the command is cancellation-aware.
+        /// will terminate immediately.
         /// </remarks>
-        CancellationToken RegisterCancellation();
+        CancellationToken RegisterCancellationHandler();
     }
 
     /// <summary>

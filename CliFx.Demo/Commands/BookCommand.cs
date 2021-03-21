@@ -27,7 +27,7 @@ namespace CliFx.Demo.Commands
             if (book is null)
                 throw new CommandException("Book not found.", 10);
 
-            console.RenderBook(book);
+            console.Output.WriteBook(book);
 
             return default;
         }

@@ -49,12 +49,10 @@ public class MyCommand : ICommand
             // Arrange
             // language=cs
             const string code = @"
-public abstract class MyCommand : ICommand
+public abstract class MyCommand
 {
     [CommandParameter(0)]
     public string Foo { get; set; }
-
-    public ValueTask ExecuteAsync(IConsole console) => default;
 }";
 
             // Act & assert

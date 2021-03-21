@@ -6,32 +6,32 @@ namespace CliFx.Demo.Utils
 {
     internal static class ConsoleExtensions
     {
-        public static void RenderBook(this IConsole console, Book book)
+        public static void WriteBook(this ConsoleWriter writer, Book book)
         {
             // Title
-            using (console.WithForegroundColor(ConsoleColor.White))
-                console.Output.WriteLine(book.Title);
+            using (writer.Console.WithForegroundColor(ConsoleColor.White))
+                writer.WriteLine(book.Title);
 
             // Author
-            console.Output.Write("  ");
-            console.Output.Write("Author: ");
+            writer.Write("  ");
+            writer.Write("Author: ");
 
-            using (console.WithForegroundColor(ConsoleColor.White))
-                console.Output.WriteLine(book.Author);
+            using (writer.Console.WithForegroundColor(ConsoleColor.White))
+                writer.WriteLine(book.Author);
 
             // Published
-            console.Output.Write("  ");
-            console.Output.Write("Published: ");
+            writer.Write("  ");
+            writer.Write("Published: ");
 
-            using (console.WithForegroundColor(ConsoleColor.White))
-                console.Output.WriteLine($"{book.Published:d}");
+            using (writer.Console.WithForegroundColor(ConsoleColor.White))
+                writer.WriteLine($"{book.Published:d}");
 
             // ISBN
-            console.Output.Write("  ");
-            console.Output.Write("ISBN: ");
+            writer.Write("  ");
+            writer.Write("ISBN: ");
 
-            using (console.WithForegroundColor(ConsoleColor.White))
-                console.Output.WriteLine(book.Isbn);
+            using (writer.Console.WithForegroundColor(ConsoleColor.White))
+                writer.WriteLine(book.Isbn);
         }
     }
 }
