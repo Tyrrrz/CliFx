@@ -33,16 +33,15 @@ namespace CliFx.Tests
             // Act
             try
             {
-                // We can't attach a debugger programmatically, so the application
-                // will hang indefinitely.
-                // To work around it, we will wait until the application writes
-                // something to the standard output and then kill it.
-
-                // This has a timeout just in case
+                // This has a timeout just in case the execution hangs forever
                 using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
                 var task = command.ExecuteAsync(cts.Token);
 
+                // We can't attach a debugger programmatically, so the application
+                // will hang indefinitely.
+                // To work around it, we will wait until the application writes
+                // something to the standard output and then kill it.
                 while (true)
                 {
                     if (stdOutBuffer.Length > 0)
@@ -65,6 +64,8 @@ namespace CliFx.Tests
 
             // Assert
             stdOut.Should().Contain("Attach debugger to");
+
+            TestOutput.WriteLine(stdOut);
         }
 
         [Fact]

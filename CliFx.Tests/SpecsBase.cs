@@ -8,6 +8,7 @@ namespace CliFx.Tests
     public abstract class SpecsBase : IDisposable
     {
         public ITestOutputHelper TestOutput { get; }
+
         public FakeInMemoryConsole FakeConsole { get; } = new();
 
         protected SpecsBase(ITestOutputHelper testOutput) =>
