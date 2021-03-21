@@ -1,32 +1,33 @@
 ﻿using System.Threading.Tasks;
 using CliFx.Attributes;
-using CliFx.Demo.Internal;
-using CliFx.Demo.Services;
+using CliFx.Demo.Domain;
+using CliFx.Demo.Utils;
 using CliFx.Exceptions;
+using CliFx.Infrastructure;
 
 namespace CliFx.Demo.Commands
 {
-    [Command("book", Description = "View, list, add or remove books.")]
+    [Command("book", Description = "Retrieve a book from the library.")]
     public class BookCommand : ICommand
     {
-        private readonly LibraryService _libraryService;
+        private readonly LibraryProvider _libraryProvider;
 
-        [CommandParameter(0, Name = "title", Description = "Book title.")]
-        public string Title { get; set; } = "";
+        [CommandParameter(0, Name = "title", Description = "Title of the book to retrieve.")]
+        public string Title { get; init; } = "";
 
-        public BookCommand(LibraryService libraryService)
+        public BookCommand(LibraryProvider libraryProvider)
         {
-            _libraryService = libraryService;
+            _libraryProvider = libraryProvider;
         }
 
         public ValueTask ExecuteAsync(IConsole console)
         {
-            var book = _libraryService.GetBook(Title);
+            var book = _libraryProvider.TryGetBook(Title);
 
-            if (book == null)
-                throw new CommandException("Book not found.", 1);
+            if (book is null)
+                throw new CommandException("Book not found.", 10);
 
-            console.RenderBook(book);
+            console.Output.WriteBook(book);
 
             return default;
         }

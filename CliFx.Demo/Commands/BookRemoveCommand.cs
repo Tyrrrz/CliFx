@@ -1,31 +1,32 @@
 ﻿using System.Threading.Tasks;
 using CliFx.Attributes;
-using CliFx.Demo.Services;
+using CliFx.Demo.Domain;
 using CliFx.Exceptions;
+using CliFx.Infrastructure;
 
 namespace CliFx.Demo.Commands
 {
     [Command("book remove", Description = "Remove a book from the library.")]
     public class BookRemoveCommand : ICommand
     {
-        private readonly LibraryService _libraryService;
+        private readonly LibraryProvider _libraryProvider;
 
-        [CommandParameter(0, Name = "title", Description = "Book title.")]
-        public string Title { get; set; } = "";
+        [CommandParameter(0, Name = "title", Description = "Title of the book to remove.")]
+        public string Title { get; init; } = "";
 
-        public BookRemoveCommand(LibraryService libraryService)
+        public BookRemoveCommand(LibraryProvider libraryProvider)
         {
-            _libraryService = libraryService;
+            _libraryProvider = libraryProvider;
         }
 
         public ValueTask ExecuteAsync(IConsole console)
         {
-            var book = _libraryService.GetBook(Title);
+            var book = _libraryProvider.TryGetBook(Title);
 
-            if (book == null)
-                throw new CommandException("Book not found.", 1);
+            if (book is null)
+                throw new CommandException("Book not found.", 10);
 
-            _libraryService.RemoveBook(book);
+            _libraryProvider.RemoveBook(book);
 
             console.Output.WriteLine($"Book {Title} removed.");
 

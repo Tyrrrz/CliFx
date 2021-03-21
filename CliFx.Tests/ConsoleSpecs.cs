@@ -1,18 +1,28 @@
 ﻿using System;
-using System.IO;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using CliFx.Tests.Utils;
 using CliWrap;
 using CliWrap.Buffered;
 using FluentAssertions;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace CliFx.Tests
 {
-    public class ConsoleSpecs
+    public class ConsoleSpecs : SpecsBase
     {
-        [Fact]
-        public async Task Real_implementation_of_console_maps_directly_to_system_console()
+        public ConsoleSpecs(ITestOutputHelper testOutput)
+            : base(testOutput)
         {
+        }
+
+        [Fact]
+        public async Task Real_console_maps_directly_to_system_console()
+        {
+            // Can't verify our own console output, so using an
+            // external process for this test.
+
             // Arrange
             var command = "Hello world" | Cli.Wrap("dotnet")
                 .WithArguments(a => a
@@ -23,53 +33,107 @@ namespace CliFx.Tests
             var result = await command.ExecuteBufferedAsync();
 
             // Assert
-            result.StandardOutput.TrimEnd().Should().Be("Hello world");
-            result.StandardError.TrimEnd().Should().Be("Hello world");
+            result.StandardOutput.Trim().Should().Be("Hello world");
+            result.StandardError.Trim().Should().Be("Hello world");
         }
 
         [Fact]
-        public void Fake_implementation_of_console_can_be_used_to_execute_commands_in_isolation()
+        public async Task Fake_console_does_not_leak_to_system_console()
         {
             // Arrange
-            using var stdIn = new MemoryStream(Console.InputEncoding.GetBytes("input"));
-            using var stdOut = new MemoryStream();
-            using var stdErr = new MemoryStream();
+            var commandType = DynamicCommandBuilder.Compile(
+                // language=cs
+                @"
+[Command]
+public class Command : ICommand
+{   
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.ResetColor();
+        console.ForegroundColor = ConsoleColor.DarkMagenta;
+        console.BackgroundColor = ConsoleColor.DarkMagenta;
+        console.CursorLeft = 42;
+        console.CursorTop = 24;
 
-            var console = new VirtualConsole(
-                input: stdIn,
-                output: stdOut,
-                error: stdErr
-            );
+        console.Output.WriteLine(""Hello "");
+        console.Error.WriteLine(""world!"");
+
+        return default;
+    }
+}
+");
+
+            var application = new CliApplicationBuilder()
+                .AddCommand(commandType)
+                .UseConsole(FakeConsole)
+                .Build();
 
             // Act
-            console.Output.Write("output");
-            console.Error.Write("error");
-
-            var stdInData = console.Input.ReadToEnd();
-            var stdOutData = console.Output.Encoding.GetString(stdOut.ToArray());
-            var stdErrData = console.Error.Encoding.GetString(stdErr.ToArray());
-
-            console.ResetColor();
-            console.ForegroundColor = ConsoleColor.DarkMagenta;
-            console.BackgroundColor = ConsoleColor.DarkMagenta;
-            console.CursorLeft = 42;
-            console.CursorTop = 24;
+            var exitCode = await application.RunAsync(
+                Array.Empty<string>(),
+                new Dictionary<string, string>()
+            );
 
             // Assert
-            stdInData.Should().Be("input");
-            stdOutData.Should().Be("output");
-            stdErrData.Should().Be("error");
+            exitCode.Should().Be(0);
 
-            console.Input.Should().NotBeSameAs(Console.In);
-            console.Output.Should().NotBeSameAs(Console.Out);
-            console.Error.Should().NotBeSameAs(Console.Error);
+            Console.OpenStandardInput().Should().NotBe(FakeConsole.Input.BaseStream);
+            Console.OpenStandardOutput().Should().NotBe(FakeConsole.Output.BaseStream);
+            Console.OpenStandardError().Should().NotBe(FakeConsole.Error.BaseStream);
 
-            console.IsInputRedirected.Should().BeTrue();
-            console.IsOutputRedirected.Should().BeTrue();
-            console.IsErrorRedirected.Should().BeTrue();
+            Console.ForegroundColor.Should().NotBe(ConsoleColor.DarkMagenta);
+            Console.BackgroundColor.Should().NotBe(ConsoleColor.DarkMagenta);
 
-            console.ForegroundColor.Should().NotBe(Console.ForegroundColor);
-            console.BackgroundColor.Should().NotBe(Console.BackgroundColor);
+            // This fails because tests don't spawn a console window
+            //Console.CursorLeft.Should().NotBe(42);
+            //Console.CursorTop.Should().NotBe(24);
+
+            FakeConsole.IsInputRedirected.Should().BeTrue();
+            FakeConsole.IsOutputRedirected.Should().BeTrue();
+            FakeConsole.IsErrorRedirected.Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task Fake_console_can_be_used_with_an_in_memory_backing_store()
+        {
+            // Arrange
+            var commandType = DynamicCommandBuilder.Compile(
+                // language=cs
+                @"
+[Command]
+public class Command : ICommand
+{   
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        var input = console.Input.ReadToEnd();
+        console.Output.WriteLine(input);
+        console.Error.WriteLine(input);
+
+        return default;
+    }
+}
+");
+
+            var application = new CliApplicationBuilder()
+                .AddCommand(commandType)
+                .UseConsole(FakeConsole)
+                .Build();
+
+            // Act
+            FakeConsole.WriteInput("Hello world");
+
+            var exitCode = await application.RunAsync(
+                Array.Empty<string>(),
+                new Dictionary<string, string>()
+            );
+
+            var stdOut = FakeConsole.ReadOutputString();
+            var stdErr = FakeConsole.ReadErrorString();
+
+            // Assert
+            exitCode.Should().Be(0);
+            stdOut.Trim().Should().Be("Hello world");
+            stdErr.Trim().Should().Be("Hello world");
         }
     }
 }

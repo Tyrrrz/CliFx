@@ -1,174 +1,205 @@
-﻿using System.Threading.Tasks;
-using CliFx.Tests.Commands;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using CliFx.Tests.Utils;
+using CliFx.Tests.Utils.Extensions;
 using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace CliFx.Tests
 {
-    public class ErrorReportingSpecs
+    public class ErrorReportingSpecs : SpecsBase
     {
-        private readonly ITestOutputHelper _output;
-
-        public ErrorReportingSpecs(ITestOutputHelper output) => _output = output;
-
-        [Fact]
-        public async Task Command_may_throw_a_generic_exception_which_exits_and_prints_error_message_and_stack_trace()
+        public ErrorReportingSpecs(ITestOutputHelper testOutput)
+            : base(testOutput)
         {
-            // Arrange
-            var (console, stdOut, stdErr) = VirtualConsole.CreateBuffered();
-
-            var application = new CliApplicationBuilder()
-                .AddCommand<GenericExceptionCommand>()
-                .UseConsole(console)
-                .Build();
-
-            // Act
-            var exitCode = await application.RunAsync(new[] {"cmd", "-m", "Kaput"});
-
-            // Assert
-            exitCode.Should().NotBe(0);
-            stdOut.GetString().Should().BeEmpty();
-            stdErr.GetString().Should().ContainAll(
-                "System.Exception:",
-                "Kaput", "at",
-                "CliFx.Tests"
-            );
-
-            _output.WriteLine(stdOut.GetString());
-            _output.WriteLine(stdErr.GetString());
         }
 
         [Fact]
-        public async Task Command_may_throw_a_generic_exception_with_inner_exception_which_exits_and_prints_error_message_and_stack_trace()
+        public async Task Command_can_throw_an_exception_which_exits_with_a_stacktrace()
         {
             // Arrange
-            var (console, stdOut, stdErr) = VirtualConsole.CreateBuffered();
+            var commandType = DynamicCommandBuilder.Compile(
+                // language=cs
+                @"
+[Command]
+public class Command : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console) =>
+        throw new Exception(""Something went wrong"");
+}
+");
 
             var application = new CliApplicationBuilder()
-                .AddCommand<GenericInnerExceptionCommand>()
-                .UseConsole(console)
+                .AddCommand(commandType)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[] {"cmd", "-m", "Kaput", "-i", "FooBar"});
+            var exitCode = await application.RunAsync(
+                Array.Empty<string>(),
+                new Dictionary<string, string>()
+            );
+
+            var stdOut = FakeConsole.ReadOutputString();
+            var stdErr = FakeConsole.ReadErrorString();
 
             // Assert
             exitCode.Should().NotBe(0);
-            stdOut.GetString().Should().BeEmpty();
-            stdErr.GetString().Should().ContainAll(
-                "System.Exception:",
-                "FooBar",
-                "Kaput", "at",
-                "CliFx.Tests"
+            stdOut.Should().BeEmpty();
+            stdErr.Should().ContainAllInOrder(
+                "System.Exception", "Something went wrong",
+                "at", "CliFx."
             );
-
-            _output.WriteLine(stdOut.GetString());
-            _output.WriteLine(stdErr.GetString());
         }
 
         [Fact]
-        public async Task Command_may_throw_a_specialized_exception_which_exits_with_custom_code_and_prints_minimal_error_details()
+        public async Task Command_can_throw_an_exception_with_an_inner_exception_which_exits_with_a_stacktrace()
         {
             // Arrange
-            var (console, stdOut, stdErr) = VirtualConsole.CreateBuffered();
+            var commandType = DynamicCommandBuilder.Compile(
+                // language=cs
+                @"
+[Command]
+public class Command : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console) =>
+        throw new Exception(""Something went wrong"", new Exception(""Another exception""));
+}
+");
 
             var application = new CliApplicationBuilder()
-                .AddCommand<CommandExceptionCommand>()
-                .UseConsole(console)
+                .AddCommand(commandType)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[] {"cmd", "-m", "Kaput", "-c", "69"});
+            var exitCode = await application.RunAsync(
+                Array.Empty<string>(),
+                new Dictionary<string, string>()
+            );
+
+            var stdOut = FakeConsole.ReadOutputString();
+            var stdErr = FakeConsole.ReadErrorString();
+
+            // Assert
+            exitCode.Should().NotBe(0);
+            stdOut.Should().BeEmpty();
+            stdErr.Should().ContainAllInOrder(
+                "System.Exception", "Something went wrong",
+                "System.Exception", "Another exception",
+                "at", "CliFx."
+            );
+        }
+
+        [Fact]
+        public async Task Command_can_throw_a_special_exception_which_exits_with_specified_code_and_message()
+        {
+            // Arrange
+            var commandType = DynamicCommandBuilder.Compile(
+                // language=cs
+                @"
+[Command]
+public class Command : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console) =>
+        throw new CommandException(""Something went wrong"", 69);
+}
+");
+
+            var application = new CliApplicationBuilder()
+                .AddCommand(commandType)
+                .UseConsole(FakeConsole)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(
+                Array.Empty<string>(),
+                new Dictionary<string, string>()
+            );
+
+            var stdOut = FakeConsole.ReadOutputString();
+            var stdErr = FakeConsole.ReadErrorString();
 
             // Assert
             exitCode.Should().Be(69);
-            stdOut.GetString().Should().BeEmpty();
-            stdErr.GetString().Trim().Should().Be("Kaput");
-
-            _output.WriteLine(stdOut.GetString());
-            _output.WriteLine(stdErr.GetString());
+            stdOut.Should().BeEmpty();
+            stdErr.Trim().Should().Be("Something went wrong");
         }
 
         [Fact]
-        public async Task Command_may_throw_a_specialized_exception_without_error_message_which_exits_and_prints_full_error_details()
+        public async Task Command_can_throw_a_special_exception_without_message_which_exits_with_a_stacktrace()
         {
             // Arrange
-            var (console, stdOut, stdErr) = VirtualConsole.CreateBuffered();
+            var commandType = DynamicCommandBuilder.Compile(
+                // language=cs
+                @"
+[Command]
+public class Command : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console) =>
+        throw new CommandException("""", 69);
+}
+");
 
             var application = new CliApplicationBuilder()
-                .AddCommand<CommandExceptionCommand>()
-                .UseConsole(console)
+                .AddCommand(commandType)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[] {"cmd"});
-
-            // Assert
-            exitCode.Should().NotBe(0);
-            stdOut.GetString().Should().BeEmpty();
-            stdErr.GetString().Should().ContainAll(
-                "CliFx.Exceptions.CommandException:",
-                "at",
-                "CliFx.Tests"
+            var exitCode = await application.RunAsync(
+                Array.Empty<string>(),
+                new Dictionary<string, string>()
             );
 
-            _output.WriteLine(stdOut.GetString());
-            _output.WriteLine(stdErr.GetString());
+            var stdOut = FakeConsole.ReadOutputString();
+            var stdErr = FakeConsole.ReadErrorString();
+
+            // Assert
+            exitCode.Should().Be(69);
+            stdOut.Should().BeEmpty();
+            stdErr.Should().ContainAllInOrder(
+                "CliFx.Exceptions.CommandException",
+                "at", "CliFx."
+            );
         }
 
         [Fact]
-        public async Task Command_may_throw_a_specialized_exception_which_exits_and_prints_help_text()
+        public async Task Command_can_throw_a_special_exception_which_prints_help_text_before_exiting()
         {
             // Arrange
-            var (console, stdOut, stdErr) = VirtualConsole.CreateBuffered();
+            var commandType = DynamicCommandBuilder.Compile(
+                // language=cs
+                @"
+[Command]
+public class Command : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console) =>
+        throw new CommandException(""Something went wrong"", 69, true);
+}
+");
 
             var application = new CliApplicationBuilder()
-                .AddCommand<CommandExceptionCommand>()
-                .UseConsole(console)
+                .AddCommand(commandType)
+                .UseConsole(FakeConsole)
+                .SetDescription("This will be in help text")
                 .Build();
 
             // Act
-            var exitCode = await application.RunAsync(new[] {"cmd", "-m", "Kaput", "--show-help"});
+            var exitCode = await application.RunAsync(
+                Array.Empty<string>(),
+                new Dictionary<string, string>()
+            );
+
+            var stdOut = FakeConsole.ReadOutputString();
+            var stdErr = FakeConsole.ReadErrorString();
 
             // Assert
-            exitCode.Should().NotBe(0);
-            stdOut.GetString().Should().ContainAll(
-                "Usage",
-                "Options",
-                "-h|--help"
-            );
-            stdErr.GetString().Trim().Should().Be("Kaput");
-
-            _output.WriteLine(stdOut.GetString());
-            _output.WriteLine(stdErr.GetString());
-        }
-
-        [Fact]
-        public async Task Command_shows_help_text_on_invalid_user_input()
-        {
-            // Arrange
-            var (console, stdOut, stdErr) = VirtualConsole.CreateBuffered();
-
-            var application = new CliApplicationBuilder()
-                .AddCommand<DefaultCommand>()
-                .UseConsole(console)
-                .Build();
-
-            // Act
-            var exitCode = await application.RunAsync(new[] {"not-a-valid-command", "-r", "foo"});
-
-            // Assert
-            exitCode.Should().NotBe(0);
-            stdOut.GetString().Should().ContainAll(
-                "Usage",
-                "Options",
-                "-h|--help"
-            );
-            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
-
-            _output.WriteLine(stdOut.GetString());
-            _output.WriteLine(stdErr.GetString());
+            exitCode.Should().Be(69);
+            stdOut.Should().Contain("This will be in help text");
+            stdErr.Trim().Should().Be("Something went wrong");
         }
     }
 }

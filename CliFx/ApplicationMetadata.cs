@@ -18,7 +18,7 @@
         /// <summary>
         /// Application version text.
         /// </summary>
-        public string VersionText { get; }
+        public string Version { get; }
 
         /// <summary>
         /// Application description.
@@ -31,12 +31,12 @@
         public ApplicationMetadata(
             string title,
             string executableName,
-            string versionText,
+            string version,
             string? description)
         {
             Title = title;
             ExecutableName = executableName;
-            VersionText = versionText;
+            Version = version;
             Description = description;
         }
     }

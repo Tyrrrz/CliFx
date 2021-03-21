@@ -1,45 +1,45 @@
 ﻿using System;
 using System.Threading.Tasks;
 using CliFx.Attributes;
-using CliFx.Demo.Internal;
-using CliFx.Demo.Models;
-using CliFx.Demo.Services;
+using CliFx.Demo.Domain;
+using CliFx.Demo.Utils;
 using CliFx.Exceptions;
+using CliFx.Infrastructure;
 
 namespace CliFx.Demo.Commands
 {
     [Command("book add", Description = "Add a book to the library.")]
     public partial class BookAddCommand : ICommand
     {
-        private readonly LibraryService _libraryService;
+        private readonly LibraryProvider _libraryProvider;
 
         [CommandParameter(0, Name = "title", Description = "Book title.")]
-        public string Title { get; set; } = "";
+        public string Title { get; init; } = "";
 
         [CommandOption("author", 'a', IsRequired = true, Description = "Book author.")]
-        public string Author { get; set; } = "";
+        public string Author { get; init; } = "";
 
         [CommandOption("published", 'p', Description = "Book publish date.")]
-        public DateTimeOffset Published { get; set; } = CreateRandomDate();
+        public DateTimeOffset Published { get; init; } = CreateRandomDate();
 
         [CommandOption("isbn", 'n', Description = "Book ISBN.")]
-        public Isbn Isbn { get; set; } = CreateRandomIsbn();
+        public Isbn Isbn { get; init; } = CreateRandomIsbn();
 
-        public BookAddCommand(LibraryService libraryService)
+        public BookAddCommand(LibraryProvider libraryProvider)
         {
-            _libraryService = libraryService;
+            _libraryProvider = libraryProvider;
         }
 
         public ValueTask ExecuteAsync(IConsole console)
         {
-            if (_libraryService.GetBook(Title) != null)
-                throw new CommandException("Book already exists.", 1);
+            if (_libraryProvider.TryGetBook(Title) is not null)
+                throw new CommandException("Book already exists.", 10);
 
             var book = new Book(Title, Author, Published, Isbn);
-            _libraryService.AddBook(book);
+            _libraryProvider.AddBook(book);
 
             console.Output.WriteLine("Book added.");
-            console.RenderBook(book);
+            console.Output.WriteBook(book);
 
             return default;
         }
@@ -56,13 +56,15 @@ namespace CliFx.Demo.Commands
             Random.Next(1, 23),
             Random.Next(1, 59),
             Random.Next(1, 59),
-            TimeSpan.Zero);
+            TimeSpan.Zero
+        );
 
         private static Isbn CreateRandomIsbn() => new(
             Random.Next(0, 999),
             Random.Next(0, 99),
             Random.Next(0, 99999),
             Random.Next(0, 99),
-            Random.Next(0, 9));
+            Random.Next(0, 9)
+        );
     }
 }

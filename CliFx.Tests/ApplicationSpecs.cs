@@ -1,495 +1,86 @@
 ﻿using System;
-using System.IO;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using CliFx.Tests.Commands;
-using CliFx.Tests.Commands.Invalid;
+using CliFx.Tests.Utils;
 using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace CliFx.Tests
 {
-    public class ApplicationSpecs
+    public class ApplicationSpecs : SpecsBase
     {
-        private readonly ITestOutputHelper _output;
-
-        public ApplicationSpecs(ITestOutputHelper output) => _output = output;
+        public ApplicationSpecs(ITestOutputHelper testOutput)
+            : base(testOutput)
+        {
+        }
 
         [Fact]
-        public void Application_can_be_created_with_a_default_configuration()
+        public async Task Application_can_be_created_with_minimal_configuration()
         {
             // Act
             var app = new CliApplicationBuilder()
                 .AddCommandsFromThisAssembly()
+                .UseConsole(FakeConsole)
                 .Build();
 
+            var exitCode = await app.RunAsync(
+                Array.Empty<string>(),
+                new Dictionary<string, string>()
+            );
+
             // Assert
-            app.Should().NotBeNull();
+            exitCode.Should().Be(0);
         }
 
         [Fact]
-        public void Application_can_be_created_with_a_custom_configuration()
+        public async Task Application_can_be_created_with_a_fully_customized_configuration()
         {
             // Act
             var app = new CliApplicationBuilder()
-                .AddCommand<DefaultCommand>()
-                .AddCommandsFrom(typeof(DefaultCommand).Assembly)
-                .AddCommands(new[] {typeof(DefaultCommand)})
-                .AddCommandsFrom(new[] {typeof(DefaultCommand).Assembly})
+                .AddCommand<NoOpCommand>()
+                .AddCommandsFrom(typeof(NoOpCommand).Assembly)
+                .AddCommands(new[] {typeof(NoOpCommand)})
+                .AddCommandsFrom(new[] {typeof(NoOpCommand).Assembly})
                 .AddCommandsFromThisAssembly()
                 .AllowDebugMode()
                 .AllowPreviewMode()
-                .UseTitle("test")
-                .UseExecutableName("test")
-                .UseVersionText("test")
-                .UseDescription("test")
-                .UseConsole(new VirtualConsole(Stream.Null))
+                .SetTitle("test")
+                .SetExecutableName("test")
+                .SetVersion("test")
+                .SetDescription("test")
+                .UseConsole(FakeConsole)
                 .UseTypeActivator(Activator.CreateInstance!)
                 .Build();
 
+            var exitCode = await app.RunAsync(
+                Array.Empty<string>(),
+                new Dictionary<string, string>()
+            );
+
             // Assert
-            app.Should().NotBeNull();
+            exitCode.Should().Be(0);
         }
 
         [Fact]
-        public async Task At_least_one_command_must_be_defined_in_an_application()
+        public async Task Application_configuration_fails_if_an_invalid_command_is_registered()
         {
-            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
-
-            var application = new CliApplicationBuilder()
-                .UseConsole(console)
+            // Act
+            var app = new CliApplicationBuilder()
+                .AddCommand(typeof(ApplicationSpecs))
+                .UseConsole(FakeConsole)
                 .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(Array.Empty<string>());
+            var exitCode = await app.RunAsync(
+                Array.Empty<string>(),
+                new Dictionary<string, string>()
+            );
+
+            var stdErr = FakeConsole.ReadErrorString();
 
             // Assert
             exitCode.Should().NotBe(0);
-            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
-
-            _output.WriteLine(stdErr.GetString());
-        }
-
-        [Fact]
-        public async Task Commands_must_implement_the_corresponding_interface()
-        {
-            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
-
-            var application = new CliApplicationBuilder()
-                .AddCommand(typeof(NonImplementedCommand))
-                .UseConsole(console)
-                .Build();
-
-            // Act
-            var exitCode = await application.RunAsync(Array.Empty<string>());
-
-            // Assert
-            exitCode.Should().NotBe(0);
-            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
-
-            _output.WriteLine(stdErr.GetString());
-        }
-
-        [Fact]
-        public async Task Commands_must_be_annotated_by_an_attribute()
-        {
-            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
-
-            var application = new CliApplicationBuilder()
-                .AddCommand<NonAnnotatedCommand>()
-                .UseConsole(console)
-                .Build();
-
-            // Act
-            var exitCode = await application.RunAsync(Array.Empty<string>());
-
-            // Assert
-            exitCode.Should().NotBe(0);
-            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
-
-            _output.WriteLine(stdErr.GetString());
-        }
-
-        [Fact]
-        public async Task Commands_must_have_unique_names()
-        {
-            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
-
-            var application = new CliApplicationBuilder()
-                .AddCommand<GenericExceptionCommand>()
-                .AddCommand<CommandExceptionCommand>()
-                .UseConsole(console)
-                .Build();
-
-            // Act
-            var exitCode = await application.RunAsync(Array.Empty<string>());
-
-            // Assert
-            exitCode.Should().NotBe(0);
-            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
-
-            _output.WriteLine(stdErr.GetString());
-        }
-
-        [Fact]
-        public async Task Command_can_be_default_but_only_if_it_is_the_only_such_command()
-        {
-            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
-
-            var application = new CliApplicationBuilder()
-                .AddCommand<DefaultCommand>()
-                .AddCommand<OtherDefaultCommand>()
-                .UseConsole(console)
-                .Build();
-
-            // Act
-            var exitCode = await application.RunAsync(Array.Empty<string>());
-
-            // Assert
-            exitCode.Should().NotBe(0);
-            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
-
-            _output.WriteLine(stdErr.GetString());
-        }
-
-        [Fact]
-        public async Task Command_parameters_must_have_unique_order()
-        {
-            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
-
-            var application = new CliApplicationBuilder()
-                .AddCommand<DuplicateParameterOrderCommand>()
-                .UseConsole(console)
-                .Build();
-
-            // Act
-            var exitCode = await application.RunAsync(Array.Empty<string>());
-
-            // Assert
-            exitCode.Should().NotBe(0);
-            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
-
-            _output.WriteLine(stdErr.GetString());
-        }
-
-        [Fact]
-        public async Task Command_parameters_must_have_unique_names()
-        {
-            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
-
-            var application = new CliApplicationBuilder()
-                .AddCommand<DuplicateParameterNameCommand>()
-                .UseConsole(console)
-                .Build();
-
-            // Act
-            var exitCode = await application.RunAsync(Array.Empty<string>());
-
-            // Assert
-            exitCode.Should().NotBe(0);
-            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
-
-            _output.WriteLine(stdErr.GetString());
-        }
-
-        [Fact]
-        public async Task Command_parameter_can_be_non_scalar_only_if_no_other_such_parameter_is_present()
-        {
-            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
-
-            var application = new CliApplicationBuilder()
-                .AddCommand<MultipleNonScalarParametersCommand>()
-                .UseConsole(console)
-                .Build();
-
-            // Act
-            var exitCode = await application.RunAsync(Array.Empty<string>());
-
-            // Assert
-            exitCode.Should().NotBe(0);
-            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
-
-            _output.WriteLine(stdErr.GetString());
-        }
-
-        [Fact]
-        public async Task Command_parameter_can_be_non_scalar_only_if_it_is_the_last_in_order()
-        {
-            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
-
-            var application = new CliApplicationBuilder()
-                .AddCommand<NonLastNonScalarParameterCommand>()
-                .UseConsole(console)
-                .Build();
-
-            // Act
-            var exitCode = await application.RunAsync(Array.Empty<string>());
-
-            // Assert
-            exitCode.Should().NotBe(0);
-            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
-
-            _output.WriteLine(stdErr.GetString());
-        }
-
-        [Fact]
-        public async Task Command_parameter_custom_converter_must_implement_the_corresponding_interface()
-        {
-            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
-
-            var application = new CliApplicationBuilder()
-                .AddCommand<InvalidCustomConverterParameterCommand>()
-                .UseConsole(console)
-                .Build();
-
-            // Act
-            var exitCode = await application.RunAsync(Array.Empty<string>());
-
-            // Assert
-            exitCode.Should().NotBe(0);
-            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
-
-            _output.WriteLine(stdErr.GetString());
-        }
-
-        [Fact]
-        public async Task Command_parameter_custom_validator_must_implement_the_corresponding_interface()
-        {
-            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
-
-            var application = new CliApplicationBuilder()
-                .AddCommand<InvalidCustomValidatorParameterCommand>()
-                .UseConsole(console)
-                .Build();
-
-            // Act
-            var exitCode = await application.RunAsync(Array.Empty<string>());
-
-            // Assert
-            exitCode.Should().NotBe(0);
-            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
-
-            _output.WriteLine(stdErr.GetString());
-        }
-
-        [Fact]
-        public async Task Command_options_must_have_names_that_are_not_empty()
-        {
-            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
-
-            var application = new CliApplicationBuilder()
-                .AddCommand<EmptyOptionNameCommand>()
-                .UseConsole(console)
-                .Build();
-
-            // Act
-            var exitCode = await application.RunAsync(Array.Empty<string>());
-
-            // Assert
-            exitCode.Should().NotBe(0);
-            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
-
-            _output.WriteLine(stdErr.GetString());
-        }
-
-        [Fact]
-        public async Task Command_options_must_have_names_that_are_longer_than_one_character()
-        {
-            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
-
-            var application = new CliApplicationBuilder()
-                .AddCommand<SingleCharacterOptionNameCommand>()
-                .UseConsole(console)
-                .Build();
-
-            // Act
-            var exitCode = await application.RunAsync(Array.Empty<string>());
-
-            // Assert
-            exitCode.Should().NotBe(0);
-            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
-
-            _output.WriteLine(stdErr.GetString());
-        }
-
-        [Fact]
-        public async Task Command_options_must_have_unique_names()
-        {
-            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
-
-            var application = new CliApplicationBuilder()
-                .AddCommand<DuplicateOptionNamesCommand>()
-                .UseConsole(console)
-                .Build();
-
-            // Act
-            var exitCode = await application.RunAsync(Array.Empty<string>());
-
-            // Assert
-            exitCode.Should().NotBe(0);
-            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
-
-            _output.WriteLine(stdErr.GetString());
-        }
-
-        [Fact]
-        public async Task Command_options_must_have_unique_short_names()
-        {
-            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
-
-            var application = new CliApplicationBuilder()
-                .AddCommand<DuplicateOptionShortNamesCommand>()
-                .UseConsole(console)
-                .Build();
-
-            // Act
-            var exitCode = await application.RunAsync(Array.Empty<string>());
-
-            // Assert
-            exitCode.Should().NotBe(0);
-            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
-
-            _output.WriteLine(stdErr.GetString());
-        }
-
-        [Fact]
-        public async Task Command_options_must_have_unique_environment_variable_names()
-        {
-            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
-
-            var application = new CliApplicationBuilder()
-                .AddCommand<DuplicateOptionEnvironmentVariableNamesCommand>()
-                .UseConsole(console)
-                .Build();
-
-            // Act
-            var exitCode = await application.RunAsync(Array.Empty<string>());
-
-            // Assert
-            exitCode.Should().NotBe(0);
-            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
-
-            _output.WriteLine(stdErr.GetString());
-        }
-
-        [Fact]
-        public async Task Command_options_must_not_have_conflicts_with_the_implicit_help_option()
-        {
-            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
-
-            var application = new CliApplicationBuilder()
-                .AddCommand<ConflictWithHelpOptionCommand>()
-                .UseConsole(console)
-                .Build();
-
-            // Act
-            var exitCode = await application.RunAsync(Array.Empty<string>());
-
-            // Assert
-            exitCode.Should().NotBe(0);
-            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
-
-            _output.WriteLine(stdErr.GetString());
-        }
-
-        [Fact]
-        public async Task Command_options_must_not_have_conflicts_with_the_implicit_version_option()
-        {
-            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
-
-            var application = new CliApplicationBuilder()
-                .AddCommand<ConflictWithVersionOptionCommand>()
-                .UseConsole(console)
-                .Build();
-
-            // Act
-            var exitCode = await application.RunAsync(Array.Empty<string>());
-
-            // Assert
-            exitCode.Should().NotBe(0);
-            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
-
-            _output.WriteLine(stdErr.GetString());
-        }
-
-        [Fact]
-        public async Task Command_option_custom_converter_must_implement_the_corresponding_interface()
-        {
-            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
-
-            var application = new CliApplicationBuilder()
-                .AddCommand<InvalidCustomConverterOptionCommand>()
-                .UseConsole(console)
-                .Build();
-
-            // Act
-            var exitCode = await application.RunAsync(Array.Empty<string>());
-
-            // Assert
-            exitCode.Should().NotBe(0);
-            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
-
-            _output.WriteLine(stdErr.GetString());
-        }
-
-        [Fact]
-        public async Task Command_option_custom_validator_must_implement_the_corresponding_interface()
-        {
-            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
-
-            var application = new CliApplicationBuilder()
-                .AddCommand<InvalidCustomValidatorOptionCommand>()
-                .UseConsole(console)
-                .Build();
-
-            // Act
-            var exitCode = await application.RunAsync(Array.Empty<string>());
-
-            // Assert
-            exitCode.Should().NotBe(0);
-            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
-
-            _output.WriteLine(stdErr.GetString());
-        }
-
-        [Fact]
-        public async Task Command_options_must_have_names_that_start_with_a_letter_character()
-        {
-            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
-
-            var application = new CliApplicationBuilder()
-                .AddCommand<NonLetterCharacterNameCommand>()
-                .UseConsole(console)
-                .Build();
-
-            // Act
-            var exitCode = await application.RunAsync(Array.Empty<string>());
-
-            // Assert
-            exitCode.Should().NotBe(0);
-            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
-
-            _output.WriteLine(stdErr.GetString());
-        }
-
-        [Fact]
-        public async Task Command_options_must_have_short_names_that_are_letter_characters()
-        {
-            var (console, _, stdErr) = VirtualConsole.CreateBuffered();
-
-            var application = new CliApplicationBuilder()
-                .AddCommand<NonLetterCharacterShortNameCommand>()
-                .UseConsole(console)
-                .Build();
-
-            // Act
-            var exitCode = await application.RunAsync(Array.Empty<string>());
-
-            // Assert
-            exitCode.Should().NotBe(0);
-            stdErr.GetString().Should().NotBeNullOrWhiteSpace();
-
-            _output.WriteLine(stdErr.GetString());
+            stdErr.Should().Contain("not a valid command");
         }
     }
 }

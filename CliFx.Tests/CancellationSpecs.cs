@@ -1,36 +1,67 @@
 ﻿using System;
-using System.Threading;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using CliFx.Tests.Commands;
+using CliFx.Tests.Utils;
 using FluentAssertions;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace CliFx.Tests
 {
-    public class CancellationSpecs
+    public class CancellationSpecs : SpecsBase
     {
-        [Fact]
-        public async Task Command_can_perform_additional_cleanup_if_cancellation_is_requested()
+        public CancellationSpecs(ITestOutputHelper testOutput)
+            : base(testOutput)
         {
-            // Can't test it with a real console because CliWrap can't send Ctrl+C
+        }
 
+        [Fact]
+        public async Task Command_can_register_to_receive_a_cancellation_signal_from_the_console()
+        {
             // Arrange
-            using var cts = new CancellationTokenSource();
-            var (console, stdOut, _) = VirtualConsole.CreateBuffered(cts.Token);
+            var commandType = DynamicCommandBuilder.Compile(
+                // language=cs
+                @"
+[Command]
+public class Command : ICommand
+{
+    public async ValueTask ExecuteAsync(IConsole console)
+    {
+        try
+        {
+            await Task.Delay(
+                TimeSpan.FromSeconds(3),
+                console.RegisterCancellationHandler()
+            );
+
+            console.Output.WriteLine(""Completed successfully"");
+        }
+        catch (OperationCanceledException)
+        {
+            console.Output.WriteLine(""Cancelled"");
+            throw;
+        }
+    }
+}");
 
             var application = new CliApplicationBuilder()
-                .AddCommand<CancellableCommand>()
-                .UseConsole(console)
+                .AddCommand(commandType)
+                .UseConsole(FakeConsole)
                 .Build();
 
             // Act
-            cts.CancelAfter(TimeSpan.FromSeconds(0.2));
+            FakeConsole.RequestCancellation(TimeSpan.FromSeconds(0.2));
 
-            var exitCode = await application.RunAsync(new[] {"cmd"});
+            var exitCode = await application.RunAsync(
+                Array.Empty<string>(),
+                new Dictionary<string, string>()
+            );
+
+            var stdOut = FakeConsole.ReadOutputString();
 
             // Assert
             exitCode.Should().NotBe(0);
-            stdOut.GetString().Trim().Should().Be(CancellableCommand.CancellationOutputText);
+            stdOut.Trim().Should().Be("Cancelled");
         }
     }
 }

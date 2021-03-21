@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using CliFx.Attributes;
+using CliFx.Infrastructure;
 
 namespace CliFx.Tests.Dummy.Commands
 {
@@ -11,11 +12,11 @@ namespace CliFx.Tests.Dummy.Commands
         {
             var input = console.Input.ReadToEnd();
 
-            console.WithColors(ConsoleColor.Black, ConsoleColor.White, () =>
+            using (console.WithColors(ConsoleColor.Black, ConsoleColor.White))
             {
                 console.Output.WriteLine(input);
                 console.Error.WriteLine(input);
-            });
+            }
 
             return default;
         }
