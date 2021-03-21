@@ -42,12 +42,12 @@ public class NamedCommand : ICommand
     }
 }
 
-[Command(""cmd sub"")]
-public class SubCommand : ICommand
+[Command(""cmd child"")]
+public class NamedChildCommand : ICommand
 {
     public ValueTask ExecuteAsync(IConsole console)
     {
-        console.Output.WriteLine(""cmd sub"");
+        console.Output.WriteLine(""cmd child"");
         return default;
     }
 }
@@ -98,12 +98,12 @@ public class NamedCommand : ICommand
     }
 }
 
-[Command(""cmd sub"")]
-public class SubCommand : ICommand
+[Command(""cmd child"")]
+public class NamedChildCommand : ICommand
 {
     public ValueTask ExecuteAsync(IConsole console)
     {
-        console.Output.WriteLine(""cmd sub"");
+        console.Output.WriteLine(""cmd child"");
         return default;
     }
 }
@@ -128,7 +128,7 @@ public class SubCommand : ICommand
         }
 
         [Fact]
-        public async Task Specific_named_sub_command_is_executed_if_provided_arguments_match_its_name()
+        public async Task Specific_named_child_command_is_executed_if_provided_arguments_match_its_name()
         {
             // Arrange
             var commandTypes = DynamicCommandBuilder.CompileMany(
@@ -154,12 +154,12 @@ public class NamedCommand : ICommand
     }
 }
 
-[Command(""cmd sub"")]
-public class SubCommand : ICommand
+[Command(""cmd child"")]
+public class NamedChildCommand : ICommand
 {
     public ValueTask ExecuteAsync(IConsole console)
     {
-        console.Output.WriteLine(""cmd sub"");
+        console.Output.WriteLine(""cmd child"");
         return default;
     }
 }
@@ -172,7 +172,7 @@ public class SubCommand : ICommand
 
             // Act
             var exitCode = await application.RunAsync(
-                new[] {"cmd", "sub"},
+                new[] {"cmd", "child"},
                 new Dictionary<string, string>()
             );
 
@@ -180,7 +180,7 @@ public class SubCommand : ICommand
 
             // Assert
             exitCode.Should().Be(0);
-            stdOut.Trim().Should().Be("cmd sub");
+            stdOut.Trim().Should().Be("cmd child");
         }
     }
 }

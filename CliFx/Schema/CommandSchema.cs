@@ -80,7 +80,8 @@ namespace CliFx.Schema
 
             var attribute = type.GetCustomAttribute<CommandAttribute>();
 
-            var name = attribute?.Name;
+            var name = attribute?.Name?.Trim();
+            var description = attribute?.Description?.Trim();
 
             var implicitOptionSchemas = string.IsNullOrWhiteSpace(name)
                 ? new[] {OptionSchema.HelpOption, OptionSchema.VersionOption}
@@ -100,7 +101,7 @@ namespace CliFx.Schema
             return new CommandSchema(
                 type,
                 name,
-                attribute?.Description,
+                description,
                 parameterSchemas!,
                 optionSchemas!
             );

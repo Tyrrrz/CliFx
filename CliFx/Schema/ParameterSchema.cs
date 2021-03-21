@@ -48,13 +48,14 @@ namespace CliFx.Schema
             if (attribute is null)
                 return null;
 
-            var name = attribute.Name ?? property.Name.ToLowerInvariant();
+            var name = attribute.Name?.Trim() ?? property.Name.ToLowerInvariant();
+            var description = attribute.Description?.Trim();
 
             return new ParameterSchema(
                 new BindablePropertyDescriptor(property),
                 attribute.Order,
                 name,
-                attribute.Description,
+                description,
                 attribute.Converter,
                 attribute.Validators
             );

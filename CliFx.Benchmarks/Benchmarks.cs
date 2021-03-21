@@ -5,7 +5,6 @@ using BenchmarkDotNet.Running;
 
 namespace CliFx.Benchmarks
 {
-    [SimpleJob]
     [RankColumn]
     [Orderer(SummaryOrderPolicy.FastestToSlowest)]
     public partial class Benchmarks

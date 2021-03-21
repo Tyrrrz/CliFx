@@ -99,15 +99,17 @@ namespace CliFx.Schema
                 return null;
 
             // The user may mistakenly specify dashes, thinking it's required, so trim them
-            var name = attribute.Name?.TrimStart('-');
+            var name = attribute.Name?.TrimStart('-').Trim();
+            var environmentVariable = attribute.EnvironmentVariable?.Trim();
+            var description = attribute.Description?.Trim();
 
             return new OptionSchema(
                 new BindablePropertyDescriptor(property),
                 name,
                 attribute.ShortName,
-                attribute.EnvironmentVariable,
+                environmentVariable,
                 attribute.IsRequired,
-                attribute.Description,
+                description,
                 attribute.Converter,
                 attribute.Validators
             );

@@ -48,11 +48,7 @@ namespace CliFx.Tests
 [Command]
 public class DefaultCommand : ICommand
 {
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(""default"");
-        return default;
-    }
+    public ValueTask ExecuteAsync(IConsole console) => default;
 }
 ");
 
@@ -88,8 +84,8 @@ public class NamedCommand : ICommand
     public ValueTask ExecuteAsync(IConsole console) => default;
 }
 
-[Command(""cmd sub"")]
-public class SubCommand : ICommand
+[Command(""cmd child"")]
+public class NamedChildCommand : ICommand
 {
     public ValueTask ExecuteAsync(IConsole console) => default;
 }
@@ -127,14 +123,14 @@ public class DefaultCommand : ICommand
     public ValueTask ExecuteAsync(IConsole console) => default;
 }
 
-[Command(""cmd"", Description = ""Description of named command"")]
+[Command(""cmd"", Description = ""Description of a named command."")]
 public class NamedCommand : ICommand
 {
     public ValueTask ExecuteAsync(IConsole console) => default;
 }
 
-[Command(""cmd sub"")]
-public class SubCommand : ICommand
+[Command(""cmd child"")]
+public class NamedChildCommand : ICommand
 {
     public ValueTask ExecuteAsync(IConsole console) => default;
 }
@@ -155,11 +151,11 @@ public class SubCommand : ICommand
 
             // Assert
             exitCode.Should().Be(0);
-            stdOut.Should().Contain("Description of named command");
+            stdOut.Should().Contain("Description of a named command.");
         }
 
         [Fact]
-        public async Task Help_text_for_a_specific_named_sub_command_is_printed_if_provided_arguments_match_its_name_and_contain_the_help_option()
+        public async Task Help_text_for_a_specific_named_child_command_is_printed_if_provided_arguments_match_its_name_and_contain_the_help_option()
         {
             // Arrange
             var commandTypes = DynamicCommandBuilder.CompileMany(
@@ -177,8 +173,8 @@ public class NamedCommand : ICommand
     public ValueTask ExecuteAsync(IConsole console) => default;
 }
 
-[Command(""cmd sub"", Description = ""Description of sub command"")]
-public class SubCommand : ICommand
+[Command(""cmd child"", Description = ""Description of a named child command."")]
+public class NamedChildCommand : ICommand
 {
     public ValueTask ExecuteAsync(IConsole console) => default;
 }
@@ -199,7 +195,7 @@ public class SubCommand : ICommand
 
             // Assert
             exitCode.Should().Be(0);
-            stdOut.Should().Contain("Description of sub command");
+            stdOut.Should().Contain("Description of a named child command.");
         }
 
         [Fact]
@@ -262,7 +258,7 @@ public class SubCommand : ICommand
             var commandType = DynamicCommandBuilder.Compile(
                 // language=cs
                 @"
-[Command(Description = ""Description of default command"")]
+[Command(Description = ""Description of the default command."")]
 public class DefaultCommand : ICommand
 {
     public ValueTask ExecuteAsync(IConsole console) => default;
@@ -286,7 +282,7 @@ public class DefaultCommand : ICommand
             exitCode.Should().Be(0);
             stdOut.Should().ContainAllInOrder(
                 "DESCRIPTION",
-                "Description of default command"
+                "Description of the default command."
             );
         }
 
@@ -328,47 +324,6 @@ public class NamedCommand : ICommand
             stdOut.Should().ContainAllInOrder(
                 "USAGE",
                 "[command]", "[...]"
-            );
-        }
-
-        [Fact]
-        public async Task Help_text_shows_usage_format_which_indicates_how_to_execute_a_sub_command()
-        {
-            // Arrange
-            var commandTypes = DynamicCommandBuilder.CompileMany(
-                // language=cs
-                @"
-[Command(""cmd"")]
-public class NamedCommand : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}
-
-[Command(""cmd sub"")]
-public class SubCommand : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}
-");
-
-            var application = new CliApplicationBuilder()
-                .AddCommands(commandTypes)
-                .UseConsole(FakeConsole)
-                .Build();
-
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"cmd", "--help"},
-                new Dictionary<string, string>()
-            );
-
-            var stdOut = FakeConsole.ReadOutputString();
-
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Should().ContainAllInOrder(
-                "USAGE",
-                "cmd", "[command]", "[...]"
             );
         }
 
@@ -461,7 +416,7 @@ public class Command : ICommand
         }
 
         [Fact]
-        public async Task Help_text_shows_all_available_parameters_and_options()
+        public async Task Help_text_shows_all_parameters_and_options()
         {
             // Arrange
             var commandType = DynamicCommandBuilder.Compile(
@@ -470,10 +425,10 @@ public class Command : ICommand
 [Command]
 public class Command : ICommand
 {
-    [CommandParameter(0, Name = ""foo"", Description = ""Description of foo"")]
+    [CommandParameter(0, Name = ""foo"", Description = ""Description of foo."")]
     public string Foo { get; set; }
     
-    [CommandOption(""bar"", Description = ""Description of bar"")]
+    [CommandOption(""bar"", Description = ""Description of bar."")]
     public string Bar { get; set; }
     
     public ValueTask ExecuteAsync(IConsole console) => default;
@@ -497,9 +452,9 @@ public class Command : ICommand
             exitCode.Should().Be(0);
             stdOut.Should().ContainAllInOrder(
                 "PARAMETERS",
-                "foo", "Description of foo",
+                "foo", "Description of foo.",
                 "OPTIONS",
-                "--bar", "Description of bar"
+                "--bar", "Description of bar."
             );
         }
 
@@ -574,120 +529,6 @@ public class Command : ICommand
             );
             stdOut.Should().NotContainAny(
                 "--version", "Shows version information"
-            );
-        }
-
-        [Fact]
-        public async Task Help_text_shows_all_available_sub_commands()
-        {
-            // Arrange
-            var commandTypes = DynamicCommandBuilder.CompileMany(
-                // language=cs
-                @"
-[Command(Description = ""Description of default command"")]
-public class DefaultCommand : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}
-
-[Command(""cmd1"", Description = ""Description of one command"")]
-public class FirstCommand : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}
-
-[Command(""cmd2"", Description = ""Description of another command"")]
-public class SecondCommand : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}
-");
-
-            var application = new CliApplicationBuilder()
-                .AddCommands(commandTypes)
-                .UseConsole(FakeConsole)
-                .Build();
-
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"--help"},
-                new Dictionary<string, string>()
-            );
-
-            var stdOut = FakeConsole.ReadOutputString();
-
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Should().ContainAllInOrder(
-                "COMMANDS",
-                "cmd1", "Description of one command",
-                "cmd2", "Description of another command"
-            );
-        }
-
-        [Fact]
-        public async Task Help_text_shows_all_available_sub_commands_of_sub_commands()
-        {
-            // Arrange
-            var commandTypes = DynamicCommandBuilder.CompileMany(
-                // language=cs
-                @"
-[Command]
-public class DefaultCommand : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}
-
-[Command(""cmd1"")]
-public class FirstCommand : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}
-
-[Command(""cmd1 sub1"")]
-public class FirstCommandFirstSubCommand : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}
-
-[Command(""cmd2"")]
-public class SecondCommand : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}
-
-[Command(""cmd2 sub1"")]
-public class SecondCommandFirstSubCommand : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}
-
-[Command(""cmd2 sub2"")]
-public class SecondCommandSecondSubCommand : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}
-");
-
-            var application = new CliApplicationBuilder()
-                .AddCommands(commandTypes)
-                .UseConsole(FakeConsole)
-                .Build();
-
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"--help"},
-                new Dictionary<string, string>()
-            );
-
-            var stdOut = FakeConsole.ReadOutputString();
-
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Should().ContainAllInOrder(
-                "COMMANDS",
-                "cmd1", "Subcommands:", "cmd1 sub1",
-                "cmd2", "Subcommands:", "cmd2 sub1", "cmd2 sub2"
             );
         }
 
@@ -846,6 +687,169 @@ public class Command : ICommand
                 "--lol", "Default:", "Two"
             );
             stdOut.Should().NotContain("not printed");
+        }
+
+        [Fact]
+        public async Task Help_text_shows_all_immediate_child_commands()
+        {
+            // Arrange
+            var commandTypes = DynamicCommandBuilder.CompileMany(
+                // language=cs
+                @"
+[Command(""cmd1"", Description = ""Description of one command."")]
+public class FirstCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}
+
+[Command(""cmd2"", Description = ""Description of another command."")]
+public class SecondCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}
+
+[Command(""cmd2 child"", Description = ""Description of another command's child command."")]
+public class SecondCommandChildCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}
+");
+
+            var application = new CliApplicationBuilder()
+                .AddCommands(commandTypes)
+                .UseConsole(FakeConsole)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(
+                new[] {"--help"},
+                new Dictionary<string, string>()
+            );
+
+            var stdOut = FakeConsole.ReadOutputString();
+
+            // Assert
+            exitCode.Should().Be(0);
+            stdOut.Should().ContainAllInOrder(
+                "COMMANDS",
+                "cmd1", "Description of one command.",
+                "cmd2", "Description of another command."
+            );
+
+            // `cmd2 child` will still appear in the list of `cmd2` subcommands,
+            // but its description will not be seen.
+            stdOut.Should().NotContain(
+                "Description of another command's child command."
+            );
+        }
+
+        [Fact]
+        public async Task Help_text_shows_all_immediate_child_commands_for_each_child_command()
+        {
+            // Arrange
+            var commandTypes = DynamicCommandBuilder.CompileMany(
+                // language=cs
+                @"
+[Command(""cmd1"")]
+public class FirstCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}
+
+[Command(""cmd1 child1"")]
+public class FirstCommandFirstChildCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}
+
+[Command(""cmd2"")]
+public class SecondCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}
+
+[Command(""cmd2 child11"")]
+public class SecondCommandFirstChildCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}
+
+[Command(""cmd2 child2"")]
+public class SecondCommandSecondChildCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}
+");
+
+            var application = new CliApplicationBuilder()
+                .AddCommands(commandTypes)
+                .UseConsole(FakeConsole)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(
+                new[] {"--help"},
+                new Dictionary<string, string>()
+            );
+
+            var stdOut = FakeConsole.ReadOutputString();
+
+            // Assert
+            exitCode.Should().Be(0);
+            stdOut.Should().ContainAllInOrder(
+                "COMMANDS",
+                "cmd1", "Subcommands:", "cmd1 child1",
+                "cmd2", "Subcommands:", "cmd2 child1", "cmd2 child2"
+            );
+        }
+
+        [Fact]
+        public async Task Help_text_shows_non_immediate_child_commands_if_they_do_not_have_a_more_specific_parent()
+        {
+            // Arrange
+            var commandTypes = DynamicCommandBuilder.CompileMany(
+                // language=cs
+                @"
+[Command(""cmd1"")]
+public class FirstCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}
+
+[Command(""cmd2 child1"")]
+public class SecondCommandFirstChildCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}
+
+[Command(""cmd2 child2"")]
+public class SecondCommandSecondChildCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}
+");
+
+            var application = new CliApplicationBuilder()
+                .AddCommands(commandTypes)
+                .UseConsole(FakeConsole)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(
+                new[] {"--help"},
+                new Dictionary<string, string>()
+            );
+
+            var stdOut = FakeConsole.ReadOutputString();
+
+            // Assert
+            exitCode.Should().Be(0);
+            stdOut.Should().ContainAllInOrder(
+                "COMMANDS",
+                "cmd1",
+                "cmd2 child1",
+                "cmd2 child2"
+            );
         }
 
         [Fact]
