@@ -2,7 +2,6 @@
 using CliFx.Analyzers.ObjectModel;
 using CliFx.Analyzers.Utils.Extensions;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
@@ -25,15 +24,11 @@ namespace CliFx.Analyzers
                 .Select(i => i.ConstructedFrom)
                 .Any(s => s.DisplayNameMatches("System.Collections.Generic.IEnumerable<T>"));
 
-        private void Analyze(SyntaxNodeAnalysisContext context)
+        private void Analyze(
+            SyntaxNodeAnalysisContext context,
+            PropertyDeclarationSyntax propertyDeclaration,
+            IPropertySymbol property)
         {
-            if (context.Node is not PropertyDeclarationSyntax propertyDeclaration)
-                return;
-
-            var property = context.SemanticModel.GetDeclaredSymbol(propertyDeclaration);
-            if (property is null)
-                return;
-
             if (IsScalar(property.Type))
                 return;
 
@@ -64,7 +59,7 @@ namespace CliFx.Analyzers
         public override void Initialize(AnalysisContext context)
         {
             base.Initialize(context);
-            context.RegisterSyntaxNodeAction(Analyze, SyntaxKind.PropertyDeclaration);
+            context.HandlePropertyDeclaration(Analyze);
         }
     }
 }

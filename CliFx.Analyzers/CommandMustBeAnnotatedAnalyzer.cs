@@ -2,7 +2,6 @@
 using CliFx.Analyzers.ObjectModel;
 using CliFx.Analyzers.Utils.Extensions;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
@@ -18,15 +17,11 @@ namespace CliFx.Analyzers
         {
         }
 
-        private void Analyze(SyntaxNodeAnalysisContext context)
+        private void Analyze(
+            SyntaxNodeAnalysisContext context,
+            ClassDeclarationSyntax classDeclaration,
+            ITypeSymbol type)
         {
-            if (context.Node is not ClassDeclarationSyntax classDeclaration)
-                return;
-
-            var type = context.SemanticModel.GetDeclaredSymbol(classDeclaration);
-            if (type is null)
-                return;
-
             // Ignore abstract classes, because they may be used to define
             // base implementations for commands, in which case the command
             // attribute doesn't make sense.
@@ -53,7 +48,7 @@ namespace CliFx.Analyzers
         public override void Initialize(AnalysisContext context)
         {
             base.Initialize(context);
-            context.RegisterSyntaxNodeAction(Analyze, SyntaxKind.ClassDeclaration);
+            context.HandleClassDeclaration(Analyze);
         }
     }
 }
