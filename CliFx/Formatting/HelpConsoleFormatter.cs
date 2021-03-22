@@ -191,7 +191,7 @@ namespace CliFx.Formatting
                         }
 
                         Write(ConsoleColor.DarkGray, '"');
-                        Write(ConsoleColor.White, validValue.ToString());
+                        Write(validValue.ToString());
                         Write(ConsoleColor.DarkGray, '"');
                     }
 
@@ -270,7 +270,7 @@ namespace CliFx.Formatting
                         }
 
                         Write(ConsoleColor.DarkGray, '"');
-                        Write(ConsoleColor.White, validValue.ToString());
+                        Write(validValue.ToString());
                         Write(ConsoleColor.DarkGray, '"');
                     }
 
