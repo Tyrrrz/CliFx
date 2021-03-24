@@ -31,7 +31,7 @@
   <!-- The following elements are responsible for embedding the analyzer assembly within the output NuGet package -->
 
   <ItemGroup>
-    <ProjectReference Include="..\CliFx.Analyzers\CliFx.Analyzers.csproj" ReferenceOutputAssembly="true" IncludeAssets="CliFx.Analyzers.dll" />
+    <ProjectReference Include="..\CliFx.Analyzers\CliFx.Analyzers.csproj" ReferenceOutputAssembly="false" IncludeAssets="CliFx.Analyzers.dll" />
   </ItemGroup>
 
   <PropertyGroup>
