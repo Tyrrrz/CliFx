@@ -1,3 +1,8 @@
+### v2.0.1 (24-Mar-2021)
+
+- Fixed an issue where some exceptions with async stack traces generated on .NET 3.1 or earlier were not parsed and formatted correctly.
+- Fixed an issue where help text applied slightly incorrect formatting when displaying choices for enum-based parameters and properties.
+
 ### v2.0 (21-Mar-2021)
 
 > Note: this major release includes many breaking changes.
