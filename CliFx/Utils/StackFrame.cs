@@ -91,12 +91,7 @@ namespace CliFx.Utils
         {
             var matches = Pattern.Matches(stackTrace).Cast<Match>().ToArray();
 
-            // Ensure success (all lines should be parsed)
-            var isSuccess =
-                matches.Length ==
-                stackTrace.Split('\n', StringSplitOptions.RemoveEmptyEntries).Length;
-
-            if (!isSuccess)
+            if (matches.Length <= 0 || matches.Any(m => !m.Success))
             {
                 // If parsing fails, we include the original stacktrace in the
                 // exception so that it's shown to the user.
