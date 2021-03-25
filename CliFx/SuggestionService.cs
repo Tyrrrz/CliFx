@@ -33,7 +33,7 @@ namespace CliFx
             if (commandMatch == null)
             {
                 return _applicationSchema.GetCommandNames()
-                             .Where(p => p.Contains(suggestInput.CommandName, StringComparison.OrdinalIgnoreCase))
+                             .Where(p => p.StartsWith(suggestInput.CommandName, StringComparison.OrdinalIgnoreCase))
                              .OrderBy(p => p)
                              .ToList();
             }

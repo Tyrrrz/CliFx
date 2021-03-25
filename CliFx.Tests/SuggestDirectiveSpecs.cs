@@ -94,13 +94,13 @@ public class Command02 : ICommand
         [Theory]
         [InlineData("supply all commands if nothing supplied",                    
                         "clifx.exe", 0, new[] { "cmd", "cmd02" })]
-        [InlineData("supply all commands that match partially",
+        [InlineData("supply all commands that 'start with' argument",
                         "clifx.exe c", 0, new[] { "cmd", "cmd02" })]
         [InlineData("supply command options if match found, regardles of other partial matches (no options defined)",
                         "clifx.exe cmd", 0, new string[] { })]
-        [InlineData("supply nothing if no partial match applies",
-                        "clifx.exe cmd2", 0, new string[] { })]
-        [InlineData("supply all commands that match partially, allowing for cursor position",
+        [InlineData("supply nothing if no commands 'starts with' artument",
+                        "clifx.exe m", 0, new string[] { })]
+        [InlineData("supply all commands that 'start with' argument, allowing for cursor position",
                         "clifx.exe cmd", -2, new[] { "cmd", "cmd02" })]
         public async Task Suggest_directive_suggests_commands_by_environment_variables(string usecase, string variableContents, int cursorOffset, string[] expected)
         {
