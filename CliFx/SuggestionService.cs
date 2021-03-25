@@ -48,7 +48,7 @@ namespace CliFx
 
             if (commandCacheVariable == null)
             {
-                // ignore cursor position as we don't know what the original user input string is
+                // ignore cursor position as we don't know what the original user input string really is
                 return string.Join(" ", input.OriginalCommandLine.Where(arg => !IsDirective(arg)));
             }
 

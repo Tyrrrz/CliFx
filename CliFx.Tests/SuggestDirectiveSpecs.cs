@@ -93,14 +93,16 @@ public class Command02 : ICommand
 
         [Theory]
         [InlineData("supply all commands if nothing supplied",                    
-                        "clifx.exe", new[] { "cmd", "cmd02" })]
+                        "clifx.exe", 0, new[] { "cmd", "cmd02" })]
         [InlineData("supply all commands that match partially",
-                        "clifx.exe c", new[] { "cmd", "cmd02" })]
+                        "clifx.exe c", 0, new[] { "cmd", "cmd02" })]
         [InlineData("supply command options if match found, regardles of other partial matches (no options defined)",
-                        "clifx.exe cmd", new string[] { })]
+                        "clifx.exe cmd", 0, new string[] { })]
         [InlineData("supply nothing if no partial match applies",
-                        "clifx.exe cmd2", new string[] { })]
-        public async Task Suggest_directive_accepts_command_line_by_environment_variable(string usecase, string variableContents, string[] expected)
+                        "clifx.exe cmd2", 0, new string[] { })]
+        [InlineData("supply all commands that match partially, allowing for cursor position",
+                        "clifx.exe cmd", -2, new[] { "cmd", "cmd02" })]
+        public async Task Suggest_directive_suggests_commands_by_environment_variables(string usecase, string variableContents, int cursorOffset, string[] expected)
         {
             // Arrange
             var application = TestApplicationFactory(_cmdCommandCs, _cmd2CommandCs)
@@ -108,7 +110,7 @@ public class Command02 : ICommand
 
             // Act
             var exitCode = await application.RunAsync(
-                new[] { "[suggest]", "--envvar", "CLIFX-{GUID}", "--cursor", variableContents.Length.ToString() },
+                new[] { "[suggest]", "--envvar", "CLIFX-{GUID}", "--cursor", (variableContents.Length + cursorOffset).ToString() },
                 new Dictionary<string, string>()
                 {
                     ["CLIFX-{GUID}"] = variableContents
@@ -142,26 +144,5 @@ public class Command02 : ICommand
             exitCode.Should().Be(0);
             stdOut.Should().Be(FormatExpectedOutput(expected), usecase);
         }
-
-        //[Theory]
-        //[InlineData("happy case", "clifx.exe c", "")]
-        //public async Task Suggest_directive_generates_suggestions(string because, string commandline, string expectedResult)
-        //{
-        //    // Arrange
-        //    var application = TestApplicationFactory(_cmdCommandCs)
-        //        .Build();
-
-        //    // Act
-        //    var exitCode = await application.RunAsync(
-        //        new[] { "[suggest]", commandline }
-        //    );
-
-        //    var stdOut = FakeConsole.ReadOutputString();
-
-        //    // Assert
-        //    exitCode.Should().Be(0);
-
-        //    stdOut.Should().Be(expectedResult + "\r\n", because);
-        //}
     }
 }
