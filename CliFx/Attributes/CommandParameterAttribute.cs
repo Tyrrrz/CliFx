@@ -7,7 +7,7 @@ namespace CliFx.Attributes
     /// Annotates a property that defines a command parameter.
     /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
-    public class CommandParameterAttribute : Attribute
+    public sealed class CommandParameterAttribute : Attribute
     {
         /// <summary>
         /// Parameter order.

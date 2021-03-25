@@ -7,7 +7,7 @@ namespace CliFx.Attributes
     /// Annotates a property that defines a command option.
     /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
-    public class CommandOptionAttribute : Attribute
+    public sealed class CommandOptionAttribute : Attribute
     {
         /// <summary>
         /// Option name.

@@ -6,7 +6,7 @@ namespace CliFx.Attributes
     /// Annotates a type that defines a command.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    public class CommandAttribute : Attribute
+    public sealed class CommandAttribute : Attribute
     {
         /// <summary>
         /// Command's name.
