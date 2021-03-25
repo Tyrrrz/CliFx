@@ -34,4 +34,20 @@
     <None Include="../CliFx.Analyzers/bin/$(Configuration)/netstandard2.0/CliFx.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);CopyAnalyzerToPackage</TargetsForTfmSpecificContentInPackage>
+  </PropertyGroup>
+
+  <Target Name="CopyAnalyzerToPackage">
+    <ItemGroup>
+      <TfmSpecificPackageFile Include="$(OutDir)/CliFx.Analyzers.dll" PackagePath="analyzers/dotnet/cs" BuildAction="none" />
+    </ItemGroup>
+  </Target>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>CliFx.Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
 </Project>
