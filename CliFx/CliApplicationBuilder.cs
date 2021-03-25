@@ -19,6 +19,7 @@ namespace CliFx
 
         private bool _isDebugModeAllowed = true;
         private bool _isPreviewModeAllowed = true;
+        private bool _isSuggestModeAllowed = true;
         private string? _title;
         private string? _executableName;
         private string? _versionText;
@@ -35,6 +36,7 @@ namespace CliFx
 
             return this;
         }
+
 
         /// <summary>
         /// Adds a command to the application.
@@ -107,6 +109,15 @@ namespace CliFx
         public CliApplicationBuilder AllowPreviewMode(bool isAllowed = true)
         {
             _isPreviewModeAllowed = isAllowed;
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies whether suggest mode (enabled with the [suggest] directive) is allowed in the application.
+        /// </summary>
+        public CliApplicationBuilder AllowSuggestMode(bool isAllowed = true)
+        {
+            _isSuggestModeAllowed = isAllowed;
             return this;
         }
 
@@ -196,7 +207,8 @@ namespace CliFx
             var configuration = new ApplicationConfiguration(
                 _commandTypes.ToArray(),
                 _isDebugModeAllowed,
-                _isPreviewModeAllowed
+                _isPreviewModeAllowed,
+                _isSuggestModeAllowed
             );
 
             return new CliApplication(

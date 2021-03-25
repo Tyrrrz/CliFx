@@ -56,6 +56,9 @@ namespace CliFx
         private bool IsPreviewModeEnabled(CommandInput commandInput) =>
             Configuration.IsPreviewModeAllowed && commandInput.IsPreviewDirectiveSpecified;
 
+        private bool IsSuggestModeEnabled(CommandInput commandInput) =>
+            Configuration.IsSuggestModeAllowed && commandInput.IsSuggestDirectiveSpecified;
+
         private bool ShouldShowHelpText(CommandSchema commandSchema, CommandInput commandInput) =>
             commandSchema.IsHelpOptionAvailable && commandInput.IsHelpOptionSpecified ||
             // Show help text also in case the fallback default command is
@@ -100,6 +103,13 @@ namespace CliFx
             if (IsPreviewModeEnabled(commandInput))
             {
                 _console.Output.WriteCommandInput(commandInput);
+                return 0;
+            }
+
+            // Handle suggest directive
+            if (IsSuggestModeEnabled(commandInput))
+            {
+                _console.Output.WriteLine("cmd");
                 return 0;
             }
 

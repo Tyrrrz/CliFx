@@ -12,6 +12,9 @@ namespace CliFx.Input
         public bool IsPreviewDirective =>
             string.Equals(Name, "preview", StringComparison.OrdinalIgnoreCase);
 
+        public bool IsSuggestDirective =>
+            string.Equals(Name, "suggest", StringComparison.OrdinalIgnoreCase);
+        
         public DirectiveInput(string name) => Name = name;
     }
 }
