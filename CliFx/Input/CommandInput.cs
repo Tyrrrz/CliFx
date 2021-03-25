@@ -18,6 +18,8 @@ namespace CliFx.Input
 
         public IReadOnlyList<EnvironmentVariableInput> EnvironmentVariables { get; }
 
+        public IReadOnlyList<string> OriginalCommandLine { get; }
+
         public bool IsDebugDirectiveSpecified => Directives.Any(d => d.IsDebugDirective);
 
         public bool IsPreviewDirectiveSpecified => Directives.Any(d => d.IsPreviewDirective);
@@ -28,18 +30,21 @@ namespace CliFx.Input
 
         public bool IsVersionOptionSpecified => Options.Any(o => o.IsVersionOption);
 
+
         public CommandInput(
             string? commandName,
             IReadOnlyList<DirectiveInput> directives,
             IReadOnlyList<ParameterInput> parameters,
             IReadOnlyList<OptionInput> options,
-            IReadOnlyList<EnvironmentVariableInput> environmentVariables)
+            IReadOnlyList<EnvironmentVariableInput> environmentVariables,
+            IReadOnlyList<string> originalCommandLine)
         {
             CommandName = commandName;
             Directives = directives;
             Parameters = parameters;
             Options = options;
             EnvironmentVariables = environmentVariables;
+            OriginalCommandLine = originalCommandLine;
         }
     }
 
@@ -95,11 +100,15 @@ namespace CliFx.Input
                 }
             }
 
-            // Move the index to the position where the command name ended
+            // Move the index to the position where the command name ended, and return the matching commandName
             if (!string.IsNullOrWhiteSpace(commandName))
+            {
                 index = lastIndex + 1;
+                return commandName;
+            }
 
-            return commandName;
+            // Otherwise leave index where it is, and return the potentialCommandName for auto-suggestion purposes
+            return potentialCommandNameComponents.JoinToString(" ");
         }
 
         private static IReadOnlyList<ParameterInput> ParseParameters(
@@ -225,7 +234,8 @@ namespace CliFx.Input
                 parsedDirectives,
                 parsedParameters,
                 parsedOptions,
-                parsedEnvironmentVariables
+                parsedEnvironmentVariables,
+                commandLineArguments
             );
         }
     }

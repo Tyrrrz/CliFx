@@ -109,7 +109,9 @@ namespace CliFx
             // Handle suggest directive
             if (IsSuggestModeEnabled(commandInput))
             {
-                _console.Output.WriteLine("cmd");
+                new SuggestionService(applicationSchema)
+                     .GetSuggestions(commandInput).ToList()
+                     .ForEach(p => _console.Output.WriteLine(p));
                 return 0;
             }
 

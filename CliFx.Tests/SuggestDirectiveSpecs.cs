@@ -26,6 +26,14 @@ public class Command : ICommand
 }
 ";
 
+        private string _cmd2CommandCs = @"
+[Command(""cmd02"")]
+public class Command02 : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}
+";
+
         public CliApplicationBuilder TestApplicationFactory(params string[] commandClasses)
         {
             var builder = new CliApplicationBuilder();
@@ -73,5 +81,66 @@ public class Command : ICommand
             // Assert
             exitCode.Should().Be(0);
         }
+
+        private string FormatExpectedOutput(string [] s)
+        {
+            if( s.Length == 0)
+            {
+                return "";
+            }
+            return string.Join("\r\n", s) + "\r\n";
+        }
+
+        [Theory]
+        [InlineData("supply all commands if nothing supplied",                    
+                        "clifx.exe", new[] { "cmd", "cmd02" })]
+        [InlineData("supply all commands that match partially",
+                        "clifx.exe c", new[] { "cmd", "cmd02" })]
+        [InlineData("supply command options if match found, regardles of other partial matches (no options defined)",
+                        "clifx.exe cmd", new string[] { })]
+        [InlineData("supply nothing if no partial match applies",
+                        "clifx.exe cmd2", new string[] { })]
+        public async Task Suggest_directive_accepts_command_line_by_environment_variable(string usecase, string variableContents, string[] expected)
+        {
+            // Arrange
+            var application = TestApplicationFactory(_cmdCommandCs, _cmd2CommandCs)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(
+                new[] { "[suggest]", "--envvar", "CLIFX-{GUID}", "--cursor", variableContents.Length.ToString() },
+                new Dictionary<string, string>()
+                {
+                    ["CLIFX-{GUID}"] = variableContents
+                }
+            );
+
+            var stdOut = FakeConsole.ReadOutputString();
+            
+            // Assert
+            exitCode.Should().Be(0);
+            stdOut.Should().Be(FormatExpectedOutput(expected), usecase);
+        }
+
+        //[Theory]
+        //[InlineData("happy case", "clifx.exe c", "")]
+        //public async Task Suggest_directive_generates_suggestions(string because, string commandline, string expectedResult)
+        //{
+        //    // Arrange
+        //    var application = TestApplicationFactory(_cmdCommandCs)
+        //        .Build();
+
+        //    // Act
+        //    var exitCode = await application.RunAsync(
+        //        new[] { "[suggest]", commandline }
+        //    );
+
+        //    var stdOut = FakeConsole.ReadOutputString();
+
+        //    // Assert
+        //    exitCode.Should().Be(0);
+
+        //    stdOut.Should().Be(expectedResult + "\r\n", because);
+        //}
     }
 }
