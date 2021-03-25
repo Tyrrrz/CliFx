@@ -122,6 +122,27 @@ public class Command02 : ICommand
             stdOut.Should().Be(FormatExpectedOutput(expected), usecase);
         }
 
+        [Theory]
+        [InlineData("supply all commands that match partially",
+                        new[] { "[suggest]", "clifx.exe", "c" }, new[] { "cmd", "cmd02" })]
+        [InlineData("supply command options if match found, regardles of other partial matches (no options defined)",
+                        new[] { "[suggest]", "clifx.exe", "cmd" }, new string[] { })]
+        public async Task Suggest_directive_suggests_commands_by_command_line_only(string usecase, string[] commandLine, string[] expected)
+        {
+            // Arrange
+            var application = TestApplicationFactory(_cmdCommandCs, _cmd2CommandCs)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(commandLine);
+
+            var stdOut = FakeConsole.ReadOutputString();
+
+            // Assert
+            exitCode.Should().Be(0);
+            stdOut.Should().Be(FormatExpectedOutput(expected), usecase);
+        }
+
         //[Theory]
         //[InlineData("happy case", "clifx.exe c", "")]
         //public async Task Suggest_directive_generates_suggestions(string because, string commandline, string expectedResult)
