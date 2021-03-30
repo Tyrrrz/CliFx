@@ -37,9 +37,8 @@ namespace CliFx.Suggestions
 
         public string GetInstallCommand(string commandName)
         {
-            var safeName = commandName.Replace(" ", "_");
             return $@"
-### clifx-suggest-begins-here-{safeName}-{Version}
+### clifx-suggest-begins-here-{commandName}-{Version}
 # this block provides auto-complete for the {commandName} command
 # and assumes that {commandName} is on the path
 $scriptblock = {{
@@ -58,7 +57,7 @@ $scriptblock = {{
 }}
 
 Register-ArgumentCompleter -Native -CommandName ""{commandName}"" -ScriptBlock $scriptblock
-### clifx-suggest-ends-here-{safeName}";
+### clifx-suggest-ends-here-{commandName}";
         }
     }
 }

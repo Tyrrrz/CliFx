@@ -27,7 +27,7 @@ namespace CliFx.Suggestions
         {
             var safeName = commandName.Replace(" ", "_");
             return $@"
-### clifx-suggest-begins-here-{safeName}-{Version}
+### clifx-suggest-begins-here-{commandName}-{Version}
 # this block provides auto-complete for the {commandName} command
 # and assumes that {commandName} is on the path
 _{safeName}_complete()
@@ -52,7 +52,7 @@ _{safeName}_complete()
   COMPREPLY=( $(compgen -W ""$completions"" -- ""$word"") )
 }}
 
-complete -f -F _{safeName}_complete ""{commandName}""
+complete -f -F _{commandName}_complete ""{commandName}""
 
 ### clifx-suggest-ends-here-{safeName}";
         }
