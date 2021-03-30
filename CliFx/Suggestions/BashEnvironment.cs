@@ -1,21 +1,21 @@
-﻿using System;
+﻿using CliFx.Infrastructure;
+using CliFx.Input;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace CliFx.Suggestions
 {
-    class BashSuggestEnvironment : ISuggestEnvironment
+    class BashEnvironment : ISuggestEnvironment
     {
         public string Version => "V1";
 
         public bool ShouldInstall()
         {
-            if (Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX)
-            {
-                return File.Exists(GetInstallPath());
-            }
-            return false;
+            return RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
         }
 
         public string GetInstallPath()
@@ -55,6 +55,6 @@ _{safeName}_complete()
 complete -f -F _{commandName}_complete ""{commandName}""
 
 ### clifx-suggest-ends-here-{safeName}";
-        }
+        }       
     }
 }

@@ -23,12 +23,18 @@ namespace CliFx.Infrastructure
             return Files.ContainsKey(path);
         }
 
-        public string ReadAllText(string path)
+        public bool TryReadText(string path, out string content)
         {
-            return Files[path];
+            if( Files.ContainsKey(path))
+            {
+                content = Files[path];
+                return true;
+            }
+            content = "";
+            return false;
         }
 
-        public void WriteAllText(string path, string content)
+        public void WriteText(string path, string content)
         {
             Files[path] = content;
         }

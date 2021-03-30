@@ -14,13 +14,23 @@ namespace CliFx.Infrastructure
             return File.Exists(path);
         }
 
-        public string ReadAllText(string path)
+        public bool TryReadText(string path, out string text)
         {
-            return File.ReadAllText(path);
+            if (!File.Exists(path))
+            {
+                text = "";
+                return false;
+            }
+            text = File.ReadAllText(path);
+            return true;
         }
 
-        public void WriteAllText(string path, string content)
+        public void WriteText(string path, string content)
         {
+            if (!Directory.Exists(Path.GetDirectoryName(path)))
+            {
+                Directory.CreateDirectory(path);
+            }
             File.WriteAllText(path, content);
         }
     }

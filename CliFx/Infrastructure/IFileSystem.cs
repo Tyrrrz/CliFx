@@ -18,13 +18,13 @@ namespace CliFx.Infrastructure
         /// <summary>
         /// Opens a text file, reads all the text in the file, and then closes the file.
         /// </summary>
-        string ReadAllText(string filePath);
+        bool TryReadText(string filePath, out string content);
 
         /// <summary>
         /// Creates a new file, writes the specified string to the file, and then closes
         /// the file. If the target file already exists, it is overwritten.
         /// </summary>
-        void WriteAllText(string filePath, string content);
+        void WriteText(string filePath, string content);
 
         /// <summary>
         /// Copies an existing file to a new file. Overwriting a file of the same name is

@@ -113,12 +113,12 @@ namespace CliFx
             // Handle suggest directive
             if (Configuration.IsSuggestModeAllowed)
             {
-                new SuggestionService(applicationSchema, _fileSystem).EnsureInstalled(Metadata.Title);
+                new ShellHookInstaller(_fileSystem).EnsureInstalled(Metadata.Title);
             }
 
             if (IsSuggestModeEnabled(commandInput))
             {
-                new SuggestionService(applicationSchema, _fileSystem)
+                new SuggestionService(applicationSchema, _fileSystem, commandInput.EnvironmentVariables)
                            .GetSuggestions(commandInput).ToList()
                            .ForEach(p => _console.Output.WriteLine(p));
                 return 0;

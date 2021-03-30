@@ -19,12 +19,13 @@ namespace CliFx.Infrastructure
             return false;
         }
 
-        public string ReadAllText(string path)
+        public bool TryReadText(string path, out string content)
         {
-            return "";
+            content = "";
+            return false;
         }
 
-        public void WriteAllText(string path, string content)
+        public void WriteText(string path, string content)
         {
         }
     }

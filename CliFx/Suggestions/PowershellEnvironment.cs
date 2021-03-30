@@ -1,38 +1,33 @@
-﻿using System;
+﻿using CliFx.Infrastructure;
+using CliFx.Input;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace CliFx.Suggestions
 {
-    class PowershellSuggestEnvironment : ISuggestEnvironment
+   
+    /// <summary>
+    /// Known issue: always triggers in Ubuntu on Windows.
+    /// </summary>
+    class PowershellEnvironment : ISuggestEnvironment
     {
         public string Version => "V1";
-        
+
         public bool ShouldInstall()
         {
-            if (Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX)
-            {
-                return File.Exists("/usr/bin/pwsh");
-
-            }
-            return true;
+            return RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
         }
 
-        public string GetInstallPath()
+        public virtual string GetInstallPath()
         {
-            var baseDir = "";
-            if (Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX)
-            {
-                baseDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config", ".powershell");
-            }
-            else
-            {
-                var myDocuments = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments, Environment.SpecialFolderOption.DoNotVerify);
-                baseDir = Path.Combine(myDocuments, "WindowsPowerShell");
-            }
-
-            return Path.Combine(baseDir, "Microsoft.PowerShell_profile.ps1");
+            return Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments, Environment.SpecialFolderOption.DoNotVerify),
+                "WindowsPowerShell",
+                "Microsoft.PowerShell_profile.ps1");
         }
 
         public string GetInstallCommand(string commandName)
