@@ -11,6 +11,8 @@ namespace CliFx.Tests
 
         public FakeInMemoryConsole FakeConsole { get; } = new();
 
+        public NullFileSystem NullFileSystem { get; } = new();
+
         protected SpecsBase(ITestOutputHelper testOutput) =>
             TestOutput = testOutput;
 

@@ -19,7 +19,7 @@ namespace CliFx
 
         private bool _isDebugModeAllowed = true;
         private bool _isPreviewModeAllowed = true;
-        private bool _isSuggestModeAllowed = true;
+        private bool _isSuggestModeAllowed = false;
         private string? _title;
         private string? _executableName;
         private string? _versionText;
@@ -182,7 +182,7 @@ namespace CliFx
         /// <summary>
         /// Configures the application to use the specified implementation of <see cref="IFileSystem"/>.
         /// </summary>
-        CliApplicationBuilder UseFileSystem(IFileSystem fileSystem)
+        public CliApplicationBuilder UseFileSystem(IFileSystem fileSystem)
         {
             _fileSystem = fileSystem;
             return this;

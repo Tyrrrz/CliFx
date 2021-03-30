@@ -44,7 +44,8 @@ public class Command02 : ICommand
                 builder = builder.AddCommand(commandType);
             });
 
-            return builder.UseConsole(FakeConsole);
+            return builder.UseConsole(FakeConsole)
+                          .UseFileSystem(NullFileSystem);
         }
 
         [Theory]
@@ -67,7 +68,7 @@ public class Command02 : ICommand
         }
 
         [Fact]
-        public async Task Suggest_directive_is_enabled_by_default()
+        public async Task Suggest_directive_is_disabled_by_default()
         {
             // Arrange
             var application = TestApplicationFactory(_cmdCommandCs)
@@ -79,7 +80,7 @@ public class Command02 : ICommand
             );
 
             // Assert
-            exitCode.Should().Be(0);
+            exitCode.Should().Be(1);
         }
 
         private string FormatExpectedOutput(string [] s)
@@ -106,6 +107,7 @@ public class Command02 : ICommand
         {
             // Arrange
             var application = TestApplicationFactory(_cmdCommandCs, _cmd2CommandCs)
+                .AllowSuggestMode()
                 .Build();
 
             // Act
@@ -133,6 +135,7 @@ public class Command02 : ICommand
         {
             // Arrange
             var application = TestApplicationFactory(_cmdCommandCs, _cmd2CommandCs)
+                .AllowSuggestMode()
                 .Build();
 
             // Act
