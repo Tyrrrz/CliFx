@@ -37,7 +37,7 @@ public class Command02 : ICommand
         public CliApplicationBuilder TestApplicationFactory(params string[] commandClasses)
         {
             var builder = new CliApplicationBuilder();
-            
+
             commandClasses.ToList().ForEach(c =>
             {
                 var commandType = DynamicCommandBuilder.Compile(c);
@@ -49,7 +49,7 @@ public class Command02 : ICommand
         }
 
         [Theory]
-        [InlineData(true, 0 )]
+        [InlineData(true, 0)]
         [InlineData(false, 1)]
         public async Task Suggest_directive_can_be_configured(bool enabled, int expectedExitCode)
         {
@@ -83,17 +83,8 @@ public class Command02 : ICommand
             exitCode.Should().Be(1);
         }
 
-        private string FormatExpectedOutput(string [] s)
-        {
-            if( s.Length == 0)
-            {
-                return "";
-            }
-            return string.Join("\r\n", s) + "\r\n";
-        }
-
         [Theory]
-        [InlineData("supply all commands if nothing supplied",                    
+        [InlineData("supply all commands if nothing supplied",
                         "clifx.exe", 0, new[] { "cmd", "cmd02" })]
         [InlineData("supply all commands that 'start with' argument",
                         "clifx.exe c", 0, new[] { "cmd", "cmd02" })]
@@ -120,10 +111,13 @@ public class Command02 : ICommand
             );
 
             var stdOut = FakeConsole.ReadOutputString();
-            
+
             // Assert
             exitCode.Should().Be(0);
-            stdOut.Should().Be(FormatExpectedOutput(expected), usecase);
+
+            stdOut.Split(null)
+                  .Where(p => !string.IsNullOrWhiteSpace(p))
+                  .Should().BeEquivalentTo(expected, usecase);
         }
 
         [Theory]
@@ -145,7 +139,10 @@ public class Command02 : ICommand
 
             // Assert
             exitCode.Should().Be(0);
-            stdOut.Should().Be(FormatExpectedOutput(expected), usecase);
+
+            stdOut.Split(null)
+                  .Where(p => !string.IsNullOrWhiteSpace(p))
+                  .Should().BeEquivalentTo(expected, usecase);
         }
     }
 }
