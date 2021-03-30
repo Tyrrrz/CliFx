@@ -70,12 +70,16 @@ namespace CliFx.Infrastructure
         /// Subsequent calls to this method have no side-effects and return the same token.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// Calling this method effectively makes the command cancellation-aware, which
-        /// means that sending an interrupt signal won't immediately terminate the application,
+        /// means that sending the interrupt signal won't immediately terminate the application,
         /// but will instead trigger a token that the command can use to exit more gracefully.
-        ///
-        /// If the user sends a second interrupt signal after the first one, the application
-        /// will terminate immediately.
+        /// </para>
+        /// <para>
+        /// Note that the handler is only respected when the user sends the interrupt signal for the first time.
+        /// If the user decides to issue the signal again, the application will terminate immediately
+        /// regardless of whether the command is cancellation-aware.
+        /// </para>
         /// </remarks>
         CancellationToken RegisterCancellationHandler();
     }
