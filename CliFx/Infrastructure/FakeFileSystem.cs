@@ -4,6 +4,11 @@ using System.Text;
 
 namespace CliFx.Infrastructure
 {
+
+#pragma warning disable 1591
+    /// <summary>
+    /// A mock for IFileSystem
+    /// </summary>
     public class FakeSystem : IFileSystem
     {
         public Dictionary<string, string> Files => new Dictionary<string, string>();
@@ -29,5 +34,5 @@ namespace CliFx.Infrastructure
         }
     }
 
-
+#pragma warning restore 1591
 }

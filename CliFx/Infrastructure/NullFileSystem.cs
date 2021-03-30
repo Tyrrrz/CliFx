@@ -4,6 +4,10 @@ using System.Text;
 
 namespace CliFx.Infrastructure
 {
+#pragma warning disable 1591
+    /// <summary>
+    /// Null Pattern implementation of IFileSystem. Does nothing, returns false.
+    /// </summary>
     public class NullFileSystem : IFileSystem
     {
         public void Copy(string sourceFileName, string destFileName)
@@ -24,4 +28,5 @@ namespace CliFx.Infrastructure
         {
         }
     }
+#pragma warning restore 1591
 }
