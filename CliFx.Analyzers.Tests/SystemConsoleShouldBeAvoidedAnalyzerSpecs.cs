@@ -104,5 +104,24 @@ public class MyCommand : ICommand
             // Act & assert
             Analyzer.Should().NotProduceDiagnostics(code);
         }
+
+        [Fact]
+        public void Analyzer_does_not_report_an_error_if_a_command_does_not_access_SystemConsole()
+        {
+            // Arrange
+            // language=cs
+            const string code = @"
+[Command]
+public class MyCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        return default;
+    }
+}";
+
+            // Act & assert
+            Analyzer.Should().NotProduceDiagnostics(code);
+        }
     }
 }
