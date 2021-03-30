@@ -30,6 +30,7 @@ namespace CliFx.Demo
                 .SetDescription("Demo application showcasing CliFx features.")
                 .AddCommandsFromThisAssembly()
                 .UseTypeActivator(GetServiceProvider().GetRequiredService)
+                .AllowSuggestMode(true)
                 .Build()
                 .RunAsync();
     }

@@ -1,0 +1,35 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+
+namespace CliFx.Infrastructure
+{
+    /// <summary>
+    /// Abstraction for the file system
+    /// </summary>
+    public interface IFileSystem
+    {
+        /// <summary>
+        /// Determines whether the specified file exists.
+        /// </summary>
+        bool Exists(string filePath);
+
+        /// <summary>
+        /// Opens a text file, reads all the text in the file, and then closes the file.
+        /// </summary>
+        string ReadAllText(string filePath);
+
+        /// <summary>
+        /// Creates a new file, writes the specified string to the file, and then closes
+        /// the file. If the target file already exists, it is overwritten.
+        /// </summary>
+        void WriteAllText(string filePath, string content);
+
+        /// <summary>
+        /// Copies an existing file to a new file. Overwriting a file of the same name is
+        /// not allowed.
+        /// </summary>
+        void Copy(string path, string backupPath);
+    }
+}

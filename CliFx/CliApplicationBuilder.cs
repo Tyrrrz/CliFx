@@ -26,6 +26,7 @@ namespace CliFx
         private string? _description;
         private IConsole? _console;
         private ITypeActivator? _typeActivator;
+        private IFileSystem? _fileSystem;
 
         /// <summary>
         /// Adds a command to the application.
@@ -121,6 +122,7 @@ namespace CliFx
             return this;
         }
 
+
         /// <summary>
         /// Sets application title, which is shown in the help text.
         /// </summary>
@@ -178,6 +180,15 @@ namespace CliFx
         }
 
         /// <summary>
+        /// Configures the application to use the specified implementation of <see cref="IFileSystem"/>.
+        /// </summary>
+        CliApplicationBuilder UseFileSystem(IFileSystem fileSystem)
+        {
+            _fileSystem = fileSystem;
+            return this;
+        }
+
+        /// <summary>
         /// Configures the application to use the specified implementation of <see cref="ITypeActivator"/>.
         /// </summary>
         public CliApplicationBuilder UseTypeActivator(ITypeActivator typeActivator)
@@ -215,7 +226,8 @@ namespace CliFx
                 metadata,
                 configuration,
                 _console ?? new SystemConsole(),
-                _typeActivator ?? new DefaultTypeActivator()
+                _typeActivator ?? new DefaultTypeActivator(),
+                _fileSystem ?? new FileSystem()
             );
         }
     }

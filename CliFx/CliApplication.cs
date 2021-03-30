@@ -8,6 +8,7 @@ using CliFx.Formatting;
 using CliFx.Infrastructure;
 using CliFx.Input;
 using CliFx.Schema;
+using CliFx.Suggestions;
 using CliFx.Utils;
 using CliFx.Utils.Extensions;
 
@@ -32,6 +33,7 @@ namespace CliFx
         private readonly ITypeActivator _typeActivator;
 
         private readonly CommandBinder _commandBinder;
+        private readonly IFileSystem _fileSystem;
 
         /// <summary>
         /// Initializes an instance of <see cref="CliApplication"/>.
@@ -40,7 +42,8 @@ namespace CliFx
             ApplicationMetadata metadata,
             ApplicationConfiguration configuration,
             IConsole console,
-            ITypeActivator typeActivator)
+            ITypeActivator typeActivator,
+            IFileSystem fileSystem)
         {
             Metadata = metadata;
             Configuration = configuration;
@@ -48,6 +51,7 @@ namespace CliFx
             _typeActivator = typeActivator;
 
             _commandBinder = new CommandBinder(typeActivator);
+            _fileSystem = fileSystem;
         }
 
         private bool IsDebugModeEnabled(CommandInput commandInput) =>
@@ -107,11 +111,16 @@ namespace CliFx
             }
 
             // Handle suggest directive
+            if (Configuration.IsSuggestModeAllowed)
+            {
+                new SuggestionService(applicationSchema, _fileSystem).EnsureInstalled(Metadata.Title);
+            }
+
             if (IsSuggestModeEnabled(commandInput))
             {
-                new SuggestionService(applicationSchema)
-                     .GetSuggestions(commandInput).ToList()
-                     .ForEach(p => _console.Output.WriteLine(p));
+                new SuggestionService(applicationSchema, _fileSystem)
+                           .GetSuggestions(commandInput).ToList()
+                           .ForEach(p => _console.Output.WriteLine(p));
                 return 0;
             }
 
