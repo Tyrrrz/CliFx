@@ -116,16 +116,10 @@ namespace CliFx.Infrastructure
         public static IDisposable WithColors(
             this IConsole console,
             ConsoleColor foregroundColor,
-            ConsoleColor backgroundColor)
-        {
-            var foregroundColorRegistration = console.WithForegroundColor(foregroundColor);
-            var backgroundColorRegistration = console.WithBackgroundColor(backgroundColor);
-
-            return Disposable.Create(() =>
-            {
-                foregroundColorRegistration.Dispose();
-                backgroundColorRegistration.Dispose();
-            });
-        }
+            ConsoleColor backgroundColor) =>
+            Disposable.Merge(
+                console.WithForegroundColor(foregroundColor),
+                console.WithBackgroundColor(backgroundColor)
+            );
     }
 }
