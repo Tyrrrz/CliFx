@@ -22,6 +22,9 @@ namespace CliFx.Analyzers
             PropertyDeclarationSyntax propertyDeclaration,
             IPropertySymbol property)
         {
+            if (property.ContainingType is null)
+                return;
+
             if (property.ContainingType.IsAbstract)
                 return;
 

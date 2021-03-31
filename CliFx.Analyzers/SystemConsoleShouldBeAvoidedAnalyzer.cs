@@ -27,9 +27,9 @@ namespace CliFx.Analyzers
 
             while (currentNode is MemberAccessExpressionSyntax memberAccess)
             {
-                var symbol = context.SemanticModel.GetSymbolInfo(memberAccess).Symbol;
+                var member = context.SemanticModel.GetSymbolInfo(memberAccess).Symbol;
 
-                if (symbol is not null && symbol.ContainingType.DisplayNameMatches("System.Console"))
+                if (member?.ContainingType?.DisplayNameMatches("System.Console") == true)
                 {
                     return memberAccess;
                 }

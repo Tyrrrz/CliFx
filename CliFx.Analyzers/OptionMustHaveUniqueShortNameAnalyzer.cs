@@ -22,6 +22,9 @@ namespace CliFx.Analyzers
             PropertyDeclarationSyntax propertyDeclaration,
             IPropertySymbol property)
         {
+            if (property.ContainingType is null)
+                return;
+
             var option = CommandOptionSymbol.TryResolve(property);
             if (option is null)
                 return;
