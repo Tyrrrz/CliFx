@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace CliFx.Suggestions
 {
@@ -19,7 +20,7 @@ namespace CliFx.Suggestions
 
         public string GetInstallCommand(string commandName)
         {
-            var safeName = commandName.Replace(" ", "_");
+            var safeName = new Regex("[^a-zA-Z0-9]").Replace(commandName, "");
             return $@"
 ### clifx-suggest-begins-here-{commandName}-{Version}
 # this block provides auto-complete for the {commandName} command
@@ -37,7 +38,7 @@ _{safeName}_complete()
 
   local completions
   completions=""$({commandName} ""[suggest]"" --cursor ""${{COMP_POINT}}"" --envvar $CLIFX_CMD_CACHE 2>/dev/null)""
-  if [ $? -ne 0]; then
+  if [ $? -ne 0 ]; then
     completions=""""
   fi
 
@@ -46,9 +47,9 @@ _{safeName}_complete()
   COMPREPLY=( $(compgen -W ""$completions"" -- ""$word"") )
 }}
 
-complete -f -F _{commandName}_complete ""{commandName}""
+complete -f -F _{safeName}_complete ""{commandName}""
 
-### clifx-suggest-ends-here-{safeName}".Replace("\r", "");
+### clifx-suggest-ends-here-{commandName}".Replace("\r", "");
         }
     }
 }
