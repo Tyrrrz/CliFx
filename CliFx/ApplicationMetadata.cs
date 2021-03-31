@@ -16,7 +16,7 @@
         public string ExecutableName { get; }
 
         /// <summary>
-        /// Application version text.
+        /// Application version.
         /// </summary>
         public string Version { get; }
 

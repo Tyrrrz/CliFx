@@ -99,7 +99,7 @@ namespace CliFx
             // Handle preview directive
             if (IsPreviewModeEnabled(commandInput))
             {
-                _console.WriteCommandInput(commandInput);
+                _console.Output.WriteCommandInput(commandInput);
                 return 0;
             }
 
@@ -125,7 +125,7 @@ namespace CliFx
             // Handle help option
             if (ShouldShowHelpText(commandSchema, commandInput))
             {
-                _console.WriteHelpText(helpContext);
+                _console.Output.WriteHelpText(helpContext);
                 return 0;
             }
 
@@ -150,12 +150,12 @@ namespace CliFx
             }
             catch (CliFxException ex)
             {
-                _console.WriteException(ex);
+                _console.Error.WriteException(ex);
 
                 if (ex.ShowHelp)
                 {
                     _console.Output.WriteLine();
-                    _console.WriteHelpText(helpContext);
+                    _console.Output.WriteHelpText(helpContext);
                 }
 
                 return ex.ExitCode;
@@ -200,7 +200,7 @@ namespace CliFx
             // developer, so we don't swallow them in that case.
             catch (Exception ex) when (!Debugger.IsAttached)
             {
-                _console.WriteException(ex);
+                _console.Error.WriteException(ex);
                 return 1;
             }
         }

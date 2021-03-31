@@ -443,7 +443,7 @@ namespace CliFx.Formatting
 
     internal static class HelpConsoleFormatterExtensions
     {
-        public static void WriteHelpText(this IConsole console, HelpContext context) =>
-            new HelpConsoleFormatter(console.Output, context).WriteHelpText();
+        public static void WriteHelpText(this ConsoleWriter consoleWriter, HelpContext context) =>
+            new HelpConsoleFormatter(consoleWriter, context).WriteHelpText();
     }
 }

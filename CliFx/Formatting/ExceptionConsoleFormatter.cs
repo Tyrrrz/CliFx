@@ -129,7 +129,7 @@ namespace CliFx.Formatting
 
     internal static class ExceptionConsoleFormatterExtensions
     {
-        public static void WriteException(this IConsole console, Exception exception) =>
-            new ExceptionConsoleFormatter(console.Error).WriteException(exception);
+        public static void WriteException(this ConsoleWriter consoleWriter, Exception exception) =>
+            new ExceptionConsoleFormatter(consoleWriter).WriteException(exception);
     }
 }

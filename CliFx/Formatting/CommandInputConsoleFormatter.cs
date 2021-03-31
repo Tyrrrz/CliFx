@@ -93,7 +93,7 @@ namespace CliFx.Formatting
 
     internal static class CommandInputConsoleFormatterExtensions
     {
-        public static void WriteCommandInput(this IConsole console, CommandInput commandInput) =>
-            new CommandInputConsoleFormatter(console.Output).WriteCommandInput(commandInput);
+        public static void WriteCommandInput(this ConsoleWriter consoleWriter, CommandInput commandInput) =>
+            new CommandInputConsoleFormatter(consoleWriter).WriteCommandInput(commandInput);
     }
 }

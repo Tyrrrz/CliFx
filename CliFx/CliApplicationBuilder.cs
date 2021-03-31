@@ -37,7 +37,7 @@ namespace CliFx
         }
 
         /// <summary>
-        /// Adds a command the application.
+        /// Adds a command to the application.
         /// </summary>
         public CliApplicationBuilder AddCommand<TCommand>() where TCommand : ICommand =>
             AddCommand(typeof(TCommand));
