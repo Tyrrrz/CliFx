@@ -28,20 +28,10 @@
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
   </ItemGroup>
 
-  <!-- The following elements are responsible for embedding the analyzer assembly within the output NuGet package -->
-
+  <!-- Pack the analyzer assembly inside the package -->
   <ItemGroup>
-    <ProjectReference Include="..\CliFx.Analyzers\CliFx.Analyzers.csproj" ReferenceOutputAssembly="false" IncludeAssets="CliFx.Analyzers.dll" />
+    <ProjectReference Include="../CliFx.Analyzers/CliFx.Analyzers.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+    <None Include="../CliFx.Analyzers/bin/$(Configuration)/netstandard2.0/CliFx.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
   </ItemGroup>
-
-  <PropertyGroup>
-    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);CopyAnalyzerToPackage</TargetsForTfmSpecificContentInPackage>
-  </PropertyGroup>
-
-  <Target Name="CopyAnalyzerToPackage">
-    <ItemGroup>
-      <TfmSpecificPackageFile Include="$(OutDir)/CliFx.Analyzers.dll" PackagePath="analyzers/dotnet/cs" BuildAction="none" />
-    </ItemGroup>
-  </Target>
 
 </Project>
