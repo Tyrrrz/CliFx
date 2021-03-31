@@ -8,9 +8,9 @@ namespace CliFx.Suggestions
 {
     interface ISuggestEnvironment
     {
-        bool ShouldInstall();
-
         string Version { get; }
+
+        string[] ShellPaths { get; }
 
         string GetInstallPath();
 

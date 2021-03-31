@@ -9,18 +9,11 @@ using System.Text;
 
 namespace CliFx.Suggestions
 {
-   
-    /// <summary>
-    /// Known issue: always triggers in Ubuntu on Windows.
-    /// </summary>
-    class PowershellEnvironment : ISuggestEnvironment
+    class WindowsPowershellEnvironment : ISuggestEnvironment
     {
         public string Version => "V1";
 
-        public bool ShouldInstall()
-        {
-            return RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-        }
+        public virtual string[] ShellPaths => new[] { @"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" };
 
         public virtual string GetInstallPath()
         {
@@ -53,6 +46,6 @@ $scriptblock = {{
 
 Register-ArgumentCompleter -Native -CommandName ""{commandName}"" -ScriptBlock $scriptblock
 ### clifx-suggest-ends-here-{commandName}";
-        }
+        }                
     }
 }

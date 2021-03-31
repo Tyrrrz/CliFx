@@ -13,10 +13,7 @@ namespace CliFx.Suggestions
     {
         public string Version => "V1";
 
-        public bool ShouldInstall()
-        {
-            return RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
-        }
+        public string[] ShellPaths => new[] { @"/usr/bin/bash" };
 
         public string GetInstallPath()
         {

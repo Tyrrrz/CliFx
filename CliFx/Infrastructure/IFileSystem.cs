@@ -11,18 +11,19 @@ namespace CliFx.Infrastructure
     public interface IFileSystem
     {
         /// <summary>
-        /// Determines whether the specified file exists.
+        /// Determines whether the specified file exists. 
+        /// Doesn't work in Linux Subsystem for Windows unless application if the application resides on a windows mount (eg /mnt/c/...)
         /// </summary>
         bool Exists(string filePath);
 
         /// <summary>
-        /// Opens a text file, reads all the text in the file, and then closes the file.
+        /// Attempts to open a text file, reads all the text in the file, and then closes the file.
         /// </summary>
         bool TryReadText(string filePath, out string content);
 
         /// <summary>
-        /// Creates a new file, writes the specified string to the file, and then closes
-        /// the file. If the target file already exists, it is overwritten.
+        /// Creates a new file (and any intermediate directories required), writes the specified string to the file, 
+        /// and then closes the file. If the target file already exists, it is overwritten.
         /// </summary>
         void WriteText(string filePath, string content);
 

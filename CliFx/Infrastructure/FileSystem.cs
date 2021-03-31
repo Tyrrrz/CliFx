@@ -2,7 +2,7 @@
 
 namespace CliFx.Infrastructure
 {
-    class FileSystem : IFileSystem
+    internal class FileSystem : IFileSystem
     {
         public void Copy(string sourceFileName, string destFileName)
         {
@@ -11,7 +11,7 @@ namespace CliFx.Infrastructure
 
         public bool Exists(string path)
         {
-            return File.Exists(path);
+            return new FileInfo(path).Exists;
         }
 
         public bool TryReadText(string path, out string text)

@@ -113,9 +113,8 @@ namespace CliFx
             // Handle suggest directive
             if (Configuration.IsSuggestModeAllowed)
             {
-                new ShellHookInstaller(_fileSystem).EnsureInstalled(Metadata.Title);
+                new SuggestShellHookInstaller(_fileSystem).Install(Metadata.Title);
             }
-
             if (IsSuggestModeEnabled(commandInput))
             {
                 new SuggestionService(applicationSchema, _fileSystem, commandInput.EnvironmentVariables)

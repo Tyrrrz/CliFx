@@ -3,24 +3,26 @@ using CliFx.Input;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
 namespace CliFx.Suggestions
 {
-    class ShellHookInstaller
+    class SuggestShellHookInstaller
     {
         private readonly IFileSystem _fileSystem;
 
-        public ShellHookInstaller(IFileSystem fileSystem)
+        public SuggestShellHookInstaller(IFileSystem fileSystem)
         {
             _fileSystem = fileSystem;
         }
-        public void EnsureInstalled(string commandName)
+
+        public void Install(string commandName)
         {
-            foreach (var env in new ISuggestEnvironment[] { new BashEnvironment(), new PowershellEnvironment() })
+            foreach (var env in new ISuggestEnvironment[] { new BashEnvironment(), new WindowsPowershellEnvironment(), new UnixPowershellEnvironment() })
             {
-                if (!env.ShouldInstall())
+                if( !env.ShellPaths.Any(p=> _fileSystem.Exists(p)))
                 {
                     continue;
                 }
