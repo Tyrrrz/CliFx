@@ -48,7 +48,7 @@ _{safeName}_complete()
 
 complete -f -F _{commandName}_complete ""{commandName}""
 
-### clifx-suggest-ends-here-{safeName}";
+### clifx-suggest-ends-here-{safeName}".Replace("\r", "");
         }
     }
 }

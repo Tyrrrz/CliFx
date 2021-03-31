@@ -14,7 +14,7 @@ namespace CliFx.Suggestions
                 "WindowsPowerShell",
                 "Microsoft.PowerShell_profile.ps1");
 
-        public string GetInstallCommand(string commandName)
+        public virtual string GetInstallCommand(string commandName)
         {
             return $@"
 ### clifx-suggest-begins-here-{commandName}-{Version}

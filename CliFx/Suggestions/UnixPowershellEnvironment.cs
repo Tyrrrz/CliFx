@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 
 namespace CliFx.Suggestions
 {
@@ -11,5 +12,10 @@ namespace CliFx.Suggestions
                         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData, Environment.SpecialFolderOption.DoNotVerify),
                         "powershell",
                         "Microsoft.PowerShell_profile.ps1");
+
+        public override string GetInstallCommand(string commandName)
+        {
+            return base.GetInstallCommand(commandName).Replace("\r", "");
+        }
     }
 }
