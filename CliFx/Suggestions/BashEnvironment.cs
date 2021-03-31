@@ -13,12 +13,9 @@ namespace CliFx.Suggestions
     {
         public string Version => "V1";
 
-        public string[] ShellPaths => new[] { @"/usr/bin/bash" };
+        public string[] SupportedShellPaths => new[] { @"/usr/bin/bash" };
 
-        public string GetInstallPath()
-        {
-            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".bashrc");
-        }
+        public string InstallPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".bashrc");
 
         public string GetInstallCommand(string commandName)
         {
@@ -52,6 +49,6 @@ _{safeName}_complete()
 complete -f -F _{commandName}_complete ""{commandName}""
 
 ### clifx-suggest-ends-here-{safeName}";
-        }       
+        }
     }
 }

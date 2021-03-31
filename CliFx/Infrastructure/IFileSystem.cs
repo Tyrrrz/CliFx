@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-
-namespace CliFx.Infrastructure
+﻿namespace CliFx.Infrastructure
 {
     /// <summary>
     /// Abstraction for the file system

@@ -1,7 +1,5 @@
 ﻿using CliFx.Infrastructure;
-using CliFx.Input;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -20,15 +18,15 @@ namespace CliFx.Suggestions
 
         public void Install(string commandName)
         {
-            foreach (var env in new ISuggestEnvironment[] { new BashEnvironment(), new WindowsPowershellEnvironment(), new UnixPowershellEnvironment() })
-            {
-                if( !env.ShellPaths.Any(p=> _fileSystem.Exists(p)))
-                {
-                    continue;
-                }
+            var detectedEnvironments = new ISuggestEnvironment[] {
+                                    new BashEnvironment(),
+                                    new WindowsPowershellEnvironment(),
+                                    new UnixPowershellEnvironment() }
+                                 .Where(env => env.SupportedShellPaths.Any(p => _fileSystem.Exists(p) ));
 
-                var path = env.GetInstallPath();
-                
+            foreach (var env in detectedEnvironments)
+            {
+                var path = env.InstallPath;
                 var pattern = $"### clifx-suggest-begins-here-{Regex.Escape(commandName)}-{env.Version}.*### clifx-suggest-ends-here-{Regex.Escape(commandName)}";
 
                 string script = "";

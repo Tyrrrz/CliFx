@@ -1,11 +1,5 @@
-﻿using CliFx.Infrastructure;
-using CliFx.Input;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
 
 namespace CliFx.Suggestions
 {
@@ -13,15 +7,12 @@ namespace CliFx.Suggestions
     {
         public string Version => "V1";
 
-        public virtual string[] ShellPaths => new[] { @"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" };
+        public virtual string[] SupportedShellPaths => new[] { @"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" };
 
-        public virtual string GetInstallPath()
-        {
-            return Path.Combine(
+        public virtual string InstallPath => Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments, Environment.SpecialFolderOption.DoNotVerify),
                 "WindowsPowerShell",
                 "Microsoft.PowerShell_profile.ps1");
-        }
 
         public string GetInstallCommand(string commandName)
         {

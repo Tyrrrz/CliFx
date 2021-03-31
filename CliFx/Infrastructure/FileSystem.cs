@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace CliFx.Infrastructure
 {
@@ -6,7 +7,10 @@ namespace CliFx.Infrastructure
     {
         public void Copy(string sourceFileName, string destFileName)
         {
-            File.Copy(sourceFileName, destFileName);
+            if( File.Exists(sourceFileName))
+            {
+                File.Copy(sourceFileName, destFileName);
+            }
         }
 
         public bool Exists(string path)
@@ -27,9 +31,10 @@ namespace CliFx.Infrastructure
 
         public void WriteText(string path, string content)
         {
-            if (!Directory.Exists(Path.GetDirectoryName(path)))
+            var directory = Path.GetDirectoryName(path);
+            if (!Directory.Exists(directory))
             {
-                Directory.CreateDirectory(path);
+                Directory.CreateDirectory(directory);
             }
             File.WriteAllText(path, content);
         }
