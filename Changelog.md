@@ -1,3 +1,8 @@
+### v2.0.2 (31-Mar-2021)
+
+- Fixed an issue where having a transitive reference to CliFx sometimes resulted in `SystemConsoleShouldBeAvoidedAnalyzer` throwing `NullReferenceException` during build.
+- Fixed some documentation typos and inconsistencies.
+
 ### v2.0.1 (24-Mar-2021)
 
 - Fixed an issue where some exceptions with async stack traces generated on .NET 3.1 or earlier were not parsed and formatted correctly.
