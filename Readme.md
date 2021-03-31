@@ -129,7 +129,8 @@ public class LogCommand : ICommand
     [CommandParameter(0, Description = "Value whose logarithm is to be found.")]
     public double Value { get; init; }
 
-    // Name: --base | Short name: -b
+    // Name: --base
+    // Short name: -b
     [CommandOption("base", 'b', Description = "Logarithm base.")]
     public double Base { get; init; } = 10;
 
