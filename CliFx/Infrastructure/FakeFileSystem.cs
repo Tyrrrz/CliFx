@@ -9,13 +9,18 @@ namespace CliFx.Infrastructure
     /// <summary>
     /// A mock for IFileSystem
     /// </summary>
-    public class FakeSystem : IFileSystem
+    public class FakeFileSystem : IFileSystem
     {
-        public Dictionary<string, string> Files => new Dictionary<string, string>();
+        public Dictionary<string, string> Files = new Dictionary<string, string>();
+
+        public IEnumerable<string> FilePaths => Files.Keys;
 
         public void Copy(string sourceFileName, string destFileName)
         {
-            Files[destFileName] = Files[sourceFileName];
+            if( Files.ContainsKey(sourceFileName))
+            {
+                Files[destFileName] = Files[sourceFileName];
+            }
         }
 
         public bool Exists(string path)
