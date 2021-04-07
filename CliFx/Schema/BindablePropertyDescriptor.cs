@@ -21,7 +21,17 @@ namespace CliFx.Schema
 
         public IReadOnlyList<object?> GetValidValues()
         {
-            var underlyingType = Type.TryGetNullableUnderlyingType() ?? Type;
+            Type typeToCheck = Type;
+            foreach (var inf in typeToCheck.GetInterfaces())
+            {
+                if (inf.IsGenericType && inf.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+                {
+                    typeToCheck = inf.GenericTypeArguments[0];
+                    break;
+                }
+            }
+
+            var underlyingType = typeToCheck.TryGetNullableUnderlyingType() ?? typeToCheck;
 
             // We can only get valid values for enums
             if (underlyingType.IsEnum)

@@ -578,6 +578,51 @@ public class Command : ICommand
         }
 
         [Fact]
+        public async Task Help_text_shows_all_valid_values_for_non_scalar_enum_parameters_and_options()
+        {
+            // Arrange
+            var commandType = DynamicCommandBuilder.Compile(
+                // language=cs
+                @"
+public enum CustomEnum { One, Two, Three }
+
+[Command]
+public class Command : ICommand
+{
+    [CommandParameter(0)]
+    public List<CustomEnum> Foo { get; set; }
+
+    [CommandOption(""bar"")]
+    public List<CustomEnum> Bar { get; set; }
+
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}
+");
+
+            var application = new CliApplicationBuilder()
+                .AddCommand(commandType)
+                .UseConsole(FakeConsole)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(
+                new[] {"--help"},
+                new Dictionary<string, string>()
+            );
+
+            var stdOut = FakeConsole.ReadOutputString();
+
+            // Assert
+            exitCode.Should().Be(0);
+            stdOut.Should().ContainAllInOrder(
+                "PARAMETERS",
+                "foo", "Choices:", "One", "Two", "Three",
+                "OPTIONS",
+                "--bar", "Choices:", "One", "Two", "Three"
+            );
+        }
+
+        [Fact]
         public async Task Help_text_shows_environment_variables_for_options_that_have_them_configured_as_fallback()
         {
             // Arrange
