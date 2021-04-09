@@ -1,3 +1,7 @@
+### v2.0.3 (09-Apr-2021)
+
+- Improved help text by showing valid values for non-scalar enum parameters and options. (Thanks [@Robert Dailey](https://github.com/rcdailey))
+
 ### v2.0.2 (31-Mar-2021)
 
 - Fixed an issue where having a transitive reference to CliFx sometimes resulted in `SystemConsoleShouldBeAvoidedAnalyzer` throwing `NullReferenceException` during build.
