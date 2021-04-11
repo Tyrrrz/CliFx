@@ -21,10 +21,8 @@ namespace CliFx.Schema
 
         public IReadOnlyList<object?> GetValidValues()
         {
-            var underlyingType =
-                Type.TryGetNullableUnderlyingType() ??
-                Type.TryGetEnumerableUnderlyingType() ??
-                Type;
+            var underlyingType = Type.TryGetEnumerableUnderlyingType() ?? Type;
+            underlyingType = underlyingType.TryGetNullableUnderlyingType() ?? underlyingType;
 
             // We can only get valid values for enums
             if (underlyingType.IsEnum)
