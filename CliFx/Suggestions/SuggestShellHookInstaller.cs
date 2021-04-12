@@ -41,13 +41,14 @@ namespace CliFx.Suggestions
                 var sb = new StringBuilder(Regex.Replace(script, uninstallPattern, "", RegexOptions.Singleline));
                 sb.AppendLine(env.GetInstallCommand(commandName));
 
-                // backup to temp folder for OS to delete eventually (just in case something really bad happens)
-                var tempFile = Path.GetFileName(path);
-                var tempExtension = Path.GetExtension(tempFile) + $".backup_{DateTime.UtcNow.ToFileTime()}";
-                tempFile = Path.ChangeExtension(tempFile, tempExtension);
-                var backupPath = Path.Combine(Path.GetTempPath(), tempFile);
+                // create backup in case something bad happens
+                var backupExtension = Path.GetExtension(path) + $".backup_{DateTime.UtcNow.ToFileTime()}";
+                var backupPath = Path.ChangeExtension(path, backupExtension);
 
-                _fileSystem.Copy(path, backupPath);
+                if (_fileSystem.Exists(path))
+                {
+                    _fileSystem.Copy(path, backupPath);
+                }
                 _fileSystem.WriteText(path, sb.ToString());
             }
         }

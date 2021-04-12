@@ -7,10 +7,7 @@ namespace CliFx.Infrastructure
     {
         public void Copy(string sourceFileName, string destFileName)
         {
-            if( File.Exists(sourceFileName))
-            {
-                File.Copy(sourceFileName, destFileName);
-            }
+            File.Copy(sourceFileName, destFileName);
         }
 
         public bool Exists(string path)

@@ -7,7 +7,6 @@
     {
         /// <summary>
         /// Determines whether the specified file exists. 
-        /// Doesn't work in Linux Subsystem for Windows unless application if the application resides on a windows mount (eg /mnt/c/...)
         /// </summary>
         bool Exists(string filePath);
 
