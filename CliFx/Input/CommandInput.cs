@@ -150,6 +150,7 @@ namespace CliFx.Input
 
             var lastOptionIdentifier = default(string?);
             var lastOptionValues = new List<string>();
+            var lastText = "";
 
             // Consume and group all remaining arguments into options
             for (; index < commandLineArguments.Count; index++)
@@ -163,8 +164,9 @@ namespace CliFx.Input
                 {
                     // Flush previous
                     if (!string.IsNullOrWhiteSpace(lastOptionIdentifier))
-                        result.Add(new OptionInput(lastOptionIdentifier, lastOptionValues));
+                        result.Add(new OptionInput(lastOptionIdentifier, lastOptionValues, lastText));
 
+                    lastText = argument;
                     lastOptionIdentifier = argument.Substring(2);
                     lastOptionValues = new List<string>();
                 }
@@ -177,8 +179,9 @@ namespace CliFx.Input
                     {
                         // Flush previous
                         if (!string.IsNullOrWhiteSpace(lastOptionIdentifier))
-                            result.Add(new OptionInput(lastOptionIdentifier, lastOptionValues));
+                            result.Add(new OptionInput(lastOptionIdentifier, lastOptionValues, lastText));
 
+                        lastText = argument;
                         lastOptionIdentifier = alias.AsString();
                         lastOptionValues = new List<string>();
                     }
@@ -186,13 +189,14 @@ namespace CliFx.Input
                 // Value
                 else if (!string.IsNullOrWhiteSpace(lastOptionIdentifier))
                 {
+                    lastText = $"{lastText} {argument}";
                     lastOptionValues.Add(argument);
                 }
             }
 
             // Flush last option
             if (!string.IsNullOrWhiteSpace(lastOptionIdentifier))
-                result.Add(new OptionInput(lastOptionIdentifier, lastOptionValues));
+                result.Add(new OptionInput(lastOptionIdentifier, lastOptionValues, lastText));
 
             return result;
         }

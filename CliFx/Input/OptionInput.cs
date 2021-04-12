@@ -9,17 +9,21 @@ namespace CliFx.Input
 
         public IReadOnlyList<string> Values { get; }
 
+        public string RawText { get; }
+
         public bool IsHelpOption =>
             OptionSchema.HelpOption.MatchesIdentifier(Identifier);
 
         public bool IsVersionOption =>
             OptionSchema.VersionOption.MatchesIdentifier(Identifier);
 
-        public OptionInput(string identifier, IReadOnlyList<string> values)
+        public OptionInput(string identifier, IReadOnlyList<string> values, string rawText)
         {
             Identifier = identifier;
             Values = values;
+            RawText = rawText;
         }
+
 
         public string GetFormattedIdentifier() => Identifier switch
         {

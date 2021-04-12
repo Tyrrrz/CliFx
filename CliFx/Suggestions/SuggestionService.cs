@@ -51,6 +51,38 @@ namespace CliFx.Suggestions
                              .ToList();
             }
 
+            // handle options for the command we found
+            var option = suggestInput.Options.LastOrDefault();
+            if (option != null)
+            {
+                if( commandMatch.Options.Any(p => p.MatchesIdentifier(option.Identifier)))
+                {
+                    // Don't return any suggestions for exact option matches
+                    return NoSuggestions();
+                }
+
+                if (option.RawText.StartsWith("--"))
+                {
+                    return commandMatch.Options
+                                       .Where(p => p.Name != null && p.Name.StartsWith(option.Identifier, StringComparison.OrdinalIgnoreCase))
+                                       .Select(p => $"--{p.Name}");
+                }
+                return NoSuggestions();
+            }
+
+            // the parser returns a parameter for "--" or "-"
+            var lastParameter = suggestInput.Parameters.LastOrDefault();
+            if (lastParameter?.Value == "--")
+            {
+                return commandMatch.Options.OrderBy(p => p.Name).Select(p => $"--{p.Name}");
+            }
+
+            if (lastParameter?.Value == "-")
+            {
+                return commandMatch.Options.OrderBy(p => p.ShortName).Select(p => $"-{p.ShortName}")
+                        .Concat(commandMatch.Options.Select(p => $"--{p.Name}"));
+            }
+
             return NoSuggestions();
         }
 
