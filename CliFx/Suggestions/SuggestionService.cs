@@ -24,6 +24,11 @@ namespace CliFx.Suggestions
             _environmentVariableInputs = environmentVariableInputs;
         }
 
+        public bool ShouldInstallHooks(CommandInput commandInput)
+        {
+            return commandInput.Options.Any(p => p.Identifier == "install");
+        }
+
         public IEnumerable<string> GetSuggestions(CommandInput commandInput)
         {
             var text = ExtractCommandText(commandInput);

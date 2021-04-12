@@ -110,16 +110,18 @@ namespace CliFx
                 return 0;
             }
 
-            // Handle suggest directive
-            if (Configuration.IsSuggestModeAllowed)
-            {
-                new SuggestShellHookInstaller(_fileSystem).Install(Metadata.Title);
-            }
+            // Handle suggest directive             
             if (IsSuggestModeEnabled(commandInput))
             {
-                new SuggestionService(applicationSchema, _fileSystem, commandInput.EnvironmentVariables)
-                           .GetSuggestions(commandInput).ToList()
-                           .ForEach(p => _console.Output.WriteLine(p));
+                var suggestionService = new SuggestionService(applicationSchema, _fileSystem, commandInput.EnvironmentVariables);
+
+                if (suggestionService.ShouldInstallHooks(commandInput))
+                {
+                    new SuggestShellHookInstaller(_fileSystem).Install(Metadata.Title);
+                }
+
+                suggestionService.GetSuggestions(commandInput).ToList()
+                                 .ForEach(p => _console.Output.WriteLine(p));
                 return 0;
             }
 
@@ -132,7 +134,7 @@ namespace CliFx
             // Activate command instance
             var commandInstance = commandSchema == FallbackDefaultCommand.Schema
                 ? new FallbackDefaultCommand() // bypass activator
-                : (ICommand) _typeActivator.CreateInstance(commandSchema.Type);
+                : (ICommand)_typeActivator.CreateInstance(commandSchema.Type);
 
             // Assemble help context
             var helpContext = new HelpContext(

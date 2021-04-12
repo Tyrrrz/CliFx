@@ -29,7 +29,7 @@ namespace CliFx.Tests
         [InlineData("/usr/bin/bash", ".bashrc")]
         [InlineData("/usr/bin/pwsh", "Microsoft.PowerShell_profile.ps1")]
         [InlineData(@"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe", "Microsoft.PowerShell_profile.ps1")]
-        public async Task Suggest_hook_is_added_when_suggestions_are_allowed(string shellPath, string expectedHookScript)
+        public async Task Suggest_hook_is_added_when_install_parameter_is_provided(string shellPath, string expectedHookScript)
         {
             // Arrange
             var fileSystem = new FakeFileSystem();
@@ -38,11 +38,11 @@ namespace CliFx.Tests
             var application = TestApplicationFactory()
                 .AllowSuggestMode(true)
                 .UseFileSystem(fileSystem)
-                .Build();
+                .Build();                          
 
             // Act
             var exitCode = await application.RunAsync(
-                new string[] { }
+                new[] { "[suggest]", "--install" }
             );
 
             // Assert
@@ -58,20 +58,20 @@ namespace CliFx.Tests
         }
 
         [Fact]
-        public async Task Suggest_hook_is_not_installed_when_suggestions_arent_allowed()
+        public async Task Suggest_hook_is_not_installed_by_default()
         {
             // Arrange
             var fileSystem = new FakeFileSystem();
             fileSystem.Files["/usr/bin/bash"] = "stub shell interpeter";
 
             var application = TestApplicationFactory()
-                .AllowSuggestMode(false)
+                .AllowSuggestMode(true)
                 .UseFileSystem(fileSystem)
                 .Build();
 
             // Act
             var exitCode = await application.RunAsync(
-                new string[] {  }
+                new[] { "[suggest]" }
             );
 
             // Assert
