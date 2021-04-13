@@ -47,47 +47,89 @@ namespace CliFx.Suggestions
             {
                 return _applicationSchema.GetCommandNames()
                              .Where(p => p.StartsWith(suggestInput.CommandName, StringComparison.OrdinalIgnoreCase))
-                             .OrderBy(p => p)
                              .ToList();
             }
 
-            // handle options for the command we found
-            var optionInput = suggestInput.Options.LastOrDefault();
-            if (optionInput != null)
-            {
-                bool exactOptionMatchFound = commandSchema.Options.Any(p =>
-
-                    string.Equals($"--{p.Name}", optionInput.RawText, StringComparison.OrdinalIgnoreCase) ||
-                    string.Equals($"-{p.ShortName}", optionInput.RawText)
-                );
-
-                if (exactOptionMatchFound)
-                {
-                    return NoSuggestions();
-                }
-
-                if (optionInput.RawText.StartsWith("--"))
-                {
-                    return commandSchema.Options
-                                       .Where(p => p.Name != null && p.Name.StartsWith(optionInput.Identifier, StringComparison.OrdinalIgnoreCase))
-                                       .Select(p => $"--{p.Name}");
-                }
-                return NoSuggestions();
-            }
-
-            // the parser returns a parameter for "--" or "-"
+            // prioritise option suggestions over parameter suggestions, as there might be an 
+            // unlimited suggestions for parameters where a series of parameters is expected
+            // edge case: CommandInput.Parse() returns a parameter for "--" or "-", so get this case out of the way first.
             var lastParameter = suggestInput.Parameters.LastOrDefault();
             if (lastParameter?.Value == "--")
             {
-                return commandSchema.Options.OrderBy(p => p.Name).Select(p => $"--{p.Name}");
+                return commandSchema.Options.Select(p => $"--{p.Name}");
             }
 
             if (lastParameter?.Value == "-")
             {
-                return commandSchema.Options.OrderBy(p => p.ShortName).Select(p => $"-{p.ShortName}")
-                        .Concat(commandSchema.Options.Select(p => $"--{p.Name}"));
+                return commandSchema.Options.Select(p => $"-{p.ShortName}").Concat(commandSchema.Options.Select(p => $"--{p.Name}"));
             }
 
+            var optionInput = suggestInput.Options.LastOrDefault();
+            if (optionInput != null)
+            {
+                return ProvideSuggestionsForOptionInputs(commandSchema, optionInput);
+            }
+
+            // provide parameter suggestions
+            try
+            {
+                var parameterBindings = GetParameterBindings(suggestInput.Parameters, commandSchema.Parameters);
+                if (lastParameter != null)
+                {
+                    var schema = parameterBindings[lastParameter];
+
+                    var validParameterValues = schema.Property.GetValidValues()
+                                   .Select(p => p == null ? "" : p.ToString())
+                                   .Where(p => p.StartsWith(lastParameter.Value, StringComparison.OrdinalIgnoreCase));
+
+                    if (validParameterValues.Any(p => string.Equals(p, lastParameter.Value, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        return NoSuggestions();
+                    }
+
+                    return validParameterValues;
+                }
+            }
+            catch (InvalidOperationException)
+            {
+                // parameters outnumber schemas, no way to make any suggestions. 
+                return NoSuggestions();
+            }
+
+            return NoSuggestions();
+        }
+
+        private Dictionary<ParameterInput, ParameterSchema> GetParameterBindings(IReadOnlyList<ParameterInput> inputs, IReadOnlyList<ParameterSchema> schemas)
+        {
+            var queue = new Queue<ParameterSchema>(schemas.OrderBy(p => p.Order));
+            var dictionary = new Dictionary<ParameterInput, ParameterSchema>();
+
+            foreach (var input in inputs)
+            {
+                var schema = queue.Peek().Property.IsScalar() ? queue.Dequeue() : queue.Peek();
+                dictionary.Add(input, schema);
+            }
+
+            return dictionary;
+        }
+
+        private static IEnumerable<string> ProvideSuggestionsForOptionInputs(CommandSchema commandSchema, OptionInput optionInput)
+        {
+            bool exactOptionMatchFound = commandSchema.Options.Any(
+                                            p => string.Equals($"--{p.Name}", optionInput.RawText, StringComparison.OrdinalIgnoreCase)
+                                              || string.Equals($"-{p.ShortName}", optionInput.RawText));
+
+            if (exactOptionMatchFound)
+            {
+                return NoSuggestions();
+            }
+
+            if (optionInput.RawText.StartsWith("--"))
+            {
+                return commandSchema.Options
+                                   .Where(p => p.Name != null && p.Name.StartsWith(optionInput.Identifier, StringComparison.OrdinalIgnoreCase))
+                                   .Select(p => $"--{p.Name}");
+            }
             return NoSuggestions();
         }
 

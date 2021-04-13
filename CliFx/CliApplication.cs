@@ -120,7 +120,8 @@ namespace CliFx
                     new SuggestShellHookInstaller(_fileSystem).Install(Metadata.Title);
                 }
 
-                suggestionService.GetSuggestions(commandInput).ToList()
+                suggestionService.GetSuggestions(commandInput)
+                                 .OrderBy(p=>p).ToList()
                                  .ForEach(p => _console.Output.WriteLine(p));
                 return 0;
             }

@@ -199,5 +199,73 @@ public class OptionCommand : ICommand
                   .Where(p => !string.IsNullOrWhiteSpace(p))
                   .Should().BeEquivalentTo(expected, usecase);
         }
+
+
+        [Theory]
+        [InlineData("don't suggest parameters that don't have a sensible suggestion",
+                     "clifx.exe cmd x", 0, new string[] { })]
+        [InlineData("suggest parameters where valid values are present",
+                     "clifx.exe cmd x Re", 0, new[] { "Red", "RedOrange" })]
+        [InlineData("don't suggest parameters where complete values are present",
+                     "clifx.exe cmd x Red", 0, new string[] { })]
+        [InlineData("suggest for non-scalar parameters",
+                     "clifx.exe cmd x Red R", 0, new[] { "Red", "RedOrange" })]
+        [InlineData("suggest options when parameter present",
+                     "clifx.exe cmd x --opt0", 0, new[] { "--opt01", "--opt02" })]
+        public async Task Suggest_directive_suggests_parameters(string usecase, string variableContents, int cursorOffset, string[] expected)
+        {
+            // Arrange
+            var optCommandCs = @"
+public enum TestColor
+{
+    Red, RedOrange, Green, Blue
+}
+
+[Command(""cmd"")]
+public class ParameterCommand : ICommand
+{
+    [CommandParameter(0, Name = ""param"")]
+    public string Parameter { get; set; } = """";
+
+    [CommandParameter(1, Name = ""color"")]
+    public TestColor Color { get; set; }
+
+    [CommandParameter(2, Name = ""hue"")]
+    public IReadOnlyList<TestColor> Hue { get; set;}
+
+    [CommandOption(""opt"", 'o')]
+    public string Option { get; set; } = """";
+
+    [CommandOption(""opt01"", '1')]
+    public string Option01 { get; set; } = """";
+
+    [CommandOption(""opt02"", '2')]
+    public string Option02 { get; set; } = """";
+
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}
+";
+            var application = TestApplicationFactory(optCommandCs)
+                .AllowSuggestMode()
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(
+                new[] { "[suggest]", "--envvar", "CLIFX-{GUID}", "--cursor", (variableContents.Length + cursorOffset).ToString() },
+                new Dictionary<string, string>()
+                {
+                    ["CLIFX-{GUID}"] = variableContents
+                }
+            );
+
+            var stdOut = FakeConsole.ReadOutputString();
+
+            // Assert
+            exitCode.Should().Be(0);
+
+            stdOut.Split(null)
+                  .Where(p => !string.IsNullOrWhiteSpace(p))
+                  .Should().BeEquivalentTo(expected, usecase);
+        }
     }
 }
