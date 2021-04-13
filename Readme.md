@@ -700,6 +700,85 @@ test
 Environment variables can be configured for options of non-scalar types as well.
 In such case, the values of the environment variable will be split by `Path.PathSeparator` (`;` on Windows, `:` on Linux).
 
+### Suggest mode
+
+Suggest mode provides command-line autocompletion for Powershell and Bash. By default, it is disabled, but it can be enabled as follows:
+
+```csharp
+var app = new CliApplicationBuilder()
+    .AddCommandsFromThisAssembly()
+    .AllowSuggestMode(true) // allow suggest mode
+    .Build();
+```
+
+Once enabled, your shell must be configured to use suggest mode as follows:
+
+1. Add your application to the PATH
+2. Add a snippet to your shell's to instruct your shell in how to generate auto-completions. This can be done as follows.
+ 
+   ``` sh
+   > cmd [suggest] --install
+   ```
+
+For Powershell terminals, code will be appended to the file at the $PROFILE location. A backup is made to the same location prior to modification. The snippet below is provided for users who would prefer to make the change manually.
+
+``` powershell
+### clifx-suggest-begins-here-CliFx.Demo-V1
+# this block provides auto-complete for the CliFx.Demo command
+# and assumes that CliFx.Demo is on the path
+$scriptblock = {
+    param($wordToComplete, $commandAst, $cursorPosition)        
+        $command = "CliFx.Demo"
+
+        $commandCacheId = "clifx-suggest-" + (new-guid).ToString()
+        Set-Content -path "ENV:\$commandCacheId" -value $commandAst
+
+        $result = &$command `[suggest`] --envvar $commandCacheId --cursor $cursorPosition | ForEach-Object {
+                [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
+         }
+
+        Remove-Item -Path "ENV:\$commandCacheId"
+        $result
+}
+
+Register-ArgumentCompleter -Native -CommandName "CliFx.Demo" -ScriptBlock $scriptblock
+### clifx-suggest-ends-here-CliFx.Demo
+
+```
+For Bash terminals, code will be appended to the ~/.bashrc file. A backup is made to the same location prior to modification. The snippet below is provided for users who would prefer to make the change manually.
+
+``` bash
+### clifx-suggest-begins-here-CliFx.Demo-V1
+# this block provides auto-complete for the CliFx.Demo command
+# and assumes that CliFx.Demo is on the path
+_CliFxDemo_complete()
+{
+local word=${COMP_WORDS[COMP_CWORD]}
+
+# generate unique environment variable
+CLIFX_CMD_CACHE="clifx-suggest-$(uuidgen)"
+# replace hyphens with underscores to make it valid
+CLIFX_CMD_CACHE=${CLIFX_CMD_CACHE//\-/_}
+
+export $CLIFX_CMD_CACHE=${COMP_LINE}
+
+local completions
+completions="$(CliFx.Demo "[suggest]" --cursor "${COMP_POINT}" --envvar $CLIFX_CMD_CACHE 2>/dev/null)"
+if [ $? -ne 0 ]; then
+    completions=""
+fi
+
+unset $CLIFX_CMD_CACHE
+
+COMPREPLY=( $(compgen -W "$completions" -- "$word") )
+}
+
+complete -f -F _CliFxDemo_complete "CliFx.Demo"
+
+### clifx-suggest-ends-here-CliFx.Demo
+```
+
+
 ## Etymology
 
 CliFx is made out of "Cli" for "Command Line Interface" and "Fx" for "Framework". It's pronounced as "cliff ex".
