@@ -54,7 +54,7 @@ namespace CliFx.Suggestions
                 var inputSegments = suggestInput.CommandName?.Split() ?? new string[] { };
                 var completeSegementCount = Math.Max(0, inputSegments.Count() - 1);
 
-                var result = segments.Select(p => string.Join(" ", p.Skip(completeSegementCount).ToArray() ));
+                var result = segments.Select(p => string.Join(" ", p.Skip(completeSegementCount).ToArray()));
                 return result;
             }
 

@@ -28,7 +28,7 @@ namespace CliFx.Suggestions
 _{safeName}_complete()
 {{
   local word=${{COMP_WORDS[COMP_CWORD]}}
-
+  local IFS=$'\n'
   # generate unique environment variable
   CLIFX_CMD_CACHE=""clifx-suggest-$(uuidgen)""
   # replace hyphens with underscores to make it valid
