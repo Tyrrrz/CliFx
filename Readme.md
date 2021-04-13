@@ -727,7 +727,7 @@ For Powershell terminals, code will be appended to the file at the $PROFILE loca
 # this block provides auto-complete for the CliFx.Demo command
 # and assumes that CliFx.Demo is on the path
 $scriptblock = {
-    param($wordToComplete, $commandAst, $cursorPosition)        
+    param($wordToComplete, $commandAst, $cursorPosition)
         $command = "CliFx.Demo"
 
         $commandCacheId = "clifx-suggest-" + (new-guid).ToString()
@@ -753,24 +753,24 @@ For Bash terminals, code will be appended to the ~/.bashrc file. A backup is mad
 # and assumes that CliFx.Demo is on the path
 _CliFxDemo_complete()
 {
-local word=${COMP_WORDS[COMP_CWORD]}
+  local word=${COMP_WORDS[COMP_CWORD]}
 
-# generate unique environment variable
-CLIFX_CMD_CACHE="clifx-suggest-$(uuidgen)"
-# replace hyphens with underscores to make it valid
-CLIFX_CMD_CACHE=${CLIFX_CMD_CACHE//\-/_}
+  # generate unique environment variable
+  CLIFX_CMD_CACHE="clifx-suggest-$(uuidgen)"
+  # replace hyphens with underscores to make it valid
+  CLIFX_CMD_CACHE=${CLIFX_CMD_CACHE//\-/_}
 
-export $CLIFX_CMD_CACHE=${COMP_LINE}
+  export $CLIFX_CMD_CACHE="${COMP_LINE}"
 
-local completions
-completions="$(CliFx.Demo "[suggest]" --cursor "${COMP_POINT}" --envvar $CLIFX_CMD_CACHE 2>/dev/null)"
-if [ $? -ne 0 ]; then
+  local completions
+  completions="$(CliFx.Demo "[suggest]" --cursor "${COMP_POINT}" --envvar $CLIFX_CMD_CACHE 2>/dev/null)"
+  if [ $? -ne 0 ]; then
     completions=""
-fi
+  fi
 
-unset $CLIFX_CMD_CACHE
+  unset $CLIFX_CMD_CACHE
 
-COMPREPLY=( $(compgen -W "$completions" -- "$word") )
+  COMPREPLY=( $(compgen -W "$completions" -- "$word") )
 }
 
 complete -f -F _CliFxDemo_complete "CliFx.Demo"
