@@ -150,6 +150,8 @@ public class Command02 : ICommand
                       "clifx.exe opt --", 0, new[] { "--help", "--opt", "--opt01", "--opt02" })]
         [InlineData("suggest all option names beginning with prefix",
                       "clifx.exe opt --opt0", 0, new[] { "--opt01", "--opt02" })]
+        [InlineData("suggest all option names beginning with prefix that also match short names",
+                      "clifx.exe opt --o", 0, new[] { "--opt", "--opt01", "--opt02" })]
         [InlineData("suggest all option names and aliases",
                       "clifx.exe opt -", 0, new[] { "-1", "-2", "-h", "-o", "--help", "--opt", "--opt01", "--opt02" })]
         [InlineData("don't suggest additional aliases because it doesn't feel right even if it is valid?",

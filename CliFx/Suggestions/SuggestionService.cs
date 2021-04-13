@@ -39,11 +39,11 @@ namespace CliFx.Suggestions
                    _environmentVariableInputs.ToDictionary(p => p.Name, p => p.Value),
                    _applicationSchema.GetCommandNames());
 
-            var commandMatch = _applicationSchema.Commands
+            var commandSchema = _applicationSchema.Commands
                                    .FirstOrDefault(p => string.Equals(p.Name, suggestInput.CommandName, StringComparison.OrdinalIgnoreCase));
 
             // suggest a command name if we don't have an exact match
-            if (commandMatch == null)
+            if (commandSchema == null)
             {
                 return _applicationSchema.GetCommandNames()
                              .Where(p => p.StartsWith(suggestInput.CommandName, StringComparison.OrdinalIgnoreCase))
@@ -52,19 +52,24 @@ namespace CliFx.Suggestions
             }
 
             // handle options for the command we found
-            var option = suggestInput.Options.LastOrDefault();
-            if (option != null)
+            var optionInput = suggestInput.Options.LastOrDefault();
+            if (optionInput != null)
             {
-                if( commandMatch.Options.Any(p => p.MatchesIdentifier(option.Identifier)))
+                bool exactOptionMatchFound = commandSchema.Options.Any(p =>
+
+                    string.Equals($"--{p.Name}", optionInput.RawText, StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals($"-{p.ShortName}", optionInput.RawText)
+                );
+
+                if (exactOptionMatchFound)
                 {
-                    // Don't return any suggestions for exact option matches
                     return NoSuggestions();
                 }
 
-                if (option.RawText.StartsWith("--"))
+                if (optionInput.RawText.StartsWith("--"))
                 {
-                    return commandMatch.Options
-                                       .Where(p => p.Name != null && p.Name.StartsWith(option.Identifier, StringComparison.OrdinalIgnoreCase))
+                    return commandSchema.Options
+                                       .Where(p => p.Name != null && p.Name.StartsWith(optionInput.Identifier, StringComparison.OrdinalIgnoreCase))
                                        .Select(p => $"--{p.Name}");
                 }
                 return NoSuggestions();
@@ -74,13 +79,13 @@ namespace CliFx.Suggestions
             var lastParameter = suggestInput.Parameters.LastOrDefault();
             if (lastParameter?.Value == "--")
             {
-                return commandMatch.Options.OrderBy(p => p.Name).Select(p => $"--{p.Name}");
+                return commandSchema.Options.OrderBy(p => p.Name).Select(p => $"--{p.Name}");
             }
 
             if (lastParameter?.Value == "-")
             {
-                return commandMatch.Options.OrderBy(p => p.ShortName).Select(p => $"-{p.ShortName}")
-                        .Concat(commandMatch.Options.Select(p => $"--{p.Name}"));
+                return commandSchema.Options.OrderBy(p => p.ShortName).Select(p => $"-{p.ShortName}")
+                        .Concat(commandSchema.Options.Select(p => $"--{p.Name}"));
             }
 
             return NoSuggestions();
