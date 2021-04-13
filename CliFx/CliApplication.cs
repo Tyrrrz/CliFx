@@ -118,6 +118,7 @@ namespace CliFx
                 if (suggestionService.ShouldInstallHooks(commandInput))
                 {
                     new SuggestShellHookInstaller(_fileSystem).Install(Metadata.Title);
+                    return 0;
                 }
 
                 suggestionService.GetSuggestions(commandInput)
