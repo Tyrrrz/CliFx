@@ -209,7 +209,8 @@ namespace CliFx
                 var commandInput = CommandInput.Parse(
                     commandLineArguments,
                     environmentVariables,
-                    applicationSchema.GetCommandNames()
+                    applicationSchema.GetCommandNames(),
+                    false
                 );
 
                 return await RunAsync(applicationSchema, commandInput);

@@ -75,7 +75,7 @@ namespace CliFx.Input
         private static string? ParseCommandName(
             IReadOnlyList<string> commandLineArguments,
             ISet<string> commandNames,
-            ref int index)
+            ref int index, bool suggestMode)
         {
             var potentialCommandNameComponents = new List<string>();
             var commandName = default(string?);
@@ -91,7 +91,8 @@ namespace CliFx.Input
                 potentialCommandNameComponents.Add(argument);
 
                 var potentialCommandName = potentialCommandNameComponents.JoinToString(" ");
-                if (commandNames.Contains(potentialCommandName))
+                if (commandNames.Contains(potentialCommandName) ||
+                    suggestMode && commandNames.Any(p => p.StartsWith(potentialCommandName, StringComparison.OrdinalIgnoreCase)))
                 {
                     // Record the position but continue the loop in case
                     // we find a longer (more specific) match.
@@ -204,7 +205,8 @@ namespace CliFx.Input
         public static CommandInput Parse(
             IReadOnlyList<string> commandLineArguments,
             IReadOnlyDictionary<string, string> environmentVariables,
-            IReadOnlyList<string> availableCommandNames)
+            IReadOnlyList<string> availableCommandNames,
+            bool suggestMode)
         {
             var index = 0;
 
@@ -216,7 +218,7 @@ namespace CliFx.Input
             var parsedCommandName = ParseCommandName(
                 commandLineArguments,
                 availableCommandNames.ToHashSet(StringComparer.OrdinalIgnoreCase),
-                ref index
+                ref index, suggestMode
             );
 
             var parsedParameters = ParseParameters(

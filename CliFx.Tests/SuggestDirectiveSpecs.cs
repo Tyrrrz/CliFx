@@ -34,6 +34,22 @@ public class Command02 : ICommand
 }
 ";
 
+        private string _parentCommandCs = @"
+[Command(""parent"")]
+public class ParentCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}
+";
+
+        private string _childCommandCs = @"
+[Command(""parent list"")]
+public class ParentCommand : ICommand
+{
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}
+";
+
         public CliApplicationBuilder TestApplicationFactory(params string[] commandClasses)
         {
             var builder = new CliApplicationBuilder();
@@ -85,19 +101,21 @@ public class Command02 : ICommand
 
         [Theory]
         [InlineData("supply all commands if nothing supplied",
-                        "clifx.exe", 0, new[] { "cmd", "cmd02" })]
+                        "clifx.exe", 0, new[] { "cmd", "cmd02", "parent", "parent list" })]
         [InlineData("supply all commands that 'start with' argument",
                         "clifx.exe c", 0, new[] { "cmd", "cmd02" })]
         [InlineData("supply command options if match found, regardles of other partial matches (no options defined)",
                         "clifx.exe cmd", 0, new string[] { })]
-        [InlineData("supply nothing if no commands 'starts with' artument",
+        [InlineData("supply nothing if no commands 'starts with' argument",
                         "clifx.exe m", 0, new string[] { })]
+        [InlineData("supply completions of partial child commands",
+                        "clifx.exe parent l", 0, new[] { "list" })]
         [InlineData("supply all commands that 'start with' argument, allowing for cursor position",
                         "clifx.exe cmd", -2, new[] { "cmd", "cmd02" })]
         public async Task Suggest_directive_suggests_commands_by_environment_variables(string usecase, string variableContents, int cursorOffset, string[] expected)
         {
             // Arrange
-            var application = TestApplicationFactory(_cmdCommandCs, _cmd2CommandCs)
+            var application = TestApplicationFactory(_cmdCommandCs, _cmd2CommandCs, _parentCommandCs, _childCommandCs)
                 .AllowSuggestMode()
                 .Build();
 
@@ -115,8 +133,7 @@ public class Command02 : ICommand
             // Assert
             exitCode.Should().Be(0);
 
-            stdOut.Split(null)
-                  .Where(p => !string.IsNullOrWhiteSpace(p))
+            stdOut.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
                   .Should().BeEquivalentTo(expected, usecase);
         }
 

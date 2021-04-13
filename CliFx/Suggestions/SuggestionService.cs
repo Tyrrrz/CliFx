@@ -37,7 +37,7 @@ namespace CliFx.Suggestions
             var suggestInput = CommandInput.Parse(
                    suggestArgs.ToArray(),
                    _environmentVariableInputs.ToDictionary(p => p.Name, p => p.Value),
-                   _applicationSchema.GetCommandNames());
+                   _applicationSchema.GetCommandNames(), true);
 
             var commandSchema = _applicationSchema.Commands
                                    .FirstOrDefault(p => string.Equals(p.Name, suggestInput.CommandName, StringComparison.OrdinalIgnoreCase));
@@ -45,9 +45,16 @@ namespace CliFx.Suggestions
             // suggest a command name if we don't have an exact match
             if (commandSchema == null)
             {
-                return _applicationSchema.GetCommandNames()
-                             .Where(p => p.StartsWith(suggestInput.CommandName, StringComparison.OrdinalIgnoreCase))
-                             .ToList();
+                // handle completions of incomplete child command names
+                // where the remaining segment of the command name must be supplied (and not the complete command name)
+                var segments = _applicationSchema.GetCommandNames()
+                    .Where(p => p.StartsWith(suggestInput.CommandName, StringComparison.OrdinalIgnoreCase))
+                    .Select(p => p.Split());
+
+                var inputSegments = suggestInput.CommandName?.Split() ?? new string[] { };
+                var completeSegementCount = Math.Max(0, inputSegments.Count() -1 );
+
+                return segments.Select(p => string.Join(" ", p.Skip(completeSegementCount).ToArray()));
             }
 
             // prioritise option suggestions over parameter suggestions, as there might be an 
