@@ -34,7 +34,7 @@ _{safeName}_complete()
   # replace hyphens with underscores to make it valid
   CLIFX_CMD_CACHE=${{CLIFX_CMD_CACHE//\-/_}}
 
-  export $CLIFX_CMD_CACHE=${{COMP_LINE}}
+  export $CLIFX_CMD_CACHE=""${{COMP_LINE}}""
 
   local completions
   completions=""$({commandName} ""[suggest]"" --cursor ""${{COMP_POINT}}"" --envvar $CLIFX_CMD_CACHE 2>/dev/null)""

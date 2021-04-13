@@ -52,9 +52,10 @@ namespace CliFx.Suggestions
                     .Select(p => p.Split());
 
                 var inputSegments = suggestInput.CommandName?.Split() ?? new string[] { };
-                var completeSegementCount = Math.Max(0, inputSegments.Count() -1 );
+                var completeSegementCount = Math.Max(0, inputSegments.Count() - 1);
 
-                return segments.Select(p => string.Join(" ", p.Skip(completeSegementCount).ToArray()));
+                var result = segments.Select(p => string.Join(" ", p.Skip(completeSegementCount).ToArray() ));
+                return result;
             }
 
             // prioritise option suggestions over parameter suggestions, as there might be an 
