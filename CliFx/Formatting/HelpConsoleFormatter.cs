@@ -321,6 +321,8 @@ namespace CliFx.Formatting
                                     Write(element.ToString(CultureInfo.InvariantCulture));
                                     Write(ConsoleColor.DarkGray, '"');
                                 }
+
+                                Write('.');
                             }
                         }
                         else
@@ -332,10 +334,9 @@ namespace CliFx.Formatting
                                 Write(ConsoleColor.DarkGray, '"');
                                 Write(defaultValue.ToString(CultureInfo.InvariantCulture));
                                 Write(ConsoleColor.DarkGray, '"');
+                                Write('.');
                             }
                         }
-
-                        Write('.');
                     }
                 }
 

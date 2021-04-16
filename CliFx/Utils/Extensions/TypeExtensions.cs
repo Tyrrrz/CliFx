@@ -54,9 +54,11 @@ namespace CliFx.Utils.Extensions
             return array;
         }
 
-        public static bool IsToStringOverriden(this Type type) =>
-            type.GetMethod(nameof(ToString), Type.EmptyTypes) !=
-            typeof(object).GetMethod(nameof(ToString), Type.EmptyTypes);
+        public static bool IsToStringOverriden(this Type type)
+        {
+            var toStringMethod = type.GetMethod(nameof(ToString), Type.EmptyTypes);
+            return toStringMethod?.GetBaseDefinition()?.DeclaringType != toStringMethod?.DeclaringType;
+        }
 
         // Types supported by `Convert.ChangeType(...)`
         private static readonly HashSet<Type> ConvertibleTypes = new()
