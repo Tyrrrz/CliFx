@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Text;
+using CliFx.Utils;
 
 namespace CliFx.Infrastructure
 {
@@ -17,7 +18,7 @@ namespace CliFx.Infrastructure
         /// Initializes an instance of <see cref="ConsoleWriter"/>.
         /// </summary>
         public ConsoleWriter(IConsole console, Stream stream, Encoding encoding)
-            : base(stream, encoding)
+            : base(stream, encoding, 256)
         {
             Console = console;
         }
@@ -26,14 +27,18 @@ namespace CliFx.Infrastructure
         /// Initializes an instance of <see cref="ConsoleWriter"/>.
         /// </summary>
         public ConsoleWriter(IConsole console, Stream stream)
-            : this(console, stream, System.Console.OutputEncoding)
+            : this(console, stream, System.Console.OutputEncoding.WithoutPreamble())
         {
         }
     }
 
     public partial class ConsoleWriter
     {
-        internal static ConsoleWriter Create(IConsole console, Stream? stream) =>
-            new(console, stream is not null ? Stream.Synchronized(stream) : Stream.Null) {AutoFlush = true};
+        internal static ConsoleWriter Create(IConsole console, Stream? stream) => new(
+            console,
+            stream is not null
+                ? Stream.Synchronized(stream)
+                : Stream.Null
+        ) {AutoFlush = true};
     }
 }

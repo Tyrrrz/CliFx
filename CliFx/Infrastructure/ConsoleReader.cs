@@ -17,7 +17,7 @@ namespace CliFx.Infrastructure
         /// Initializes an instance of <see cref="ConsoleReader"/>.
         /// </summary>
         public ConsoleReader(IConsole console, Stream stream, Encoding encoding)
-            : base(stream, encoding, false)
+            : base(stream, encoding, false, 4096)
         {
             Console = console;
         }
@@ -33,7 +33,11 @@ namespace CliFx.Infrastructure
 
     public partial class ConsoleReader
     {
-        internal static ConsoleReader Create(IConsole console, Stream? stream) =>
-            new(console, stream is not null ? Stream.Synchronized(stream) : Stream.Null);
+        internal static ConsoleReader Create(IConsole console, Stream? stream) => new(
+            console,
+            stream is not null
+                ? Stream.Synchronized(stream)
+                : Stream.Null
+        );
     }
 }
