@@ -53,7 +53,7 @@ public static class Program
 }
 ```
 
-> Note: ensure that your `Main()` method returns the integer exit code provided by `CliApplication.RunAsync()`, as shown in the above example.
+> ⚠️ Ensure that your `Main()` method returns the integer exit code provided by `CliApplication.RunAsync()`, as shown in the above example.
 Exit code is used to communicate execution result to the parent process, so it's important that your program returns it.
 
 The code above calls `AddCommandsFromThisAssembly()` to scan and resolve command types defined within the current assembly.
@@ -97,10 +97,10 @@ They can be used to show help text or application version respectively:
 
 MyApp v1.0
 
-Usage
+USAGE
   dotnet myapp.dll [options]
 
-Options
+OPTIONS
   -h|--help         Shows help text.
   --version         Shows version information.
 ```
@@ -176,13 +176,13 @@ Available parameters and options are also listed in the command's help text, whi
 
 MyApp v1.0
 
-Usage
+USAGE
   dotnet myapp.dll <value> [options]
 
-Parameters
+PARAMETERS
 * value             Value whose logarithm is to be found.
 
-Options
+OPTIONS
   -b|--base         Logarithm base. Default: "10".
   -h|--help         Shows help text.
   --version         Shows version information.
@@ -215,7 +215,7 @@ Here are some examples of how it works:
 - `myapp cmd abc -o` routes to command `cmd` (assuming it's an existing command) with parameter `abc` and sets option `'o'` without value
 
 Additionally, argument parsing in CliFx aims to be as deterministic as possible, ideally yielding the same result regardless of the application configuration.
-In fact, the only context-sensitive part in the parser is the command name resolution, which needs to know the list of available commands in order to discern between arguments that correspond to command name and arguments which map as parameters. 
+In fact, the only context-sensitive part in the parser is the command name resolution, which needs to know the list of available commands in order to discern between arguments that correspond to command name and arguments which map as parameters.
 
 The parser's context-free nature has several implications on how it consumes arguments.
 For example, passing `myapp -i file1.txt file2.txt` will always be parsed as an option with multiple values, regardless of the arity of the underlying property it's bound to.
@@ -245,61 +245,9 @@ Parameters and options can have the following underlying types:
   - Types that are assignable from arrays (`IReadOnlyList<T>`, `ICollection<T>`, etc.)
   - Types with a constructor accepting an array (`List<T>`, `HashSet<T>`, etc.)
 
-- Example command with a custom converter:
+#### Non-scalar parameters and options
 
-```csharp
-// Maps 2D vectors from AxB notation
-public class VectorConverter : BindingConverter<Vector2>
-{
-    public override Vector2 Convert(string? rawValue)
-    {
-        if (string.IsNullOrWhiteSpace(rawValue))
-            return default;
-
-        var components = rawValue.Split('x', 'X', ';');
-        var x = int.Parse(components[0], CultureInfo.InvariantCulture);
-        var y = int.Parse(components[1], CultureInfo.InvariantCulture);
-
-        return new Vector2(x, y);
-    }
-}
-
-[Command]
-public class SurfaceCalculatorCommand : ICommand
-{
-    // Custom converter is used to map raw argument values
-    [CommandParameter(0, Converter = typeof(VectorConverter))]
-    public Vector2 PointA { get; init; }
-
-    [CommandParameter(1, Converter = typeof(VectorConverter))]
-    public Vector2 PointB { get; init; }
-
-    [CommandParameter(2, Converter = typeof(VectorConverter))]
-    public Vector2 PointC { get; init; }
-
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        var a = (PointB - PointA).Length();
-        var b = (PointC - PointB).Length();
-        var c = (PointA - PointC).Length();
-
-        var p = (a + b + c) / 2;
-        var surface = Math.Sqrt(p * (p - a) * (p - b) * (p - c));
-
-        console.Output.WriteLine($"Triangle surface area: {surface}");
-
-        return default;
-    }
-}
-```
-
-```sh
-> dotnet myapp.dll 0x0 0x18 24x0
-
-Triangle surface area: 216
-```
-
-- Example command with an array-backed parameter:
+Here's an example of a command with an array-backed parameter:
 
 ```csharp
 [Command]
@@ -351,6 +299,56 @@ public class FileSizeCalculatorCommand : ICommand
 > dotnet myapp.dll --files file1.bin file2.exe
 
 Total file size: 186368 bytes
+```
+
+#### Custom conversion
+
+To create a custom converter for a parameter or an option, define a class that inherits from `BindingConverter<T>` and specify it in the attribute:
+
+```csharp
+// Maps 2D vectors from AxB notation
+public class VectorConverter : BindingConverter<Vector2>
+{
+    public override Vector2 Convert(string? rawValue)
+    {
+        if (string.IsNullOrWhiteSpace(rawValue))
+            return default;
+
+        var components = rawValue.Split('x', 'X', ';');
+        var x = int.Parse(components[0], CultureInfo.InvariantCulture);
+        var y = int.Parse(components[1], CultureInfo.InvariantCulture);
+
+        return new Vector2(x, y);
+    }
+}
+
+[Command]
+public class SurfaceCalculatorCommand : ICommand
+{
+    // Custom converter is used to map raw argument values
+    [CommandParameter(0, Converter = typeof(VectorConverter))]
+    public Vector2 PointA { get; init; }
+
+    [CommandParameter(1, Converter = typeof(VectorConverter))]
+    public Vector2 PointB { get; init; }
+
+    [CommandParameter(2, Converter = typeof(VectorConverter))]
+    public Vector2 PointC { get; init; }
+
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        var a = (PointB - PointA).Length();
+        var b = (PointC - PointB).Length();
+        var c = (PointA - PointC).Length();
+
+        var p = (a + b + c) / 2;
+        var surface = Math.Sqrt(p * (p - a) * (p - b) * (p - c));
+
+        console.Output.WriteLine($"Triangle surface area: {surface}");
+
+        return default;
+    }
+}
 ```
 
 ### Multiple commands
@@ -435,7 +433,7 @@ You can run `dotnet myapp.dll cmd1 [command] --help` to show help on a specific 
 ```
 
 > Note that defining a default (unnamed) command is not required.
-In the even of its absence, running the application without specifying a command will just show root level help text.
+If it's absent, running the application without specifying a command will just show root level help text.
 
 ### Reporting errors
 
@@ -479,7 +477,8 @@ Division by zero is not supported.
 133
 ```
 
-> Note that Unix systems rely on 8-bit unsigned integers to represent exit codes, which means that you can only use values between `1` and `255` to indicate an unsuccessful execution result.
+> ⚠️ Even though exit codes are represented by 32-bit integers in .NET, using values outside of 8-bit range will cause an overflow on Unix systems.
+To avoid unexpected results, use numbers between 1 and 255 for exit codes that indicate failure.
 
 ### Graceful cancellation
 
@@ -512,7 +511,7 @@ public class CancellableCommand : ICommand
 ```
 
 > Note that a command may use this approach to delay cancellation only once.
-If the user issues a second interrupt signal, the application will be immediately terminated.
+If the user issues a second interrupt signal, the application will be terminated immediately.
 
 ### Type activation
 
@@ -522,7 +521,7 @@ To facilitate that, it uses an interface called `ITypeActivator` that determines
 The default implementation of `ITypeActivator` only supports types that have public parameterless constructors, which is sufficient for majority of scenarios.
 However, in some cases you may also want to define a custom initializer, for example when integrating with an external dependency container.
 
-The following snippet shows how to configure your application to use [`Microsoft.Extensions.DependencyInjection`](https://nuget.org/packages/Microsoft.Extensions.DependencyInjection) as the type activator:
+The following example shows how to configure your application to use [`Microsoft.Extensions.DependencyInjection`](https://nuget.org/packages/Microsoft.Extensions.DependencyInjection) as the type activator in CliFx:
 
 ```csharp
 public static class Program
@@ -633,7 +632,7 @@ public async Task ConcatCommand_executes_successfully()
 ### Debug and preview mode
 
 When troubleshooting issues, you may find it useful to run your app in debug or preview mode.
-To do that, you need to pass pass the corresponding directive before any other arguments.
+To do that, you need to pass the corresponding directive before any other arguments.
 
 In order to run the application in debug mode, use the `[debug]` directive.
 This will cause the program to launch in a suspended state, waiting for debugger to be attached to the process:
@@ -697,7 +696,7 @@ public class AuthCommand : ICommand
 test
 ```
 
-Environment variables can be configured for options of non-scalar types as well.
+Environment variables can be configured for options of non-scalar types (arrays, lists, etc.) as well.
 In such case, the values of the environment variable will be split by `Path.PathSeparator` (`;` on Windows, `:` on Linux).
 
 ## Etymology
