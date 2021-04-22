@@ -477,7 +477,7 @@ Division by zero is not supported.
 133
 ```
 
-> ⚠️ Even though exit codes are represented by 32-bit integers in .NET, using values outside of 8-bit range will cause an overflow on Unix systems.
+> ⚠️ Even though exit codes are represented by 32-bit integers in .NET, using values outside of 8-bit unsigned range will cause an overflow on Unix systems.
 To avoid unexpected results, use numbers between 1 and 255 for exit codes that indicate failure.
 
 ### Graceful cancellation
