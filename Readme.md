@@ -399,15 +399,15 @@ Requesting help will show direct subcommands of the current command:
 
 MyApp v1.0
 
-Usage
+USAGE
   dotnet myapp.dll [options]
   dotnet myapp.dll [command] [...]
 
-Options
+OPTIONS
   -h|--help         Shows help text.
   --version         Shows version information.
 
-Commands
+COMMANDS
   cmd1              Subcommands: cmd1 sub.
   cmd2
 
@@ -419,14 +419,14 @@ The user can also refine their help request by querying it on a specific command
 ```sh
 > dotnet myapp.dll cmd1 --help
 
-Usage
+USAGE
   dotnet myapp.dll cmd1 [options]
   dotnet myapp.dll cmd1 [command] [...]
 
-Options
+OPTIONS
   -h|--help         Shows help text.
 
-Commands
+COMMANDS
   sub
 
 You can run `dotnet myapp.dll cmd1 [command] --help` to show help on a specific command.
