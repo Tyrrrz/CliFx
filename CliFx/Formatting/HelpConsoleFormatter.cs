@@ -27,7 +27,7 @@ namespace CliFx.Formatting
 
         private void WriteCommandInvocation()
         {
-            Write(ConsoleColor.DarkGray, _context.ApplicationMetadata.ExecutableName);
+            Write(_context.ApplicationMetadata.ExecutableName);
 
             // Command name
             if (!string.IsNullOrWhiteSpace(_context.CommandSchema.Name))
@@ -190,9 +190,9 @@ namespace CliFx.Formatting
                             Write(", ");
                         }
 
-                        Write(ConsoleColor.DarkGray, '"');
+                        Write('"');
                         Write(validValue.ToString());
-                        Write(ConsoleColor.DarkGray, '"');
+                        Write('"');
                     }
 
                     Write('.');
@@ -269,9 +269,9 @@ namespace CliFx.Formatting
                             Write(", ");
                         }
 
-                        Write(ConsoleColor.DarkGray, '"');
+                        Write('"');
                         Write(validValue.ToString());
-                        Write(ConsoleColor.DarkGray, '"');
+                        Write('"');
                     }
 
                     Write('.');
@@ -317,9 +317,9 @@ namespace CliFx.Formatting
                                         Write(", ");
                                     }
 
-                                    Write(ConsoleColor.DarkGray, '"');
+                                    Write('"');
                                     Write(element.ToString(CultureInfo.InvariantCulture));
-                                    Write(ConsoleColor.DarkGray, '"');
+                                    Write('"');
                                 }
 
                                 Write('.');
@@ -331,9 +331,9 @@ namespace CliFx.Formatting
                             {
                                 Write(ConsoleColor.White, "Default: ");
 
-                                Write(ConsoleColor.DarkGray, '"');
+                                Write('"');
                                 Write(defaultValue.ToString(CultureInfo.InvariantCulture));
-                                Write(ConsoleColor.DarkGray, '"');
+                                Write('"');
                                 Write('.');
                             }
                         }

@@ -19,7 +19,7 @@ namespace CliFx.Formatting
             Write("at ");
 
             // Fully qualified method name
-            Write(ConsoleColor.DarkGray, stackFrame.ParentType + '.');
+            Write(stackFrame.ParentType + '.');
             Write(ConsoleColor.Yellow, stackFrame.MethodName);
 
             // Method parameters
@@ -60,7 +60,7 @@ namespace CliFx.Formatting
                 Write("in ");
 
                 // File path
-                Write(ConsoleColor.DarkGray, stackFrameDirectoryPath);
+                Write(stackFrameDirectoryPath);
                 Write(ConsoleColor.Yellow, stackFrameFileName);
 
                 // Source position
@@ -80,7 +80,7 @@ namespace CliFx.Formatting
 
             // Fully qualified exception type
             var exceptionType = exception.GetType();
-            Write(ConsoleColor.DarkGray, exceptionType.Namespace + '.');
+            Write(exceptionType.Namespace + '.');
             Write(ConsoleColor.White, exceptionType.Name);
             Write(": ");
 

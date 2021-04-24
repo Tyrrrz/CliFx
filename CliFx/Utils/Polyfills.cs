@@ -24,9 +24,6 @@ internal static partial class PolyfillExtensions
         key = pair.Key;
         value = pair.Value;
     }
-
-    public static TValue GetValueOrDefault<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dic, TKey key) =>
-        dic.TryGetValue(key!, out var result) ? result! : default!;
 }
 
 internal static partial class PolyfillExtensions
@@ -42,6 +39,15 @@ namespace System.Linq
     {
         public static HashSet<T> ToHashSet<T>(this IEnumerable<T> source, IEqualityComparer<T> comparer) =>
             new(source, comparer);
+    }
+}
+
+namespace System.Collections.Generic
+{
+    internal static class PolyfillExtensions
+    {
+        public static TValue GetValueOrDefault<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dic, TKey key) =>
+            dic.TryGetValue(key!, out var result) ? result! : default!;
     }
 }
 #endif

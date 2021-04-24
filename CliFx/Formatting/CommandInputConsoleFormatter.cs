@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using CliFx.Infrastructure;
 using CliFx.Input;
 
@@ -47,9 +46,9 @@ namespace CliFx.Formatting
                 foreach (var value in optionInput.Values)
                 {
                     Write(' ');
-                    Write(ConsoleColor.DarkGray, '"');
+                    Write('"');
                     Write(value);
-                    Write(ConsoleColor.DarkGray, '"');
+                    Write('"');
                 }
 
                 Write(']');
@@ -75,9 +74,9 @@ namespace CliFx.Formatting
                 Write('=');
 
                 // Value
-                Write(ConsoleColor.DarkGray, '"');
+                Write('"');
                 Write(environmentVariableInput.Value);
-                Write(ConsoleColor.DarkGray, '"');
+                Write('"');
 
                 WriteLine();
             }
