@@ -1,3 +1,10 @@
+### v2.0.4 (24-Apr-2021)
+
+- Fixed an issue where output and error streams in `SystemConsole` defaulted to UTF8 encoding with BOM when the application was running with UTF8 codepage. `ConsoleWriter` will now discard preamble from the specified encoding. This fix brings the behavior of `SystemConsole` in line with .NET's own `System.Console` which also discards preamble for output and error streams.
+- Fixed an issue where help text tried to show default values for parameters and options whose type does not override `ToString()` method.
+- Fixed an issue where help text didn't show default values for parameters and options whose type is an enumerable of nullable enums. (Thanks [@Robert Dailey](https://github.com/rcdailey))
+- Fixed an issue where specific parts of the help text weren't legible in some terminals due to low color resolution. Removed the usage of `ConsoleColor.DarkGray` in help text.
+
 ### v2.0.3 (09-Apr-2021)
 
 - Improved help text by showing valid values for non-scalar enum parameters and options. (Thanks [@Robert Dailey](https://github.com/rcdailey))
