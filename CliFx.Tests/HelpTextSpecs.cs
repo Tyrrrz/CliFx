@@ -590,10 +590,10 @@ public enum CustomEnum { One, Two, Three }
 public class Command : ICommand
 {
     [CommandParameter(0)]
-    public List<CustomEnum> Foo { get; set; }
+    public IReadOnlyList<CustomEnum> Foo { get; set; }
 
     [CommandOption(""bar"")]
-    public List<CustomEnum> Bar { get; set; }
+    public IReadOnlyList<CustomEnum> Bar { get; set; }
 
     public ValueTask ExecuteAsync(IConsole console) => default;
 }
@@ -638,7 +638,7 @@ public class Command : ICommand
     public CustomEnum? Foo { get; set; }
 
     [CommandOption(""bar"")]
-    public List<CustomEnum?> Bar { get; set; }
+    public IReadOnlyList<CustomEnum?> Bar { get; set; }
 
     public ValueTask ExecuteAsync(IConsole console) => default;
 }

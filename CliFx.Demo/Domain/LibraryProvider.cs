@@ -21,7 +21,7 @@ namespace CliFx.Demo.Domain
 
             var data = File.ReadAllText(StorageFilePath);
 
-            return JsonConvert.DeserializeObject<Library>(data);
+            return JsonConvert.DeserializeObject<Library>(data) ?? Library.Empty;
         }
 
         public Book? TryGetBook(string title) => GetLibrary().Books.FirstOrDefault(b => b.Title == title);
