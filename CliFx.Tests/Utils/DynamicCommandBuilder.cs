@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Basic.Reference.Assemblies;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
@@ -60,16 +61,9 @@ namespace CliFx.Tests.Utils
             var compilation = CSharpCompilation.Create(
                 "CliFxTests_DynamicAssembly_" + Guid.NewGuid(),
                 new[] {ast},
-                new[]
-                {
-                    MetadataReference.CreateFromFile(Assembly.Load("netstandard").Location),
-                    MetadataReference.CreateFromFile(Assembly.Load("System.Runtime").Location),
-                    MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
-                    MetadataReference.CreateFromFile(typeof(Console).Assembly.Location),
-                    MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location),
-                    MetadataReference.CreateFromFile(typeof(DynamicCommandBuilder).Assembly.Location),
-                    MetadataReference.CreateFromFile(typeof(ICommand).Assembly.Location)
-                },
+                ReferenceAssemblies.Net50
+                    .Append(MetadataReference.CreateFromFile(typeof(ICommand).Assembly.Location))
+                    .Append(MetadataReference.CreateFromFile(typeof(DynamicCommandBuilder).Assembly.Location)),
                 // DLL to avoid having to define the Main() method
                 new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
             );
