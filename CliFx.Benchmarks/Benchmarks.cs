@@ -14,7 +14,7 @@ namespace CliFx.Benchmarks
         public static void Main() => BenchmarkRunner.Run<Benchmarks>(
             DefaultConfig
                 .Instance
-                .With(ConfigOptions.DisableOptimizationsValidator)
+                .WithOptions(ConfigOptions.DisableOptimizationsValidator)
         );
     }
 }
