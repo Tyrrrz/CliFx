@@ -253,7 +253,7 @@ Here's an example of a command with an array-backed parameter:
 [Command]
 public class FileSizeCalculatorCommand : ICommand
 {
-    // FileInfo is string-initializable and IReadOnlyList<T> can be assgined from an array,
+    // FileInfo is string-initializable and IReadOnlyList<T> can be assigned from an array,
     // so the value of this property can be mapped from a sequence of arguments.
     [CommandParameter(0)]
     public IReadOnlyList<FileInfo> Files { get; init; }
