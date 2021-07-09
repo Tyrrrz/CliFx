@@ -18,7 +18,7 @@ namespace CliFx.Infrastructure
         /// Initializes an instance of <see cref="ConsoleWriter"/>.
         /// </summary>
         public ConsoleWriter(IConsole console, Stream stream, Encoding encoding)
-            : base(stream, encoding, 256)
+            : base(stream, encoding.WithoutPreamble(), 256)
         {
             Console = console;
         }
@@ -27,7 +27,7 @@ namespace CliFx.Infrastructure
         /// Initializes an instance of <see cref="ConsoleWriter"/>.
         /// </summary>
         public ConsoleWriter(IConsole console, Stream stream)
-            : this(console, stream, System.Console.OutputEncoding.WithoutPreamble())
+            : this(console, stream, System.Console.OutputEncoding)
         {
         }
     }
