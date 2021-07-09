@@ -1,3 +1,8 @@
+### v2.0.5 (09-Jul-2021)
+
+- Fixed an issue where calling `IConsole.Output.Encoding.EncodingName` and some other members threw an exception.
+- Added readme file to the package.
+
 ### v2.0.4 (24-Apr-2021)
 
 - Fixed an issue where output and error streams in `SystemConsole` defaulted to UTF8 encoding with BOM when the application was running with UTF8 codepage. `ConsoleWriter` will now discard preamble from the specified encoding. This fix brings the behavior of `SystemConsole` in line with .NET's own `System.Console` which also discards preamble for output and error streams.
