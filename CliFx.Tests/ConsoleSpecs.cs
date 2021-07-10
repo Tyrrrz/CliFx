@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using System.Threading.Tasks;
+using CliFx.Infrastructure;
 using CliFx.Tests.Utils;
 using CliWrap;
 using CliWrap.Buffered;
@@ -134,6 +137,23 @@ public class Command : ICommand
             exitCode.Should().Be(0);
             stdOut.Trim().Should().Be("Hello world");
             stdErr.Trim().Should().Be("Hello world");
+        }
+
+        [Fact]
+        public void Console_does_not_emit_preamble_when_used_with_encoding_that_has_it()
+        {
+            // Arrange
+            using var buffer = new MemoryStream();
+            using var consoleWriter = new ConsoleWriter(FakeConsole, buffer, Encoding.UTF8);
+
+            // Act
+            consoleWriter.Write("Hello world");
+            consoleWriter.Flush();
+
+            var output = consoleWriter.Encoding.GetString(buffer.ToArray());
+
+            // Assert
+            output.Should().Be("Hello world");
         }
     }
 }
