@@ -1,3 +1,7 @@
+### v2.0.6 (17-Jul-2021)
+
+- Fixed an issue where an exception thrown via reflection during parameter or option binding resulted in `Exception has been thrown by the target of an invocation` error instead of a more useful message. Such exceptions will now be unwrapped to provide better user experience.
+
 ### v2.0.5 (09-Jul-2021)
 
 - Fixed an issue where calling `IConsole.Output.Encoding.EncodingName` and some other members threw an exception.
