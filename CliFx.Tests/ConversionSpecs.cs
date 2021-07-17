@@ -946,5 +946,48 @@ public class Command : ICommand
             exitCode.Should().NotBe(0);
             stdErr.Should().Contain("Hello world");
         }
+
+        [Fact]
+        public async Task Parameter_or_option_value_conversion_fails_if_the_static_parse_method_throws()
+        {
+            // Arrange
+            var commandType = DynamicCommandBuilder.Compile(
+                // language=cs
+                @"
+public class CustomType
+{
+    public string Value { get; }
+    
+    private CustomType(string value) => Value = value;
+    
+    public static CustomType Parse(string value) => throw new Exception(""Hello world"");
+}
+
+[Command]
+public class Command : ICommand
+{
+    [CommandOption('f')]
+    public CustomType Foo { get; set; }
+    
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}
+");
+            var application = new CliApplicationBuilder()
+                .AddCommand(commandType)
+                .UseConsole(FakeConsole)
+                .Build();
+
+            // Act
+            var exitCode = await application.RunAsync(
+                new[] {"-f", "bar"},
+                new Dictionary<string, string>()
+            );
+
+            var stdErr = FakeConsole.ReadErrorString();
+
+            // Assert
+            exitCode.Should().NotBe(0);
+            stdErr.Should().Contain("Hello world");
+        }
     }
 }

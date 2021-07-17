@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using CliFx.Exceptions;
 using CliFx.Extensibility;
 using CliFx.Infrastructure;
@@ -161,12 +162,18 @@ namespace CliFx
             }
             catch (Exception ex) when (ex is not CliFxException) // don't wrap CliFxException
             {
+                // We use reflection-based invocation which can throw TargetInvocationException.
+                // Unwrap these exceptions to provide a more user-friendly error message.
+                var errorMessage = ex is TargetInvocationException invokeEx
+                    ? invokeEx.InnerException?.Message ?? invokeEx.Message
+                    : ex.Message;
+
                 throw CliFxException.UserError(
                     $"{memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} cannot be set from provided argument(s):" +
                     Environment.NewLine +
                     rawValues.Select(v => '<' + v + '>').JoinToString(" ") +
                     Environment.NewLine +
-                    $"Error: {ex.Message}",
+                    $"Error: {errorMessage}",
                     ex
                 );
             }
