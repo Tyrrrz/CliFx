@@ -89,6 +89,9 @@ namespace CliFx.Infrastructure
 
             return (_cancellationTokenSource = cts).Token;
         }
+        
+        /// <inheritdoc />
+        public void Clear() => Console.Clear();
 
         /// <inheritdoc />
         public void Dispose()
