@@ -82,6 +82,11 @@ namespace CliFx.Infrastructure
         /// </para>
         /// </remarks>
         CancellationToken RegisterCancellationHandler();
+        
+        /// <summary>
+        /// Clears the console buffer and corresponding console window of display information.
+        /// </summary>
+        void Clear();
     }
 
     /// <summary>

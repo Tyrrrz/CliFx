@@ -84,6 +84,11 @@ namespace CliFx.Infrastructure
                 _cancellationTokenSource.Cancel();
             }
         }
+        
+        /// <inheritdoc />
+        public void Clear()
+        {
+        }
 
         /// <inheritdoc />
         public virtual void Dispose() => _cancellationTokenSource.Dispose();
