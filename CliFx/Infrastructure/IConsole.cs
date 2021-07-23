@@ -89,10 +89,9 @@ namespace CliFx.Infrastructure
         void Clear();
 
         /// <summary>
-        /// Wrapper to the <a href="https://docs.microsoft.com/en-us/dotnet/api/system.console.readkey">System.Console.ReadKey</a> method
+        /// Obtains the next character or function key pressed by the user.
         /// </summary>
-        /// <param name="intercept"></param>
-        void ReadKey(bool intercept);
+        void ReadKey(bool intercept = false);
     }
 
     /// <summary>
