@@ -84,9 +84,14 @@ namespace CliFx.Infrastructure
                 _cancellationTokenSource.Cancel();
             }
         }
-        
+
         /// <inheritdoc />
         public void Clear()
+        {
+        }
+
+        /// <inheritdoc />
+        public void ReadKey(bool intercept = false)
         {
         }
 
