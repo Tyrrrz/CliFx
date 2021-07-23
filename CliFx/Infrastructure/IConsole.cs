@@ -87,6 +87,12 @@ namespace CliFx.Infrastructure
         /// Clears the console buffer and corresponding console window of display information.
         /// </summary>
         void Clear();
+
+        /// <summary>
+        /// Wrapper to the <a href="https://docs.microsoft.com/en-us/dotnet/api/system.console.readkey">System.Console.ReadKey</a> method
+        /// </summary>
+        /// <param name="intercept"></param>
+        void ReadKey(bool intercept);
     }
 
     /// <summary>
