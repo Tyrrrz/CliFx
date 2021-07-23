@@ -94,7 +94,7 @@ namespace CliFx.Infrastructure
         public void Clear() => Console.Clear();
 
         /// <inheritdoc />
-        public void ReadKey(bool intercept) => Console.ReadKey(intercept);
+        public void ReadKey(bool intercept = false) => Console.ReadKey(intercept);
 
         /// <inheritdoc />
         public void Dispose()
