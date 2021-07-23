@@ -91,7 +91,7 @@ namespace CliFx.Infrastructure
         }
 
         /// <inheritdoc />
-        public void ReadKey(bool intercept)
+        public void ReadKey(bool intercept = false)
         {
         }
 
