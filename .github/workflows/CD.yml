@@ -27,5 +27,5 @@ jobs:
       - name: Notify Discord
         run: |
           curl '${{ secrets.DISCORD_WEBHOOK }}' \
-            --data-raw '{"content":"[**CliFx** ver. ${{ github.ref }} released](https://github.com/Tyrrrz/CliFx/releases/latest)"}' \
+            --data-raw '{"content":"**CliFx** new version released!\nRef: `${{ github.ref }}`\nChangelog: <https://github.com/Tyrrrz/CliFx/blob/${{ github.sha }}/Changelog.md>"}' \
             -H 'content-type: application/json'
