@@ -435,7 +435,7 @@ COMMANDS
 You can run `dotnet myapp.dll cmd1 [command] --help` to show help on a specific command.
 ```
 
-> Note that defining a default (unnamed) command is not required.
+> ⚠️ Note that defining a default (unnamed) command is not required.
 If it's absent, running the application without specifying a command will just show root level help text.
 
 ### Reporting errors
