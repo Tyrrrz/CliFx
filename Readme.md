@@ -16,7 +16,7 @@ Its primary goal is to completely take over the user input layer, allowing you t
 
 ## Download
 
-- [NuGet](https://nuget.org/packages/CliFx): `dotnet add package CliFx`
+📦 [NuGet](https://nuget.org/packages/CliFx): `dotnet add package CliFx`
 
 ## Features
 
@@ -488,8 +488,8 @@ To avoid unexpected results, use numbers between 1 and 255 for exit codes that i
 Console applications support the concept of interrupt signals, which can be issued by the user to abort the currently ongoing operation.
 If your command performs critical work, you can intercept these signals to handle cancellation requests in a graceful way.
 
-To make command cancellation-aware, call `console.RegisterCancellationHandler()`.
-This method configures a handler that listens for interrupt signals on the console and returns a `CancellationToken` that represents a potential cancellation request.
+To make a command cancellation-aware, call `console.RegisterCancellationHandler()` to register the signal handler and obtain the corresponding `CancellationToken`.
+Once this method is called, the program will no longer terminate on an interrupt signal but will instead trigger the token, so it's important to be able to process it correctly.
 
 ```csharp
 [Command]
@@ -513,8 +513,8 @@ public class CancellableCommand : ICommand
 }
 ```
 
-> Note that a command may use this approach to delay cancellation only once.
-If the user issues a second interrupt signal, the application will be terminated immediately.
+> ⚠️ Note that forceful termination of a command can only be delayed once.
+If the user issues a second interrupt signal, the process will be killed immediately without waiting for graceful cancellation.
 
 ### Type activation
 
