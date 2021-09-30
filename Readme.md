@@ -435,8 +435,8 @@ COMMANDS
 You can run `dotnet myapp.dll cmd1 [command] --help` to show help on a specific command.
 ```
 
-> ⚠️ Note that defining a default (unnamed) command is not required.
-If it's absent, running the application without specifying a command will just show root level help text.
+> 💡 Defining a default (unnamed) command is not required.
+If it's absent, running the application without specifying a command will just show the root level help text.
 
 ### Reporting errors
 
@@ -513,7 +513,7 @@ public class CancellableCommand : ICommand
 }
 ```
 
-> ⚠️ Note that forceful termination of a command can only be delayed once.
+> ⚠️ Forceful termination of a command can only be delayed once.
 If the user issues a second interrupt signal, the process will be killed immediately without waiting for graceful cancellation.
 
 ### Type activation
