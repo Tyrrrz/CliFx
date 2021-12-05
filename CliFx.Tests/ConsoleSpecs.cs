@@ -80,9 +80,9 @@ public class Command : ICommand
             // Assert
             exitCode.Should().Be(0);
 
-            Console.OpenStandardInput().Should().NotBe(FakeConsole.Input.BaseStream);
-            Console.OpenStandardOutput().Should().NotBe(FakeConsole.Output.BaseStream);
-            Console.OpenStandardError().Should().NotBe(FakeConsole.Error.BaseStream);
+            Console.OpenStandardInput().Should().NotBeSameAs(FakeConsole.Input.BaseStream);
+            Console.OpenStandardOutput().Should().NotBeSameAs(FakeConsole.Output.BaseStream);
+            Console.OpenStandardError().Should().NotBeSameAs(FakeConsole.Error.BaseStream);
 
             Console.ForegroundColor.Should().NotBe(ConsoleColor.DarkMagenta);
             Console.BackgroundColor.Should().NotBe(ConsoleColor.DarkMagenta);
