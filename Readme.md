@@ -9,7 +9,7 @@
 
 ✅ **Project status: active**. [What does it mean?](https://github.com/Tyrrrz/shared/blob/master/docs/project-status.md)
 
-CliFx is a simple to use, yet powerful framework for building command line applications.
+**CliFx** is a simple to use, yet powerful framework for building command line applications.
 Its primary goal is to completely take over the user input layer, allowing you to forget about infrastructural concerns and instead focus on writing your application.
 
 💬 **If you want to chat, join my [Discord server](https://discord.gg/2SUWKFnHSm)**.
@@ -119,7 +119,7 @@ v1.0
 Commands can be configured to take input from command line arguments.
 To do that, you need to add properties to the command class and annotate them with special attributes.
 
-In CliFx, there are two types of argument bindings: **parameters** and **options**.
+In **CliFx**, there are two types of argument bindings: **parameters** and **options**.
 Parameters are positional arguments identified by the order they appear in, while options represent sets of arguments identified by their name.
 
 As an example, here's a command that calculates the logarithm of a value, using a parameter binding to specify the input and an option binding to configure the logarithm base:
@@ -217,7 +217,7 @@ Here are some examples of how it works:
 - `myapp -i file1.txt -i file2.txt` sets option `'i'` to a sequence of values `"file1.txt"` and `"file2.txt"`
 - `myapp cmd abc -o` routes to command `cmd` (assuming it's an existing command) with parameter `abc` and sets option `'o'` without value
 
-Additionally, argument parsing in CliFx aims to be as deterministic as possible, ideally yielding the same result regardless of the application configuration.
+Additionally, argument parsing in **CliFx** aims to be as deterministic as possible, ideally yielding the same result regardless of the application configuration.
 In fact, the only context-sensitive part in the parser is the command name resolution, which needs to know the list of available commands in order to discern between arguments that correspond to command name and arguments which map as parameters.
 
 The parser's context-free nature has several implications on how it consumes arguments.
@@ -359,7 +359,7 @@ public class SurfaceCalculatorCommand : ICommand
 In order to facilitate a variety of different workflows, command line applications may provide the user with more than just a single command.
 Complex applications may also nest commands within each other, employing a multi-level hierarchical structure.
 
-With CliFx, this is achieved by simply giving each command a unique name through the `[Command]` attribute.
+With **CliFx**, this is achieved by simply giving each command a unique name through the `[Command]` attribute.
 Commands that have common name segments are considered to be hierarchically related, which affects how they're listed in the help text.
 
 ```csharp
@@ -440,7 +440,7 @@ If it's absent, running the application without specifying a command will just s
 
 ### Reporting errors
 
-Commands in CliFx do not directly return exit codes, but can instead communicate execution errors by throwing `CommandException`.
+Commands in **CliFx** do not directly return exit codes, but can instead communicate execution errors by throwing `CommandException`.
 This special exception can be used to print an error message to the console, return a specific exit code, and also optionally show help text for the current command:
 
 ```csharp
@@ -518,13 +518,13 @@ If the user issues a second interrupt signal, the process will be killed immedia
 
 ### Type activation
 
-Because CliFx takes responsibility for the application's entire lifecycle, it needs to be capable of instantiating various user-defined types at runtime.
+Because **CliFx** takes responsibility for the application's entire lifecycle, it needs to be capable of instantiating various user-defined types at runtime.
 To facilitate that, it uses an interface called `ITypeActivator` that determines how to create a new instance of a given type.
 
 The default implementation of `ITypeActivator` only supports types that have public parameterless constructors, which is sufficient for majority of scenarios.
 However, in some cases you may also want to define a custom initializer, for example when integrating with an external dependency container.
 
-The following example shows how to configure your application to use [`Microsoft.Extensions.DependencyInjection`](https://nuget.org/packages/Microsoft.Extensions.DependencyInjection) as the type activator in CliFx:
+The following example shows how to configure your application to use [`Microsoft.Extensions.DependencyInjection`](https://nuget.org/packages/Microsoft.Extensions.DependencyInjection) as the type activator in **CliFx**:
 
 ```csharp
 public static class Program
@@ -552,7 +552,7 @@ public static class Program
 
 ### Testing
 
-Thanks to the `IConsole` abstraction, CliFx commands can be easily tested in isolation.
+Thanks to the `IConsole` abstraction, **CliFx** commands can be easily tested in isolation.
 While an application running in production would rely on `SystemConsole` to interact with the real console, you can use `FakeConsole` and `FakeInMemoryConsole` in your tests to execute your commands in a simulated environment.
 
 For example, imagine you have the following command:
@@ -704,4 +704,4 @@ In such case, the values of the environment variable will be split by `Path.Path
 
 ## Etymology
 
-CliFx is made out of "Cli" for "Command Line Interface" and "Fx" for "Framework". It's pronounced as "cliff ex".
+**CliFx** is made out of "Cli" for "Command Line Interface" and "Fx" for "Framework". It's pronounced as "cliff ex".
