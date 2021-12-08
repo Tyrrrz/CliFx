@@ -4,132 +4,131 @@ using CliFx.Exceptions;
 using CliFx.Infrastructure;
 using CliFx.Utils;
 
-namespace CliFx.Formatting
+namespace CliFx.Formatting;
+
+internal class ExceptionConsoleFormatter : ConsoleFormatter
 {
-    internal class ExceptionConsoleFormatter : ConsoleFormatter
+    public ExceptionConsoleFormatter(ConsoleWriter consoleWriter)
+        : base(consoleWriter)
     {
-        public ExceptionConsoleFormatter(ConsoleWriter consoleWriter)
-            : base(consoleWriter)
+    }
+
+    private void WriteStackFrame(StackFrame stackFrame, int indentLevel)
+    {
+        WriteHorizontalMargin(2 + 4 * indentLevel);
+        Write("at ");
+
+        // Fully qualified method name
+        Write(stackFrame.ParentType + '.');
+        Write(ConsoleColor.Yellow, stackFrame.MethodName);
+
+        // Method parameters
+
+        Write('(');
+
+        for (var i = 0; i < stackFrame.Parameters.Count; i++)
         {
-        }
+            var parameter = stackFrame.Parameters[i];
 
-        private void WriteStackFrame(StackFrame stackFrame, int indentLevel)
-        {
-            WriteHorizontalMargin(2 + 4 * indentLevel);
-            Write("at ");
-
-            // Fully qualified method name
-            Write(stackFrame.ParentType + '.');
-            Write(ConsoleColor.Yellow, stackFrame.MethodName);
-
-            // Method parameters
-
-            Write('(');
-
-            for (var i = 0; i < stackFrame.Parameters.Count; i++)
+            // Separator
+            if (i > 0)
             {
-                var parameter = stackFrame.Parameters[i];
-
-                // Separator
-                if (i > 0)
-                {
-                    Write(", ");
-                }
-
-                // Parameter type
-                Write(ConsoleColor.Blue, parameter.Type);
-
-                // Parameter name (can be null for dynamically generated methods)
-                if (!string.IsNullOrWhiteSpace(parameter.Name))
-                {
-                    Write(' ');
-                    Write(ConsoleColor.White, parameter.Name);
-                }
+                Write(", ");
             }
 
-            Write(") ");
+            // Parameter type
+            Write(ConsoleColor.Blue, parameter.Type);
 
-            // Location
-            if (!string.IsNullOrWhiteSpace(stackFrame.FilePath))
+            // Parameter name (can be null for dynamically generated methods)
+            if (!string.IsNullOrWhiteSpace(parameter.Name))
             {
-                var stackFrameDirectoryPath =
-                    Path.GetDirectoryName(stackFrame.FilePath) + Path.DirectorySeparatorChar;
-
-                var stackFrameFileName = Path.GetFileName(stackFrame.FilePath);
-
-                Write("in ");
-
-                // File path
-                Write(stackFrameDirectoryPath);
-                Write(ConsoleColor.Yellow, stackFrameFileName);
-
-                // Source position
-                if (!string.IsNullOrWhiteSpace(stackFrame.LineNumber))
-                {
-                    Write(':');
-                    Write(ConsoleColor.Blue, stackFrame.LineNumber);
-                }
-            }
-
-            WriteLine();
-        }
-
-        private void WriteException(Exception exception, int indentLevel)
-        {
-            WriteHorizontalMargin(4 * indentLevel);
-
-            // Fully qualified exception type
-            var exceptionType = exception.GetType();
-            Write(exceptionType.Namespace + '.');
-            Write(ConsoleColor.White, exceptionType.Name);
-            Write(": ");
-
-            // Exception message
-            Write(ConsoleColor.Red, exception.Message);
-            WriteLine();
-
-            // Recurse into inner exceptions
-            if (exception.InnerException is not null)
-            {
-                WriteException(exception.InnerException, indentLevel + 1);
-            }
-
-            // Non-thrown exceptions (e.g. inner exceptions) have no stacktrace
-            if (!string.IsNullOrWhiteSpace(exception.StackTrace))
-            {
-                // Parse and pretty-print the stacktrace
-                foreach (var stackFrame in StackFrame.ParseMany(exception.StackTrace))
-                {
-                    WriteStackFrame(stackFrame, indentLevel);
-                }
+                Write(' ');
+                Write(ConsoleColor.White, parameter.Name);
             }
         }
 
-        public void WriteException(Exception exception)
+        Write(") ");
+
+        // Location
+        if (!string.IsNullOrWhiteSpace(stackFrame.FilePath))
         {
-            // Domain exceptions should be printed with minimal information
-            // because they are meant for the user of the application,
-            // not the user of the library.
-            if (exception is CliFxException cliFxException &&
-                !string.IsNullOrWhiteSpace(cliFxException.ActualMessage))
+            var stackFrameDirectoryPath =
+                Path.GetDirectoryName(stackFrame.FilePath) + Path.DirectorySeparatorChar;
+
+            var stackFrameFileName = Path.GetFileName(stackFrame.FilePath);
+
+            Write("in ");
+
+            // File path
+            Write(stackFrameDirectoryPath);
+            Write(ConsoleColor.Yellow, stackFrameFileName);
+
+            // Source position
+            if (!string.IsNullOrWhiteSpace(stackFrame.LineNumber))
             {
-                Write(ConsoleColor.Red, cliFxException.ActualMessage);
-                WriteLine();
+                Write(':');
+                Write(ConsoleColor.Blue, stackFrame.LineNumber);
             }
-            // All other exceptions most likely indicate an actual bug
-            // and should include stacktrace and other detailed information.
-            else
+        }
+
+        WriteLine();
+    }
+
+    private void WriteException(Exception exception, int indentLevel)
+    {
+        WriteHorizontalMargin(4 * indentLevel);
+
+        // Fully qualified exception type
+        var exceptionType = exception.GetType();
+        Write(exceptionType.Namespace + '.');
+        Write(ConsoleColor.White, exceptionType.Name);
+        Write(": ");
+
+        // Exception message
+        Write(ConsoleColor.Red, exception.Message);
+        WriteLine();
+
+        // Recurse into inner exceptions
+        if (exception.InnerException is not null)
+        {
+            WriteException(exception.InnerException, indentLevel + 1);
+        }
+
+        // Non-thrown exceptions (e.g. inner exceptions) have no stacktrace
+        if (!string.IsNullOrWhiteSpace(exception.StackTrace))
+        {
+            // Parse and pretty-print the stacktrace
+            foreach (var stackFrame in StackFrame.ParseMany(exception.StackTrace))
             {
-                Write(ConsoleColor.White, ConsoleColor.DarkRed, "ERROR");
-                WriteLine();
-                WriteException(exception, 0);
+                WriteStackFrame(stackFrame, indentLevel);
             }
         }
     }
 
-    internal static class ExceptionConsoleFormatterExtensions
+    public void WriteException(Exception exception)
     {
-        public static void WriteException(this ConsoleWriter consoleWriter, Exception exception) =>
-            new ExceptionConsoleFormatter(consoleWriter).WriteException(exception);
+        // Domain exceptions should be printed with minimal information
+        // because they are meant for the user of the application,
+        // not the user of the library.
+        if (exception is CliFxException cliFxException &&
+            !string.IsNullOrWhiteSpace(cliFxException.ActualMessage))
+        {
+            Write(ConsoleColor.Red, cliFxException.ActualMessage);
+            WriteLine();
+        }
+        // All other exceptions most likely indicate an actual bug
+        // and should include stacktrace and other detailed information.
+        else
+        {
+            Write(ConsoleColor.White, ConsoleColor.DarkRed, "ERROR");
+            WriteLine();
+            WriteException(exception, 0);
+        }
     }
+}
+
+internal static class ExceptionConsoleFormatterExtensions
+{
+    public static void WriteException(this ConsoleWriter consoleWriter, Exception exception) =>
+        new ExceptionConsoleFormatter(consoleWriter).WriteException(exception);
 }

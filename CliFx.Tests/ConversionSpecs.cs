@@ -6,22 +6,22 @@ using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace CliFx.Tests
-{
-    public class ConversionSpecs : SpecsBase
-    {
-        public ConversionSpecs(ITestOutputHelper testOutput)
-            : base(testOutput)
-        {
-        }
+namespace CliFx.Tests;
 
-        [Fact]
-        public async Task Parameter_or_option_value_can_be_converted_to_a_string()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+public class ConversionSpecs : SpecsBase
+{
+    public ConversionSpecs(ITestOutputHelper testOutput)
+        : base(testOutput)
+    {
+    }
+
+    [Fact]
+    public async Task Parameter_or_option_value_can_be_converted_to_a_string()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 [Command]
 public class Command : ICommand
 {
@@ -35,31 +35,31 @@ public class Command : ICommand
     }
 }
 ");
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"-f", "xyz"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"-f", "xyz"},
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Trim().Should().Be("xyz");
-        }
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Trim().Should().Be("xyz");
+    }
 
-        [Fact]
-        public async Task Parameter_or_option_value_can_be_converted_to_an_object()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Parameter_or_option_value_can_be_converted_to_an_object()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 [Command]
 public class Command : ICommand
 {
@@ -73,31 +73,31 @@ public class Command : ICommand
     }
 }
 ");
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"-f", "xyz"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"-f", "xyz"},
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Trim().Should().Be("xyz");
-        }
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Trim().Should().Be("xyz");
+    }
 
-        [Fact]
-        public async Task Parameter_or_option_value_can_be_converted_to_a_boolean()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Parameter_or_option_value_can_be_converted_to_a_boolean()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 [Command]
 public class Command : ICommand
 {
@@ -116,34 +116,34 @@ public class Command : ICommand
     }
 }
 ");
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"-f", "true", "-b", "false"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"-f", "true", "-b", "false"},
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Should().ConsistOfLines(
-                "Foo = True",
-                "Bar = False"
-            );
-        }
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Should().ConsistOfLines(
+            "Foo = True",
+            "Bar = False"
+        );
+    }
 
-        [Fact]
-        public async Task Parameter_or_option_value_can_be_converted_to_a_boolean_with_implicit_value()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Parameter_or_option_value_can_be_converted_to_a_boolean_with_implicit_value()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 [Command]
 public class Command : ICommand
 {
@@ -157,31 +157,31 @@ public class Command : ICommand
     }
 }
 ");
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"-f"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"-f"},
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Trim().Should().Be("True");
-        }
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Trim().Should().Be("True");
+    }
 
-        [Fact]
-        public async Task Parameter_or_option_value_can_be_converted_to_an_integer()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Parameter_or_option_value_can_be_converted_to_an_integer()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 [Command]
 public class Command : ICommand
 {
@@ -195,31 +195,31 @@ public class Command : ICommand
     }
 }
 ");
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"-f", "32"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"-f", "32"},
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Trim().Should().Be("32");
-        }
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Trim().Should().Be("32");
+    }
 
-        [Fact]
-        public async Task Parameter_or_option_value_can_be_converted_to_a_double()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Parameter_or_option_value_can_be_converted_to_a_double()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 [Command]
 public class Command : ICommand
 {
@@ -233,31 +233,31 @@ public class Command : ICommand
     }
 }
 ");
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"-f", "32.14"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"-f", "32.14"},
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Trim().Should().Be("32.14");
-        }
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Trim().Should().Be("32.14");
+    }
 
-        [Fact]
-        public async Task Parameter_or_option_value_can_be_converted_to_DateTimeOffset()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Parameter_or_option_value_can_be_converted_to_DateTimeOffset()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 [Command]
 public class Command : ICommand
 {
@@ -271,31 +271,31 @@ public class Command : ICommand
     }
 }
 ");
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"-f", "1995-04-28Z"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"-f", "1995-04-28Z"},
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Trim().Should().Be("1995-04-28 00:00:00Z");
-        }
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Trim().Should().Be("1995-04-28 00:00:00Z");
+    }
 
-        [Fact]
-        public async Task Parameter_or_option_value_can_be_converted_to_a_TimeSpan()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Parameter_or_option_value_can_be_converted_to_a_TimeSpan()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 [Command]
 public class Command : ICommand
 {
@@ -309,31 +309,31 @@ public class Command : ICommand
     }
 }
 ");
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"-f", "12:34:56"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"-f", "12:34:56"},
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Trim().Should().Be("12:34:56");
-        }
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Trim().Should().Be("12:34:56");
+    }
 
-        [Fact]
-        public async Task Parameter_or_option_value_can_be_converted_to_an_enum()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Parameter_or_option_value_can_be_converted_to_an_enum()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 public enum CustomEnum { One = 1, Two = 2, Three = 3 }
 
 [Command]
@@ -349,31 +349,31 @@ public class Command : ICommand
     }
 }
 ");
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"-f", "two"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"-f", "two"},
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Trim().Should().Be("2");
-        }
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Trim().Should().Be("2");
+    }
 
-        [Fact]
-        public async Task Parameter_or_option_value_can_be_converted_to_a_nullable_integer()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Parameter_or_option_value_can_be_converted_to_a_nullable_integer()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 [Command]
 public class Command : ICommand
 {
@@ -392,34 +392,34 @@ public class Command : ICommand
     }
 }
 ");
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"-b", "123"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"-b", "123"},
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Should().ConsistOfLines(
-                "Foo = ",
-                "Bar = 123"
-            );
-        }
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Should().ConsistOfLines(
+            "Foo = ",
+            "Bar = 123"
+        );
+    }
 
-        [Fact]
-        public async Task Parameter_or_option_value_can_be_converted_to_a_nullable_enum()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Parameter_or_option_value_can_be_converted_to_a_nullable_enum()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 public enum CustomEnum { One = 1, Two = 2, Three = 3 }
 
 [Command]
@@ -440,34 +440,34 @@ public class Command : ICommand
     }
 }
 ");
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"-b", "two"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"-b", "two"},
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Should().ConsistOfLines(
-                "Foo = ",
-                "Bar = 2"
-            );
-        }
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Should().ConsistOfLines(
+            "Foo = ",
+            "Bar = 2"
+        );
+    }
 
-        [Fact]
-        public async Task Parameter_or_option_value_can_be_converted_to_a_type_that_has_a_constructor_accepting_a_string()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Parameter_or_option_value_can_be_converted_to_a_type_that_has_a_constructor_accepting_a_string()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 public class CustomType
 {
     public string Value { get; }
@@ -488,31 +488,31 @@ public class Command : ICommand
     }
 }
 ");
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"-f", "xyz"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"-f", "xyz"},
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Trim().Should().Be("xyz");
-        }
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Trim().Should().Be("xyz");
+    }
 
-        [Fact]
-        public async Task Parameter_or_option_value_can_be_converted_to_a_type_that_has_a_static_parse_method()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Parameter_or_option_value_can_be_converted_to_a_type_that_has_a_static_parse_method()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 public class CustomTypeA
 {
     public string Value { get; }
@@ -551,34 +551,34 @@ public class Command : ICommand
     }
 }
 ");
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"-f", "hello", "-b", "world"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"-f", "hello", "-b", "world"},
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Should().ConsistOfLines(
-                "Foo = hello",
-                "Bar = world"
-            );
-        }
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Should().ConsistOfLines(
+            "Foo = hello",
+            "Bar = world"
+        );
+    }
 
-        [Fact]
-        public async Task Parameter_or_option_value_can_be_converted_using_a_custom_converter()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Parameter_or_option_value_can_be_converted_using_a_custom_converter()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 public class CustomConverter : BindingConverter<int>
 {
     public override int Convert(string rawValue) =>
@@ -598,31 +598,31 @@ public class Command : ICommand
     }
 }
 ");
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"-f", "hello world"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"-f", "hello world"},
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Trim().Should().Be("11");
-        }
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Trim().Should().Be("11");
+    }
 
-        [Fact]
-        public async Task Parameter_or_option_value_can_be_converted_to_an_array_of_strings()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Parameter_or_option_value_can_be_converted_to_an_array_of_strings()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 [Command]
 public class Command : ICommand
 {
@@ -638,35 +638,35 @@ public class Command : ICommand
     }
 }
 ");
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"-f", "one", "two", "three"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"-f", "one", "two", "three"},
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Should().ConsistOfLines(
-                "one",
-                "two",
-                "three"
-            );
-        }
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Should().ConsistOfLines(
+            "one",
+            "two",
+            "three"
+        );
+    }
 
-        [Fact]
-        public async Task Parameter_or_option_value_can_be_converted_to_a_read_only_list_of_strings()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Parameter_or_option_value_can_be_converted_to_a_read_only_list_of_strings()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 [Command]
 public class Command : ICommand
 {
@@ -682,35 +682,35 @@ public class Command : ICommand
     }
 }
 ");
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"-f", "one", "two", "three"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"-f", "one", "two", "three"},
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Should().ConsistOfLines(
-                "one",
-                "two",
-                "three"
-            );
-        }
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Should().ConsistOfLines(
+            "one",
+            "two",
+            "three"
+        );
+    }
 
-        [Fact]
-        public async Task Parameter_or_option_value_can_be_converted_to_a_list_of_strings()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Parameter_or_option_value_can_be_converted_to_a_list_of_strings()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 [Command]
 public class Command : ICommand
 {
@@ -726,35 +726,35 @@ public class Command : ICommand
     }
 }
 ");
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"-f", "one", "two", "three"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"-f", "one", "two", "three"},
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Should().ConsistOfLines(
-                "one",
-                "two",
-                "three"
-            );
-        }
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Should().ConsistOfLines(
+            "one",
+            "two",
+            "three"
+        );
+    }
 
-        [Fact]
-        public async Task Parameter_or_option_value_can_be_converted_to_an_array_of_integers()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Parameter_or_option_value_can_be_converted_to_an_array_of_integers()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 [Command]
 public class Command : ICommand
 {
@@ -770,35 +770,35 @@ public class Command : ICommand
     }
 }
 ");
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"-f", "1", "13", "27"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"-f", "1", "13", "27"},
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Should().ConsistOfLines(
-                "1",
-                "13",
-                "27"
-            );
-        }
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Should().ConsistOfLines(
+            "1",
+            "13",
+            "27"
+        );
+    }
 
-        [Fact]
-        public async Task Parameter_or_option_value_conversion_fails_if_the_value_cannot_be_converted_to_the_target_type()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Parameter_or_option_value_conversion_fails_if_the_value_cannot_be_converted_to_the_target_type()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 [Command]
 public class Command : ICommand
 {
@@ -808,31 +808,31 @@ public class Command : ICommand
     public ValueTask ExecuteAsync(IConsole console) => default;
 }
 ");
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"-f", "12.34"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"-f", "12.34"},
+            new Dictionary<string, string>()
+        );
 
-            var stdErr = FakeConsole.ReadErrorString();
+        var stdErr = FakeConsole.ReadErrorString();
 
-            // Assert
-            exitCode.Should().NotBe(0);
-            stdErr.Should().NotBeNullOrWhiteSpace();
-        }
+        // Assert
+        exitCode.Should().NotBe(0);
+        stdErr.Should().NotBeNullOrWhiteSpace();
+    }
 
-        [Fact]
-        public async Task Parameter_or_option_value_conversion_fails_if_the_target_type_is_not_supported()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Parameter_or_option_value_conversion_fails_if_the_target_type_is_not_supported()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 public class CustomType {}
 
 [Command]
@@ -844,31 +844,31 @@ public class Command : ICommand
     public ValueTask ExecuteAsync(IConsole console) => default;
 }
 ");
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"-f", "xyz"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"-f", "xyz"},
+            new Dictionary<string, string>()
+        );
 
-            var stdErr = FakeConsole.ReadErrorString();
+        var stdErr = FakeConsole.ReadErrorString();
 
-            // Assert
-            exitCode.Should().NotBe(0);
-            stdErr.Should().Contain("has an unsupported underlying property type");
-        }
+        // Assert
+        exitCode.Should().NotBe(0);
+        stdErr.Should().Contain("has an unsupported underlying property type");
+    }
 
-        [Fact]
-        public async Task Parameter_or_option_value_conversion_fails_if_the_target_non_scalar_type_is_not_supported()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Parameter_or_option_value_conversion_fails_if_the_target_non_scalar_type_is_not_supported()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 public class CustomType : IEnumerable<object>
 {
     public IEnumerator<object> GetEnumerator() => Enumerable.Empty<object>().GetEnumerator();
@@ -885,31 +885,31 @@ public class Command : ICommand
     public ValueTask ExecuteAsync(IConsole console) => default;
 }
 ");
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"-f", "one", "two"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"-f", "one", "two"},
+            new Dictionary<string, string>()
+        );
 
-            var stdErr = FakeConsole.ReadErrorString();
+        var stdErr = FakeConsole.ReadErrorString();
 
-            // Assert
-            exitCode.Should().NotBe(0);
-            stdErr.Should().Contain("has an unsupported underlying property type");
-        }
+        // Assert
+        exitCode.Should().NotBe(0);
+        stdErr.Should().Contain("has an unsupported underlying property type");
+    }
 
-        [Fact]
-        public async Task Parameter_or_option_value_conversion_fails_if_one_of_the_validators_fail()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Parameter_or_option_value_conversion_fails_if_one_of_the_validators_fail()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 public class ValidatorA : BindingValidator<int>
 {
     public override BindingValidationError Validate(int value) => Ok();
@@ -929,31 +929,31 @@ public class Command : ICommand
     public ValueTask ExecuteAsync(IConsole console) => default;
 }
 ");
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"-f", "12"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"-f", "12"},
+            new Dictionary<string, string>()
+        );
 
-            var stdErr = FakeConsole.ReadErrorString();
+        var stdErr = FakeConsole.ReadErrorString();
 
-            // Assert
-            exitCode.Should().NotBe(0);
-            stdErr.Should().Contain("Hello world");
-        }
+        // Assert
+        exitCode.Should().NotBe(0);
+        stdErr.Should().Contain("Hello world");
+    }
 
-        [Fact]
-        public async Task Parameter_or_option_value_conversion_fails_if_the_static_parse_method_throws()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Parameter_or_option_value_conversion_fails_if_the_static_parse_method_throws()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 public class CustomType
 {
     public string Value { get; }
@@ -972,22 +972,21 @@ public class Command : ICommand
     public ValueTask ExecuteAsync(IConsole console) => default;
 }
 ");
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"-f", "bar"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"-f", "bar"},
+            new Dictionary<string, string>()
+        );
 
-            var stdErr = FakeConsole.ReadErrorString();
+        var stdErr = FakeConsole.ReadErrorString();
 
-            // Assert
-            exitCode.Should().NotBe(0);
-            stdErr.Should().Contain("Hello world");
-        }
+        // Assert
+        exitCode.Should().NotBe(0);
+        stdErr.Should().Contain("Hello world");
     }
 }

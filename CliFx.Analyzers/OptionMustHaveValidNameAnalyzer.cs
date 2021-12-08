@@ -4,40 +4,39 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace CliFx.Analyzers
+namespace CliFx.Analyzers;
+
+[DiagnosticAnalyzer(LanguageNames.CSharp)]
+public class OptionMustHaveValidNameAnalyzer : AnalyzerBase
 {
-    [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class OptionMustHaveValidNameAnalyzer : AnalyzerBase
+    public OptionMustHaveValidNameAnalyzer()
+        : base(
+            "Options must have valid names",
+            "This option's name must be at least 2 characters long and must start with a letter.")
     {
-        public OptionMustHaveValidNameAnalyzer()
-            : base(
-                "Options must have valid names",
-                "This option's name must be at least 2 characters long and must start with a letter.")
+    }
+
+    private void Analyze(
+        SyntaxNodeAnalysisContext context,
+        PropertyDeclarationSyntax propertyDeclaration,
+        IPropertySymbol property)
+    {
+        var option = CommandOptionSymbol.TryResolve(property);
+        if (option is null)
+            return;
+
+        if (string.IsNullOrWhiteSpace(option.Name))
+            return;
+
+        if (option.Name.Length < 2 || !char.IsLetter(option.Name[0]))
         {
+            context.ReportDiagnostic(CreateDiagnostic(propertyDeclaration.GetLocation()));
         }
+    }
 
-        private void Analyze(
-            SyntaxNodeAnalysisContext context,
-            PropertyDeclarationSyntax propertyDeclaration,
-            IPropertySymbol property)
-        {
-            var option = CommandOptionSymbol.TryResolve(property);
-            if (option is null)
-                return;
-
-            if (string.IsNullOrWhiteSpace(option.Name))
-                return;
-
-            if (option.Name.Length < 2 || !char.IsLetter(option.Name[0]))
-            {
-                context.ReportDiagnostic(CreateDiagnostic(propertyDeclaration.GetLocation()));
-            }
-        }
-
-        public override void Initialize(AnalysisContext context)
-        {
-            base.Initialize(context);
-            context.HandlePropertyDeclaration(Analyze);
-        }
+    public override void Initialize(AnalysisContext context)
+    {
+        base.Initialize(context);
+        context.HandlePropertyDeclaration(Analyze);
     }
 }

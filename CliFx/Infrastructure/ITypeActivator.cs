@@ -1,15 +1,14 @@
 ﻿using System;
 
-namespace CliFx.Infrastructure
+namespace CliFx.Infrastructure;
+
+/// <summary>
+/// Abstraction for a service that can instantiate objects at runtime.
+/// </summary>
+public interface ITypeActivator
 {
     /// <summary>
-    /// Abstraction for a service that can instantiate objects at runtime.
+    /// Creates an instance of the specified type.
     /// </summary>
-    public interface ITypeActivator
-    {
-        /// <summary>
-        /// Creates an instance of the specified type.
-        /// </summary>
-        object CreateInstance(Type type);
-    }
+    object CreateInstance(Type type);
 }

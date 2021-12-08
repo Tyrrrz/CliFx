@@ -7,44 +7,44 @@ using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace CliFx.Tests
+namespace CliFx.Tests;
+
+public class HelpTextSpecs : SpecsBase
 {
-    public class HelpTextSpecs : SpecsBase
+    public HelpTextSpecs(ITestOutputHelper testOutput)
+        : base(testOutput)
     {
-        public HelpTextSpecs(ITestOutputHelper testOutput)
-            : base(testOutput)
-        {
-        }
+    }
 
-        [Fact]
-        public async Task Help_text_is_printed_if_no_arguments_are_provided_and_the_default_command_is_not_defined()
-        {
-            // Arrange
-            var application = new CliApplicationBuilder()
-                .UseConsole(FakeConsole)
-                .SetDescription("This will be in help text")
-                .Build();
+    [Fact]
+    public async Task Help_text_is_printed_if_no_arguments_are_provided_and_the_default_command_is_not_defined()
+    {
+        // Arrange
+        var application = new CliApplicationBuilder()
+            .UseConsole(FakeConsole)
+            .SetDescription("This will be in help text")
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                Array.Empty<string>(),
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            Array.Empty<string>(),
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Should().Contain("This will be in help text");
-        }
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Should().Contain("This will be in help text");
+    }
 
-        [Fact]
-        public async Task Help_text_is_printed_if_provided_arguments_contain_the_help_option()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Help_text_is_printed_if_provided_arguments_contain_the_help_option()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 [Command]
 public class DefaultCommand : ICommand
 {
@@ -52,32 +52,32 @@ public class DefaultCommand : ICommand
 }
 ");
 
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .SetDescription("This will be in help text")
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .SetDescription("This will be in help text")
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"--help"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"--help"},
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Should().Contain("This will be in help text");
-        }
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Should().Contain("This will be in help text");
+    }
 
-        [Fact]
-        public async Task Help_text_is_printed_if_provided_arguments_contain_the_help_option_even_if_the_default_command_is_not_defined()
-        {
-            // Arrange
-            var commandTypes = DynamicCommandBuilder.CompileMany(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Help_text_is_printed_if_provided_arguments_contain_the_help_option_even_if_the_default_command_is_not_defined()
+    {
+        // Arrange
+        var commandTypes = DynamicCommandBuilder.CompileMany(
+            // language=cs
+            @"
 [Command(""cmd"")]
 public class NamedCommand : ICommand
 {
@@ -91,32 +91,32 @@ public class NamedChildCommand : ICommand
 }
 ");
 
-            var application = new CliApplicationBuilder()
-                .AddCommands(commandTypes)
-                .UseConsole(FakeConsole)
-                .SetDescription("This will be in help text")
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommands(commandTypes)
+            .UseConsole(FakeConsole)
+            .SetDescription("This will be in help text")
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"--help"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"--help"},
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Should().Contain("This will be in help text");
-        }
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Should().Contain("This will be in help text");
+    }
 
-        [Fact]
-        public async Task Help_text_for_a_specific_named_command_is_printed_if_provided_arguments_match_its_name_and_contain_the_help_option()
-        {
-            // Arrange
-            var commandTypes = DynamicCommandBuilder.CompileMany(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Help_text_for_a_specific_named_command_is_printed_if_provided_arguments_match_its_name_and_contain_the_help_option()
+    {
+        // Arrange
+        var commandTypes = DynamicCommandBuilder.CompileMany(
+            // language=cs
+            @"
 [Command]
 public class DefaultCommand : ICommand
 {
@@ -136,31 +136,31 @@ public class NamedChildCommand : ICommand
 }
 ");
 
-            var application = new CliApplicationBuilder()
-                .AddCommands(commandTypes)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommands(commandTypes)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"cmd", "--help"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"cmd", "--help"},
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Should().Contain("Description of a named command.");
-        }
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Should().Contain("Description of a named command.");
+    }
 
-        [Fact]
-        public async Task Help_text_for_a_specific_named_child_command_is_printed_if_provided_arguments_match_its_name_and_contain_the_help_option()
-        {
-            // Arrange
-            var commandTypes = DynamicCommandBuilder.CompileMany(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Help_text_for_a_specific_named_child_command_is_printed_if_provided_arguments_match_its_name_and_contain_the_help_option()
+    {
+        // Arrange
+        var commandTypes = DynamicCommandBuilder.CompileMany(
+            // language=cs
+            @"
 [Command]
 public class DefaultCommand : ICommand
 {
@@ -180,84 +180,84 @@ public class NamedChildCommand : ICommand
 }
 ");
 
-            var application = new CliApplicationBuilder()
-                .AddCommands(commandTypes)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommands(commandTypes)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"cmd", "sub", "--help"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"cmd", "sub", "--help"},
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Should().Contain("Description of a named child command.");
-        }
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Should().Contain("Description of a named child command.");
+    }
 
-        [Fact]
-        public async Task Help_text_is_printed_on_invalid_user_input()
-        {
-            // Arrange
-            var application = new CliApplicationBuilder()
-                .AddCommand<NoOpCommand>()
-                .UseConsole(FakeConsole)
-                .SetDescription("This will be in help text")
-                .Build();
+    [Fact]
+    public async Task Help_text_is_printed_on_invalid_user_input()
+    {
+        // Arrange
+        var application = new CliApplicationBuilder()
+            .AddCommand<NoOpCommand>()
+            .UseConsole(FakeConsole)
+            .SetDescription("This will be in help text")
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"invalid-command", "--invalid-option"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"invalid-command", "--invalid-option"},
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
-            var stdErr = FakeConsole.ReadErrorString();
+        var stdOut = FakeConsole.ReadOutputString();
+        var stdErr = FakeConsole.ReadErrorString();
 
-            // Assert
-            exitCode.Should().NotBe(0);
-            stdOut.Should().Contain("This will be in help text");
-            stdErr.Should().NotBeNullOrWhiteSpace();
-        }
+        // Assert
+        exitCode.Should().NotBe(0);
+        stdOut.Should().Contain("This will be in help text");
+        stdErr.Should().NotBeNullOrWhiteSpace();
+    }
 
-        [Fact]
-        public async Task Help_text_shows_application_metadata()
-        {
-            // Arrange
-            var application = new CliApplicationBuilder()
-                .UseConsole(FakeConsole)
-                .SetTitle("App title")
-                .SetDescription("App description")
-                .SetVersion("App version")
-                .Build();
+    [Fact]
+    public async Task Help_text_shows_application_metadata()
+    {
+        // Arrange
+        var application = new CliApplicationBuilder()
+            .UseConsole(FakeConsole)
+            .SetTitle("App title")
+            .SetDescription("App description")
+            .SetVersion("App version")
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"--help"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"--help"},
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Should().ContainAll(
-                "App title",
-                "App description",
-                "App version"
-            );
-        }
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Should().ContainAll(
+            "App title",
+            "App description",
+            "App version"
+        );
+    }
 
-        [Fact]
-        public async Task Help_text_shows_command_description()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Help_text_shows_command_description()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 [Command(Description = ""Description of the default command."")]
 public class DefaultCommand : ICommand
 {
@@ -265,34 +265,34 @@ public class DefaultCommand : ICommand
 }
 ");
 
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"--help"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"--help"},
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Should().ContainAllInOrder(
-                "DESCRIPTION",
-                "Description of the default command."
-            );
-        }
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Should().ContainAllInOrder(
+            "DESCRIPTION",
+            "Description of the default command."
+        );
+    }
 
-        [Fact]
-        public async Task Help_text_shows_usage_format_which_indicates_how_to_execute_a_named_command()
-        {
-            // Arrange
-            var commandTypes = DynamicCommandBuilder.CompileMany(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Help_text_shows_usage_format_which_indicates_how_to_execute_a_named_command()
+    {
+        // Arrange
+        var commandTypes = DynamicCommandBuilder.CompileMany(
+            // language=cs
+            @"
 [Command]
 public class DefaultCommand : ICommand
 {
@@ -306,34 +306,34 @@ public class NamedCommand : ICommand
 }
 ");
 
-            var application = new CliApplicationBuilder()
-                .AddCommands(commandTypes)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommands(commandTypes)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"--help"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"--help"},
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Should().ContainAllInOrder(
-                "USAGE",
-                "[command]", "[...]"
-            );
-        }
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Should().ContainAllInOrder(
+            "USAGE",
+            "[command]", "[...]"
+        );
+    }
 
-        [Fact]
-        public async Task Help_text_shows_usage_format_which_lists_all_parameters()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Help_text_shows_usage_format_which_lists_all_parameters()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 [Command]
 public class Command : ICommand
 {
@@ -350,34 +350,34 @@ public class Command : ICommand
 }
 ");
 
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"--help"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"--help"},
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Should().ContainAllInOrder(
-                "USAGE",
-                "<foo>", "<bar>", "<baz...>"
-            );
-        }
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Should().ContainAllInOrder(
+            "USAGE",
+            "<foo>", "<bar>", "<baz...>"
+        );
+    }
 
-        [Fact]
-        public async Task Help_text_shows_usage_format_which_lists_all_required_options()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Help_text_shows_usage_format_which_lists_all_required_options()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 [Command]
 public class Command : ICommand
 {
@@ -394,34 +394,34 @@ public class Command : ICommand
 }
 ");
 
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"--help"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"--help"},
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Should().ContainAllInOrder(
-                "USAGE",
-                "--foo <value>", "--baz <values...>", "[options]"
-            );
-        }
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Should().ContainAllInOrder(
+            "USAGE",
+            "--foo <value>", "--baz <values...>", "[options]"
+        );
+    }
 
-        [Fact]
-        public async Task Help_text_shows_all_parameters_and_options()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Help_text_shows_all_parameters_and_options()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 [Command]
 public class Command : ICommand
 {
@@ -435,36 +435,36 @@ public class Command : ICommand
 }
 ");
 
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"--help"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"--help"},
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Should().ContainAllInOrder(
-                "PARAMETERS",
-                "foo", "Description of foo.",
-                "OPTIONS",
-                "--bar", "Description of bar."
-            );
-        }
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Should().ContainAllInOrder(
+            "PARAMETERS",
+            "foo", "Description of foo.",
+            "OPTIONS",
+            "--bar", "Description of bar."
+        );
+    }
 
-        [Fact]
-        public async Task Help_text_shows_the_implicit_help_and_version_options_on_the_default_command()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Help_text_shows_the_implicit_help_and_version_options_on_the_default_command()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 [Command]
 public class Command : ICommand
 {
@@ -472,35 +472,35 @@ public class Command : ICommand
 }
 ");
 
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"--help"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"--help"},
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Should().ContainAllInOrder(
-                "OPTIONS",
-                "-h", "--help", "Shows help text",
-                "--version", "Shows version information"
-            );
-        }
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Should().ContainAllInOrder(
+            "OPTIONS",
+            "-h", "--help", "Shows help text",
+            "--version", "Shows version information"
+        );
+    }
 
-        [Fact]
-        public async Task Help_text_shows_the_implicit_help_option_but_not_the_version_option_on_a_named_command()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Help_text_shows_the_implicit_help_option_but_not_the_version_option_on_a_named_command()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 [Command(""cmd"")]
 public class Command : ICommand
 {
@@ -508,37 +508,37 @@ public class Command : ICommand
 }
 ");
 
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"cmd", "--help"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"cmd", "--help"},
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Should().ContainAllInOrder(
-                "OPTIONS",
-                "-h", "--help", "Shows help text"
-            );
-            stdOut.Should().NotContainAny(
-                "--version", "Shows version information"
-            );
-        }
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Should().ContainAllInOrder(
+            "OPTIONS",
+            "-h", "--help", "Shows help text"
+        );
+        stdOut.Should().NotContainAny(
+            "--version", "Shows version information"
+        );
+    }
 
-        [Fact]
-        public async Task Help_text_shows_all_valid_values_for_enum_parameters_and_options()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Help_text_shows_all_valid_values_for_enum_parameters_and_options()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 public enum CustomEnum { One, Two, Three }
 
 [Command]
@@ -554,36 +554,36 @@ public class Command : ICommand
 }
 ");
 
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"--help"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"--help"},
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Should().ContainAllInOrder(
-                "PARAMETERS",
-                "foo", "Choices:", "One", "Two", "Three",
-                "OPTIONS",
-                "--bar", "Choices:", "One", "Two", "Three"
-            );
-        }
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Should().ContainAllInOrder(
+            "PARAMETERS",
+            "foo", "Choices:", "One", "Two", "Three",
+            "OPTIONS",
+            "--bar", "Choices:", "One", "Two", "Three"
+        );
+    }
 
-        [Fact]
-        public async Task Help_text_shows_all_valid_values_for_non_scalar_enum_parameters_and_options()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Help_text_shows_all_valid_values_for_non_scalar_enum_parameters_and_options()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 public enum CustomEnum { One, Two, Three }
 
 [Command]
@@ -599,36 +599,36 @@ public class Command : ICommand
 }
 ");
 
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"--help"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"--help"},
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Should().ContainAllInOrder(
-                "PARAMETERS",
-                "foo", "Choices:", "One", "Two", "Three",
-                "OPTIONS",
-                "--bar", "Choices:", "One", "Two", "Three"
-            );
-        }
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Should().ContainAllInOrder(
+            "PARAMETERS",
+            "foo", "Choices:", "One", "Two", "Three",
+            "OPTIONS",
+            "--bar", "Choices:", "One", "Two", "Three"
+        );
+    }
 
-        [Fact]
-        public async Task Help_text_shows_all_valid_values_for_nullable_enum_parameters_and_options()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Help_text_shows_all_valid_values_for_nullable_enum_parameters_and_options()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 public enum CustomEnum { One, Two, Three }
 
 [Command]
@@ -644,36 +644,36 @@ public class Command : ICommand
 }
 ");
 
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"--help"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"--help"},
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Should().ContainAllInOrder(
-                "PARAMETERS",
-                "foo", "Choices:", "One", "Two", "Three",
-                "OPTIONS",
-                "--bar", "Choices:", "One", "Two", "Three"
-            );
-        }
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Should().ContainAllInOrder(
+            "PARAMETERS",
+            "foo", "Choices:", "One", "Two", "Three",
+            "OPTIONS",
+            "--bar", "Choices:", "One", "Two", "Three"
+        );
+    }
 
-        [Fact]
-        public async Task Help_text_shows_environment_variables_for_options_that_have_them_configured_as_fallback()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Help_text_shows_environment_variables_for_options_that_have_them_configured_as_fallback()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 public enum CustomEnum { One, Two, Three }
 
 [Command]
@@ -689,35 +689,35 @@ public class Command : ICommand
 }
 ");
 
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"--help"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"--help"},
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Should().ContainAllInOrder(
-                "OPTIONS",
-                "--foo", "Environment variable:", "ENV_FOO",
-                "--bar", "Environment variable:", "ENV_BAR"
-            );
-        }
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Should().ContainAllInOrder(
+            "OPTIONS",
+            "--foo", "Environment variable:", "ENV_FOO",
+            "--bar", "Environment variable:", "ENV_BAR"
+        );
+    }
 
-        [Fact]
-        public async Task Help_text_shows_default_values_for_non_required_options()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Help_text_shows_default_values_for_non_required_options()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 public enum CustomEnum { One, Two, Three }
 
 [Command]
@@ -751,41 +751,41 @@ public class Command : ICommand
 }
 ");
 
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"--help"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"--help"},
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Should().ContainAllInOrder(
-                "OPTIONS",
-                "--foo", "Default:", "42",
-                "--bar", "Default:", "hello",
-                "--baz", "Default:", "one", "two", "three",
-                "--qwe", "Default:", "True",
-                "--qop", "Default:", "1337",
-                "--zor", "Default:", "02:03:00",
-                "--lol", "Default:", "Two"
-            );
-            stdOut.Should().NotContain("not printed");
-        }
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Should().ContainAllInOrder(
+            "OPTIONS",
+            "--foo", "Default:", "42",
+            "--bar", "Default:", "hello",
+            "--baz", "Default:", "one", "two", "three",
+            "--qwe", "Default:", "True",
+            "--qop", "Default:", "1337",
+            "--zor", "Default:", "02:03:00",
+            "--lol", "Default:", "Two"
+        );
+        stdOut.Should().NotContain("not printed");
+    }
 
-        [Fact]
-        public async Task Help_text_shows_all_immediate_child_commands()
-        {
-            // Arrange
-            var commandTypes = DynamicCommandBuilder.CompileMany(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Help_text_shows_all_immediate_child_commands()
+    {
+        // Arrange
+        var commandTypes = DynamicCommandBuilder.CompileMany(
+            // language=cs
+            @"
 [Command(""cmd1"", Description = ""Description of one command."")]
 public class FirstCommand : ICommand
 {
@@ -805,41 +805,41 @@ public class SecondCommandChildCommand : ICommand
 }
 ");
 
-            var application = new CliApplicationBuilder()
-                .AddCommands(commandTypes)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommands(commandTypes)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"--help"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"--help"},
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Should().ContainAllInOrder(
-                "COMMANDS",
-                "cmd1", "Description of one command.",
-                "cmd2", "Description of another command."
-            );
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Should().ContainAllInOrder(
+            "COMMANDS",
+            "cmd1", "Description of one command.",
+            "cmd2", "Description of another command."
+        );
 
-            // `cmd2 child` will still appear in the list of `cmd2` subcommands,
-            // but its description will not be seen.
-            stdOut.Should().NotContain(
-                "Description of another command's child command."
-            );
-        }
+        // `cmd2 child` will still appear in the list of `cmd2` subcommands,
+        // but its description will not be seen.
+        stdOut.Should().NotContain(
+            "Description of another command's child command."
+        );
+    }
 
-        [Fact]
-        public async Task Help_text_shows_all_immediate_child_commands_of_each_child_command()
-        {
-            // Arrange
-            var commandTypes = DynamicCommandBuilder.CompileMany(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Help_text_shows_all_immediate_child_commands_of_each_child_command()
+    {
+        // Arrange
+        var commandTypes = DynamicCommandBuilder.CompileMany(
+            // language=cs
+            @"
 [Command(""cmd1"")]
 public class FirstCommand : ICommand
 {
@@ -871,35 +871,35 @@ public class SecondCommandSecondChildCommand : ICommand
 }
 ");
 
-            var application = new CliApplicationBuilder()
-                .AddCommands(commandTypes)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommands(commandTypes)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"--help"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"--help"},
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Should().ContainAllInOrder(
-                "COMMANDS",
-                "cmd1", "Subcommands:", "cmd1 child1",
-                "cmd2", "Subcommands:", "cmd2 child1", "cmd2 child2"
-            );
-        }
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Should().ContainAllInOrder(
+            "COMMANDS",
+            "cmd1", "Subcommands:", "cmd1 child1",
+            "cmd2", "Subcommands:", "cmd2 child1", "cmd2 child2"
+        );
+    }
 
-        [Fact]
-        public async Task Help_text_shows_non_immediate_child_commands_if_they_do_not_have_a_more_specific_parent()
-        {
-            // Arrange
-            var commandTypes = DynamicCommandBuilder.CompileMany(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Help_text_shows_non_immediate_child_commands_if_they_do_not_have_a_more_specific_parent()
+    {
+        // Arrange
+        var commandTypes = DynamicCommandBuilder.CompileMany(
+            // language=cs
+            @"
 [Command(""cmd1"")]
 public class FirstCommand : ICommand
 {
@@ -919,50 +919,49 @@ public class SecondCommandSecondChildCommand : ICommand
 }
 ");
 
-            var application = new CliApplicationBuilder()
-                .AddCommands(commandTypes)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommands(commandTypes)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"--help"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"--help"},
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Should().ContainAllInOrder(
-                "COMMANDS",
-                "cmd1",
-                "cmd2 child1",
-                "cmd2 child2"
-            );
-        }
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Should().ContainAllInOrder(
+            "COMMANDS",
+            "cmd1",
+            "cmd2 child1",
+            "cmd2 child2"
+        );
+    }
 
-        [Fact]
-        public async Task Version_text_is_printed_if_provided_arguments_contain_the_version_option()
-        {
-            // Arrange
-            var application = new CliApplicationBuilder()
-                .AddCommand<NoOpCommand>()
-                .SetVersion("v6.9")
-                .UseConsole(FakeConsole)
-                .Build();
+    [Fact]
+    public async Task Version_text_is_printed_if_provided_arguments_contain_the_version_option()
+    {
+        // Arrange
+        var application = new CliApplicationBuilder()
+            .AddCommand<NoOpCommand>()
+            .SetVersion("v6.9")
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                new[] {"--version"},
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"--version"},
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Trim().Should().Be("v6.9");
-        }
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Trim().Should().Be("v6.9");
     }
 }

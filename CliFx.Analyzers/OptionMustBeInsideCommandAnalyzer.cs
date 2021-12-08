@@ -5,47 +5,46 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace CliFx.Analyzers
+namespace CliFx.Analyzers;
+
+[DiagnosticAnalyzer(LanguageNames.CSharp)]
+public class OptionMustBeInsideCommandAnalyzer : AnalyzerBase
 {
-    [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class OptionMustBeInsideCommandAnalyzer : AnalyzerBase
+    public OptionMustBeInsideCommandAnalyzer()
+        : base(
+            "Options must be defined inside commands",
+            $"This option must be defined inside a class that implements `{SymbolNames.CliFxCommandInterface}`.")
     {
-        public OptionMustBeInsideCommandAnalyzer()
-            : base(
-                "Options must be defined inside commands",
-                $"This option must be defined inside a class that implements `{SymbolNames.CliFxCommandInterface}`.")
+    }
+
+    private void Analyze(
+        SyntaxNodeAnalysisContext context,
+        PropertyDeclarationSyntax propertyDeclaration,
+        IPropertySymbol property)
+    {
+        if (property.ContainingType is null)
+            return;
+
+        if (property.ContainingType.IsAbstract)
+            return;
+
+        if (!CommandOptionSymbol.IsOptionProperty(property))
+            return;
+
+        var isInsideCommand = property
+            .ContainingType
+            .AllInterfaces
+            .Any(s => s.DisplayNameMatches(SymbolNames.CliFxCommandInterface));
+
+        if (!isInsideCommand)
         {
+            context.ReportDiagnostic(CreateDiagnostic(propertyDeclaration.GetLocation()));
         }
+    }
 
-        private void Analyze(
-            SyntaxNodeAnalysisContext context,
-            PropertyDeclarationSyntax propertyDeclaration,
-            IPropertySymbol property)
-        {
-            if (property.ContainingType is null)
-                return;
-
-            if (property.ContainingType.IsAbstract)
-                return;
-
-            if (!CommandOptionSymbol.IsOptionProperty(property))
-                return;
-
-            var isInsideCommand = property
-                .ContainingType
-                .AllInterfaces
-                .Any(s => s.DisplayNameMatches(SymbolNames.CliFxCommandInterface));
-
-            if (!isInsideCommand)
-            {
-                context.ReportDiagnostic(CreateDiagnostic(propertyDeclaration.GetLocation()));
-            }
-        }
-
-        public override void Initialize(AnalysisContext context)
-        {
-            base.Initialize(context);
-            context.HandlePropertyDeclaration(Analyze);
-        }
+    public override void Initialize(AnalysisContext context)
+    {
+        base.Initialize(context);
+        context.HandlePropertyDeclaration(Analyze);
     }
 }

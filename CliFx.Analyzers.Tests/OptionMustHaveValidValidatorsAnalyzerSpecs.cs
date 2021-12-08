@@ -2,18 +2,18 @@
 using Microsoft.CodeAnalysis.Diagnostics;
 using Xunit;
 
-namespace CliFx.Analyzers.Tests
-{
-    public class OptionMustHaveValidValidatorsAnalyzerSpecs
-    {
-        private static DiagnosticAnalyzer Analyzer { get; } = new OptionMustHaveValidValidatorsAnalyzer();
+namespace CliFx.Analyzers.Tests;
 
-        [Fact]
-        public void Analyzer_reports_an_error_if_one_of_the_specified_option_validators_does_not_derive_from_BindingValidator()
-        {
-            // Arrange
-            // language=cs
-            const string code = @"
+public class OptionMustHaveValidValidatorsAnalyzerSpecs
+{
+    private static DiagnosticAnalyzer Analyzer { get; } = new OptionMustHaveValidValidatorsAnalyzer();
+
+    [Fact]
+    public void Analyzer_reports_an_error_if_one_of_the_specified_option_validators_does_not_derive_from_BindingValidator()
+    {
+        // Arrange
+        // language=cs
+        const string code = @"
 public class MyValidator
 {
     public void Validate(string value) {}
@@ -28,16 +28,16 @@ public class MyCommand : ICommand
     public ValueTask ExecuteAsync(IConsole console) => default;
 }";
 
-            // Act & assert
-            Analyzer.Should().ProduceDiagnostics(code);
-        }
+        // Act & assert
+        Analyzer.Should().ProduceDiagnostics(code);
+    }
 
-        [Fact]
-        public void Analyzer_does_not_report_an_error_if_all_specified_option_validators_derive_from_BindingValidator()
-        {
-            // Arrange
-            // language=cs
-            const string code = @"
+    [Fact]
+    public void Analyzer_does_not_report_an_error_if_all_specified_option_validators_derive_from_BindingValidator()
+    {
+        // Arrange
+        // language=cs
+        const string code = @"
 public class MyValidator : BindingValidator<string>
 {
     public override BindingValidationError Validate(string value) => Ok();
@@ -52,16 +52,16 @@ public class MyCommand : ICommand
     public ValueTask ExecuteAsync(IConsole console) => default;
 }";
 
-            // Act & assert
-            Analyzer.Should().NotProduceDiagnostics(code);
-        }
+        // Act & assert
+        Analyzer.Should().NotProduceDiagnostics(code);
+    }
 
-        [Fact]
-        public void Analyzer_does_not_report_an_error_if_an_option_does_not_have_validators()
-        {
-            // Arrange
-            // language=cs
-            const string code = @"
+    [Fact]
+    public void Analyzer_does_not_report_an_error_if_an_option_does_not_have_validators()
+    {
+        // Arrange
+        // language=cs
+        const string code = @"
 [Command]
 public class MyCommand : ICommand
 {
@@ -71,16 +71,16 @@ public class MyCommand : ICommand
     public ValueTask ExecuteAsync(IConsole console) => default;
 }";
 
-            // Act & assert
-            Analyzer.Should().NotProduceDiagnostics(code);
-        }
+        // Act & assert
+        Analyzer.Should().NotProduceDiagnostics(code);
+    }
 
-        [Fact]
-        public void Analyzer_does_not_report_an_error_on_a_property_that_is_not_an_option()
-        {
-            // Arrange
-            // language=cs
-            const string code = @"
+    [Fact]
+    public void Analyzer_does_not_report_an_error_on_a_property_that_is_not_an_option()
+    {
+        // Arrange
+        // language=cs
+        const string code = @"
 [Command]
 public class MyCommand : ICommand
 {
@@ -89,8 +89,7 @@ public class MyCommand : ICommand
     public ValueTask ExecuteAsync(IConsole console) => default;
 }";
 
-            // Act & assert
-            Analyzer.Should().NotProduceDiagnostics(code);
-        }
+        // Act & assert
+        Analyzer.Should().NotProduceDiagnostics(code);
     }
 }

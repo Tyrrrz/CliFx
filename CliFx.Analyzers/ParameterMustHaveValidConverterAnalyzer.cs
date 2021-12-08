@@ -5,46 +5,45 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace CliFx.Analyzers
+namespace CliFx.Analyzers;
+
+[DiagnosticAnalyzer(LanguageNames.CSharp)]
+public class ParameterMustHaveValidConverterAnalyzer : AnalyzerBase
 {
-    [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class ParameterMustHaveValidConverterAnalyzer : AnalyzerBase
+    public ParameterMustHaveValidConverterAnalyzer()
+        : base(
+            $"Parameter converters must derive from `{SymbolNames.CliFxBindingConverterClass}`",
+            $"Converter specified for this parameter must derive from `{SymbolNames.CliFxBindingConverterClass}`.")
     {
-        public ParameterMustHaveValidConverterAnalyzer()
-            : base(
-                $"Parameter converters must derive from `{SymbolNames.CliFxBindingConverterClass}`",
-                $"Converter specified for this parameter must derive from `{SymbolNames.CliFxBindingConverterClass}`.")
+    }
+
+    private void Analyze(
+        SyntaxNodeAnalysisContext context,
+        PropertyDeclarationSyntax propertyDeclaration,
+        IPropertySymbol property)
+    {
+        var parameter = CommandParameterSymbol.TryResolve(property);
+        if (parameter is null)
+            return;
+
+        if (parameter.ConverterType is null)
+            return;
+
+        // We check against an internal interface because checking against a generic class is a pain
+        var converterImplementsInterface = parameter
+            .ConverterType
+            .AllInterfaces
+            .Any(s => s.DisplayNameMatches(SymbolNames.CliFxBindingConverterInterface));
+
+        if (!converterImplementsInterface)
         {
+            context.ReportDiagnostic(CreateDiagnostic(propertyDeclaration.GetLocation()));
         }
+    }
 
-        private void Analyze(
-            SyntaxNodeAnalysisContext context,
-            PropertyDeclarationSyntax propertyDeclaration,
-            IPropertySymbol property)
-        {
-            var parameter = CommandParameterSymbol.TryResolve(property);
-            if (parameter is null)
-                return;
-
-            if (parameter.ConverterType is null)
-                return;
-
-            // We check against an internal interface because checking against a generic class is a pain
-            var converterImplementsInterface = parameter
-                .ConverterType
-                .AllInterfaces
-                .Any(s => s.DisplayNameMatches(SymbolNames.CliFxBindingConverterInterface));
-
-            if (!converterImplementsInterface)
-            {
-                context.ReportDiagnostic(CreateDiagnostic(propertyDeclaration.GetLocation()));
-            }
-        }
-
-        public override void Initialize(AnalysisContext context)
-        {
-            base.Initialize(context);
-            context.HandlePropertyDeclaration(Analyze);
-        }
+    public override void Initialize(AnalysisContext context)
+    {
+        base.Initialize(context);
+        context.HandlePropertyDeclaration(Analyze);
     }
 }

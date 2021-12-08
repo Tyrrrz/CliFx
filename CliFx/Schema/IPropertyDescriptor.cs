@@ -2,23 +2,22 @@
 using System.Collections.Generic;
 using CliFx.Utils.Extensions;
 
-namespace CliFx.Schema
+namespace CliFx.Schema;
+
+internal interface IPropertyDescriptor
 {
-    internal interface IPropertyDescriptor
-    {
-        Type Type { get; }
+    Type Type { get; }
 
-        object? GetValue(ICommand commandInstance);
+    object? GetValue(ICommand commandInstance);
 
-        void SetValue(ICommand commandInstance, object? value);
+    void SetValue(ICommand commandInstance, object? value);
 
-        IReadOnlyList<object?> GetValidValues();
-    }
+    IReadOnlyList<object?> GetValidValues();
+}
 
-    internal static class PropertyDescriptorExtensions
-    {
-        public static bool IsScalar(this IPropertyDescriptor propertyDescriptor) =>
-            propertyDescriptor.Type == typeof(string) ||
-            propertyDescriptor.Type.TryGetEnumerableUnderlyingType() is null;
-    }
+internal static class PropertyDescriptorExtensions
+{
+    public static bool IsScalar(this IPropertyDescriptor propertyDescriptor) =>
+        propertyDescriptor.Type == typeof(string) ||
+        propertyDescriptor.Type.TryGetEnumerableUnderlyingType() is null;
 }

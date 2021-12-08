@@ -3,21 +3,20 @@ using CliFx.Infrastructure;
 using CliFx.Tests.Utils.Extensions;
 using Xunit.Abstractions;
 
-namespace CliFx.Tests
+namespace CliFx.Tests;
+
+public abstract class SpecsBase : IDisposable
 {
-    public abstract class SpecsBase : IDisposable
+    public ITestOutputHelper TestOutput { get; }
+
+    public FakeInMemoryConsole FakeConsole { get; } = new();
+
+    protected SpecsBase(ITestOutputHelper testOutput) =>
+        TestOutput = testOutput;
+
+    public void Dispose()
     {
-        public ITestOutputHelper TestOutput { get; }
-
-        public FakeInMemoryConsole FakeConsole { get; } = new();
-
-        protected SpecsBase(ITestOutputHelper testOutput) =>
-            TestOutput = testOutput;
-
-        public void Dispose()
-        {
-            FakeConsole.DumpToTestOutput(TestOutput);
-            FakeConsole.Dispose();
-        }
+        FakeConsole.DumpToTestOutput(TestOutput);
+        FakeConsole.Dispose();
     }
 }

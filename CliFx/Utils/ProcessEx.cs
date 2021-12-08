@@ -1,13 +1,12 @@
 ﻿using System.Diagnostics;
 
-namespace CliFx.Utils
+namespace CliFx.Utils;
+
+internal static class ProcessEx
 {
-    internal static class ProcessEx
+    public static int GetCurrentProcessId()
     {
-        public static int GetCurrentProcessId()
-        {
-            using var process = Process.GetCurrentProcess();
-            return process.Id;
-        }
+        using var process = Process.GetCurrentProcess();
+        return process.Id;
     }
 }

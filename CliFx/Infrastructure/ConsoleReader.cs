@@ -1,43 +1,42 @@
 ﻿using System.IO;
 using System.Text;
 
-namespace CliFx.Infrastructure
+namespace CliFx.Infrastructure;
+
+/// <summary>
+/// Implements a <see cref="TextReader"/> for reading characters from a console stream.
+/// </summary>
+public partial class ConsoleReader : StreamReader
 {
     /// <summary>
-    /// Implements a <see cref="TextReader"/> for reading characters from a console stream.
+    /// Console that owns this stream.
     /// </summary>
-    public partial class ConsoleReader : StreamReader
+    public IConsole Console { get; }
+
+    /// <summary>
+    /// Initializes an instance of <see cref="ConsoleReader"/>.
+    /// </summary>
+    public ConsoleReader(IConsole console, Stream stream, Encoding encoding)
+        : base(stream, encoding, false, 4096)
     {
-        /// <summary>
-        /// Console that owns this stream.
-        /// </summary>
-        public IConsole Console { get; }
-
-        /// <summary>
-        /// Initializes an instance of <see cref="ConsoleReader"/>.
-        /// </summary>
-        public ConsoleReader(IConsole console, Stream stream, Encoding encoding)
-            : base(stream, encoding, false, 4096)
-        {
-            Console = console;
-        }
-
-        /// <summary>
-        /// Initializes an instance of <see cref="ConsoleReader"/>.
-        /// </summary>
-        public ConsoleReader(IConsole console, Stream stream)
-            : this(console, stream, System.Console.InputEncoding)
-        {
-        }
+        Console = console;
     }
 
-    public partial class ConsoleReader
+    /// <summary>
+    /// Initializes an instance of <see cref="ConsoleReader"/>.
+    /// </summary>
+    public ConsoleReader(IConsole console, Stream stream)
+        : this(console, stream, System.Console.InputEncoding)
     {
-        internal static ConsoleReader Create(IConsole console, Stream? stream) => new(
-            console,
-            stream is not null
-                ? Stream.Synchronized(stream)
-                : Stream.Null
-        );
     }
+}
+
+public partial class ConsoleReader
+{
+    internal static ConsoleReader Create(IConsole console, Stream? stream) => new(
+        console,
+        stream is not null
+            ? Stream.Synchronized(stream)
+            : Stream.Null
+    );
 }

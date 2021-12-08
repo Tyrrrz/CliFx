@@ -2,11 +2,10 @@
 using CliFx.Attributes;
 using CliFx.Infrastructure;
 
-namespace CliFx.Tests.Utils
+namespace CliFx.Tests.Utils;
+
+[Command]
+public class NoOpCommand : ICommand
 {
-    [Command]
-    public class NoOpCommand : ICommand
-    {
-        public ValueTask ExecuteAsync(IConsole console) => default;
-    }
+    public ValueTask ExecuteAsync(IConsole console) => default;
 }

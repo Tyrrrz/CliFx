@@ -3,38 +3,37 @@ using CliFx.Analyzers.Utils.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace CliFx.Analyzers
+namespace CliFx.Analyzers;
+
+public abstract class AnalyzerBase : DiagnosticAnalyzer
 {
-    public abstract class AnalyzerBase : DiagnosticAnalyzer
+    public DiagnosticDescriptor SupportedDiagnostic { get; }
+
+    public sealed override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; }
+
+    protected AnalyzerBase(
+        string diagnosticTitle,
+        string diagnosticMessage,
+        DiagnosticSeverity diagnosticSeverity = DiagnosticSeverity.Error)
     {
-        public DiagnosticDescriptor SupportedDiagnostic { get; }
+        SupportedDiagnostic = new DiagnosticDescriptor(
+            "CliFx_" + GetType().Name.TrimEnd("Analyzer"),
+            diagnosticTitle,
+            diagnosticMessage,
+            "CliFx",
+            diagnosticSeverity,
+            true
+        );
 
-        public sealed override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; }
+        SupportedDiagnostics = ImmutableArray.Create(SupportedDiagnostic);
+    }
 
-        protected AnalyzerBase(
-            string diagnosticTitle,
-            string diagnosticMessage,
-            DiagnosticSeverity diagnosticSeverity = DiagnosticSeverity.Error)
-        {
-            SupportedDiagnostic = new DiagnosticDescriptor(
-                "CliFx_" + GetType().Name.TrimEnd("Analyzer"),
-                diagnosticTitle,
-                diagnosticMessage,
-                "CliFx",
-                diagnosticSeverity,
-                true
-            );
+    protected Diagnostic CreateDiagnostic(Location location) =>
+        Diagnostic.Create(SupportedDiagnostic, location);
 
-            SupportedDiagnostics = ImmutableArray.Create(SupportedDiagnostic);
-        }
-
-        protected Diagnostic CreateDiagnostic(Location location) =>
-            Diagnostic.Create(SupportedDiagnostic, location);
-
-        public override void Initialize(AnalysisContext context)
-        {
-            context.EnableConcurrentExecution();
-            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
-        }
+    public override void Initialize(AnalysisContext context)
+    {
+        context.EnableConcurrentExecution();
+        context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
     }
 }

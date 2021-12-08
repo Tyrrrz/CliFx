@@ -2,19 +2,18 @@
 using CliFx.Attributes;
 using CliFx.Infrastructure;
 
-namespace CliFx.Tests.Dummy.Commands
+namespace CliFx.Tests.Dummy.Commands;
+
+[Command("env-test")]
+public class EnvironmentTestCommand : ICommand
 {
-    [Command("env-test")]
-    public class EnvironmentTestCommand : ICommand
+    [CommandOption("target", EnvironmentVariable = "ENV_TARGET")]
+    public string GreetingTarget { get; set; } = "World";
+
+    public ValueTask ExecuteAsync(IConsole console)
     {
-        [CommandOption("target", EnvironmentVariable = "ENV_TARGET")]
-        public string GreetingTarget { get; set; } = "World";
+        console.Output.WriteLine($"Hello {GreetingTarget}!");
 
-        public ValueTask ExecuteAsync(IConsole console)
-        {
-            console.Output.WriteLine($"Hello {GreetingTarget}!");
-
-            return default;
-        }
+        return default;
     }
 }

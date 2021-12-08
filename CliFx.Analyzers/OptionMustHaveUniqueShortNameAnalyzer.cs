@@ -5,60 +5,59 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace CliFx.Analyzers
+namespace CliFx.Analyzers;
+
+[DiagnosticAnalyzer(LanguageNames.CSharp)]
+public class OptionMustHaveUniqueShortNameAnalyzer : AnalyzerBase
 {
-    [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class OptionMustHaveUniqueShortNameAnalyzer : AnalyzerBase
+    public OptionMustHaveUniqueShortNameAnalyzer()
+        : base(
+            "Options must have unique short names",
+            "This option's short name must be unique within the command (comparison IS case sensitive).")
     {
-        public OptionMustHaveUniqueShortNameAnalyzer()
-            : base(
-                "Options must have unique short names",
-                "This option's short name must be unique within the command (comparison IS case sensitive).")
+    }
+
+    private void Analyze(
+        SyntaxNodeAnalysisContext context,
+        PropertyDeclarationSyntax propertyDeclaration,
+        IPropertySymbol property)
+    {
+        if (property.ContainingType is null)
+            return;
+
+        var option = CommandOptionSymbol.TryResolve(property);
+        if (option is null)
+            return;
+
+        if (option.ShortName is null)
+            return;
+
+        var otherProperties = property
+            .ContainingType
+            .GetMembers()
+            .OfType<IPropertySymbol>()
+            .Where(m => !m.Equals(property, SymbolEqualityComparer.Default))
+            .ToArray();
+
+        foreach (var otherProperty in otherProperties)
         {
-        }
+            var otherOption = CommandOptionSymbol.TryResolve(otherProperty);
+            if (otherOption is null)
+                continue;
 
-        private void Analyze(
-            SyntaxNodeAnalysisContext context,
-            PropertyDeclarationSyntax propertyDeclaration,
-            IPropertySymbol property)
-        {
-            if (property.ContainingType is null)
-                return;
+            if (otherOption.ShortName is null)
+                continue;
 
-            var option = CommandOptionSymbol.TryResolve(property);
-            if (option is null)
-                return;
-
-            if (option.ShortName is null)
-                return;
-
-            var otherProperties = property
-                .ContainingType
-                .GetMembers()
-                .OfType<IPropertySymbol>()
-                .Where(m => !m.Equals(property, SymbolEqualityComparer.Default))
-                .ToArray();
-
-            foreach (var otherProperty in otherProperties)
+            if (option.ShortName == otherOption.ShortName)
             {
-                var otherOption = CommandOptionSymbol.TryResolve(otherProperty);
-                if (otherOption is null)
-                    continue;
-
-                if (otherOption.ShortName is null)
-                    continue;
-
-                if (option.ShortName == otherOption.ShortName)
-                {
-                    context.ReportDiagnostic(CreateDiagnostic(propertyDeclaration.GetLocation()));
-                }
+                context.ReportDiagnostic(CreateDiagnostic(propertyDeclaration.GetLocation()));
             }
         }
+    }
 
-        public override void Initialize(AnalysisContext context)
-        {
-            base.Initialize(context);
-            context.HandlePropertyDeclaration(Analyze);
-        }
+    public override void Initialize(AnalysisContext context)
+    {
+        base.Initialize(context);
+        context.HandlePropertyDeclaration(Analyze);
     }
 }

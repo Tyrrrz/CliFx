@@ -6,22 +6,22 @@ using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace CliFx.Tests
-{
-    public class CancellationSpecs : SpecsBase
-    {
-        public CancellationSpecs(ITestOutputHelper testOutput)
-            : base(testOutput)
-        {
-        }
+namespace CliFx.Tests;
 
-        [Fact]
-        public async Task Command_can_register_to_receive_a_cancellation_signal_from_the_console()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+public class CancellationSpecs : SpecsBase
+{
+    public CancellationSpecs(ITestOutputHelper testOutput)
+        : base(testOutput)
+    {
+    }
+
+    [Fact]
+    public async Task Command_can_register_to_receive_a_cancellation_signal_from_the_console()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 [Command]
 public class Command : ICommand
 {
@@ -44,24 +44,23 @@ public class Command : ICommand
     }
 }");
 
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            FakeConsole.RequestCancellation(TimeSpan.FromSeconds(0.2));
+        // Act
+        FakeConsole.RequestCancellation(TimeSpan.FromSeconds(0.2));
 
-            var exitCode = await application.RunAsync(
-                Array.Empty<string>(),
-                new Dictionary<string, string>()
-            );
+        var exitCode = await application.RunAsync(
+            Array.Empty<string>(),
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
+        var stdOut = FakeConsole.ReadOutputString();
 
-            // Assert
-            exitCode.Should().NotBe(0);
-            stdOut.Trim().Should().Be("Cancelled");
-        }
+        // Assert
+        exitCode.Should().NotBe(0);
+        stdOut.Trim().Should().Be("Cancelled");
     }
 }

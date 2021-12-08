@@ -4,33 +4,32 @@ using CliFx.Demo.Domain;
 using CliFx.Exceptions;
 using CliFx.Infrastructure;
 
-namespace CliFx.Demo.Commands
+namespace CliFx.Demo.Commands;
+
+[Command("book remove", Description = "Remove a book from the library.")]
+public class BookRemoveCommand : ICommand
 {
-    [Command("book remove", Description = "Remove a book from the library.")]
-    public class BookRemoveCommand : ICommand
+    private readonly LibraryProvider _libraryProvider;
+
+    [CommandParameter(0, Name = "title", Description = "Title of the book to remove.")]
+    public string Title { get; init; } = "";
+
+    public BookRemoveCommand(LibraryProvider libraryProvider)
     {
-        private readonly LibraryProvider _libraryProvider;
+        _libraryProvider = libraryProvider;
+    }
 
-        [CommandParameter(0, Name = "title", Description = "Title of the book to remove.")]
-        public string Title { get; init; } = "";
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        var book = _libraryProvider.TryGetBook(Title);
 
-        public BookRemoveCommand(LibraryProvider libraryProvider)
-        {
-            _libraryProvider = libraryProvider;
-        }
+        if (book is null)
+            throw new CommandException("Book not found.", 10);
 
-        public ValueTask ExecuteAsync(IConsole console)
-        {
-            var book = _libraryProvider.TryGetBook(Title);
+        _libraryProvider.RemoveBook(book);
 
-            if (book is null)
-                throw new CommandException("Book not found.", 10);
+        console.Output.WriteLine($"Book {Title} removed.");
 
-            _libraryProvider.RemoveBook(book);
-
-            console.Output.WriteLine($"Book {Title} removed.");
-
-            return default;
-        }
+        return default;
     }
 }

@@ -7,22 +7,22 @@ using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace CliFx.Tests
-{
-    public class ErrorReportingSpecs : SpecsBase
-    {
-        public ErrorReportingSpecs(ITestOutputHelper testOutput)
-            : base(testOutput)
-        {
-        }
+namespace CliFx.Tests;
 
-        [Fact]
-        public async Task Command_can_throw_an_exception_which_exits_with_a_stacktrace()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+public class ErrorReportingSpecs : SpecsBase
+{
+    public ErrorReportingSpecs(ITestOutputHelper testOutput)
+        : base(testOutput)
+    {
+    }
+
+    [Fact]
+    public async Task Command_can_throw_an_exception_which_exits_with_a_stacktrace()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 [Command]
 public class Command : ICommand
 {
@@ -31,36 +31,36 @@ public class Command : ICommand
 }
 ");
 
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                Array.Empty<string>(),
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            Array.Empty<string>(),
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
-            var stdErr = FakeConsole.ReadErrorString();
+        var stdOut = FakeConsole.ReadOutputString();
+        var stdErr = FakeConsole.ReadErrorString();
 
-            // Assert
-            exitCode.Should().NotBe(0);
-            stdOut.Should().BeEmpty();
-            stdErr.Should().ContainAllInOrder(
-                "System.Exception", "Something went wrong",
-                "at", "CliFx."
-            );
-        }
+        // Assert
+        exitCode.Should().NotBe(0);
+        stdOut.Should().BeEmpty();
+        stdErr.Should().ContainAllInOrder(
+            "System.Exception", "Something went wrong",
+            "at", "CliFx."
+        );
+    }
 
-        [Fact]
-        public async Task Command_can_throw_an_exception_with_an_inner_exception_which_exits_with_a_stacktrace()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Command_can_throw_an_exception_with_an_inner_exception_which_exits_with_a_stacktrace()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 [Command]
 public class Command : ICommand
 {
@@ -69,37 +69,37 @@ public class Command : ICommand
 }
 ");
 
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                Array.Empty<string>(),
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            Array.Empty<string>(),
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
-            var stdErr = FakeConsole.ReadErrorString();
+        var stdOut = FakeConsole.ReadOutputString();
+        var stdErr = FakeConsole.ReadErrorString();
 
-            // Assert
-            exitCode.Should().NotBe(0);
-            stdOut.Should().BeEmpty();
-            stdErr.Should().ContainAllInOrder(
-                "System.Exception", "Something went wrong",
-                "System.Exception", "Another exception",
-                "at", "CliFx."
-            );
-        }
+        // Assert
+        exitCode.Should().NotBe(0);
+        stdOut.Should().BeEmpty();
+        stdErr.Should().ContainAllInOrder(
+            "System.Exception", "Something went wrong",
+            "System.Exception", "Another exception",
+            "at", "CliFx."
+        );
+    }
 
-        [Fact]
-        public async Task Command_can_throw_a_special_exception_which_exits_with_specified_code_and_message()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Command_can_throw_a_special_exception_which_exits_with_specified_code_and_message()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 [Command]
 public class Command : ICommand
 {
@@ -108,33 +108,33 @@ public class Command : ICommand
 }
 ");
 
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                Array.Empty<string>(),
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            Array.Empty<string>(),
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
-            var stdErr = FakeConsole.ReadErrorString();
+        var stdOut = FakeConsole.ReadOutputString();
+        var stdErr = FakeConsole.ReadErrorString();
 
-            // Assert
-            exitCode.Should().Be(69);
-            stdOut.Should().BeEmpty();
-            stdErr.Trim().Should().Be("Something went wrong");
-        }
+        // Assert
+        exitCode.Should().Be(69);
+        stdOut.Should().BeEmpty();
+        stdErr.Trim().Should().Be("Something went wrong");
+    }
 
-        [Fact]
-        public async Task Command_can_throw_a_special_exception_without_message_which_exits_with_a_stacktrace()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Command_can_throw_a_special_exception_without_message_which_exits_with_a_stacktrace()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 [Command]
 public class Command : ICommand
 {
@@ -143,36 +143,36 @@ public class Command : ICommand
 }
 ");
 
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                Array.Empty<string>(),
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            Array.Empty<string>(),
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
-            var stdErr = FakeConsole.ReadErrorString();
+        var stdOut = FakeConsole.ReadOutputString();
+        var stdErr = FakeConsole.ReadErrorString();
 
-            // Assert
-            exitCode.Should().Be(69);
-            stdOut.Should().BeEmpty();
-            stdErr.Should().ContainAllInOrder(
-                "CliFx.Exceptions.CommandException",
-                "at", "CliFx."
-            );
-        }
+        // Assert
+        exitCode.Should().Be(69);
+        stdOut.Should().BeEmpty();
+        stdErr.Should().ContainAllInOrder(
+            "CliFx.Exceptions.CommandException",
+            "at", "CliFx."
+        );
+    }
 
-        [Fact]
-        public async Task Command_can_throw_a_special_exception_which_prints_help_text_before_exiting()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Command_can_throw_a_special_exception_which_prints_help_text_before_exiting()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 [Command]
 public class Command : ICommand
 {
@@ -181,25 +181,24 @@ public class Command : ICommand
 }
 ");
 
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .SetDescription("This will be in help text")
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .SetDescription("This will be in help text")
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                Array.Empty<string>(),
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            Array.Empty<string>(),
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
-            var stdErr = FakeConsole.ReadErrorString();
+        var stdOut = FakeConsole.ReadOutputString();
+        var stdErr = FakeConsole.ReadErrorString();
 
-            // Assert
-            exitCode.Should().Be(69);
-            stdOut.Should().Contain("This will be in help text");
-            stdErr.Trim().Should().Be("Something went wrong");
-        }
+        // Assert
+        exitCode.Should().Be(69);
+        stdOut.Should().Contain("This will be in help text");
+        stdErr.Trim().Should().Be("Something went wrong");
     }
 }

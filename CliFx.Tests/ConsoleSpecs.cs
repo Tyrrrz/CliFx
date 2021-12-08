@@ -11,42 +11,42 @@ using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace CliFx.Tests
+namespace CliFx.Tests;
+
+public class ConsoleSpecs : SpecsBase
 {
-    public class ConsoleSpecs : SpecsBase
+    public ConsoleSpecs(ITestOutputHelper testOutput)
+        : base(testOutput)
     {
-        public ConsoleSpecs(ITestOutputHelper testOutput)
-            : base(testOutput)
-        {
-        }
+    }
 
-        [Fact]
-        public async Task Real_console_maps_directly_to_system_console()
-        {
-            // Can't verify our own console output, so using an
-            // external process for this test.
+    [Fact]
+    public async Task Real_console_maps_directly_to_system_console()
+    {
+        // Can't verify our own console output, so using an
+        // external process for this test.
 
-            // Arrange
-            var command = "Hello world" | Cli.Wrap("dotnet")
-                .WithArguments(a => a
-                    .Add(Dummy.Program.Location)
-                    .Add("console-test"));
+        // Arrange
+        var command = "Hello world" | Cli.Wrap("dotnet")
+            .WithArguments(a => a
+                .Add(Dummy.Program.Location)
+                .Add("console-test"));
 
-            // Act
-            var result = await command.ExecuteBufferedAsync();
+        // Act
+        var result = await command.ExecuteBufferedAsync();
 
-            // Assert
-            result.StandardOutput.Trim().Should().Be("Hello world");
-            result.StandardError.Trim().Should().Be("Hello world");
-        }
+        // Assert
+        result.StandardOutput.Trim().Should().Be("Hello world");
+        result.StandardError.Trim().Should().Be("Hello world");
+    }
 
-        [Fact]
-        public async Task Fake_console_does_not_leak_to_system_console()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Fake_console_does_not_leak_to_system_console()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 [Command]
 public class Command : ICommand
 {   
@@ -66,43 +66,43 @@ public class Command : ICommand
 }
 ");
 
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            var exitCode = await application.RunAsync(
-                Array.Empty<string>(),
-                new Dictionary<string, string>()
-            );
+        // Act
+        var exitCode = await application.RunAsync(
+            Array.Empty<string>(),
+            new Dictionary<string, string>()
+        );
 
-            // Assert
-            exitCode.Should().Be(0);
+        // Assert
+        exitCode.Should().Be(0);
 
-            Console.OpenStandardInput().Should().NotBeSameAs(FakeConsole.Input.BaseStream);
-            Console.OpenStandardOutput().Should().NotBeSameAs(FakeConsole.Output.BaseStream);
-            Console.OpenStandardError().Should().NotBeSameAs(FakeConsole.Error.BaseStream);
+        Console.OpenStandardInput().Should().NotBeSameAs(FakeConsole.Input.BaseStream);
+        Console.OpenStandardOutput().Should().NotBeSameAs(FakeConsole.Output.BaseStream);
+        Console.OpenStandardError().Should().NotBeSameAs(FakeConsole.Error.BaseStream);
 
-            Console.ForegroundColor.Should().NotBe(ConsoleColor.DarkMagenta);
-            Console.BackgroundColor.Should().NotBe(ConsoleColor.DarkMagenta);
+        Console.ForegroundColor.Should().NotBe(ConsoleColor.DarkMagenta);
+        Console.BackgroundColor.Should().NotBe(ConsoleColor.DarkMagenta);
 
-            // This fails because tests don't spawn a console window
-            //Console.CursorLeft.Should().NotBe(42);
-            //Console.CursorTop.Should().NotBe(24);
+        // This fails because tests don't spawn a console window
+        //Console.CursorLeft.Should().NotBe(42);
+        //Console.CursorTop.Should().NotBe(24);
 
-            FakeConsole.IsInputRedirected.Should().BeTrue();
-            FakeConsole.IsOutputRedirected.Should().BeTrue();
-            FakeConsole.IsErrorRedirected.Should().BeTrue();
-        }
+        FakeConsole.IsInputRedirected.Should().BeTrue();
+        FakeConsole.IsOutputRedirected.Should().BeTrue();
+        FakeConsole.IsErrorRedirected.Should().BeTrue();
+    }
 
-        [Fact]
-        public async Task Fake_console_can_be_used_with_an_in_memory_backing_store()
-        {
-            // Arrange
-            var commandType = DynamicCommandBuilder.Compile(
-                // language=cs
-                @"
+    [Fact]
+    public async Task Fake_console_can_be_used_with_an_in_memory_backing_store()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
 [Command]
 public class Command : ICommand
 {   
@@ -117,43 +117,42 @@ public class Command : ICommand
 }
 ");
 
-            var application = new CliApplicationBuilder()
-                .AddCommand(commandType)
-                .UseConsole(FakeConsole)
-                .Build();
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
 
-            // Act
-            FakeConsole.WriteInput("Hello world");
+        // Act
+        FakeConsole.WriteInput("Hello world");
 
-            var exitCode = await application.RunAsync(
-                Array.Empty<string>(),
-                new Dictionary<string, string>()
-            );
+        var exitCode = await application.RunAsync(
+            Array.Empty<string>(),
+            new Dictionary<string, string>()
+        );
 
-            var stdOut = FakeConsole.ReadOutputString();
-            var stdErr = FakeConsole.ReadErrorString();
+        var stdOut = FakeConsole.ReadOutputString();
+        var stdErr = FakeConsole.ReadErrorString();
 
-            // Assert
-            exitCode.Should().Be(0);
-            stdOut.Trim().Should().Be("Hello world");
-            stdErr.Trim().Should().Be("Hello world");
-        }
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Trim().Should().Be("Hello world");
+        stdErr.Trim().Should().Be("Hello world");
+    }
 
-        [Fact]
-        public void Console_does_not_emit_preamble_when_used_with_encoding_that_has_it()
-        {
-            // Arrange
-            using var buffer = new MemoryStream();
-            using var consoleWriter = new ConsoleWriter(FakeConsole, buffer, Encoding.UTF8);
+    [Fact]
+    public void Console_does_not_emit_preamble_when_used_with_encoding_that_has_it()
+    {
+        // Arrange
+        using var buffer = new MemoryStream();
+        using var consoleWriter = new ConsoleWriter(FakeConsole, buffer, Encoding.UTF8);
 
-            // Act
-            consoleWriter.Write("Hello world");
-            consoleWriter.Flush();
+        // Act
+        consoleWriter.Write("Hello world");
+        consoleWriter.Flush();
 
-            var output = consoleWriter.Encoding.GetString(buffer.ToArray());
+        var output = consoleWriter.Encoding.GetString(buffer.ToArray());
 
-            // Assert
-            output.Should().Be("Hello world");
-        }
+        // Assert
+        output.Should().Be("Hello world");
     }
 }
