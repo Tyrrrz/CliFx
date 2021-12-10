@@ -1,6 +1,6 @@
 # CliFx
 
-[![Build](https://github.com/Tyrrrz/CliFx/workflows/CI/badge.svg?branch=master)](https://github.com/Tyrrrz/CliFx/actions)
+[![Build](https://github.com/Tyrrrz/CliFx/workflows/main/badge.svg?branch=master)](https://github.com/Tyrrrz/CliFx/actions)
 [![Coverage](https://codecov.io/gh/Tyrrrz/CliFx/branch/master/graph/badge.svg)](https://codecov.io/gh/Tyrrrz/CliFx)
 [![Version](https://img.shields.io/nuget/v/CliFx.svg)](https://nuget.org/packages/CliFx)
 [![Downloads](https://img.shields.io/nuget/dt/CliFx.svg)](https://nuget.org/packages/CliFx)
