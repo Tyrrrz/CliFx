@@ -90,6 +90,7 @@ internal partial class CommandSchema
         var parameterSchemas = type.GetProperties()
             .Select(ParameterSchema.TryResolve)
             .Where(p => p is not null)
+            .OrderBy(p => p!.Order)
             .ToArray();
 
         var optionSchemas = type.GetProperties()
