@@ -6,6 +6,25 @@ namespace CliFx.Utils.Extensions;
 
 internal static class CollectionExtensions
 {
+    public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T?> source)
+        where T : class
+    {
+        foreach (var i in source)
+        {
+            if (i is not null)
+                yield return i;
+        }
+    }
+
+    public static IEnumerable<string> WhereNotNullOrWhiteSpace(this IEnumerable<string?> source)
+    {
+        foreach (var i in source)
+        {
+            if (!string.IsNullOrWhiteSpace(i))
+                yield return i;
+        }
+    }
+
     public static void RemoveRange<T>(this ICollection<T> source, IEnumerable<T> items)
     {
         foreach (var item in items)
@@ -17,5 +36,5 @@ internal static class CollectionExtensions
         IEqualityComparer<TKey> comparer) =>
         dictionary
             .Cast<DictionaryEntry>()
-            .ToDictionary(entry => (TKey) entry.Key, entry => (TValue) entry.Value, comparer)!;
+            .ToDictionary(entry => (TKey) entry.Key, entry => (TValue) entry.Value, comparer);
 }

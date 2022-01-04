@@ -72,7 +72,7 @@ internal class HelpConsoleFormatter : ConsoleFormatter
             Write(' ');
 
             // Parameters
-            foreach (var parameter in _context.CommandSchema.Parameters)
+            foreach (var parameter in _context.CommandSchema.Parameters.OrderBy(p => p.Order))
             {
                 Write(ConsoleColor.DarkCyan, parameter.Property.IsScalar()
                     ? $"<{parameter.Name}>"

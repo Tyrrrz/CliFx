@@ -89,13 +89,12 @@ internal partial class CommandSchema
 
         var parameterSchemas = type.GetProperties()
             .Select(ParameterSchema.TryResolve)
-            .Where(p => p is not null)
-            .OrderBy(p => p!.Order)
+            .WhereNotNull()
             .ToArray();
 
         var optionSchemas = type.GetProperties()
             .Select(OptionSchema.TryResolve)
-            .Where(o => o is not null)
+            .WhereNotNull()
             .Concat(implicitOptionSchemas)
             .ToArray();
 
@@ -103,8 +102,8 @@ internal partial class CommandSchema
             type,
             name,
             description,
-            parameterSchemas!,
-            optionSchemas!
+            parameterSchemas,
+            optionSchemas
         );
     }
 

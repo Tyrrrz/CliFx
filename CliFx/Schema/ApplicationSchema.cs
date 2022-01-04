@@ -16,8 +16,8 @@ internal partial class ApplicationSchema
 
     public IReadOnlyList<string> GetCommandNames() => Commands
         .Select(c => c.Name)
-        .Where(n => !string.IsNullOrWhiteSpace(n))
-        .ToArray()!;
+        .WhereNotNullOrWhiteSpace()
+        .ToArray();
 
     public CommandSchema? TryFindDefaultCommand() =>
         Commands.FirstOrDefault(c => c.IsDefault);

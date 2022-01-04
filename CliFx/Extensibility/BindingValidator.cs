@@ -29,7 +29,7 @@ public abstract class BindingValidator<T> : IBindingValidator
     /// You can use the utility methods <see cref="Ok"/> and <see cref="Error"/> to
     /// create an appropriate result.
     /// </remarks>
-    public abstract BindingValidationError? Validate(T value);
+    public abstract BindingValidationError? Validate(T? value);
 
-    BindingValidationError? IBindingValidator.Validate(object? value) => Validate((T) value!);
+    BindingValidationError? IBindingValidator.Validate(object? value) => Validate((T?) value);
 }
