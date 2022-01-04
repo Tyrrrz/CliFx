@@ -106,13 +106,13 @@ internal static class DynamicCommandBuilder
         // Return all defined commands
         var commandTypes = generatedAssembly
             .GetTypes()
-            .Where(t => t.IsAssignableTo(typeof(ICommand)))
+            .Where(t => t.IsAssignableTo(typeof(ICommand)) && !t.IsAbstract)
             .ToArray();
 
         if (commandTypes.Length <= 0)
         {
             throw new InvalidOperationException(
-                "There are no command definitions in the provide source code."
+                "There are no command definitions in the provided source code."
             );
         }
 
@@ -126,7 +126,7 @@ internal static class DynamicCommandBuilder
         if (commandTypes.Count > 1)
         {
             throw new InvalidOperationException(
-                "There are more than one command definitions in the provide source code."
+                "There are more than one command definitions in the provided source code."
             );
         }
 
