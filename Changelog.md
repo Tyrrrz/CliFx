@@ -1,3 +1,9 @@
+### v2.1 (04-Jan-2022)
+
+- Added `IConsole.Clear()` with corresponding implementations in `SystemConsole`, `FakeConsole`, and `FakeInMemoryConsole`. (Thanks [@Alex Rosenfeld](https://github.com/alexrosenfeld10))
+- Added `IConsole.ReadKey()` with corresponding implementations in `SystemConsole`, `FakeConsole`, and `FakeInMemoryConsole`. (Thanks [@Alex Rosenfeld](https://github.com/alexrosenfeld10))
+- Fixed an issue that caused parameters to appear out of order in the usage format section of the help text. (Thanks [@David Fallah](https://github.com/TAGC))
+
 ### v2.0.6 (17-Jul-2021)
 
 - Fixed an issue where an exception thrown via reflection during parameter or option binding resulted in `Exception has been thrown by the target of an invocation` error instead of a more useful message. Such exceptions will now be unwrapped to provide better user experience.
