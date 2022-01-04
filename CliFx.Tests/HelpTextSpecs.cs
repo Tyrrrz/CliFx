@@ -223,6 +223,56 @@ public class NamedChildCommand : ICommand
         stdErr.Should().NotBeNullOrWhiteSpace();
     }
 
+    // Regression test for #117
+    [Fact]
+    public async Task Help_text_lists_parameters_in_specified_order()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
+public abstract class CommandBase : ICommand
+{
+    [CommandParameter(0)]
+    public string Foo { get; set; }
+
+    public abstract ValueTask ExecuteAsync(IConsole console);
+}
+
+[Command]
+public class Command : CommandBase
+{
+    [CommandParameter(1)]
+    public string Bar { get; set; }
+    
+    [CommandParameter(2)]
+    public IReadOnlyList<string> Baz { get; set; }
+    
+    public override ValueTask ExecuteAsync(IConsole console) => default;
+}
+");
+
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
+
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] { "--help" },
+            new Dictionary<string, string>()
+        );
+
+        var stdOut = FakeConsole.ReadOutputString();
+
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Should().ContainAllInOrder(
+            "USAGE",
+            "<foo>", "<bar>", "<baz...>"
+        );
+    }
+
     [Fact]
     public async Task Help_text_shows_application_metadata()
     {
