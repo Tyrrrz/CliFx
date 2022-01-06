@@ -10,19 +10,22 @@ internal partial class CommandParameterSymbol
     public int Order { get; }
 
     public string? Name { get; }
-
+    
+    public bool? IsOptional { get; }
+    
     public ITypeSymbol? ConverterType { get; }
 
     public IReadOnlyList<ITypeSymbol> ValidatorTypes { get; }
 
-    public CommandParameterSymbol(
-        int order,
+    public CommandParameterSymbol(int order,
         string? name,
+        bool? isOptional,
         ITypeSymbol? converterType,
         IReadOnlyList<ITypeSymbol> validatorTypes)
     {
         Order = order;
         Name = name;
+        IsOptional = isOptional;
         ConverterType = converterType;
         ValidatorTypes = validatorTypes;
     }
@@ -47,6 +50,12 @@ internal partial class CommandParameterSymbol
             .Where(a => a.Key == "Name")
             .Select(a => a.Value.Value)
             .FirstOrDefault() as string;
+        
+        var isOptional = attribute
+            .NamedArguments
+            .Where(a => a.Key == "IsOptional")
+            .Select(a => a.Value.Value)
+            .FirstOrDefault() as bool?;
 
         var converter = attribute
             .NamedArguments
@@ -63,17 +72,14 @@ internal partial class CommandParameterSymbol
             .Cast<ITypeSymbol>()
             .ToArray();
 
-        return new CommandParameterSymbol(order, name, converter, validators);
+        return new CommandParameterSymbol(order, name, isOptional, converter, validators);
     }
 
     public static CommandParameterSymbol? TryResolve(IPropertySymbol property)
     {
         var attribute = TryGetParameterAttribute(property);
 
-        if (attribute is null)
-            return null;
-
-        return FromAttribute(attribute);
+        return attribute is null ? null : FromAttribute(attribute);
     }
 
     public static bool IsParameterProperty(IPropertySymbol property) =>
