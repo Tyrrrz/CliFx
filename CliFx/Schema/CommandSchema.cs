@@ -87,12 +87,14 @@ internal partial class CommandSchema
             ? new[] {OptionSchema.HelpOption, OptionSchema.VersionOption}
             : new[] {OptionSchema.HelpOption};
 
-        var parameterSchemas = type.GetProperties()
+        var properties = type.GetProperties();
+
+        var parameterSchemas = properties
             .Select(ParameterSchema.TryResolve)
             .WhereNotNull()
             .ToArray();
 
-        var optionSchemas = type.GetProperties()
+        var optionSchemas = properties
             .Select(OptionSchema.TryResolve)
             .WhereNotNull()
             .Concat(implicitOptionSchemas)
