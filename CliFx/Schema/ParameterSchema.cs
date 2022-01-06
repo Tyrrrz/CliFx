@@ -15,7 +15,7 @@ internal partial class ParameterSchema : IMemberSchema
 
     public string? Description { get; }
    
-    public bool IsOptional { get; }
+    public bool IsRequired { get; }
     
     public Type? ConverterType { get; }
 
@@ -25,7 +25,7 @@ internal partial class ParameterSchema : IMemberSchema
         int order,
         string name,
         string? description,
-        bool isOptional,
+        bool isRequired,
         Type? converterType,
         IReadOnlyList<Type> validatorTypes)
     {
@@ -33,7 +33,7 @@ internal partial class ParameterSchema : IMemberSchema
         Order = order;
         Name = name;
         Description = description;
-        IsOptional = isOptional;
+        IsRequired = isRequired;
         ConverterType = converterType;
         ValidatorTypes = validatorTypes;
     }
@@ -61,7 +61,7 @@ internal partial class ParameterSchema
             attribute.Order,
             name,
             description,
-            attribute.IsOptional,
+            attribute.IsRequired,
             attribute.Converter,
             attribute.Validators
         );

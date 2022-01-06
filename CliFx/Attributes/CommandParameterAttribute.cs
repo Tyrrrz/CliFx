@@ -24,10 +24,11 @@ public sealed class CommandParameterAttribute : Attribute
     public int Order { get; }
     
     /// <summary>
-    /// Whether this parameter is optional.
+    /// Whether this parameter is required. (default: true)
+    /// If an parameter is required, the user will get an error if they don't set it.
     /// Only the last CommandParameter can be optional.
     /// </summary>
-    public bool IsOptional { get; set; }
+    public bool IsRequired { get; set; } = true;
 
     /// <summary>
     /// Parameter name.

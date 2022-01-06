@@ -223,7 +223,7 @@ internal class CommandBinder
     {
         // Ensure there are no unexpected parameters and that all parameters are provided
         var remainingParameterInputs = commandInput.Parameters.ToList();
-        var remainingRequiredParameterSchemas = commandSchema.Parameters.Where(q=> !q.IsOptional).ToList();
+        var remainingRequiredParameterSchemas = commandSchema.Parameters.Where(p => p.IsRequired).ToList();
 
         var position = 0;
 

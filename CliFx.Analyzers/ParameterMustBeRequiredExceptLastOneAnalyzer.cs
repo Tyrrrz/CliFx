@@ -9,12 +9,12 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace CliFx.Analyzers;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public class OptionalParameterMustBeLastParameterAnalyzer : AnalyzerBase
+public class ParameterMustBeRequiredExceptLastOneAnalyzer : AnalyzerBase
 {
-    public OptionalParameterMustBeLastParameterAnalyzer()
+    public ParameterMustBeRequiredExceptLastOneAnalyzer()
         : base(
-            "Only last parameter can be optional.",
-            "IsOptional can only be applied to the last parameter.")
+            "Only last parameter can be optional",
+            "IsRequired can only be set to false on the last parameter.")
     {
     }
 
@@ -28,7 +28,7 @@ public class OptionalParameterMustBeLastParameterAnalyzer : AnalyzerBase
 
         var parameter = CommandParameterSymbol.TryResolve(property);
         
-        if (parameter is null || parameter.IsOptional is null or false )
+        if (parameter is null || parameter.IsRequired is null or true )
             return;
         
         var otherProperties = property
@@ -44,7 +44,7 @@ public class OptionalParameterMustBeLastParameterAnalyzer : AnalyzerBase
             if (otherParameter is null)
                 continue;
 
-            if (parameter.IsOptional.Value && parameter.Order < otherParameter.Order)
+            if (parameter.IsRequired is false && parameter.Order < otherParameter.Order)
             {
                 context.ReportDiagnostic(CreateDiagnostic(propertyDeclaration.GetLocation()));
             }
