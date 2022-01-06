@@ -14,16 +14,18 @@ internal partial class ParameterSchema : IMemberSchema
     public string Name { get; }
 
     public string? Description { get; }
-
+   
+    public bool IsOptional { get; }
+    
     public Type? ConverterType { get; }
 
     public IReadOnlyList<Type> ValidatorTypes { get; }
 
-    public ParameterSchema(
-        IPropertyDescriptor property,
+    public ParameterSchema(IPropertyDescriptor property,
         int order,
         string name,
         string? description,
+        bool isOptional,
         Type? converterType,
         IReadOnlyList<Type> validatorTypes)
     {
@@ -31,9 +33,12 @@ internal partial class ParameterSchema : IMemberSchema
         Order = order;
         Name = name;
         Description = description;
+        IsOptional = isOptional;
         ConverterType = converterType;
         ValidatorTypes = validatorTypes;
     }
+
+  
 
     public string GetFormattedIdentifier() => Property.IsScalar()
         ? $"<{Name}>"
@@ -56,6 +61,7 @@ internal partial class ParameterSchema
             attribute.Order,
             name,
             description,
+            attribute.IsOptional,
             attribute.Converter,
             attribute.Validators
         );

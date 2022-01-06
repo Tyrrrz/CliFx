@@ -22,6 +22,12 @@ public sealed class CommandParameterAttribute : Attribute
     /// Only one non-scalar parameter is allowed in a command.
     /// </remarks>
     public int Order { get; }
+    
+    /// <summary>
+    /// Whether this parameter is optional.
+    /// Only the last CommandParameter can be optional.
+    /// </summary>
+    public bool IsOptional { get; set; }
 
     /// <summary>
     /// Parameter name.
