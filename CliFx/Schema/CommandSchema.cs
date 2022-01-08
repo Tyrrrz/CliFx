@@ -89,8 +89,7 @@ internal partial class CommandSchema
         
         // Include interface members for multiple inheritance
         // If interface inherits from ICommand, it will be included
-        var iType = typeof(ICommand);
-        var interfaces = type.GetInterfaces().Where(i => i != iType && iType.IsAssignableFrom(i) );
+        var interfaces = type.GetInterfaces().Where(i => i != typeof(ICommand) && typeof(ICommand).IsAssignableFrom(i) );
         var properties = type.GetProperties().Concat(interfaces.SelectMany(i => i.GetProperties())).ToArray();
       
         var parameterSchemas = properties
