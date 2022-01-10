@@ -762,6 +762,6 @@ public class Command : IOptionFoo, IOptionBar
 
         // Assert
         exitCode.Should().Be(0);
-        stdOut.Trim().Should().Be("Foo: True\r\nBar: True");
+        stdOut.Trim().Should().Be("Foo: True" + Environment.NewLine + "Bar: True");
     }
 }
