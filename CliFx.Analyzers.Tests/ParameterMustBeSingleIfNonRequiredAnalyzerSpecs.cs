@@ -4,12 +4,12 @@ using Xunit;
 
 namespace CliFx.Analyzers.Tests;
 
-public class ParameterMustBeLastIfNotRequiredAnalyzerSpecs
+public class ParameterMustBeSingleIfNonRequiredAnalyzerSpecs
 {
-    private static DiagnosticAnalyzer Analyzer { get; } = new ParameterMustBeLastIfNotRequiredAnalyzer();
+    private static DiagnosticAnalyzer Analyzer { get; } = new ParameterMustBeSingleIfNonRequiredAnalyzer();
 
     [Fact]
-    public void Analyzer_reports_an_error_if_a_non_required_parameter_is_not_the_last_in_order()
+    public void Analyzer_reports_an_error_if_more_than_one_non_required_parameters_are_defined()
     {
         // Arrange
         // language=cs
@@ -17,10 +17,10 @@ public class ParameterMustBeLastIfNotRequiredAnalyzerSpecs
 [Command]
 public class MyCommand : ICommand
 {
-    [CommandParameter(0, Name = ""foo"", IsRequired = false)]
+    [CommandParameter(0, IsRequired = false)]
     public string Foo { get; set; }
 
-    [CommandParameter(1, Name = ""bar"", IsRequired = false)]
+    [CommandParameter(1, IsRequired = false)]
     public string Bar { get; set; }
 
     public ValueTask ExecuteAsync(IConsole console) => default;
@@ -31,7 +31,7 @@ public class MyCommand : ICommand
     }
 
     [Fact]
-    public void Analyzer_does_not_report_an_error_if_a_non_required_parameter_is_the_last_in_order()
+    public void Analyzer_does_not_report_an_error_if_only_one_non_required_parameter_is_defined()
     {
         // Arrange
         // language=cs
@@ -39,10 +39,10 @@ public class MyCommand : ICommand
 [Command]
 public class MyCommand : ICommand
 {
-    [CommandParameter(0, Name = ""foo"", IsRequired = true)]
+    [CommandParameter(0)]
     public string Foo { get; set; }
 
-    [CommandParameter(1, Name = ""bar"", IsRequired = false)]
+    [CommandParameter(1, IsRequired = false)]
     public string Bar { get; set; }
 
     public ValueTask ExecuteAsync(IConsole console) => default;
@@ -61,10 +61,10 @@ public class MyCommand : ICommand
 [Command]
 public class MyCommand : ICommand
 {
-    [CommandParameter(0, Name = ""foo"")]
+    [CommandParameter(0)]
     public string Foo { get; set; }
 
-    [CommandParameter(1, Name = ""bar"", IsRequired = true)]
+    [CommandParameter(1, IsRequired = true)]
     public string Bar { get; set; }
 
     public ValueTask ExecuteAsync(IConsole console) => default;
