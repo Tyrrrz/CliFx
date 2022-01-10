@@ -157,8 +157,14 @@ internal class HelpConsoleFormatter : ConsoleFormatter
 
         foreach (var parameterSchema in _context.CommandSchema.Parameters.OrderBy(p => p.Order))
         {
-            var star = parameterSchema.IsRequired ? "* " : "  ";
-            Write(ConsoleColor.Red, star);
+            if (parameterSchema.IsRequired)
+            {
+                Write(ConsoleColor.Red, "* ");
+            }
+            else
+            {
+                WriteHorizontalMargin();
+            }
             Write(ConsoleColor.DarkCyan, $"{parameterSchema.Name}");
 
             WriteColumnMargin();
