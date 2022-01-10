@@ -59,27 +59,4 @@ internal static class TypeExtensions
         var toStringMethod = type.GetMethod(nameof(ToString), Type.EmptyTypes);
         return toStringMethod?.GetBaseDefinition()?.DeclaringType != toStringMethod?.DeclaringType;
     }
-
-    // Types supported by `Convert.ChangeType(...)`
-    private static readonly HashSet<Type> ConvertibleTypes = new()
-    {
-        typeof(bool),
-        typeof(char),
-        typeof(sbyte),
-        typeof(byte),
-        typeof(short),
-        typeof(ushort),
-        typeof(int),
-        typeof(uint),
-        typeof(long),
-        typeof(ulong),
-        typeof(float),
-        typeof(double),
-        typeof(decimal),
-        typeof(DateTime),
-        typeof(string),
-        typeof(object)
-    };
-
-    public static bool IsConvertible(this Type type) => ConvertibleTypes.Contains(type);
 }

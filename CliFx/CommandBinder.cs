@@ -43,12 +43,6 @@ internal class CommandBinder
             return string.IsNullOrWhiteSpace(rawValue) || bool.Parse(rawValue);
         }
 
-        // IConvertible primitives (int, double, char, etc)
-        if (targetType.IsConvertible())
-        {
-            return Convert.ChangeType(rawValue, targetType, _formatProvider);
-        }
-
         // Special case for DateTimeOffset
         if (targetType == typeof(DateTimeOffset))
         {
@@ -66,6 +60,12 @@ internal class CommandBinder
         {
             // Null reference exception will be handled upstream
             return Enum.Parse(targetType, rawValue!, true);
+        }
+
+        // Convertible primitives (int, double, char, etc)
+        if (targetType.Implements(typeof(IConvertible)))
+        {
+            return Convert.ChangeType(rawValue, targetType, _formatProvider);
         }
 
         // Nullable<T>
