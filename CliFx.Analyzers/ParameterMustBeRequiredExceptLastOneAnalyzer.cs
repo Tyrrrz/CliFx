@@ -9,9 +9,9 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace CliFx.Analyzers;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public class ParameterMustBeRequiredExceptLastOneAnalyzer : AnalyzerBase
+public class ParameterMustBeLastIfNotRequiredAnalyzer : AnalyzerBase
 {
-    public ParameterMustBeRequiredExceptLastOneAnalyzer()
+    public ParameterMustBeLastIfNotRequiredAnalyzer()
         : base(
             "Only last parameter can be optional",
             "IsRequired can only be set to false on the last parameter.")
