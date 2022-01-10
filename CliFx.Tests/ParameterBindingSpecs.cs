@@ -120,7 +120,53 @@ public class Command : ICommand
     }
 
     [Fact]
-    public async Task Parameter_binding_fails_if_one_of_the_parameters_has_not_been_provided()
+    public async Task Parameter_is_not_bound_if_there_are_no_arguments_matching_its_order()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
+[Command]
+public class Command : ICommand
+{
+    [CommandParameter(0)]
+    public string Foo { get; set; }
+
+    [CommandParameter(1, IsRequired = false)]
+    public string Bar { get; set; } = ""xyz"";
+
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(""Foo = "" + Foo);
+        console.Output.WriteLine(""Bar = "" + Bar);
+
+        return default;
+    }
+}");
+
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
+
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"abc"},
+            new Dictionary<string, string>()
+        );
+
+        var stdOut = FakeConsole.ReadOutputString();
+
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Should().ConsistOfLines(
+            "Foo = abc",
+            "Bar = xyz"
+        );
+    }
+
+    [Fact]
+    public async Task Parameter_binding_fails_if_a_required_parameter_has_not_been_provided()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
