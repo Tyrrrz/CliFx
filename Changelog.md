@@ -1,3 +1,8 @@
+### v2.2 (11-Jan-2022)
+
+- Added support for optional parameters. A parameter can be marked as optional by setting `IsRequired = false` on the attribute. Only one parameter is allowed to be optional and such parameter must be the last in order. (Thanks [@AliReZa Sabouri](https://github.com/alirezanet))
+- Fixed an issue where parameters and options bound to properties implemented as default interface members were not working correctly. (Thanks [@AliReZa Sabouri](https://github.com/alirezanet))
+
 ### v2.1 (04-Jan-2022)
 
 - Added `IConsole.Clear()` with corresponding implementations in `SystemConsole`, `FakeConsole`, and `FakeInMemoryConsole`. (Thanks [@Alex Rosenfeld](https://github.com/alexrosenfeld10))
