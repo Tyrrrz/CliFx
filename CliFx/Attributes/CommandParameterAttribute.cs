@@ -26,7 +26,7 @@ public sealed class CommandParameterAttribute : Attribute
     /// <summary>
     /// Whether this parameter is required. (default: true)
     /// If a parameter is required, the user will get an error if they don't set it.
-    /// Only the last CommandParameter can be optional.
+    /// Only the last parameter in order can be optional.
     /// </summary>
     public bool IsRequired { get; set; } = true;
 
