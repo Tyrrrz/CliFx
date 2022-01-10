@@ -4,12 +4,12 @@ using Xunit;
 
 namespace CliFx.Analyzers.Tests;
 
-public class ParameterMustBeRequiredExceptLastOneAnalyzerSpecs
+public class ParameterMustBeLastIfNotRequiredAnalyzerSpecs
 {
-    private static DiagnosticAnalyzer Analyzer { get; } = new ParameterMustBeRequiredExceptLastOneAnalyzer();
+    private static DiagnosticAnalyzer Analyzer { get; } = new ParameterMustBeLastIfNotRequiredAnalyzer();
 
     [Fact]
-    public void Analyzer_reports_an_error_if_a_parameter_isRequired_is_false_except_last_parameter()
+    public void Analyzer_reports_an_error_if_a_parameter_isRequired_is_false_and_is_not_last_parameter()
     {
         // Arrange
         // language=cs
