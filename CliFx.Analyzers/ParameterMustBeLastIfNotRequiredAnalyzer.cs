@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using CliFx.Analyzers.ObjectModel;
 using CliFx.Analyzers.Utils.Extensions;
 using Microsoft.CodeAnalysis;
@@ -13,8 +12,8 @@ public class ParameterMustBeLastIfNotRequiredAnalyzer : AnalyzerBase
 {
     public ParameterMustBeLastIfNotRequiredAnalyzer()
         : base(
-            "Only last parameter can be optional",
-            "IsRequired can only be set to false on the last parameter.")
+            "Parameters marked as non-required must be the last in order",
+            "This parameter is non-required so it must be the last in order (its order must be highest within the command).")
     {
     }
 
@@ -27,10 +26,12 @@ public class ParameterMustBeLastIfNotRequiredAnalyzer : AnalyzerBase
             return;
 
         var parameter = CommandParameterSymbol.TryResolve(property);
-        
-        if (parameter is null || parameter.IsRequired != false)
+        if (parameter is null)
             return;
-        
+
+        if (parameter.IsRequired != false)
+            return;
+
         var otherProperties = property
             .ContainingType
             .GetMembers()
@@ -44,7 +45,7 @@ public class ParameterMustBeLastIfNotRequiredAnalyzer : AnalyzerBase
             if (otherParameter is null)
                 continue;
 
-            if (parameter.IsRequired is false && parameter.Order < otherParameter.Order)
+            if (otherParameter.Order > parameter.Order)
             {
                 context.ReportDiagnostic(CreateDiagnostic(propertyDeclaration.GetLocation()));
             }

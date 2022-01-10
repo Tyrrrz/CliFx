@@ -226,7 +226,7 @@ Similarly, unseparated arguments in the form of `myapp -ofile` will be treated a
 
 Because of these rules, order of arguments is semantically important and must always follow this pattern:
 
-```ini
+```txt
 [directives] [command name] [parameters] [options]
 ```
 
@@ -596,7 +596,7 @@ public async Task ConcatCommand_executes_successfully()
 
     // Act
     await command.ExecuteAsync(console);
-    
+
     var stdOut = console.ReadOutputString();
 
     // Assert
@@ -624,7 +624,7 @@ public async Task ConcatCommand_executes_successfully()
 
     // Act
     await app.RunAsync(args, envVars);
-    
+
     var stdOut = console.ReadOutputString();
 
     // Assert

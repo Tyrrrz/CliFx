@@ -24,7 +24,7 @@ public class MyCommand : ICommand
 {
     [CommandParameter(0, Validators = new[] {typeof(MyValidator)})]
     public string Foo { get; set; }
-    
+
     public ValueTask ExecuteAsync(IConsole console) => default;
 }";
 
@@ -48,7 +48,7 @@ public class MyCommand : ICommand
 {
     [CommandParameter(0, Validators = new[] {typeof(MyValidator)})]
     public string Foo { get; set; }
-    
+
     public ValueTask ExecuteAsync(IConsole console) => default;
 }";
 
@@ -67,7 +67,7 @@ public class MyCommand : ICommand
 {
     [CommandParameter(0)]
     public string Foo { get; set; }
-    
+
     public ValueTask ExecuteAsync(IConsole console) => default;
 }";
 

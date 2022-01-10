@@ -11,23 +11,24 @@ public sealed class CommandParameterAttribute : Attribute
 {
     /// <summary>
     /// Parameter order.
-    /// </summary>
-    /// <remarks>
     /// Higher order means the parameter appears later, lower order means
     /// it appears earlier.
-    ///
+    /// </summary>
+    /// <remarks>
     /// All parameters in a command must have unique order.
-    ///
     /// Parameter whose type is a non-scalar (e.g. array), must always be the last in order.
     /// Only one non-scalar parameter is allowed in a command.
     /// </remarks>
     public int Order { get; }
-    
+
     /// <summary>
-    /// Whether this parameter is required. (default: true)
+    /// Whether this parameter is required (default: <c>true</c>).
     /// If a parameter is required, the user will get an error if they don't set it.
-    /// Only the last parameter in order can be optional.
     /// </summary>
+    /// <remarks>
+    /// Parameter marked as non-required must always be the last in order.
+    /// Only one non-required parameter is allowed in a command.
+    /// </remarks>
     public bool IsRequired { get; set; } = true;
 
     /// <summary>

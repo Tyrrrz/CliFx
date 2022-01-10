@@ -12,8 +12,8 @@ public class ParameterMustBeLastIfNonScalarAnalyzer : AnalyzerBase
 {
     public ParameterMustBeLastIfNonScalarAnalyzer()
         : base(
-            "Parameters of non-scalar types must be last in order",
-            "This parameter has a non-scalar type so it must be last in order (its order must be highest within the command).")
+            "Parameters of non-scalar types must be the last in order",
+            "This parameter has a non-scalar type so it must be the last in order (its order must be highest within the command).")
     {
     }
 

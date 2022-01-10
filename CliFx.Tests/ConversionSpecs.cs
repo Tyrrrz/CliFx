@@ -103,7 +103,7 @@ public class Command : ICommand
 {
     [CommandOption('f')]
     public bool Foo { get; set; }
-    
+
     [CommandOption('b')]
     public bool Bar { get; set; }
 
@@ -379,7 +379,7 @@ public class Command : ICommand
 {
     [CommandOption('f')]
     public int? Foo { get; set; }
-    
+
     [CommandOption('b')]
     public int? Bar { get; set; }
 
@@ -427,7 +427,7 @@ public class Command : ICommand
 {
     [CommandOption('f')]
     public CustomEnum? Foo { get; set; }
-    
+
     [CommandOption('b')]
     public CustomEnum? Bar { get; set; }
 
@@ -471,7 +471,7 @@ public class Command : ICommand
 public class CustomType
 {
     public string Value { get; }
-    
+
     public CustomType(string value) => Value = value;
 }
 
@@ -480,7 +480,7 @@ public class Command : ICommand
 {
     [CommandOption('f')]
     public CustomType Foo { get; set; }
-    
+
     public ValueTask ExecuteAsync(IConsole console)
     {
         console.Output.WriteLine(Foo.Value);
@@ -516,9 +516,9 @@ public class Command : ICommand
 public class CustomTypeA
 {
     public string Value { get; }
-    
+
     private CustomTypeA(string value) => Value = value;
-    
+
     public static CustomTypeA Parse(string value) => 
         new CustomTypeA(value);
 }
@@ -526,9 +526,9 @@ public class CustomTypeA
 public class CustomTypeB
 {
     public string Value { get; }
-    
+
     private CustomTypeB(string value) => Value = value;
-    
+
     public static CustomTypeB Parse(string value, IFormatProvider formatProvider) =>
         new CustomTypeB(value);
 }
@@ -538,10 +538,10 @@ public class Command : ICommand
 {
     [CommandOption('f')]
     public CustomTypeA Foo { get; set; }
-    
+
     [CommandOption('b')]
     public CustomTypeB Bar { get; set; }
-    
+
     public ValueTask ExecuteAsync(IConsole console)
     {
         console.Output.WriteLine(""Foo = "" + Foo.Value);
@@ -590,7 +590,7 @@ public class Command : ICommand
 {
     [CommandOption('f', Converter = typeof(CustomConverter))]
     public int Foo { get; set; }
-    
+
     public ValueTask ExecuteAsync(IConsole console)
     {
         console.Output.WriteLine(Foo);
@@ -628,7 +628,7 @@ public class Command : ICommand
 {
     [CommandOption('f')]
     public string[] Foo { get; set; }
-    
+
     public ValueTask ExecuteAsync(IConsole console)
     {
         foreach (var i in Foo)
@@ -672,7 +672,7 @@ public class Command : ICommand
 {
     [CommandOption('f')]
     public IReadOnlyList<string> Foo { get; set; }
-    
+
     public ValueTask ExecuteAsync(IConsole console)
     {
         foreach (var i in Foo)
@@ -716,7 +716,7 @@ public class Command : ICommand
 {
     [CommandOption('f')]
     public List<string> Foo { get; set; }
-    
+
     public ValueTask ExecuteAsync(IConsole console)
     {
         foreach (var i in Foo)
@@ -760,7 +760,7 @@ public class Command : ICommand
 {
     [CommandOption('f')]
     public int[] Foo { get; set; }
-    
+
     public ValueTask ExecuteAsync(IConsole console)
     {
         foreach (var i in Foo)
@@ -804,7 +804,7 @@ public class Command : ICommand
 {
     [CommandOption('f')]
     public int Foo { get; set; }
-    
+
     public ValueTask ExecuteAsync(IConsole console) => default;
 }
 ");
@@ -840,7 +840,7 @@ public class Command : ICommand
 {
     [CommandOption('f')]
     public CustomType Foo { get; set; }
-    
+
     public ValueTask ExecuteAsync(IConsole console) => default;
 }
 ");
@@ -872,7 +872,7 @@ public class Command : ICommand
 public class CustomType : IEnumerable<object>
 {
     public IEnumerator<object> GetEnumerator() => Enumerable.Empty<object>().GetEnumerator();
-    
+
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }
 
@@ -881,7 +881,7 @@ public class Command : ICommand
 {
     [CommandOption('f')]
     public CustomType Foo { get; set; }
-    
+
     public ValueTask ExecuteAsync(IConsole console) => default;
 }
 ");
@@ -925,7 +925,7 @@ public class Command : ICommand
 {
     [CommandOption('f', Validators = new[] {typeof(ValidatorA), typeof(ValidatorB)})]
     public int Foo { get; set; }
-    
+
     public ValueTask ExecuteAsync(IConsole console) => default;
 }
 ");
@@ -957,9 +957,9 @@ public class Command : ICommand
 public class CustomType
 {
     public string Value { get; }
-    
+
     private CustomType(string value) => Value = value;
-    
+
     public static CustomType Parse(string value) => throw new Exception(""Hello world"");
 }
 
@@ -968,7 +968,7 @@ public class Command : ICommand
 {
     [CommandOption('f')]
     public CustomType Foo { get; set; }
-    
+
     public ValueTask ExecuteAsync(IConsole console) => default;
 }
 ");

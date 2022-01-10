@@ -28,7 +28,7 @@ public class Command : ICommand
 {
     [CommandOption(""foo"")]
     public bool Foo { get; set; }
-       
+
     public ValueTask ExecuteAsync(IConsole console)
     {
         console.Output.WriteLine(Foo);
@@ -66,7 +66,7 @@ public class Command : ICommand
 {
     [CommandOption('f')]
     public bool Foo { get; set; }
-       
+
     public ValueTask ExecuteAsync(IConsole console)
     {
         console.Output.WriteLine(Foo);
@@ -104,10 +104,10 @@ public class Command : ICommand
 {
     [CommandOption(""foo"")]
     public string Foo { get; set; }
-    
+
     [CommandOption(""bar"")]
     public string Bar { get; set; }
-    
+
     public ValueTask ExecuteAsync(IConsole console)
     {
         console.Output.WriteLine(""Foo = "" + Foo);
@@ -150,10 +150,10 @@ public class Command : ICommand
 {
     [CommandOption('f')]
     public string Foo { get; set; }
-    
+
     [CommandOption('b')]
     public string Bar { get; set; }
-    
+
     public ValueTask ExecuteAsync(IConsole console)
     {
         console.Output.WriteLine(""Foo = "" + Foo);
@@ -196,10 +196,10 @@ public class Command : ICommand
 {
     [CommandOption('f')]
     public string Foo { get; set; }
-    
+
     [CommandOption('b')]
     public string Bar { get; set; }
-    
+
     public ValueTask ExecuteAsync(IConsole console)
     {
         console.Output.WriteLine(""Foo = "" + Foo);
@@ -242,7 +242,7 @@ public class Command : ICommand
 {
     [CommandOption(""Foo"")]
     public IReadOnlyList<string> Foo { get; set; }
-    
+
     public ValueTask ExecuteAsync(IConsole console)
     {
         foreach (var i in Foo)
@@ -286,7 +286,7 @@ public class Command : ICommand
 {
     [CommandOption('f')]
     public IReadOnlyList<string> Foo { get; set; }
-    
+
     public ValueTask ExecuteAsync(IConsole console)
     {
         foreach (var i in Foo)
@@ -330,7 +330,7 @@ public class Command : ICommand
 {
     [CommandOption(""foo"")]
     public IReadOnlyList<string> Foo { get; set; }
-    
+
     public ValueTask ExecuteAsync(IConsole console)
     {
         foreach (var i in Foo)
@@ -374,7 +374,7 @@ public class Command : ICommand
 {
     [CommandOption('f')]
     public IReadOnlyList<string> Foo { get; set; }
-    
+
     public ValueTask ExecuteAsync(IConsole console)
     {
         foreach (var i in Foo)
@@ -418,7 +418,7 @@ public class Command : ICommand
 {
     [CommandOption(""foo"", 'f')]
     public IReadOnlyList<string> Foo { get; set; }
-    
+
     public ValueTask ExecuteAsync(IConsole console)
     {
         foreach (var i in Foo)
@@ -462,10 +462,10 @@ public class Command : ICommand
 {
     [CommandOption(""foo"")]
     public string Foo { get; set; }
-    
+
     [CommandOption(""bar"")]
     public string Bar { get; set; } = ""hello"";
-    
+
     public ValueTask ExecuteAsync(IConsole console)
     {
         console.Output.WriteLine(""Foo = "" + Foo);
@@ -506,7 +506,7 @@ public class Command : ICommand
 public static class SharedContext
 {
     public static int Foo { get; set; }
-    
+
     public static bool Bar { get; set; }
 }
 
@@ -585,7 +585,7 @@ public class Command : ICommand
 {
     [CommandOption(""foo"")]
     public string Foo { get; set; }
-    
+
     public ValueTask ExecuteAsync(IConsole console)
     {
         console.Output.WriteLine(Foo);
@@ -624,7 +624,7 @@ public class Command : ICommand
 {
     [CommandOption(""foo"", IsRequired = true)]
     public string Foo { get; set; }
-    
+
     public ValueTask ExecuteAsync(IConsole console) => default;
 }");
 
@@ -658,7 +658,7 @@ public class Command : ICommand
 {
     [CommandOption(""foo"", IsRequired = true)]
     public string Foo { get; set; }
-    
+
     public ValueTask ExecuteAsync(IConsole console) => default;
 }");
 
@@ -692,7 +692,7 @@ public class Command : ICommand
 {
     [CommandOption(""foo"", IsRequired = true)]
     public IReadOnlyList<string> Foo { get; set; }
-    
+
     public ValueTask ExecuteAsync(IConsole console) => default;
 }");
 
@@ -726,7 +726,7 @@ public class Command : ICommand
 {
     [CommandOption(""foo"")]
     public string Foo { get; set; }
-    
+
     public ValueTask ExecuteAsync(IConsole console) => default;
 }");
 
@@ -760,7 +760,7 @@ public class Command : ICommand
 {
     [CommandOption(""foo"")]
     public string Foo { get; set; }
-    
+
     public ValueTask ExecuteAsync(IConsole console) => default;
 }");
 

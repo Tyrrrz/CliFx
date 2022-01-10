@@ -71,10 +71,9 @@ internal partial class CommandOptionSymbol
     {
         var attribute = TryGetOptionAttribute(property);
 
-        if (attribute is null)
-            return null;
-
-        return FromAttribute(attribute);
+        return attribute is not null
+            ? FromAttribute(attribute)
+            : null;
     }
 
     public static bool IsOptionProperty(IPropertySymbol property) =>

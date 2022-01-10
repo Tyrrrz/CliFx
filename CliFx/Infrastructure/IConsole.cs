@@ -82,7 +82,7 @@ public interface IConsole
     /// </para>
     /// </remarks>
     CancellationToken RegisterCancellationHandler();
-        
+
     /// <summary>
     /// Clears the console buffer and corresponding console window of display information.
     /// </summary>

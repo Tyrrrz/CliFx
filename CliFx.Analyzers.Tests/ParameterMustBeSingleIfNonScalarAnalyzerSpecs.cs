@@ -19,7 +19,7 @@ public class MyCommand : ICommand
 {
     [CommandParameter(0)]
     public string[] Foo { get; set; }
-    
+
     [CommandParameter(1)]
     public string[] Bar { get; set; }
 
@@ -41,7 +41,7 @@ public class MyCommand : ICommand
 {
     [CommandParameter(0)]
     public string Foo { get; set; }
-    
+
     [CommandParameter(1)]
     public string[] Bar { get; set; }
 
@@ -63,7 +63,7 @@ public class MyCommand : ICommand
 {
     [CommandParameter(0)]
     public string Foo { get; set; }
-    
+
     [CommandParameter(1)]
     public string Bar { get; set; }
 

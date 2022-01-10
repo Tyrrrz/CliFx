@@ -339,13 +339,13 @@ public class Command : ICommand
 {
     [CommandParameter(0)]
     public string Foo { get; set; }
-    
+
     [CommandParameter(1)]
     public string Bar { get; set; }
-    
+
     [CommandParameter(2)]
     public IReadOnlyList<string> Baz { get; set; }
-    
+
     public ValueTask ExecuteAsync(IConsole console) => default;
 }
 ");
@@ -396,7 +396,7 @@ public class Command : CommandBase
 
     [CommandParameter(1)]
     public string Bar { get; set; }
-    
+
     public override ValueTask ExecuteAsync(IConsole console) => default;
 }
 ");
@@ -434,13 +434,13 @@ public class Command : ICommand
 {
     [CommandOption(""foo"", IsRequired = true)]
     public string Foo { get; set; }
-    
+
     [CommandOption(""bar"")]
     public string Bar { get; set; }
-    
+
     [CommandOption(""baz"", IsRequired = true)]
     public IReadOnlyList<string> Baz { get; set; }
-    
+
     public ValueTask ExecuteAsync(IConsole console) => default;
 }
 ");
@@ -478,10 +478,10 @@ public class Command : ICommand
 {
     [CommandParameter(0, Name = ""foo"", Description = ""Description of foo."")]
     public string Foo { get; set; }
-    
+
     [CommandOption(""bar"", Description = ""Description of bar."")]
     public string Bar { get; set; }
-    
+
     public ValueTask ExecuteAsync(IConsole console) => default;
 }
 ");
@@ -597,10 +597,10 @@ public class Command : ICommand
 {
     [CommandParameter(0)]
     public CustomEnum Foo { get; set; }
-    
+
     [CommandOption(""bar"")]
     public CustomEnum Bar { get; set; }
-    
+
     public ValueTask ExecuteAsync(IConsole console) => default;
 }
 ");
@@ -732,10 +732,10 @@ public class Command : ICommand
 {
     [CommandOption(""foo"", EnvironmentVariable = ""ENV_FOO"")]
     public CustomEnum Foo { get; set; }
-    
+
     [CommandOption(""bar"", EnvironmentVariable = ""ENV_BAR"")]
     public CustomEnum Bar { get; set; }
-    
+
     public ValueTask ExecuteAsync(IConsole console) => default;
 }
 ");
@@ -794,10 +794,10 @@ public class Command : ICommand
 
     [CommandOption(""lol"")]
     public CustomEnum Lol { get; set; } = CustomEnum.Two;
-    
+
     [CommandOption(""hmm"", IsRequired = true)]
     public string Hmm { get; set; } = ""not printed"";
-    
+
     public ValueTask ExecuteAsync(IConsole console) => default;
 }
 ");

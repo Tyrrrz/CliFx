@@ -32,7 +32,6 @@ internal static partial class PolyfillExtensions
         stream.Write(buffer, 0, buffer.Length);
 }
 
-
 namespace System.Linq
 {
     internal static class PolyfillExtensions

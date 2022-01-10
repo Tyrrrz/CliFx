@@ -19,7 +19,7 @@ public class MyCommand : ICommand
 {
     [CommandOption(null)]
     public string Foo { get; set; }
-    
+
     public ValueTask ExecuteAsync(IConsole console) => default;
 }";
 
@@ -38,7 +38,7 @@ public class MyCommand : ICommand
 {
     [CommandOption(""foo"")]
     public string Foo { get; set; }
-    
+
     public ValueTask ExecuteAsync(IConsole console) => default;
 }";
 
@@ -57,7 +57,7 @@ public class MyCommand : ICommand
 {
     [CommandOption('f')]
     public string Foo { get; set; }
-    
+
     public ValueTask ExecuteAsync(IConsole console) => default;
 }";
 

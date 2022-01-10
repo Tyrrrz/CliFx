@@ -10,9 +10,9 @@ internal partial class CommandParameterSymbol
     public int Order { get; }
 
     public string? Name { get; }
-    
+
     public bool? IsRequired { get; }
-    
+
     public ITypeSymbol? ConverterType { get; }
 
     public IReadOnlyList<ITypeSymbol> ValidatorTypes { get; }
@@ -41,7 +41,7 @@ internal partial class CommandParameterSymbol
 
     private static CommandParameterSymbol FromAttribute(AttributeData attribute)
     {
-        var order = (int) attribute
+        var order = (int)attribute
             .ConstructorArguments
             .Select(a => a.Value)
             .First()!;
@@ -51,7 +51,7 @@ internal partial class CommandParameterSymbol
             .Where(a => a.Key == "Name")
             .Select(a => a.Value.Value)
             .FirstOrDefault() as string;
-        
+
         var isRequired = attribute
             .NamedArguments
             .Where(a => a.Key == "IsRequired")

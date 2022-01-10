@@ -29,7 +29,7 @@ public sealed class CommandOptionAttribute : Attribute
     public char? ShortName { get; }
 
     /// <summary>
-    /// Whether this option is required.
+    /// Whether this option is required (default: <c>false</c>).
     /// If an option is required, the user will get an error if they don't set it.
     /// </summary>
     public bool IsRequired { get; set; }

@@ -33,7 +33,7 @@ internal class BindablePropertyDescriptor : IPropertyDescriptor
 
             return type;
         }
-            
+
         var underlyingType = GetUnderlyingType(Type);
 
         // We can only get valid values for enums
