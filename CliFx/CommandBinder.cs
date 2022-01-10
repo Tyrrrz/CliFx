@@ -275,7 +275,7 @@ internal class CommandBinder
         if (remainingRequiredParameterSchemas.Any())
         {
             throw CliFxException.UserError(
-                "Missing parameter(s):" +
+                "Missing required parameter(s):" +
                 Environment.NewLine +
                 remainingRequiredParameterSchemas
                     .Select(o => o.GetFormattedIdentifier())
