@@ -80,7 +80,9 @@ internal partial class CommandParameterSymbol
     {
         var attribute = TryGetParameterAttribute(property);
 
-        return attribute is null ? null : FromAttribute(attribute);
+        return attribute is not null
+            ? FromAttribute(attribute)
+            : null;
     }
 
     public static bool IsParameterProperty(IPropertySymbol property) =>
