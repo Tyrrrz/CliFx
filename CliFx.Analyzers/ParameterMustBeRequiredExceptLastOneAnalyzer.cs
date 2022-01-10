@@ -28,7 +28,7 @@ public class ParameterMustBeLastIfNotRequiredAnalyzer : AnalyzerBase
 
         var parameter = CommandParameterSymbol.TryResolve(property);
         
-        if (parameter is null || parameter.IsRequired is null or true )
+        if (parameter is null || parameter.IsRequired != false)
             return;
         
         var otherProperties = property
