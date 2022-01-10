@@ -223,7 +223,7 @@ internal class CommandBinder
     {
         // Ensure there are no unexpected parameters and that all parameters are provided
         var remainingParameterInputs = commandInput.Parameters.ToList();
-        var remainingParameterSchemas = commandSchema.Parameters.ToList();
+        var remainingRequiredParameterSchemas = commandSchema.Parameters.Where(p => p.IsRequired).ToList();
 
         var position = 0;
 
@@ -258,7 +258,7 @@ internal class CommandBinder
                 remainingParameterInputs.RemoveRange(parameterInputs);
             }
 
-            remainingParameterSchemas.Remove(parameterSchema);
+            remainingRequiredParameterSchemas.Remove(parameterSchema);
         }
 
         if (remainingParameterInputs.Any())
@@ -272,12 +272,12 @@ internal class CommandBinder
             );
         }
 
-        if (remainingParameterSchemas.Any())
+        if (remainingRequiredParameterSchemas.Any())
         {
             throw CliFxException.UserError(
-                "Missing parameter(s):" +
+                "Missing required parameter(s):" +
                 Environment.NewLine +
-                remainingParameterSchemas
+                remainingRequiredParameterSchemas
                     .Select(o => o.GetFormattedIdentifier())
                     .JoinToString(" ")
             );

@@ -153,7 +153,7 @@ public class Command : ICommand
 
         // Assert
         exitCode.Should().NotBe(0);
-        stdErr.Should().Contain("Missing parameter(s)");
+        stdErr.Should().Contain("Missing required parameter(s)");
     }
 
     [Fact]
@@ -190,7 +190,7 @@ public class Command : ICommand
 
         // Assert
         exitCode.Should().NotBe(0);
-        stdErr.Should().Contain("Missing parameter(s)");
+        stdErr.Should().Contain("Missing required parameter(s)");
     }
 
     [Fact]

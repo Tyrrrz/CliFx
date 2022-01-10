@@ -14,16 +14,18 @@ internal partial class ParameterSchema : IMemberSchema
     public string Name { get; }
 
     public string? Description { get; }
-
+   
+    public bool IsRequired { get; }
+    
     public Type? ConverterType { get; }
 
     public IReadOnlyList<Type> ValidatorTypes { get; }
 
-    public ParameterSchema(
-        IPropertyDescriptor property,
+    public ParameterSchema(IPropertyDescriptor property,
         int order,
         string name,
         string? description,
+        bool isRequired,
         Type? converterType,
         IReadOnlyList<Type> validatorTypes)
     {
@@ -31,6 +33,7 @@ internal partial class ParameterSchema : IMemberSchema
         Order = order;
         Name = name;
         Description = description;
+        IsRequired = isRequired;
         ConverterType = converterType;
         ValidatorTypes = validatorTypes;
     }
@@ -56,6 +59,7 @@ internal partial class ParameterSchema
             attribute.Order,
             name,
             description,
+            attribute.IsRequired,
             attribute.Converter,
             attribute.Validators
         );
