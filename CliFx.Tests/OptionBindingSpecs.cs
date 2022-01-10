@@ -497,6 +497,83 @@ public class Command : ICommand
     }
 
     [Fact]
+    public async Task Option_binding_supports_multiple_inheritance_through_default_interface_members()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
+public static class SharedContext
+{
+    public static int Foo { get; set; }
+    
+    public static bool Bar { get; set; }
+}
+
+public interface IHasFoo : ICommand
+{
+    [CommandOption(""foo"")]
+    public int Foo
+    {
+        get => SharedContext.Foo;
+        set => SharedContext.Foo = value;
+    }
+}
+
+public interface IHasBar : ICommand
+{
+    [CommandOption(""bar"")]
+    public bool Bar
+    {
+        get => SharedContext.Bar;
+        set => SharedContext.Bar = value;
+    }
+}
+
+public interface IHasBaz : ICommand
+{
+    public string Baz { get; set; }
+}
+
+[Command]
+public class Command : IHasFoo, IHasBar, IHasBaz
+{
+    [CommandOption(""baz"")]
+    public string Baz { get; set; }
+
+	public ValueTask ExecuteAsync(IConsole console)
+	{
+        console.Output.WriteLine(""Foo = "" + SharedContext.Foo);
+        console.Output.WriteLine(""Bar = "" + SharedContext.Bar);
+        console.Output.WriteLine(""Baz = "" + Baz);
+
+        return default;
+    }
+}
+");
+
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
+
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] { "--foo", "42", "--bar", "--baz", "xyz" }
+        );
+
+        var stdOut = FakeConsole.ReadOutputString();
+
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Should().ConsistOfLines(
+            "Foo = 42",
+            "Bar = True",
+            "Baz = xyz"
+        );
+    }
+
+    [Fact]
     public async Task Option_binding_does_not_consider_a_negative_number_as_an_option_name_or_short_name()
     {
         // Arrange
@@ -703,65 +780,5 @@ public class Command : ICommand
         // Assert
         exitCode.Should().NotBe(0);
         stdErr.Should().Contain("expects a single argument, but provided with multiple");
-    }
-
-    
-    [Fact]
-    public async Task Option_bound_using_interfaces_for_multiple_inheritance_should_work()
-    {
-        // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
-            @"
-public static class FooBarLogger
-{
-    public static bool Foo { get; set; } = false;
-    public static bool Bar { get; set; } = false;
-}
-public interface IOptionBar : ICommand
-{
-    [CommandOption(""bar"")]
-    public bool Bar
-    {
-        get => FooBarLogger.Bar;
-        set => FooBarLogger.Bar = value;
-    }
-}
-public interface IOptionFoo : ICommand
-{
-    [CommandOption(""foo"")]
-    public bool Foo
-    {
-        get => FooBarLogger.Foo;
-        set => FooBarLogger.Foo = value;
-    }
-}
-
-[Command]
-public class Command : IOptionFoo, IOptionBar
-{
-	public ValueTask ExecuteAsync(IConsole console)
-	{
-		console.Output.WriteLine($""Foo: { FooBarLogger.Foo }"");
-        console.Output.WriteLine($""Bar: { FooBarLogger.Bar }"");
-        return default;
-    }
-}
-");
-
-        var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
-            .UseConsole(FakeConsole)
-            .Build();
-
-        // Act
-        var exitCode = await application.RunAsync(
-            new[] {"--foo" , "--bar"});
-
-        var stdOut = FakeConsole.ReadOutputString();
-
-        // Assert
-        exitCode.Should().Be(0);
-        stdOut.Trim().Should().Be("Foo: True" + Environment.NewLine + "Bar: True");
     }
 }

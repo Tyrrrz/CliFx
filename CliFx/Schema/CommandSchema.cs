@@ -86,12 +86,22 @@ internal partial class CommandSchema
         var implicitOptionSchemas = string.IsNullOrWhiteSpace(name)
             ? new[] {OptionSchema.HelpOption, OptionSchema.VersionOption}
             : new[] {OptionSchema.HelpOption};
-        
-        // Include interface members for multiple inheritance
-        // If interface inherits from ICommand, it will be included
-        var interfaces = type.GetInterfaces().Where(i => i != typeof(ICommand) && typeof(ICommand).IsAssignableFrom(i) );
-        var properties = type.GetProperties().Concat(interfaces.SelectMany(i => i.GetProperties())).ToArray();
-      
+
+        var properties = type
+            // Get properties directly on command type
+            .GetProperties()
+            // Get non-abstract properties on interfaces (to support default interfaces members)
+            .Union(type
+                .GetInterfaces()
+                // Only interfaces implementing ICommand for explicitness
+                .Where(i => typeof(ICommand).IsAssignableFrom(i) && i != typeof(ICommand))
+                .SelectMany(i => i
+                    .GetProperties()
+                    .Where(p => !p.GetMethod.IsAbstract && !p.SetMethod.IsAbstract)
+                )
+            )
+            .ToArray();
+
         var parameterSchemas = properties
             .Select(ParameterSchema.TryResolve)
             .WhereNotNull()
