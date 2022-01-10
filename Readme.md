@@ -168,7 +168,7 @@ In case the user forgets to specify the `value` parameter, the application will 
 ```sh
 > dotnet myapp.dll -b 10
 
-Missing parameter(s):
+Missing required parameter(s):
 <value>
 ```
 
@@ -193,11 +193,12 @@ OPTIONS
 
 Overall, parameters and options are both used to consume input from the command line, but they differ in a few important ways:
 
-- Parameters are identified by their relative order. Options are identified by their name or a single-character short name.
-- Parameters technically also have a name, but it's only used in the help text.
-- Parameters are always required. Options are normally optional, but can also be configured to require a value.
-- Options can be configured to use an environment variable as a fallback.
-- Both parameters and options can take multiple values, but there can only be one such parameter in a command and it must be the last in order. Options are not limited in this regard.
+|                    | Parameters                                                                                            | Options                                                                                         |
+|--------------------|-------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------|
+| **Identification** | Positional (by relative order).                                                                       | Named (by name or short name).                                                                  |
+| **Requiredness**   | Required by default. Only the last parameter can be configured to be optional.                        | Optional by default. Any option can be configured to be required without limitations.           |
+| **Arity**          | Depends on the property type. Only the last parameter can be bound to a non-scalar type (i.e. array). | Depends on the property type. Any option can be bound to a non-scalar type without limitations. |
+| **Fallback**       | —                                                                                                     | Can be configured to use an environment variable as fallback, in case the option isn't set.     |
 
 As a general guideline, it's recommended to use parameters for required inputs that the command can't function without.
 Use options for all other non-required inputs or when specifying the name explicitly makes the usage clearer.
