@@ -165,6 +165,7 @@ internal class HelpConsoleFormatter : ConsoleFormatter
             {
                 WriteHorizontalMargin();
             }
+
             Write(ConsoleColor.DarkCyan, $"{parameterSchema.Name}");
 
             WriteColumnMargin();
