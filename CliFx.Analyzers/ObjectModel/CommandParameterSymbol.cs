@@ -17,7 +17,8 @@ internal partial class CommandParameterSymbol
 
     public IReadOnlyList<ITypeSymbol> ValidatorTypes { get; }
 
-    public CommandParameterSymbol(int order,
+    public CommandParameterSymbol(
+        int order,
         string? name,
         bool? isRequired,
         ITypeSymbol? converterType,
