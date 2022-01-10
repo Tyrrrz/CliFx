@@ -38,8 +38,6 @@ internal partial class ParameterSchema : IMemberSchema
         ValidatorTypes = validatorTypes;
     }
 
-  
-
     public string GetFormattedIdentifier() => Property.IsScalar()
         ? $"<{Name}>"
         : $"<{Name}...>";
