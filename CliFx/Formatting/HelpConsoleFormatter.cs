@@ -206,6 +206,12 @@ internal class HelpConsoleFormatter : ConsoleFormatter
                 Write('.');
                 Write(' ');
             }
+            
+            // Default value
+            if (!parameterSchema.IsRequired)
+            {
+                WriteDefaultValue(parameterSchema);
+            }
 
             WriteLine();
         }
@@ -298,57 +304,62 @@ internal class HelpConsoleFormatter : ConsoleFormatter
             // Default value
             if (!optionSchema.IsRequired)
             {
-                var defaultValue = _context.CommandDefaultValues.GetValueOrDefault(optionSchema);
-                if (defaultValue is not null)
-                {
-                    // Non-Scalar
-                    if (defaultValue is not string && defaultValue is IEnumerable defaultValues)
-                    {
-                        var elementType =
-                            defaultValues.GetType().TryGetEnumerableUnderlyingType() ??
-                            typeof(object);
-
-                        if (elementType.IsToStringOverriden())
-                        {
-                            Write(ConsoleColor.White, "Default: ");
-
-                            var isFirst = true;
-
-                            foreach (var element in defaultValues)
-                            {
-                                if (isFirst)
-                                {
-                                    isFirst = false;
-                                }
-                                else
-                                {
-                                    Write(", ");
-                                }
-
-                                Write('"');
-                                Write(element.ToString(CultureInfo.InvariantCulture));
-                                Write('"');
-                            }
-
-                            Write('.');
-                        }
-                    }
-                    else
-                    {
-                        if (defaultValue.GetType().IsToStringOverriden())
-                        {
-                            Write(ConsoleColor.White, "Default: ");
-
-                            Write('"');
-                            Write(defaultValue.ToString(CultureInfo.InvariantCulture));
-                            Write('"');
-                            Write('.');
-                        }
-                    }
-                }
+                WriteDefaultValue(optionSchema);
             }
 
             WriteLine();
+        }
+    }
+
+    private void WriteDefaultValue(IMemberSchema schema)
+    {
+        var defaultValue = _context.CommandDefaultValues.GetValueOrDefault(schema);
+        if (defaultValue is not null)
+        {
+            // Non-Scalar
+            if (defaultValue is not string && defaultValue is IEnumerable defaultValues)
+            {
+                var elementType =
+                    defaultValues.GetType().TryGetEnumerableUnderlyingType() ??
+                    typeof(object);
+
+                if (elementType.IsToStringOverriden())
+                {
+                    Write(ConsoleColor.White, "Default: ");
+
+                    var isFirst = true;
+
+                    foreach (var element in defaultValues)
+                    {
+                        if (isFirst)
+                        {
+                            isFirst = false;
+                        }
+                        else
+                        {
+                            Write(", ");
+                        }
+
+                        Write('"');
+                        Write(element.ToString(CultureInfo.InvariantCulture));
+                        Write('"');
+                    }
+
+                    Write('.');
+                }
+            }
+            else
+            {
+                if (defaultValue.GetType().IsToStringOverriden())
+                {
+                    Write(ConsoleColor.White, "Default: ");
+
+                    Write('"');
+                    Write(defaultValue.ToString(CultureInfo.InvariantCulture));
+                    Write('"');
+                    Write('.');
+                }
+            }
         }
     }
 
