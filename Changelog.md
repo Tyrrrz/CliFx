@@ -1,3 +1,7 @@
+### v2.2.1 (16-Jan-2022)
+
+- Fixed an issue which caused help text to not show default values for optional parameters. (Thanks [@AliReZa Sabouri](https://github.com/alirezanet))
+
 ### v2.2 (11-Jan-2022)
 
 - Added support for optional parameters. A parameter can be marked as optional by setting `IsRequired = false` on the attribute. Only one parameter is allowed to be optional and such parameter must be the last in order. (Thanks [@AliReZa Sabouri](https://github.com/alirezanet))
