@@ -1,3 +1,8 @@
+### v2.2.2 (30-Jan-2022)
+
+- Fixed an issue where `ConsoleWriter` and `ConsoleReader` were not properly thread-safe.
+- Fixed an issue where the analyzer failed to load under certain circumstances when running inside Visual Studio.
+
 ### v2.2.1 (16-Jan-2022)
 
 - Fixed an issue which caused help text to not show default values for optional parameters. (Thanks [@AliReZa Sabouri](https://github.com/alirezanet))
