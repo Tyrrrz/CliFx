@@ -53,10 +53,8 @@ public partial class ConsoleReader : StreamReader
 
     /// <inheritdoc />
     [ExcludeFromCodeCoverage, MethodImpl(MethodImplOptions.Synchronized)]
-    public override int ReadBlock(char[] buffer, int index, int count)
-    {
-        return base.ReadBlock(buffer, index, count);
-    }
+    public override int ReadBlock(char[] buffer, int index, int count) =>
+        base.ReadBlock(buffer, index, count);
 
     /// <inheritdoc />
     [ExcludeFromCodeCoverage, MethodImpl(MethodImplOptions.Synchronized)]
@@ -68,35 +66,27 @@ public partial class ConsoleReader : StreamReader
 
     /// <inheritdoc />
     [ExcludeFromCodeCoverage, MethodImpl(MethodImplOptions.Synchronized)]
-    public override Task<int> ReadAsync(char[] buffer, int index, int count)
-    {
+    public override Task<int> ReadAsync(char[] buffer, int index, int count) =>
         // Must be non-async to work with locks
-        return Task.FromResult(Read(buffer, index, count));
-    }
+        Task.FromResult(Read(buffer, index, count));
 
     /// <inheritdoc />
     [ExcludeFromCodeCoverage, MethodImpl(MethodImplOptions.Synchronized)]
-    public override Task<int> ReadBlockAsync(char[] buffer, int index, int count)
-    {
+    public override Task<int> ReadBlockAsync(char[] buffer, int index, int count) =>
         // Must be non-async to work with locks
-        return Task.FromResult(ReadBlock(buffer, index, count));
-    }
+        Task.FromResult(ReadBlock(buffer, index, count));
 
     /// <inheritdoc />
     [ExcludeFromCodeCoverage, MethodImpl(MethodImplOptions.Synchronized)]
-    public override Task<string?> ReadLineAsync()
-    {
+    public override Task<string?> ReadLineAsync() =>
         // Must be non-async to work with locks
-        return Task.FromResult(ReadLine());
-    }
+        Task.FromResult(ReadLine());
 
     /// <inheritdoc />
     [ExcludeFromCodeCoverage, MethodImpl(MethodImplOptions.Synchronized)]
-    public override Task<string> ReadToEndAsync()
-    {
+    public override Task<string> ReadToEndAsync() =>
         // Must be non-async to work with locks
-        return Task.FromResult(ReadToEnd());
-    }
+        Task.FromResult(ReadToEnd());
 
     /// <inheritdoc />
     [ExcludeFromCodeCoverage, MethodImpl(MethodImplOptions.Synchronized)]
