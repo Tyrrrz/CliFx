@@ -91,7 +91,7 @@ public interface IConsole
     /// <summary>
     /// Obtains the next character or function key pressed by the user.
     /// </summary>
-    void ReadKey(bool intercept = false);
+    ConsoleKeyInfo ReadKey(bool intercept = false);
 }
 
 /// <summary>

@@ -94,7 +94,7 @@ public class SystemConsole : IConsole, IDisposable
     public void Clear() => Console.Clear();
 
     /// <inheritdoc />
-    public void ReadKey(bool intercept = false) => Console.ReadKey(intercept);
+    public ConsoleKeyInfo ReadKey(bool intercept = false) => Console.ReadKey(intercept);
 
     /// <inheritdoc />
     public void Dispose()

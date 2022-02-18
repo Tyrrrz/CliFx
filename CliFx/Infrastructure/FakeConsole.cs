@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Threading;
 
@@ -14,6 +15,7 @@ namespace CliFx.Infrastructure;
 public class FakeConsole : IConsole, IDisposable
 {
     private readonly CancellationTokenSource _cancellationTokenSource = new();
+    private readonly ConcurrentQueue<ConsoleKeyInfo> _keys = new();
 
     /// <inheritdoc />
     public ConsoleReader Input { get; }
@@ -91,9 +93,18 @@ public class FakeConsole : IConsole, IDisposable
     }
 
     /// <inheritdoc />
-    public void ReadKey(bool intercept = false)
-    {
-    }
+    public ConsoleKeyInfo ReadKey(bool intercept = false) =>
+        _keys.TryDequeue(out var key)
+            ? key
+            : throw new InvalidOperationException(
+                "Cannot read key because there are no key presses enqueued. " +
+                $"Use the `{nameof(EnqueueKey)}(...)` method to simulate a key press."
+            );
+
+    /// <summary>
+    /// Enqueues a simulated key press, which can then be read by calling <see cref="ReadKey"/>.
+    /// </summary>
+    public void EnqueueKey(ConsoleKeyInfo key) => _keys.Enqueue(key);
 
     /// <inheritdoc />
     public virtual void Dispose() => _cancellationTokenSource.Dispose();

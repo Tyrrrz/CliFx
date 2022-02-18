@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CliFx.Infrastructure;
 using CliFx.Tests.Utils;
+using CliFx.Tests.Utils.Extensions;
 using CliWrap;
 using CliWrap.Buffered;
 using FluentAssertions;
@@ -137,6 +138,53 @@ public class Command : ICommand
         exitCode.Should().Be(0);
         stdOut.Trim().Should().Be("Hello world");
         stdErr.Trim().Should().Be("Hello world");
+    }
+
+    [Fact]
+    public async Task Fake_console_can_read_key_presses()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
+[Command]
+public class Command : ICommand
+{   
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(console.ReadKey().Key);
+        console.Output.WriteLine(console.ReadKey().Key);
+        console.Output.WriteLine(console.ReadKey().Key);
+
+        return default;
+    }
+}
+");
+
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
+
+        // Act
+        FakeConsole.EnqueueKey(new ConsoleKeyInfo('0', ConsoleKey.D0, false, false, false));
+        FakeConsole.EnqueueKey(new ConsoleKeyInfo('a', ConsoleKey.A, false, false, false));
+        FakeConsole.EnqueueKey(new ConsoleKeyInfo('\0', ConsoleKey.Backspace, false, false, false));
+
+        var exitCode = await application.RunAsync(
+            Array.Empty<string>(),
+            new Dictionary<string, string>()
+        );
+
+        var stdOut = FakeConsole.ReadOutputString();
+
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Trim().Should().ConsistOfLines(
+            "D0",
+            "A",
+            "Backspace"
+        );
     }
 
     [Fact]
