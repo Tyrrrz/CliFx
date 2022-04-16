@@ -23,7 +23,7 @@ public abstract class BindingValidator<T> : IBindingValidator
 
     /// <summary>
     /// Validates the value bound to a parameter or an option.
-    /// Returns <code>null</code> if validation is successful, or an error in case of failure.
+    /// Returns null if validation is successful, or an error in case of failure.
     /// </summary>
     /// <remarks>
     /// You can use the utility methods <see cref="Ok"/> and <see cref="Error"/> to
@@ -31,5 +31,5 @@ public abstract class BindingValidator<T> : IBindingValidator
     /// </remarks>
     public abstract BindingValidationError? Validate(T? value);
 
-    BindingValidationError? IBindingValidator.Validate(object? value) => Validate((T?) value);
+    BindingValidationError? IBindingValidator.Validate(object? value) => Validate((T?)value);
 }
