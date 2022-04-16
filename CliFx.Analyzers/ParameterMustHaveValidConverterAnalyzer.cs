@@ -13,7 +13,7 @@ public class ParameterMustHaveValidConverterAnalyzer : AnalyzerBase
     public ParameterMustHaveValidConverterAnalyzer()
         : base(
             $"Parameter converters must derive from `{SymbolNames.CliFxBindingConverterClass}`",
-            $"Converter specified for this parameter must derive from `{SymbolNames.CliFxBindingConverterClass}`.")
+            $"Converter specified for this parameter must derive from a compatible `{SymbolNames.CliFxBindingConverterClass}`.")
     {
     }
 
@@ -29,13 +29,15 @@ public class ParameterMustHaveValidConverterAnalyzer : AnalyzerBase
         if (parameter.ConverterType is null)
             return;
 
-        // We check against an internal interface because checking against a generic class is a pain
-        var converterImplementsInterface = parameter
+        var converterValueType = parameter
             .ConverterType
-            .AllInterfaces
-            .Any(s => s.DisplayNameMatches(SymbolNames.CliFxBindingConverterInterface));
+            .GetBaseTypes()
+            .FirstOrDefault(t => t.ConstructedFrom.DisplayNameMatches(SymbolNames.CliFxBindingConverterClass))?
+            .TypeArguments
+            .FirstOrDefault();
 
-        if (!converterImplementsInterface)
+        // Value returned by the converter must be assignable to the property type
+        if (converterValueType is null || !property.Type.IsAssignableFrom(converterValueType))
         {
             context.ReportDiagnostic(CreateDiagnostic(propertyDeclaration.GetLocation()));
         }

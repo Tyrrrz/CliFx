@@ -13,7 +13,7 @@ public class ParameterMustHaveValidValidatorsAnalyzer : AnalyzerBase
     public ParameterMustHaveValidValidatorsAnalyzer()
         : base(
             $"Parameter validators must derive from `{SymbolNames.CliFxBindingValidatorClass}`",
-            $"All validators specified for this parameter must derive from `{SymbolNames.CliFxBindingValidatorClass}`.")
+            $"Each validator specified for this parameter must derive from a compatible `{SymbolNames.CliFxBindingValidatorClass}`.")
     {
     }
 
@@ -28,12 +28,14 @@ public class ParameterMustHaveValidValidatorsAnalyzer : AnalyzerBase
 
         foreach (var validatorType in parameter.ValidatorTypes)
         {
-            // We check against an internal interface because checking against a generic class is a pain
-            var validatorImplementsInterface = validatorType
-                .AllInterfaces
-                .Any(s => s.DisplayNameMatches(SymbolNames.CliFxBindingValidatorInterface));
+            var validatorValueType = validatorType
+                .GetBaseTypes()
+                .FirstOrDefault(t => t.ConstructedFrom.DisplayNameMatches(SymbolNames.CliFxBindingValidatorClass))?
+                .TypeArguments
+                .FirstOrDefault();
 
-            if (!validatorImplementsInterface)
+            // Value passed to the validator must be assignable from the property type
+            if (validatorValueType is null || !validatorValueType.IsAssignableFrom(property.Type))
             {
                 context.ReportDiagnostic(CreateDiagnostic(propertyDeclaration.GetLocation()));
 

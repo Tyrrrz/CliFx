@@ -33,7 +33,31 @@ public class MyCommand : ICommand
     }
 
     [Fact]
-    public void Analyzer_does_not_report_an_error_if_all_specified_option_validators_derive_from_BindingValidator()
+    public void Analyzer_reports_an_error_if_one_of_the_specified_option_validators_does_not_derive_from_a_compatible_BindingValidator()
+    {
+        // Arrange
+        // language=cs
+        const string code = @"
+public class MyValidator : BindingValidator<int>
+{
+    public override BindingValidationError Validate(int value) => Ok();
+}
+
+[Command]
+public class MyCommand : ICommand
+{
+    [CommandOption(""foo"", Validators = new[] {typeof(MyValidator)})]
+    public string Foo { get; set; }
+
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}";
+
+        // Act & assert
+        Analyzer.Should().ProduceDiagnostics(code);
+    }
+
+    [Fact]
+    public void Analyzer_does_not_report_an_error_if_each_specified_option_validator_derives_from_a_compatible_BindingValidator()
     {
         // Arrange
         // language=cs

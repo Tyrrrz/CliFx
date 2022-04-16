@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -15,6 +17,22 @@ internal static class RoslynExtensions
             name,
             StringComparison.Ordinal
         );
+
+    public static IEnumerable<INamedTypeSymbol> GetBaseTypes(this ITypeSymbol type)
+    {
+        var current = type.BaseType;
+
+        while (current is not null)
+        {
+            yield return current;
+            current = current.BaseType;
+        }
+    }
+
+    public static bool IsAssignableFrom(this ITypeSymbol target, ITypeSymbol source) =>
+        SymbolEqualityComparer.Default.Equals(target, source) ||
+        source.GetBaseTypes().Contains(target, SymbolEqualityComparer.Default) ||
+        source.AllInterfaces.Contains(target, SymbolEqualityComparer.Default);
 
     public static void HandleClassDeclaration(
         this AnalysisContext analysisContext,

@@ -34,7 +34,7 @@ public class ParameterMustBeInsideCommandAnalyzer : AnalyzerBase
         var isInsideCommand = property
             .ContainingType
             .AllInterfaces
-            .Any(s => s.DisplayNameMatches(SymbolNames.CliFxCommandInterface));
+            .Any(i => i.DisplayNameMatches(SymbolNames.CliFxCommandInterface));
 
         if (!isInsideCommand)
         {

@@ -57,7 +57,7 @@ internal class AnalyzerAssertions : ReferenceTypeAssertions<DiagnosticAnalyzer, 
         // Compile the code to IL
         var compilation = CSharpCompilation.Create(
             "CliFxTests_DynamicAssembly_" + Guid.NewGuid(),
-            new[] {ast},
+            new[] { ast },
             ReferenceAssemblies.Net50
                 .Append(MetadataReference.CreateFromFile(typeof(ICommand).Assembly.Location)),
             // DLL to avoid having to define the Main() method
@@ -101,11 +101,11 @@ internal class AnalyzerAssertions : ReferenceTypeAssertions<DiagnosticAnalyzer, 
         var expectedDiagnosticIds = expectedDiagnostics.Select(d => d.Id).Distinct().ToArray();
         var producedDiagnosticIds = producedDiagnostics.Select(d => d.Id).Distinct().ToArray();
 
-        var result =
+        var isSuccessfulAssertion =
             expectedDiagnosticIds.Intersect(producedDiagnosticIds).Count() ==
             expectedDiagnosticIds.Length;
 
-        Execute.Assertion.ForCondition(result).FailWith(() =>
+        Execute.Assertion.ForCondition(isSuccessfulAssertion).FailWith(() =>
         {
             var buffer = new StringBuilder();
 
@@ -125,10 +125,17 @@ internal class AnalyzerAssertions : ReferenceTypeAssertions<DiagnosticAnalyzer, 
 
             buffer.AppendLine("Produced diagnostics:");
 
-            foreach (var producedDiagnostic in producedDiagnostics)
+            if (producedDiagnostics.Any())
             {
-                buffer.Append("  - ");
-                buffer.Append(producedDiagnostic);
+                foreach (var producedDiagnostic in producedDiagnostics)
+                {
+                    buffer.Append("  - ");
+                    buffer.Append(producedDiagnostic);
+                }
+            }
+            else
+            {
+                buffer.AppendLine("  < none >");
             }
 
             return new FailReason(buffer.ToString());
@@ -138,10 +145,9 @@ internal class AnalyzerAssertions : ReferenceTypeAssertions<DiagnosticAnalyzer, 
     public void NotProduceDiagnostics(string sourceCode)
     {
         var producedDiagnostics = GetProducedDiagnostics(sourceCode);
+        var isSuccessfulAssertion = !producedDiagnostics.Any();
 
-        var result = !producedDiagnostics.Any();
-
-        Execute.Assertion.ForCondition(result).FailWith(() =>
+        Execute.Assertion.ForCondition(isSuccessfulAssertion).FailWith(() =>
         {
             var buffer = new StringBuilder();
 

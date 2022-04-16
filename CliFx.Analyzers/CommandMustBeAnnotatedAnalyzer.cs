@@ -30,12 +30,12 @@ public class CommandMustBeAnnotatedAnalyzer : AnalyzerBase
 
         var implementsCommandInterface = type
             .AllInterfaces
-            .Any(s => s.DisplayNameMatches(SymbolNames.CliFxCommandInterface));
+            .Any(i => i.DisplayNameMatches(SymbolNames.CliFxCommandInterface));
 
         var hasCommandAttribute = type
             .GetAttributes()
             .Select(a => a.AttributeClass)
-            .Any(s => s.DisplayNameMatches(SymbolNames.CliFxCommandAttribute));
+            .Any(c => c.DisplayNameMatches(SymbolNames.CliFxCommandAttribute));
 
         // If the interface is implemented, but the attribute is missing,
         // then it's very likely a user error.

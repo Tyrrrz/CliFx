@@ -27,7 +27,7 @@ internal class CommandBinder
         // Custom converter
         if (memberSchema.ConverterType is not null)
         {
-            var converter = (IBindingConverter) _typeActivator.CreateInstance(memberSchema.ConverterType);
+            var converter = (IBindingConverter)_typeActivator.CreateInstance(memberSchema.ConverterType);
             return converter.Convert(rawValue);
         }
 
@@ -78,24 +78,24 @@ internal class CommandBinder
         }
 
         // String-constructible (FileInfo, etc)
-        var stringConstructor = targetType.GetConstructor(new[] {typeof(string)});
+        var stringConstructor = targetType.GetConstructor(new[] { typeof(string) });
         if (stringConstructor is not null)
         {
-            return stringConstructor.Invoke(new object?[] {rawValue});
+            return stringConstructor.Invoke(new object?[] { rawValue });
         }
 
         // String-parseable (with IFormatProvider)
         var parseMethodWithFormatProvider = targetType.TryGetStaticParseMethod(true);
         if (parseMethodWithFormatProvider is not null)
         {
-            return parseMethodWithFormatProvider.Invoke(null, new object?[] {rawValue, _formatProvider});
+            return parseMethodWithFormatProvider.Invoke(null, new object?[] { rawValue, _formatProvider });
         }
 
         // String-parseable (without IFormatProvider)
         var parseMethod = targetType.TryGetStaticParseMethod();
         if (parseMethod is not null)
         {
-            return parseMethod.Invoke(null, new object?[] {rawValue});
+            return parseMethod.Invoke(null, new object?[] { rawValue });
         }
 
         throw CliFxException.InternalError(
@@ -126,10 +126,10 @@ internal class CommandBinder
         }
 
         // Array-constructible (List<T>, HashSet<T>, etc)
-        var arrayConstructor = targetEnumerableType.GetConstructor(new[] {arrayType});
+        var arrayConstructor = targetEnumerableType.GetConstructor(new[] { arrayType });
         if (arrayConstructor is not null)
         {
-            return arrayConstructor.Invoke(new object?[] {array});
+            return arrayConstructor.Invoke(new object?[] { array });
         }
 
         throw CliFxException.InternalError(
@@ -192,7 +192,7 @@ internal class CommandBinder
 
         foreach (var validatorType in memberSchema.ValidatorTypes)
         {
-            var validator = (IBindingValidator) _typeActivator.CreateInstance(validatorType);
+            var validator = (IBindingValidator)_typeActivator.CreateInstance(validatorType);
             var error = validator.Validate(convertedValue);
 
             if (error is not null)
@@ -238,7 +238,7 @@ internal class CommandBinder
             {
                 var parameterInput = commandInput.Parameters[position];
 
-                var rawValues = new[] {parameterInput.Value};
+                var rawValues = new[] { parameterInput.Value };
                 BindMember(parameterSchema, commandInstance, rawValues);
 
                 position++;
@@ -278,7 +278,7 @@ internal class CommandBinder
                 "Missing required parameter(s):" +
                 Environment.NewLine +
                 remainingRequiredParameterSchemas
-                    .Select(o => o.GetFormattedIdentifier())
+                    .Select(p => p.GetFormattedIdentifier())
                     .JoinToString(" ")
             );
         }
@@ -316,7 +316,7 @@ internal class CommandBinder
             else if (environmentVariableInput is not null)
             {
                 var rawValues = optionSchema.Property.IsScalar()
-                    ? new[] {environmentVariableInput.Value}
+                    ? new[] { environmentVariableInput.Value }
                     : environmentVariableInput.SplitValues();
 
                 BindMember(optionSchema, commandInstance, rawValues);

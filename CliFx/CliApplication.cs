@@ -112,7 +112,7 @@ public class CliApplication
         // Activate command instance
         var commandInstance = commandSchema == FallbackDefaultCommand.Schema
             ? new FallbackDefaultCommand() // bypass activator
-            : (ICommand) _typeActivator.CreateInstance(commandSchema.Type);
+            : (ICommand)_typeActivator.CreateInstance(commandSchema.Type);
 
         // Assemble help context
         var helpContext = new HelpContext(
@@ -176,7 +176,7 @@ public class CliApplication
     {
         try
         {
-            // Console colors may have already been overriden by the parent process,
+            // Console colors may have already been overridden by the parent process,
             // so we need to reset it to make sure that everything we write looks properly.
             _console.ResetColor();
 

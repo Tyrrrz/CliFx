@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Microsoft.CodeAnalysis;
 using System.Linq;
 using CliFx.Analyzers.Utils.Extensions;
+using Microsoft.CodeAnalysis;
 
 namespace CliFx.Analyzers.ObjectModel;
 

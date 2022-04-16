@@ -22,7 +22,7 @@ public class ParameterMustBeLastIfNonScalarAnalyzer : AnalyzerBase
         type.DisplayNameMatches("System.String") ||
         !type.AllInterfaces
             .Select(i => i.ConstructedFrom)
-            .Any(s => s.DisplayNameMatches("System.Collections.Generic.IEnumerable<T>"));
+            .Any(t => t.DisplayNameMatches("System.Collections.Generic.IEnumerable<T>"));
 
     private void Analyze(
         SyntaxNodeAnalysisContext context,

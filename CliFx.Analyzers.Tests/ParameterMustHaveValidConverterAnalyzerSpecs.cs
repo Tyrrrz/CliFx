@@ -33,7 +33,32 @@ public class MyCommand : ICommand
     }
 
     [Fact]
-    public void Analyzer_does_not_report_an_error_if_the_specified_parameter_converter_derives_from_BindingConverter()
+    public void Analyzer_reports_an_error_if_the_specified_parameter_converter_does_not_derive_from_a_compatible_BindingConverter()
+    {
+        // Arrange
+        // language=cs
+        const string code = @"
+public class MyConverter : BindingConverter<int>
+{
+    public override int Convert(string rawValue) => 42;
+}
+
+[Command]
+public class MyCommand : ICommand
+{
+    [CommandParameter(0, Converter = typeof(MyConverter))]
+    public string Foo { get; set; }
+
+    public ValueTask ExecuteAsync(IConsole console) => default;
+}";
+
+
+        // Act & assert
+        Analyzer.Should().ProduceDiagnostics(code);
+    }
+
+    [Fact]
+    public void Analyzer_does_not_report_an_error_if_the_specified_parameter_converter_derives_from_a_compatible_BindingConverter()
     {
         // Arrange
         // language=cs
