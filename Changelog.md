@@ -1,3 +1,11 @@
+### v2.2.3 (17-Apr-2022)
+
+- Changed method signature of `IConsole.ReadKey()` to return `ConsoleKeyInfo` instead of `void`. The return type was originally defined as `void` by mistake. This change is source-backwards-compatible but may break on binary level if you were previously calling this method indirectly (i.e. through a library).
+- Added `FakeConsole.EnqueueKey(...)` to facilitate the testing of `IConsole.ReadKey()`. You can use this method to simulate key presses in your application.
+- Extended analyzers that verify the correctness of specified converters and validators. They now also ensure that the specified types are compatible with the type of the underlying property.
+- Improved diagnostics produced by analyzers. Where relevant, highlighted code is now limited to the property or type identifier, instead of the whole property or type declaration. Also extended the diagnostic messages with additional information.
+- Fixed an issue where throwing an exception inside a constructor of a command type resulted in an unrelated error message about the absence of a parameterless constructor.
+
 ### v2.2.2 (30-Jan-2022)
 
 - Fixed an issue where `ConsoleWriter` and `ConsoleReader` were not properly thread-safe.
@@ -51,7 +59,7 @@
 ### v2.0 (21-Mar-2021)
 
 > Note: this major release includes many breaking changes.
-Please refer to the readme to find updated instructions and usage examples.
+> Please refer to the readme to find updated instructions and usage examples.
 
 - Renamed property `EnvironmentVariableName` to `EnvironmentVariable` on `CommandOption` attribute.
 - Removed most of schema validation checks that used to take place during application startup. Going forward, CliFx will be relying solely on its built-in set of Roslyn analyzers to catch common errors in command configuration.
