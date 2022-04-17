@@ -12,7 +12,8 @@ public class OptionMustHaveValidNameAnalyzer : AnalyzerBase
     public OptionMustHaveValidNameAnalyzer()
         : base(
             "Options must have valid names",
-            "This option's name must be at least 2 characters long and must start with a letter.")
+            "This option's name must be at least 2 characters long and must start with a letter. " +
+            "Specified name: '{0}'.")
     {
     }
 
@@ -30,7 +31,12 @@ public class OptionMustHaveValidNameAnalyzer : AnalyzerBase
 
         if (option.Name.Length < 2 || !char.IsLetter(option.Name[0]))
         {
-            context.ReportDiagnostic(CreateDiagnostic(propertyDeclaration.GetLocation()));
+            context.ReportDiagnostic(
+                CreateDiagnostic(
+                    propertyDeclaration.Identifier.GetLocation(),
+                    option.Name
+                )
+            );
         }
     }
 

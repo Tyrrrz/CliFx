@@ -47,7 +47,9 @@ public class ParameterMustBeSingleIfNonRequiredAnalyzer : AnalyzerBase
 
             if (otherParameter.IsRequired == false)
             {
-                context.ReportDiagnostic(CreateDiagnostic(propertyDeclaration.GetLocation()));
+                context.ReportDiagnostic(
+                    CreateDiagnostic(propertyDeclaration.Identifier.GetLocation())
+                );
             }
         }
     }

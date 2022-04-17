@@ -35,7 +35,9 @@ public class CommandMustImplementInterfaceAnalyzer : AnalyzerBase
         // it's very likely a user error.
         if (hasCommandAttribute && !implementsCommandInterface)
         {
-            context.ReportDiagnostic(CreateDiagnostic(classDeclaration.GetLocation()));
+            context.ReportDiagnostic(
+                CreateDiagnostic(classDeclaration.Identifier.GetLocation())
+            );
         }
     }
 

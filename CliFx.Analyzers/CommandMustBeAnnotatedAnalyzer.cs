@@ -41,7 +41,9 @@ public class CommandMustBeAnnotatedAnalyzer : AnalyzerBase
         // then it's very likely a user error.
         if (implementsCommandInterface && !hasCommandAttribute)
         {
-            context.ReportDiagnostic(CreateDiagnostic(classDeclaration.GetLocation()));
+            context.ReportDiagnostic(
+                CreateDiagnostic(classDeclaration.Identifier.GetLocation())
+            );
         }
     }
 

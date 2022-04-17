@@ -39,7 +39,9 @@ public class ParameterMustHaveValidConverterAnalyzer : AnalyzerBase
         // Value returned by the converter must be assignable to the property type
         if (converterValueType is null || !property.Type.IsAssignableFrom(converterValueType))
         {
-            context.ReportDiagnostic(CreateDiagnostic(propertyDeclaration.GetLocation()));
+            context.ReportDiagnostic(
+                CreateDiagnostic(propertyDeclaration.Identifier.GetLocation())
+            );
         }
     }
 

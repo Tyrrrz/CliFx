@@ -14,7 +14,8 @@ public class ParameterMustHaveUniqueNameAnalyzer : AnalyzerBase
     public ParameterMustHaveUniqueNameAnalyzer()
         : base(
             "Parameters must have unique names",
-            "This parameter's name must be unique within the command (comparison IS NOT case sensitive).")
+            "This parameter's name must be unique within the command (comparison IS NOT case sensitive). " +
+            "Specified name: '{0}'.")
     {
     }
 
@@ -51,7 +52,12 @@ public class ParameterMustHaveUniqueNameAnalyzer : AnalyzerBase
 
             if (string.Equals(parameter.Name, otherParameter.Name, StringComparison.OrdinalIgnoreCase))
             {
-                context.ReportDiagnostic(CreateDiagnostic(propertyDeclaration.GetLocation()));
+                context.ReportDiagnostic(
+                    CreateDiagnostic(
+                        propertyDeclaration.Identifier.GetLocation(),
+                        parameter.Name
+                    )
+                );
             }
         }
     }

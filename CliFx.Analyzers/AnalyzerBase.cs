@@ -28,8 +28,8 @@ public abstract class AnalyzerBase : DiagnosticAnalyzer
         SupportedDiagnostics = ImmutableArray.Create(SupportedDiagnostic);
     }
 
-    protected Diagnostic CreateDiagnostic(Location location) =>
-        Diagnostic.Create(SupportedDiagnostic, location);
+    protected Diagnostic CreateDiagnostic(Location location, params object?[]? messageArgs) =>
+        Diagnostic.Create(SupportedDiagnostic, location, messageArgs);
 
     public override void Initialize(AnalysisContext context)
     {

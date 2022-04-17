@@ -52,7 +52,9 @@ public class ParameterMustBeSingleIfNonScalarAnalyzer : AnalyzerBase
 
             if (!IsScalar(otherProperty.Type))
             {
-                context.ReportDiagnostic(CreateDiagnostic(propertyDeclaration.GetLocation()));
+                context.ReportDiagnostic(
+                    CreateDiagnostic(propertyDeclaration.Identifier.GetLocation())
+                );
             }
         }
     }

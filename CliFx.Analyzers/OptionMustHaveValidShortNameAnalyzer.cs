@@ -12,7 +12,8 @@ public class OptionMustHaveValidShortNameAnalyzer : AnalyzerBase
     public OptionMustHaveValidShortNameAnalyzer()
         : base(
             "Option short names must be letter characters",
-            "This option's short name must be a single letter character.")
+            "This option's short name must be a single letter character. " +
+            "Specified short name: '{0}'.")
     {
     }
 
@@ -30,7 +31,12 @@ public class OptionMustHaveValidShortNameAnalyzer : AnalyzerBase
 
         if (!char.IsLetter(option.ShortName.Value))
         {
-            context.ReportDiagnostic(CreateDiagnostic(propertyDeclaration.GetLocation()));
+            context.ReportDiagnostic(
+                CreateDiagnostic(
+                    propertyDeclaration.Identifier.GetLocation(),
+                    option.ShortName
+                )
+            );
         }
     }
 

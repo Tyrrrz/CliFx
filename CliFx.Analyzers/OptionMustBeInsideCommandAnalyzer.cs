@@ -38,7 +38,9 @@ public class OptionMustBeInsideCommandAnalyzer : AnalyzerBase
 
         if (!isInsideCommand)
         {
-            context.ReportDiagnostic(CreateDiagnostic(propertyDeclaration.GetLocation()));
+            context.ReportDiagnostic(
+                CreateDiagnostic(propertyDeclaration.Identifier.GetLocation())
+            );
         }
     }
 

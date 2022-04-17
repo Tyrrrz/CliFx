@@ -65,7 +65,9 @@ public class SystemConsoleShouldBeAvoidedAnalyzer : AnalyzerBase
 
         if (isConsoleInterfaceAvailable)
         {
-            context.ReportDiagnostic(CreateDiagnostic(systemConsoleMemberAccess.GetLocation()));
+            context.ReportDiagnostic(
+                CreateDiagnostic(systemConsoleMemberAccess.GetLocation())
+            );
         }
     }
 

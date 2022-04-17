@@ -27,7 +27,9 @@ public class OptionMustHaveNameOrShortNameAnalyzer : AnalyzerBase
 
         if (string.IsNullOrWhiteSpace(option.Name) && option.ShortName is null)
         {
-            context.ReportDiagnostic(CreateDiagnostic(propertyDeclaration.GetLocation()));
+            context.ReportDiagnostic(
+                CreateDiagnostic(propertyDeclaration.Identifier.GetLocation())
+            );
         }
     }
 

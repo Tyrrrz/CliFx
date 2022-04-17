@@ -14,7 +14,8 @@ public class OptionMustHaveUniqueNameAnalyzer : AnalyzerBase
     public OptionMustHaveUniqueNameAnalyzer()
         : base(
             "Options must have unique names",
-            "This option's name must be unique within the command (comparison IS NOT case sensitive).")
+            "This option's name must be unique within the command (comparison IS NOT case sensitive). " +
+            "Specified name: '{0}'.")
     {
     }
 
@@ -51,7 +52,12 @@ public class OptionMustHaveUniqueNameAnalyzer : AnalyzerBase
 
             if (string.Equals(option.Name, otherOption.Name, StringComparison.OrdinalIgnoreCase))
             {
-                context.ReportDiagnostic(CreateDiagnostic(propertyDeclaration.GetLocation()));
+                context.ReportDiagnostic(
+                    CreateDiagnostic(
+                        propertyDeclaration.Identifier.GetLocation(),
+                        option.Name
+                    )
+                );
             }
         }
     }

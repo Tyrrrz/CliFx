@@ -37,7 +37,9 @@ public class OptionMustHaveValidValidatorsAnalyzer : AnalyzerBase
             // Value passed to the validator must be assignable from the property type
             if (validatorValueType is null || !validatorValueType.IsAssignableFrom(property.Type))
             {
-                context.ReportDiagnostic(CreateDiagnostic(propertyDeclaration.GetLocation()));
+                context.ReportDiagnostic(
+                    CreateDiagnostic(propertyDeclaration.Identifier.GetLocation())
+                );
 
                 // No need to report multiple identical diagnostics on the same node
                 break;

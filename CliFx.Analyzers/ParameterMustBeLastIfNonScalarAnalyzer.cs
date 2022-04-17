@@ -54,7 +54,9 @@ public class ParameterMustBeLastIfNonScalarAnalyzer : AnalyzerBase
 
             if (otherParameter.Order > parameter.Order)
             {
-                context.ReportDiagnostic(CreateDiagnostic(propertyDeclaration.GetLocation()));
+                context.ReportDiagnostic(
+                    CreateDiagnostic(propertyDeclaration.Identifier.GetLocation())
+                );
             }
         }
     }
