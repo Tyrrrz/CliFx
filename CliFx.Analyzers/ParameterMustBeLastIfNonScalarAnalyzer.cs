@@ -13,7 +13,8 @@ public class ParameterMustBeLastIfNonScalarAnalyzer : AnalyzerBase
     public ParameterMustBeLastIfNonScalarAnalyzer()
         : base(
             "Parameters of non-scalar types must be the last in order",
-            "This parameter has a non-scalar type so it must be the last in order (its order must be highest within the command).")
+            "This parameter has a non-scalar type so it must be the last in order (its order must be highest within the command). " +
+            "Property bound to another non-scalar parameter: `{0}`.")
     {
     }
 
@@ -48,7 +49,10 @@ public class ParameterMustBeLastIfNonScalarAnalyzer : AnalyzerBase
             if (otherParameter.Order > parameter.Order)
             {
                 context.ReportDiagnostic(
-                    CreateDiagnostic(propertyDeclaration.Identifier.GetLocation())
+                    CreateDiagnostic(
+                        propertyDeclaration.Identifier.GetLocation(),
+                        otherProperty.Name
+                    )
                 );
             }
         }

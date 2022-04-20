@@ -13,7 +13,7 @@ public class OptionMustHaveValidNameAnalyzer : AnalyzerBase
         : base(
             "Options must have valid names",
             "This option's name must be at least 2 characters long and must start with a letter. " +
-            "Specified name: '{0}'.")
+            "Specified name: `{0}`.")
     {
     }
 

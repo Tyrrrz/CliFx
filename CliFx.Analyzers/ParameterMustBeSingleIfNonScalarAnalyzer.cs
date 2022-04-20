@@ -13,7 +13,8 @@ public class ParameterMustBeSingleIfNonScalarAnalyzer : AnalyzerBase
     public ParameterMustBeSingleIfNonScalarAnalyzer()
         : base(
             "Parameters of non-scalar types are limited to one per command",
-            "This parameter has a non-scalar type so it must be the only such parameter in the command.")
+            "This parameter has a non-scalar type so it must be the only such parameter in the command. " +
+            "Property bound to another non-scalar parameter: `{0}`.")
     {
     }
 
@@ -48,7 +49,10 @@ public class ParameterMustBeSingleIfNonScalarAnalyzer : AnalyzerBase
             if (!otherParameter.IsScalar())
             {
                 context.ReportDiagnostic(
-                    CreateDiagnostic(propertyDeclaration.Identifier.GetLocation())
+                    CreateDiagnostic(
+                        propertyDeclaration.Identifier.GetLocation(),
+                        otherProperty.Name
+                    )
                 );
             }
         }

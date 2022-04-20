@@ -13,7 +13,7 @@ public class OptionMustHaveValidShortNameAnalyzer : AnalyzerBase
         : base(
             "Option short names must be letter characters",
             "This option's short name must be a single letter character. " +
-            "Specified short name: '{0}'.")
+            "Specified short name: `{0}`.")
     {
     }
 

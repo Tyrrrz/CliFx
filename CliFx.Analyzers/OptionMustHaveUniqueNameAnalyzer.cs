@@ -15,7 +15,8 @@ public class OptionMustHaveUniqueNameAnalyzer : AnalyzerBase
         : base(
             "Options must have unique names",
             "This option's name must be unique within the command (comparison IS NOT case sensitive). " +
-            "Specified name: '{0}'.")
+            "Specified name: `{0}`. " +
+            "Property bound to another option with the same name: `{1}`.")
     {
     }
 
@@ -55,7 +56,8 @@ public class OptionMustHaveUniqueNameAnalyzer : AnalyzerBase
                 context.ReportDiagnostic(
                     CreateDiagnostic(
                         propertyDeclaration.Identifier.GetLocation(),
-                        option.Name
+                        option.Name,
+                        otherProperty.Name
                     )
                 );
             }

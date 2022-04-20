@@ -13,7 +13,8 @@ public class ParameterMustBeSingleIfNonRequiredAnalyzer : AnalyzerBase
     public ParameterMustBeSingleIfNonRequiredAnalyzer()
         : base(
             "Parameters marked as non-required are limited to one per command",
-            "This parameter is non-required so it must be the only such parameter in the command.")
+            "This parameter is non-required so it must be the only such parameter in the command. " +
+            "Property bound to another non-required parameter: `{0}`.")
     {
     }
 
@@ -48,7 +49,10 @@ public class ParameterMustBeSingleIfNonRequiredAnalyzer : AnalyzerBase
             if (otherParameter.IsRequired == false)
             {
                 context.ReportDiagnostic(
-                    CreateDiagnostic(propertyDeclaration.Identifier.GetLocation())
+                    CreateDiagnostic(
+                        propertyDeclaration.Identifier.GetLocation(),
+                        otherProperty.Name
+                    )
                 );
             }
         }

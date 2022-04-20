@@ -14,7 +14,8 @@ public class OptionMustHaveUniqueShortNameAnalyzer : AnalyzerBase
         : base(
             "Options must have unique short names",
             "This option's short name must be unique within the command (comparison IS case sensitive). " +
-            "Specified short name: '{0}'.")
+            "Specified short name: `{0}` " +
+            "Property bound to another option with the same short name: `{1}`.")
     {
     }
 
@@ -54,7 +55,8 @@ public class OptionMustHaveUniqueShortNameAnalyzer : AnalyzerBase
                 context.ReportDiagnostic(
                     CreateDiagnostic(
                         propertyDeclaration.Identifier.GetLocation(),
-                        option.ShortName
+                        option.ShortName,
+                        otherProperty.Name
                     )
                 );
             }

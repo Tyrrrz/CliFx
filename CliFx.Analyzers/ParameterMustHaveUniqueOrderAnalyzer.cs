@@ -14,7 +14,8 @@ public class ParameterMustHaveUniqueOrderAnalyzer : AnalyzerBase
         : base(
             "Parameters must have unique order",
             "This parameter's order must be unique within the command. " +
-            "Specified order: {0}.")
+            "Specified order: {0}. " +
+            "Property bound to another parameter with the same order: `{1}`.")
     {
     }
 
@@ -48,7 +49,8 @@ public class ParameterMustHaveUniqueOrderAnalyzer : AnalyzerBase
                 context.ReportDiagnostic(
                     CreateDiagnostic(
                         propertyDeclaration.Identifier.GetLocation(),
-                        parameter.Order
+                        parameter.Order,
+                        otherProperty.Name
                     )
                 );
             }

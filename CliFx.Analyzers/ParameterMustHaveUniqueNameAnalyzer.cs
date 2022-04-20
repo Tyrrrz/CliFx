@@ -15,7 +15,8 @@ public class ParameterMustHaveUniqueNameAnalyzer : AnalyzerBase
         : base(
             "Parameters must have unique names",
             "This parameter's name must be unique within the command (comparison IS NOT case sensitive). " +
-            "Specified name: '{0}'.")
+            "Specified name: `{0}`. " +
+            "Property bound to another parameter with the same name: `{1}`.")
     {
     }
 
@@ -55,7 +56,8 @@ public class ParameterMustHaveUniqueNameAnalyzer : AnalyzerBase
                 context.ReportDiagnostic(
                     CreateDiagnostic(
                         propertyDeclaration.Identifier.GetLocation(),
-                        parameter.Name
+                        parameter.Name,
+                        otherProperty.Name
                     )
                 );
             }

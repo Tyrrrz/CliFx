@@ -13,7 +13,8 @@ public class ParameterMustBeLastIfNonRequiredAnalyzer : AnalyzerBase
     public ParameterMustBeLastIfNonRequiredAnalyzer()
         : base(
             "Parameters marked as non-required must be the last in order",
-            "This parameter is non-required so it must be the last in order (its order must be highest within the command).")
+            "This parameter is non-required so it must be the last in order (its order must be highest within the command). " +
+            "Property bound to another non-required parameter: `{0}`.")
     {
     }
 
@@ -48,7 +49,10 @@ public class ParameterMustBeLastIfNonRequiredAnalyzer : AnalyzerBase
             if (otherParameter.Order > parameter.Order)
             {
                 context.ReportDiagnostic(
-                    CreateDiagnostic(propertyDeclaration.Identifier.GetLocation())
+                    CreateDiagnostic(
+                        propertyDeclaration.Identifier.GetLocation(),
+                        otherProperty.Name
+                    )
                 );
             }
         }
