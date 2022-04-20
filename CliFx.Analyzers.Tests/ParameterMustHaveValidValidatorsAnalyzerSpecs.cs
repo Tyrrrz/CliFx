@@ -9,7 +9,7 @@ public class ParameterMustHaveValidValidatorsAnalyzerSpecs
     private static DiagnosticAnalyzer Analyzer { get; } = new ParameterMustHaveValidValidatorsAnalyzer();
 
     [Fact]
-    public void Analyzer_reports_an_error_if_one_of_the_specified_parameter_validators_does_not_derive_from_BindingValidator()
+    public void Analyzer_reports_an_error_a_parameter_has_a_validator_that_does_not_derive_from_BindingValidator()
     {
         // Arrange
         // language=cs
@@ -33,7 +33,7 @@ public class MyCommand : ICommand
     }
 
     [Fact]
-    public void Analyzer_reports_an_error_if_one_of_the_specified_parameter_validators_does_not_derive_from_a_compatible_BindingValidator()
+    public void Analyzer_reports_an_error_if_a_parameter_has_a_validator_that_does_not_derive_from_a_compatible_BindingValidator()
     {
         // Arrange
         // language=cs
@@ -57,7 +57,7 @@ public class MyCommand : ICommand
     }
 
     [Fact]
-    public void Analyzer_does_not_report_an_error_if_each_specified_parameter_validator_derives_from_a_compatible_BindingValidator()
+    public void Analyzer_does_not_report_an_error_if_a_parameter_has_validators_that_all_derive_from_compatible_BindingValidators()
     {
         // Arrange
         // language=cs

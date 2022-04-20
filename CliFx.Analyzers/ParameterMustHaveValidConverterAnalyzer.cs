@@ -37,7 +37,16 @@ public class ParameterMustHaveValidConverterAnalyzer : AnalyzerBase
             .FirstOrDefault();
 
         // Value returned by the converter must be assignable to the property type
-        if (converterValueType is null || !property.Type.IsAssignableFrom(converterValueType))
+        var isCompatible =
+            converterValueType is not null && (parameter.IsScalar()
+                // Scalar
+                ? context.Compilation.IsAssignable(converterValueType, property.Type)
+                // Non-scalar (assume we can handle all IEnumerable types for simplicity)
+                : property.Type.TryGetEnumerableUnderlyingType() is { } enumerableUnderlyingType &&
+                  context.Compilation.IsAssignable(converterValueType, enumerableUnderlyingType)
+            );
+
+        if (!isCompatible)
         {
             context.ReportDiagnostic(
                 CreateDiagnostic(propertyDeclaration.Identifier.GetLocation())

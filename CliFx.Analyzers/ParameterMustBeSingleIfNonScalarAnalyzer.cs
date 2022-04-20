@@ -17,13 +17,6 @@ public class ParameterMustBeSingleIfNonScalarAnalyzer : AnalyzerBase
     {
     }
 
-    private static bool IsScalar(ITypeSymbol type) =>
-        type.DisplayNameMatches("string") ||
-        type.DisplayNameMatches("System.String") ||
-        !type.AllInterfaces
-            .Select(i => i.ConstructedFrom)
-            .Any(t => t.DisplayNameMatches("System.Collections.Generic.IEnumerable<T>"));
-
     private void Analyze(
         SyntaxNodeAnalysisContext context,
         PropertyDeclarationSyntax propertyDeclaration,
@@ -32,10 +25,11 @@ public class ParameterMustBeSingleIfNonScalarAnalyzer : AnalyzerBase
         if (property.ContainingType is null)
             return;
 
-        if (!CommandParameterSymbol.IsParameterProperty(property))
+        var parameter = CommandParameterSymbol.TryResolve(property);
+        if (parameter is null)
             return;
 
-        if (IsScalar(property.Type))
+        if (parameter.IsScalar())
             return;
 
         var otherProperties = property
@@ -47,10 +41,11 @@ public class ParameterMustBeSingleIfNonScalarAnalyzer : AnalyzerBase
 
         foreach (var otherProperty in otherProperties)
         {
-            if (!CommandParameterSymbol.IsParameterProperty(otherProperty))
+            var otherParameter = CommandParameterSymbol.TryResolve(otherProperty);
+            if (otherParameter is null)
                 continue;
 
-            if (!IsScalar(otherProperty.Type))
+            if (!otherParameter.IsScalar())
             {
                 context.ReportDiagnostic(
                     CreateDiagnostic(propertyDeclaration.Identifier.GetLocation())

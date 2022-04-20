@@ -35,7 +35,11 @@ public class OptionMustHaveValidValidatorsAnalyzer : AnalyzerBase
                 .FirstOrDefault();
 
             // Value passed to the validator must be assignable from the property type
-            if (validatorValueType is null || !validatorValueType.IsAssignableFrom(property.Type))
+            var isCompatible =
+                validatorValueType is not null &&
+                context.Compilation.IsAssignable(property.Type, validatorValueType);
+
+            if (!isCompatible)
             {
                 context.ReportDiagnostic(
                     CreateDiagnostic(propertyDeclaration.Identifier.GetLocation())

@@ -5,8 +5,10 @@ using Microsoft.CodeAnalysis;
 
 namespace CliFx.Analyzers.ObjectModel;
 
-internal partial class CommandOptionSymbol
+internal partial class CommandOptionSymbol : ICommandMemberSymbol
 {
+    public IPropertySymbol Property { get; }
+
     public string? Name { get; }
 
     public char? ShortName { get; }
@@ -16,11 +18,13 @@ internal partial class CommandOptionSymbol
     public IReadOnlyList<ITypeSymbol> ValidatorTypes { get; }
 
     public CommandOptionSymbol(
+        IPropertySymbol property,
         string? name,
         char? shortName,
         ITypeSymbol? converterType,
         IReadOnlyList<ITypeSymbol> validatorTypes)
     {
+        Property = property;
         Name = name;
         ShortName = shortName;
         ConverterType = converterType;
@@ -30,22 +34,25 @@ internal partial class CommandOptionSymbol
 
 internal partial class CommandOptionSymbol
 {
-    private static AttributeData? TryGetOptionAttribute(IPropertySymbol property) =>
-        property
-            .GetAttributes()
-            .FirstOrDefault(a => a.AttributeClass.DisplayNameMatches(SymbolNames.CliFxCommandOptionAttribute));
+    private static AttributeData? TryGetOptionAttribute(IPropertySymbol property) => property
+        .GetAttributes()
+        .FirstOrDefault(a => a.AttributeClass?.DisplayNameMatches(SymbolNames.CliFxCommandOptionAttribute) == true);
 
-    private static CommandOptionSymbol FromAttribute(AttributeData attribute)
+    public static CommandOptionSymbol? TryResolve(IPropertySymbol property)
     {
+        var attribute = TryGetOptionAttribute(property);
+        if (attribute is null)
+            return null;
+
         var name = attribute
             .ConstructorArguments
-            .Where(a => a.Type.DisplayNameMatches("string") || a.Type.DisplayNameMatches("System.String"))
+            .Where(a => a.Type?.SpecialType == SpecialType.System_String)
             .Select(a => a.Value)
             .FirstOrDefault() as string;
 
         var shortName = attribute
             .ConstructorArguments
-            .Where(a => a.Type.DisplayNameMatches("char") || a.Type.DisplayNameMatches("System.Char"))
+            .Where(a => a.Type?.SpecialType == SpecialType.System_Char)
             .Select(a => a.Value)
             .FirstOrDefault() as char?;
 
@@ -64,16 +71,7 @@ internal partial class CommandOptionSymbol
             .Cast<ITypeSymbol>()
             .ToArray();
 
-        return new CommandOptionSymbol(name, shortName, converter, validators);
-    }
-
-    public static CommandOptionSymbol? TryResolve(IPropertySymbol property)
-    {
-        var attribute = TryGetOptionAttribute(property);
-
-        return attribute is not null
-            ? FromAttribute(attribute)
-            : null;
+        return new CommandOptionSymbol(property, name, shortName, converter, validators);
     }
 
     public static bool IsOptionProperty(IPropertySymbol property) =>

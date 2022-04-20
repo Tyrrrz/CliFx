@@ -29,10 +29,13 @@ internal static class RoslynExtensions
         }
     }
 
-    public static bool IsAssignableFrom(this ITypeSymbol target, ITypeSymbol source) =>
-        SymbolEqualityComparer.Default.Equals(target, source) ||
-        source.GetBaseTypes().Contains(target, SymbolEqualityComparer.Default) ||
-        source.AllInterfaces.Contains(target, SymbolEqualityComparer.Default);
+    public static ITypeSymbol? TryGetEnumerableUnderlyingType(this ITypeSymbol type) => type
+        .AllInterfaces
+        .FirstOrDefault(i => i.ConstructedFrom.SpecialType == SpecialType.System_Collections_Generic_IEnumerable_T)?
+        .TypeArguments[0];
+
+    public static bool IsAssignable(this Compilation compilation, ITypeSymbol source, ITypeSymbol destination) =>
+        compilation.ClassifyConversion(source, destination).Exists;
 
     public static void HandleClassDeclaration(
         this AnalysisContext analysisContext,

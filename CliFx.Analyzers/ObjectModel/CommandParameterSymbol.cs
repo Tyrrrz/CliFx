@@ -5,8 +5,10 @@ using Microsoft.CodeAnalysis;
 
 namespace CliFx.Analyzers.ObjectModel;
 
-internal partial class CommandParameterSymbol
+internal partial class CommandParameterSymbol : ICommandMemberSymbol
 {
+    public IPropertySymbol Property { get; }
+
     public int Order { get; }
 
     public string? Name { get; }
@@ -18,12 +20,14 @@ internal partial class CommandParameterSymbol
     public IReadOnlyList<ITypeSymbol> ValidatorTypes { get; }
 
     public CommandParameterSymbol(
+        IPropertySymbol property,
         int order,
         string? name,
         bool? isRequired,
         ITypeSymbol? converterType,
         IReadOnlyList<ITypeSymbol> validatorTypes)
     {
+        Property = property;
         Order = order;
         Name = name;
         IsRequired = isRequired;
@@ -34,13 +38,16 @@ internal partial class CommandParameterSymbol
 
 internal partial class CommandParameterSymbol
 {
-    private static AttributeData? TryGetParameterAttribute(IPropertySymbol property) =>
-        property
-            .GetAttributes()
-            .FirstOrDefault(a => a.AttributeClass.DisplayNameMatches(SymbolNames.CliFxCommandParameterAttribute));
+    private static AttributeData? TryGetParameterAttribute(IPropertySymbol property) => property
+        .GetAttributes()
+        .FirstOrDefault(a => a.AttributeClass?.DisplayNameMatches(SymbolNames.CliFxCommandParameterAttribute) == true);
 
-    private static CommandParameterSymbol FromAttribute(AttributeData attribute)
+    public static CommandParameterSymbol? TryResolve(IPropertySymbol property)
     {
+        var attribute = TryGetParameterAttribute(property);
+        if (attribute is null)
+            return null;
+
         var order = (int)attribute
             .ConstructorArguments
             .Select(a => a.Value)
@@ -73,16 +80,7 @@ internal partial class CommandParameterSymbol
             .Cast<ITypeSymbol>()
             .ToArray();
 
-        return new CommandParameterSymbol(order, name, isRequired, converter, validators);
-    }
-
-    public static CommandParameterSymbol? TryResolve(IPropertySymbol property)
-    {
-        var attribute = TryGetParameterAttribute(property);
-
-        return attribute is not null
-            ? FromAttribute(attribute)
-            : null;
+        return new CommandParameterSymbol(property, order, name, isRequired, converter, validators);
     }
 
     public static bool IsParameterProperty(IPropertySymbol property) =>

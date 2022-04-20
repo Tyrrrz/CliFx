@@ -17,13 +17,6 @@ public class ParameterMustBeLastIfNonScalarAnalyzer : AnalyzerBase
     {
     }
 
-    private static bool IsScalar(ITypeSymbol type) =>
-        type.DisplayNameMatches("string") ||
-        type.DisplayNameMatches("System.String") ||
-        !type.AllInterfaces
-            .Select(i => i.ConstructedFrom)
-            .Any(t => t.DisplayNameMatches("System.Collections.Generic.IEnumerable<T>"));
-
     private void Analyze(
         SyntaxNodeAnalysisContext context,
         PropertyDeclarationSyntax propertyDeclaration,
@@ -32,11 +25,11 @@ public class ParameterMustBeLastIfNonScalarAnalyzer : AnalyzerBase
         if (property.ContainingType is null)
             return;
 
-        if (IsScalar(property.Type))
-            return;
-
         var parameter = CommandParameterSymbol.TryResolve(property);
         if (parameter is null)
+            return;
+
+        if (parameter.IsScalar())
             return;
 
         var otherProperties = property
