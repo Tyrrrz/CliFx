@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace CliFx.Tests.Dummy;
@@ -14,9 +15,17 @@ public static partial class Program
 
 public static partial class Program
 {
-    public static async Task Main() =>
+    public static async Task Main()
+    {
+        // Make sure color codes are not produced because we rely on the output in tests
+        Environment.SetEnvironmentVariable(
+            "DOTNET_SYSTEM_CONSOLE_ALLOW_ANSI_COLOR_REDIRECTION",
+            "false"
+        );
+
         await new CliApplicationBuilder()
             .AddCommandsFromThisAssembly()
             .Build()
             .RunAsync();
+    }
 }
