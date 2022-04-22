@@ -35,6 +35,14 @@
   <ItemGroup>
     <ProjectReference Include="../CliFx.Analyzers/CliFx.Analyzers.csproj" ReferenceOutputAssembly="false" OutputItemType="analyzer" />
     <None Include="../CliFx.Analyzers/bin/$(Configuration)/netstandard2.0/CliFx.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="../CliFx.Analyzers/bin/$(Configuration)/netstandard2.0/System.Buffers.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="../CliFx.Analyzers/bin/$(Configuration)/netstandard2.0/System.Collections.Immutable.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="../CliFx.Analyzers/bin/$(Configuration)/netstandard2.0/System.Memory.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="../CliFx.Analyzers/bin/$(Configuration)/netstandard2.0/System.Numerics.Vectors.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="../CliFx.Analyzers/bin/$(Configuration)/netstandard2.0/System.Reflection.Metadata.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="../CliFx.Analyzers/bin/$(Configuration)/netstandard2.0/System.Runtime.CompilerServices.Unsafe.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="../CliFx.Analyzers/bin/$(Configuration)/netstandard2.0/System.Text.Encoding.CodePages.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="../CliFx.Analyzers/bin/$(Configuration)/netstandard2.0/System.Threading.Tasks.Extensions.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
   </ItemGroup>
 
 </Project>
