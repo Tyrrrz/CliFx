@@ -10,7 +10,7 @@
   <ItemGroup>
     <!-- Keep this dependency as low as possible since we can't bundle it -->
     <!-- https://github.com/Tyrrrz/CliFx/issues/127 -->
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0" PrivateAssets="all" />
   </ItemGroup>
 
 </Project>
