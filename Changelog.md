@@ -1,3 +1,9 @@
+### v2.2.4 (22-Apr-2022)
+
+- Added more contextual information to analyzer diagnostics.
+- Fixed an issue where the analyzer incorrectly reported an error on converters that didn't directly match the target type but were compatible through known built-in conversions.
+- Fixed an issue where MSBuild produced a lot of analyzer-related warnings in certain circumstances.
+
 ### v2.2.3 (17-Apr-2022)
 
 - Changed method signature of `IConsole.ReadKey()` to return `ConsoleKeyInfo` instead of `void`. The return type was originally defined as `void` by mistake. This change is source-backwards-compatible but may break on binary level if you were previously calling this method indirectly (i.e. through a library).
