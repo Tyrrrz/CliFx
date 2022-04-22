@@ -41,6 +41,20 @@ public class SystemConsole : IConsole, IDisposable
         get => Console.BackgroundColor;
         set => Console.BackgroundColor = value;
     }
+    
+    /// <inheritdoc />
+    public int CursorLeft
+    {
+        get => Console.CursorLeft;
+        set => Console.CursorLeft = value;
+    }
+
+    /// <inheritdoc />
+    public int CursorTop
+    {
+        get => Console.CursorTop;
+        set => Console.CursorTop = value;
+    }
 
     /// <summary>
     /// Initializes an instance of <see cref="SystemConsole"/>.
@@ -56,19 +70,11 @@ public class SystemConsole : IConsole, IDisposable
     public void ResetColor() => Console.ResetColor();
 
     /// <inheritdoc />
-    public int CursorLeft
-    {
-        get => Console.CursorLeft;
-        set => Console.CursorLeft = value;
-    }
-
+    public ConsoleKeyInfo ReadKey(bool intercept = false) => Console.ReadKey(intercept);
+    
     /// <inheritdoc />
-    public int CursorTop
-    {
-        get => Console.CursorTop;
-        set => Console.CursorTop = value;
-    }
-
+    public void Clear() => Console.Clear();
+    
     /// <inheritdoc />
     public CancellationToken RegisterCancellationHandler()
     {
@@ -89,13 +95,7 @@ public class SystemConsole : IConsole, IDisposable
 
         return (_cancellationTokenSource = cts).Token;
     }
-
-    /// <inheritdoc />
-    public void Clear() => Console.Clear();
-
-    /// <inheritdoc />
-    public ConsoleKeyInfo ReadKey(bool intercept = false) => Console.ReadKey(intercept);
-
+    
     /// <inheritdoc />
     public void Dispose()
     {

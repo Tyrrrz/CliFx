@@ -99,10 +99,8 @@ public partial class ConsoleReader : StreamReader
 
 public partial class ConsoleReader
 {
-    internal static ConsoleReader Create(IConsole console, Stream? stream) => new(
+    internal static ConsoleReader Create(IConsole console, Stream stream) => new(
         console,
-        stream is not null
-            ? Stream.Synchronized(stream)
-            : Stream.Null
+        Stream.Synchronized(stream)
     );
 }

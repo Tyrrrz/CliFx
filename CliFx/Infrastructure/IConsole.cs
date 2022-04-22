@@ -65,6 +65,16 @@ public interface IConsole
     int CursorTop { get; set; }
 
     /// <summary>
+    /// Obtains the next character or function key pressed by the user.
+    /// </summary>
+    ConsoleKeyInfo ReadKey(bool intercept = false);
+    
+    /// <summary>
+    /// Clears the console buffer and corresponding console window of display information.
+    /// </summary>
+    void Clear();
+    
+    /// <summary>
     /// Registers a handler for the interrupt signal (Ctrl+C) on the console and returns
     /// a token representing the cancellation request.
     /// Subsequent calls to this method have no side-effects and return the same token.
@@ -82,16 +92,6 @@ public interface IConsole
     /// </para>
     /// </remarks>
     CancellationToken RegisterCancellationHandler();
-
-    /// <summary>
-    /// Clears the console buffer and corresponding console window of display information.
-    /// </summary>
-    void Clear();
-
-    /// <summary>
-    /// Obtains the next character or function key pressed by the user.
-    /// </summary>
-    ConsoleKeyInfo ReadKey(bool intercept = false);
 }
 
 /// <summary>

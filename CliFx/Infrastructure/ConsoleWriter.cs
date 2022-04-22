@@ -272,10 +272,8 @@ public partial class ConsoleWriter : StreamWriter
 
 public partial class ConsoleWriter
 {
-    internal static ConsoleWriter Create(IConsole console, Stream? stream) => new(
+    internal static ConsoleWriter Create(IConsole console, Stream stream) => new(
         console,
-        stream is not null
-            ? Stream.Synchronized(stream)
-            : Stream.Null
+        Stream.Synchronized(stream)
     ) {AutoFlush = true};
 }

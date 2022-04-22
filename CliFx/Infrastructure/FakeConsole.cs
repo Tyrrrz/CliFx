@@ -59,14 +59,33 @@ public class FakeConsole : IConsole, IDisposable
     /// </summary>
     public FakeConsole(Stream? input = null, Stream? output = null, Stream? error = null)
     {
-        Input = ConsoleReader.Create(this, input);
-        Output = ConsoleWriter.Create(this, output);
-        Error = ConsoleWriter.Create(this, error);
+        Input = ConsoleReader.Create(this, input ?? Stream.Null);
+        Output = ConsoleWriter.Create(this, output ?? Stream.Null);
+        Error = ConsoleWriter.Create(this, error ?? Stream.Null);
+    }
+
+    /// <inheritdoc />
+    public ConsoleKeyInfo ReadKey(bool intercept = false) =>
+        _keys.TryDequeue(out var key)
+            ? key
+            : throw new InvalidOperationException(
+                "Cannot read key because there are no key presses enqueued. " +
+                $"Use the `{nameof(EnqueueKey)}(...)` method to simulate a key press."
+            );
+
+    /// <summary>
+    /// Enqueues a simulated key press, which can then be read by calling <see cref="ReadKey"/>.
+    /// </summary>
+    public void EnqueueKey(ConsoleKeyInfo key) => _keys.Enqueue(key);
+    
+    /// <inheritdoc />
+    public void Clear()
+    {
     }
 
     /// <inheritdoc />
     public CancellationToken RegisterCancellationHandler() => _cancellationTokenSource.Token;
-
+    
     /// <summary>
     /// Sends a cancellation signal to the currently executing command.
     /// </summary>
@@ -86,25 +105,6 @@ public class FakeConsole : IConsole, IDisposable
             _cancellationTokenSource.Cancel();
         }
     }
-
-    /// <inheritdoc />
-    public void Clear()
-    {
-    }
-
-    /// <inheritdoc />
-    public ConsoleKeyInfo ReadKey(bool intercept = false) =>
-        _keys.TryDequeue(out var key)
-            ? key
-            : throw new InvalidOperationException(
-                "Cannot read key because there are no key presses enqueued. " +
-                $"Use the `{nameof(EnqueueKey)}(...)` method to simulate a key press."
-            );
-
-    /// <summary>
-    /// Enqueues a simulated key press, which can then be read by calling <see cref="ReadKey"/>.
-    /// </summary>
-    public void EnqueueKey(ConsoleKeyInfo key) => _keys.Enqueue(key);
 
     /// <inheritdoc />
     public virtual void Dispose() => _cancellationTokenSource.Dispose();
