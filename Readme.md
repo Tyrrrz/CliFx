@@ -66,10 +66,10 @@ public static class Program
 ```
 
 > ⚠️ Ensure that your `Main()` method returns the integer exit code provided by `CliApplication.RunAsync()`, as shown in the above example.
-Exit code is used to communicate execution result to the parent process, so it's important that your program propagates it.
+> Exit code is used to communicate execution result to the parent process, so it's important that your program propagates it.
 
 > 💡 When calling `CliApplication.RunAsync()`, **CliFx** resolves command line arguments and environment variables from `Environment.GetCommandLineArgs()` and `Environment.GetEnvironmentVariables()` respectively.
-You can also provide them explicitly if you choose.
+> You can also provide them explicitly if you choose.
 
 The code above uses `AddCommandsFromThisAssembly()` to detect command types defined within the current assembly.
 Commands are entry points, through which the user can interact with your application.
@@ -98,7 +98,7 @@ Use this abstraction in place of `System.Console` whenever you need to write out
 
 With the basic setup above, the user can now run the application and get a greeting in return:
 
-```sh
+```powershell
 > dotnet myapp.dll
 
 Hello world!
@@ -107,7 +107,7 @@ Hello world!
 Out of the box, the application also comes with built-in `--help` and `--version` options.
 They can be used to show help text or application version respectively:
 
-```sh
+```powershell
 > dotnet myapp.dll --help
 
 MyApp v1.0
@@ -120,7 +120,7 @@ OPTIONS
   --version         Shows version information.
 ```
 
-```sh
+```powershell
 > dotnet myapp.dll --version
 
 v1.0
@@ -160,11 +160,11 @@ public class LogCommand : ICommand
 ```
 
 > 💡 **CliFx** has built-in analyzers that detect common errors in command definitions.
-Your code will not compile if the command contains duplicate options, overlapping parameters, or otherwise invalid configuration.
+> Your code will not compile if the command contains duplicate options, overlapping parameters, or otherwise invalid configuration.
 
 In order to execute this command, at a minimum, the user needs to provide the input value:
 
-```sh
+```powershell
 > dotnet myapp.dll 10000
 
 4
@@ -172,7 +172,7 @@ In order to execute this command, at a minimum, the user needs to provide the in
 
 They can also pass the `base` option to override the default logarithm base of 10:
 
-```sh
+```powershell
 > dotnet myapp.dll 729 -b 3
 
 6
@@ -180,7 +180,7 @@ They can also pass the `base` option to override the default logarithm base of 1
 
 In case the user forgets to specify the `value` parameter, the application will exit with an error:
 
-```sh
+```powershell
 > dotnet myapp.dll -b 10
 
 Missing required parameter(s):
@@ -189,7 +189,7 @@ Missing required parameter(s):
 
 Available parameters and options are also listed in the command's help text, which can be accessed by passing the `--help` option:
 
-```sh
+```powershell
 > dotnet myapp.dll --help
 
 MyApp v1.0
@@ -209,7 +209,7 @@ OPTIONS
 Overall, parameters and options are both used to consume input from the command line, but they differ in a few important ways:
 
 |                    | Parameter                                                                      | Option                                                                                               |
-|--------------------|--------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
+| ------------------ | ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
 | **Identification** | Positional (by relative order).                                                | Nominal (by name or short name).                                                                     |
 | **Requiredness**   | Required by default. Only the last parameter can be configured to be optional. | Optional by default. Any option can be configured to be required without limitations.                |
 | **Arity**          | Only the last parameter can be bound to a non-scalar property (i.e. an array). | Any option can be bound to a non-scalar property without limitations.                                |
@@ -242,7 +242,7 @@ Similarly, unseparated arguments in the form of `myapp -ofile` will be treated a
 
 These rules also make the order of arguments important — command line string is expected to follow this pattern:
 
-```sh
+```powershell
 > myapp [...directives] [command] [...parameters] [...options]
 ```
 
@@ -288,7 +288,7 @@ public class FileSizeCalculatorCommand : ICommand
 }
 ```
 
-```sh
+```powershell
 > dotnet myapp.dll file1.bin file2.exe
 
 Total file size: 186368 bytes
@@ -314,7 +314,7 @@ public class FileSizeCalculatorCommand : ICommand
 }
 ```
 
-```sh
+```powershell
 > dotnet myapp.dll --files file1.bin file2.exe
 
 Total file size: 186368 bytes
@@ -391,7 +391,7 @@ public class AuthCommand : ICommand
 }
 ```
 
-```sh
+```powershell
 > $env:AUTH_TOKEN="test"
 
 > dotnet myapp.dll
@@ -445,7 +445,7 @@ For example, running `dotnet myapp.dll cmd1 arg1 -p 42` will execute `FirstComma
 
 Requesting help will show direct subcommands of the current command:
 
-```sh
+```powershell
 > dotnet myapp.dll --help
 
 MyApp v1.0
@@ -467,7 +467,7 @@ You can run `dotnet myapp.dll [command] --help` to show help on a specific comma
 
 The user can also refine their help request by querying it on a specific command:
 
-```sh
+```powershell
 > dotnet myapp.dll cmd1 --help
 
 USAGE
@@ -484,7 +484,7 @@ You can run `dotnet myapp.dll cmd1 [command] --help` to show help on a specific 
 ```
 
 > 💡 Defining a default (unnamed) command is not required.
-If it's absent, running the application without specifying a command will just show the root level help text.
+> If it's absent, running the application without specifying a command will just show the root level help text.
 
 ### Reporting errors
 
@@ -517,7 +517,7 @@ public class DivideCommand : ICommand
 }
 ```
 
-```sh
+```powershell
 > dotnet myapp.dll --dividend 10 --divisor 0
 
 Division by zero is not supported.
@@ -529,7 +529,7 @@ Division by zero is not supported.
 ```
 
 > ⚠️ Even though exit codes are represented by 32-bit integers in .NET, using values outside of 8-bit unsigned range will cause an overflow on Unix systems.
-To avoid unexpected results, use numbers between 1 and 255 for exit codes that indicate failure.
+> To avoid unexpected results, use numbers between 1 and 255 for exit codes that indicate failure.
 
 ### Graceful cancellation
 
@@ -562,7 +562,7 @@ public class CancellableCommand : ICommand
 ```
 
 > ⚠️ Forceful termination of a command can only be delayed once.
-If the user issues a second interrupt signal, the process will be killed immediately without waiting for graceful cancellation.
+> If the user issues a second interrupt signal, the process will be killed immediately without waiting for graceful cancellation.
 
 ### Type activation
 
@@ -688,7 +688,7 @@ To do that, you need to pass the corresponding directive before any other argume
 In order to run the application in debug mode, use the `[debug]` directive.
 This will cause the program to launch in a suspended state, waiting for debugger to be attached to the process:
 
-```sh
+```powershell
 > dotnet myapp.dll [debug] cmd -o
 
 Attach debugger to PID 3148 to continue.
@@ -697,12 +697,12 @@ Attach debugger to PID 3148 to continue.
 To run the application in preview mode, use the `[preview]` directive.
 This will short-circuit the execution and instead print the consumed command line arguments as they were parsed, along with resolved environment variables:
 
-```sh
+```powershell
 > dotnet myapp.dll [preview] cmd arg1 arg2 -o foo --option bar1 bar2
 
 Command line:
   cmd <arg1> <arg2> [-o foo] [--option bar1 bar2]
-  
+
 Environment:
   FOO="123"
   BAR="xyz"
