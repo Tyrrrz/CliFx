@@ -49,9 +49,7 @@ To learn more about the war and how you can help, [click here](https://tyrrrz.me
 
 ## Usage
 
-### Quick start
-
-![quick start animated](https://i.imgur.com/uouNh2u.gif)
+### Application and commands
 
 To turn your program into a command line interface, modify your `Main` method so that it delegates execution to `CliApplication`.
 You can use `CliApplicationBuilder` to fluently create and configure an instance of `CliApplication`:
@@ -68,9 +66,12 @@ public static class Program
 ```
 
 > ⚠️ Ensure that your `Main()` method returns the integer exit code provided by `CliApplication.RunAsync()`, as shown in the above example.
-Exit code is used to communicate execution result to the parent process, so it's important that your program returns it.
+Exit code is used to communicate execution result to the parent process, so it's important that your program propagates it.
 
-The code above calls `AddCommandsFromThisAssembly()` to scan and resolve command types defined within the current assembly.
+> 💡 When calling `CliApplication.RunAsync()`, **CliFx** resolves command line arguments and environment variables from `Environment.GetCommandLineArgs()` and `Environment.GetEnvironmentVariables()` respectively.
+You can also provide them explicitly if you choose.
+
+The code above uses `AddCommandsFromThisAssembly()` to detect command types defined within the current assembly.
 Commands are entry points, through which the user can interact with your application.
 
 To define a command, create a new class by implementing the `ICommand` interface and annotate it with the `[Command]` attribute:
@@ -92,7 +93,7 @@ public class HelloWorldCommand : ICommand
 In order to implement `ICommand`, the class needs to define an `ExecuteAsync(...)` method.
 This is the method that gets called by the framework when the user decides to execute this command.
 
-As a parameter, this method takes an instance of `IConsole`, which is an abstraction around the system console.
+As the only parameter, this method takes an instance of `IConsole`, which is an abstraction around the system console.
 Use this abstraction in place of `System.Console` whenever you need to write output, read input, or otherwise interact with the console.
 
 With the basic setup above, the user can now run the application and get a greeting in return:
@@ -128,12 +129,12 @@ v1.0
 ### Parameters and options
 
 Commands can be configured to take input from command line arguments.
-To do that, you need to add properties to the command class and annotate them with special attributes.
+To do that, you need to add properties to the command class and bind them using special attributes.
 
 In **CliFx**, there are two types of argument bindings: **parameters** and **options**.
-Parameters are positional arguments identified by the order they appear in, while options represent sets of arguments identified by their name.
+Parameters are bound from arguments based on the order they appear in, while options are bound by their name.
 
-As an example, here's a command that calculates the logarithm of a value, using a parameter binding to specify the input and an option binding to configure the logarithm base:
+As an example, here's a command that calculates logarithm of a value — it uses a parameter binding to specify the input value and an option binding for the logarithm base:
 
 ```csharp
 [Command]
@@ -157,6 +158,9 @@ public class LogCommand : ICommand
     }
 }
 ```
+
+> 💡 **CliFx** has built-in analyzers that detect common errors in command definitions.
+Your code will not compile if the command contains duplicate options, overlapping parameters, or otherwise invalid configuration.
 
 In order to execute this command, at a minimum, the user needs to provide the input value:
 
@@ -204,14 +208,14 @@ OPTIONS
 
 Overall, parameters and options are both used to consume input from the command line, but they differ in a few important ways:
 
-|                    | Parameters                                                                                            | Options                                                                                         |
-|--------------------|-------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------|
-| **Identification** | Positional (by relative order).                                                                       | Named (by name or short name).                                                                  |
-| **Requiredness**   | Required by default. Only the last parameter can be configured to be optional.                        | Optional by default. Any option can be configured to be required without limitations.           |
-| **Arity**          | Depends on the property type. Only the last parameter can be bound to a non-scalar type (i.e. array). | Depends on the property type. Any option can be bound to a non-scalar type without limitations. |
-| **Fallback**       | —                                                                                                     | Can be configured to use an environment variable as fallback, in case the option isn't set.     |
+|                    | Parameter                                                                      | Option                                                                                               |
+|--------------------|--------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
+| **Identification** | Positional (by relative order).                                                | Nominal (by name or short name).                                                                     |
+| **Requiredness**   | Required by default. Only the last parameter can be configured to be optional. | Optional by default. Any option can be configured to be required without limitations.                |
+| **Arity**          | Only the last parameter can be bound to a non-scalar property (i.e. an array). | Any option can be bound to a non-scalar property without limitations.                                |
+| **Fallback**       | —                                                                              | Can be configured to use an environment variable as fallback if the value isn't explicitly provided. |
 
-As a general guideline, it's recommended to use parameters for required inputs that the command can't function without.
+As a general guideline, use parameters for required inputs that the command can't function without.
 Use options for all other non-required inputs or when specifying the name explicitly makes the usage clearer.
 
 ### Argument syntax
@@ -227,26 +231,26 @@ Here are some examples of how it works:
 - `myapp -xqf bar` sets options `'x'` and `'q'` without value, and option `'f'` to value `"bar"`
 - `myapp -i file1.txt file2.txt` sets option `'i'` to a sequence of values `"file1.txt"` and `"file2.txt"`
 - `myapp -i file1.txt -i file2.txt` sets option `'i'` to a sequence of values `"file1.txt"` and `"file2.txt"`
-- `myapp cmd abc -o` routes to command `cmd` (assuming it's an existing command) with parameter `abc` and sets option `'o'` without value
+- `myapp cmd abc -o` routes to command `cmd` (assuming it's a command) with parameter `abc` and sets option `'o'` without value
 
 Additionally, argument parsing in **CliFx** aims to be as deterministic as possible, ideally yielding the same result regardless of the application configuration.
-In fact, the only context-sensitive part in the parser is the command name resolution, which needs to know the list of available commands in order to discern between arguments that correspond to command name and arguments which map as parameters.
+In fact, the only context-sensitive part in the parser is the command name resolution, which needs to know the list of available commands in order to discern them from parameters.
 
 The parser's context-free nature has several implications on how it consumes arguments.
-For example, passing `myapp -i file1.txt file2.txt` will always be parsed as an option with multiple values, regardless of the arity of the underlying property it's bound to.
+For example, `myapp -i file1.txt file2.txt` will always be parsed as an option with multiple values, regardless of the arity of the underlying property it's bound to.
 Similarly, unseparated arguments in the form of `myapp -ofile` will be treated as five distinct options `'o'`, `'f'`, `'i'`, `'l'`, `'e'`, instead of `'o'` being set to value `"file"`.
 
-Because of these rules, order of arguments is semantically important and must always follow this pattern:
+These rules also make the order of arguments important — command line string is expected to follow this pattern:
 
-```txt
-[directives] [command name] [parameters] [options]
+```sh
+> myapp [...directives] [command] [...parameters] [...options]
 ```
 
 ### Value conversion
 
-Parameters and options can have the following underlying types:
+Parameters and options can be bound to properties with the following underlying types:
 
-- Standard types
+- Basic types
   - Primitive types (`int`, `bool`, `double`, `ulong`, `char`, etc.)
   - Date and time types (`DateTime`, `DateTimeOffset`, `TimeSpan`)
   - Enum types (converted from either name or numeric value)
@@ -366,10 +370,42 @@ public class SurfaceCalculatorCommand : ICommand
 }
 ```
 
+### Environment variables
+
+An option can be configured to use a specific environment variable as fallback.
+If the user does not provide value for such option through command line arguments, the current value of the environment variable will be used instead.
+
+```csharp
+[Command]
+public class AuthCommand : ICommand
+{
+    [CommandOption("token", IsRequired = true, EnvironmentVariable = "AUTH_TOKEN")]
+    public string AuthToken { get; init; }
+
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(AuthToken);
+
+        return default;
+    }
+}
+```
+
+```sh
+> $env:AUTH_TOKEN="test"
+
+> dotnet myapp.dll
+
+test
+```
+
+Environment variables can be configured for options of non-scalar types (arrays, lists, etc.) as well.
+In such case, the values of the environment variable will be split by `Path.PathSeparator` (`;` on Windows, `:` on Linux).
+
 ### Multiple commands
 
 In order to facilitate a variety of different workflows, command line applications may provide the user with more than just a single command.
-Complex applications may also nest commands within each other, employing a multi-level hierarchical structure.
+Complex applications may also nest commands underneath each other, employing a multi-level hierarchical structure.
 
 With **CliFx**, this is achieved by simply giving each command a unique name through the `[Command]` attribute.
 Commands that have common name segments are considered to be hierarchically related, which affects how they're listed in the help text.
@@ -404,7 +440,7 @@ public class SubCommand : ICommand
 }
 ```
 
-Once configured, the user can execute a specific command by including its name in the passed arguments.
+Once configured, the user can execute a specific command by prepending its name to the passed arguments.
 For example, running `dotnet myapp.dll cmd1 arg1 -p 42` will execute `FirstCommand` in the above example.
 
 Requesting help will show direct subcommands of the current command:
@@ -682,38 +718,7 @@ var app = new CliApplicationBuilder()
     .Build();
 ```
 
-### Environment variables
-
-An option can be configured to use a specific environment variable as fallback.
-If the user does not provide value for such option through command line arguments, the current value of the environment variable will be used instead.
-
-```csharp
-[Command]
-public class AuthCommand : ICommand
-{
-    [CommandOption("token", IsRequired = true, EnvironmentVariable = "AUTH_TOKEN")]
-    public string AuthToken { get; init; }
-
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(AuthToken);
-
-        return default;
-    }
-}
-```
-
-```sh
-> $env:AUTH_TOKEN="test"
-
-> dotnet myapp.dll
-
-test
-```
-
-Environment variables can be configured for options of non-scalar types (arrays, lists, etc.) as well.
-In such case, the values of the environment variable will be split by `Path.PathSeparator` (`;` on Windows, `:` on Linux).
-
 ## Etymology
 
-**CliFx** is made out of "Cli" for "Command Line Interface" and "Fx" for "Framework". It's pronounced as "cliff ex".
+**CliFx** is made out of "Cli" for "Command Line Interface" and "Fx" for "Framework".
+It's pronounced as "cliff ex".
