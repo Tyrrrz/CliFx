@@ -77,7 +77,7 @@ public interface IConsole
     /// <summary>
     /// Registers a handler for the interrupt signal (Ctrl+C) on the console and returns
     /// a token representing the cancellation request.
-    /// Subsequent calls to this method have no side-effects and return the same token.
+    /// Subsequent calls to this method have no side effects and return the same token.
     /// </summary>
     /// <remarks>
     /// <para>
