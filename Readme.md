@@ -209,7 +209,7 @@ OPTIONS
 Overall, parameters and options are both used to consume input from the command line, but they differ in a few important ways:
 
 |                    | Parameter                                                                      | Option                                                                                               |
-| ------------------ | ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
+|--------------------|--------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
 | **Identification** | Positional (by relative order).                                                | Nominal (by name or short name).                                                                     |
 | **Requiredness**   | Required by default. Only the last parameter can be configured to be optional. | Optional by default. Any option can be configured to be required without limitations.                |
 | **Arity**          | Only the last parameter can be bound to a non-scalar property (i.e. an array). | Any option can be bound to a non-scalar property without limitations.                                |

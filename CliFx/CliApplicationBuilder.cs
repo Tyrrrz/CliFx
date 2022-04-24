@@ -6,6 +6,7 @@ using System.Reflection;
 using CliFx.Attributes;
 using CliFx.Infrastructure;
 using CliFx.Schema;
+using CliFx.Utils;
 using CliFx.Utils.Extensions;
 
 namespace CliFx;
@@ -21,7 +22,7 @@ public partial class CliApplicationBuilder
     private bool _isPreviewModeAllowed = true;
     private string? _title;
     private string? _executableName;
-    private string? _versionText;
+    private string? _version;
     private string? _description;
     private IConsole? _console;
     private ITypeActivator? _typeActivator;
@@ -144,7 +145,7 @@ public partial class CliApplicationBuilder
     /// </remarks>
     public CliApplicationBuilder SetVersion(string version)
     {
-        _versionText = version;
+        _version = version;
         return this;
     }
 
@@ -189,7 +190,7 @@ public partial class CliApplicationBuilder
         var metadata = new ApplicationMetadata(
             _title ?? GetDefaultTitle(),
             _executableName ?? GetDefaultExecutableName(),
-            _versionText ?? GetDefaultVersionText(),
+            _version ?? GetDefaultVersionText(),
             _description
         );
 
@@ -210,14 +211,9 @@ public partial class CliApplicationBuilder
 
 public partial class CliApplicationBuilder
 {
-    private static readonly Lazy<Assembly?> EntryAssemblyLazy = new(Assembly.GetEntryAssembly);
-
-    // Entry assembly can be null, for example in tests
-    private static Assembly? EntryAssembly => EntryAssemblyLazy.Value;
-
     private static string GetDefaultTitle()
     {
-        var entryAssemblyName = EntryAssembly?.GetName().Name;
+        var entryAssemblyName = EnvironmentEx.EntryAssembly?.GetName().Name;
         if (string.IsNullOrWhiteSpace(entryAssemblyName))
             return "App";
 
@@ -226,26 +222,39 @@ public partial class CliApplicationBuilder
 
     private static string GetDefaultExecutableName()
     {
-        var entryAssemblyLocation = EntryAssembly?.Location;
+        var entryAssemblyLocation = EnvironmentEx.EntryAssembly?.Location;
         if (string.IsNullOrWhiteSpace(entryAssemblyLocation))
             return "app";
 
-        // The assembly can be an .exe or a .dll, depending on how it was packaged
+        // If the application was launched via matching EXE apphost, use that as the executable name
+        var isLaunchedViaAppHost = string.Equals(
+            EnvironmentEx.ProcessPath,
+            Path.ChangeExtension(entryAssemblyLocation, ".exe"),
+            StringComparison.OrdinalIgnoreCase
+        );
+
+        if (isLaunchedViaAppHost)
+            return Path.GetFileNameWithoutExtension(entryAssemblyLocation);
+
+        // Otherwise, use the entry assembly as the executable name.
+        // Prefix it with `dotnet` if it's a DLL file.
         var isDll = string.Equals(
             Path.GetExtension(entryAssemblyLocation),
             ".dll",
             StringComparison.OrdinalIgnoreCase
         );
 
-        var name = isDll
+        return isDll
             ? "dotnet " + Path.GetFileName(entryAssemblyLocation)
             : Path.GetFileNameWithoutExtension(entryAssemblyLocation);
-
-        return name;
     }
 
-    private static string GetDefaultVersionText() =>
-        EntryAssembly is not null
-            ? "v" + EntryAssembly.GetName().Version.ToSemanticString()
-            : "v1.0";
+    private static string GetDefaultVersionText()
+    {
+        var entryAssemblyVersion = EnvironmentEx.EntryAssembly?.GetName().Version;
+        if (entryAssemblyVersion is null)
+            return "v1.0";
+
+        return "v" + entryAssemblyVersion.ToSemanticString();
+    }
 }
