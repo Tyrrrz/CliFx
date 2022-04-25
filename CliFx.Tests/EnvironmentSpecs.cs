@@ -246,9 +246,11 @@ public class Command : ICommand
         var command = Cli.Wrap("dotnet")
             .WithArguments(a => a
                 .Add(Dummy.Program.Location)
-                .Add("env-test"))
+                .Add("env-test")
+            )
             .WithEnvironmentVariables(e => e
-                .Set("ENV_TARGET", "Mars"));
+                .Set("ENV_TARGET", "Mars")
+            );
 
         // Act
         var result = await command.ExecuteBufferedAsync();

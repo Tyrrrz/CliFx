@@ -31,7 +31,8 @@ public class ConsoleSpecs : SpecsBase
         var command = "Hello world" | Cli.Wrap("dotnet")
             .WithArguments(a => a
                 .Add(Dummy.Program.Location)
-                .Add("console-test"));
+                .Add("console-test")
+            );
 
         // Act
         var result = await command.ExecuteBufferedAsync();

@@ -28,7 +28,8 @@ public class DirectivesSpecs : SpecsBase
         var command = Cli.Wrap("dotnet")
             .WithArguments(a => a
                 .Add(Dummy.Program.Location)
-                .Add("[debug]")) | stdOutBuffer;
+                .Add("[debug]")
+            ) | stdOutBuffer;
 
         // Act
         try
@@ -57,7 +58,7 @@ public class DirectivesSpecs : SpecsBase
         }
         catch (OperationCanceledException)
         {
-            // It's expected to fail
+            // This is expected
         }
 
         var stdOut = stdOutBuffer.ToString();
