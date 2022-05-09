@@ -1,3 +1,7 @@
+### v2.2.5 (10-May-2022)
+
+- Updated default value resolution for the application executable name. It will now resolve to `myapp.exe` instead of `dotnet myapp.dll` when the application is launched through the EXE apphost on Windows. On other platforms, or when running the application through the .NET CLI, the behavior will be the same as before.
+
 ### v2.2.4 (22-Apr-2022)
 
 - Added more contextual information to analyzer diagnostics.
