@@ -169,7 +169,7 @@ internal class CommandBinder
                 : ex.Message;
 
             throw CliFxException.UserError(
-                $"{memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} cannot be set from provided argument(s):" +
+                $"{memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} cannot be set from the provided argument(s):" +
                 Environment.NewLine +
                 rawValues.Select(v => '<' + v + '>').JoinToString(" ") +
                 Environment.NewLine +
