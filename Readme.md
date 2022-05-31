@@ -65,10 +65,12 @@ public static class Program
 }
 ```
 
-> ⚠️ Ensure that your `Main()` method returns the integer exit code provided by `CliApplication.RunAsync()`, as shown in the above example.
+> **Warning**:
+> Ensure that your `Main()` method returns the integer exit code provided by `CliApplication.RunAsync()`, as shown in the above example.
 > Exit code is used to communicate execution result to the parent process, so it's important that your program propagates it.
 
-> 💡 When calling `CliApplication.RunAsync()`, **CliFx** resolves command line arguments and environment variables from `Environment.GetCommandLineArgs()` and `Environment.GetEnvironmentVariables()` respectively.
+> **Note**:
+> When calling `CliApplication.RunAsync()`, **CliFx** resolves command line arguments and environment variables from `Environment.GetCommandLineArgs()` and `Environment.GetEnvironmentVariables()` respectively.
 > You can also provide them explicitly if you choose.
 
 The code above uses `AddCommandsFromThisAssembly()` to detect command types defined within the current assembly.
@@ -159,7 +161,8 @@ public class LogCommand : ICommand
 }
 ```
 
-> 💡 **CliFx** has built-in analyzers that detect common errors in command definitions.
+> **Note**:
+> **CliFx** has built-in analyzers that detect common errors in command definitions.
 > Your code will not compile if the command contains duplicate options, overlapping parameters, or otherwise invalid configuration.
 
 In order to execute this command, at a minimum, the user needs to provide the input value:
@@ -483,7 +486,8 @@ COMMANDS
 You can run `dotnet myapp.dll cmd1 [command] --help` to show help on a specific command.
 ```
 
-> 💡 Defining a default (unnamed) command is not required.
+> **Note**:
+> Defining a default (unnamed) command is not required.
 > If it's absent, running the application without specifying a command will just show the root level help text.
 
 ### Reporting errors
@@ -528,7 +532,8 @@ Division by zero is not supported.
 133
 ```
 
-> ⚠️ Even though exit codes are represented by 32-bit integers in .NET, using values outside 8-bit unsigned range will cause an overflow on Unix systems.
+> **Warning**:
+> Even though exit codes are represented by 32-bit integers in .NET, using values outside 8-bit unsigned range will cause an overflow on Unix systems.
 > To avoid unexpected results, use numbers between 1 and 255 for exit codes that indicate failure.
 
 ### Graceful cancellation
@@ -561,7 +566,8 @@ public class CancellableCommand : ICommand
 }
 ```
 
-> ⚠️ Forceful termination of a command can only be delayed once.
+> **Warning**:
+> Forceful termination of a command can only be delayed once.
 > If the user issues a second interrupt signal, the process will be killed immediately without waiting for graceful cancellation.
 
 ### Type activation
