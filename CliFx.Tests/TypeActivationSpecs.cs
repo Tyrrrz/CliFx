@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using CliFx.Infrastructure;
 using CliFx.Tests.Utils;
 using FluentAssertions;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -87,7 +88,7 @@ public class Command : ICommand
     }
 
     [Fact]
-    public async Task Delegate_type_activator_can_initialize_a_type_using_a_custom_function()
+    public async Task Custom_type_activator_can_initialize_a_type_using_a_given_function()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -110,7 +111,7 @@ public class Command : ICommand
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
             .UseConsole(FakeConsole)
-            .UseTypeActivator(type => Activator.CreateInstance(type, "hello world")!)
+            .UseTypeActivator(type => Activator.CreateInstance(type, "Hello world")!)
             .Build();
 
         // Act
@@ -123,11 +124,55 @@ public class Command : ICommand
 
         // Assert
         exitCode.Should().Be(0);
-        stdOut.Trim().Should().Be("hello world");
+        stdOut.Trim().Should().Be("Hello world");
     }
 
     [Fact]
-    public async Task Delegate_type_activator_fails_if_the_underlying_function_returns_null()
+    public async Task Custom_type_activator_can_initialize_a_type_using_a_service_provider()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            @"
+[Command]
+public class Command : ICommand
+{
+    private readonly string _foo;
+
+    public Command(string foo) => _foo = foo;
+
+    public ValueTask ExecuteAsync(IConsole console)
+    {
+        console.Output.WriteLine(_foo);
+        return default;
+    }
+}");
+
+        var serviceProvider = new ServiceCollection()
+            .AddSingleton(commandType, Activator.CreateInstance(commandType, "Hello world")!)
+            .BuildServiceProvider();
+
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .UseTypeActivator(serviceProvider)
+            .Build();
+
+        // Act
+        var exitCode = await application.RunAsync(
+            Array.Empty<string>(),
+            new Dictionary<string, string>()
+        );
+
+        var stdOut = FakeConsole.ReadOutputString();
+
+        // Assert
+        exitCode.Should().Be(0);
+        stdOut.Trim().Should().Be("Hello world");
+    }
+
+    [Fact]
+    public async Task Custom_type_activator_fails_if_the_underlying_function_returns_null()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
