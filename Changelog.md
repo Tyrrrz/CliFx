@@ -1,3 +1,8 @@
+### v2.2.6 (14-Jun-2022)
+
+- Added an overload of `CliApplicationBuilder.UseTypeActivator(...)` that accepts an instance of `IServiceProvider`. This slightly simplifies integration with many DI containers.
+- Fixed minor grammar mistakes in user-facing error messages.
+
 ### v2.2.5 (10-May-2022)
 
 - Updated default value resolution for the application executable name. It will now resolve to `myapp.exe` instead of `dotnet myapp.dll` when the application is launched through the EXE apphost on Windows. On other platforms, or when running the application through the .NET CLI, the behavior will be the same as before.

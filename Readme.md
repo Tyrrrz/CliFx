@@ -597,7 +597,7 @@ public static class Program
 
         return await new CliApplicationBuilder()
             .AddCommandsFromThisAssembly()
-            .UseTypeActivator(serviceProvider.GetService)
+            .UseTypeActivator(serviceProvider)
             .Build()
             .RunAsync();
     }
