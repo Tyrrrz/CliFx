@@ -57,6 +57,8 @@ public class Command : ICommand
         console.ResetColor();
         console.ForegroundColor = ConsoleColor.DarkMagenta;
         console.BackgroundColor = ConsoleColor.DarkMagenta;
+        console.WindowWidth = 100;
+        console.WindowHeight = 25;
         console.CursorLeft = 42;
         console.CursorTop = 24;
 
@@ -90,6 +92,8 @@ public class Command : ICommand
         Console.BackgroundColor.Should().NotBe(ConsoleColor.DarkMagenta);
 
         // This fails because tests don't spawn a console window
+        //Console.WindowWidth.Should().Be(100);
+        //Console.WindowHeight.Should().Be(25);
         //Console.CursorLeft.Should().NotBe(42);
         //Console.CursorTop.Should().NotBe(24);
 

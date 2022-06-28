@@ -42,11 +42,10 @@ public class FakeConsole : IConsole, IDisposable
     public ConsoleColor BackgroundColor { get; set; } = ConsoleColor.Black;
 
     /// <inheritdoc />
-    public void ResetColor()
-    {
-        ForegroundColor = ConsoleColor.Gray;
-        BackgroundColor = ConsoleColor.Black;
-    }
+    public int WindowWidth { get; set; } = 232; // Windows defaults
+
+    /// <inheritdoc />
+    public int WindowHeight { get; set; } = 14; // Windows defaults
 
     /// <inheritdoc />
     public int CursorLeft { get; set; }
@@ -77,7 +76,14 @@ public class FakeConsole : IConsole, IDisposable
     /// Enqueues a simulated key press, which can then be read by calling <see cref="ReadKey"/>.
     /// </summary>
     public void EnqueueKey(ConsoleKeyInfo key) => _keys.Enqueue(key);
-    
+
+    /// <inheritdoc />
+    public void ResetColor()
+    {
+        ForegroundColor = ConsoleColor.Gray;
+        BackgroundColor = ConsoleColor.Black;
+    }
+
     /// <inheritdoc />
     public void Clear()
     {
@@ -85,7 +91,7 @@ public class FakeConsole : IConsole, IDisposable
 
     /// <inheritdoc />
     public CancellationToken RegisterCancellationHandler() => _cancellationTokenSource.Token;
-    
+
     /// <summary>
     /// Sends a cancellation signal to the currently executing command.
     /// </summary>

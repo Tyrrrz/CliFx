@@ -15,7 +15,7 @@ public interface IConsole
     ConsoleReader Input { get; }
 
     /// <summary>
-    /// Whether the input stream is redirected.
+    /// Gets a value that indicates whether input has been redirected from the standard input stream.
     /// </summary>
     bool IsInputRedirected { get; }
 
@@ -25,7 +25,7 @@ public interface IConsole
     ConsoleWriter Output { get; }
 
     /// <summary>
-    /// Whether the output stream is redirected.
+    /// Gets a value that indicates whether output has been redirected from the standard output stream.
     /// </summary>
     bool IsOutputRedirected { get; }
 
@@ -35,32 +35,37 @@ public interface IConsole
     ConsoleWriter Error { get; }
 
     /// <summary>
-    /// Whether the error stream is redirected.
+    /// Gets a value that indicates whether error output has been redirected from the standard error stream.
     /// </summary>
     bool IsErrorRedirected { get; }
 
     /// <summary>
-    /// Current foreground color.
+    /// Gets or sets the foreground color of the console
     /// </summary>
     ConsoleColor ForegroundColor { get; set; }
 
     /// <summary>
-    /// Current background color.
+    /// Gets or sets the background color of the console.
     /// </summary>
     ConsoleColor BackgroundColor { get; set; }
 
     /// <summary>
-    /// Resets foreground and background colors to their default values.
+    /// Gets or sets the width of the console window.
     /// </summary>
-    void ResetColor();
+    int WindowWidth { get; set; }
 
     /// <summary>
-    /// Cursor left offset.
+    /// Gets or sets the height of the console window.
+    /// </summary>
+    int WindowHeight { get; set; }
+
+    /// <summary>
+    /// Gets or sets the column position of the cursor within the buffer area.
     /// </summary>
     int CursorLeft { get; set; }
 
     /// <summary>
-    /// Cursor top offset.
+    /// Gets or sets the row position of the cursor within the buffer area.
     /// </summary>
     int CursorTop { get; set; }
 
@@ -68,12 +73,17 @@ public interface IConsole
     /// Obtains the next character or function key pressed by the user.
     /// </summary>
     ConsoleKeyInfo ReadKey(bool intercept = false);
-    
+
+    /// <summary>
+    /// Sets the foreground and background console colors to their defaults.
+    /// </summary>
+    void ResetColor();
+
     /// <summary>
     /// Clears the console buffer and corresponding console window of display information.
     /// </summary>
     void Clear();
-    
+
     /// <summary>
     /// Registers a handler for the interrupt signal (Ctrl+C) on the console and returns
     /// a token representing the cancellation request.

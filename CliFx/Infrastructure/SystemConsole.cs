@@ -41,7 +41,21 @@ public class SystemConsole : IConsole, IDisposable
         get => Console.BackgroundColor;
         set => Console.BackgroundColor = value;
     }
-    
+
+    /// <inheritdoc />
+    public int WindowWidth
+    {
+        get => Console.WindowWidth;
+        set => Console.WindowWidth = value;
+    }
+
+    /// <inheritdoc />
+    public int WindowHeight
+    {
+        get => Console.WindowHeight;
+        set => Console.WindowHeight = value;
+    }
+
     /// <inheritdoc />
     public int CursorLeft
     {
@@ -67,14 +81,14 @@ public class SystemConsole : IConsole, IDisposable
     }
 
     /// <inheritdoc />
+    public ConsoleKeyInfo ReadKey(bool intercept = false) => Console.ReadKey(intercept);
+
+    /// <inheritdoc />
     public void ResetColor() => Console.ResetColor();
 
     /// <inheritdoc />
-    public ConsoleKeyInfo ReadKey(bool intercept = false) => Console.ReadKey(intercept);
-    
-    /// <inheritdoc />
     public void Clear() => Console.Clear();
-    
+
     /// <inheritdoc />
     public CancellationToken RegisterCancellationHandler()
     {
@@ -95,7 +109,7 @@ public class SystemConsole : IConsole, IDisposable
 
         return (_cancellationTokenSource = cts).Token;
     }
-    
+
     /// <inheritdoc />
     public void Dispose()
     {
