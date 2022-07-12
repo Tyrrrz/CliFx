@@ -1,3 +1,8 @@
+### v2.3 (12-Jul-2022)
+
+- Added console dimension properties `WindowWidth` and `WindowHeight` to `IConsole` interface and implementing classes.
+- Improved inline documentation for members of `IConsole` interface.
+
 ### v2.2.6 (14-Jun-2022)
 
 - Added an overload of `CliApplicationBuilder.UseTypeActivator(...)` that accepts an instance of `IServiceProvider`. This slightly simplifies integration with many DI containers.
