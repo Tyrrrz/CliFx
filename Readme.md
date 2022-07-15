@@ -219,7 +219,7 @@ Overall, parameters and options are both used to consume input from the command 
 | **Fallback**       | —                                                                              | Can be configured to use an environment variable as fallback if the value isn't explicitly provided. |
 
 As a general guideline, use parameters for required inputs that the command can't function without.
-Use options for all other non-required inputs or when specifying the name explicitly makes the usage clearer.
+Use options for all other non-required inputs, or when specifying the name explicitly makes the usage clearer.
 
 ### Argument syntax
 
@@ -403,7 +403,7 @@ test
 ```
 
 Environment variables can be configured for options of non-scalar types (arrays, lists, etc.) as well.
-In such case, the values of the environment variable will be split by `Path.PathSeparator` (`;` on Windows, `:` on Linux).
+In such case, the values of the environment variable will be split by `Path.PathSeparator` (`;` on Windows, `:` on Unix systems).
 
 ### Multiple commands
 
@@ -488,7 +488,7 @@ You can run `dotnet myapp.dll cmd1 [command] --help` to show help on a specific 
 
 > **Note**:
 > Defining a default (unnamed) command is not required.
-> If it's absent, running the application without specifying a command will just show the root level help text.
+> If it's absent, running the application without specifying a command will just show the root-level help text.
 
 ### Reporting errors
 
@@ -568,7 +568,7 @@ public class CancellableCommand : ICommand
 
 > **Warning**:
 > Forceful termination of a command can only be delayed once.
-> If the user issues a second interrupt signal, the process will be killed immediately without waiting for graceful cancellation.
+> If the user issues a second interrupt signal, the process will be killed immediately, without waiting for graceful cancellation.
 
 ### Type activation
 
