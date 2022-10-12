@@ -9,7 +9,7 @@ namespace CliFx;
 public interface ICommand
 {
     /// <summary>
-    /// Executes the command using the specified implementation of <see cref="IConsole"/>.
+    /// Executes the command using the specified implementation of <see cref="IConsole" />.
     /// </summary>
     /// <remarks>
     /// If the execution of the command is not asynchronous, simply end the method with

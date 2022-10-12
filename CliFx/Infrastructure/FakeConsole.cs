@@ -6,7 +6,7 @@ using System.Threading;
 namespace CliFx.Infrastructure;
 
 /// <summary>
-/// Implementation of <see cref="IConsole"/> that uses the provided fake
+/// Implementation of <see cref="IConsole" /> that uses the provided fake
 /// standard input, output, and error streams.
 /// </summary>
 /// <remarks>
@@ -54,7 +54,7 @@ public class FakeConsole : IConsole, IDisposable
     public int CursorTop { get; set; }
 
     /// <summary>
-    /// Initializes an instance of <see cref="FakeConsole"/>.
+    /// Initializes an instance of <see cref="FakeConsole" />.
     /// </summary>
     public FakeConsole(Stream? input = null, Stream? output = null, Stream? error = null)
     {
@@ -73,7 +73,7 @@ public class FakeConsole : IConsole, IDisposable
             );
 
     /// <summary>
-    /// Enqueues a simulated key press, which can then be read by calling <see cref="ReadKey"/>.
+    /// Enqueues a simulated key press, which can then be read by calling <see cref="ReadKey" />.
     /// </summary>
     public void EnqueueKey(ConsoleKeyInfo key) => _keys.Enqueue(key);
 
@@ -96,7 +96,7 @@ public class FakeConsole : IConsole, IDisposable
     /// Sends a cancellation signal to the currently executing command.
     /// </summary>
     /// <remarks>
-    /// If the command is not cancellation-aware (i.e. it doesn't call <see cref="IConsole.RegisterCancellationHandler"/>),
+    /// If the command is not cancellation-aware (i.e. it doesn't call <see cref="IConsole.RegisterCancellationHandler" />),
     /// this method will not have any effect.
     /// </remarks>
     public void RequestCancellation(TimeSpan? delay = null)

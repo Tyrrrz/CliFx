@@ -3,7 +3,7 @@
 namespace CliFx.Infrastructure;
 
 /// <summary>
-/// Implementation of <see cref="IConsole"/> that uses fake
+/// Implementation of <see cref="IConsole" /> that uses fake
 /// standard input, output, and error streams backed by in-memory stores.
 /// </summary>
 /// <remarks>
@@ -24,7 +24,7 @@ public class FakeInMemoryConsole : FakeConsole
     }
 
     /// <summary>
-    /// Initializes an instance of <see cref="FakeInMemoryConsole"/>.
+    /// Initializes an instance of <see cref="FakeInMemoryConsole" />.
     /// </summary>
     public FakeInMemoryConsole()
         : this(new MemoryStream(), new MemoryStream(), new MemoryStream())

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace CliFx.Infrastructure;
 
 /// <summary>
-/// Implements a <see cref="TextReader"/> for reading characters from a console stream.
+/// Implements a <see cref="TextReader" /> for reading characters from a console stream.
 /// </summary>
 // Both the underlying stream AND the stream reader must be synchronized!
 // https://github.com/Tyrrrz/CliFx/issues/123
@@ -19,7 +19,7 @@ public partial class ConsoleReader : StreamReader
     public IConsole Console { get; }
 
     /// <summary>
-    /// Initializes an instance of <see cref="ConsoleReader"/>.
+    /// Initializes an instance of <see cref="ConsoleReader" />.
     /// </summary>
     public ConsoleReader(IConsole console, Stream stream, Encoding encoding)
         : base(stream, encoding, false, 4096)
@@ -28,7 +28,7 @@ public partial class ConsoleReader : StreamReader
     }
 
     /// <summary>
-    /// Initializes an instance of <see cref="ConsoleReader"/>.
+    /// Initializes an instance of <see cref="ConsoleReader" />.
     /// </summary>
     public ConsoleReader(IConsole console, Stream stream)
         : this(console, stream, System.Console.InputEncoding)

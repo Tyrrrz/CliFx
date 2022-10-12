@@ -26,7 +26,7 @@ public class ApplicationMetadata
     public string? Description { get; }
 
     /// <summary>
-    /// Initializes an instance of <see cref="ApplicationMetadata"/>.
+    /// Initializes an instance of <see cref="ApplicationMetadata" />.
     /// </summary>
     public ApplicationMetadata(
         string title,

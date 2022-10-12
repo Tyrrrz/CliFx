@@ -24,7 +24,7 @@ public class ApplicationConfiguration
     public bool IsPreviewModeAllowed { get; }
 
     /// <summary>
-    /// Initializes an instance of <see cref="ApplicationConfiguration"/>.
+    /// Initializes an instance of <see cref="ApplicationConfiguration" />.
     /// </summary>
     public ApplicationConfiguration(
         IReadOnlyList<Type> commandTypes,

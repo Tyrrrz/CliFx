@@ -9,7 +9,7 @@ namespace CliFx.Exceptions;
 public class CommandException : CliFxException
 {
     /// <summary>
-    /// Initializes an instance of <see cref="CommandException"/>.
+    /// Initializes an instance of <see cref="CommandException" />.
     /// </summary>
     public CommandException(
         string message,

@@ -24,7 +24,7 @@ public partial class CliFxException : Exception
     public bool ShowHelp { get; }
 
     /// <summary>
-    /// Initializes an instance of <see cref="CliFxException"/>.
+    /// Initializes an instance of <see cref="CliFxException" />.
     /// </summary>
     public CliFxException(
         string message,

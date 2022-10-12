@@ -26,7 +26,7 @@ public abstract class BindingValidator<T> : IBindingValidator
     /// Returns null if validation is successful, or an error in case of failure.
     /// </summary>
     /// <remarks>
-    /// You can use the utility methods <see cref="Ok"/> and <see cref="Error"/> to
+    /// You can use the utility methods <see cref="Ok" /> and <see cref="Error" /> to
     /// create an appropriate result.
     /// </remarks>
     public abstract BindingValidationError? Validate(T? value);

@@ -26,7 +26,7 @@ public sealed class CommandAttribute : Attribute
     public string? Description { get; set; }
 
     /// <summary>
-    /// Initializes an instance of <see cref="CommandAttribute"/>.
+    /// Initializes an instance of <see cref="CommandAttribute" />.
     /// </summary>
     public CommandAttribute(string name)
     {
@@ -34,7 +34,7 @@ public sealed class CommandAttribute : Attribute
     }
 
     /// <summary>
-    /// Initializes an instance of <see cref="CommandAttribute"/>.
+    /// Initializes an instance of <see cref="CommandAttribute" />.
     /// </summary>
     public CommandAttribute()
     {

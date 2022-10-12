@@ -14,7 +14,7 @@ public sealed class CommandOptionAttribute : Attribute
     /// </summary>
     /// <remarks>
     /// Must contain at least two characters and start with a letter.
-    /// Either <see cref="Name"/> or <see cref="ShortName"/> must be set.
+    /// Either <see cref="Name" /> or <see cref="ShortName" /> must be set.
     /// All options in a command must have unique names (comparison IS NOT case-sensitive).
     /// </remarks>
     public string? Name { get; }
@@ -23,7 +23,7 @@ public sealed class CommandOptionAttribute : Attribute
     /// Option short name.
     /// </summary>
     /// <remarks>
-    /// Either <see cref="Name"/> or <see cref="ShortName"/> must be set.
+    /// Either <see cref="Name" /> or <see cref="ShortName" /> must be set.
     /// All options in a command must have unique short names (comparison IS case-sensitive).
     /// </remarks>
     public char? ShortName { get; }
@@ -51,7 +51,7 @@ public sealed class CommandOptionAttribute : Attribute
     /// a value expected by the underlying property.
     /// </summary>
     /// <remarks>
-    /// Converter must derive from <see cref="BindingConverter{T}"/>.
+    /// Converter must derive from <see cref="BindingConverter{T}" />.
     /// </remarks>
     public Type? Converter { get; set; }
 
@@ -60,12 +60,12 @@ public sealed class CommandOptionAttribute : Attribute
     /// property, after it has been bound.
     /// </summary>
     /// <remarks>
-    /// Validators must derive from <see cref="BindingValidator{T}"/>.
+    /// Validators must derive from <see cref="BindingValidator{T}" />.
     /// </remarks>
     public Type[] Validators { get; set; } = Array.Empty<Type>();
 
     /// <summary>
-    /// Initializes an instance of <see cref="CommandOptionAttribute"/>.
+    /// Initializes an instance of <see cref="CommandOptionAttribute" />.
     /// </summary>
     private CommandOptionAttribute(string? name, char? shortName)
     {
@@ -74,7 +74,7 @@ public sealed class CommandOptionAttribute : Attribute
     }
 
     /// <summary>
-    /// Initializes an instance of <see cref="CommandOptionAttribute"/>.
+    /// Initializes an instance of <see cref="CommandOptionAttribute" />.
     /// </summary>
     public CommandOptionAttribute(string name, char shortName)
         : this(name, (char?) shortName)
@@ -82,7 +82,7 @@ public sealed class CommandOptionAttribute : Attribute
     }
 
     /// <summary>
-    /// Initializes an instance of <see cref="CommandOptionAttribute"/>.
+    /// Initializes an instance of <see cref="CommandOptionAttribute" />.
     /// </summary>
     public CommandOptionAttribute(string name)
         : this(name, null)
@@ -90,7 +90,7 @@ public sealed class CommandOptionAttribute : Attribute
     }
 
     /// <summary>
-    /// Initializes an instance of <see cref="CommandOptionAttribute"/>.
+    /// Initializes an instance of <see cref="CommandOptionAttribute" />.
     /// </summary>
     public CommandOptionAttribute(char shortName)
         : this(null, (char?) shortName)

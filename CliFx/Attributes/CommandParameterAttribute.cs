@@ -51,7 +51,7 @@ public sealed class CommandParameterAttribute : Attribute
     /// a value expected by the underlying property.
     /// </summary>
     /// <remarks>
-    /// Converter must derive from <see cref="BindingConverter{T}"/>.
+    /// Converter must derive from <see cref="BindingConverter{T}" />.
     /// </remarks>
     public Type? Converter { get; set; }
 
@@ -60,12 +60,12 @@ public sealed class CommandParameterAttribute : Attribute
     /// property, after it has been bound.
     /// </summary>
     /// <remarks>
-    /// Validators must derive from <see cref="BindingValidator{T}"/>.
+    /// Validators must derive from <see cref="BindingValidator{T}" />.
     /// </remarks>
     public Type[] Validators { get; set; } = Array.Empty<Type>();
 
     /// <summary>
-    /// Initializes an instance of <see cref="CommandParameterAttribute"/>.
+    /// Initializes an instance of <see cref="CommandParameterAttribute" />.
     /// </summary>
     public CommandParameterAttribute(int order)
     {

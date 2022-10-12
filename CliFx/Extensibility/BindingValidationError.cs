@@ -11,7 +11,7 @@ public class BindingValidationError
     public string Message { get; }
 
     /// <summary>
-    /// Initializes an instance of <see cref="BindingValidationError"/>.
+    /// Initializes an instance of <see cref="BindingValidationError" />.
     /// </summary>
     public BindingValidationError(string message) => Message = message;
 }

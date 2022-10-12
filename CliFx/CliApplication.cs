@@ -34,7 +34,7 @@ public class CliApplication
     private readonly CommandBinder _commandBinder;
 
     /// <summary>
-    /// Initializes an instance of <see cref="CliApplication"/>.
+    /// Initializes an instance of <see cref="CliApplication" />.
     /// </summary>
     public CliApplication(
         ApplicationMetadata metadata,

@@ -8,7 +8,7 @@ using CliFx.Utils;
 namespace CliFx.Infrastructure;
 
 /// <summary>
-/// Implements a <see cref="TextWriter"/> for writing characters to a console stream.
+/// Implements a <see cref="TextWriter" /> for writing characters to a console stream.
 /// </summary>
 // Both the underlying stream AND the stream writer must be synchronized!
 // https://github.com/Tyrrrz/CliFx/issues/123
@@ -20,7 +20,7 @@ public partial class ConsoleWriter : StreamWriter
     public IConsole Console { get; }
 
     /// <summary>
-    /// Initializes an instance of <see cref="ConsoleWriter"/>.
+    /// Initializes an instance of <see cref="ConsoleWriter" />.
     /// </summary>
     public ConsoleWriter(IConsole console, Stream stream, Encoding encoding)
         : base(stream, encoding.WithoutPreamble(), 256)
@@ -29,7 +29,7 @@ public partial class ConsoleWriter : StreamWriter
     }
 
     /// <summary>
-    /// Initializes an instance of <see cref="ConsoleWriter"/>.
+    /// Initializes an instance of <see cref="ConsoleWriter" />.
     /// </summary>
     public ConsoleWriter(IConsole console, Stream stream)
         : this(console, stream, System.Console.OutputEncoding)

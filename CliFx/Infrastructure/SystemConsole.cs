@@ -4,7 +4,7 @@ using System.Threading;
 namespace CliFx.Infrastructure;
 
 /// <summary>
-/// Implementation of <see cref="IConsole"/> that represents the real system console.
+/// Implementation of <see cref="IConsole" /> that represents the real system console.
 /// </summary>
 public class SystemConsole : IConsole, IDisposable
 {
@@ -71,7 +71,7 @@ public class SystemConsole : IConsole, IDisposable
     }
 
     /// <summary>
-    /// Initializes an instance of <see cref="SystemConsole"/>.
+    /// Initializes an instance of <see cref="SystemConsole" />.
     /// </summary>
     public SystemConsole()
     {

@@ -12,7 +12,7 @@ using CliFx.Utils.Extensions;
 namespace CliFx;
 
 /// <summary>
-/// Builder for <see cref="CliApplication"/>.
+/// Builder for <see cref="CliApplication" />.
 /// </summary>
 public partial class CliApplicationBuilder
 {
@@ -58,8 +58,8 @@ public partial class CliApplicationBuilder
     /// Adds commands from the specified assembly to the application.
     /// </summary>
     /// <remarks>
-    /// This method looks for public non-abstract classes that implement <see cref="ICommand"/>
-    /// and are annotated by <see cref="CommandAttribute"/>.
+    /// This method looks for public non-abstract classes that implement <see cref="ICommand" />
+    /// and are annotated by <see cref="CommandAttribute" />.
     /// </remarks>
     public CliApplicationBuilder AddCommandsFrom(Assembly commandAssembly)
     {
@@ -73,8 +73,8 @@ public partial class CliApplicationBuilder
     /// Adds commands from the specified assemblies to the application.
     /// </summary>
     /// <remarks>
-    /// This method looks for public non-abstract classes that implement <see cref="ICommand"/>
-    /// and are annotated by <see cref="CommandAttribute"/>.
+    /// This method looks for public non-abstract classes that implement <see cref="ICommand" />
+    /// and are annotated by <see cref="CommandAttribute" />.
     /// </remarks>
     public CliApplicationBuilder AddCommandsFrom(IEnumerable<Assembly> commandAssemblies)
     {
@@ -88,8 +88,8 @@ public partial class CliApplicationBuilder
     /// Adds commands from the calling assembly to the application.
     /// </summary>
     /// <remarks>
-    /// This method looks for public non-abstract classes that implement <see cref="ICommand"/>
-    /// and are annotated by <see cref="CommandAttribute"/>.
+    /// This method looks for public non-abstract classes that implement <see cref="ICommand" />
+    /// and are annotated by <see cref="CommandAttribute" />.
     /// </remarks>
     public CliApplicationBuilder AddCommandsFromThisAssembly() => AddCommandsFrom(Assembly.GetCallingAssembly());
 
@@ -159,7 +159,7 @@ public partial class CliApplicationBuilder
     }
 
     /// <summary>
-    /// Configures the application to use the specified implementation of <see cref="IConsole"/>.
+    /// Configures the application to use the specified implementation of <see cref="IConsole" />.
     /// </summary>
     public CliApplicationBuilder UseConsole(IConsole console)
     {
@@ -168,7 +168,7 @@ public partial class CliApplicationBuilder
     }
 
     /// <summary>
-    /// Configures the application to use the specified implementation of <see cref="ITypeActivator"/>.
+    /// Configures the application to use the specified implementation of <see cref="ITypeActivator" />.
     /// </summary>
     public CliApplicationBuilder UseTypeActivator(ITypeActivator typeActivator)
     {
@@ -189,7 +189,7 @@ public partial class CliApplicationBuilder
         UseTypeActivator(serviceProvider.GetService);
 
     /// <summary>
-    /// Creates a configured instance of <see cref="CliApplication"/>.
+    /// Creates a configured instance of <see cref="CliApplication" />.
     /// </summary>
     public CliApplication Build()
     {

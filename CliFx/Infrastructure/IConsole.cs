@@ -105,12 +105,12 @@ public interface IConsole
 }
 
 /// <summary>
-/// Extensions for <see cref="IConsole"/>.
+/// Extensions for <see cref="IConsole" />.
 /// </summary>
 public static class ConsoleExtensions
 {
     /// <summary>
-    /// Sets the specified foreground color and returns an <see cref="IDisposable"/>
+    /// Sets the specified foreground color and returns an <see cref="IDisposable" />
     /// that will reset the color back to its previous value upon disposal.
     /// </summary>
     public static IDisposable WithForegroundColor(this IConsole console, ConsoleColor foregroundColor)
@@ -122,7 +122,7 @@ public static class ConsoleExtensions
     }
 
     /// <summary>
-    /// Sets the specified background color and returns an <see cref="IDisposable"/>
+    /// Sets the specified background color and returns an <see cref="IDisposable" />
     /// that will reset the color back to its previous value upon disposal.
     /// </summary>
     public static IDisposable WithBackgroundColor(this IConsole console, ConsoleColor backgroundColor)
@@ -134,7 +134,7 @@ public static class ConsoleExtensions
     }
 
     /// <summary>
-    /// Sets the specified foreground and background colors and returns an <see cref="IDisposable"/>
+    /// Sets the specified foreground and background colors and returns an <see cref="IDisposable" />
     /// that will reset the colors back to their previous values upon disposal.
     /// </summary>
     public static IDisposable WithColors(
