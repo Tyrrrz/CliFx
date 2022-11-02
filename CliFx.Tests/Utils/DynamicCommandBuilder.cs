@@ -61,7 +61,8 @@ internal static class DynamicCommandBuilder
         var compilation = CSharpCompilation.Create(
             "CliFxTests_DynamicAssembly_" + Guid.NewGuid(),
             new[] {ast},
-            ReferenceAssemblies.Net50
+            ReferenceAssemblies
+                .Net60
                 .Append(MetadataReference.CreateFromFile(typeof(ICommand).Assembly.Location))
                 .Append(MetadataReference.CreateFromFile(typeof(DynamicCommandBuilder).Assembly.Location)),
             // DLL to avoid having to define the Main() method

@@ -58,7 +58,8 @@ internal class AnalyzerAssertions : ReferenceTypeAssertions<DiagnosticAnalyzer, 
         var compilation = CSharpCompilation.Create(
             "CliFxTests_DynamicAssembly_" + Guid.NewGuid(),
             new[] { ast },
-            ReferenceAssemblies.Net50
+            ReferenceAssemblies
+                .Net60
                 .Append(MetadataReference.CreateFromFile(typeof(ICommand).Assembly.Location)),
             // DLL to avoid having to define the Main() method
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)

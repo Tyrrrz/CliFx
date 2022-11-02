@@ -3,14 +3,20 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <Nullable>annotations</Nullable>
+    <GenerateDependencyFile>true</GenerateDependencyFile>
     <NoWarn>$(NoWarn);RS1025;RS1026</NoWarn>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <!--
+      Because this project only has a single target framework, the condition in
+      Directory.Build.props does not appear to work. This is a workaround for that.
+    -->
+    <Nullable>annotations</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- Keep this dependency as low as possible since we can't bundle it -->
-    <!-- https://github.com/Tyrrrz/CliFx/issues/127 -->
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.1" PrivateAssets="all" />
   </ItemGroup>
 
 </Project>
