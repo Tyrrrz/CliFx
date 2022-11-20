@@ -572,7 +572,7 @@ public class CancellableCommand : ICommand
 
 ### Type activation
 
-Because **CliFx** takes responsibility for the application's entire lifecycle, it needs to be capable of instantiating various user-defined types at runtime.
+Because **CliFx** takes responsibility for the application's entire lifecycle, it needs to be capable of instantiating various user-defined types at run-time.
 To facilitate that, it uses an interface called `ITypeActivator` that determines how to create a new instance of a given type.
 
 The default implementation of `ITypeActivator` only supports types that have public parameterless constructors, which is sufficient for the majority of scenarios.
