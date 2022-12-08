@@ -51,7 +51,7 @@ public class ParameterMustBeRequiredIfPropertyRequiredAnalyzerSpecs
     }
 
     [Fact]
-    public void Analyzer_does_not_report_an_error_if_a_non_required_parameter_is_bound_to_an_unannotated_property()
+    public void Analyzer_does_not_report_an_error_if_a_non_required_parameter_is_bound_to_an_non_required_property()
     {
         // Arrange
         // language=cs
@@ -72,7 +72,7 @@ public class ParameterMustBeRequiredIfPropertyRequiredAnalyzerSpecs
     }
 
     [Fact]
-    public void Analyzer_does_not_report_an_error_if_a_required_parameter_is_bound_to_an_unannotated_property()
+    public void Analyzer_does_not_report_an_error_if_a_required_parameter_is_bound_to_a_non_required_property()
     {
         // Arrange
         // language=cs
