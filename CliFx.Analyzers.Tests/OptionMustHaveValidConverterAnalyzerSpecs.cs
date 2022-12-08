@@ -13,20 +13,22 @@ public class OptionMustHaveValidConverterAnalyzerSpecs
     {
         // Arrange
         // language=cs
-        const string code = @"
-public class MyConverter
-{
-    public string Convert(string rawValue) => rawValue;
-}
-
-[Command]
-public class MyCommand : ICommand
-{
-    [CommandOption(""foo"", Converter = typeof(MyConverter))]
-    public string Foo { get; set; }
-
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}";
+        const string code =
+            """
+            public class MyConverter
+            {
+                public string Convert(string rawValue) => rawValue;
+            }
+            
+            [Command]
+            public class MyCommand : ICommand
+            {
+                [CommandOption("foo", Converter = typeof(MyConverter))]
+                public string Foo { get; set; }
+            
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """;
 
         // Act & assert
         Analyzer.Should().ProduceDiagnostics(code);
@@ -37,20 +39,22 @@ public class MyCommand : ICommand
     {
         // Arrange
         // language=cs
-        const string code = @"
-public class MyConverter : BindingConverter<int>
-{
-    public override int Convert(string rawValue) => 42;
-}
-
-[Command]
-public class MyCommand : ICommand
-{
-    [CommandOption(""foo"", Converter = typeof(MyConverter))]
-    public string Foo { get; set; }
-
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}";
+        const string code =
+            """
+            public class MyConverter : BindingConverter<int>
+            {
+                public override int Convert(string rawValue) => 42;
+            }
+            
+            [Command]
+            public class MyCommand : ICommand
+            {
+                [CommandOption("foo", Converter = typeof(MyConverter))]
+                public string Foo { get; set; }
+            
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """;
 
         // Act & assert
         Analyzer.Should().ProduceDiagnostics(code);
@@ -61,20 +65,22 @@ public class MyCommand : ICommand
     {
         // Arrange
         // language=cs
-        const string code = @"
-public class MyConverter : BindingConverter<string>
-{
-    public override string Convert(string rawValue) => rawValue;
-}
-
-[Command]
-public class MyCommand : ICommand
-{
-    [CommandOption(""foo"", Converter = typeof(MyConverter))]
-    public string Foo { get; set; }
-
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}";
+        const string code =
+            """
+            public class MyConverter : BindingConverter<string>
+            {
+                public override string Convert(string rawValue) => rawValue;
+            }
+            
+            [Command]
+            public class MyCommand : ICommand
+            {
+                [CommandOption("foo", Converter = typeof(MyConverter))]
+                public string Foo { get; set; }
+            
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """;
 
         // Act & assert
         Analyzer.Should().NotProduceDiagnostics(code);
@@ -85,20 +91,22 @@ public class MyCommand : ICommand
     {
         // Arrange
         // language=cs
-        const string code = @"
-public class MyConverter : BindingConverter<int>
-{
-    public override int Convert(string rawValue) => 42;
-}
-
-[Command]
-public class MyCommand : ICommand
-{
-    [CommandOption(""foo"", Converter = typeof(MyConverter))]
-    public int? Foo { get; set; }
-
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}";
+        const string code =
+            """
+            public class MyConverter : BindingConverter<int>
+            {
+                public override int Convert(string rawValue) => 42;
+            }
+            
+            [Command]
+            public class MyCommand : ICommand
+            {
+                [CommandOption("foo", Converter = typeof(MyConverter))]
+                public int? Foo { get; set; }
+            
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """;
 
         // Act & assert
         Analyzer.Should().NotProduceDiagnostics(code);
@@ -109,20 +117,22 @@ public class MyCommand : ICommand
     {
         // Arrange
         // language=cs
-        const string code = @"
-public class MyConverter : BindingConverter<string>
-{
-    public override string Convert(string rawValue) => rawValue;
-}
-
-[Command]
-public class MyCommand : ICommand
-{
-    [CommandOption(""foo"", Converter = typeof(MyConverter))]
-    public IReadOnlyList<string> Foo { get; set; }
-
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}";
+        const string code =
+            """
+            public class MyConverter : BindingConverter<string>
+            {
+                public override string Convert(string rawValue) => rawValue;
+            }
+            
+            [Command]
+            public class MyCommand : ICommand
+            {
+                [CommandOption("foo", Converter = typeof(MyConverter))]
+                public IReadOnlyList<string> Foo { get; set; }
+            
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """;
 
         // Act & assert
         Analyzer.Should().NotProduceDiagnostics(code);
@@ -133,15 +143,17 @@ public class MyCommand : ICommand
     {
         // Arrange
         // language=cs
-        const string code = @"
-[Command]
-public class MyCommand : ICommand
-{
-    [CommandOption(""foo"")]
-    public string Foo { get; set; }
-
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}";
+        const string code =
+            """
+            [Command]
+            public class MyCommand : ICommand
+            {
+                [CommandOption("foo")]
+                public string Foo { get; set; }
+            
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """;
 
         // Act & assert
         Analyzer.Should().NotProduceDiagnostics(code);
@@ -152,14 +164,16 @@ public class MyCommand : ICommand
     {
         // Arrange
         // language=cs
-        const string code = @"
-[Command]
-public class MyCommand : ICommand
-{
-    public string Foo { get; set; }
-
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}";
+        const string code =
+            """
+            [Command]
+            public class MyCommand : ICommand
+            {
+                public string Foo { get; set; }
+            
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """;
 
         // Act & assert
         Analyzer.Should().NotProduceDiagnostics(code);

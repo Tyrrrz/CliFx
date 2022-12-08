@@ -23,16 +23,18 @@ public class TypeActivationSpecs : SpecsBase
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(""foo"");
-        return default;
-    }
-}");
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine("foo");
+                    return default;
+                }
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -59,14 +61,16 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    public Command(string foo) {}
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                public Command(string foo) {}
 
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}");
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -93,20 +97,22 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    private readonly string _foo;
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                private readonly string _foo;
 
-    public Command(string foo) => _foo = foo;
+                public Command(string foo) => _foo = foo;
 
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(_foo);
-        return default;
-    }
-}");
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine(_foo);
+                    return default;
+                }
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -133,20 +139,22 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    private readonly string _foo;
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                private readonly string _foo;
 
-    public Command(string foo) => _foo = foo;
+                public Command(string foo) => _foo = foo;
 
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(_foo);
-        return default;
-    }
-}");
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine(_foo);
+                    return default;
+                }
+            }
+            """
+        );
 
         var serviceProvider = new ServiceCollection()
             .AddSingleton(commandType, Activator.CreateInstance(commandType, "Hello world")!)
@@ -177,16 +185,18 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(""foo"");
-        return default;
-    }
-}");
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine("foo");
+                    return default;
+                }
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)

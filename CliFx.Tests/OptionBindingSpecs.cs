@@ -22,19 +22,21 @@ public class OptionBindingSpecs : SpecsBase
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    [CommandOption(""foo"")]
-    public bool Foo { get; set; }
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption("foo")]
+                public bool Foo { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(Foo);
-        return default;
-    }
-}");
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine(Foo);
+                    return default;
+                }
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -60,19 +62,21 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    [CommandOption('f')]
-    public bool Foo { get; set; }
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption('f')]
+                public bool Foo { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(Foo);
-        return default;
-    }
-}");
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine(Foo);
+                    return default;
+                }
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -98,24 +102,26 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    [CommandOption(""foo"")]
-    public string Foo { get; set; }
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption("foo")]
+                public string Foo { get; set; }
 
-    [CommandOption(""bar"")]
-    public string Bar { get; set; }
+                [CommandOption("bar")]
+                public string Bar { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(""Foo = "" + Foo);
-        console.Output.WriteLine(""Bar = "" + Bar);
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine("Foo = " + Foo);
+                    console.Output.WriteLine("Bar = " + Bar);
 
-        return default;
-    }
-}");
+                    return default;
+                }
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -144,24 +150,26 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    [CommandOption('f')]
-    public string Foo { get; set; }
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption('f')]
+                public string Foo { get; set; }
 
-    [CommandOption('b')]
-    public string Bar { get; set; }
+                [CommandOption('b')]
+                public string Bar { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(""Foo = "" + Foo);
-        console.Output.WriteLine(""Bar = "" + Bar);
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine("Foo = " + Foo);
+                    console.Output.WriteLine("Bar = " + Bar);
 
-        return default;
-    }
-}");
+                    return default;
+                }
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -190,24 +198,26 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    [CommandOption('f')]
-    public string Foo { get; set; }
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption('f')]
+                public string Foo { get; set; }
 
-    [CommandOption('b')]
-    public string Bar { get; set; }
+                [CommandOption('b')]
+                public string Bar { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(""Foo = "" + Foo);
-        console.Output.WriteLine(""Bar = "" + Bar);
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine("Foo = " + Foo);
+                    console.Output.WriteLine("Bar = " + Bar);
 
-        return default;
-    }
-}");
+                    return default;
+                }
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -236,21 +246,23 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    [CommandOption(""Foo"")]
-    public IReadOnlyList<string> Foo { get; set; }
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption("Foo")]
+                public IReadOnlyList<string> Foo { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        foreach (var i in Foo)
-            console.Output.WriteLine(i);
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    foreach (var i in Foo)
+                        console.Output.WriteLine(i);
 
-        return default;
-    }
-}");
+                    return default;
+                }
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -280,21 +292,23 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    [CommandOption('f')]
-    public IReadOnlyList<string> Foo { get; set; }
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption('f')]
+                public IReadOnlyList<string> Foo { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        foreach (var i in Foo)
-            console.Output.WriteLine(i);
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    foreach (var i in Foo)
+                        console.Output.WriteLine(i);
 
-        return default;
-    }
-}");
+                    return default;
+                }
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -324,21 +338,23 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    [CommandOption(""foo"")]
-    public IReadOnlyList<string> Foo { get; set; }
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption("foo")]
+                public IReadOnlyList<string> Foo { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        foreach (var i in Foo)
-            console.Output.WriteLine(i);
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    foreach (var i in Foo)
+                        console.Output.WriteLine(i);
 
-        return default;
-    }
-}");
+                    return default;
+                }
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -368,21 +384,23 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    [CommandOption('f')]
-    public IReadOnlyList<string> Foo { get; set; }
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption('f')]
+                public IReadOnlyList<string> Foo { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        foreach (var i in Foo)
-            console.Output.WriteLine(i);
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    foreach (var i in Foo)
+                        console.Output.WriteLine(i);
 
-        return default;
-    }
-}");
+                    return default;
+                }
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -412,21 +430,23 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    [CommandOption(""foo"", 'f')]
-    public IReadOnlyList<string> Foo { get; set; }
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption("foo", 'f')]
+                public IReadOnlyList<string> Foo { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        foreach (var i in Foo)
-            console.Output.WriteLine(i);
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    foreach (var i in Foo)
+                        console.Output.WriteLine(i);
 
-        return default;
-    }
-}");
+                    return default;
+                }
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -456,24 +476,26 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    [CommandOption(""foo"")]
-    public string Foo { get; set; }
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption("foo")]
+                public string Foo { get; set; }
 
-    [CommandOption(""bar"")]
-    public string Bar { get; set; } = ""hello"";
+                [CommandOption("bar")]
+                public string Bar { get; set; } = "hello";
 
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(""Foo = "" + Foo);
-        console.Output.WriteLine(""Bar = "" + Bar);
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine("Foo = " + Foo);
+                    console.Output.WriteLine("Bar = " + Bar);
 
-        return default;
-    }
-}");
+                    return default;
+                }
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -502,55 +524,56 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-public static class SharedContext
-{
-    public static int Foo { get; set; }
+            """
+            public static class SharedContext
+            {
+                public static int Foo { get; set; }
 
-    public static bool Bar { get; set; }
-}
+                public static bool Bar { get; set; }
+            }
 
-public interface IHasFoo : ICommand
-{
-    [CommandOption(""foo"")]
-    public int Foo
-    {
-        get => SharedContext.Foo;
-        set => SharedContext.Foo = value;
-    }
-}
+            public interface IHasFoo : ICommand
+            {
+                [CommandOption("foo")]
+                public int Foo
+                {
+                    get => SharedContext.Foo;
+                    set => SharedContext.Foo = value;
+                }
+            }
 
-public interface IHasBar : ICommand
-{
-    [CommandOption(""bar"")]
-    public bool Bar
-    {
-        get => SharedContext.Bar;
-        set => SharedContext.Bar = value;
-    }
-}
+            public interface IHasBar : ICommand
+            {
+                [CommandOption("bar")]
+                public bool Bar
+                {
+                    get => SharedContext.Bar;
+                    set => SharedContext.Bar = value;
+                }
+            }
 
-public interface IHasBaz : ICommand
-{
-    public string Baz { get; set; }
-}
+            public interface IHasBaz : ICommand
+            {
+                public string Baz { get; set; }
+            }
 
-[Command]
-public class Command : IHasFoo, IHasBar, IHasBaz
-{
-    [CommandOption(""baz"")]
-    public string Baz { get; set; }
+            [Command]
+            public class Command : IHasFoo, IHasBar, IHasBaz
+            {
+                [CommandOption("baz")]
+                public string Baz { get; set; }
 
-	public ValueTask ExecuteAsync(IConsole console)
-	{
-        console.Output.WriteLine(""Foo = "" + SharedContext.Foo);
-        console.Output.WriteLine(""Bar = "" + SharedContext.Bar);
-        console.Output.WriteLine(""Baz = "" + Baz);
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine("Foo = " + SharedContext.Foo);
+                    console.Output.WriteLine("Bar = " + SharedContext.Bar);
+                    console.Output.WriteLine("Baz = " + Baz);
 
-        return default;
-    }
-}
-");
+                    return default;
+                }
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -579,20 +602,22 @@ public class Command : IHasFoo, IHasBar, IHasBaz
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    [CommandOption(""foo"")]
-    public string Foo { get; set; }
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption("foo")]
+                public string Foo { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(Foo);
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine(Foo);
 
-        return default;
-    }
-}");
+                    return default;
+                }
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -618,15 +643,17 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    [CommandOption(""foo"", IsRequired = true)]
-    public string Foo { get; set; }
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption("foo", IsRequired = true)]
+                public string Foo { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}");
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -652,15 +679,17 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    [CommandOption(""foo"", IsRequired = true)]
-    public string Foo { get; set; }
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption("foo", IsRequired = true)]
+                public string Foo { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}");
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -686,15 +715,17 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    [CommandOption(""foo"", IsRequired = true)]
-    public IReadOnlyList<string> Foo { get; set; }
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption("foo", IsRequired = true)]
+                public IReadOnlyList<string> Foo { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}");
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -720,15 +751,17 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    [CommandOption(""foo"")]
-    public string Foo { get; set; }
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption("foo")]
+                public string Foo { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}");
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -754,15 +787,17 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    [CommandOption(""foo"")]
-    public string Foo { get; set; }
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption("foo")]
+                public string Foo { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}");
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)

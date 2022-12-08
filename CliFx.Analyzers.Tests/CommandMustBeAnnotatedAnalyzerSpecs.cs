@@ -13,11 +13,13 @@ public class CommandMustBeAnnotatedAnalyzerSpecs
     {
         // Arrange
         // language=cs
-        const string code = @"
-public class MyCommand : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}";
+        const string code =
+            """
+            public class MyCommand : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """;
 
         // Act & assert
         Analyzer.Should().ProduceDiagnostics(code);
@@ -28,12 +30,14 @@ public class MyCommand : ICommand
     {
         // Arrange
         // language=cs
-        const string code = @"
-[Command]
-public abstract class MyCommand : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}";
+        const string code =
+            """
+            [Command]
+            public abstract class MyCommand : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """;
 
         // Act & assert
         Analyzer.Should().NotProduceDiagnostics(code);
@@ -44,11 +48,13 @@ public abstract class MyCommand : ICommand
     {
         // Arrange
         // language=cs
-        const string code = @"
-public abstract class MyCommand : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}";
+        const string code =
+            """
+            public abstract class MyCommand : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """;
 
         // Act & assert
         Analyzer.Should().NotProduceDiagnostics(code);
@@ -59,11 +65,13 @@ public abstract class MyCommand : ICommand
     {
         // Arrange
         // language=cs
-        const string code = @"
-public class Foo
-{
-    public int Bar { get; set; } = 5;
-}";
+        const string code =
+            """
+            public class Foo
+            {
+                public int Bar { get; set; } = 5;
+            }
+            """;
 
         // Act & assert
         Analyzer.Should().NotProduceDiagnostics(code);

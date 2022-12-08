@@ -22,14 +22,15 @@ public class ErrorReportingSpecs : SpecsBase
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console) =>
-        throw new Exception(""Something went wrong"");
-}
-");
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console) =>
+                    throw new Exception("Something went wrong");
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -60,14 +61,15 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console) =>
-        throw new Exception(""Something went wrong"", new Exception(""Another exception""));
-}
-");
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console) =>
+                    throw new Exception("Something went wrong", new Exception("Another exception"));
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -99,14 +101,15 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console) =>
-        throw new CommandException(""Something went wrong"", 69);
-}
-");
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console) =>
+                    throw new CommandException("Something went wrong", 69);
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -134,14 +137,15 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console) =>
-        throw new CommandException("""", 69);
-}
-");
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console) =>
+                    throw new CommandException("", 69);
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -172,14 +176,15 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console) =>
-        throw new CommandException(""Something went wrong"", 69, true);
-}
-");
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console) =>
+                    throw new CommandException("Something went wrong", 69, true);
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)

@@ -13,12 +13,14 @@ public class ParameterMustBeInsideCommandAnalyzerSpecs
     {
         // Arrange
         // language=cs
-        const string code = @"
-public class MyClass
-{
-    [CommandParameter(0)]
-    public string Foo { get; set; }
-}";
+        const string code =
+            """
+            public class MyClass
+            {
+                [CommandParameter(0)]
+                public string Foo { get; set; }
+            }
+            """;
 
         // Act & assert
         Analyzer.Should().ProduceDiagnostics(code);
@@ -29,15 +31,17 @@ public class MyClass
     {
         // Arrange
         // language=cs
-        const string code = @"
-[Command]
-public class MyCommand : ICommand
-{
-    [CommandParameter(0)]
-    public string Foo { get; set; }
-
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}";
+        const string code =
+            """
+            [Command]
+            public class MyCommand : ICommand
+            {
+                [CommandParameter(0)]
+                public string Foo { get; set; }
+            
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """;
 
         // Act & assert
         Analyzer.Should().NotProduceDiagnostics(code);
@@ -48,12 +52,14 @@ public class MyCommand : ICommand
     {
         // Arrange
         // language=cs
-        const string code = @"
-public abstract class MyCommand
-{
-    [CommandParameter(0)]
-    public string Foo { get; set; }
-}";
+        const string code =
+            """
+            public abstract class MyCommand
+            {
+                [CommandParameter(0)]
+                public string Foo { get; set; }
+            }
+            """;
 
         // Act & assert
         Analyzer.Should().NotProduceDiagnostics(code);
@@ -64,14 +70,16 @@ public abstract class MyCommand
     {
         // Arrange
         // language=cs
-        const string code = @"
-[Command]
-public class MyCommand : ICommand
-{
-    public string Foo { get; set; }
-
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}";
+        const string code =
+            """
+            [Command]
+            public class MyCommand : ICommand
+            {
+                public string Foo { get; set; }
+            
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """;
 
         // Act & assert
         Analyzer.Should().NotProduceDiagnostics(code);

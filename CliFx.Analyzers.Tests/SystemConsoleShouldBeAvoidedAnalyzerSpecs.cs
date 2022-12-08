@@ -13,16 +13,18 @@ public class SystemConsoleShouldBeAvoidedAnalyzerSpecs
     {
         // Arrange
         // language=cs
-        const string code = @"
-[Command]
-public class MyCommand : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        Console.WriteLine(""Hello world"");
-        return default;
-    }
-}";
+        const string code =
+            """
+            [Command]
+            public class MyCommand : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    Console.WriteLine("Hello world");
+                    return default;
+                }
+            }
+            """;
 
         // Act & assert
         Analyzer.Should().ProduceDiagnostics(code);
@@ -33,16 +35,19 @@ public class MyCommand : ICommand
     {
         // Arrange
         // language=cs
-        const string code = @"
-[Command]
-public class MyCommand : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        Console.ForegroundColor = ConsoleColor.Black;
-        return default;
-    }
-}";
+        const string code =
+            """
+            [Command]
+            public class MyCommand : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    Console.ForegroundColor = ConsoleColor.Black;
+                    return default;
+                }
+            }
+            """;
+
         // Act & assert
         Analyzer.Should().ProduceDiagnostics(code);
     }
@@ -52,16 +57,18 @@ public class MyCommand : ICommand
     {
         // Arrange
         // language=cs
-        const string code = @"
-[Command]
-public class MyCommand : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        Console.Error.WriteLine(""Hello world"");
-        return default;
-    }
-}";
+        const string code =
+            """
+            [Command]
+            public class MyCommand : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    Console.Error.WriteLine("Hello world");
+                    return default;
+                }
+            }
+            """;
 
         // Act & assert
         Analyzer.Should().ProduceDiagnostics(code);
@@ -72,16 +79,18 @@ public class MyCommand : ICommand
     {
         // Arrange
         // language=cs
-        const string code = @"
-[Command]
-public class MyCommand : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(""Hello world"");
-        return default;
-    }
-}";
+        const string code =
+            """
+            [Command]
+            public class MyCommand : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine("Hello world");
+                    return default;
+                }
+            }
+            """;
 
         // Act & assert
         Analyzer.Should().NotProduceDiagnostics(code);
@@ -92,14 +101,16 @@ public class MyCommand : ICommand
     {
         // Arrange
         // language=cs
-        const string code = @"
-[Command]
-public class MyCommand : ICommand
-{
-    public void SomeOtherMethod() => Console.WriteLine(""Test"");
-
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}";
+        const string code =
+            """
+            [Command]
+            public class MyCommand : ICommand
+            {
+                public void SomeOtherMethod() => Console.WriteLine("Test");
+            
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """;
 
         // Act & assert
         Analyzer.Should().NotProduceDiagnostics(code);
@@ -110,15 +121,17 @@ public class MyCommand : ICommand
     {
         // Arrange
         // language=cs
-        const string code = @"
-[Command]
-public class MyCommand : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        return default;
-    }
-}";
+        const string code =
+            """
+            [Command]
+            public class MyCommand : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    return default;
+                }
+            }
+            """;
 
         // Act & assert
         Analyzer.Should().NotProduceDiagnostics(code);

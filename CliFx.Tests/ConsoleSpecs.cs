@@ -48,27 +48,28 @@ public class ConsoleSpecs : SpecsBase
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{   
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.ResetColor();
-        console.ForegroundColor = ConsoleColor.DarkMagenta;
-        console.BackgroundColor = ConsoleColor.DarkMagenta;
-        console.WindowWidth = 100;
-        console.WindowHeight = 25;
-        console.CursorLeft = 42;
-        console.CursorTop = 24;
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.ResetColor();
+                    console.ForegroundColor = ConsoleColor.DarkMagenta;
+                    console.BackgroundColor = ConsoleColor.DarkMagenta;
+                    console.WindowWidth = 100;
+                    console.WindowHeight = 25;
+                    console.CursorLeft = 42;
+                    console.CursorTop = 24;
 
-        console.Output.WriteLine(""Hello "");
-        console.Error.WriteLine(""world!"");
+                    console.Output.WriteLine("Hello ");
+                    console.Error.WriteLine("world!");
 
-        return default;
-    }
-}
-");
+                    return default;
+                }
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -108,20 +109,21 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{   
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        var input = console.Input.ReadToEnd();
-        console.Output.WriteLine(input);
-        console.Error.WriteLine(input);
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    var input = console.Input.ReadToEnd();
+                    console.Output.WriteLine(input);
+                    console.Error.WriteLine(input);
 
-        return default;
-    }
-}
-");
+                    return default;
+                }
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -151,20 +153,21 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{   
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(console.ReadKey().Key);
-        console.Output.WriteLine(console.ReadKey().Key);
-        console.Output.WriteLine(console.ReadKey().Key);
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine(console.ReadKey().Key);
+                    console.Output.WriteLine(console.ReadKey().Key);
+                    console.Output.WriteLine(console.ReadKey().Key);
 
-        return default;
-    }
-}
-");
+                    return default;
+                }
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)

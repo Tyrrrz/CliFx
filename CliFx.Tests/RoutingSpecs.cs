@@ -21,37 +21,38 @@ public class RoutingSpecs : SpecsBase
         // Arrange
         var commandTypes = DynamicCommandBuilder.CompileMany(
             // language=cs
-            @"
-[Command]
-public class DefaultCommand : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(""default"");
-        return default;
-    }
-}
+            """
+            [Command]
+            public class DefaultCommand : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine("default");
+                    return default;
+                }
+            }
 
-[Command(""cmd"")]
-public class NamedCommand : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(""cmd"");
-        return default;
-    }
-}
+            [Command("cmd")]
+            public class NamedCommand : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine("cmd");
+                    return default;
+                }
+            }
 
-[Command(""cmd child"")]
-public class NamedChildCommand : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(""cmd child"");
-        return default;
-    }
-}
-");
+            [Command("cmd child")]
+            public class NamedChildCommand : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine("cmd child");
+                    return default;
+                }
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommands(commandTypes)
@@ -77,37 +78,38 @@ public class NamedChildCommand : ICommand
         // Arrange
         var commandTypes = DynamicCommandBuilder.CompileMany(
             // language=cs
-            @"
-[Command]
-public class DefaultCommand : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(""default"");
-        return default;
-    }
-}
+            """
+            [Command]
+            public class DefaultCommand : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine("default");
+                    return default;
+                }
+            }
 
-[Command(""cmd"")]
-public class NamedCommand : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(""cmd"");
-        return default;
-    }
-}
+            [Command("cmd")]
+            public class NamedCommand : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine("cmd");
+                    return default;
+                }
+            }
 
-[Command(""cmd child"")]
-public class NamedChildCommand : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(""cmd child"");
-        return default;
-    }
-}
-");
+            [Command("cmd child")]
+            public class NamedChildCommand : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine("cmd child");
+                    return default;
+                }
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommands(commandTypes)
@@ -133,37 +135,38 @@ public class NamedChildCommand : ICommand
         // Arrange
         var commandTypes = DynamicCommandBuilder.CompileMany(
             // language=cs
-            @"
-[Command]
-public class DefaultCommand : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(""default"");
-        return default;
-    }
-}
+            """
+            [Command]
+            public class DefaultCommand : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine("default");
+                    return default;
+                }
+            }
 
-[Command(""cmd"")]
-public class NamedCommand : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(""cmd"");
-        return default;
-    }
-}
+            [Command("cmd")]
+            public class NamedCommand : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine("cmd");
+                    return default;
+                }
+            }
 
-[Command(""cmd child"")]
-public class NamedChildCommand : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(""cmd child"");
-        return default;
-    }
-}
-");
+            [Command("cmd child")]
+            public class NamedChildCommand : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine("cmd child");
+                    return default;
+                }
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommands(commandTypes)

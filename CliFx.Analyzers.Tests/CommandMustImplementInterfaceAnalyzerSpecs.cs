@@ -13,12 +13,14 @@ public class CommandMustImplementInterfaceAnalyzerSpecs
     {
         // Arrange
         // language=cs
-        const string code = @"
-[Command]
-public class MyCommand
-{
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}";
+        const string code =
+            """
+            [Command]
+            public class MyCommand
+            {
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """;
 
         // Act & assert
         Analyzer.Should().ProduceDiagnostics(code);
@@ -29,12 +31,14 @@ public class MyCommand
     {
         // Arrange
         // language=cs
-        const string code = @"
-[Command]
-public class MyCommand : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}";
+        const string code =
+            """
+            [Command]
+            public class MyCommand : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """;
 
         // Act & assert
         Analyzer.Should().NotProduceDiagnostics(code);
@@ -45,11 +49,13 @@ public class MyCommand : ICommand
     {
         // Arrange
         // language=cs
-        const string code = @"
-public class Foo
-{
-    public int Bar { get; set; } = 5;
-}";
+        const string code =
+            """
+            public class Foo
+            {
+                public int Bar { get; set; } = 5;
+            }
+            """;
 
         // Act & assert
         Analyzer.Should().NotProduceDiagnostics(code);

@@ -21,20 +21,22 @@ public class ConversionSpecs : SpecsBase
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    [CommandOption('f')]
-    public string Foo { get; set; }
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption('f')]
+                public string Foo { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(Foo);
-        return default;
-    }
-}
-");
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine(Foo);
+                    return default;
+                }
+            }
+            """
+        );
+
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
             .UseConsole(FakeConsole)
@@ -59,20 +61,22 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    [CommandOption('f')]
-    public object Foo { get; set; }
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption('f')]
+                public object Foo { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(Foo);
-        return default;
-    }
-}
-");
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine(Foo);
+                    return default;
+                }
+            }
+            """
+        );
+
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
             .UseConsole(FakeConsole)
@@ -97,25 +101,27 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    [CommandOption('f')]
-    public bool Foo { get; set; }
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption('f')]
+                public bool Foo { get; set; }
 
-    [CommandOption('b')]
-    public bool Bar { get; set; }
+                [CommandOption('b')]
+                public bool Bar { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(""Foo = "" + Foo);
-        console.Output.WriteLine(""Bar = "" + Bar);
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine("Foo = " + Foo);
+                    console.Output.WriteLine("Bar = " + Bar);
 
-        return default;
-    }
-}
-");
+                    return default;
+                }
+            }
+            """
+        );
+
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
             .UseConsole(FakeConsole)
@@ -143,20 +149,22 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    [CommandOption('f')]
-    public bool Foo { get; set; }
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption('f')]
+                public bool Foo { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(Foo);
-        return default;
-    }
-}
-");
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine(Foo);
+                    return default;
+                }
+            }
+            """
+        );
+
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
             .UseConsole(FakeConsole)
@@ -181,20 +189,22 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    [CommandOption('f')]
-    public int Foo { get; set; }
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption('f')]
+                public int Foo { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(Foo);
-        return default;
-    }
-}
-");
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine(Foo);
+                    return default;
+                }
+            }
+            """
+        );
+
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
             .UseConsole(FakeConsole)
@@ -219,20 +229,22 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    [CommandOption('f')]
-    public double Foo { get; set; }
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption('f')]
+                public double Foo { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(Foo.ToString(CultureInfo.InvariantCulture));
-        return default;
-    }
-}
-");
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine(Foo.ToString(CultureInfo.InvariantCulture));
+                    return default;
+                }
+            }
+            """
+        );
+
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
             .UseConsole(FakeConsole)
@@ -257,20 +269,22 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    [CommandOption('f')]
-    public DateTimeOffset Foo { get; set; }
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption('f')]
+                public DateTimeOffset Foo { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(Foo.ToString(""u"", CultureInfo.InvariantCulture));
-        return default;
-    }
-}
-");
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine(Foo.ToString("u", CultureInfo.InvariantCulture));
+                    return default;
+                }
+            }
+            """
+        );
+
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
             .UseConsole(FakeConsole)
@@ -295,20 +309,22 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    [CommandOption('f')]
-    public TimeSpan Foo { get; set; }
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption('f')]
+                public TimeSpan Foo { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(Foo.ToString(null, CultureInfo.InvariantCulture));
-        return default;
-    }
-}
-");
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine(Foo.ToString(null, CultureInfo.InvariantCulture));
+                    return default;
+                }
+            }
+            """
+        );
+
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
             .UseConsole(FakeConsole)
@@ -333,22 +349,24 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-public enum CustomEnum { One = 1, Two = 2, Three = 3 }
+            """
+            public enum CustomEnum { One = 1, Two = 2, Three = 3 }
 
-[Command]
-public class Command : ICommand
-{
-    [CommandOption('f')]
-    public CustomEnum Foo { get; set; }
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption('f')]
+                public CustomEnum Foo { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine((int) Foo);
-        return default;
-    }
-}
-");
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine((int) Foo);
+                    return default;
+                }
+            }
+            """
+        );
+
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
             .UseConsole(FakeConsole)
@@ -373,25 +391,27 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    [CommandOption('f')]
-    public int? Foo { get; set; }
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption('f')]
+                public int? Foo { get; set; }
 
-    [CommandOption('b')]
-    public int? Bar { get; set; }
+                [CommandOption('b')]
+                public int? Bar { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(""Foo = "" + Foo);
-        console.Output.WriteLine(""Bar = "" + Bar);
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine("Foo = " + Foo);
+                    console.Output.WriteLine("Bar = " + Bar);
 
-        return default;
-    }
-}
-");
+                    return default;
+                }
+            }
+            """
+        );
+
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
             .UseConsole(FakeConsole)
@@ -419,27 +439,29 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-public enum CustomEnum { One = 1, Two = 2, Three = 3 }
+            """
+            public enum CustomEnum { One = 1, Two = 2, Three = 3 }
 
-[Command]
-public class Command : ICommand
-{
-    [CommandOption('f')]
-    public CustomEnum? Foo { get; set; }
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption('f')]
+                public CustomEnum? Foo { get; set; }
 
-    [CommandOption('b')]
-    public CustomEnum? Bar { get; set; }
+                [CommandOption('b')]
+                public CustomEnum? Bar { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(""Foo = "" + (int?) Foo);
-        console.Output.WriteLine(""Bar = "" + (int?) Bar);
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine("Foo = " + (int?) Foo);
+                    console.Output.WriteLine("Bar = " + (int?) Bar);
 
-        return default;
-    }
-}
-");
+                    return default;
+                }
+            }
+            """
+        );
+
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
             .UseConsole(FakeConsole)
@@ -467,27 +489,29 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-public class CustomType
-{
-    public string Value { get; }
+            """
+            public class CustomType
+            {
+                public string Value { get; }
 
-    public CustomType(string value) => Value = value;
-}
+                public CustomType(string value) => Value = value;
+            }
 
-[Command]
-public class Command : ICommand
-{
-    [CommandOption('f')]
-    public CustomType Foo { get; set; }
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption('f')]
+                public CustomType Foo { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(Foo.Value);
-        return default;
-    }
-}
-");
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine(Foo.Value);
+                    return default;
+                }
+            }
+            """
+        );
+
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
             .UseConsole(FakeConsole)
@@ -512,45 +536,47 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-public class CustomTypeA
-{
-    public string Value { get; }
+            """
+            public class CustomTypeA
+            {
+                public string Value { get; }
 
-    private CustomTypeA(string value) => Value = value;
+                private CustomTypeA(string value) => Value = value;
 
-    public static CustomTypeA Parse(string value) => 
-        new CustomTypeA(value);
-}
+                public static CustomTypeA Parse(string value) =>
+                    new CustomTypeA(value);
+            }
 
-public class CustomTypeB
-{
-    public string Value { get; }
+            public class CustomTypeB
+            {
+                public string Value { get; }
 
-    private CustomTypeB(string value) => Value = value;
+                private CustomTypeB(string value) => Value = value;
 
-    public static CustomTypeB Parse(string value, IFormatProvider formatProvider) =>
-        new CustomTypeB(value);
-}
+                public static CustomTypeB Parse(string value, IFormatProvider formatProvider) =>
+                    new CustomTypeB(value);
+            }
 
-[Command]
-public class Command : ICommand
-{
-    [CommandOption('f')]
-    public CustomTypeA Foo { get; set; }
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption('f')]
+                public CustomTypeA Foo { get; set; }
 
-    [CommandOption('b')]
-    public CustomTypeB Bar { get; set; }
+                [CommandOption('b')]
+                public CustomTypeB Bar { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(""Foo = "" + Foo.Value);
-        console.Output.WriteLine(""Bar = "" + Bar.Value);
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine("Foo = " + Foo.Value);
+                    console.Output.WriteLine("Bar = " + Bar.Value);
 
-        return default;
-    }
-}
-");
+                    return default;
+                }
+            }
+            """
+        );
+
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
             .UseConsole(FakeConsole)
@@ -578,26 +604,28 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-public class CustomConverter : BindingConverter<int>
-{
-    public override int Convert(string rawValue) =>
-        rawValue.Length;
-}
+            """
+            public class CustomConverter : BindingConverter<int>
+            {
+                public override int Convert(string rawValue) =>
+                    rawValue.Length;
+            }
 
-[Command]
-public class Command : ICommand
-{
-    [CommandOption('f', Converter = typeof(CustomConverter))]
-    public int Foo { get; set; }
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption('f', Converter = typeof(CustomConverter))]
+                public int Foo { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(Foo);
-        return default;
-    }
-}
-");
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine(Foo);
+                    return default;
+                }
+            }
+            """
+        );
+
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
             .UseConsole(FakeConsole)
@@ -622,22 +650,24 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    [CommandOption('f')]
-    public string[] Foo { get; set; }
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption('f')]
+                public string[] Foo { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        foreach (var i in Foo)
-            console.Output.WriteLine(i);
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    foreach (var i in Foo)
+                        console.Output.WriteLine(i);
 
-        return default;
-    }
-}
-");
+                    return default;
+                }
+            }
+            """
+        );
+
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
             .UseConsole(FakeConsole)
@@ -666,22 +696,24 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    [CommandOption('f')]
-    public IReadOnlyList<string> Foo { get; set; }
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption('f')]
+                public IReadOnlyList<string> Foo { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        foreach (var i in Foo)
-            console.Output.WriteLine(i);
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    foreach (var i in Foo)
+                        console.Output.WriteLine(i);
 
-        return default;
-    }
-}
-");
+                    return default;
+                }
+            }
+            """
+        );
+
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
             .UseConsole(FakeConsole)
@@ -710,22 +742,24 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    [CommandOption('f')]
-    public List<string> Foo { get; set; }
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption('f')]
+                public List<string> Foo { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        foreach (var i in Foo)
-            console.Output.WriteLine(i);
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    foreach (var i in Foo)
+                        console.Output.WriteLine(i);
 
-        return default;
-    }
-}
-");
+                    return default;
+                }
+            }
+            """
+        );
+
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
             .UseConsole(FakeConsole)
@@ -754,22 +788,24 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    [CommandOption('f')]
-    public int[] Foo { get; set; }
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption('f')]
+                public int[] Foo { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        foreach (var i in Foo)
-            console.Output.WriteLine(i);
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    foreach (var i in Foo)
+                        console.Output.WriteLine(i);
 
-        return default;
-    }
-}
-");
+                    return default;
+                }
+            }
+            """
+        );
+
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
             .UseConsole(FakeConsole)
@@ -798,16 +834,18 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    [CommandOption('f')]
-    public int Foo { get; set; }
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption('f')]
+                public int Foo { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}
-");
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
+
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
             .UseConsole(FakeConsole)
@@ -832,18 +870,20 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-public class CustomType {}
+            """
+            public class CustomType {}
 
-[Command]
-public class Command : ICommand
-{
-    [CommandOption('f')]
-    public CustomType Foo { get; set; }
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption('f')]
+                public CustomType Foo { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}
-");
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
+
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
             .UseConsole(FakeConsole)
@@ -868,23 +908,25 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-public class CustomType : IEnumerable<object>
-{
-    public IEnumerator<object> GetEnumerator() => Enumerable.Empty<object>().GetEnumerator();
+            """
+            public class CustomType : IEnumerable<object>
+            {
+                public IEnumerator<object> GetEnumerator() => Enumerable.Empty<object>().GetEnumerator();
 
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-}
+                IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+            }
 
-[Command]
-public class Command : ICommand
-{
-    [CommandOption('f')]
-    public CustomType Foo { get; set; }
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption('f')]
+                public CustomType Foo { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}
-");
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
+
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
             .UseConsole(FakeConsole)
@@ -909,26 +951,28 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-public class ValidatorA : BindingValidator<int>
-{
-    public override BindingValidationError Validate(int value) => Ok();
-}
+            """
+            public class ValidatorA : BindingValidator<int>
+            {
+                public override BindingValidationError Validate(int value) => Ok();
+            }
 
-public class ValidatorB : BindingValidator<int>
-{
-    public override BindingValidationError Validate(int value) => Error(""Hello world"");
-}
+            public class ValidatorB : BindingValidator<int>
+            {
+                public override BindingValidationError Validate(int value) => Error("Hello world");
+            }
 
-[Command]
-public class Command : ICommand
-{
-    [CommandOption('f', Validators = new[] {typeof(ValidatorA), typeof(ValidatorB)})]
-    public int Foo { get; set; }
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption('f', Validators = new[] {typeof(ValidatorA), typeof(ValidatorB)})]
+                public int Foo { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}
-");
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
+
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
             .UseConsole(FakeConsole)
@@ -953,25 +997,27 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-public class CustomType
-{
-    public string Value { get; }
+            """
+            public class CustomType
+            {
+                public string Value { get; }
 
-    private CustomType(string value) => Value = value;
+                private CustomType(string value) => Value = value;
 
-    public static CustomType Parse(string value) => throw new Exception(""Hello world"");
-}
+                public static CustomType Parse(string value) => throw new Exception("Hello world");
+            }
 
-[Command]
-public class Command : ICommand
-{
-    [CommandOption('f')]
-    public CustomType Foo { get; set; }
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption('f')]
+                public CustomType Foo { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}
-");
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
+
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
             .UseConsole(FakeConsole)

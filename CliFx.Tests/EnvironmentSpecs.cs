@@ -25,20 +25,21 @@ public class EnvironmentSpecs : SpecsBase
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    [CommandOption(""foo"", IsRequired = true, EnvironmentVariable = ""ENV_FOO"")]
-    public string Foo { get; set; }
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption("foo", IsRequired = true, EnvironmentVariable = "ENV_FOO")]
+                public string Foo { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(Foo);
-        return default;
-    }
-}
-");
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine(Foo);
+                    return default;
+                }
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -67,20 +68,21 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    [CommandOption(""foo"", EnvironmentVariable = ""ENV_FOO"")]
-    public string Foo { get; set; }
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption("foo", EnvironmentVariable = "ENV_FOO")]
+                public string Foo { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(Foo);
-        return default;
-    }
-}
-");
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine(Foo);
+                    return default;
+                }
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -109,22 +111,23 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    [CommandOption(""foo"", EnvironmentVariable = ""ENV_FOO"")]
-    public IReadOnlyList<string> Foo { get; set; }
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption("foo", EnvironmentVariable = "ENV_FOO")]
+                public IReadOnlyList<string> Foo { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        foreach (var i in Foo)
-            console.Output.WriteLine(i);
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    foreach (var i in Foo)
+                        console.Output.WriteLine(i);
 
-        return default;
-    }
-}
-");
+                    return default;
+                }
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -156,20 +159,21 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    [CommandOption(""foo"", EnvironmentVariable = ""ENV_FOO"")]
-    public string Foo { get; set; }
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption("foo", EnvironmentVariable = "ENV_FOO")]
+                public string Foo { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(Foo);
-        return default;
-    }
-}
-");
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine(Foo);
+                    return default;
+                }
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -198,20 +202,21 @@ public class Command : ICommand
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    [CommandOption(""foo"", EnvironmentVariable = ""ENV_FOO"")]
-    public string Foo { get; set; }
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption("foo", EnvironmentVariable = "ENV_FOO")]
+                public string Foo { get; set; }
 
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(Foo);
-        return default;
-    }
-}
-");
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.Output.WriteLine(Foo);
+                    return default;
+                }
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)

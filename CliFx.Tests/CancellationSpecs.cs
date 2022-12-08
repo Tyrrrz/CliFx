@@ -21,28 +21,30 @@ public class CancellationSpecs : SpecsBase
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command]
-public class Command : ICommand
-{
-    public async ValueTask ExecuteAsync(IConsole console)
-    {
-        try
-        {
-            await Task.Delay(
-                TimeSpan.FromSeconds(3),
-                console.RegisterCancellationHandler()
-            );
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                public async ValueTask ExecuteAsync(IConsole console)
+                {
+                    try
+                    {
+                        await Task.Delay(
+                            TimeSpan.FromSeconds(3),
+                            console.RegisterCancellationHandler()
+                        );
 
-            console.Output.WriteLine(""Completed successfully"");
-        }
-        catch (OperationCanceledException)
-        {
-            console.Output.WriteLine(""Cancelled"");
-            throw;
-        }
-    }
-}");
+                        console.Output.WriteLine("Completed successfully");
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        console.Output.WriteLine("Cancelled");
+                        throw;
+                    }
+                }
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)

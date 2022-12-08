@@ -75,13 +75,14 @@ public class DirectivesSpecs : SpecsBase
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
-            @"
-[Command(""cmd"")]
-public class Command : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}
-");
+            """
+            [Command("cmd")]
+            public class Command : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)

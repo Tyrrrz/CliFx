@@ -13,20 +13,22 @@ public class ParameterMustHaveValidValidatorsAnalyzerSpecs
     {
         // Arrange
         // language=cs
-        const string code = @"
-public class MyValidator
-{
-    public void Validate(string value) {}
-}
-
-[Command]
-public class MyCommand : ICommand
-{
-    [CommandParameter(0, Validators = new[] {typeof(MyValidator)})]
-    public string Foo { get; set; }
-
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}";
+        const string code =
+            """
+            public class MyValidator
+            {
+                public void Validate(string value) {}
+            }
+            
+            [Command]
+            public class MyCommand : ICommand
+            {
+                [CommandParameter(0, Validators = new[] {typeof(MyValidator)})]
+                public string Foo { get; set; }
+            
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """;
 
         // Act & assert
         Analyzer.Should().ProduceDiagnostics(code);
@@ -37,20 +39,22 @@ public class MyCommand : ICommand
     {
         // Arrange
         // language=cs
-        const string code = @"
-public class MyValidator : BindingValidator<int>
-{
-    public override BindingValidationError Validate(int value) => Ok();
-}
-
-[Command]
-public class MyCommand : ICommand
-{
-    [CommandParameter(0, Validators = new[] {typeof(MyValidator)})]
-    public string Foo { get; set; }
-
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}";
+        const string code =
+            """
+            public class MyValidator : BindingValidator<int>
+            {
+                public override BindingValidationError Validate(int value) => Ok();
+            }
+            
+            [Command]
+            public class MyCommand : ICommand
+            {
+                [CommandParameter(0, Validators = new[] {typeof(MyValidator)})]
+                public string Foo { get; set; }
+            
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """;
 
         // Act & assert
         Analyzer.Should().ProduceDiagnostics(code);
@@ -61,20 +65,22 @@ public class MyCommand : ICommand
     {
         // Arrange
         // language=cs
-        const string code = @"
-public class MyValidator : BindingValidator<string>
-{
-    public override BindingValidationError Validate(string value) => Ok();
-}
-
-[Command]
-public class MyCommand : ICommand
-{
-    [CommandParameter(0, Validators = new[] {typeof(MyValidator)})]
-    public string Foo { get; set; }
-
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}";
+        const string code =
+            """
+            public class MyValidator : BindingValidator<string>
+            {
+                public override BindingValidationError Validate(string value) => Ok();
+            }
+            
+            [Command]
+            public class MyCommand : ICommand
+            {
+                [CommandParameter(0, Validators = new[] {typeof(MyValidator)})]
+                public string Foo { get; set; }
+            
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """;
 
         // Act & assert
         Analyzer.Should().NotProduceDiagnostics(code);
@@ -85,15 +91,17 @@ public class MyCommand : ICommand
     {
         // Arrange
         // language=cs
-        const string code = @"
-[Command]
-public class MyCommand : ICommand
-{
-    [CommandParameter(0)]
-    public string Foo { get; set; }
-
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}";
+        const string code =
+            """
+            [Command]
+            public class MyCommand : ICommand
+            {
+                [CommandParameter(0)]
+                public string Foo { get; set; }
+            
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """;
 
         // Act & assert
         Analyzer.Should().NotProduceDiagnostics(code);
@@ -104,14 +112,16 @@ public class MyCommand : ICommand
     {
         // Arrange
         // language=cs
-        const string code = @"
-[Command]
-public class MyCommand : ICommand
-{
-    public string Foo { get; set; }
-
-    public ValueTask ExecuteAsync(IConsole console) => default;
-}";
+        const string code =
+            """
+            [Command]
+            public class MyCommand : ICommand
+            {
+                public string Foo { get; set; }
+            
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """;
 
         // Act & assert
         Analyzer.Should().NotProduceDiagnostics(code);
