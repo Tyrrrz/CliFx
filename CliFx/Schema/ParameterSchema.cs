@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using CliFx.Attributes;
+using CliFx.Utils.Extensions;
 
 namespace CliFx.Schema;
 
@@ -53,13 +54,14 @@ internal partial class ParameterSchema
             return null;
 
         var name = attribute.Name?.Trim() ?? property.Name.ToLowerInvariant();
+        var isRequired = attribute.IsRequired || property.IsRequired();
         var description = attribute.Description?.Trim();
 
         return new ParameterSchema(
             new BindablePropertyDescriptor(property),
             attribute.Order,
             name,
-            attribute.IsRequired,
+            isRequired,
             description,
             attribute.Converter,
             attribute.Validators

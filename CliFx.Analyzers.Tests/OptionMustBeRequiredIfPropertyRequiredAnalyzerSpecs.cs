@@ -4,12 +4,12 @@ using Xunit;
 
 namespace CliFx.Analyzers.Tests;
 
-public class ParameterMustBeLastIfNonRequiredAnalyzerSpecs
+public class OptionMustBeRequiredIfPropertyRequiredAnalyzerSpecs
 {
-    private static DiagnosticAnalyzer Analyzer { get; } = new ParameterMustBeLastIfNonRequiredAnalyzer();
+    private static DiagnosticAnalyzer Analyzer { get; } = new OptionMustBeRequiredIfPropertyRequiredAnalyzer();
 
     [Fact]
-    public void Analyzer_reports_an_error_if_a_non_required_parameter_is_not_the_last_in_order()
+    public void Analyzer_reports_an_error_if_a_non_required_option_is_bound_to_a_required_property()
     {
         // Arrange
         // language=cs
@@ -18,12 +18,9 @@ public class ParameterMustBeLastIfNonRequiredAnalyzerSpecs
             [Command]
             public class MyCommand : ICommand
             {
-                [CommandParameter(0, IsRequired = false)]
-                public string Foo { get; set; }
-            
-                [CommandParameter(1)]
-                public string Bar { get; set; }
-            
+                [CommandOption('f', IsRequired = false)]
+                public required string Foo { get; set; }
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;
@@ -33,7 +30,7 @@ public class ParameterMustBeLastIfNonRequiredAnalyzerSpecs
     }
 
     [Fact]
-    public void Analyzer_does_not_report_an_error_if_a_non_required_parameter_is_the_last_in_order()
+    public void Analyzer_does_not_report_an_error_if_a_required_option_is_bound_to_a_required_property()
     {
         // Arrange
         // language=cs
@@ -42,12 +39,9 @@ public class ParameterMustBeLastIfNonRequiredAnalyzerSpecs
             [Command]
             public class MyCommand : ICommand
             {
-                [CommandParameter(0)]
-                public string Foo { get; set; }
-            
-                [CommandParameter(1, IsRequired = false)]
-                public string Bar { get; set; }
-            
+                [CommandOption('f', IsRequired = true)]
+                public required string Foo { get; set; }
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;
@@ -57,7 +51,7 @@ public class ParameterMustBeLastIfNonRequiredAnalyzerSpecs
     }
 
     [Fact]
-    public void Analyzer_does_not_report_an_error_if_no_non_required_parameters_are_defined()
+    public void Analyzer_does_not_report_an_error_if_a_non_required_option_is_bound_to_an_unannotated_property()
     {
         // Arrange
         // language=cs
@@ -66,12 +60,9 @@ public class ParameterMustBeLastIfNonRequiredAnalyzerSpecs
             [Command]
             public class MyCommand : ICommand
             {
-                [CommandParameter(0)]
+                [CommandOption('f', IsRequired = false)]
                 public string Foo { get; set; }
-            
-                [CommandParameter(1, IsRequired = true)]
-                public string Bar { get; set; }
-            
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;
@@ -81,7 +72,7 @@ public class ParameterMustBeLastIfNonRequiredAnalyzerSpecs
     }
 
     [Fact]
-    public void Analyzer_does_not_report_an_error_on_a_property_that_is_not_a_parameter()
+    public void Analyzer_does_not_report_an_error_if_a_required_option_is_bound_to_an_unannotated_property()
     {
         // Arrange
         // language=cs
@@ -90,8 +81,29 @@ public class ParameterMustBeLastIfNonRequiredAnalyzerSpecs
             [Command]
             public class MyCommand : ICommand
             {
+                [CommandOption('f', IsRequired = true)]
                 public string Foo { get; set; }
-            
+
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """;
+
+        // Act & assert
+        Analyzer.Should().NotProduceDiagnostics(code);
+    }
+
+    [Fact]
+    public void Analyzer_does_not_report_an_error_on_a_property_that_is_not_an_option()
+    {
+        // Arrange
+        // language=cs
+        const string code =
+            """
+            [Command]
+            public class MyCommand : ICommand
+            {
+                public required string Foo { get; set; }
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;

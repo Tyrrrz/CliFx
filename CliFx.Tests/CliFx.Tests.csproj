@@ -9,7 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Basic.Reference.Assemblies" Version="1.4.1" />
+    <PackageReference Include="Basic.Reference.Assemblies.Net70" Version="1.4.1" />
     <PackageReference Include="CliWrap" Version="3.5.0" />
     <PackageReference Include="FluentAssertions" Version="6.8.0" />
     <PackageReference Include="GitHubActionsTestLogger" Version="2.0.1" PrivateAssets="all" />

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -37,4 +38,14 @@ internal static class CollectionExtensions
         dictionary
             .Cast<DictionaryEntry>()
             .ToDictionary(entry => (TKey) entry.Key, entry => (TValue) entry.Value, comparer);
+
+    public static Array ToNonGenericArray<T>(this IEnumerable<T> source, Type elementType)
+    {
+        var sourceAsCollection = source as ICollection ?? source.ToArray();
+
+        var array = Array.CreateInstance(elementType, sourceAsCollection.Count);
+        sourceAsCollection.CopyTo(array, 0);
+
+        return array;
+    }
 }

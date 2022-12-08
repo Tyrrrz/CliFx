@@ -13,6 +13,8 @@ internal partial class CommandOptionSymbol : ICommandMemberSymbol
 
     public char? ShortName { get; }
 
+    public bool? IsRequired { get; }
+
     public ITypeSymbol? ConverterType { get; }
 
     public IReadOnlyList<ITypeSymbol> ValidatorTypes { get; }
@@ -21,12 +23,14 @@ internal partial class CommandOptionSymbol : ICommandMemberSymbol
         IPropertySymbol property,
         string? name,
         char? shortName,
+        bool? isRequired,
         ITypeSymbol? converterType,
         IReadOnlyList<ITypeSymbol> validatorTypes)
     {
         Property = property;
         Name = name;
         ShortName = shortName;
+        IsRequired = isRequired;
         ConverterType = converterType;
         ValidatorTypes = validatorTypes;
     }
@@ -56,6 +60,12 @@ internal partial class CommandOptionSymbol
             .Select(a => a.Value)
             .FirstOrDefault() as char?;
 
+        var isRequired = attribute
+            .NamedArguments
+            .Where(a => a.Key == "IsRequired")
+            .Select(a => a.Value.Value)
+            .FirstOrDefault() as bool?;
+
         var converter = attribute
             .NamedArguments
             .Where(a => a.Key == "Converter")
@@ -71,7 +81,7 @@ internal partial class CommandOptionSymbol
             .Cast<ITypeSymbol>()
             .ToArray();
 
-        return new CommandOptionSymbol(property, name, shortName, converter, validators);
+        return new CommandOptionSymbol(property, name, shortName, isRequired, converter, validators);
     }
 
     public static bool IsOptionProperty(IPropertySymbol property) =>

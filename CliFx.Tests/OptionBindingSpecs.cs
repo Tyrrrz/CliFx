@@ -816,4 +816,40 @@ public class OptionBindingSpecs : SpecsBase
         exitCode.Should().NotBe(0);
         stdErr.Should().Contain("expects a single argument, but provided with multiple");
     }
+
+    [Fact]
+    public async Task Option_binding_fails_if_a_required_property_option_has_not_been_provided()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption("foo")]
+                public required string Foo { get; set; }
+
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
+
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
+
+        // Act
+        var exitCode = await application.RunAsync(
+            Array.Empty<string>(),
+            new Dictionary<string, string>()
+        );
+
+        var stdErr = FakeConsole.ReadErrorString();
+
+        // Assert
+        exitCode.Should().NotBe(0);
+        stdErr.Should().Contain("Missing required option(s)");
+    }
 }

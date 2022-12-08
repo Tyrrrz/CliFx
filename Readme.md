@@ -144,7 +144,7 @@ public class LogCommand : ICommand
 {
     // Order: 0
     [CommandParameter(0, Description = "Value whose logarithm is to be found.")]
-    public double Value { get; init; }
+    public required double Value { get; init; }
 
     // Name: --base
     // Short name: -b
@@ -382,7 +382,7 @@ If the user does not provide value for such option through command line argument
 [Command]
 public class AuthCommand : ICommand
 {
-    [CommandOption("token", IsRequired = true, EnvironmentVariable = "AUTH_TOKEN")]
+    [CommandOption("token", EnvironmentVariable = "AUTH_TOKEN")]
     public required string AuthToken { get; init; }
 
     public ValueTask ExecuteAsync(IConsole console)
@@ -499,10 +499,10 @@ This special exception can be used to print an error message to the console, ret
 [Command]
 public class DivideCommand : ICommand
 {
-    [CommandOption("dividend", IsRequired = true)]
+    [CommandOption("dividend")]
     public required double Dividend { get; init; }
 
-    [CommandOption("divisor", IsRequired = true)]
+    [CommandOption("divisor")]
     public required double Divisor { get; init; }
 
     public ValueTask ExecuteAsync(IConsole console)

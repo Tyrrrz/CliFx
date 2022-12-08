@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using CliFx.Attributes;
+using CliFx.Utils.Extensions;
 
 namespace CliFx.Schema;
 
@@ -101,6 +102,7 @@ internal partial class OptionSchema
         // The user may mistakenly specify dashes, thinking it's required, so trim them
         var name = attribute.Name?.TrimStart('-').Trim();
         var environmentVariable = attribute.EnvironmentVariable?.Trim();
+        var isRequired = attribute.IsRequired || property.IsRequired();
         var description = attribute.Description?.Trim();
 
         return new OptionSchema(
@@ -108,7 +110,7 @@ internal partial class OptionSchema
             name,
             attribute.ShortName,
             environmentVariable,
-            attribute.IsRequired,
+            isRequired,
             description,
             attribute.Converter,
             attribute.Validators
