@@ -1,3 +1,7 @@
+### v2.3.1 (08-Dec-2022)
+
+- Added support for the `required` keyword introduced in C# 11. Command options bound to required properties are now marked as required by default (equivalent to setting `IsRequired = true` on the attribute). Also added analyzers that prevent marking an option or parameter non-required if it's bound to a required property.
+
 ### v2.3 (12-Jul-2022)
 
 - Added console dimension properties `WindowWidth` and `WindowHeight` to `IConsole` interface and implementing classes.
