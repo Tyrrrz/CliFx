@@ -12,7 +12,7 @@ public class BookRemoveCommand : ICommand
     private readonly LibraryProvider _libraryProvider;
 
     [CommandParameter(0, Name = "title", Description = "Title of the book to remove.")]
-    public string Title { get; init; } = "";
+    public required string Title { get; init; }
 
     public BookRemoveCommand(LibraryProvider libraryProvider)
     {

@@ -383,7 +383,7 @@ If the user does not provide value for such option through command line argument
 public class AuthCommand : ICommand
 {
     [CommandOption("token", IsRequired = true, EnvironmentVariable = "AUTH_TOKEN")]
-    public string AuthToken { get; init; }
+    public required string AuthToken { get; init; }
 
     public ValueTask ExecuteAsync(IConsole console)
     {
@@ -500,10 +500,10 @@ This special exception can be used to print an error message to the console, ret
 public class DivideCommand : ICommand
 {
     [CommandOption("dividend", IsRequired = true)]
-    public double Dividend { get; init; }
+    public required double Dividend { get; init; }
 
     [CommandOption("divisor", IsRequired = true)]
-    public double Divisor { get; init; }
+    public required double Divisor { get; init; }
 
     public ValueTask ExecuteAsync(IConsole console)
     {

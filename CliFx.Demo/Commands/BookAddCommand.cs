@@ -14,10 +14,10 @@ public partial class BookAddCommand : ICommand
     private readonly LibraryProvider _libraryProvider;
 
     [CommandParameter(0, Name = "title", Description = "Book title.")]
-    public string Title { get; init; } = "";
+    public required string Title { get; init; }
 
     [CommandOption("author", 'a', IsRequired = true, Description = "Book author.")]
-    public string Author { get; init; } = "";
+    public required string Author { get; init; }
 
     [CommandOption("published", 'p', Description = "Book publish date.")]
     public DateTimeOffset Published { get; init; } = CreateRandomDate();
