@@ -73,9 +73,10 @@ internal class AnalyzerAssertions : ReferenceTypeAssertions<DiagnosticAnalyzer, 
         if (compilationErrors.Any())
         {
             throw new InvalidOperationException(
-                "Failed to compile code." +
-                Environment.NewLine +
-                string.Join(Environment.NewLine, compilationErrors.Select(e => e.ToString()))
+                $"""
+                Failed to compile code.
+                {string.Join(Environment.NewLine, compilationErrors.Select(e => e.ToString()))}
+                """
             );
         }
 

@@ -99,11 +99,11 @@ internal class CommandBinder
         }
 
         throw CliFxException.InternalError(
-            $"{memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} has an unsupported underlying property type." +
-            Environment.NewLine +
-            $"There is no known way to convert a string value into an instance of type `{targetType.FullName}`." +
-            Environment.NewLine +
-            "To fix this, either change the property to use a supported type or configure a custom converter."
+            $"""
+            {memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} has an unsupported underlying property type.
+            There is no known way to convert a string value into an instance of type `{targetType.FullName}`
+            To fix this, either change the property to use a supported type or configure a custom converter.
+            """
         );
     }
 
@@ -133,11 +133,11 @@ internal class CommandBinder
         }
 
         throw CliFxException.InternalError(
-            $"{memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} has an unsupported underlying property type." +
-            Environment.NewLine +
-            $"There is no known way to convert an array of `{targetElementType.FullName}` into an instance of type `{targetEnumerableType.FullName}`." +
-            Environment.NewLine +
-            "To fix this, change the property to use a type which can be assigned from an array or a type that has a constructor which accepts an array."
+            $"""
+            {memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} has an unsupported underlying property type.
+            There is no known way to convert an array of `{targetElementType.FullName}` into an instance of type `{targetEnumerableType.FullName}`.
+            To fix this, change the property to use a type which can be assigned from an array or a type that has a constructor which accepts an array.
+            """
         );
     }
 
@@ -169,20 +169,21 @@ internal class CommandBinder
                 : ex.Message;
 
             throw CliFxException.UserError(
-                $"{memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} cannot be set from the provided argument(s):" +
-                Environment.NewLine +
-                rawValues.Select(v => '<' + v + '>').JoinToString(" ") +
-                Environment.NewLine +
-                $"Error: {errorMessage}",
+                $"""
+                {memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} cannot be set from the provided argument(s):
+                {rawValues.Select(v => '<' + v + '>').JoinToString(" ")}
+                Error: {errorMessage}
+                """,
                 ex
             );
         }
 
         // Mismatch (scalar but too many values)
         throw CliFxException.UserError(
-            $"{memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} expects a single argument, but provided with multiple:" +
-            Environment.NewLine +
-            rawValues.Select(v => '<' + v + '>').JoinToString(" ")
+            $"""
+            {memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} expects a single argument, but provided with multiple:
+            {rawValues.Select(v => '<' + v + '>').JoinToString(" ")}
+            """
         );
     }
 
@@ -202,11 +203,11 @@ internal class CommandBinder
         if (errors.Any())
         {
             throw CliFxException.UserError(
-                $"{memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} has been provided with an invalid value." +
-                Environment.NewLine +
-                "Error(s):" +
-                Environment.NewLine +
-                errors.Select(e => "- " + e.Message).JoinToString(Environment.NewLine)
+                $"""
+                {memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} has been provided with an invalid value.
+                Error(s):
+                {errors.Select(e => "- " + e.Message).JoinToString(Environment.NewLine)}
+                """
             );
         }
     }
@@ -264,22 +265,20 @@ internal class CommandBinder
         if (remainingParameterInputs.Any())
         {
             throw CliFxException.UserError(
-                "Unexpected parameter(s):" +
-                Environment.NewLine +
-                remainingParameterInputs
-                    .Select(p => p.GetFormattedIdentifier())
-                    .JoinToString(" ")
+                $"""
+                Unexpected parameter(s):
+                {remainingParameterInputs.Select(p => p.GetFormattedIdentifier()).JoinToString(" ")}
+                """
             );
         }
 
         if (remainingRequiredParameterSchemas.Any())
         {
             throw CliFxException.UserError(
-                "Missing required parameter(s):" +
-                Environment.NewLine +
-                remainingRequiredParameterSchemas
-                    .Select(p => p.GetFormattedIdentifier())
-                    .JoinToString(" ")
+                $"""
+                Missing required parameter(s):
+                {remainingRequiredParameterSchemas.Select(p => p.GetFormattedIdentifier()).JoinToString(" ")}
+                """
             );
         }
     }
@@ -337,22 +336,20 @@ internal class CommandBinder
         if (remainingOptionInputs.Any())
         {
             throw CliFxException.UserError(
-                "Unrecognized option(s):" +
-                Environment.NewLine +
-                remainingOptionInputs
-                    .Select(o => o.GetFormattedIdentifier())
-                    .JoinToString(", ")
+                $"""
+                Unrecognized option(s):
+                {remainingOptionInputs.Select(o => o.GetFormattedIdentifier()).JoinToString(", ")}
+                """
             );
         }
 
         if (remainingRequiredOptionSchemas.Any())
         {
             throw CliFxException.UserError(
-                "Missing required option(s):" +
-                Environment.NewLine +
-                remainingRequiredOptionSchemas
-                    .Select(o => o.GetFormattedIdentifier())
-                    .JoinToString(", ")
+                $"""
+                Missing required option(s):
+                {remainingRequiredOptionSchemas.Select(o => o.GetFormattedIdentifier()).JoinToString(", ")}
+                """
             );
         }
     }

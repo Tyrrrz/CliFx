@@ -20,11 +20,11 @@ public class DefaultTypeActivator : ITypeActivator
         catch (MemberAccessException ex)
         {
             throw CliFxException.InternalError(
-                $"Failed to create an instance of type `{type.FullName}`, could not access the constructor." +
-                Environment.NewLine +
-                "Default type activator is only capable of instantiating a type if it has a public parameterless constructor." +
-                Environment.NewLine +
-                "To fix this, either add a parameterless constructor to the type or configure a custom activator for the application.",
+                $"""
+                Failed to create an instance of type `{type.FullName}`, could not access the constructor.
+                Default type activator is only capable of instantiating a type if it has a public parameterless constructor.
+                To fix this, either add a parameterless constructor to the type or configure a custom activator for the application.
+                """,
                 ex
             );
         }

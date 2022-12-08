@@ -77,9 +77,10 @@ internal static class DynamicCommandBuilder
         if (compilationErrors.Any())
         {
             throw new InvalidOperationException(
-                "Failed to compile code." +
-                Environment.NewLine +
-                string.Join(Environment.NewLine, compilationErrors.Select(e => e.ToString()))
+                $"""
+                Failed to compile code.
+                {string.Join(Environment.NewLine, compilationErrors.Select(e => e.ToString()))}
+                """
             );
         }
 
@@ -95,9 +96,10 @@ internal static class DynamicCommandBuilder
         if (emitErrors.Any())
         {
             throw new InvalidOperationException(
-                "Failed to emit code." +
-                Environment.NewLine +
-                string.Join(Environment.NewLine, emitErrors.Select(e => e.ToString()))
+                $"""
+                Failed to emit code.
+                {string.Join(Environment.NewLine, emitErrors.Select(e => e.ToString()))}
+                """
             );
         }
 

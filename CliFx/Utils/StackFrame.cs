@@ -96,9 +96,10 @@ internal partial class StackFrame
             // If parsing fails, we include the original stacktrace in the
             // exception so that it's shown to the user.
             throw new FormatException(
-                "Could not parse stacktrace:" +
-                Environment.NewLine +
-                stackTrace
+                $"""
+                Could not parse stacktrace:
+                {stackTrace}
+                """
             );
         }
 
