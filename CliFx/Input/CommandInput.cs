@@ -153,7 +153,7 @@ internal partial class CommandInput
                 if (!string.IsNullOrWhiteSpace(lastOptionIdentifier))
                     result.Add(new OptionInput(lastOptionIdentifier, lastOptionValues));
 
-                lastOptionIdentifier = argument.Substring(2);
+                lastOptionIdentifier = argument[2..];
                 lastOptionValues = new List<string>();
             }
             // Short name
@@ -161,7 +161,7 @@ internal partial class CommandInput
                      argument.Length > 1 &&
                      char.IsLetter(argument[1]))
             {
-                foreach (var alias in argument.Substring(1))
+                foreach (var alias in argument[1..])
                 {
                     // Flush previous
                     if (!string.IsNullOrWhiteSpace(lastOptionIdentifier))
