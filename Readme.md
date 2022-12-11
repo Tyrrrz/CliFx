@@ -136,7 +136,7 @@ To do that, you need to add properties to the command class and bind them using 
 In **CliFx**, there are two types of argument bindings: **parameters** and **options**.
 Parameters are bound from arguments based on the order they appear in, while options are bound by their name.
 
-As an example, here's a command that calculates logarithm of a value — it uses a parameter binding to specify the input value and an option binding for the logarithm base:
+As an example, here's a command that calculates the logarithm of a value — it uses a parameter binding to specify the input value and an option binding for the logarithm base:
 
 ```csharp
 [Command]
@@ -160,6 +160,10 @@ public class LogCommand : ICommand
     }
 }
 ```
+
+> **Note**:
+> You can specify whether a parameter or an option is required by setting the `IsRequired` property on the attribute.
+> Alternatively, you can also use the `required` keyword (introduced in C# 11) on the property to mark the corresponding argument binding as required.
 
 > **Note**:
 > **CliFx** has built-in analyzers that detect common errors in command definitions.
@@ -278,7 +282,7 @@ public class FileSizeCalculatorCommand : ICommand
     // FileInfo is string-initializable and IReadOnlyList<T> can be assigned from an array,
     // so the value of this property can be mapped from a sequence of arguments.
     [CommandParameter(0)]
-    public IReadOnlyList<FileInfo> Files { get; init; }
+    public required IReadOnlyList<FileInfo> Files { get; init; }
 
     public ValueTask ExecuteAsync(IConsole console)
     {
@@ -304,7 +308,7 @@ Same command, but using an option for the list of files instead:
 public class FileSizeCalculatorCommand : ICommand
 {
     [CommandOption("files")]
-    public IReadOnlyList<FileInfo> Files { get; init; }
+    public required IReadOnlyList<FileInfo> Files { get; init; }
 
     public ValueTask ExecuteAsync(IConsole console)
     {
@@ -349,13 +353,13 @@ public class SurfaceCalculatorCommand : ICommand
 {
     // Custom converter is used to map raw argument values
     [CommandParameter(0, Converter = typeof(VectorConverter))]
-    public Vector2 PointA { get; init; }
+    public required Vector2 PointA { get; init; }
 
     [CommandParameter(1, Converter = typeof(VectorConverter))]
-    public Vector2 PointB { get; init; }
+    public required Vector2 PointB { get; init; }
 
     [CommandParameter(2, Converter = typeof(VectorConverter))]
-    public Vector2 PointC { get; init; }
+    public required Vector2 PointC { get; init; }
 
     public ValueTask ExecuteAsync(IConsole console)
     {
@@ -541,7 +545,7 @@ Division by zero is not supported.
 Console applications support the concept of interrupt signals, which can be issued by the user to abort the currently ongoing operation.
 If your command performs critical work, you can intercept these signals to handle cancellation requests in a graceful way.
 
-To make a command cancellation-aware, call `console.RegisterCancellationHandler()` to register the signal handler and obtain the corresponding `CancellationToken`.
+In order to make the command cancellation-aware, call `console.RegisterCancellationHandler()` to register the signal handler and obtain the corresponding `CancellationToken`.
 Once this method is called, the program will no longer terminate on an interrupt signal but will instead trigger the token, so it's important to be able to process it correctly.
 
 ```csharp
