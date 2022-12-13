@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using CliFx.Exceptions;
 using CliFx.Formatting;
@@ -216,11 +217,13 @@ public class CliApplication
     /// </remarks>
     public async ValueTask<int> RunAsync(IReadOnlyList<string> commandLineArguments) => await RunAsync(
         commandLineArguments,
-        // Use case-sensitive comparison because environment variables are
-        // case-sensitive on Linux and macOS (but not on Windows).
         Environment
             .GetEnvironmentVariables()
-            .ToDictionary<string, string>(StringComparer.Ordinal)
+            .ToDictionary<string, string>(
+                RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                    ? StringComparer.OrdinalIgnoreCase
+                    : StringComparer.Ordinal
+            )
     );
 
     /// <summary>
