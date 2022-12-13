@@ -7,6 +7,6 @@ internal static class StringPolyfills
         str.Length > 0 && str[0] == c;
 
     public static bool EndsWith(this string str, char c) =>
-        str.Length > 0 && str[str.Length - 1] == c;
+        str.Length > 0 && str[^1] == c;
 }
 #endif
