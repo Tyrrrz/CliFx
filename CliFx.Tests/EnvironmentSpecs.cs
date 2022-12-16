@@ -241,7 +241,7 @@ public class EnvironmentSpecs : SpecsBase
         stdOut.Trim().Should().Be("bar");
     }
 
-    [Fact]
+    [Fact(Timeout = 15000)]
     public async Task Environment_variables_are_extracted_automatically()
     {
         // Ensures that the environment variables are properly obtained from

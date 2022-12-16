@@ -21,7 +21,7 @@ public class ConsoleSpecs : SpecsBase
     {
     }
 
-    [Fact]
+    [Fact(Timeout = 15000)]
     public async Task Real_console_maps_directly_to_system_console()
     {
         // Can't verify our own console output, so using an

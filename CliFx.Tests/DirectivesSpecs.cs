@@ -19,54 +19,35 @@ public class DirectivesSpecs : SpecsBase
     {
     }
 
-    [Fact]
+    [Fact(Timeout = 15000)]
     public async Task Debug_directive_can_be_specified_to_interrupt_execution_until_a_debugger_is_attached()
     {
         // Arrange
-        var stdOutBuffer = new StringBuilder();
+        using var cts = new CancellationTokenSource();
+
+        // We can't actually attach a debugger, but we can ensure that the process is waiting for one
+        void HandleStdOut(string line)
+        {
+            // Kill the process once it writes the output we expect
+            if (line.Contains("Attach debugger to", StringComparison.OrdinalIgnoreCase))
+                cts.Cancel();
+        }
 
         var command = Cli.Wrap("dotnet")
             .WithArguments(a => a
                 .Add(Dummy.Program.Location)
                 .Add("[debug]")
-            ) | stdOutBuffer;
+            ) | HandleStdOut;
 
-        // Act
+        // Act & assert
         try
         {
-            // This has a timeout just in case the execution hangs forever
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-
-            var task = command.ExecuteAsync(cts.Token);
-
-            // We can't attach a debugger programmatically, so the application
-            // will hang indefinitely.
-            // To work around it, we will wait until the application writes
-            // something to the standard output and then kill it.
-            while (true)
-            {
-                if (stdOutBuffer.Length > 0)
-                {
-                    cts.Cancel();
-                    break;
-                }
-
-                await Task.Delay(100, cts.Token);
-            }
-
-            await task;
+            await command.ExecuteAsync(cts.Token);
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException ex) when (ex.CancellationToken == cts.Token)
         {
-            // This is expected
+            // This means that the process was killed after it wrote the expected output
         }
-
-        var stdOut = stdOutBuffer.ToString();
-
-        // Assert
-        stdOut.Should().Contain("Attach debugger to");
-
-        TestOutput.WriteLine(stdOut);
     }
 
     [Fact]
