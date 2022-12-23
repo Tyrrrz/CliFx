@@ -71,7 +71,6 @@ public static class Program
 
 > **Note**:
 > When calling `CliApplication.RunAsync()`, **CliFx** resolves command line arguments and environment variables from `Environment.GetCommandLineArgs()` and `Environment.GetEnvironmentVariables()` respectively.
-> You can also provide them explicitly if you choose.
 
 The code above uses `AddCommandsFromThisAssembly()` to detect command types defined within the current assembly.
 Commands are entry points, through which the user can interact with your application.
@@ -407,7 +406,7 @@ test
 ```
 
 Environment variables can be configured for options of non-scalar types (arrays, lists, etc.) as well.
-In such case, the values of the environment variable will be split by `Path.PathSeparator` (`;` on Windows, `:` on Unix systems).
+In such case, the value of the environment variable will be split by `Path.PathSeparator` (`;` on Windows, `:` on Unix systems).
 
 ### Multiple commands
 
