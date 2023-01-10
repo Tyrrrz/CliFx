@@ -1,6 +1,6 @@
 # CliFx
 
-[![Made in Ukraine](https://img.shields.io/badge/made_in-ukraine-ffd700.svg?labelColor=0057b7)](https://vshymanskyy.github.io/StandWithUkraine)
+[![Made in Ukraine](https://img.shields.io/badge/made_in-ukraine-ffd700.svg?labelColor=0057b7)](https://tyrrrz.me/ukraine)
 [![Build](https://img.shields.io/github/actions/workflow/status/Tyrrrz/CliFx/main.yml?branch=master)](https://github.com/Tyrrrz/CliFx/actions)
 [![Coverage](https://img.shields.io/codecov/c/github/Tyrrrz/CliFx/master)](https://codecov.io/gh/Tyrrrz/CliFx)
 [![Version](https://img.shields.io/nuget/v/CliFx.svg)](https://nuget.org/packages/CliFx)
