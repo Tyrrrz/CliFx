@@ -12,7 +12,7 @@ internal interface IBindingConverter
 public abstract class BindingConverter<T> : IBindingConverter
 {
     /// <summary>
-    /// Parses value from a raw command line argument.
+    /// Parses value from a raw command-line argument.
     /// </summary>
     public abstract T Convert(string? rawValue);
 

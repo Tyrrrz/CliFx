@@ -13,7 +13,7 @@ internal class CommandInputConsoleFormatter : ConsoleFormatter
 
     private void WriteCommandLineArguments(CommandInput commandInput)
     {
-        Write("Command line:");
+        Write("Command-line:");
         WriteLine();
 
         WriteHorizontalMargin();

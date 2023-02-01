@@ -15,7 +15,7 @@ using CliFx.Utils.Extensions;
 namespace CliFx;
 
 /// <summary>
-/// Command line application facade.
+/// Command-line application facade.
 /// </summary>
 public class CliApplication
 {
@@ -164,7 +164,7 @@ public class CliApplication
     }
 
     /// <summary>
-    /// Runs the application with the specified command line arguments and environment variables.
+    /// Runs the application with the specified command-line arguments and environment variables.
     /// Returns an exit code which indicates whether the application completed successfully.
     /// </summary>
     /// <remarks>
@@ -207,7 +207,7 @@ public class CliApplication
     }
 
     /// <summary>
-    /// Runs the application with the specified command line arguments.
+    /// Runs the application with the specified command-line arguments.
     /// Environment variables are resolved automatically.
     /// Returns an exit code which indicates whether the application completed successfully.
     /// </summary>
@@ -228,7 +228,7 @@ public class CliApplication
 
     /// <summary>
     /// Runs the application.
-    /// Command line arguments and environment variables are resolved automatically.
+    /// Command-line arguments and environment variables are resolved automatically.
     /// Returns an exit code which indicates whether the application completed successfully.
     /// </summary>
     /// <remarks>

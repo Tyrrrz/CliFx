@@ -4,7 +4,7 @@ using CliFx.Infrastructure;
 namespace CliFx;
 
 /// <summary>
-/// Entry point through which the user interacts with the command line application.
+/// Entry point through which the user interacts with the command-line application.
 /// </summary>
 public interface ICommand
 {

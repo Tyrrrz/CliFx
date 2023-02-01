@@ -100,7 +100,7 @@
   - Assigned separate colors to parameters and options to make them visually stand out
   - Usage section no longer lists usage formats of all descendant commands
   - Command section now also lists available subcommands for each of the current command's subcommands
-- Changed the behavior of `[preview]` directive. Running the application with this directive will now also print all resolved environment variables, in addition to parsed command line arguments.
+- Changed the behavior of `[preview]` directive. Running the application with this directive will now also print all resolved environment variables, in addition to parsed command-line arguments.
 - Reworked `IArgumentValueConverter`/`ArgumentValueConverter` into `BindingConverter`. Method `ConvertFrom(...)` has been renamed to `Convert(...)`.
 - Reworked `ArgumentValueValidator` into `BindingValidator`. This class exposes an abstract `Validate(...)` method that returns a nullable `BindingValidationError`. This class also provides utility methods `Ok()` and `Error(...)` to help create corresponding validation results.
 - Changed the type of `IConsole.Output` and `IConsole.Error` from `StreamWriter` to `ConsoleWriter`. This type derives from `StreamWriter` and additionally exposes a `Console` property that refers to the console instance that owns the stream. This change enables you to author extension methods scoped specifically to console output and error streams.

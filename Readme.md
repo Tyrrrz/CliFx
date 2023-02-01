@@ -11,7 +11,7 @@
 
 > 🟡 **Project status**: maintenance mode<sup>[[?]](https://github.com/Tyrrrz/.github/blob/master/docs/project-status.md)</sup>
 
-**CliFx** is a simple to use, yet powerful framework for building command line applications.
+**CliFx** is a simple to use, yet powerful framework for building command-line applications.
 Its primary goal is to completely take over the user input layer, allowing you to forget about infrastructural concerns and instead focus on writing your application.
 
 ## Terms of use<sup>[[?]](https://github.com/Tyrrrz/.github/blob/master/docs/why-so-political.md)</sup>
@@ -51,7 +51,7 @@ To learn more about the war and how you can help, [click here](https://tyrrrz.me
 
 ### Application and commands
 
-To turn your program into a command line interface, modify your `Main` method so that it delegates execution to `CliApplication`.
+To turn your program into a command-line interface, modify your `Main` method so that it delegates execution to `CliApplication`.
 You can use `CliApplicationBuilder` to fluently create and configure an instance of `CliApplication`:
 
 ```csharp
@@ -70,7 +70,7 @@ public static class Program
 > Exit code is used to communicate execution result to the parent process, so it's important that your program propagates it.
 
 > **Note**:
-> When calling `CliApplication.RunAsync()`, **CliFx** resolves command line arguments and environment variables from `Environment.GetCommandLineArgs()` and `Environment.GetEnvironmentVariables()` respectively.
+> When calling `CliApplication.RunAsync()`, **CliFx** resolves command-line arguments and environment variables from `Environment.GetCommandLineArgs()` and `Environment.GetEnvironmentVariables()` respectively.
 
 The code above uses `AddCommandsFromThisAssembly()` to detect command types defined within the current assembly.
 Commands are entry points, through which the user can interact with your application.
@@ -129,7 +129,7 @@ v1.0
 
 ### Parameters and options
 
-Commands can be configured to take input from command line arguments.
+Commands can be configured to take input from command-line arguments.
 To do that, you need to add properties to the command class and bind them using special attributes.
 
 In **CliFx**, there are two types of argument bindings: **parameters** and **options**.
@@ -212,7 +212,7 @@ OPTIONS
   --version         Shows version information.
 ```
 
-Overall, parameters and options are both used to consume input from the command line, but they differ in a few important ways:
+Overall, parameters and options are both used to consume input from the command-line, but they differ in a few important ways:
 
 |                    | Parameter                                                                      | Option                                                                                               |
 | ------------------ | ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
@@ -226,7 +226,7 @@ Use options for all other non-required inputs, or when specifying the name expli
 
 ### Argument syntax
 
-This library employs the POSIX argument syntax, which is used in most modern command line tools.
+This library employs the POSIX argument syntax, which is used in most modern command-line tools.
 Here are some examples of how it works:
 
 - `myapp --foo bar` sets option `"foo"` to value `"bar"`
@@ -246,7 +246,7 @@ The parser's context-free nature has several implications on how it consumes arg
 For example, `myapp -i file1.txt file2.txt` will always be parsed as an option with multiple values, regardless of the arity of the underlying property it's bound to.
 Similarly, unseparated arguments in the form of `myapp -ofile` will be treated as five distinct options `'o'`, `'f'`, `'i'`, `'l'`, `'e'`, instead of `'o'` being set to value `"file"`.
 
-These rules also make the order of arguments important — command line string is expected to follow this pattern:
+These rules also make the order of arguments important — command-line string is expected to follow this pattern:
 
 ```powershell
 > myapp [...directives] [command] [...parameters] [...options]
@@ -379,7 +379,7 @@ public class SurfaceCalculatorCommand : ICommand
 ### Environment variables
 
 An option can be configured to use a specific environment variable as fallback.
-If the user does not provide value for such option through command line arguments, the current value of the environment variable will be used instead.
+If the user does not provide value for such option through command-line arguments, the current value of the environment variable will be used instead.
 
 ```csharp
 [Command]
@@ -410,7 +410,7 @@ In such case, the value of the environment variable will be split by `Path.PathS
 
 ### Multiple commands
 
-In order to facilitate a variety of different workflows, command line applications may provide the user with more than just a single command.
+In order to facilitate a variety of different workflows, command-line applications may provide the user with more than just a single command.
 Complex applications may also nest commands underneath each other, employing a multi-level hierarchical structure.
 
 With **CliFx**, this is achieved by simply giving each command a unique name through the `[Command]` attribute.
@@ -704,12 +704,12 @@ Attach debugger to PID 3148 to continue.
 ```
 
 To run the application in preview mode, use the `[preview]` directive.
-This will short-circuit the execution and instead print the consumed command line arguments as they were parsed, along with resolved environment variables:
+This will short-circuit the execution and instead print the consumed command-line arguments as they were parsed, along with resolved environment variables:
 
 ```powershell
 > dotnet myapp.dll [preview] cmd arg1 arg2 -o foo --option bar1 bar2
 
-Command line:
+Command-line:
   cmd <arg1> <arg2> [-o foo] [--option bar1 bar2]
 
 Environment:
@@ -729,5 +729,5 @@ var app = new CliApplicationBuilder()
 
 ## Etymology
 
-**CliFx** is made out of "Cli" for "Command Line Interface" and "Fx" for "Framework".
+**CliFx** is made out of "Cli" for "Command-line Interface" and "Fx" for "Framework".
 It's pronounced as "cliff ex".

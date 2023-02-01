@@ -47,7 +47,7 @@ public sealed class CommandParameterAttribute : Attribute
     public string? Description { get; set; }
 
     /// <summary>
-    /// Custom converter used for mapping the raw command line argument into
+    /// Custom converter used for mapping the raw command-line argument into
     /// a value expected by the underlying property.
     /// </summary>
     /// <remarks>

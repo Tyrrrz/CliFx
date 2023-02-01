@@ -40,7 +40,7 @@ public sealed class CommandOptionAttribute : Attribute
 
     /// <summary>
     /// Environment variable whose value will be used as a fallback if the option
-    /// has not been explicitly set through command line arguments.
+    /// has not been explicitly set through command-line arguments.
     /// </summary>
     public string? EnvironmentVariable { get; set; }
 
@@ -51,7 +51,7 @@ public sealed class CommandOptionAttribute : Attribute
     public string? Description { get; set; }
 
     /// <summary>
-    /// Custom converter used for mapping the raw command line argument into
+    /// Custom converter used for mapping the raw command-line argument into
     /// a value expected by the underlying property.
     /// </summary>
     /// <remarks>
@@ -81,7 +81,7 @@ public sealed class CommandOptionAttribute : Attribute
     /// Initializes an instance of <see cref="CommandOptionAttribute" />.
     /// </summary>
     public CommandOptionAttribute(string name, char shortName)
-        : this(name, (char?) shortName)
+        : this(name, (char?)shortName)
     {
     }
 
@@ -97,7 +97,7 @@ public sealed class CommandOptionAttribute : Attribute
     /// Initializes an instance of <see cref="CommandOptionAttribute" />.
     /// </summary>
     public CommandOptionAttribute(char shortName)
-        : this(null, (char?) shortName)
+        : this(null, (char?)shortName)
     {
     }
 }
