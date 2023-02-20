@@ -4,15 +4,8 @@ using System.Linq;
 
 namespace CliFx.Demo.Domain;
 
-public partial class Library
+public partial record Library(IReadOnlyList<Book> Books)
 {
-    public IReadOnlyList<Book> Books { get; }
-
-    public Library(IReadOnlyList<Book> books)
-    {
-        Books = books;
-    }
-
     public Library WithBook(Book book)
     {
         var books = Books.ToList();
@@ -29,7 +22,7 @@ public partial class Library
     }
 }
 
-public partial class Library
+public partial record Library
 {
     public static Library Empty { get; } = new(Array.Empty<Book>());
 }

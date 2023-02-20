@@ -1,6 +1,6 @@
 ﻿using System.IO;
 using System.Linq;
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace CliFx.Demo.Domain;
 
@@ -10,7 +10,7 @@ public class LibraryProvider
 
     private void StoreLibrary(Library library)
     {
-        var data = JsonConvert.SerializeObject(library);
+        var data = JsonSerializer.Serialize(library);
         File.WriteAllText(StorageFilePath, data);
     }
 
@@ -21,7 +21,7 @@ public class LibraryProvider
 
         var data = File.ReadAllText(StorageFilePath);
 
-        return JsonConvert.DeserializeObject<Library>(data) ?? Library.Empty;
+        return JsonSerializer.Deserialize<Library>(data) ?? Library.Empty;
     }
 
     public Book? TryGetBook(string title) => GetLibrary().Books.FirstOrDefault(b => b.Title == title);
