@@ -49,12 +49,14 @@ To learn more about the war and how you can help, [click here](https://tyrrrz.me
 
 ## Usage
 
-### Application and commands
+### Quick overview
 
-To turn your program into a command-line interface, modify your `Main` method so that it delegates execution to `CliApplication`.
-You can use `CliApplicationBuilder` to fluently create and configure an instance of `CliApplication`:
+To turn your program into a command-line interface, modify the `Main()` method so that it delegates the execution to an instance of `CliApplication`.
+You can use `CliApplicationBuilder` to simplify the process of creating and configuring an application:
 
 ```csharp
+using CliFx;
+
 public static class Program
 {
     public static async Task<int> Main() =>
@@ -71,74 +73,18 @@ public static class Program
 
 > **Note**:
 > When calling `CliApplication.RunAsync()`, **CliFx** resolves command-line arguments and environment variables from `Environment.GetCommandLineArgs()` and `Environment.GetEnvironmentVariables()` respectively.
+> You can also provide them manually using one of the alternative overloads.
 
-The code above uses `AddCommandsFromThisAssembly()` to detect command types defined within the current assembly.
-Commands are entry points, through which the user can interact with your application.
+The code above uses `AddCommandsFromThisAssembly()` to detect command types defined within the current project and register them on the application.
+Commands are independent entry points, through which the user can interact with your program.
 
-To define a command, create a new class by implementing the `ICommand` interface and annotate it with the `[Command]` attribute:
-
-```csharp
-[Command]
-public class HelloWorldCommand : ICommand
-{
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine("Hello world!");
-
-        // Return default task if the command is not asynchronous
-        return default;
-    }
-}
-```
-
-In order to implement `ICommand`, the class needs to define an `ExecuteAsync(...)` method.
-This is the method that gets called by the framework when the user decides to execute this command.
-
-As the only parameter, this method takes an instance of `IConsole`, which is an abstraction around the system console.
-Use this abstraction in place of `System.Console` whenever you need to write output, read input, or otherwise interact with the console.
-
-With the basic setup above, the user can now run the application and get a greeting in return:
-
-```powershell
-> dotnet myapp.dll
-
-Hello world!
-```
-
-Out of the box, the application also comes with built-in `--help` and `--version` options.
-They can be used to show help text or application version respectively:
-
-```powershell
-> dotnet myapp.dll --help
-
-MyApp v1.0
-
-USAGE
-  dotnet myapp.dll [options]
-
-OPTIONS
-  -h|--help         Shows help text.
-  --version         Shows version information.
-```
-
-```powershell
-> dotnet myapp.dll --version
-
-v1.0
-```
-
-### Parameters and options
-
-Commands can be configured to take input from command-line arguments.
-To do that, you need to add properties to the command class and bind them using special attributes.
-
-In **CliFx**, there are two types of argument bindings: **parameters** and **options**.
-Parameters are bound from arguments based on the order they appear in, while options are bound by their name.
-
-As an example, here's a command that calculates the logarithm of a value — it uses a parameter binding to specify the input value and an option binding for the logarithm base:
+To define a command, create a class that implements the `ICommand` interface and annotate it with the `[Command]` attribute:
 
 ```csharp
-[Command]
+using CliFx;
+using CliFx.Attributes;
+
+[Command(Description = "Calculates the logarithm of a value.")]
 public class LogCommand : ICommand
 {
     // Order: 0
@@ -155,53 +101,60 @@ public class LogCommand : ICommand
         var result = Math.Log(Value, Base);
         console.Output.WriteLine(result);
 
+        // If the execution is not meant to be asynchronous,
+        // return an empty task at the end of the method.
         return default;
     }
 }
 ```
 
-> **Note**:
-> You can specify whether a parameter or an option is required by setting the `IsRequired` property on the attribute.
-> Alternatively, you can also use the `required` keyword (introduced in C# 11) on the property to mark the corresponding argument binding as required.
+In order to implement `ICommand`, the class needs to define an `ExecuteAsync(...)` method.
+This is the method that gets called by the framework when the user decides to execute the command.
 
-> **Note**:
-> **CliFx** has built-in analyzers that detect common errors in command definitions.
-> Your code will not compile if the command contains duplicate options, overlapping parameters, or otherwise invalid configuration.
+As the only parameter, this method takes an instance of `IConsole`, which is an abstraction around the system console.
+Use this abstraction in place of `System.Console` whenever you need to write output, read input, or otherwise interact with the console.
 
-In order to execute this command, at a minimum, the user needs to provide the input value:
+In most cases, you will also want to define input bindings, which are properties annotated by the `[CommandParameter]` and `[CommandOption]` attributes.
+These bindings provide a way to map command-line arguments into structured data that can be used by the command.
 
-```powershell
-> dotnet myapp.dll 10000
+The command in the above example serves as a simple logarithm calculator and defines two inputs: a positional parameter for the input value and a named option for the logarithm base.
+In order to execute this command, at minimum, the user needs to provide the input value:
+
+```sh
+$ dotnet myapp.dll 10000
 
 4
 ```
 
-They can also pass the `base` option to override the default logarithm base of 10:
+They can also pass the `-b|--base` option to override the default logarithm base of `10`:
 
-```powershell
-> dotnet myapp.dll 729 -b 3
+```sh
+$ dotnet myapp.dll 729 -b 3
 
 6
 ```
 
-In case the user forgets to specify the `value` parameter, the application will exit with an error:
+In case the user forgets to specify the required `value` parameter, the application will instead exit with an error:
 
-```powershell
-> dotnet myapp.dll -b 10
+```sh
+$ dotnet myapp.dll -b 10
 
 Missing required parameter(s):
 <value>
 ```
 
-Available parameters and options are also listed in the command's help text, which can be accessed by passing the `--help` option:
+Out of the box, **CliFx** also provides a built-in `--help` option, which generates a help screen that lists all parameters and options available for the command:
 
-```powershell
-> dotnet myapp.dll --help
+```sh
+$ dotnet myapp.dll --help
 
 MyApp v1.0
 
 USAGE
   dotnet myapp.dll <value> [options]
+
+DESCRIPTION
+  Calculates the logarithm of a value.  
 
 PARAMETERS
 * value             Value whose logarithm is to be found.
@@ -212,21 +165,9 @@ OPTIONS
   --version         Shows version information.
 ```
 
-Overall, parameters and options are both used to consume input from the command-line, but they differ in a few important ways:
-
-|                    | Parameter                                                                      | Option                                                                                               |
-| ------------------ | ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
-| **Identification** | Positional (by relative order).                                                | Nominal (by name or short name).                                                                     |
-| **Requiredness**   | Required by default. Only the last parameter can be configured to be optional. | Optional by default. Any option can be configured to be required without limitations.                |
-| **Arity**          | Only the last parameter can be bound to a non-scalar property (i.e. an array). | Any option can be bound to a non-scalar property without limitations.                                |
-| **Fallback**       | —                                                                              | Can be configured to use an environment variable as fallback if the value isn't explicitly provided. |
-
-As a general guideline, use parameters for required inputs that the command can't function without.
-Use options for all other non-required inputs, or when specifying the name explicitly makes the usage clearer.
-
 ### Argument syntax
 
-This library employs the POSIX argument syntax, which is used in most modern command-line tools.
+This library employs a variation of the POSIX argument syntax, which is used in most modern command-line tools.
 Here are some examples of how it works:
 
 - `myapp --foo bar` sets option `"foo"` to value `"bar"`
@@ -248,9 +189,66 @@ Similarly, unseparated arguments in the form of `myapp -ofile` will be treated a
 
 These rules also make the order of arguments important — command-line string is expected to follow this pattern:
 
-```powershell
-> myapp [...directives] [command] [...parameters] [...options]
+```sh
+$ myapp [...directives] [command] [...parameters] [...options]
 ```
+
+### Parameters and options
+
+**CliFx** supports two types of argument bindings: **parameters** and **options**.
+Parameters are bound from arguments based on the order they appear in, while options are bound by their name.
+
+Besides that, they also differ in the following ways:
+
+- Parameters are required by default, while options are not.
+
+  - You can make an option required by setting `IsRequired = true` on the corresponding attribute or by adding the `required` keyword to the property declaration (introduced in C# 11):
+
+      ```csharp
+      // Any option can be required or optional without restrictions
+      [CommandOption("foo")]
+      public required string RequiredOption { get; init; }
+      ```
+
+  - To make a parameter optional, you can set `IsRequired = false`, but only the last parameter (by order) can be configured in such way:
+
+    ```csharp
+    // Only the last parameter can be optional
+    [CommandParameter(0, IsRequired = false)]
+    public string? OptionalParameter { get; init; }
+    ```
+
+- Parameters are primarily used for scalar (non-enumerable) properties, while options can be used for both scalar and non-scalar properties.
+
+  - You can bind an option to a property of a non-scalar type, such as `IReadOnlyList<T>`:
+
+    ```csharp
+    // Any option can be non-scalar
+    [CommandOption("foo")]
+    public required IReadOnlyList<string> NonScalarOption { get; init; }
+    ```
+
+  - You can bind a parameter to a non-scalar property, but only if it's the last parameter in the command:
+  
+    ```csharp
+    // Only the last parameter can be non-scalar
+    [CommandParameter(0)]
+    public required IReadOnlyList<string> NonScalarParameter { get; init; }
+    ```
+
+- Options can rely on an environment variable for fallback, while parameters cannot:
+
+  ```csharp
+  // If the value is not provided directly, it will be read
+  // from the environment variable instead.
+  // This works for both scalar and non-scalar properties.
+  [CommandOption("foo", EnvironmentVariable = "ENV_FOO")]
+  public required string OptionWithFallback { get; init; }
+  ```
+
+> **Note**:
+> **CliFx** has a set of built-in analyzers that detect common errors in command definitions.
+> Your code will not compile if a command contains duplicate options, overlapping parameters, or otherwise invalid configuration.
 
 ### Value conversion
 
@@ -294,34 +292,8 @@ public class FileSizeCalculatorCommand : ICommand
 }
 ```
 
-```powershell
-> dotnet myapp.dll file1.bin file2.exe
-
-Total file size: 186368 bytes
-```
-
-Same command, but using an option for the list of files instead:
-
-```csharp
-[Command]
-public class FileSizeCalculatorCommand : ICommand
-{
-    [CommandOption("files")]
-    public required IReadOnlyList<FileInfo> Files { get; init; }
-
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        var totalSize = Files.Sum(f => f.Length);
-
-        console.Output.WriteLine($"Total file size: {totalSize} bytes");
-
-        return default;
-    }
-}
-```
-
-```powershell
-> dotnet myapp.dll --files file1.bin file2.exe
+```sh
+$ dotnet myapp.dll file1.bin file2.exe
 
 Total file size: 186368 bytes
 ```
@@ -376,37 +348,11 @@ public class SurfaceCalculatorCommand : ICommand
 }
 ```
 
-### Environment variables
+```sh
+$ dotnet myapp.dll 0x0 0x10 10x0
 
-An option can be configured to use a specific environment variable as fallback.
-If the user does not provide value for such option through command-line arguments, the current value of the environment variable will be used instead.
-
-```csharp
-[Command]
-public class AuthCommand : ICommand
-{
-    [CommandOption("token", EnvironmentVariable = "AUTH_TOKEN")]
-    public required string AuthToken { get; init; }
-
-    public ValueTask ExecuteAsync(IConsole console)
-    {
-        console.Output.WriteLine(AuthToken);
-
-        return default;
-    }
-}
+Triangle surface area: 50
 ```
-
-```powershell
-> $env:AUTH_TOKEN="test"
-
-> dotnet myapp.dll
-
-test
-```
-
-Environment variables can be configured for options of non-scalar types (arrays, lists, etc.) as well.
-In such case, the value of the environment variable will be split by `Path.PathSeparator` (`;` on Windows, `:` on Unix systems).
 
 ### Multiple commands
 
@@ -451,8 +397,8 @@ For example, running `dotnet myapp.dll cmd1 arg1 -p 42` will execute `FirstComma
 
 Requesting help will show direct subcommands of the current command:
 
-```powershell
-> dotnet myapp.dll --help
+```sh
+$ dotnet myapp.dll --help
 
 MyApp v1.0
 
@@ -473,8 +419,8 @@ You can run `dotnet myapp.dll [command] --help` to show help on a specific comma
 
 The user can also refine their help request by querying it on a specific command:
 
-```powershell
-> dotnet myapp.dll cmd1 --help
+```sh
+$ dotnet myapp.dll cmd1 --help
 
 USAGE
   dotnet myapp.dll cmd1 [options]
@@ -524,13 +470,12 @@ public class DivideCommand : ICommand
 }
 ```
 
-```powershell
-> dotnet myapp.dll --dividend 10 --divisor 0
+```sh
+$ dotnet myapp.dll --dividend 10 --divisor 0
 
 Division by zero is not supported.
 
-
-> $LastExitCode
+$ echo $?
 
 133
 ```
@@ -697,8 +642,8 @@ To do that, you need to pass the corresponding directive before any other argume
 In order to run the application in debug mode, use the `[debug]` directive.
 This will cause the program to launch in a suspended state, waiting for debugger to be attached to the process:
 
-```powershell
-> dotnet myapp.dll [debug] cmd -o
+```sh
+$ dotnet myapp.dll [debug] cmd -o
 
 Attach debugger to PID 3148 to continue.
 ```
@@ -706,8 +651,8 @@ Attach debugger to PID 3148 to continue.
 To run the application in preview mode, use the `[preview]` directive.
 This will short-circuit the execution and instead print the consumed command-line arguments as they were parsed, along with resolved environment variables:
 
-```powershell
-> dotnet myapp.dll [preview] cmd arg1 arg2 -o foo --option bar1 bar2
+```sh
+$ dotnet myapp.dll [preview] cmd arg1 arg2 -o foo --option bar1 bar2
 
 Command-line:
   cmd <arg1> <arg2> [-o foo] [--option bar1 bar2]

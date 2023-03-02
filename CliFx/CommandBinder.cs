@@ -31,7 +31,7 @@ internal class CommandBinder
             return converter.Convert(rawValue);
         }
 
-        // Assignable from string (e.g. string itself, object, etc)
+        // Assignable from a string (e.g. string itself, object, etc)
         if (targetType.IsAssignableFrom(typeof(string)))
         {
             return rawValue;
@@ -77,7 +77,7 @@ internal class CommandBinder
                 : null;
         }
 
-        // String-constructible (FileInfo, etc)
+        // String-constructable (FileInfo, etc)
         var stringConstructor = targetType.GetConstructor(new[] { typeof(string) });
         if (stringConstructor is not null)
         {
@@ -125,7 +125,7 @@ internal class CommandBinder
             return array;
         }
 
-        // Array-constructible (List<T>, HashSet<T>, etc)
+        // Array-constructable (List<T>, HashSet<T>, etc)
         var arrayConstructor = targetEnumerableType.GetConstructor(new[] { arrayType });
         if (arrayConstructor is not null)
         {
@@ -307,7 +307,7 @@ internal class CommandBinder
 
                 BindMember(optionSchema, commandInstance, rawValues);
 
-                // Required options require at least one value to be set
+                // Required options need at least one value to be set
                 if (rawValues.Any())
                     remainingRequiredOptionSchemas.Remove(optionSchema);
             }
@@ -320,7 +320,7 @@ internal class CommandBinder
 
                 BindMember(optionSchema, commandInstance, rawValues);
 
-                // Required options require at least one value to be set
+                // Required options need at least one value to be set
                 if (rawValues.Any())
                     remainingRequiredOptionSchemas.Remove(optionSchema);
             }

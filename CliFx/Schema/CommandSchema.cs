@@ -70,8 +70,7 @@ internal partial class CommandSchema
     public static bool IsCommandType(Type type) =>
         type.Implements(typeof(ICommand)) &&
         type.IsDefined(typeof(CommandAttribute)) &&
-        !type.IsAbstract &&
-        !type.IsInterface;
+        type is { IsAbstract: false, IsInterface: false };
 
     public static CommandSchema? TryResolve(Type type)
     {
@@ -88,7 +87,7 @@ internal partial class CommandSchema
             : new[] {OptionSchema.HelpOption};
 
         var properties = type
-            // Get properties directly on command type
+            // Get properties directly on the command type
             .GetProperties()
             // Get non-abstract properties on interfaces (to support default interfaces members)
             .Union(type
