@@ -63,9 +63,7 @@ public partial class CliApplicationBuilder
     /// </remarks>
     public CliApplicationBuilder AddCommandsFrom(Assembly commandAssembly)
     {
-        foreach (var commandType in commandAssembly.ExportedTypes
-            .Where(CommandSchema.IsCommandType)
-            .OrderBy(a => a.Name))
+        foreach (var commandType in commandAssembly.ExportedTypes.Where(CommandSchema.IsCommandType))
             AddCommand(commandType);
 
         return this;
