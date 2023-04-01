@@ -367,7 +367,8 @@ internal class HelpConsoleFormatter : ConsoleFormatter
     {
         var childCommandSchemas = _context
             .ApplicationSchema
-            .GetChildCommands(_context.CommandSchema.Name);
+            .GetChildCommands(_context.CommandSchema.Name)
+            .OrderBy(a => a.Name, StringComparer.Ordinal);
 
         if (!childCommandSchemas.Any())
             return;
