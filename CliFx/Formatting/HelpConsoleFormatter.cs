@@ -206,7 +206,7 @@ internal class HelpConsoleFormatter : ConsoleFormatter
                 Write('.');
                 Write(' ');
             }
-            
+
             // Default value
             if (!parameterSchema.IsRequired)
             {
@@ -368,7 +368,8 @@ internal class HelpConsoleFormatter : ConsoleFormatter
         var childCommandSchemas = _context
             .ApplicationSchema
             .GetChildCommands(_context.CommandSchema.Name)
-            .OrderBy(a => a.Name, StringComparer.Ordinal);
+            .OrderBy(a => a.Name, StringComparer.Ordinal)
+            .ToArray();
 
         if (!childCommandSchemas.Any())
             return;
@@ -403,7 +404,9 @@ internal class HelpConsoleFormatter : ConsoleFormatter
             // Child commands of child command
             var grandChildCommandSchemas = _context
                 .ApplicationSchema
-                .GetChildCommands(childCommandSchema.Name);
+                .GetChildCommands(childCommandSchema.Name)
+                .OrderBy(c => c.Name, StringComparer.Ordinal)
+                .ToArray();
 
             if (grandChildCommandSchemas.Any())
             {
