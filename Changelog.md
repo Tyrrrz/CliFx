@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.3.2 (06-Apr-2023)
+
+- Added name-based ordering to subcommands when displayed in the help text. (Thanks [@CartBlanche](https://github.com/CartBlanche))
+
 ## v2.3.1 (08-Dec-2022)
 
 - Added support for the `required` keyword introduced in C# 11. Command options bound to required properties are now marked as required by default (equivalent to setting `IsRequired = true` on the attribute). Also added analyzers that prevent marking an option or parameter non-required if it's bound to a required property.
