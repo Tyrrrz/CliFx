@@ -10,7 +10,7 @@ internal static class StringExtensions
         StringComparison comparison = StringComparison.Ordinal)
     {
         while (str.EndsWith(sub, comparison))
-            str = str.Substring(0, str.Length - sub.Length);
+            str = str[..^sub.Length];
 
         return str;
     }
