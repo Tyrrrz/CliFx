@@ -4,6 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <GenerateDependencyFile>true</GenerateDependencyFile>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     <NoWarn>$(NoWarn);RS1025;RS1026</NoWarn>
   </PropertyGroup>
 
@@ -16,6 +17,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.5.0" PrivateAssets="all" />
     <PackageReference Include="PolyShim" Version="1.1.0" PrivateAssets="all" />
   </ItemGroup>
