@@ -24,7 +24,7 @@ public class ParameterMustBeRequiredIfPropertyRequiredAnalyzer : AnalyzerBase
         if (property.ContainingType is null)
             return;
 
-        if (!property.IsRequired)
+        if (!property.IsRequired())
             return;
 
         var parameter = CommandParameterSymbol.TryResolve(property);

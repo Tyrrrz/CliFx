@@ -24,7 +24,7 @@ public class OptionMustBeRequiredIfPropertyRequiredAnalyzer : AnalyzerBase
         if (property.ContainingType is null)
             return;
 
-        if (!property.IsRequired)
+        if (!property.IsRequired())
             return;
 
         var option = CommandOptionSymbol.TryResolve(property);

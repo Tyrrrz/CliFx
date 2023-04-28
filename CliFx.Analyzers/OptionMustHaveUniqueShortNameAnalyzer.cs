@@ -38,7 +38,7 @@ public class OptionMustHaveUniqueShortNameAnalyzer : AnalyzerBase
             .ContainingType
             .GetMembers()
             .OfType<IPropertySymbol>()
-            .Where(m => !m.Equals(property, SymbolEqualityComparer.Default))
+            .Where(m => !m.Equals(property))
             .ToArray();
 
         foreach (var otherProperty in otherProperties)
