@@ -11,7 +11,6 @@
     <PackageTags>command line executable interface framework parser arguments cli app application net core</PackageTags>
     <PackageProjectUrl>https://github.com/Tyrrrz/CliFx</PackageProjectUrl>
     <PackageReleaseNotes>https://github.com/Tyrrrz/CliFx/blob/master/Changelog.md</PackageReleaseNotes>
-    <PackageReadmeFile>Readme.md</PackageReadmeFile>
     <PackageIcon>favicon.png</PackageIcon>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -21,7 +20,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="../Readme.md" Pack="true" PackagePath="" Visible="false" />
     <None Include="../favicon.png" Pack="true" PackagePath="" Visible="false" />
   </ItemGroup>
 
