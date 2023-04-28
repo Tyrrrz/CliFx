@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.3.3 (28-Apr-2023)
+
+- Fixed an issue where the analyzers failed to load in some projects, due to targeting a Roslyn version that was too high.
+
 ## v2.3.2 (06-Apr-2023)
 
 - Added name-based ordering to subcommands when displayed in the help text. (Thanks [@CartBlanche](https://github.com/CartBlanche))
