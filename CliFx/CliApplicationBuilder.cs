@@ -259,7 +259,7 @@ public partial class CliApplicationBuilder
         // If the process path has the same name and parent directory as the entry assembly path,
         // but different extension, it's a framework-dependent .NET Core app launched through the apphost.
         if (PathEx.AreEqual(Path.ChangeExtension(entryAssemblyFilePath, "exe"), processFilePath) ||
-            PathEx.AreEqual(Path.ChangeExtension(entryAssemblyFilePath, ""), processFilePath))
+            PathEx.AreEqual(Path.GetFileNameWithoutExtension(entryAssemblyFilePath), processFilePath))
         {
             return Path.GetFileNameWithoutExtension(entryAssemblyFilePath);
         }
