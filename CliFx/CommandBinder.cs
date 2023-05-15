@@ -27,7 +27,7 @@ internal class CommandBinder
         // Custom converter
         if (memberSchema.ConverterType is not null)
         {
-            var converter = (IBindingConverter)_typeActivator.CreateInstance(memberSchema.ConverterType);
+            var converter = _typeActivator.CreateInstance<IBindingConverter>(memberSchema.ConverterType);
             return converter.Convert(rawValue);
         }
 
@@ -101,7 +101,7 @@ internal class CommandBinder
         throw CliFxException.InternalError(
             $"""
             {memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} has an unsupported underlying property type.
-            There is no known way to convert a string value into an instance of type `{targetType.FullName}`
+            There is no known way to convert a string value into an instance of type `{targetType.FullName}`.
             To fix this, either change the property to use a supported type or configure a custom converter.
             """
         );
@@ -136,34 +136,41 @@ internal class CommandBinder
             $"""
             {memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} has an unsupported underlying property type.
             There is no known way to convert an array of `{targetElementType.FullName}` into an instance of type `{targetEnumerableType.FullName}`.
-            To fix this, change the property to use a type which can be assigned from an array or a type that has a constructor which accepts an array.
+            To fix this, change the property to use a type which can be assigned from an array or a type which has a constructor that accepts an array.
             """
         );
     }
 
     private object? ConvertMember(IMemberSchema memberSchema, IReadOnlyList<string> rawValues)
     {
-        var targetType = memberSchema.Property.Type;
-
         try
         {
             // Non-scalar
-            var enumerableUnderlyingType = targetType.TryGetEnumerableUnderlyingType();
-            if (targetType != typeof(string) && enumerableUnderlyingType is not null)
+            var enumerableUnderlyingType = memberSchema.Property.Type.TryGetEnumerableUnderlyingType();
+            if (enumerableUnderlyingType is not null && memberSchema.Property.Type != typeof(string))
             {
-                return ConvertMultiple(memberSchema, rawValues, targetType, enumerableUnderlyingType);
+                return ConvertMultiple(
+                    memberSchema,
+                    rawValues,
+                    memberSchema.Property.Type,
+                    enumerableUnderlyingType
+                );
             }
 
             // Scalar
             if (rawValues.Count <= 1)
             {
-                return ConvertSingle(memberSchema, rawValues.SingleOrDefault(), targetType);
+                return ConvertSingle(
+                    memberSchema,
+                    rawValues.SingleOrDefault(),
+                    memberSchema.Property.Type
+                );
             }
         }
         catch (Exception ex) when (ex is not CliFxException) // don't wrap CliFxException
         {
             // We use reflection-based invocation which can throw TargetInvocationException.
-            // Unwrap these exceptions to provide a more user-friendly error message.
+            // Unwrap those exceptions to provide a more user-friendly error message.
             var errorMessage = ex is TargetInvocationException invokeEx
                 ? invokeEx.InnerException?.Message ?? invokeEx.Message
                 : ex.Message;
@@ -193,7 +200,7 @@ internal class CommandBinder
 
         foreach (var validatorType in memberSchema.ValidatorTypes)
         {
-            var validator = (IBindingValidator)_typeActivator.CreateInstance(validatorType);
+            var validator = _typeActivator.CreateInstance<IBindingValidator>(validatorType);
             var error = validator.Validate(convertedValue);
 
             if (error is not null)
@@ -234,7 +241,7 @@ internal class CommandBinder
             if (position >= commandInput.Parameters.Count)
                 break;
 
-            // Scalar - take one input at the current position
+            // Scalar: take one input at the current position
             if (parameterSchema.Property.IsScalar())
             {
                 var parameterInput = commandInput.Parameters[position];
@@ -246,7 +253,7 @@ internal class CommandBinder
 
                 remainingParameterInputs.Remove(parameterInput);
             }
-            // Non-scalar - take all remaining inputs starting from the current position
+            // Non-scalar: take all remaining inputs starting from the current position
             else
             {
                 var parameterInputs = commandInput.Parameters.Skip(position).ToArray();
@@ -324,7 +331,7 @@ internal class CommandBinder
                 if (rawValues.Any())
                     remainingRequiredOptionSchemas.Remove(optionSchema);
             }
-            // No input - skip
+            // No input, skip
             else
             {
                 continue;

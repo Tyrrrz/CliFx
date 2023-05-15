@@ -59,12 +59,8 @@ public class CliApplication
 
     private bool ShouldShowHelpText(CommandSchema commandSchema, CommandInput commandInput) =>
         commandSchema.IsHelpOptionAvailable && commandInput.IsHelpOptionSpecified ||
-        // Show help text also in case the fallback default command is
-        // executed without any arguments.
-        commandSchema == FallbackDefaultCommand.Schema &&
-        string.IsNullOrWhiteSpace(commandInput.CommandName) &&
-        !commandInput.Parameters.Any() &&
-        !commandInput.Options.Any();
+        // Show help text also if the fallback default command is executed without any arguments
+        commandSchema == FallbackDefaultCommand.Schema && !commandInput.HasArguments;
 
     private bool ShouldShowVersionText(CommandSchema commandSchema, CommandInput commandInput) =>
         commandSchema.IsVersionOptionAvailable && commandInput.IsVersionOptionSpecified;
@@ -76,28 +72,30 @@ public class CliApplication
             var processId = ProcessEx.GetCurrentProcessId();
 
             _console.Output.WriteLine(
-                $"Attach debugger to PID {processId} to continue."
+                $"Attach the debugger to process with ID {processId} to continue."
             );
         }
 
-        // Try to also launch debugger ourselves (only works if VS is installed)
+        // Try to also launch the debugger ourselves (only works with Visual Studio)
         Debugger.Launch();
 
         while (!Debugger.IsAttached)
-        {
             await Task.Delay(100);
-        }
     }
 
     private async ValueTask<int> RunAsync(ApplicationSchema applicationSchema, CommandInput commandInput)
     {
-        // Handle debug directive
+        // Console colors may have already been overridden by the parent process,
+        // so we need to reset it to make sure that everything we write looks properly.
+        _console.ResetColor();
+
+        // Handle the debug directive
         if (IsDebugModeEnabled(commandInput))
         {
             await PromptDebuggerAsync();
         }
 
-        // Handle preview directive
+        // Handle the preview directive
         if (IsPreviewModeEnabled(commandInput))
         {
             _console.Output.WriteCommandInput(commandInput);
@@ -106,16 +104,23 @@ public class CliApplication
 
         // Try to get the command schema that matches the input
         var commandSchema =
-            applicationSchema.TryFindCommand(commandInput.CommandName) ??
-            applicationSchema.TryFindDefaultCommand() ??
+            (!string.IsNullOrWhiteSpace(commandInput.CommandName)
+                // If the command name is specified, try to find the command by name.
+                // This should always succeed, because the input parsing relies on
+                // the list of available command names.
+                ? applicationSchema.TryFindCommand(commandInput.CommandName)
+                // Otherwise, try to find the default command
+                : applicationSchema.TryFindDefaultCommand()) ??
+            // If a valid command was not found, use the fallback default command.
+            // This is only used as a stub to show the help text.
             FallbackDefaultCommand.Schema;
 
-        // Activate command instance
+        // Initialize an instance of the command type
         var commandInstance = commandSchema == FallbackDefaultCommand.Schema
-            ? new FallbackDefaultCommand() // bypass activator
-            : (ICommand)_typeActivator.CreateInstance(commandSchema.Type);
+            ? new FallbackDefaultCommand() // bypass the activator
+            : _typeActivator.CreateInstance<ICommand>(commandSchema.Type);
 
-        // Assemble help context
+        // Assemble the help context
         var helpContext = new HelpContext(
             Metadata,
             applicationSchema,
@@ -123,14 +128,14 @@ public class CliApplication
             commandSchema.GetValues(commandInstance)
         );
 
-        // Handle help option
+        // Handle the help option
         if (ShouldShowHelpText(commandSchema, commandInput))
         {
             _console.Output.WriteHelpText(helpContext);
             return 0;
         }
 
-        // Handle version option
+        // Handle the version option
         if (ShouldShowVersionText(commandSchema, commandInput))
         {
             _console.Output.WriteLine(Metadata.Version);
@@ -138,12 +143,12 @@ public class CliApplication
         }
 
         // Starting from this point, we may produce exceptions that are meant for the
-        // end user of the application (i.e. invalid input, command exception, etc).
+        // end-user of the application (i.e. invalid input, command exception, etc).
         // Catch these exceptions here, print them to the console, and don't let them
         // propagate further.
         try
         {
-            // Bind and execute command
+            // Bind and execute the command
             _commandBinder.Bind(commandInput, commandSchema, commandInstance);
             await commandInstance.ExecuteAsync(_console);
 
@@ -165,11 +170,11 @@ public class CliApplication
 
     /// <summary>
     /// Runs the application with the specified command-line arguments and environment variables.
-    /// Returns an exit code which indicates whether the application completed successfully.
+    /// Returns the exit code which indicates whether the application completed successfully.
     /// </summary>
     /// <remarks>
-    /// When running WITHOUT debugger (i.e. in production), this method swallows all exceptions and
-    /// reports them to the console.
+    /// When running WITHOUT the debugger attached (i.e. in production), this method swallows
+    /// all exceptions and reports them to the console.
     /// </remarks>
     public async ValueTask<int> RunAsync(
         IReadOnlyList<string> commandLineArguments,
@@ -177,10 +182,6 @@ public class CliApplication
     {
         try
         {
-            // Console colors may have already been overridden by the parent process,
-            // so we need to reset it to make sure that everything we write looks properly.
-            _console.ResetColor();
-
             var applicationSchema = ApplicationSchema.Resolve(Configuration.CommandTypes);
 
             var commandInput = CommandInput.Parse(
@@ -193,10 +194,8 @@ public class CliApplication
         }
         // To prevent the app from showing the annoying troubleshooting dialog on Windows,
         // we handle all exceptions ourselves and print them to the console.
-        //
         // We only want to do that if the app is running in production, which we infer
-        // based on whether a debugger is attached to the process.
-        //
+        // based on whether the debugger is attached to the process.
         // When not running in production, we want the IDE to show exceptions to the
         // developer, so we don't swallow them in that case.
         catch (Exception ex) when (!Debugger.IsAttached)
@@ -208,12 +207,11 @@ public class CliApplication
 
     /// <summary>
     /// Runs the application with the specified command-line arguments.
-    /// Environment variables are resolved automatically.
-    /// Returns an exit code which indicates whether the application completed successfully.
+    /// Returns the exit code which indicates whether the application completed successfully.
     /// </summary>
     /// <remarks>
-    /// When running WITHOUT debugger (i.e. in production), this method swallows all exceptions and
-    /// reports them to the console.
+    /// When running WITHOUT the debugger attached (i.e. in production), this method swallows
+    /// all exceptions and reports them to the console.
     /// </remarks>
     public async ValueTask<int> RunAsync(IReadOnlyList<string> commandLineArguments) => await RunAsync(
         commandLineArguments,
@@ -229,11 +227,11 @@ public class CliApplication
     /// <summary>
     /// Runs the application.
     /// Command-line arguments and environment variables are resolved automatically.
-    /// Returns an exit code which indicates whether the application completed successfully.
+    /// Returns the exit code which indicates whether the application completed successfully.
     /// </summary>
     /// <remarks>
-    /// When running WITHOUT debugger (i.e. in production), this method swallows all exceptions and
-    /// reports them to the console.
+    /// When running WITHOUT the debugger attached (i.e. in production), this method swallows
+    /// all exceptions and reports them to the console.
     /// </remarks>
     public async ValueTask<int> RunAsync() => await RunAsync(
         Environment.GetCommandLineArgs()

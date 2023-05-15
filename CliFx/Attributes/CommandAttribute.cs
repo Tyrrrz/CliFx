@@ -9,13 +9,12 @@ namespace CliFx.Attributes;
 public sealed class CommandAttribute : Attribute
 {
     /// <summary>
-    /// Command's name.
+    /// Command name.
     /// </summary>
     /// <remarks>
-    /// Command can have no name, in which case it's treated as the default command.
-    ///
+    /// Command can have no name, in which case it's treated as the application's default command.
+    /// Only one default command is allowed in an application.
     /// All commands registered in an application must have unique names (comparison IS NOT case-sensitive).
-    /// Only one command without a name is allowed in an application.
     /// </remarks>
     public string? Name { get; }
 

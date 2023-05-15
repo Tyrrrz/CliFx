@@ -69,7 +69,7 @@ public class CommandMustBeAnnotatedAnalyzerSpecs
             """
             public class Foo
             {
-                public int Bar { get; set; } = 5;
+                public int Bar { get; init; } = 5;
             }
             """;
 

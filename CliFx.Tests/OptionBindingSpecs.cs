@@ -17,7 +17,7 @@ public class OptionBindingSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Option_is_bound_from_an_argument_matching_its_name()
+    public async Task I_can_bind_an_option_to_a_property_and_get_the_value_from_the_corresponding_argument_by_name()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -27,7 +27,7 @@ public class OptionBindingSpecs : SpecsBase
             public class Command : ICommand
             {
                 [CommandOption("foo")]
-                public bool Foo { get; set; }
+                public bool Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -49,15 +49,15 @@ public class OptionBindingSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Trim().Should().Be("True");
     }
 
     [Fact]
-    public async Task Option_is_bound_from_an_argument_matching_its_short_name()
+    public async Task I_can_bind_an_option_to_a_property_and_get_the_value_from_the_corresponding_argument_by_short_name()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -67,7 +67,7 @@ public class OptionBindingSpecs : SpecsBase
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public bool Foo { get; set; }
+                public bool Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -89,15 +89,15 @@ public class OptionBindingSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Trim().Should().Be("True");
     }
 
     [Fact]
-    public async Task Option_is_bound_from_a_set_of_arguments_matching_its_name()
+    public async Task I_can_bind_an_option_to_a_property_and_get_the_value_from_the_corresponding_argument_set_by_name()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -107,10 +107,10 @@ public class OptionBindingSpecs : SpecsBase
             public class Command : ICommand
             {
                 [CommandOption("foo")]
-                public string Foo { get; set; }
+                public string? Foo { get; init; }
 
                 [CommandOption("bar")]
-                public string Bar { get; set; }
+                public string? Bar { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -130,14 +130,18 @@ public class OptionBindingSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"--foo", "one", "--bar", "two"},
+            new[]
+            {
+                "--foo", "one",
+                "--bar", "two"
+            },
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().ConsistOfLines(
             "Foo = one",
             "Bar = two"
@@ -145,7 +149,7 @@ public class OptionBindingSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Option_is_bound_from_a_set_of_arguments_matching_its_short_name()
+    public async Task I_can_bind_an_option_to_a_property_and_get_the_value_from_the_corresponding_argument_set_by_short_name()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -155,10 +159,10 @@ public class OptionBindingSpecs : SpecsBase
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public string Foo { get; set; }
+                public string? Foo { get; init; }
 
                 [CommandOption('b')]
-                public string Bar { get; set; }
+                public string? Bar { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -178,14 +182,18 @@ public class OptionBindingSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"-f", "one", "-b", "two"},
+            new[]
+            {
+                "-f", "one",
+                "-b", "two"
+            },
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().ConsistOfLines(
             "Foo = one",
             "Bar = two"
@@ -193,7 +201,7 @@ public class OptionBindingSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Option_is_bound_from_a_stack_of_arguments_matching_its_short_name()
+    public async Task I_can_bind_an_option_to_a_property_and_get_the_value_from_the_corresponding_argument_stack_by_short_name()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -203,10 +211,10 @@ public class OptionBindingSpecs : SpecsBase
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public string Foo { get; set; }
+                public string? Foo { get; init; }
 
                 [CommandOption('b')]
-                public string Bar { get; set; }
+                public string? Bar { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -230,10 +238,10 @@ public class OptionBindingSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().ConsistOfLines(
             "Foo = ",
             "Bar = value"
@@ -241,7 +249,7 @@ public class OptionBindingSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Option_of_non_scalar_type_is_bound_from_a_set_of_arguments_matching_its_name()
+    public async Task I_can_bind_an_option_to_a_non_scalar_property_and_get_the_values_from_the_corresponding_arguments_by_name()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -251,7 +259,7 @@ public class OptionBindingSpecs : SpecsBase
             public class Command : ICommand
             {
                 [CommandOption("Foo")]
-                public IReadOnlyList<string> Foo { get; set; }
+                public IReadOnlyList<string>? Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -275,10 +283,10 @@ public class OptionBindingSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().ConsistOfLines(
             "one",
             "two",
@@ -287,7 +295,7 @@ public class OptionBindingSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Option_of_non_scalar_type_is_bound_from_a_set_of_arguments_matching_its_short_name()
+    public async Task I_can_bind_an_option_to_a_non_scalar_property_and_get_the_values_from_the_corresponding_arguments_by_short_name()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -297,7 +305,7 @@ public class OptionBindingSpecs : SpecsBase
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public IReadOnlyList<string> Foo { get; set; }
+                public IReadOnlyList<string>? Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -321,10 +329,10 @@ public class OptionBindingSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().ConsistOfLines(
             "one",
             "two",
@@ -333,7 +341,7 @@ public class OptionBindingSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Option_of_non_scalar_type_is_bound_from_multiple_sets_of_arguments_matching_its_name()
+    public async Task I_can_bind_an_option_to_a_non_scalar_property_and_get_the_values_from_the_corresponding_argument_sets_by_name()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -343,7 +351,7 @@ public class OptionBindingSpecs : SpecsBase
             public class Command : ICommand
             {
                 [CommandOption("foo")]
-                public IReadOnlyList<string> Foo { get; set; }
+                public IReadOnlyList<string>? Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -363,14 +371,19 @@ public class OptionBindingSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"--foo", "one", "--foo", "two", "--foo", "three"},
+            new[]
+            {
+                "--foo", "one",
+                "--foo", "two",
+                "--foo", "three"
+            },
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().ConsistOfLines(
             "one",
             "two",
@@ -379,7 +392,7 @@ public class OptionBindingSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Option_of_non_scalar_type_is_bound_from_multiple_sets_of_arguments_matching_its_short_name()
+    public async Task I_can_bind_an_option_to_a_non_scalar_property_and_get_the_values_from_the_corresponding_argument_sets_by_short_name()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -389,7 +402,7 @@ public class OptionBindingSpecs : SpecsBase
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public IReadOnlyList<string> Foo { get; set; }
+                public IReadOnlyList<string>? Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -409,14 +422,19 @@ public class OptionBindingSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"-f", "one", "-f", "two", "-f", "three"},
+            new[]
+            {
+                "-f", "one",
+                "-f", "two",
+                "-f", "three"
+            },
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().ConsistOfLines(
             "one",
             "two",
@@ -425,7 +443,7 @@ public class OptionBindingSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Option_of_non_scalar_type_is_bound_from_multiple_sets_of_arguments_matching_its_name_or_short_name()
+    public async Task I_can_bind_an_option_to_a_non_scalar_property_and_get_the_values_from_the_corresponding_argument_sets_by_name_or_short_name()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -435,7 +453,7 @@ public class OptionBindingSpecs : SpecsBase
             public class Command : ICommand
             {
                 [CommandOption("foo", 'f')]
-                public IReadOnlyList<string> Foo { get; set; }
+                public IReadOnlyList<string>? Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -455,14 +473,19 @@ public class OptionBindingSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"--foo", "one", "-f", "two", "--foo", "three"},
+            new[]
+            {
+                "--foo", "one",
+                "-f", "two",
+                "--foo", "three"
+            },
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().ConsistOfLines(
             "one",
             "two",
@@ -471,7 +494,7 @@ public class OptionBindingSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Option_is_not_bound_if_there_are_no_arguments_matching_its_name_or_short_name()
+    public async Task I_can_bind_an_option_to_a_property_and_get_no_value_if_the_user_does_not_provide_the_corresponding_argument()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -481,10 +504,10 @@ public class OptionBindingSpecs : SpecsBase
             public class Command : ICommand
             {
                 [CommandOption("foo")]
-                public string Foo { get; set; }
+                public string? Foo { get; init; }
 
                 [CommandOption("bar")]
-                public string Bar { get; set; } = "hello";
+                public string? Bar { get; init; } = "hello";
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -508,10 +531,10 @@ public class OptionBindingSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().ConsistOfLines(
             "Foo = one",
             "Bar = hello"
@@ -519,7 +542,7 @@ public class OptionBindingSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Option_binding_supports_multiple_inheritance_through_default_interface_members()
+    public async Task I_can_bind_an_option_to_a_property_through_multiple_inheritance()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -538,7 +561,7 @@ public class OptionBindingSpecs : SpecsBase
                 public int Foo
                 {
                     get => SharedContext.Foo;
-                    set => SharedContext.Foo = value;
+                    init => SharedContext.Foo = value;
                 }
             }
 
@@ -548,20 +571,20 @@ public class OptionBindingSpecs : SpecsBase
                 public bool Bar
                 {
                     get => SharedContext.Bar;
-                    set => SharedContext.Bar = value;
+                    init => SharedContext.Bar = value;
                 }
             }
 
             public interface IHasBaz : ICommand
             {
-                public string Baz { get; set; }
+                public string? Baz { get; init; }
             }
 
             [Command]
             public class Command : IHasFoo, IHasBar, IHasBaz
             {
                 [CommandOption("baz")]
-                public string Baz { get; set; }
+                public string? Baz { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -582,13 +605,18 @@ public class OptionBindingSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] { "--foo", "42", "--bar", "--baz", "xyz" }
+            new[]
+            {
+                "--foo", "42",
+                "--bar",
+                "--baz", "xyz"
+            }
         );
-
-        var stdOut = FakeConsole.ReadOutputString();
 
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().ConsistOfLines(
             "Foo = 42",
             "Bar = True",
@@ -597,7 +625,7 @@ public class OptionBindingSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Option_binding_does_not_consider_a_negative_number_as_an_option_name_or_short_name()
+    public async Task I_can_bind_an_option_to_a_property_and_get_the_correct_value_if_the_user_provides_an_argument_containing_a_negative_number()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -607,12 +635,11 @@ public class OptionBindingSpecs : SpecsBase
             public class Command : ICommand
             {
                 [CommandOption("foo")]
-                public string Foo { get; set; }
+                public string? Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
                     console.Output.WriteLine(Foo);
-
                     return default;
                 }
             }
@@ -630,15 +657,15 @@ public class OptionBindingSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Trim().Should().Be("-13");
     }
 
     [Fact]
-    public async Task Option_binding_fails_if_a_required_option_has_not_been_provided()
+    public async Task I_can_bind_a_required_option_to_a_property_and_get_an_error_if_the_user_does_not_provide_the_corresponding_argument()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -647,8 +674,8 @@ public class OptionBindingSpecs : SpecsBase
             [Command]
             public class Command : ICommand
             {
-                [CommandOption("foo", IsRequired = true)]
-                public string Foo { get; set; }
+                [CommandOption("foo")]
+                public required string Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -666,87 +693,15 @@ public class OptionBindingSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdErr = FakeConsole.ReadErrorString();
-
         // Assert
         exitCode.Should().NotBe(0);
+
+        var stdErr = FakeConsole.ReadErrorString();
         stdErr.Should().Contain("Missing required option(s)");
     }
 
     [Fact]
-    public async Task Option_binding_fails_if_a_required_option_has_been_provided_with_an_empty_value()
-    {
-        // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
-            """
-            [Command]
-            public class Command : ICommand
-            {
-                [CommandOption("foo", IsRequired = true)]
-                public string Foo { get; set; }
-
-                public ValueTask ExecuteAsync(IConsole console) => default;
-            }
-            """
-        );
-
-        var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
-            .UseConsole(FakeConsole)
-            .Build();
-
-        // Act
-        var exitCode = await application.RunAsync(
-            new[] {"--foo"},
-            new Dictionary<string, string>()
-        );
-
-        var stdErr = FakeConsole.ReadErrorString();
-
-        // Assert
-        exitCode.Should().NotBe(0);
-        stdErr.Should().Contain("Missing required option(s)");
-    }
-
-    [Fact]
-    public async Task Option_binding_fails_if_a_required_option_of_non_scalar_type_has_not_been_provided_with_at_least_one_value()
-    {
-        // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
-            """
-            [Command]
-            public class Command : ICommand
-            {
-                [CommandOption("foo", IsRequired = true)]
-                public IReadOnlyList<string> Foo { get; set; }
-
-                public ValueTask ExecuteAsync(IConsole console) => default;
-            }
-            """
-        );
-
-        var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
-            .UseConsole(FakeConsole)
-            .Build();
-
-        // Act
-        var exitCode = await application.RunAsync(
-            new[] {"--foo"},
-            new Dictionary<string, string>()
-        );
-
-        var stdErr = FakeConsole.ReadErrorString();
-
-        // Assert
-        exitCode.Should().NotBe(0);
-        stdErr.Should().Contain("Missing required option(s)");
-    }
-
-    [Fact]
-    public async Task Option_binding_fails_if_one_of_the_provided_option_names_is_not_recognized()
+    public async Task I_can_bind_a_required_option_to_a_property_and_get_an_error_if_the_user_provides_an_empty_argument()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -756,7 +711,7 @@ public class OptionBindingSpecs : SpecsBase
             public class Command : ICommand
             {
                 [CommandOption("foo")]
-                public string Foo { get; set; }
+                public required string Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -770,19 +725,95 @@ public class OptionBindingSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"--foo", "one", "--bar", "two"},
+            new[] {"--foo"},
             new Dictionary<string, string>()
         );
 
+        // Assert
+        exitCode.Should().NotBe(0);
+
         var stdErr = FakeConsole.ReadErrorString();
+        stdErr.Should().Contain("Missing required option(s)");
+    }
+
+    [Fact]
+    public async Task I_can_bind_an_option_to_a_non_scalar_property_and_get_an_error_if_the_user_does_not_provide_at_least_one_corresponding_argument()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption("foo")]
+                public required IReadOnlyList<string> Foo { get; init; }
+
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
+
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
+
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"--foo"},
+            new Dictionary<string, string>()
+        );
 
         // Assert
         exitCode.Should().NotBe(0);
+
+        var stdErr = FakeConsole.ReadErrorString();
+        stdErr.Should().Contain("Missing required option(s)");
+    }
+
+    [Fact]
+    public async Task I_can_bind_options_and_get_an_error_if_the_user_provides_unrecognized_arguments()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption("foo")]
+                public string? Foo { get; init; }
+
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
+
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
+
+        // Act
+        var exitCode = await application.RunAsync(
+            new[]
+            {
+                "--foo", "one",
+                "--bar", "two"
+            },
+            new Dictionary<string, string>()
+        );
+
+        // Assert
+        exitCode.Should().NotBe(0);
+
+        var stdErr = FakeConsole.ReadErrorString();
         stdErr.Should().Contain("Unrecognized option(s)");
     }
 
     [Fact]
-    public async Task Option_binding_fails_if_an_option_of_scalar_type_has_been_provided_with_multiple_values()
+    public async Task I_can_bind_an_option_to_a_scalar_property_and_get_an_error_if_the_user_provides_too_many_arguments()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -792,7 +823,7 @@ public class OptionBindingSpecs : SpecsBase
             public class Command : ICommand
             {
                 [CommandOption("foo")]
-                public string Foo { get; set; }
+                public string? Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -810,46 +841,10 @@ public class OptionBindingSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdErr = FakeConsole.ReadErrorString();
-
         // Assert
         exitCode.Should().NotBe(0);
+
+        var stdErr = FakeConsole.ReadErrorString();
         stdErr.Should().Contain("expects a single argument, but provided with multiple");
-    }
-
-    [Fact]
-    public async Task Option_binding_fails_if_a_required_property_option_has_not_been_provided()
-    {
-        // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
-            """
-            [Command]
-            public class Command : ICommand
-            {
-                [CommandOption("foo")]
-                public required string Foo { get; set; }
-
-                public ValueTask ExecuteAsync(IConsole console) => default;
-            }
-            """
-        );
-
-        var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
-            .UseConsole(FakeConsole)
-            .Build();
-
-        // Act
-        var exitCode = await application.RunAsync(
-            Array.Empty<string>(),
-            new Dictionary<string, string>()
-        );
-
-        var stdErr = FakeConsole.ReadErrorString();
-
-        // Assert
-        exitCode.Should().NotBe(0);
-        stdErr.Should().Contain("Missing required option(s)");
     }
 }

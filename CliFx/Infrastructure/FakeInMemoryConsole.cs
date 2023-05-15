@@ -5,10 +5,8 @@ namespace CliFx.Infrastructure;
 /// <summary>
 /// Implementation of <see cref="IConsole" /> that uses fake
 /// standard input, output, and error streams backed by in-memory stores.
+/// Use this implementation in tests to verify command interactions with the console.
 /// </summary>
-/// <remarks>
-/// Use this implementation in tests to verify how a command interacts with the console.
-/// </remarks>
 public class FakeInMemoryConsole : FakeConsole
 {
     private readonly MemoryStream _input;
@@ -36,17 +34,17 @@ public class FakeInMemoryConsole : FakeConsole
     /// </summary>
     public void WriteInput(byte[] data)
     {
-        // We want the consumer to be able to read what we wrote
-        // so we need to seek the stream back to its original
-        // position after we finish writing.
         lock (_input)
         {
             var lastPosition = _input.Position;
 
+            // Write the data to the end of the stream
+            _input.Seek(0, SeekOrigin.End);
             _input.Write(data);
             _input.Flush();
 
-            _input.Position = lastPosition;
+            // Reset position to where it was before
+            _input.Seek(lastPosition, SeekOrigin.Begin);
         }
     }
 

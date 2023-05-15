@@ -86,19 +86,18 @@ public interface IConsole
 
     /// <summary>
     /// Registers a handler for the interrupt signal (Ctrl+C) on the console and returns
-    /// a token representing the cancellation request.
+    /// the token that represents the associated cancellation request.
     /// Subsequent calls to this method have no side effects and return the same token.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Calling this method effectively makes the command cancellation-aware, which
-    /// means that sending the interrupt signal won't immediately terminate the application,
-    /// but will instead trigger a token that the command can use to exit more gracefully.
+    /// Calling this method makes the command cancellation-aware, which means that sending
+    /// the interrupt signal won't immediately terminate the application, but will instead
+    /// trigger the associated token, allowing the command to exit early but on its own terms.
     /// </para>
     /// <para>
-    /// Note that the handler is only respected when the user sends the interrupt signal for the first time.
-    /// If the user decides to issue the signal again, the application will terminate immediately
-    /// regardless of whether the command is cancellation-aware.
+    /// Note that if the user sends the interrupt signal a second time, the application will
+    /// be forcefully terminated without triggering the token.
     /// </para>
     /// </remarks>
     CancellationToken RegisterCancellationHandler();

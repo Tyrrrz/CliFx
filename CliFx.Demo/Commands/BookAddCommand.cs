@@ -16,7 +16,7 @@ public partial class BookAddCommand : ICommand
     [CommandParameter(0, Name = "title", Description = "Book title.")]
     public required string Title { get; init; }
 
-    [CommandOption("author", 'a', IsRequired = true, Description = "Book author.")]
+    [CommandOption("author", 'a', Description = "Book author.")]
     public required string Author { get; init; }
 
     [CommandOption("published", 'p', Description = "Book publish date.")]

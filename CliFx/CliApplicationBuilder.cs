@@ -252,11 +252,13 @@ public partial class CliApplicationBuilder
         // If the process path matches the entry assembly path, it's a legacy .NET Framework app
         // or a self-contained .NET Core app.
         if (PathEx.AreEqual(entryAssemblyFilePath, processFilePath))
+        {
             return Path.GetFileNameWithoutExtension(entryAssemblyFilePath);
+        }
 
         // If the process path has the same name and parent directory as the entry assembly path,
         // but different extension, it's a framework-dependent .NET Core app launched through the apphost.
-        if (PathEx.AreEqual(Path.ChangeExtension(entryAssemblyFilePath, ".exe"), processFilePath) ||
+        if (PathEx.AreEqual(Path.ChangeExtension(entryAssemblyFilePath, "exe"), processFilePath) ||
             PathEx.AreEqual(Path.ChangeExtension(entryAssemblyFilePath, ""), processFilePath))
         {
             return Path.GetFileNameWithoutExtension(entryAssemblyFilePath);

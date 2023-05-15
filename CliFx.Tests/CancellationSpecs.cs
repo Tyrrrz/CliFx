@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using CliFx.Tests.Utils;
+using CliWrap;
 using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
@@ -15,8 +18,36 @@ public class CancellationSpecs : SpecsBase
     {
     }
 
+    [Fact(Timeout = 15000)]
+    public async Task I_can_configure_the_command_to_listen_to_the_interrupt_signal()
+    {
+        // Arrange
+        var stdOutBuffer = new StringBuilder();
+
+        var command = Cli.Wrap("dotnet")
+            .WithArguments(a => a
+                .Add(Dummy.Program.Location)
+                .Add("cancel-test")
+            ) | stdOutBuffer;
+
+        using var cts = new CancellationTokenSource();
+        cts.CancelAfter(TimeSpan.FromSeconds(0.2));
+
+        // Act & assert
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
+            await command.ExecuteAsync(
+                // Forceful cancellation (not required because we have a timeout)
+                CancellationToken.None,
+                // Graceful cancellation
+                cts.Token
+            )
+        );
+
+        stdOutBuffer.ToString().Trim().Should().Be("Cancelled");
+    }
+
     [Fact]
-    public async Task Command_can_receive_a_cancellation_signal_from_the_console()
+    public async Task I_can_configure_the_command_to_listen_to_the_interrupt_signal_when_running_in_isolation()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -51,18 +82,18 @@ public class CancellationSpecs : SpecsBase
             .UseConsole(FakeConsole)
             .Build();
 
-        // Act
         FakeConsole.RequestCancellation(TimeSpan.FromSeconds(0.2));
 
+        // Act
         var exitCode = await application.RunAsync(
             Array.Empty<string>(),
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().NotBe(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Trim().Should().Be("Cancelled");
     }
 }

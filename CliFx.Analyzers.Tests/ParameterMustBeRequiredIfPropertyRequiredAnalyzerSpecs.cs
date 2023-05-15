@@ -19,7 +19,7 @@ public class ParameterMustBeRequiredIfPropertyRequiredAnalyzerSpecs
             public class MyCommand : ICommand
             {
                 [CommandParameter(0, IsRequired = false)]
-                public required string Foo { get; set; }
+                public required string? Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -39,8 +39,8 @@ public class ParameterMustBeRequiredIfPropertyRequiredAnalyzerSpecs
             [Command]
             public class MyCommand : ICommand
             {
-                [CommandParameter(0, IsRequired = true)]
-                public required string Foo { get; set; }
+                [CommandParameter(0)]
+                public required string Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -61,7 +61,7 @@ public class ParameterMustBeRequiredIfPropertyRequiredAnalyzerSpecs
             public class MyCommand : ICommand
             {
                 [CommandParameter(0, IsRequired = false)]
-                public string Foo { get; set; }
+                public string? Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -81,8 +81,8 @@ public class ParameterMustBeRequiredIfPropertyRequiredAnalyzerSpecs
             [Command]
             public class MyCommand : ICommand
             {
-                [CommandParameter(0, IsRequired = true)]
-                public string Foo { get; set; }
+                [CommandParameter(0)]
+                public required string Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -102,7 +102,7 @@ public class ParameterMustBeRequiredIfPropertyRequiredAnalyzerSpecs
             [Command]
             public class MyCommand : ICommand
             {
-                public required string Foo { get; set; }
+                public required string Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }

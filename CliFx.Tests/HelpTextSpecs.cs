@@ -17,7 +17,7 @@ public class HelpTextSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Help_text_is_printed_if_no_arguments_are_provided_and_the_default_command_is_not_defined()
+    public async Task I_can_request_the_help_text_by_running_the_application_without_arguments_if_the_default_command_is_not_defined()
     {
         // Arrange
         var application = new CliApplicationBuilder()
@@ -31,15 +31,15 @@ public class HelpTextSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().Contain("This will be in help text");
     }
 
     [Fact]
-    public async Task Help_text_is_printed_if_provided_arguments_contain_the_help_option()
+    public async Task I_can_request_the_help_text_by_running_the_application_with_the_help_option()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -65,15 +65,15 @@ public class HelpTextSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().Contain("This will be in help text");
     }
 
     [Fact]
-    public async Task Help_text_is_printed_if_provided_arguments_contain_the_help_option_even_if_the_default_command_is_not_defined()
+    public async Task I_can_request_the_help_text_by_running_the_application_with_the_help_option_even_if_the_default_command_is_not_defined()
     {
         // Arrange
         var commandTypes = DynamicCommandBuilder.CompileMany(
@@ -105,15 +105,15 @@ public class HelpTextSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().Contain("This will be in help text");
     }
 
     [Fact]
-    public async Task Help_text_for_a_specific_named_command_is_printed_if_provided_arguments_match_its_name_and_contain_the_help_option()
+    public async Task I_can_request_the_help_text_for_a_specific_command_by_running_the_application_and_specifying_its_name_with_the_help_option()
     {
         // Arrange
         var commandTypes = DynamicCommandBuilder.CompileMany(
@@ -150,15 +150,15 @@ public class HelpTextSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().Contain("Description of a named command.");
     }
 
     [Fact]
-    public async Task Help_text_for_a_specific_named_child_command_is_printed_if_provided_arguments_match_its_name_and_contain_the_help_option()
+    public async Task I_can_request_the_help_text_for_a_specific_nested_command_by_running_the_application_and_specifying_its_name_with_the_help_option()
     {
         // Arrange
         var commandTypes = DynamicCommandBuilder.CompileMany(
@@ -195,15 +195,15 @@ public class HelpTextSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().Contain("Description of a named child command.");
     }
 
     [Fact]
-    public async Task Help_text_is_printed_on_invalid_user_input()
+    public async Task I_can_request_the_help_text_by_running_the_application_with_invalid_arguments()
     {
         // Arrange
         var application = new CliApplicationBuilder()
@@ -218,17 +218,18 @@ public class HelpTextSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-        var stdErr = FakeConsole.ReadErrorString();
-
         // Assert
         exitCode.Should().NotBe(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().Contain("This will be in help text");
+
+        var stdErr = FakeConsole.ReadErrorString();
         stdErr.Should().NotBeNullOrWhiteSpace();
     }
 
     [Fact]
-    public async Task Help_text_shows_application_metadata()
+    public async Task I_can_request_the_help_text_to_see_the_application_title_description_and_version()
     {
         // Arrange
         var application = new CliApplicationBuilder()
@@ -244,10 +245,10 @@ public class HelpTextSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().ContainAll(
             "App title",
             "App description",
@@ -256,20 +257,19 @@ public class HelpTextSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Help_text_shows_command_description()
+    public async Task I_can_request_the_help_text_to_see_the_command_description()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
             """
-                
-                [Command(Description = "Description of the default command.")]
-                public class DefaultCommand : ICommand
-                {
-                    public ValueTask ExecuteAsync(IConsole console) => default;
-                }
-
-                """);
+            [Command(Description = "Description of the default command.")]
+            public class DefaultCommand : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -282,10 +282,10 @@ public class HelpTextSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().ContainAllInOrder(
             "DESCRIPTION",
             "Description of the default command."
@@ -293,26 +293,25 @@ public class HelpTextSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Help_text_shows_usage_format_which_indicates_how_to_execute_a_named_command()
+    public async Task I_can_request_the_help_text_to_see_the_usage_format_for_a_named_command()
     {
         // Arrange
         var commandTypes = DynamicCommandBuilder.CompileMany(
             // language=cs
             """
-                
-                [Command]
-                public class DefaultCommand : ICommand
-                {
-                    public ValueTask ExecuteAsync(IConsole console) => default;
-                }
-                
-                [Command("cmd")]
-                public class NamedCommand : ICommand
-                {
-                    public ValueTask ExecuteAsync(IConsole console) => default;
-                }
+            [Command]
+            public class DefaultCommand : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
 
-                """);
+            [Command("cmd")]
+            public class NamedCommand : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommands(commandTypes)
@@ -325,10 +324,10 @@ public class HelpTextSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().ContainAllInOrder(
             "USAGE",
             "[command]", "[...]"
@@ -336,29 +335,28 @@ public class HelpTextSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Help_text_shows_usage_format_which_lists_all_parameters()
+    public async Task I_can_request_the_help_text_to_see_the_usage_format_for_all_parameters()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
             """
-                
-                [Command]
-                public class Command : ICommand
-                {
-                    [CommandParameter(0)]
-                    public string Foo { get; set; }
-                
-                    [CommandParameter(1)]
-                    public string Bar { get; set; }
-                
-                    [CommandParameter(2)]
-                    public IReadOnlyList<string> Baz { get; set; }
-                
-                    public ValueTask ExecuteAsync(IConsole console) => default;
-                }
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandParameter(0)]
+                public required string Foo { get; init; }
 
-                """);
+                [CommandParameter(1)]
+                public required string Bar { get; init; }
+
+                [CommandParameter(2)]
+                public required IReadOnlyList<string> Baz { get; init; }
+
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -371,10 +369,10 @@ public class HelpTextSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().ContainAllInOrder(
             "USAGE",
             "<foo>", "<bar>", "<baz...>"
@@ -383,35 +381,34 @@ public class HelpTextSpecs : SpecsBase
 
     // https://github.com/Tyrrrz/CliFx/issues/117
     [Fact]
-    public async Task Help_text_shows_usage_format_which_lists_all_parameters_in_specified_order()
+    public async Task I_can_request_the_help_text_to_see_the_usage_format_for_all_parameters_in_the_correct_order()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
             """
-                
-                // Base members appear last in reflection order
-                public abstract class CommandBase : ICommand
-                {
-                    [CommandParameter(0)]
-                    public string Foo { get; set; }
-                
-                    public abstract ValueTask ExecuteAsync(IConsole console);
-                }
-                
-                [Command]
-                public class Command : CommandBase
-                {
-                    [CommandParameter(2)]
-                    public IReadOnlyList<string> Baz { get; set; }
-                
-                    [CommandParameter(1)]
-                    public string Bar { get; set; }
-                
-                    public override ValueTask ExecuteAsync(IConsole console) => default;
-                }
+            // Base members appear last in reflection order
+            public abstract class CommandBase : ICommand
+            {
+                [CommandParameter(0)]
+                public required string Foo { get; init; }
 
-                """);
+                public abstract ValueTask ExecuteAsync(IConsole console);
+            }
+
+            [Command]
+            public class Command : CommandBase
+            {
+                [CommandParameter(2)]
+                public required IReadOnlyList<string> Baz { get; init; }
+
+                [CommandParameter(1)]
+                public required string Bar { get; init; }
+
+                public override ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -424,10 +421,10 @@ public class HelpTextSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().ContainAllInOrder(
             "USAGE",
             "<foo>", "<bar>", "<baz...>"
@@ -435,29 +432,28 @@ public class HelpTextSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Help_text_shows_usage_format_which_lists_all_required_options()
+    public async Task I_can_request_the_help_text_to_see_the_usage_format_for_all_required_options()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
             """
-                
-                [Command]
-                public class Command : ICommand
-                {
-                    [CommandOption("foo", IsRequired = true)]
-                    public string Foo { get; set; }
-                
-                    [CommandOption("bar")]
-                    public string Bar { get; set; }
-                
-                    [CommandOption("baz", IsRequired = true)]
-                    public IReadOnlyList<string> Baz { get; set; }
-                
-                    public ValueTask ExecuteAsync(IConsole console) => default;
-                }
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption("foo")]
+                public required string Foo { get; init; }
 
-                """);
+                [CommandOption("bar")]
+                public string? Bar { get; init; }
+
+                [CommandOption("baz")]
+                public required IReadOnlyList<string> Baz { get; init; }
+
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -470,10 +466,10 @@ public class HelpTextSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().ContainAllInOrder(
             "USAGE",
             "--foo <value>", "--baz <values...>", "[options]"
@@ -481,26 +477,25 @@ public class HelpTextSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Help_text_shows_all_parameters_and_options()
+    public async Task I_can_request_the_help_text_to_see_the_list_of_all_parameters_and_options()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
             """
-                
-                [Command]
-                public class Command : ICommand
-                {
-                    [CommandParameter(0, Name = "foo", Description = "Description of foo.")]
-                    public string Foo { get; set; }
-                
-                    [CommandOption("bar", Description = "Description of bar.")]
-                    public string Bar { get; set; }
-                
-                    public ValueTask ExecuteAsync(IConsole console) => default;
-                }
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandParameter(0, Name = "foo", Description = "Description of foo.")]
+                public string? Foo { get; init; }
 
-                """);
+                [CommandOption("bar", Description = "Description of bar.")]
+                public string? Bar { get; init; }
+
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -513,10 +508,10 @@ public class HelpTextSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().ContainAllInOrder(
             "PARAMETERS",
             "foo", "Description of foo.",
@@ -526,20 +521,19 @@ public class HelpTextSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Help_text_shows_the_implicit_help_and_version_options_on_the_default_command()
+    public async Task I_can_request_the_help_text_to_see_the_help_and_version_options()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
             """
-                
-                [Command]
-                public class Command : ICommand
-                {
-                    public ValueTask ExecuteAsync(IConsole console) => default;
-                }
-
-                """);
+            [Command]
+            public class Command : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -552,10 +546,10 @@ public class HelpTextSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().ContainAllInOrder(
             "OPTIONS",
             "-h", "--help", "Shows help text",
@@ -564,20 +558,19 @@ public class HelpTextSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Help_text_shows_the_implicit_help_option_but_not_the_version_option_on_a_named_command()
+    public async Task I_can_request_the_help_text_on_a_named_command_to_see_the_help_option()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
             """
-                
-                [Command("cmd")]
-                public class Command : ICommand
-                {
-                    public ValueTask ExecuteAsync(IConsole console) => default;
-                }
-
-                """);
+            [Command("cmd")]
+            public class Command : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -590,42 +583,43 @@ public class HelpTextSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
+
         stdOut.Should().ContainAllInOrder(
             "OPTIONS",
             "-h", "--help", "Shows help text"
         );
+
         stdOut.Should().NotContainAny(
             "--version", "Shows version information"
         );
     }
 
     [Fact]
-    public async Task Help_text_shows_all_valid_values_for_enum_parameters_and_options()
+    public async Task I_can_request_the_help_text_to_see_the_list_of_valid_values_for_all_parameters_and_options_bound_to_enum_properties()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
             """
-                
-                public enum CustomEnum { One, Two, Three }
-                
-                [Command]
-                public class Command : ICommand
-                {
-                    [CommandParameter(0)]
-                    public CustomEnum Foo { get; set; }
-                
-                    [CommandOption("bar")]
-                    public CustomEnum Bar { get; set; }
-                
-                    public ValueTask ExecuteAsync(IConsole console) => default;
-                }
+            public enum CustomEnum { One, Two, Three }
 
-                """);
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandParameter(0)]
+                public CustomEnum Foo { get; init; }
+
+                [CommandOption("bar")]
+                public CustomEnum Bar { get; init; }
+
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -638,10 +632,10 @@ public class HelpTextSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().ContainAllInOrder(
             "PARAMETERS",
             "foo", "Choices:", "One", "Two", "Three",
@@ -651,28 +645,27 @@ public class HelpTextSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Help_text_shows_all_valid_values_for_non_scalar_enum_parameters_and_options()
+    public async Task I_can_request_the_help_text_to_see_the_list_of_valid_values_for_all_parameters_and_options_bound_to_non_scalar_enum_properties()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
             """
-                
-                public enum CustomEnum { One, Two, Three }
-                
-                [Command]
-                public class Command : ICommand
-                {
-                    [CommandParameter(0)]
-                    public IReadOnlyList<CustomEnum> Foo { get; set; }
-                
-                    [CommandOption("bar")]
-                    public IReadOnlyList<CustomEnum> Bar { get; set; }
-                
-                    public ValueTask ExecuteAsync(IConsole console) => default;
-                }
+            public enum CustomEnum { One, Two, Three }
 
-                """);
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandParameter(0)]
+                public required IReadOnlyList<CustomEnum> Foo { get; init; }
+
+                [CommandOption("bar")]
+                public required IReadOnlyList<CustomEnum> Bar { get; init; }
+
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -685,10 +678,10 @@ public class HelpTextSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().ContainAllInOrder(
             "PARAMETERS",
             "foo", "Choices:", "One", "Two", "Three",
@@ -698,28 +691,27 @@ public class HelpTextSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Help_text_shows_all_valid_values_for_nullable_enum_parameters_and_options()
+    public async Task I_can_request_the_help_text_to_see_the_list_of_valid_values_for_all_parameters_and_options_bound_to_nullable_enum_properties()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
             """
-                
-                public enum CustomEnum { One, Two, Three }
-                
-                [Command]
-                public class Command : ICommand
-                {
-                    [CommandParameter(0)]
-                    public CustomEnum? Foo { get; set; }
-                
-                    [CommandOption("bar")]
-                    public IReadOnlyList<CustomEnum?> Bar { get; set; }
-                
-                    public ValueTask ExecuteAsync(IConsole console) => default;
-                }
+            public enum CustomEnum { One, Two, Three }
 
-                """);
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandParameter(0)]
+                public CustomEnum? Foo { get; init; }
+
+                [CommandOption("bar")]
+                public IReadOnlyList<CustomEnum?>? Bar { get; init; }
+
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -732,10 +724,10 @@ public class HelpTextSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().ContainAllInOrder(
             "PARAMETERS",
             "foo", "Choices:", "One", "Two", "Three",
@@ -745,28 +737,27 @@ public class HelpTextSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Help_text_shows_environment_variables_for_options_that_have_them_configured_as_fallback()
+    public async Task I_can_request_the_help_text_to_see_the_environment_variables_of_options_that_use_them_as_fallback()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
             """
-                
-                public enum CustomEnum { One, Two, Three }
-                
-                [Command]
-                public class Command : ICommand
-                {
-                    [CommandOption("foo", EnvironmentVariable = "ENV_FOO")]
-                    public CustomEnum Foo { get; set; }
-                
-                    [CommandOption("bar", EnvironmentVariable = "ENV_BAR")]
-                    public CustomEnum Bar { get; set; }
-                
-                    public ValueTask ExecuteAsync(IConsole console) => default;
-                }
+            public enum CustomEnum { One, Two, Three }
 
-                """);
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption("foo", EnvironmentVariable = "ENV_FOO")]
+                public CustomEnum Foo { get; init; }
+
+                [CommandOption("bar", EnvironmentVariable = "ENV_BAR")]
+                public CustomEnum Bar { get; init; }
+
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -779,10 +770,10 @@ public class HelpTextSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().ContainAllInOrder(
             "OPTIONS",
             "--foo", "Environment variable:", "ENV_FOO",
@@ -791,46 +782,45 @@ public class HelpTextSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Help_text_shows_default_values_for_non_required_options()
+    public async Task I_can_request_the_help_text_to_see_the_default_values_of_non_required_options()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
             """
-                
-                public enum CustomEnum { One, Two, Three }
-                
-                [Command]
-                public class Command : ICommand
-                {
-                    [CommandOption("foo")]
-                    public object Foo { get; set; } = 42;
-                
-                    [CommandOption("bar")]
-                    public string Bar { get; set; } = "hello";
-                
-                    [CommandOption("baz")]
-                    public IReadOnlyList<string> Baz { get; set; } = new[] {"one", "two", "three"};
-                
-                    [CommandOption("qwe")]
-                    public bool Qwe { get; set; } = true;
-                
-                    [CommandOption("qop")]
-                    public int? Qop { get; set; } = 1337;
-                
-                    [CommandOption("zor")]
-                    public TimeSpan Zor { get; set; } = TimeSpan.FromMinutes(123);
-                
-                    [CommandOption("lol")]
-                    public CustomEnum Lol { get; set; } = CustomEnum.Two;
-                
-                    [CommandOption("hmm", IsRequired = true)]
-                    public string Hmm { get; set; } = "not printed";
-                
-                    public ValueTask ExecuteAsync(IConsole console) => default;
-                }
+            public enum CustomEnum { One, Two, Three }
 
-                """);
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption("foo")]
+                public object? Foo { get; init; } = 42;
+
+                [CommandOption("bar")]
+                public string? Bar { get; init; } = "hello";
+
+                [CommandOption("baz")]
+                public IReadOnlyList<string>? Baz { get; init; } = new[] {"one", "two", "three"};
+
+                [CommandOption("qwe")]
+                public bool Qwe { get; init; } = true;
+
+                [CommandOption("qop")]
+                public int? Qop { get; init; } = 1337;
+
+                [CommandOption("zor")]
+                public TimeSpan Zor { get; init; } = TimeSpan.FromMinutes(123);
+
+                [CommandOption("lol")]
+                public CustomEnum Lol { get; init; } = CustomEnum.Two;
+
+                [CommandOption("hmm")]
+                public required string Hmm { get; init; } = "not printed";
+
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
@@ -843,10 +833,11 @@ public class HelpTextSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
+
         stdOut.Should().ContainAllInOrder(
             "OPTIONS",
             "--foo", "Default:", "42",
@@ -857,36 +848,42 @@ public class HelpTextSpecs : SpecsBase
             "--zor", "Default:", "02:03:00",
             "--lol", "Default:", "Two"
         );
+
         stdOut.Should().NotContain("not printed");
     }
 
     [Fact]
-    public async Task Help_text_shows_all_immediate_child_commands()
+    public async Task I_can_request_the_help_text_to_see_the_list_of_all_immediate_child_commands()
     {
         // Arrange
         var commandTypes = DynamicCommandBuilder.CompileMany(
             // language=cs
             """
-                
-                [Command("cmd1", Description = "Description of one command.")]
-                public class FirstCommand : ICommand
-                {
-                    public ValueTask ExecuteAsync(IConsole console) => default;
-                }
-                
-                [Command("cmd2", Description = "Description of another command.")]
-                public class SecondCommand : ICommand
-                {
-                    public ValueTask ExecuteAsync(IConsole console) => default;
-                }
-                
-                [Command("cmd2 child", Description = "Description of another command's child command.")]
-                public class SecondCommandChildCommand : ICommand
-                {
-                    public ValueTask ExecuteAsync(IConsole console) => default;
-                }
+            [Command("cmd1", Description = "Description of one command.")]
+            public class FirstCommand : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
 
-                """);
+            [Command("cmd2", Description = "Description of another command.")]
+            public class SecondCommand : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+
+            [Command("cmd2 child", Description = "Description of another command's child command.")]
+            public class SecondCommandChildCommand : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+
+            [Command("cmd3 child", Description = "Description of an orphaned command.")]
+            public class ThirdCommandChildCommand : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommands(commandTypes)
@@ -899,62 +896,65 @@ public class HelpTextSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
+
         stdOut.Should().ContainAllInOrder(
             "COMMANDS",
             "cmd1", "Description of one command.",
-            "cmd2", "Description of another command."
+            "cmd2", "Description of another command.",
+            // `cmd2 child` will appear as an immediate command because it does not
+            // have a more specific parent.
+            "cmd3 child", "Description of an orphaned command."
         );
 
         // `cmd2 child` will still appear in the list of `cmd2` subcommands,
-        // but its description will not be seen.
+        // but its description will not be visible.
         stdOut.Should().NotContain(
             "Description of another command's child command."
         );
     }
 
     [Fact]
-    public async Task Help_text_shows_all_immediate_child_commands_of_each_child_command()
+    public async Task I_can_request_the_help_text_to_see_the_list_of_all_immediate_grand_child_commands()
     {
         // Arrange
         var commandTypes = DynamicCommandBuilder.CompileMany(
             // language=cs
             """
-                
-                [Command("cmd1")]
-                public class FirstCommand : ICommand
-                {
-                    public ValueTask ExecuteAsync(IConsole console) => default;
-                }
-                
-                [Command("cmd1 child1")]
-                public class FirstCommandFirstChildCommand : ICommand
-                {
-                    public ValueTask ExecuteAsync(IConsole console) => default;
-                }
-                
-                [Command("cmd2")]
-                public class SecondCommand : ICommand
-                {
-                    public ValueTask ExecuteAsync(IConsole console) => default;
-                }
-                
-                [Command("cmd2 child11")]
-                public class SecondCommandFirstChildCommand : ICommand
-                {
-                    public ValueTask ExecuteAsync(IConsole console) => default;
-                }
-                
-                [Command("cmd2 child2")]
-                public class SecondCommandSecondChildCommand : ICommand
-                {
-                    public ValueTask ExecuteAsync(IConsole console) => default;
-                }
+            [Command("cmd1")]
+            public class FirstCommand : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
 
-                """);
+            [Command("cmd1 child1")]
+            public class FirstCommandFirstChildCommand : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+
+            [Command("cmd2")]
+            public class SecondCommand : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+
+            [Command("cmd2 child11")]
+            public class SecondCommandFirstChildCommand : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+
+            [Command("cmd2 child2")]
+            public class SecondCommandSecondChildCommand : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
 
         var application = new CliApplicationBuilder()
             .AddCommands(commandTypes)
@@ -967,10 +967,10 @@ public class HelpTextSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().ContainAllInOrder(
             "COMMANDS",
             "cmd1", "Subcommands:", "cmd1 child1",
@@ -979,58 +979,7 @@ public class HelpTextSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Help_text_shows_non_immediate_child_commands_if_they_do_not_have_a_more_specific_parent()
-    {
-        // Arrange
-        var commandTypes = DynamicCommandBuilder.CompileMany(
-            // language=cs
-            """
-                
-                [Command("cmd1")]
-                public class FirstCommand : ICommand
-                {
-                    public ValueTask ExecuteAsync(IConsole console) => default;
-                }
-                
-                [Command("cmd2 child1")]
-                public class SecondCommandFirstChildCommand : ICommand
-                {
-                    public ValueTask ExecuteAsync(IConsole console) => default;
-                }
-                
-                [Command("cmd2 child2")]
-                public class SecondCommandSecondChildCommand : ICommand
-                {
-                    public ValueTask ExecuteAsync(IConsole console) => default;
-                }
-
-                """);
-
-        var application = new CliApplicationBuilder()
-            .AddCommands(commandTypes)
-            .UseConsole(FakeConsole)
-            .Build();
-
-        // Act
-        var exitCode = await application.RunAsync(
-            new[] {"--help"},
-            new Dictionary<string, string>()
-        );
-
-        var stdOut = FakeConsole.ReadOutputString();
-
-        // Assert
-        exitCode.Should().Be(0);
-        stdOut.Should().ContainAllInOrder(
-            "COMMANDS",
-            "cmd1",
-            "cmd2 child1",
-            "cmd2 child2"
-        );
-    }
-
-    [Fact]
-    public async Task Version_text_is_printed_if_provided_arguments_contain_the_version_option()
+    public async Task I_can_request_the_version_text_by_running_the_application_with_the_version_option()
     {
         // Arrange
         var application = new CliApplicationBuilder()
@@ -1045,10 +994,10 @@ public class HelpTextSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Trim().Should().Be("v6.9");
     }
 }

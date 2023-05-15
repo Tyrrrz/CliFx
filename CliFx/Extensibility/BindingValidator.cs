@@ -1,6 +1,6 @@
 ﻿namespace CliFx.Extensibility;
 
-// Used internally to simplify usage from reflection
+// Used internally to simplify the usage from reflection
 internal interface IBindingValidator
 {
     BindingValidationError? Validate(object? value);

@@ -18,7 +18,7 @@ public class OptionMustBeInsideCommandAnalyzerSpecs
             public class MyClass
             {
                 [CommandOption("foo")]
-                public string Foo { get; set; }
+                public string? Foo { get; init; }
             }
             """;
 
@@ -37,7 +37,7 @@ public class OptionMustBeInsideCommandAnalyzerSpecs
             public class MyCommand : ICommand
             {
                 [CommandOption("foo")]
-                public string Foo { get; set; }
+                public string? Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -57,7 +57,7 @@ public class OptionMustBeInsideCommandAnalyzerSpecs
             public abstract class MyCommand
             {
                 [CommandOption("foo")]
-                public string Foo { get; set; }
+                public string? Foo { get; init; }
             }
             """;
 
@@ -75,7 +75,7 @@ public class OptionMustBeInsideCommandAnalyzerSpecs
             [Command]
             public class MyCommand : ICommand
             {
-                public string Foo { get; set; }
+                public string? Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }

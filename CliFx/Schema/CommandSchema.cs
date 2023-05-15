@@ -124,7 +124,6 @@ internal partial class CommandSchema
     public static CommandSchema Resolve(Type type)
     {
         var schema = TryResolve(type);
-
         if (schema is null)
         {
             throw CliFxException.InternalError(

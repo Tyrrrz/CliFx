@@ -5,7 +5,7 @@ using CliFx.Infrastructure;
 namespace CliFx.Tests.Utils;
 
 [Command]
-public class NoOpCommand : ICommand
+internal class NoOpCommand : ICommand
 {
     public ValueTask ExecuteAsync(IConsole console) => default;
 }

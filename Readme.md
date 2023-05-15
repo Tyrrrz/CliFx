@@ -436,7 +436,7 @@ You can run `dotnet myapp.dll cmd1 [command] --help` to show help on a specific 
 ```
 
 > **Note**:
-> Defining a default (unnamed) command is not required.
+> Defining the default (unnamed) command is not required.
 > If it's absent, running the application without specifying a command will just show the root-level help text.
 
 ### Reporting errors
@@ -490,7 +490,7 @@ Console applications support the concept of interrupt signals, which can be issu
 If your command performs critical work, you can intercept these signals to handle cancellation requests in a graceful way.
 
 In order to make the command cancellation-aware, call `console.RegisterCancellationHandler()` to register the signal handler and obtain the corresponding `CancellationToken`.
-Once this method is called, the program will no longer terminate on an interrupt signal but will instead trigger the token, so it's important to be able to process it correctly.
+Once this method is called, the program will no longer terminate on an interrupt signal but will instead trigger the token, which can be used by the command to delay the termination just enough to exit in a controlled manner.
 
 ```csharp
 [Command]
@@ -516,7 +516,7 @@ public class CancellableCommand : ICommand
 
 > **Warning**:
 > Cancellation handler is only respected when the user sends the interrupt signal for the first time.
-> If the user decides to issue the signal again, the application will terminate immediately regardless of whether the command is cancellation-aware.
+> If the user decides to issue the signal again, the application will be forcefully terminated without triggering the cancellation token.
 
 ### Type activation
 
@@ -621,7 +621,12 @@ public async Task ConcatCommand_executes_successfully()
         .UseConsole(console)
         .Build();
 
-    var args = new[] {"--left", "foo", "--right", "bar"};
+    var args = new[]
+    {
+        "--left", "foo",
+        "--right", "bar"
+    };
+
     var envVars = new Dictionary<string, string>();
 
     // Act

@@ -9,17 +9,17 @@ namespace CliFx;
 public class ApplicationConfiguration
 {
     /// <summary>
-    /// Command types defined in this application.
+    /// Command types defined in the application.
     /// </summary>
     public IReadOnlyList<Type> CommandTypes { get; }
 
     /// <summary>
-    /// Whether debug mode is allowed in this application.
+    /// Whether debug mode is allowed in the application.
     /// </summary>
     public bool IsDebugModeAllowed { get; }
 
     /// <summary>
-    /// Whether preview mode is allowed in this application.
+    /// Whether preview mode is allowed in the application.
     /// </summary>
     public bool IsPreviewModeAllowed { get; }
 

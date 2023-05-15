@@ -13,7 +13,7 @@ public interface ICommand
     /// </summary>
     /// <remarks>
     /// If the execution of the command is not asynchronous, simply end the method with
-    /// <code>return default;</code>
+    /// <c>return default;</c>
     /// </remarks>
     ValueTask ExecuteAsync(IConsole console);
 }

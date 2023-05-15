@@ -17,15 +17,15 @@ public class OptionMustHaveValidConverterAnalyzerSpecs
             """
             public class MyConverter
             {
-                public string Convert(string rawValue) => rawValue;
+                public string Convert(string? rawValue) => rawValue;
             }
-            
+
             [Command]
             public class MyCommand : ICommand
             {
                 [CommandOption("foo", Converter = typeof(MyConverter))]
-                public string Foo { get; set; }
-            
+                public string? Foo { get; init; }
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;
@@ -43,15 +43,15 @@ public class OptionMustHaveValidConverterAnalyzerSpecs
             """
             public class MyConverter : BindingConverter<int>
             {
-                public override int Convert(string rawValue) => 42;
+                public override int Convert(string? rawValue) => 42;
             }
-            
+
             [Command]
             public class MyCommand : ICommand
             {
                 [CommandOption("foo", Converter = typeof(MyConverter))]
-                public string Foo { get; set; }
-            
+                public string? Foo { get; init; }
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;
@@ -69,15 +69,15 @@ public class OptionMustHaveValidConverterAnalyzerSpecs
             """
             public class MyConverter : BindingConverter<string>
             {
-                public override string Convert(string rawValue) => rawValue;
+                public override string Convert(string? rawValue) => rawValue;
             }
-            
+
             [Command]
             public class MyCommand : ICommand
             {
                 [CommandOption("foo", Converter = typeof(MyConverter))]
-                public string Foo { get; set; }
-            
+                public string? Foo { get; init; }
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;
@@ -95,15 +95,15 @@ public class OptionMustHaveValidConverterAnalyzerSpecs
             """
             public class MyConverter : BindingConverter<int>
             {
-                public override int Convert(string rawValue) => 42;
+                public override int Convert(string? rawValue) => 42;
             }
-            
+
             [Command]
             public class MyCommand : ICommand
             {
                 [CommandOption("foo", Converter = typeof(MyConverter))]
-                public int? Foo { get; set; }
-            
+                public int? Foo { get; init; }
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;
@@ -121,15 +121,15 @@ public class OptionMustHaveValidConverterAnalyzerSpecs
             """
             public class MyConverter : BindingConverter<string>
             {
-                public override string Convert(string rawValue) => rawValue;
+                public override string Convert(string? rawValue) => rawValue;
             }
-            
+
             [Command]
             public class MyCommand : ICommand
             {
                 [CommandOption("foo", Converter = typeof(MyConverter))]
-                public IReadOnlyList<string> Foo { get; set; }
-            
+                public IReadOnlyList<string>? Foo { get; init; }
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;
@@ -149,8 +149,8 @@ public class OptionMustHaveValidConverterAnalyzerSpecs
             public class MyCommand : ICommand
             {
                 [CommandOption("foo")]
-                public string Foo { get; set; }
-            
+                public string? Foo { get; init; }
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;
@@ -169,8 +169,8 @@ public class OptionMustHaveValidConverterAnalyzerSpecs
             [Command]
             public class MyCommand : ICommand
             {
-                public string Foo { get; set; }
-            
+                public string? Foo { get; init; }
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;

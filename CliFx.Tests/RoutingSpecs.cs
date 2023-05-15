@@ -16,7 +16,7 @@ public class RoutingSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Default_command_is_executed_if_provided_arguments_do_not_match_any_named_command()
+    public async Task I_can_configure_a_command_to_be_executed_by_default_when_the_user_does_not_specify_a_command_name()
     {
         // Arrange
         var commandTypes = DynamicCommandBuilder.CompileMany(
@@ -65,15 +65,15 @@ public class RoutingSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Trim().Should().Be("default");
     }
 
     [Fact]
-    public async Task Specific_named_command_is_executed_if_provided_arguments_match_its_name()
+    public async Task I_can_configure_a_command_to_be_executed_when_the_user_specifies_its_name()
     {
         // Arrange
         var commandTypes = DynamicCommandBuilder.CompileMany(
@@ -122,15 +122,15 @@ public class RoutingSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Trim().Should().Be("cmd");
     }
 
     [Fact]
-    public async Task Specific_named_child_command_is_executed_if_provided_arguments_match_its_name()
+    public async Task I_can_configure_a_nested_command_to_be_executed_when_the_user_specifies_its_name()
     {
         // Arrange
         var commandTypes = DynamicCommandBuilder.CompileMany(
@@ -179,10 +179,10 @@ public class RoutingSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Trim().Should().Be("cmd child");
     }
 }

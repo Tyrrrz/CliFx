@@ -98,26 +98,22 @@ internal class ExceptionConsoleFormatter : ConsoleFormatter
         if (!string.IsNullOrWhiteSpace(exception.StackTrace))
         {
             // Parse and pretty-print the stacktrace
-            foreach (var stackFrame in StackFrame.ParseMany(exception.StackTrace))
-            {
+            foreach (var stackFrame in StackFrame.ParseTrace(exception.StackTrace))
                 WriteStackFrame(stackFrame, indentLevel);
-            }
         }
     }
 
     public void WriteException(Exception exception)
     {
-        // Domain exceptions should be printed with minimal information
-        // because they are meant for the user of the application,
-        // not the user of the library.
-        if (exception is CliFxException cliFxException &&
-            !string.IsNullOrWhiteSpace(cliFxException.ActualMessage))
+        // Domain exceptions should be printed with minimal information because they are
+        // meant for the user of the application, not the user of the library.
+        if (exception is CliFxException { HasCustomMessage: true } cliFxException)
         {
-            Write(ConsoleColor.Red, cliFxException.ActualMessage);
+            Write(ConsoleColor.Red, cliFxException.Message);
             WriteLine();
         }
-        // All other exceptions most likely indicate an actual bug
-        // and should include stacktrace and other detailed information.
+        // All other exceptions most likely indicate an actual bug and should include
+        // the stacktrace and other detailed information.
         else
         {
             Write(ConsoleColor.White, ConsoleColor.DarkRed, "ERROR");

@@ -1,4 +1,7 @@
 ﻿using System;
+using CliFx.Exceptions;
+using CliFx.Extensibility;
+using CliFx.Utils.Extensions;
 
 namespace CliFx.Infrastructure;
 
@@ -11,4 +14,19 @@ public interface ITypeActivator
     /// Creates an instance of the specified type.
     /// </summary>
     object CreateInstance(Type type);
+}
+
+internal static class TypeActivatorExtensions
+{
+    public static T CreateInstance<T>(this ITypeActivator activator, Type type)
+    {
+        if (!typeof(T).IsAssignableFrom(type))
+        {
+            throw CliFxException.InternalError(
+                $"Type '{type.FullName}' is not assignable to '{typeof(T).FullName}'."
+            );
+        }
+
+        return (T)activator.CreateInstance(type);
+    }
 }

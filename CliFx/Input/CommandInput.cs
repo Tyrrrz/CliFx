@@ -17,6 +17,12 @@ internal partial class CommandInput
 
     public IReadOnlyList<EnvironmentVariableInput> EnvironmentVariables { get; }
 
+    public bool HasArguments =>
+        !string.IsNullOrWhiteSpace(CommandName) ||
+        Directives.Any() ||
+        Parameters.Any() ||
+        Options.Any();
+
     public bool IsDebugDirectiveSpecified => Directives.Any(d => d.IsDebugDirective);
 
     public bool IsPreviewDirectiveSpecified => Directives.Any(d => d.IsPreviewDirective);
@@ -74,8 +80,8 @@ internal partial class CommandInput
 
         var lastIndex = index;
 
-        // Append arguments to a buffer until we find the longest sequence
-        // that represents a valid command name.
+        // Append arguments to a buffer until we find the longest sequence that represents
+        // a valid command name.
         for (var i = index; i < commandLineArguments.Count; i++)
         {
             var argument = commandLineArguments[i];
@@ -85,8 +91,8 @@ internal partial class CommandInput
             var potentialCommandName = potentialCommandNameComponents.JoinToString(" ");
             if (commandNames.Contains(potentialCommandName))
             {
-                // Record the position but continue the loop in case
-                // we find a longer (more specific) match.
+                // Record the position but continue the loop in case we find
+                // a longer (more specific) match.
                 commandName = potentialCommandName;
                 lastIndex = i;
             }
@@ -105,7 +111,7 @@ internal partial class CommandInput
     {
         var result = new List<ParameterInput>();
 
-        // Consume all arguments until first option identifier
+        // Consume all arguments until the first option identifier
         for (; index < commandLineArguments.Count; index++)
         {
             var argument = commandLineArguments[index];
@@ -120,7 +126,7 @@ internal partial class CommandInput
                 argument.Length > 1 &&
                 char.IsLetter(argument[1]);
 
-            // Break on first option identifier
+            // Break on the first option identifier
             if (isOptionIdentifier)
                 break;
 
@@ -161,13 +167,13 @@ internal partial class CommandInput
                      argument.Length > 1 &&
                      char.IsLetter(argument[1]))
             {
-                foreach (var alias in argument[1..])
+                foreach (var identifier in argument[1..])
                 {
                     // Flush previous
                     if (!string.IsNullOrWhiteSpace(lastOptionIdentifier))
                         result.Add(new OptionInput(lastOptionIdentifier, lastOptionValues));
 
-                    lastOptionIdentifier = alias.AsString();
+                    lastOptionIdentifier = identifier.AsString();
                     lastOptionValues = new List<string>();
                 }
             }
@@ -178,7 +184,7 @@ internal partial class CommandInput
             }
         }
 
-        // Flush last option
+        // Flush the last option
         if (!string.IsNullOrWhiteSpace(lastOptionIdentifier))
             result.Add(new OptionInput(lastOptionIdentifier, lastOptionValues));
 

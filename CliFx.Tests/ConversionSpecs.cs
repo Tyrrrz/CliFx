@@ -16,7 +16,7 @@ public class ConversionSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Parameter_or_option_value_can_be_converted_to_a_string()
+    public async Task I_can_bind_a_parameter_or_an_option_to_a_string_property()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -26,7 +26,7 @@ public class ConversionSpecs : SpecsBase
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public string Foo { get; set; }
+                public string? Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -48,15 +48,15 @@ public class ConversionSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Trim().Should().Be("xyz");
     }
 
     [Fact]
-    public async Task Parameter_or_option_value_can_be_converted_to_an_object()
+    public async Task I_can_bind_a_parameter_or_an_option_to_an_object_property()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -66,7 +66,7 @@ public class ConversionSpecs : SpecsBase
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public object Foo { get; set; }
+                public object? Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -88,15 +88,15 @@ public class ConversionSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Trim().Should().Be("xyz");
     }
 
     [Fact]
-    public async Task Parameter_or_option_value_can_be_converted_to_a_boolean()
+    public async Task I_can_bind_a_parameter_or_an_option_to_a_boolean_property()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -106,15 +106,19 @@ public class ConversionSpecs : SpecsBase
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public bool Foo { get; set; }
+                public bool Foo { get; init; }
 
                 [CommandOption('b')]
-                public bool Bar { get; set; }
+                public bool Bar { get; init; }
+
+                [CommandOption('c')]
+                public bool Baz { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
                     console.Output.WriteLine("Foo = " + Foo);
                     console.Output.WriteLine("Bar = " + Bar);
+                    console.Output.WriteLine("Baz = " + Baz);
 
                     return default;
                 }
@@ -129,22 +133,28 @@ public class ConversionSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"-f", "true", "-b", "false"},
+            new[]
+            {
+                "-f", "true",
+                "-b", "false",
+                "-c"
+            },
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().ConsistOfLines(
             "Foo = True",
-            "Bar = False"
+            "Bar = False",
+            "Baz = True"
         );
     }
 
     [Fact]
-    public async Task Parameter_or_option_value_can_be_converted_to_a_boolean_with_implicit_value()
+    public async Task I_can_bind_a_parameter_or_an_option_to_an_integer_property()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -154,47 +164,7 @@ public class ConversionSpecs : SpecsBase
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public bool Foo { get; set; }
-
-                public ValueTask ExecuteAsync(IConsole console)
-                {
-                    console.Output.WriteLine(Foo);
-                    return default;
-                }
-            }
-            """
-        );
-
-        var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
-            .UseConsole(FakeConsole)
-            .Build();
-
-        // Act
-        var exitCode = await application.RunAsync(
-            new[] {"-f"},
-            new Dictionary<string, string>()
-        );
-
-        var stdOut = FakeConsole.ReadOutputString();
-
-        // Assert
-        exitCode.Should().Be(0);
-        stdOut.Trim().Should().Be("True");
-    }
-
-    [Fact]
-    public async Task Parameter_or_option_value_can_be_converted_to_an_integer()
-    {
-        // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
-            """
-            [Command]
-            public class Command : ICommand
-            {
-                [CommandOption('f')]
-                public int Foo { get; set; }
+                public int Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -216,15 +186,15 @@ public class ConversionSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Trim().Should().Be("32");
     }
 
     [Fact]
-    public async Task Parameter_or_option_value_can_be_converted_to_a_double()
+    public async Task I_can_bind_a_parameter_or_an_option_to_a_double_property()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -234,7 +204,7 @@ public class ConversionSpecs : SpecsBase
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public double Foo { get; set; }
+                public double Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -256,15 +226,15 @@ public class ConversionSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Trim().Should().Be("32.14");
     }
 
     [Fact]
-    public async Task Parameter_or_option_value_can_be_converted_to_DateTimeOffset()
+    public async Task I_can_bind_a_parameter_or_an_option_to_a_DateTimeOffset_property()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -274,7 +244,7 @@ public class ConversionSpecs : SpecsBase
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public DateTimeOffset Foo { get; set; }
+                public DateTimeOffset Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -296,15 +266,15 @@ public class ConversionSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Trim().Should().Be("1995-04-28 00:00:00Z");
     }
 
     [Fact]
-    public async Task Parameter_or_option_value_can_be_converted_to_a_TimeSpan()
+    public async Task I_can_bind_a_parameter_or_an_option_to_a_TimeSpan_property()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -314,7 +284,7 @@ public class ConversionSpecs : SpecsBase
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public TimeSpan Foo { get; set; }
+                public TimeSpan Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -336,15 +306,15 @@ public class ConversionSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Trim().Should().Be("12:34:56");
     }
 
     [Fact]
-    public async Task Parameter_or_option_value_can_be_converted_to_an_enum()
+    public async Task I_can_bind_a_parameter_or_an_option_to_an_enum_property()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -356,7 +326,7 @@ public class ConversionSpecs : SpecsBase
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public CustomEnum Foo { get; set; }
+                public CustomEnum Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -378,15 +348,15 @@ public class ConversionSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Trim().Should().Be("2");
     }
 
     [Fact]
-    public async Task Parameter_or_option_value_can_be_converted_to_a_nullable_integer()
+    public async Task I_can_bind_a_parameter_or_an_option_to_a_nullable_integer_property()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -396,10 +366,10 @@ public class ConversionSpecs : SpecsBase
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public int? Foo { get; set; }
+                public int? Foo { get; init; }
 
                 [CommandOption('b')]
-                public int? Bar { get; set; }
+                public int? Bar { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -423,10 +393,10 @@ public class ConversionSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().ConsistOfLines(
             "Foo = ",
             "Bar = 123"
@@ -434,7 +404,7 @@ public class ConversionSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Parameter_or_option_value_can_be_converted_to_a_nullable_enum()
+    public async Task I_can_bind_a_parameter_or_an_option_to_a_nullable_enum_property()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -446,10 +416,10 @@ public class ConversionSpecs : SpecsBase
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public CustomEnum? Foo { get; set; }
+                public CustomEnum? Foo { get; init; }
 
                 [CommandOption('b')]
-                public CustomEnum? Bar { get; set; }
+                public CustomEnum? Bar { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -473,10 +443,10 @@ public class ConversionSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().ConsistOfLines(
             "Foo = ",
             "Bar = 2"
@@ -484,7 +454,7 @@ public class ConversionSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Parameter_or_option_value_can_be_converted_to_a_type_that_has_a_constructor_accepting_a_string()
+    public async Task I_can_bind_a_parameter_or_an_option_to_a_string_constructable_object_property()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -501,7 +471,7 @@ public class ConversionSpecs : SpecsBase
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public CustomType Foo { get; set; }
+                public CustomType? Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -523,15 +493,15 @@ public class ConversionSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Trim().Should().Be("xyz");
     }
 
     [Fact]
-    public async Task Parameter_or_option_value_can_be_converted_to_a_type_that_has_a_static_parse_method()
+    public async Task I_can_bind_a_parameter_or_an_option_to_a_string_parsable_object_property()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -561,10 +531,10 @@ public class ConversionSpecs : SpecsBase
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public CustomTypeA Foo { get; set; }
+                public CustomTypeA? Foo { get; init; }
 
                 [CommandOption('b')]
-                public CustomTypeB Bar { get; set; }
+                public CustomTypeB? Bar { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -588,10 +558,10 @@ public class ConversionSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().ConsistOfLines(
             "Foo = hello",
             "Bar = world"
@@ -599,7 +569,7 @@ public class ConversionSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Parameter_or_option_value_can_be_converted_using_a_custom_converter()
+    public async Task I_can_bind_a_parameter_or_an_option_to_a_property_with_a_custom_converter()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -615,7 +585,7 @@ public class ConversionSpecs : SpecsBase
             public class Command : ICommand
             {
                 [CommandOption('f', Converter = typeof(CustomConverter))]
-                public int Foo { get; set; }
+                public int Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -637,15 +607,15 @@ public class ConversionSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Trim().Should().Be("11");
     }
 
     [Fact]
-    public async Task Parameter_or_option_value_can_be_converted_to_an_array_of_strings()
+    public async Task I_can_bind_a_parameter_or_an_option_to_a_string_array_property()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -655,7 +625,7 @@ public class ConversionSpecs : SpecsBase
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public string[] Foo { get; set; }
+                public string[]? Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -679,10 +649,10 @@ public class ConversionSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().ConsistOfLines(
             "one",
             "two",
@@ -691,7 +661,7 @@ public class ConversionSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Parameter_or_option_value_can_be_converted_to_a_read_only_list_of_strings()
+    public async Task I_can_bind_a_parameter_or_an_option_to_a_read_only_list_of_strings_property()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -701,7 +671,7 @@ public class ConversionSpecs : SpecsBase
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public IReadOnlyList<string> Foo { get; set; }
+                public IReadOnlyList<string>? Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -725,10 +695,10 @@ public class ConversionSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().ConsistOfLines(
             "one",
             "two",
@@ -737,7 +707,7 @@ public class ConversionSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Parameter_or_option_value_can_be_converted_to_a_list_of_strings()
+    public async Task I_can_bind_a_parameter_or_an_option_to_a_string_list_property()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -747,7 +717,7 @@ public class ConversionSpecs : SpecsBase
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public List<string> Foo { get; set; }
+                public List<string>? Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -771,10 +741,10 @@ public class ConversionSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().ConsistOfLines(
             "one",
             "two",
@@ -783,7 +753,7 @@ public class ConversionSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Parameter_or_option_value_can_be_converted_to_an_array_of_integers()
+    public async Task I_can_bind_a_parameter_or_an_option_to_an_integer_array_property()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -793,7 +763,7 @@ public class ConversionSpecs : SpecsBase
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public int[] Foo { get; set; }
+                public int[]? Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -817,10 +787,10 @@ public class ConversionSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().ConsistOfLines(
             "1",
             "13",
@@ -829,55 +799,21 @@ public class ConversionSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Parameter_or_option_value_conversion_fails_if_the_value_cannot_be_converted_to_the_target_type()
+    public async Task I_can_try_to_bind_a_parameter_or_an_option_to_a_property_of_an_unsupported_type_and_get_an_error()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
             // language=cs
             """
-            [Command]
-            public class Command : ICommand
+            public class CustomType
             {
-                [CommandOption('f')]
-                public int Foo { get; set; }
-
-                public ValueTask ExecuteAsync(IConsole console) => default;
             }
-            """
-        );
-
-        var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
-            .UseConsole(FakeConsole)
-            .Build();
-
-        // Act
-        var exitCode = await application.RunAsync(
-            new[] {"-f", "12.34"},
-            new Dictionary<string, string>()
-        );
-
-        var stdErr = FakeConsole.ReadErrorString();
-
-        // Assert
-        exitCode.Should().NotBe(0);
-        stdErr.Should().NotBeNullOrWhiteSpace();
-    }
-
-    [Fact]
-    public async Task Parameter_or_option_value_conversion_fails_if_the_target_type_is_not_supported()
-    {
-        // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
-            """
-            public class CustomType {}
 
             [Command]
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public CustomType Foo { get; set; }
+                public CustomType? Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -895,15 +831,15 @@ public class ConversionSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdErr = FakeConsole.ReadErrorString();
-
         // Assert
         exitCode.Should().NotBe(0);
+
+        var stdErr = FakeConsole.ReadErrorString();
         stdErr.Should().Contain("has an unsupported underlying property type");
     }
 
     [Fact]
-    public async Task Parameter_or_option_value_conversion_fails_if_the_target_non_scalar_type_is_not_supported()
+    public async Task I_can_try_to_bind_a_parameter_or_an_option_to_a_non_scalar_property_of_an_unsupported_type_and_get_an_error()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -920,7 +856,7 @@ public class ConversionSpecs : SpecsBase
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public CustomType Foo { get; set; }
+                public CustomType? Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -938,15 +874,51 @@ public class ConversionSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdErr = FakeConsole.ReadErrorString();
-
         // Assert
         exitCode.Should().NotBe(0);
+
+        var stdErr = FakeConsole.ReadErrorString();
         stdErr.Should().Contain("has an unsupported underlying property type");
     }
 
     [Fact]
-    public async Task Parameter_or_option_value_conversion_fails_if_one_of_the_validators_fail()
+    public async Task I_can_bind_a_parameter_or_an_option_to_a_property_and_get_an_error_if_the_user_provides_an_invalid_value()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption('f')]
+                public int Foo { get; init; }
+
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
+
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
+
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"-f", "12.34"},
+            new Dictionary<string, string>()
+        );
+
+        // Assert
+        exitCode.Should().NotBe(0);
+
+        var stdErr = FakeConsole.ReadErrorString();
+        stdErr.Should().NotBeNullOrWhiteSpace();
+    }
+
+    [Fact]
+    public async Task I_can_bind_a_parameter_or_an_option_to_a_property_and_get_an_error_if_a_custom_validator_fails()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -966,7 +938,7 @@ public class ConversionSpecs : SpecsBase
             public class Command : ICommand
             {
                 [CommandOption('f', Validators = new[] {typeof(ValidatorA), typeof(ValidatorB)})]
-                public int Foo { get; set; }
+                public int Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -984,15 +956,15 @@ public class ConversionSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdErr = FakeConsole.ReadErrorString();
-
         // Assert
         exitCode.Should().NotBe(0);
+
+        var stdErr = FakeConsole.ReadErrorString();
         stdErr.Should().Contain("Hello world");
     }
 
     [Fact]
-    public async Task Parameter_or_option_value_conversion_fails_if_the_static_parse_method_throws()
+    public async Task I_can_bind_a_parameter_or_an_option_to_a_string_parsable_property_and_get_an_error_if_the_parsing_fails()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -1011,7 +983,7 @@ public class ConversionSpecs : SpecsBase
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public CustomType Foo { get; set; }
+                public CustomType? Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -1029,10 +1001,10 @@ public class ConversionSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdErr = FakeConsole.ReadErrorString();
-
         // Assert
         exitCode.Should().NotBe(0);
+
+        var stdErr = FakeConsole.ReadErrorString();
         stdErr.Should().Contain("Hello world");
     }
 }

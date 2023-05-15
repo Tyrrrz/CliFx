@@ -24,7 +24,7 @@ public class OptionMustHaveValidValidatorsAnalyzerSpecs
             public class MyCommand : ICommand
             {
                 [CommandOption("foo", Validators = new[] {typeof(MyValidator)})]
-                public string Foo { get; set; }
+                public string? Foo { get; init; }
             
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -50,7 +50,7 @@ public class OptionMustHaveValidValidatorsAnalyzerSpecs
             public class MyCommand : ICommand
             {
                 [CommandOption("foo", Validators = new[] {typeof(MyValidator)})]
-                public string Foo { get; set; }
+                public string? Foo { get; init; }
             
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -76,7 +76,7 @@ public class OptionMustHaveValidValidatorsAnalyzerSpecs
             public class MyCommand : ICommand
             {
                 [CommandOption("foo", Validators = new[] {typeof(MyValidator)})]
-                public string Foo { get; set; }
+                public string? Foo { get; init; }
             
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -97,7 +97,7 @@ public class OptionMustHaveValidValidatorsAnalyzerSpecs
             public class MyCommand : ICommand
             {
                 [CommandOption("foo")]
-                public string Foo { get; set; }
+                public string? Foo { get; init; }
             
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -117,7 +117,7 @@ public class OptionMustHaveValidValidatorsAnalyzerSpecs
             [Command]
             public class MyCommand : ICommand
             {
-                public string Foo { get; set; }
+                public string? Foo { get; init; }
             
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }

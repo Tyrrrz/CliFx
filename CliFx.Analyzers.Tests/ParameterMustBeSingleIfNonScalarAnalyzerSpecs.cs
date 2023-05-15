@@ -19,11 +19,11 @@ public class ParameterMustBeSingleIfNonScalarAnalyzerSpecs
             public class MyCommand : ICommand
             {
                 [CommandParameter(0)]
-                public string[] Foo { get; set; }
-            
+                public required string[] Foo { get; init; }
+
                 [CommandParameter(1)]
-                public string[] Bar { get; set; }
-            
+                public required string[] Bar { get; init; }
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;
@@ -43,11 +43,11 @@ public class ParameterMustBeSingleIfNonScalarAnalyzerSpecs
             public class MyCommand : ICommand
             {
                 [CommandParameter(0)]
-                public string Foo { get; set; }
-            
+                public required string Foo { get; init; }
+
                 [CommandParameter(1)]
-                public string[] Bar { get; set; }
-            
+                public required string[] Bar { get; init; }
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;
@@ -67,11 +67,11 @@ public class ParameterMustBeSingleIfNonScalarAnalyzerSpecs
             public class MyCommand : ICommand
             {
                 [CommandParameter(0)]
-                public string Foo { get; set; }
-            
+                public required string Foo { get; init; }
+
                 [CommandParameter(1)]
-                public string Bar { get; set; }
-            
+                public required string Bar { get; init; }
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;
@@ -90,8 +90,8 @@ public class ParameterMustBeSingleIfNonScalarAnalyzerSpecs
             [Command]
             public class MyCommand : ICommand
             {
-                public string Foo { get; set; }
-            
+                public string? Foo { get; init; }
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;

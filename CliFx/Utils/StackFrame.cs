@@ -89,7 +89,7 @@ internal partial class StackFrame
         TimeSpan.FromSeconds(5)
     );
 
-    public static IEnumerable<StackFrame> ParseMany(string stackTrace)
+    public static IEnumerable<StackFrame> ParseTrace(string stackTrace)
     {
         var matches = Pattern.Matches(stackTrace).ToArray();
 

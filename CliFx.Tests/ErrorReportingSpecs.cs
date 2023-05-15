@@ -17,7 +17,7 @@ public class ErrorReportingSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Command_can_throw_an_exception_which_exits_with_a_stacktrace()
+    public async Task I_can_throw_an_exception_in_a_command_to_report_an_error_with_a_stacktrace()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -43,12 +43,13 @@ public class ErrorReportingSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-        var stdErr = FakeConsole.ReadErrorString();
-
         // Assert
         exitCode.Should().NotBe(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().BeEmpty();
+
+        var stdErr = FakeConsole.ReadErrorString();
         stdErr.Should().ContainAllInOrder(
             "System.Exception", "Something went wrong",
             "at", "CliFx."
@@ -56,7 +57,7 @@ public class ErrorReportingSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Command_can_throw_an_exception_with_an_inner_exception_which_exits_with_a_stacktrace()
+    public async Task I_can_throw_an_exception_with_an_inner_exception_in_a_command_to_report_an_error_with_a_stacktrace()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -82,12 +83,13 @@ public class ErrorReportingSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-        var stdErr = FakeConsole.ReadErrorString();
-
         // Assert
         exitCode.Should().NotBe(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().BeEmpty();
+
+        var stdErr = FakeConsole.ReadErrorString();
         stdErr.Should().ContainAllInOrder(
             "System.Exception", "Something went wrong",
             "System.Exception", "Another exception",
@@ -96,7 +98,7 @@ public class ErrorReportingSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Command_can_throw_a_special_exception_which_exits_with_specified_code_and_message()
+    public async Task I_can_throw_an_exception_in_a_command_to_report_an_error_and_exit_with_the_specified_code()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -122,17 +124,18 @@ public class ErrorReportingSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-        var stdErr = FakeConsole.ReadErrorString();
-
         // Assert
         exitCode.Should().Be(69);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().BeEmpty();
+
+        var stdErr = FakeConsole.ReadErrorString();
         stdErr.Trim().Should().Be("Something went wrong");
     }
 
     [Fact]
-    public async Task Command_can_throw_a_special_exception_without_message_which_exits_with_a_stacktrace()
+    public async Task I_can_throw_an_exception_without_a_message_in_a_command_to_report_an_error_with_a_stacktrace()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -158,12 +161,13 @@ public class ErrorReportingSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-        var stdErr = FakeConsole.ReadErrorString();
-
         // Assert
         exitCode.Should().Be(69);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().BeEmpty();
+
+        var stdErr = FakeConsole.ReadErrorString();
         stdErr.Should().ContainAllInOrder(
             "CliFx.Exceptions.CommandException",
             "at", "CliFx."
@@ -171,7 +175,7 @@ public class ErrorReportingSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Command_can_throw_a_special_exception_which_prints_help_text_before_exiting()
+    public async Task I_can_throw_an_exception_in_a_command_to_report_an_error_and_print_the_help_text()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -198,12 +202,13 @@ public class ErrorReportingSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-        var stdErr = FakeConsole.ReadErrorString();
-
         // Assert
         exitCode.Should().Be(69);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().Contain("This will be in help text");
+
+        var stdErr = FakeConsole.ReadErrorString();
         stdErr.Trim().Should().Be("Something went wrong");
     }
 }

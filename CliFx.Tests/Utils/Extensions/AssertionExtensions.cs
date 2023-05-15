@@ -41,7 +41,7 @@ internal static class AssertionExtensions
             lastIndex = index;
         }
 
-        return new(assertions);
+        return new AndConstraint<StringAssertions>(assertions);
     }
 
     public static AndConstraint<StringAssertions> ContainAllInOrder(

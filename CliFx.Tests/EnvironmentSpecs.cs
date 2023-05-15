@@ -20,7 +20,7 @@ public class EnvironmentSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Option_can_fall_back_to_an_environment_variable()
+    public async Task I_can_configure_an_option_to_fall_back_to_an_environment_variable_if_the_user_does_not_provide_the_corresponding_argument()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -29,12 +29,17 @@ public class EnvironmentSpecs : SpecsBase
             [Command]
             public class Command : ICommand
             {
-                [CommandOption("foo", IsRequired = true, EnvironmentVariable = "ENV_FOO")]
-                public string Foo { get; set; }
+                [CommandOption("foo", EnvironmentVariable = "ENV_FOO")]
+                public string? Foo { get; init; }
+
+                [CommandOption("bar", EnvironmentVariable = "ENV_BAR")]
+                public string? Bar { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
                     console.Output.WriteLine(Foo);
+                    console.Output.WriteLine(Bar);
+
                     return default;
                 }
             }
@@ -48,22 +53,26 @@ public class EnvironmentSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            Array.Empty<string>(),
+            new[] {"--foo", "42"},
             new Dictionary<string, string>
             {
-                ["ENV_FOO"] = "bar"
+                ["ENV_FOO"] = "100",
+                ["ENV_BAR"] = "200"
             }
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
-        stdOut.Trim().Should().Be("bar");
+
+        var stdOut = FakeConsole.ReadOutputString();
+        stdOut.Trim().Should().ConsistOfLines(
+            "42",
+            "200"
+        );
     }
 
     [Fact]
-    public async Task Option_does_not_fall_back_to_an_environment_variable_if_a_value_is_provided_through_arguments()
+    public async Task I_can_configure_an_option_bound_to_a_non_scalar_property_to_fall_back_to_an_environment_variable_if_the_user_does_not_provide_the_corresponding_argument()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -73,50 +82,7 @@ public class EnvironmentSpecs : SpecsBase
             public class Command : ICommand
             {
                 [CommandOption("foo", EnvironmentVariable = "ENV_FOO")]
-                public string Foo { get; set; }
-
-                public ValueTask ExecuteAsync(IConsole console)
-                {
-                    console.Output.WriteLine(Foo);
-                    return default;
-                }
-            }
-            """
-        );
-
-        var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
-            .UseConsole(FakeConsole)
-            .Build();
-
-        // Act
-        var exitCode = await application.RunAsync(
-            new[] {"--foo", "baz"},
-            new Dictionary<string, string>
-            {
-                ["ENV_FOO"] = "bar"
-            }
-        );
-
-        var stdOut = FakeConsole.ReadOutputString();
-
-        // Assert
-        exitCode.Should().Be(0);
-        stdOut.Trim().Should().Be("baz");
-    }
-
-    [Fact]
-    public async Task Option_of_non_scalar_type_can_receive_multiple_values_from_an_environment_variable()
-    {
-        // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
-            """
-            [Command]
-            public class Command : ICommand
-            {
-                [CommandOption("foo", EnvironmentVariable = "ENV_FOO")]
-                public IReadOnlyList<string> Foo { get; set; }
+                public IReadOnlyList<string>? Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -143,10 +109,10 @@ public class EnvironmentSpecs : SpecsBase
             }
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().ConsistOfLines(
             "bar",
             "baz"
@@ -154,7 +120,7 @@ public class EnvironmentSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Option_of_scalar_type_always_receives_a_single_value_from_an_environment_variable()
+    public async Task I_can_configure_an_option_bound_to_a_scalar_property_to_fall_back_to_an_environment_variable_while_ignoring_path_separators()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -164,7 +130,7 @@ public class EnvironmentSpecs : SpecsBase
             public class Command : ICommand
             {
                 [CommandOption("foo", EnvironmentVariable = "ENV_FOO")]
-                public string Foo { get; set; }
+                public string? Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -189,60 +155,15 @@ public class EnvironmentSpecs : SpecsBase
             }
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Trim().Should().Be($"bar{Path.PathSeparator}baz");
     }
 
-    [Fact]
-    public async Task Environment_variables_are_matched_case_sensitively()
-    {
-        // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
-            """
-            [Command]
-            public class Command : ICommand
-            {
-                [CommandOption("foo", EnvironmentVariable = "ENV_FOO")]
-                public string Foo { get; set; }
-
-                public ValueTask ExecuteAsync(IConsole console)
-                {
-                    console.Output.WriteLine(Foo);
-                    return default;
-                }
-            }
-            """
-        );
-
-        var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
-            .UseConsole(FakeConsole)
-            .Build();
-
-        // Act
-        var exitCode = await application.RunAsync(
-            Array.Empty<string>(),
-            new Dictionary<string, string>
-            {
-                ["ENV_foo"] = "baz",
-                ["ENV_FOO"] = "bar",
-                ["env_FOO"] = "qop"
-            }
-        );
-
-        var stdOut = FakeConsole.ReadOutputString();
-
-        // Assert
-        exitCode.Should().Be(0);
-        stdOut.Trim().Should().Be("bar");
-    }
-
     [Fact(Timeout = 15000)]
-    public async Task Environment_variables_are_extracted_automatically()
+    public async Task I_can_run_the_application_and_it_will_resolve_all_required_environment_variables_automatically()
     {
         // Ensures that the environment variables are properly obtained from
         // System.Environment when they are not provided explicitly to CliApplication.

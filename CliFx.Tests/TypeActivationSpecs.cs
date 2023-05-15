@@ -18,7 +18,7 @@ public class TypeActivationSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Default_type_activator_can_initialize_a_type_if_it_has_a_parameterless_constructor()
+    public async Task I_can_configure_the_application_to_use_the_default_type_activator_to_initialize_types_through_parameterless_constructors()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -48,15 +48,15 @@ public class TypeActivationSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Trim().Should().Be("foo");
     }
 
     [Fact]
-    public async Task Default_type_activator_fails_if_the_type_does_not_have_a_parameterless_constructor()
+    public async Task I_can_configure_the_application_to_use_the_default_type_activator_and_get_an_error_if_the_requested_type_does_not_have_a_parameterless_constructor()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -84,15 +84,15 @@ public class TypeActivationSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdErr = FakeConsole.ReadErrorString();
-
         // Assert
         exitCode.Should().NotBe(0);
+
+        var stdErr = FakeConsole.ReadErrorString();
         stdErr.Should().Contain("Failed to create an instance of type");
     }
 
     [Fact]
-    public async Task Custom_type_activator_can_initialize_a_type_using_a_given_function()
+    public async Task I_can_configure_the_application_to_use_a_custom_type_activator_to_initialize_types_using_a_delegate()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -126,15 +126,15 @@ public class TypeActivationSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Trim().Should().Be("Hello world");
     }
 
     [Fact]
-    public async Task Custom_type_activator_can_initialize_a_type_using_a_service_provider()
+    public async Task I_can_configure_the_application_to_use_a_custom_type_activator_to_initialize_types_using_a_service_provider()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -181,15 +181,15 @@ public class TypeActivationSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Trim().Should().Be("Hello world");
     }
 
     [Fact]
-    public async Task Custom_type_activator_fails_if_the_underlying_function_returns_null()
+    public async Task I_can_configure_the_application_to_use_a_custom_type_activator_and_get_an_error_if_the_requested_type_cannot_be_initialized()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -219,10 +219,10 @@ public class TypeActivationSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdErr = FakeConsole.ReadErrorString();
-
         // Assert
         exitCode.Should().NotBe(0);
+
+        var stdErr = FakeConsole.ReadErrorString();
         stdErr.Should().Contain("Failed to create an instance of type");
     }
 }

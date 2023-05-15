@@ -16,7 +16,7 @@ public class ParameterBindingSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Parameter_is_bound_from_an_argument_matching_its_order()
+    public async Task I_can_bind_a_parameter_to_a_property_and_get_the_value_from_the_corresponding_argument()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -26,10 +26,10 @@ public class ParameterBindingSpecs : SpecsBase
             public class Command : ICommand
             {
                 [CommandParameter(0)]
-                public string Foo { get; set; }
+                public required string Foo { get; init; }
 
                 [CommandParameter(1)]
-                public string Bar { get; set; }
+                public required string Bar { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -53,10 +53,10 @@ public class ParameterBindingSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().ConsistOfLines(
             "Foo = one",
             "Bar = two"
@@ -64,7 +64,7 @@ public class ParameterBindingSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Parameter_of_non_scalar_type_is_bound_from_remaining_non_option_arguments()
+    public async Task I_can_bind_a_parameter_to_a_non_scalar_property_and_get_values_from_the_remaining_non_option_arguments()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -74,16 +74,16 @@ public class ParameterBindingSpecs : SpecsBase
             public class Command : ICommand
             {
                 [CommandParameter(0)]
-                public string Foo { get; set; }
+                public required string Foo { get; init; }
 
                 [CommandParameter(1)]
-                public string Bar { get; set; }
+                public required string Bar { get; init; }
 
                 [CommandParameter(2)]
-                public IReadOnlyList<string> Baz { get; set; }
+                public required IReadOnlyList<string> Baz { get; init; }
 
                 [CommandOption("boo")]
-                public string Boo { get; set; }
+                public string? Boo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -110,10 +110,10 @@ public class ParameterBindingSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().ConsistOfLines(
             "Foo = one",
             "Bar = two",
@@ -124,7 +124,7 @@ public class ParameterBindingSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Parameter_is_not_bound_if_there_are_no_arguments_matching_its_order()
+    public async Task I_can_bind_a_parameter_to_a_property_and_get_an_error_if_the_user_does_not_provide_the_corresponding_argument()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -134,10 +134,88 @@ public class ParameterBindingSpecs : SpecsBase
             public class Command : ICommand
             {
                 [CommandParameter(0)]
-                public string Foo { get; set; }
+                public required string Foo { get; init; }
+
+                [CommandParameter(1)]
+                public required string Bar { get; init; }
+
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
+
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
+
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"one"},
+            new Dictionary<string, string>()
+        );
+
+        // Assert
+        exitCode.Should().NotBe(0);
+
+        var stdErr = FakeConsole.ReadErrorString();
+        stdErr.Should().Contain("Missing required parameter(s)");
+    }
+
+    [Fact]
+    public async Task I_can_bind_a_parameter_to_a_non_scalar_property_and_get_an_error_if_the_user_does_not_provide_at_least_one_corresponding_argument()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandParameter(0)]
+                public required string Foo { get; init; }
+
+                [CommandParameter(1)]
+                public required IReadOnlyList<string> Bar { get; init; }
+
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
+
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
+
+        // Act
+        var exitCode = await application.RunAsync(
+            new[] {"one"},
+            new Dictionary<string, string>()
+        );
+
+        // Assert
+        exitCode.Should().NotBe(0);
+
+        var stdErr = FakeConsole.ReadErrorString();
+        stdErr.Should().Contain("Missing required parameter(s)");
+    }
+
+    [Fact]
+    public async Task I_can_bind_a_non_required_parameter_to_a_property_and_get_no_value_if_the_user_does_not_provide_the_corresponding_argument()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // language=cs
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandParameter(0)]
+                public required string Foo { get; init; }
 
                 [CommandParameter(1, IsRequired = false)]
-                public string Bar { get; set; } = "xyz";
+                public string? Bar { get; init; } = "xyz";
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -161,10 +239,10 @@ public class ParameterBindingSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().ConsistOfLines(
             "Foo = abc",
             "Bar = xyz"
@@ -172,7 +250,7 @@ public class ParameterBindingSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Parameter_binding_fails_if_a_required_parameter_has_not_been_provided()
+    public async Task I_can_bind_parameters_and_get_an_error_if_the_user_provides_too_many_arguments()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -182,88 +260,10 @@ public class ParameterBindingSpecs : SpecsBase
             public class Command : ICommand
             {
                 [CommandParameter(0)]
-                public string Foo { get; set; }
+                public required string Foo { get; init; }
 
                 [CommandParameter(1)]
-                public string Bar { get; set; }
-
-                public ValueTask ExecuteAsync(IConsole console) => default;
-            }
-            """
-        );
-
-        var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
-            .UseConsole(FakeConsole)
-            .Build();
-
-        // Act
-        var exitCode = await application.RunAsync(
-            new[] {"one"},
-            new Dictionary<string, string>()
-        );
-
-        var stdErr = FakeConsole.ReadErrorString();
-
-        // Assert
-        exitCode.Should().NotBe(0);
-        stdErr.Should().Contain("Missing required parameter(s)");
-    }
-
-    [Fact]
-    public async Task Parameter_binding_fails_if_a_parameter_of_non_scalar_type_has_not_been_provided_with_at_least_one_value()
-    {
-        // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
-            """
-            [Command]
-            public class Command : ICommand
-            {
-                [CommandParameter(0)]
-                public string Foo { get; set; }
-
-                [CommandParameter(1)]
-                public IReadOnlyList<string> Bar { get; set; }
-
-                public ValueTask ExecuteAsync(IConsole console) => default;
-            }
-            """
-        );
-
-        var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
-            .UseConsole(FakeConsole)
-            .Build();
-
-        // Act
-        var exitCode = await application.RunAsync(
-            new[] {"one"},
-            new Dictionary<string, string>()
-        );
-
-        var stdErr = FakeConsole.ReadErrorString();
-
-        // Assert
-        exitCode.Should().NotBe(0);
-        stdErr.Should().Contain("Missing required parameter(s)");
-    }
-
-    [Fact]
-    public async Task Parameter_binding_fails_if_one_of_the_provided_parameters_is_unexpected()
-    {
-        // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
-            """
-            [Command]
-            public class Command : ICommand
-            {
-                [CommandParameter(0)]
-                public string Foo { get; set; }
-
-                [CommandParameter(1)]
-                public string Bar { get; set; }
+                public required string Bar { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -281,10 +281,10 @@ public class ParameterBindingSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdErr = FakeConsole.ReadErrorString();
-
         // Assert
         exitCode.Should().NotBe(0);
+
+        var stdErr = FakeConsole.ReadErrorString();
         stdErr.Should().Contain("Unexpected parameter(s)");
     }
 }

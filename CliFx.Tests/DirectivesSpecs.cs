@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using CliFx.Tests.Utils;
@@ -20,7 +19,7 @@ public class DirectivesSpecs : SpecsBase
     }
 
     [Fact(Timeout = 15000)]
-    public async Task Debug_directive_can_be_specified_to_interrupt_execution_until_a_debugger_is_attached()
+    public async Task I_can_use_the_debug_directive_to_make_the_application_wait_for_the_debugger_to_attach()
     {
         // Arrange
         using var cts = new CancellationTokenSource();
@@ -29,7 +28,7 @@ public class DirectivesSpecs : SpecsBase
         void HandleStdOut(string line)
         {
             // Kill the process once it writes the output we expect
-            if (line.Contains("Attach debugger to", StringComparison.OrdinalIgnoreCase))
+            if (line.Contains("Attach the debugger to", StringComparison.OrdinalIgnoreCase))
                 cts.Cancel();
         }
 
@@ -51,7 +50,7 @@ public class DirectivesSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Preview_directive_can_be_specified_to_print_command_input()
+    public async Task I_can_use_the_preview_directive_to_make_the_application_print_the_parsed_command_input()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -81,10 +80,10 @@ public class DirectivesSpecs : SpecsBase
             }
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().ContainAllInOrder(
             "cmd", "<param>", "[-a]", "[-b]", "[-c]", "[--option \"foo\"]",
             "ENV_QOP", "=", "\"hello\"",

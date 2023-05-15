@@ -22,10 +22,9 @@ public class ConsoleSpecs : SpecsBase
     }
 
     [Fact(Timeout = 15000)]
-    public async Task Real_console_maps_directly_to_system_console()
+    public async Task I_can_run_the_application_with_the_default_console_implementation_to_interact_with_the_system_console()
     {
-        // Can't verify our own console output, so using an
-        // external process for this test.
+        // Can't verify our own console output, so using an external process for this test
 
         // Arrange
         var command = "Hello world" | Cli.Wrap("dotnet")
@@ -43,7 +42,26 @@ public class ConsoleSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Fake_console_does_not_leak_to_system_console()
+    public void I_can_run_the_application_on_a_system_with_a_custom_console_encoding_and_not_get_corrupted_output()
+    {
+        // Arrange
+        using var buffer = new MemoryStream();
+        using var consoleWriter = new ConsoleWriter(FakeConsole, buffer, Encoding.UTF8);
+
+        // Act
+        consoleWriter.Write("Hello world");
+        consoleWriter.Flush();
+
+        // Assert
+        var outputBytes = buffer.ToArray();
+        outputBytes.Should().NotContain(Encoding.UTF8.GetPreamble());
+
+        var output = consoleWriter.Encoding.GetString(outputBytes);
+        output.Should().Be("Hello world");
+    }
+
+    [Fact]
+    public async Task I_can_run_the_application_with_the_fake_console_implementation_to_isolate_console_interactions()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -104,7 +122,7 @@ public class ConsoleSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Fake_console_can_be_used_with_an_in_memory_backing_store()
+    public async Task I_can_run_the_application_with_the_fake_console_implementation_and_simulate_stream_interactions()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -138,17 +156,18 @@ public class ConsoleSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-        var stdErr = FakeConsole.ReadErrorString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Trim().Should().Be("Hello world");
+
+        var stdErr = FakeConsole.ReadErrorString();
         stdErr.Trim().Should().Be("Hello world");
     }
 
     [Fact]
-    public async Task Fake_console_can_read_key_presses()
+    public async Task I_can_run_the_application_with_the_fake_console_implementation_and_simulate_key_presses()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -184,31 +203,14 @@ public class ConsoleSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdOut = FakeConsole.ReadOutputString();
-
         // Assert
         exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
         stdOut.Trim().Should().ConsistOfLines(
             "D0",
             "A",
             "Backspace"
         );
-    }
-
-    [Fact]
-    public void Console_does_not_emit_preamble_when_used_with_encoding_that_has_it()
-    {
-        // Arrange
-        using var buffer = new MemoryStream();
-        using var consoleWriter = new ConsoleWriter(FakeConsole, buffer, Encoding.UTF8);
-
-        // Act
-        consoleWriter.Write("Hello world");
-        consoleWriter.Flush();
-
-        var output = consoleWriter.Encoding.GetString(buffer.ToArray());
-
-        // Assert
-        output.Should().Be("Hello world");
     }
 }

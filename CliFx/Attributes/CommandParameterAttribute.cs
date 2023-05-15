@@ -11,8 +11,7 @@ public sealed class CommandParameterAttribute : Attribute
 {
     /// <summary>
     /// Parameter order.
-    /// Higher order means the parameter appears later, lower order means
-    /// it appears earlier.
+    /// Higher order means the parameter appears later, lower order means it appears earlier.
     /// </summary>
     /// <remarks>
     /// All parameters in a command must have unique order.

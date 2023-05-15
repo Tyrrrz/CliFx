@@ -18,7 +18,7 @@ public class ParameterMustBeInsideCommandAnalyzerSpecs
             public class MyClass
             {
                 [CommandParameter(0)]
-                public string Foo { get; set; }
+                public required string Foo { get; init; }
             }
             """;
 
@@ -37,8 +37,8 @@ public class ParameterMustBeInsideCommandAnalyzerSpecs
             public class MyCommand : ICommand
             {
                 [CommandParameter(0)]
-                public string Foo { get; set; }
-            
+                public required string Foo { get; init; }
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;
@@ -57,7 +57,7 @@ public class ParameterMustBeInsideCommandAnalyzerSpecs
             public abstract class MyCommand
             {
                 [CommandParameter(0)]
-                public string Foo { get; set; }
+                public required string Foo { get; init; }
             }
             """;
 
@@ -75,8 +75,8 @@ public class ParameterMustBeInsideCommandAnalyzerSpecs
             [Command]
             public class MyCommand : ICommand
             {
-                public string Foo { get; set; }
-            
+                public string? Foo { get; init; }
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;

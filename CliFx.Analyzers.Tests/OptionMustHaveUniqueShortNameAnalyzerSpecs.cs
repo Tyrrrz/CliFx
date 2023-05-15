@@ -19,10 +19,10 @@ public class OptionMustHaveUniqueShortNameAnalyzerSpecs
             public class MyCommand : ICommand
             {
                 [CommandOption('f')]
-                public string Foo { get; set; }
+                public string? Foo { get; init; }
             
                 [CommandOption('f')]
-                public string Bar { get; set; }
+                public string? Bar { get; init; }
             
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -43,10 +43,10 @@ public class OptionMustHaveUniqueShortNameAnalyzerSpecs
             public class MyCommand : ICommand
             {
                 [CommandOption('f')]
-                public string Foo { get; set; }
+                public string? Foo { get; init; }
             
                 [CommandOption('b')]
-                public string Bar { get; set; }
+                public string? Bar { get; init; }
             
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -67,10 +67,10 @@ public class OptionMustHaveUniqueShortNameAnalyzerSpecs
             public class MyCommand : ICommand
             {
                 [CommandOption('f')]
-                public string Foo { get; set; }
+                public string? Foo { get; init; }
             
                 [CommandOption('F')]
-                public string Bar { get; set; }
+                public string? Bar { get; init; }
             
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -91,7 +91,7 @@ public class OptionMustHaveUniqueShortNameAnalyzerSpecs
             public class MyCommand : ICommand
             {
                 [CommandOption("foo")]
-                public string Foo { get; set; }
+                public string? Foo { get; init; }
             
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -111,7 +111,7 @@ public class OptionMustHaveUniqueShortNameAnalyzerSpecs
             [Command]
             public class MyCommand : ICommand
             {
-                public string Foo { get; set; }
+                public string? Foo { get; init; }
             
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }

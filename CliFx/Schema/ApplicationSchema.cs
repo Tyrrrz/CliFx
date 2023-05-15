@@ -22,7 +22,7 @@ internal partial class ApplicationSchema
     public CommandSchema? TryFindDefaultCommand() =>
         Commands.FirstOrDefault(c => c.IsDefault);
 
-    public CommandSchema? TryFindCommand(string? commandName) =>
+    public CommandSchema? TryFindCommand(string commandName) =>
         Commands.FirstOrDefault(c => c.MatchesName(commandName));
 
     private IReadOnlyList<CommandSchema> GetDescendantCommands(

@@ -413,7 +413,6 @@ internal class HelpConsoleFormatter : ConsoleFormatter
                 Write(ConsoleColor.White, "Subcommands: ");
 
                 var isFirst = true;
-
                 foreach (var grandChildCommandSchema in grandChildCommandSchemas)
                 {
                     if (isFirst)

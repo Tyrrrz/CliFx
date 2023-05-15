@@ -8,10 +8,8 @@ namespace CliFx.Infrastructure;
 /// <summary>
 /// Implementation of <see cref="IConsole" /> that uses the provided fake
 /// standard input, output, and error streams.
+/// Use this implementation in tests to verify command interactions with the console.
 /// </summary>
-/// <remarks>
-/// Use this implementation in tests to verify how a command interacts with the console.
-/// </remarks>
 public class FakeConsole : IConsole, IDisposable
 {
     private readonly CancellationTokenSource _cancellationTokenSource = new();

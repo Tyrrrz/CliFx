@@ -16,7 +16,7 @@ public class ApplicationSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Application_can_be_created_with_minimal_configuration()
+    public async Task I_can_create_an_application_with_the_default_configuration()
     {
         // Act
         var app = new CliApplicationBuilder()
@@ -34,7 +34,7 @@ public class ApplicationSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Application_can_be_created_with_a_fully_customized_configuration()
+    public async Task I_can_create_an_application_with_a_custom_configuration()
     {
         // Act
         var app = new CliApplicationBuilder()
@@ -63,7 +63,7 @@ public class ApplicationSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task Application_configuration_fails_if_an_invalid_command_is_registered()
+    public async Task I_can_try_to_add_an_invalid_command_to_the_application_and_get_an_error()
     {
         // Act
         var app = new CliApplicationBuilder()
@@ -76,10 +76,10 @@ public class ApplicationSpecs : SpecsBase
             new Dictionary<string, string>()
         );
 
-        var stdErr = FakeConsole.ReadErrorString();
-
         // Assert
         exitCode.Should().NotBe(0);
+
+        var stdErr = FakeConsole.ReadErrorString();
         stdErr.Should().Contain("not a valid command");
     }
 }
