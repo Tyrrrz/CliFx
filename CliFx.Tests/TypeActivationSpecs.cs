@@ -210,7 +210,7 @@ public class TypeActivationSpecs : SpecsBase
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
             .UseConsole(FakeConsole)
-            .UseTypeActivator(_ => null!)
+            .UseTypeActivator((Type _) => null!)
             .Build();
 
         // Act
