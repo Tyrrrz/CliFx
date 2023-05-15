@@ -156,14 +156,23 @@ public class TypeActivationSpecs : SpecsBase
             """
         );
 
-        var serviceProvider = new ServiceCollection()
-            .AddSingleton(commandType, Activator.CreateInstance(commandType, "Hello world")!)
-            .BuildServiceProvider();
-
         var application = new CliApplicationBuilder()
             .AddCommand(commandType)
             .UseConsole(FakeConsole)
-            .UseTypeActivator(serviceProvider)
+            .UseTypeActivator(commandTypes =>
+            {
+                var services = new ServiceCollection();
+
+                foreach (var serviceType in commandTypes)
+                {
+                    services.AddSingleton(
+                        serviceType,
+                        Activator.CreateInstance(serviceType, "Hello world")!
+                    );
+                }
+
+                return services.BuildServiceProvider();
+            })
             .Build();
 
         // Act

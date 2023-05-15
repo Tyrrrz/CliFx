@@ -33,7 +33,6 @@ public partial class CliApplicationBuilder
     public CliApplicationBuilder AddCommand(Type commandType)
     {
         _commandTypes.Add(commandType);
-
         return this;
     }
 
@@ -112,7 +111,7 @@ public partial class CliApplicationBuilder
     }
 
     /// <summary>
-    /// Sets application title, which is shown in the help text.
+    /// Sets the application title, which is shown in the help text.
     /// </summary>
     /// <remarks>
     /// By default, application title is inferred from the assembly name.
@@ -124,11 +123,10 @@ public partial class CliApplicationBuilder
     }
 
     /// <summary>
-    /// Sets application executable name, which is shown in the help text.
+    /// Sets the application executable name, which is shown in the help text.
     /// </summary>
     /// <remarks>
     /// By default, application executable name is inferred from the assembly file name.
-    /// The file name is also prefixed with `dotnet` if it's a DLL file.
     /// </remarks>
     public CliApplicationBuilder SetExecutableName(string executableName)
     {
@@ -137,8 +135,7 @@ public partial class CliApplicationBuilder
     }
 
     /// <summary>
-    /// Sets application version, which is shown in the help text or
-    /// when the user specifies the version option.
+    /// Sets the application version, which is shown in the help text or when the user specifies the version option.
     /// </summary>
     /// <remarks>
     /// By default, application version is inferred from the assembly version.
@@ -150,7 +147,7 @@ public partial class CliApplicationBuilder
     }
 
     /// <summary>
-    /// Sets application description, which is shown in the help text.
+    /// Sets the application description, which is shown in the help text.
     /// </summary>
     public CliApplicationBuilder SetDescription(string? description)
     {
@@ -177,16 +174,24 @@ public partial class CliApplicationBuilder
     }
 
     /// <summary>
-    /// Configures the application to use the specified function for activating types.
+    /// Configures the application to use the specified delegate for activating types.
     /// </summary>
-    public CliApplicationBuilder UseTypeActivator(Func<Type, object> typeActivator) =>
-        UseTypeActivator(new DelegateTypeActivator(typeActivator));
+    public CliApplicationBuilder UseTypeActivator(Func<Type, object> createInstance) =>
+        UseTypeActivator(new DelegateTypeActivator(createInstance));
 
     /// <summary>
     /// Configures the application to use the specified service provider for activating types.
     /// </summary>
     public CliApplicationBuilder UseTypeActivator(IServiceProvider serviceProvider) =>
         UseTypeActivator(serviceProvider.GetService);
+
+    /// <summary>
+    /// Configures the application to use the specified service provider for activating types.
+    /// This method takes a delegate that receives the list of all added command types, so that you can
+    /// easily register them with the service provider.
+    /// </summary>
+    public CliApplicationBuilder UseTypeActivator(Func<IReadOnlyList<Type>, IServiceProvider> getServiceProvider) =>
+        UseTypeActivator(getServiceProvider(_commandTypes.ToArray()));
 
     /// <summary>
     /// Creates a configured instance of <see cref="CliApplication" />.
@@ -221,45 +226,56 @@ public partial class CliApplicationBuilder
     {
         var entryAssemblyName = EnvironmentEx.EntryAssembly?.GetName().Name;
         if (string.IsNullOrWhiteSpace(entryAssemblyName))
-            return "App";
+        {
+            throw new InvalidOperationException(
+                "Failed to infer the default application title. " +
+                $"Please specify it explicitly using {nameof(SetTitle)}()."
+            );
+        }
 
         return entryAssemblyName;
     }
 
     private static string GetDefaultExecutableName()
     {
-        var entryAssemblyLocation = EnvironmentEx.EntryAssembly?.Location;
-        if (string.IsNullOrWhiteSpace(entryAssemblyLocation))
-            return "app";
+        var entryAssemblyFilePath = EnvironmentEx.EntryAssembly?.Location;
+        var processFilePath = EnvironmentEx.ProcessPath;
 
-        // If the application was launched via matching EXE apphost, use that as the executable name
-        var isLaunchedViaAppHost = string.Equals(
-            EnvironmentEx.ProcessPath,
-            Path.ChangeExtension(entryAssemblyLocation, ".exe"),
-            StringComparison.OrdinalIgnoreCase
-        );
+        if (string.IsNullOrWhiteSpace(entryAssemblyFilePath) || string.IsNullOrWhiteSpace(processFilePath))
+        {
+            throw new InvalidOperationException(
+                "Failed to infer the default application executable name. " +
+                $"Please specify it explicitly using {nameof(SetExecutableName)}()."
+            );
+        }
 
-        if (isLaunchedViaAppHost)
-            return Path.GetFileNameWithoutExtension(entryAssemblyLocation);
+        // If the process path matches the entry assembly path, it's a legacy .NET Framework app
+        // or a self-contained .NET Core app.
+        if (PathEx.AreEqual(entryAssemblyFilePath, processFilePath))
+            return Path.GetFileNameWithoutExtension(entryAssemblyFilePath);
 
-        // Otherwise, use the entry assembly as the executable name.
-        // Prefix it with `dotnet` if it's a DLL file.
-        var isDll = string.Equals(
-            Path.GetExtension(entryAssemblyLocation),
-            ".dll",
-            StringComparison.OrdinalIgnoreCase
-        );
+        // If the process path has the same name and parent directory as the entry assembly path,
+        // but different extension, it's a framework-dependent .NET Core app launched through the apphost.
+        if (PathEx.AreEqual(Path.ChangeExtension(entryAssemblyFilePath, ".exe"), processFilePath) ||
+            PathEx.AreEqual(Path.ChangeExtension(entryAssemblyFilePath, ""), processFilePath))
+        {
+            return Path.GetFileNameWithoutExtension(entryAssemblyFilePath);
+        }
 
-        return isDll
-            ? "dotnet " + Path.GetFileName(entryAssemblyLocation)
-            : Path.GetFileNameWithoutExtension(entryAssemblyLocation);
+        // Otherwise, it's a framework-dependent .NET Core app launched through the .NET CLI
+        return "dotnet " + Path.GetFileName(entryAssemblyFilePath);
     }
 
     private static string GetDefaultVersionText()
     {
         var entryAssemblyVersion = EnvironmentEx.EntryAssembly?.GetName().Version;
         if (entryAssemblyVersion is null)
-            return "v1.0";
+        {
+            throw new InvalidOperationException(
+                "Failed to infer the default application version. " +
+                $"Please specify it explicitly using {nameof(SetVersion)}()."
+            );
+        }
 
         return "v" + entryAssemblyVersion.ToSemanticString();
     }

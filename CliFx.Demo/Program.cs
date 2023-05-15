@@ -1,25 +1,21 @@
 ﻿using CliFx;
-using CliFx.Demo.Commands;
 using CliFx.Demo.Domain;
 using Microsoft.Extensions.DependencyInjection;
-
-// We use Microsoft.Extensions.DependencyInjection for injecting dependencies in commands
-var services = new ServiceCollection();
-
-// Register services
-services.AddSingleton<LibraryProvider>();
-
-// Register commands
-services.AddTransient<BookCommand>();
-services.AddTransient<BookAddCommand>();
-services.AddTransient<BookRemoveCommand>();
-services.AddTransient<BookListCommand>();
-
-var serviceProvider = services.BuildServiceProvider();
 
 return await new CliApplicationBuilder()
     .SetDescription("Demo application showcasing CliFx features.")
     .AddCommandsFromThisAssembly()
-    .UseTypeActivator(serviceProvider.GetRequiredService)
+    .UseTypeActivator(commandTypes =>
+    {
+        // We use Microsoft.Extensions.DependencyInjection for injecting dependencies in commands
+        var services = new ServiceCollection();
+        services.AddSingleton<LibraryProvider>();
+
+        // Register all commands as transient services
+        foreach (var commandType in commandTypes)
+            services.AddTransient(commandType);
+
+        return services.BuildServiceProvider();
+    })
     .Build()
     .RunAsync();

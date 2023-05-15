@@ -531,24 +531,24 @@ The following example shows how to configure your application to use [`Microsoft
 ```csharp
 public static class Program
 {
-    public static async Task<int> Main()
-    {
-        var services = new ServiceCollection();
-
-        // Register services
-        services.AddSingleton<MyService>();
-
-        // Register commands
-        services.AddTransient<MyCommand>();
-
-        var serviceProvider = services.BuildServiceProvider();
-
-        return await new CliApplicationBuilder()
+    public static async Task<int> Main() =>
+        await new CliApplicationBuilder()
             .AddCommandsFromThisAssembly()
-            .UseTypeActivator(serviceProvider)
+            .UseTypeActivator(commandTypes =>
+            {
+                var services = new ServiceCollection();
+
+                // Register services
+                services.AddSingleton<MyService>();
+
+                // Register commands
+                foreach (var commandType in commandTypes)
+                    services.AddTransient(commandType);
+
+                return services.BuildServiceProvider();
+            })
             .Build()
             .RunAsync();
-    }
 }
 ```
 

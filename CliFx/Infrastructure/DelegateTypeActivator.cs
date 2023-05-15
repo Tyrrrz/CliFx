@@ -4,22 +4,22 @@ using CliFx.Exceptions;
 namespace CliFx.Infrastructure;
 
 /// <summary>
-/// Implementation of <see cref="ITypeActivator" /> that instantiates an object
-/// by using a predefined function.
+/// Implementation of <see cref="ITypeActivator" /> that instantiates an object by using a predefined delegate.
 /// </summary>
 public class DelegateTypeActivator : ITypeActivator
 {
-    private readonly Func<Type, object> _func;
+    private readonly Func<Type, object> _createInstance;
 
     /// <summary>
     /// Initializes an instance of <see cref="DelegateTypeActivator" />.
     /// </summary>
-    public DelegateTypeActivator(Func<Type, object> func) => _func = func;
+    public DelegateTypeActivator(Func<Type, object> createInstance) =>
+        _createInstance = createInstance;
 
     /// <inheritdoc />
     public object CreateInstance(Type type)
     {
-        var instance = _func(type);
+        var instance = _createInstance(type);
 
         if (instance is null)
         {
