@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using CliFx.Tests.Utils;
+using CliFx.Tests.Utils.Extensions;
 using CliWrap;
 using FluentAssertions;
 using Xunit;
@@ -22,16 +23,29 @@ public class CancellationSpecs : SpecsBase
     public async Task I_can_configure_the_command_to_listen_to_the_interrupt_signal()
     {
         // Arrange
+        using var cts = new CancellationTokenSource();
+
+        // We need to send the cancellation request right after the process has registered
+        // a handler for the interrupt signal, otherwise the default handler will trigger
+        // and just kill the process.
+        void HandleStdOut(string line)
+        {
+            if (string.Equals(line, "Started.", StringComparison.OrdinalIgnoreCase))
+                cts.CancelAfter(TimeSpan.FromSeconds(0.2));
+        }
+
         var stdOutBuffer = new StringBuilder();
+
+        var pipeTarget = PipeTarget.Merge(
+            PipeTarget.ToDelegate(HandleStdOut),
+            PipeTarget.ToStringBuilder(stdOutBuffer)
+        );
 
         var command = Cli.Wrap("dotnet")
             .WithArguments(a => a
                 .Add(Dummy.Program.Location)
                 .Add("cancel-test")
-            ) | stdOutBuffer;
-
-        using var cts = new CancellationTokenSource();
-        cts.CancelAfter(TimeSpan.FromSeconds(0.2));
+            ) | pipeTarget;
 
         // Act & assert
         await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
@@ -43,7 +57,10 @@ public class CancellationSpecs : SpecsBase
             )
         );
 
-        stdOutBuffer.ToString().Trim().Should().Be("Cancelled");
+        stdOutBuffer.ToString().Trim().Should().ConsistOfLines(
+            "Started.",
+            "Cancelled."
+        );
     }
 
     [Fact]
@@ -60,16 +77,18 @@ public class CancellationSpecs : SpecsBase
                 {
                     try
                     {
+                        console.Output.WriteLine("Started.");
+
                         await Task.Delay(
                             TimeSpan.FromSeconds(3),
                             console.RegisterCancellationHandler()
                         );
 
-                        console.Output.WriteLine("Completed successfully");
+                        console.Output.WriteLine("Completed.");
                     }
                     catch (OperationCanceledException)
                     {
-                        console.Output.WriteLine("Cancelled");
+                        console.Output.WriteLine("Cancelled.");
                         throw;
                     }
                 }
@@ -94,6 +113,9 @@ public class CancellationSpecs : SpecsBase
         exitCode.Should().NotBe(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Trim().Should().Be("Cancelled");
+        stdOut.Trim().Should().ConsistOfLines(
+            "Started.",
+            "Cancelled."
+        );
     }
 }

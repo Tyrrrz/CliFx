@@ -12,16 +12,18 @@ public class CancellationTestCommand : ICommand
     {
         try
         {
+            console.Output.WriteLine("Started.");
+
             await Task.Delay(
                 TimeSpan.FromSeconds(3),
                 console.RegisterCancellationHandler()
             );
 
-            console.Output.WriteLine("Completed successfully");
+            console.Output.WriteLine("Completed.");
         }
         catch (OperationCanceledException)
         {
-            console.Output.WriteLine("Cancelled");
+            console.Output.WriteLine("Cancelled.");
             throw;
         }
     }
