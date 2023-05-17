@@ -799,7 +799,7 @@ public class ConversionSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task I_can_try_to_bind_a_parameter_or_an_option_to_a_property_of_an_unsupported_type_and_get_an_error()
+    public async Task I_cannot_bind_a_parameter_or_an_option_to_a_property_of_an_unsupported_type()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -839,7 +839,7 @@ public class ConversionSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task I_can_try_to_bind_a_parameter_or_an_option_to_a_non_scalar_property_of_an_unsupported_type_and_get_an_error()
+    public async Task I_cannot_bind_a_parameter_or_an_option_to_a_non_scalar_property_of_an_unsupported_type()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
