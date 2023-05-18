@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.3.4 (18-May-2023)
+
+- Added an overload of `CliApplicationBuilder.UseTypeActivator(...)` that accepts a `Func<IReadOnlyList<Type>, IServiceProvider>` delegate. The first parameter in the delegate is the list of all command types registered in the application. You can use this overload to more easily add the commands to a DI container. See the readme for an [updated example](https://github.com/Tyrrrz/CliFx/tree/2.3.4#type-activation).
+
 ## v2.3.3 (28-Apr-2023)
 
 - Fixed an issue where the analyzers failed to load in some projects, due to targeting a Roslyn version that was too high.
