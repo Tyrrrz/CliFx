@@ -6,7 +6,7 @@ using CliFx.Infrastructure;
 
 namespace CliFx.Demo.Commands;
 
-[Command("book list", Description = "List all books in the library.")]
+[Command("book list", Description = "Lists all books in the library.")]
 public class BookListCommand : ICommand
 {
     private readonly LibraryProvider _libraryProvider;

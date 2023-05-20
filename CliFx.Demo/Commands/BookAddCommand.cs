@@ -8,7 +8,7 @@ using CliFx.Infrastructure;
 
 namespace CliFx.Demo.Commands;
 
-[Command("book add", Description = "Add a book to the library.")]
+[Command("book add", Description = "Adds a book to the library.")]
 public partial class BookAddCommand : ICommand
 {
     private readonly LibraryProvider _libraryProvider;

@@ -7,7 +7,7 @@ using CliFx.Infrastructure;
 
 namespace CliFx.Demo.Commands;
 
-[Command("book", Description = "Retrieve a book from the library.")]
+[Command("book", Description = "Retrieves a book from the library.")]
 public class BookCommand : ICommand
 {
     private readonly LibraryProvider _libraryProvider;

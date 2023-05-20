@@ -6,7 +6,7 @@ using CliFx.Infrastructure;
 
 namespace CliFx.Demo.Commands;
 
-[Command("book remove", Description = "Remove a book from the library.")]
+[Command("book remove", Description = "Removes a book from the library.")]
 public class BookRemoveCommand : ICommand
 {
     private readonly LibraryProvider _libraryProvider;
