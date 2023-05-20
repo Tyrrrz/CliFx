@@ -1,7 +1,5 @@
 ﻿using System;
 using CliFx.Exceptions;
-using CliFx.Extensibility;
-using CliFx.Utils.Extensions;
 
 namespace CliFx.Infrastructure;
 
