@@ -115,7 +115,7 @@ As the only parameter, this method takes an instance of `IConsole`, which is an 
 Use this abstraction in place of `System.Console` whenever you need to write output, read input, or otherwise interact with the console.
 
 In most cases, you will also want to define input bindings, which are properties annotated by the `[CommandParameter]` and `[CommandOption]` attributes.
-These bindings provide a way to map command-line arguments into structured data that can be used by the command.
+These bindings provide a way to map command-line arguments into structured input data that can be used by the command.
 
 The command in the above example serves as a simple logarithm calculator and defines two inputs: a positional parameter for the input value and a named option for the logarithm base.
 In order to execute this command, at minimum, the user needs to provide the input value:
@@ -196,7 +196,7 @@ $ myapp [...directives] [command] [...parameters] [...options]
 ### Parameters and options
 
 **CliFx** supports two types of argument bindings: **parameters** and **options**.
-Parameters are bound from arguments based on the order they appear in, while options are bound by their name.
+Parameters are bound from the command-line arguments based on the order they appear in, while options are bound by their name.
 
 Besides that, they also differ in the following ways:
 
@@ -259,8 +259,8 @@ Parameters and options can be bound to properties with the following underlying 
   - Date and time types (`DateTime`, `DateTimeOffset`, `TimeSpan`)
   - Enum types (converted from either name or numeric value)
 - String-initializable types
-  - Types with a constructor accepting `string` (`FileInfo`, `DirectoryInfo`, etc.)
-  - Types with a static `Parse(...)` method accepting `string` and optionally `IFormatProvider` (`Guid`, `Uri`, etc.)
+  - Types with a constructor accepting a `string` (`FileInfo`, `DirectoryInfo`, etc.)
+  - Types with a static `Parse(...)` method accepting a `string` and optionally a `IFormatProvider` (`Guid`, `BigInteger`, etc.)
 - Nullable versions of all above types (`decimal?`, `TimeSpan?`, etc.)
 - Any other type if a custom converter is specified
 - Collections of all above types
@@ -284,7 +284,6 @@ public class FileSizeCalculatorCommand : ICommand
     public ValueTask ExecuteAsync(IConsole console)
     {
         var totalSize = Files.Sum(f => f.Length);
-
         console.Output.WriteLine($"Total file size: {totalSize} bytes");
 
         return default;
@@ -392,10 +391,10 @@ public class SubCommand : ICommand
 }
 ```
 
-Once configured, the user can execute a specific command by pre-pending its name to the passed arguments.
+Once configured, the user can execute a specific command by prepending its name to the passed arguments.
 For example, running `dotnet myapp.dll cmd1 arg1 -p 42` will execute `FirstCommand` in the above example.
 
-Requesting help will show direct subcommands of the current command:
+The user can also find the list of all available top-level commands in the help text:
 
 ```sh
 $ dotnet myapp.dll --help
@@ -417,7 +416,7 @@ COMMANDS
 You can run `dotnet myapp.dll [command] --help` to show help on a specific command.
 ```
 
-The user can also refine their help request by querying it on a specific command:
+To see the list of commands nested under a specific command, the user can refine their help request by specifying the corresponding command name before the help option:
 
 ```sh
 $ dotnet myapp.dll cmd1 --help
@@ -441,8 +440,8 @@ You can run `dotnet myapp.dll cmd1 [command] --help` to show help on a specific 
 
 ### Reporting errors
 
-Commands in **CliFx** do not directly return exit codes, but can instead communicate execution errors by throwing `CommandException`.
-This special exception can be used to print an error message to the console, return a specific exit code, and also optionally show help text for the current command:
+Commands in **CliFx** do not directly return exit codes, but instead communicate execution errors via `CommandException`.
+This special exception type can be used to print an error message to the console, return a specific exit code, and also optionally show help text for the current command:
 
 ```csharp
 [Command]
@@ -481,7 +480,7 @@ $ echo $?
 ```
 
 > **Warning**:
-> Even though exit codes are represented by 32-bit integers in .NET, using values outside 8-bit unsigned range will cause an overflow on Unix systems.
+> Even though exit codes are represented by 32-bit integers in .NET, using values outside the 8-bit unsigned range will cause overflows on Unix systems.
 > To avoid unexpected results, use numbers between 1 and 255 for exit codes that indicate failure.
 
 ### Graceful cancellation
@@ -490,7 +489,7 @@ Console applications support the concept of interrupt signals, which can be issu
 If your command performs critical work, you can intercept these signals to handle cancellation requests in a graceful way.
 
 In order to make the command cancellation-aware, call `console.RegisterCancellationHandler()` to register the signal handler and obtain the corresponding `CancellationToken`.
-Once this method is called, the program will no longer terminate on an interrupt signal but will instead trigger the token, which can be used by the command to delay the termination just enough to exit in a controlled manner.
+Once this method is called, the program will no longer terminate on an interrupt signal but will instead trigger the associated token, which can be used to delay the termination of a command just enough to exit in a controlled manner.
 
 ```csharp
 [Command]
@@ -526,7 +525,26 @@ To facilitate that, it uses an interface called `ITypeActivator` that determines
 The default implementation of `ITypeActivator` only supports types that have public parameterless constructors, which is sufficient for the majority of scenarios.
 However, in some cases you may also want to define a custom initializer, for example when integrating with an external dependency container.
 
-The following example shows how to configure your application to use [`Microsoft.Extensions.DependencyInjection`](https://nuget.org/packages/Microsoft.Extensions.DependencyInjection) as the type activator in **CliFx**:
+To do that, pass a custom `ITypeActivator` or a factory delegate to the `UseTypeActivator(...)` method when building the application:
+
+```csharp
+public static class Program
+{
+    public static async Task<int> Main() =>
+        await new CliApplicationBuilder()
+            .AddCommandsFromThisAssembly()
+            .UseTypeActivator(type =>
+            {
+                var instance = MyTypeFactory.Create(type);
+                return instance;
+            })
+            .Build()
+            .RunAsync();
+}
+```
+
+This method also supports `IServiceProvider` through various overloads, which allows you to directly integrate dependency containers that implement this interface. 
+For example, this is how to configure your application to use [`Microsoft.Extensions.DependencyInjection`](https://nuget.org/packages/Microsoft.Extensions.DependencyInjection) as the type activator in **CliFx**:
 
 ```csharp
 public static class Program
@@ -580,7 +598,7 @@ public class ConcatCommand : ICommand
 }
 ```
 
-To test it, you can instantiate the command in code with the required values, and then pass an instance of `FakeInMemoryConsole` as parameter to `ExecuteAsync(...)`:
+To test it, you can instantiate the command in code with the required values, and then pass an instance of `FakeInMemoryConsole` to `ExecuteAsync(...)`:
 
 ```csharp
 // Integration test at the command level
@@ -599,9 +617,8 @@ public async Task ConcatCommand_executes_successfully()
     // Act
     await command.ExecuteAsync(console);
 
-    var stdOut = console.ReadOutputString();
-
     // Assert
+    var stdOut = console.ReadOutputString();
     Assert.That(stdOut, Is.EqualTo("foo bar"));
 }
 ```
@@ -632,9 +649,8 @@ public async Task ConcatCommand_executes_successfully()
     // Act
     await app.RunAsync(args, envVars);
 
-    var stdOut = console.ReadOutputString();
-
     // Assert
+    var stdOut = console.ReadOutputString();
     Assert.That(stdOut, Is.EqualTo("foo bar"));
 }
 ```
@@ -642,10 +658,10 @@ public async Task ConcatCommand_executes_successfully()
 ### Debug and preview mode
 
 When troubleshooting issues, you may find it useful to run your app in debug or preview mode.
-To do that, you need to pass the corresponding directive before any other arguments.
+To do that, pass the corresponding directive before any other command-line arguments.
 
 In order to run the application in debug mode, use the `[debug]` directive.
-This will cause the program to launch in a suspended state, waiting for debugger to be attached to the process:
+This will cause the program to launch in a suspended state, waiting for the debugger to attach to the current process:
 
 ```sh
 $ dotnet myapp.dll [debug] cmd -o
