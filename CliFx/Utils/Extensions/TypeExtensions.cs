@@ -29,8 +29,10 @@ internal static class TypeExtensions
             .GetInterfaces()
             .Select(TryGetEnumerableUnderlyingType)
             .Where(t => t is not null)
-            .OrderByDescending(t => t != typeof(object)) // prioritize more specific types
-            .FirstOrDefault();
+            // Every IEnumerable<T> implements IEnumerable (which is essentially IEnumerable<object>),
+            // so we try to get a more specific underlying type. Still, if the type only implements
+            // IEnumerable<object> and nothing else, then we'll just return that.
+            .MaxBy(t => t != typeof(object));
     }
 
     public static MethodInfo? TryGetStaticParseMethod(this Type type, bool withFormatProvider = false)
