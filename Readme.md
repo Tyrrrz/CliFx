@@ -11,6 +11,10 @@
 
 > 🟡 **Project status**: maintenance mode<sup>[[?]](https://github.com/Tyrrrz/.github/blob/master/docs/project-status.md)</sup>
 
+<p align="center">
+    <img src="favicon.png" alt="Icon" />
+</p>
+
 **CliFx** is a simple to use, yet powerful framework for building command-line applications.
 Its primary goal is to completely take over the user input layer, allowing you to forget about infrastructural concerns and instead focus on writing your application.
 
