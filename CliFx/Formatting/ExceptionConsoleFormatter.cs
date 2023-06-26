@@ -3,6 +3,7 @@ using System.IO;
 using CliFx.Exceptions;
 using CliFx.Infrastructure;
 using CliFx.Utils;
+using CliFx.Utils.Extensions;
 
 namespace CliFx.Formatting;
 
@@ -26,10 +27,8 @@ internal class ExceptionConsoleFormatter : ConsoleFormatter
 
         Write('(');
 
-        for (var i = 0; i < stackFrame.Parameters.Count; i++)
+        foreach (var (parameter, i) in stackFrame.Parameters.WithIndex())
         {
-            var parameter = stackFrame.Parameters[i];
-
             // Separator
             if (i > 0)
             {
