@@ -93,7 +93,7 @@ internal partial class CommandSchema
             .Union(type
                 .GetInterfaces()
                 // Only interfaces implementing ICommand for explicitness
-                .Where(i => typeof(ICommand).IsAssignableFrom(i) && i != typeof(ICommand))
+                .Where(i => i != typeof(ICommand) && i.IsAssignableTo(typeof(ICommand)))
                 .SelectMany(i => i
                     .GetProperties()
                     .Where(p => !p.GetMethod.IsAbstract && !p.SetMethod.IsAbstract)
