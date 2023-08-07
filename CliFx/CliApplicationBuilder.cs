@@ -229,7 +229,7 @@ public partial class CliApplicationBuilder
         {
             throw new InvalidOperationException(
                 "Failed to infer the default application title. " +
-                $"Please specify it explicitly using {nameof(SetTitle)}()."
+                $"Please specify it explicitly using `{nameof(SetTitle)}()`."
             );
         }
 
@@ -245,7 +245,7 @@ public partial class CliApplicationBuilder
         {
             throw new InvalidOperationException(
                 "Failed to infer the default application executable name. " +
-                $"Please specify it explicitly using {nameof(SetExecutableName)}()."
+                $"Please specify it explicitly using `{nameof(SetExecutableName)}()`."
             );
         }
 
@@ -275,7 +275,7 @@ public partial class CliApplicationBuilder
         {
             throw new InvalidOperationException(
                 "Failed to infer the default application version. " +
-                $"Please specify it explicitly using {nameof(SetVersion)}()."
+                $"Please specify it explicitly using `{nameof(SetVersion)}()`."
             );
         }
 
