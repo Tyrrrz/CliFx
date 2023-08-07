@@ -169,11 +169,8 @@ public class EnvironmentSpecs : SpecsBase
         // System.Environment when they are not provided explicitly to CliApplication.
 
         // Arrange
-        var command = Cli.Wrap("dotnet")
-            .WithArguments(a => a
-                .Add(Dummy.Program.Location)
-                .Add("env-test")
-            )
+        var command = Cli.Wrap(Dummy.Program.FilePath)
+            .WithArguments("env-test")
             .WithEnvironmentVariables(e => e
                 .Set("ENV_TARGET", "Mars")
             );

@@ -32,11 +32,9 @@ public class DirectivesSpecs : SpecsBase
                 cts.Cancel();
         }
 
-        var command = Cli.Wrap("dotnet")
-            .WithArguments(a => a
-                .Add(Dummy.Program.Location)
-                .Add("[debug]")
-            ) | HandleStdOut;
+        var command =
+            Cli.Wrap(Dummy.Program.FilePath).WithArguments("[debug]") |
+            HandleStdOut;
 
         // Act & assert
         try

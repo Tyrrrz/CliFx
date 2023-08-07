@@ -41,11 +41,9 @@ public class CancellationSpecs : SpecsBase
             PipeTarget.ToStringBuilder(stdOutBuffer)
         );
 
-        var command = Cli.Wrap("dotnet")
-            .WithArguments(a => a
-                .Add(Dummy.Program.Location)
-                .Add("cancel-test")
-            ) | pipeTarget;
+        var command =
+            Cli.Wrap(Dummy.Program.FilePath).WithArguments("cancel-test") |
+            pipeTarget;
 
         // Act & assert
         await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>

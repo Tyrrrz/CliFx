@@ -27,11 +27,9 @@ public class ConsoleSpecs : SpecsBase
         // Can't verify our own console output, so using an external process for this test
 
         // Arrange
-        var command = "Hello world" | Cli.Wrap("dotnet")
-            .WithArguments(a => a
-                .Add(Dummy.Program.Location)
-                .Add("console-test")
-            );
+        var command =
+            "Hello world" |
+            Cli.Wrap(Dummy.Program.FilePath).WithArguments("console-test");
 
         // Act
         var result = await command.ExecuteBufferedAsync();
