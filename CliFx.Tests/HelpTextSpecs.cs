@@ -43,7 +43,7 @@ public class HelpTextSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class DefaultCommand : ICommand
@@ -77,7 +77,7 @@ public class HelpTextSpecs : SpecsBase
     {
         // Arrange
         var commandTypes = DynamicCommandBuilder.CompileMany(
-            // language=cs
+            // lang=csharp
             """
             [Command("cmd")]
             public class NamedCommand : ICommand
@@ -117,7 +117,7 @@ public class HelpTextSpecs : SpecsBase
     {
         // Arrange
         var commandTypes = DynamicCommandBuilder.CompileMany(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class DefaultCommand : ICommand
@@ -162,7 +162,7 @@ public class HelpTextSpecs : SpecsBase
     {
         // Arrange
         var commandTypes = DynamicCommandBuilder.CompileMany(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class DefaultCommand : ICommand
@@ -261,7 +261,7 @@ public class HelpTextSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command(Description = "Description of the default command.")]
             public class DefaultCommand : ICommand
@@ -297,7 +297,7 @@ public class HelpTextSpecs : SpecsBase
     {
         // Arrange
         var commandTypes = DynamicCommandBuilder.CompileMany(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class DefaultCommand : ICommand
@@ -339,7 +339,7 @@ public class HelpTextSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -385,7 +385,7 @@ public class HelpTextSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             // Base members appear last in reflection order
             public abstract class CommandBase : ICommand
@@ -436,7 +436,7 @@ public class HelpTextSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -481,7 +481,7 @@ public class HelpTextSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -525,7 +525,7 @@ public class HelpTextSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -562,7 +562,7 @@ public class HelpTextSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command("cmd")]
             public class Command : ICommand
@@ -603,7 +603,7 @@ public class HelpTextSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             public enum CustomEnum { One, Two, Three }
 
@@ -649,7 +649,7 @@ public class HelpTextSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             public enum CustomEnum { One, Two, Three }
 
@@ -695,7 +695,7 @@ public class HelpTextSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             public enum CustomEnum { One, Two, Three }
 
@@ -741,7 +741,7 @@ public class HelpTextSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             public enum CustomEnum { One, Two, Three }
 
@@ -786,7 +786,7 @@ public class HelpTextSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             public enum CustomEnum { One, Two, Three }
 
@@ -857,7 +857,7 @@ public class HelpTextSpecs : SpecsBase
     {
         // Arrange
         var commandTypes = DynamicCommandBuilder.CompileMany(
-            // language=cs
+            // lang=csharp
             """
             [Command("cmd1", Description = "Description of one command.")]
             public class FirstCommand : ICommand
@@ -922,7 +922,7 @@ public class HelpTextSpecs : SpecsBase
     {
         // Arrange
         var commandTypes = DynamicCommandBuilder.CompileMany(
-            // language=cs
+            // lang=csharp
             """
             [Command("cmd1")]
             public class FirstCommand : ICommand

@@ -22,7 +22,7 @@ public class TypeActivationSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -60,7 +60,7 @@ public class TypeActivationSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -96,7 +96,7 @@ public class TypeActivationSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -138,7 +138,7 @@ public class TypeActivationSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -193,7 +193,7 @@ public class TypeActivationSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand

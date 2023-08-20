@@ -12,7 +12,7 @@ public class OptionMustBeRequiredIfPropertyRequiredAnalyzerSpecs
     public void Analyzer_reports_an_error_if_a_non_required_option_is_bound_to_a_required_property()
     {
         // Arrange
-        // language=cs
+        // lang=csharp
         const string code =
             """
             [Command]
@@ -33,7 +33,7 @@ public class OptionMustBeRequiredIfPropertyRequiredAnalyzerSpecs
     public void Analyzer_does_not_report_an_error_if_a_required_option_is_bound_to_a_required_property()
     {
         // Arrange
-        // language=cs
+        // lang=csharp
         const string code =
             """
             [Command]
@@ -54,7 +54,7 @@ public class OptionMustBeRequiredIfPropertyRequiredAnalyzerSpecs
     public void Analyzer_does_not_report_an_error_if_a_non_required_option_is_bound_to_a_non_required_property()
     {
         // Arrange
-        // language=cs
+        // lang=csharp
         const string code =
             """
             [Command]
@@ -75,7 +75,7 @@ public class OptionMustBeRequiredIfPropertyRequiredAnalyzerSpecs
     public void Analyzer_does_not_report_an_error_if_a_required_option_is_bound_to_a_non_required_property()
     {
         // Arrange
-        // language=cs
+        // lang=csharp
         const string code =
             """
             [Command]
@@ -96,7 +96,7 @@ public class OptionMustBeRequiredIfPropertyRequiredAnalyzerSpecs
     public void Analyzer_does_not_report_an_error_on_a_property_that_is_not_an_option()
     {
         // Arrange
-        // language=cs
+        // lang=csharp
         const string code =
             """
             [Command]

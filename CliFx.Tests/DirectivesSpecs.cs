@@ -52,7 +52,7 @@ public class DirectivesSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command("cmd")]
             public class Command : ICommand

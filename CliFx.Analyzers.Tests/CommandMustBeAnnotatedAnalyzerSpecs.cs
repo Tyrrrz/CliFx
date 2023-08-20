@@ -12,7 +12,7 @@ public class CommandMustBeAnnotatedAnalyzerSpecs
     public void Analyzer_reports_an_error_if_a_command_is_not_annotated_with_the_command_attribute()
     {
         // Arrange
-        // language=cs
+        // lang=csharp
         const string code =
             """
             public class MyCommand : ICommand
@@ -29,7 +29,7 @@ public class CommandMustBeAnnotatedAnalyzerSpecs
     public void Analyzer_does_not_report_an_error_if_a_command_is_annotated_with_the_command_attribute()
     {
         // Arrange
-        // language=cs
+        // lang=csharp
         const string code =
             """
             [Command]
@@ -47,7 +47,7 @@ public class CommandMustBeAnnotatedAnalyzerSpecs
     public void Analyzer_does_not_report_an_error_if_a_command_is_implemented_as_an_abstract_class()
     {
         // Arrange
-        // language=cs
+        // lang=csharp
         const string code =
             """
             public abstract class MyCommand : ICommand
@@ -64,7 +64,7 @@ public class CommandMustBeAnnotatedAnalyzerSpecs
     public void Analyzer_does_not_report_an_error_on_a_class_that_is_not_a_command()
     {
         // Arrange
-        // language=cs
+        // lang=csharp
         const string code =
             """
             public class Foo

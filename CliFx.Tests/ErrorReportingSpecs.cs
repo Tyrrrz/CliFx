@@ -21,7 +21,7 @@ public class ErrorReportingSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -61,7 +61,7 @@ public class ErrorReportingSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -102,7 +102,7 @@ public class ErrorReportingSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -139,7 +139,7 @@ public class ErrorReportingSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -179,7 +179,7 @@ public class ErrorReportingSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand

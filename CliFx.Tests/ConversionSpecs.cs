@@ -20,7 +20,7 @@ public class ConversionSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -60,7 +60,7 @@ public class ConversionSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -100,7 +100,7 @@ public class ConversionSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -158,7 +158,7 @@ public class ConversionSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -198,7 +198,7 @@ public class ConversionSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -238,7 +238,7 @@ public class ConversionSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -278,7 +278,7 @@ public class ConversionSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -318,7 +318,7 @@ public class ConversionSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             public enum CustomEnum { One = 1, Two = 2, Three = 3 }
 
@@ -360,7 +360,7 @@ public class ConversionSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -408,7 +408,7 @@ public class ConversionSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             public enum CustomEnum { One = 1, Two = 2, Three = 3 }
 
@@ -458,7 +458,7 @@ public class ConversionSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             public class CustomType
             {
@@ -505,7 +505,7 @@ public class ConversionSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             public class CustomTypeA
             {
@@ -573,7 +573,7 @@ public class ConversionSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             public class CustomConverter : BindingConverter<int>
             {
@@ -619,7 +619,7 @@ public class ConversionSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -665,7 +665,7 @@ public class ConversionSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -711,7 +711,7 @@ public class ConversionSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -757,7 +757,7 @@ public class ConversionSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -803,7 +803,7 @@ public class ConversionSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             public class CustomType
             {
@@ -843,7 +843,7 @@ public class ConversionSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             public class CustomType : IEnumerable<object>
             {
@@ -886,7 +886,7 @@ public class ConversionSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -922,7 +922,7 @@ public class ConversionSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             public class ValidatorA : BindingValidator<int>
             {
@@ -968,7 +968,7 @@ public class ConversionSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             public class CustomType
             {

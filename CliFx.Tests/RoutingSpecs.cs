@@ -20,7 +20,7 @@ public class RoutingSpecs : SpecsBase
     {
         // Arrange
         var commandTypes = DynamicCommandBuilder.CompileMany(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class DefaultCommand : ICommand
@@ -77,7 +77,7 @@ public class RoutingSpecs : SpecsBase
     {
         // Arrange
         var commandTypes = DynamicCommandBuilder.CompileMany(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class DefaultCommand : ICommand
@@ -134,7 +134,7 @@ public class RoutingSpecs : SpecsBase
     {
         // Arrange
         var commandTypes = DynamicCommandBuilder.CompileMany(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class DefaultCommand : ICommand

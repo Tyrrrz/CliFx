@@ -12,7 +12,7 @@ public class ParameterMustBeSingleIfNonScalarAnalyzerSpecs
     public void Analyzer_reports_an_error_if_more_than_one_non_scalar_parameters_are_defined()
     {
         // Arrange
-        // language=cs
+        // lang=csharp
         const string code =
             """
             [Command]
@@ -36,7 +36,7 @@ public class ParameterMustBeSingleIfNonScalarAnalyzerSpecs
     public void Analyzer_does_not_report_an_error_if_only_one_non_scalar_parameter_is_defined()
     {
         // Arrange
-        // language=cs
+        // lang=csharp
         const string code =
             """
             [Command]
@@ -60,7 +60,7 @@ public class ParameterMustBeSingleIfNonScalarAnalyzerSpecs
     public void Analyzer_does_not_report_an_error_if_no_non_scalar_parameters_are_defined()
     {
         // Arrange
-        // language=cs
+        // lang=csharp
         const string code =
             """
             [Command]
@@ -84,7 +84,7 @@ public class ParameterMustBeSingleIfNonScalarAnalyzerSpecs
     public void Analyzer_does_not_report_an_error_on_a_property_that_is_not_a_parameter()
     {
         // Arrange
-        // language=cs
+        // lang=csharp
         const string code =
             """
             [Command]

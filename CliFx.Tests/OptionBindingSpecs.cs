@@ -21,7 +21,7 @@ public class OptionBindingSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -61,7 +61,7 @@ public class OptionBindingSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -101,7 +101,7 @@ public class OptionBindingSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -153,7 +153,7 @@ public class OptionBindingSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -205,7 +205,7 @@ public class OptionBindingSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -253,7 +253,7 @@ public class OptionBindingSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -299,7 +299,7 @@ public class OptionBindingSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -345,7 +345,7 @@ public class OptionBindingSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -396,7 +396,7 @@ public class OptionBindingSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -447,7 +447,7 @@ public class OptionBindingSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -498,7 +498,7 @@ public class OptionBindingSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -546,7 +546,7 @@ public class OptionBindingSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             public static class SharedContext
             {
@@ -629,7 +629,7 @@ public class OptionBindingSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -669,7 +669,7 @@ public class OptionBindingSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -705,7 +705,7 @@ public class OptionBindingSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -741,7 +741,7 @@ public class OptionBindingSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -777,7 +777,7 @@ public class OptionBindingSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand
@@ -817,7 +817,7 @@ public class OptionBindingSpecs : SpecsBase
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
-            // language=cs
+            // lang=csharp
             """
             [Command]
             public class Command : ICommand

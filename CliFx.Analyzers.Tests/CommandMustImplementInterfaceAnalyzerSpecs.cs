@@ -12,7 +12,7 @@ public class CommandMustImplementInterfaceAnalyzerSpecs
     public void Analyzer_reports_an_error_if_a_command_does_not_implement_ICommand_interface()
     {
         // Arrange
-        // language=cs
+        // lang=csharp
         const string code =
             """
             [Command]
@@ -30,7 +30,7 @@ public class CommandMustImplementInterfaceAnalyzerSpecs
     public void Analyzer_does_not_report_an_error_if_a_command_implements_ICommand_interface()
     {
         // Arrange
-        // language=cs
+        // lang=csharp
         const string code =
             """
             [Command]
@@ -48,7 +48,7 @@ public class CommandMustImplementInterfaceAnalyzerSpecs
     public void Analyzer_does_not_report_an_error_on_a_class_that_is_not_a_command()
     {
         // Arrange
-        // language=cs
+        // lang=csharp
         const string code =
             """
             public class Foo

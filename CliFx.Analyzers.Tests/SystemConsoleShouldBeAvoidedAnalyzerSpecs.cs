@@ -12,7 +12,7 @@ public class SystemConsoleShouldBeAvoidedAnalyzerSpecs
     public void Analyzer_reports_an_error_if_a_command_calls_a_method_on_SystemConsole()
     {
         // Arrange
-        // language=cs
+        // lang=csharp
         const string code =
             """
             [Command]
@@ -34,7 +34,7 @@ public class SystemConsoleShouldBeAvoidedAnalyzerSpecs
     public void Analyzer_reports_an_error_if_a_command_accesses_a_property_on_SystemConsole()
     {
         // Arrange
-        // language=cs
+        // lang=csharp
         const string code =
             """
             [Command]
@@ -56,7 +56,7 @@ public class SystemConsoleShouldBeAvoidedAnalyzerSpecs
     public void Analyzer_reports_an_error_if_a_command_calls_a_method_on_a_property_of_SystemConsole()
     {
         // Arrange
-        // language=cs
+        // lang=csharp
         const string code =
             """
             [Command]
@@ -78,7 +78,7 @@ public class SystemConsoleShouldBeAvoidedAnalyzerSpecs
     public void Analyzer_does_not_report_an_error_if_a_command_interacts_with_the_console_through_IConsole()
     {
         // Arrange
-        // language=cs
+        // lang=csharp
         const string code =
             """
             [Command]
@@ -100,7 +100,7 @@ public class SystemConsoleShouldBeAvoidedAnalyzerSpecs
     public void Analyzer_does_not_report_an_error_if_IConsole_is_not_available_in_the_current_method()
     {
         // Arrange
-        // language=cs
+        // lang=csharp
         const string code =
             """
             [Command]
@@ -120,7 +120,7 @@ public class SystemConsoleShouldBeAvoidedAnalyzerSpecs
     public void Analyzer_does_not_report_an_error_if_a_command_does_not_access_SystemConsole()
     {
         // Arrange
-        // language=cs
+        // lang=csharp
         const string code =
             """
             [Command]

@@ -12,7 +12,7 @@ public class OptionMustHaveValidConverterAnalyzerSpecs
     public void Analyzer_reports_an_error_if_an_option_has_a_converter_that_does_not_derive_from_BindingConverter()
     {
         // Arrange
-        // language=cs
+        // lang=csharp
         const string code =
             """
             public class MyConverter
@@ -38,7 +38,7 @@ public class OptionMustHaveValidConverterAnalyzerSpecs
     public void Analyzer_reports_an_error_if_an_option_has_a_converter_that_does_not_derive_from_a_compatible_BindingConverter()
     {
         // Arrange
-        // language=cs
+        // lang=csharp
         const string code =
             """
             public class MyConverter : BindingConverter<int>
@@ -64,7 +64,7 @@ public class OptionMustHaveValidConverterAnalyzerSpecs
     public void Analyzer_does_not_report_an_error_if_an_option_has_a_converter_that_derives_from_a_compatible_BindingConverter()
     {
         // Arrange
-        // language=cs
+        // lang=csharp
         const string code =
             """
             public class MyConverter : BindingConverter<string>
@@ -90,7 +90,7 @@ public class OptionMustHaveValidConverterAnalyzerSpecs
     public void Analyzer_does_not_report_an_error_if_a_nullable_option_has_a_converter_that_derives_from_a_compatible_BindingConverter()
     {
         // Arrange
-        // language=cs
+        // lang=csharp
         const string code =
             """
             public class MyConverter : BindingConverter<int>
@@ -116,7 +116,7 @@ public class OptionMustHaveValidConverterAnalyzerSpecs
     public void Analyzer_does_not_report_an_error_if_a_non_scalar_option_has_a_converter_that_derives_from_a_compatible_BindingConverter()
     {
         // Arrange
-        // language=cs
+        // lang=csharp
         const string code =
             """
             public class MyConverter : BindingConverter<string>
@@ -142,7 +142,7 @@ public class OptionMustHaveValidConverterAnalyzerSpecs
     public void Analyzer_does_not_report_an_error_if_an_option_does_not_have_a_converter()
     {
         // Arrange
-        // language=cs
+        // lang=csharp
         const string code =
             """
             [Command]
@@ -163,7 +163,7 @@ public class OptionMustHaveValidConverterAnalyzerSpecs
     public void Analyzer_does_not_report_an_error_on_a_property_that_is_not_an_option()
     {
         // Arrange
-        // language=cs
+        // lang=csharp
         const string code =
             """
             [Command]
