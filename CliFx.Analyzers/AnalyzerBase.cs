@@ -14,7 +14,8 @@ public abstract class AnalyzerBase : DiagnosticAnalyzer
     protected AnalyzerBase(
         string diagnosticTitle,
         string diagnosticMessage,
-        DiagnosticSeverity diagnosticSeverity = DiagnosticSeverity.Error)
+        DiagnosticSeverity diagnosticSeverity = DiagnosticSeverity.Error
+    )
     {
         SupportedDiagnostic = new DiagnosticDescriptor(
             "CliFx_" + GetType().Name.TrimEnd("Analyzer"),

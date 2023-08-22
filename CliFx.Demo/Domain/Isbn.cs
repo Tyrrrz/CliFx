@@ -2,7 +2,13 @@
 
 namespace CliFx.Demo.Domain;
 
-public partial record Isbn(int EanPrefix, int RegistrationGroup, int Registrant, int Publication, int CheckDigit)
+public partial record Isbn(
+    int EanPrefix,
+    int RegistrationGroup,
+    int Registrant,
+    int Publication,
+    int CheckDigit
+)
 {
     public override string ToString() =>
         $"{EanPrefix:000}-{RegistrationGroup:00}-{Registrant:00000}-{Publication:00}-{CheckDigit:0}";

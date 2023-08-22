@@ -12,15 +12,15 @@ public class OptionMustHaveValidNameAnalyzer : AnalyzerBase
     public OptionMustHaveValidNameAnalyzer()
         : base(
             "Options must have valid names",
-            "This option's name must be at least 2 characters long and must start with a letter. " +
-            "Specified name: `{0}`.")
-    {
-    }
+            "This option's name must be at least 2 characters long and must start with a letter. "
+                + "Specified name: `{0}`."
+        ) { }
 
     private void Analyze(
         SyntaxNodeAnalysisContext context,
         PropertyDeclarationSyntax propertyDeclaration,
-        IPropertySymbol property)
+        IPropertySymbol property
+    )
     {
         var option = CommandOptionSymbol.TryResolve(property);
         if (option is null)
@@ -32,10 +32,7 @@ public class OptionMustHaveValidNameAnalyzer : AnalyzerBase
         if (option.Name.Length < 2 || !char.IsLetter(option.Name[0]))
         {
             context.ReportDiagnostic(
-                CreateDiagnostic(
-                    propertyDeclaration.Identifier.GetLocation(),
-                    option.Name
-                )
+                CreateDiagnostic(propertyDeclaration.Identifier.GetLocation(), option.Name)
             );
         }
     }

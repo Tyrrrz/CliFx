@@ -6,15 +6,15 @@ namespace CliFx.Analyzers.Tests;
 
 public class OptionMustHaveValidValidatorsAnalyzerSpecs
 {
-    private static DiagnosticAnalyzer Analyzer { get; } = new OptionMustHaveValidValidatorsAnalyzer();
+    private static DiagnosticAnalyzer Analyzer { get; } =
+        new OptionMustHaveValidValidatorsAnalyzer();
 
     [Fact]
     public void Analyzer_reports_an_error_if_an_option_has_a_validator_that_does_not_derive_from_BindingValidator()
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             public class MyValidator
             {
                 public void Validate(string value) {}
@@ -39,8 +39,7 @@ public class OptionMustHaveValidValidatorsAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             public class MyValidator : BindingValidator<int>
             {
                 public override BindingValidationError Validate(int value) => Ok();
@@ -65,8 +64,7 @@ public class OptionMustHaveValidValidatorsAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             public class MyValidator : BindingValidator<string>
             {
                 public override BindingValidationError Validate(string value) => Ok();
@@ -91,8 +89,7 @@ public class OptionMustHaveValidValidatorsAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {
@@ -112,8 +109,7 @@ public class OptionMustHaveValidValidatorsAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {

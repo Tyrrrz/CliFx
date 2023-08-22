@@ -6,15 +6,15 @@ namespace CliFx.Analyzers.Tests;
 
 public class ParameterMustBeSingleIfNonRequiredAnalyzerSpecs
 {
-    private static DiagnosticAnalyzer Analyzer { get; } = new ParameterMustBeSingleIfNonRequiredAnalyzer();
+    private static DiagnosticAnalyzer Analyzer { get; } =
+        new ParameterMustBeSingleIfNonRequiredAnalyzer();
 
     [Fact]
     public void Analyzer_reports_an_error_if_more_than_one_non_required_parameters_are_defined()
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {
@@ -37,8 +37,7 @@ public class ParameterMustBeSingleIfNonRequiredAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {
@@ -61,8 +60,7 @@ public class ParameterMustBeSingleIfNonRequiredAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {
@@ -85,8 +83,7 @@ public class ParameterMustBeSingleIfNonRequiredAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {

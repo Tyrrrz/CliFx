@@ -13,9 +13,7 @@ namespace CliFx.Tests;
 public class TypeActivationSpecs : SpecsBase
 {
     public TypeActivationSpecs(ITestOutputHelper testOutput)
-        : base(testOutput)
-    {
-    }
+        : base(testOutput) { }
 
     [Fact]
     public async Task I_can_configure_the_application_to_use_the_default_type_activator_to_initialize_types_through_parameterless_constructors()

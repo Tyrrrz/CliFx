@@ -14,9 +14,7 @@ namespace CliFx.Tests;
 public class DirectivesSpecs : SpecsBase
 {
     public DirectivesSpecs(ITestOutputHelper testOutput)
-        : base(testOutput)
-    {
-    }
+        : base(testOutput) { }
 
     [Fact(Timeout = 15000)]
     public async Task I_can_use_the_debug_directive_to_make_the_application_wait_for_the_debugger_to_attach()
@@ -32,9 +30,7 @@ public class DirectivesSpecs : SpecsBase
                 cts.Cancel();
         }
 
-        var command =
-            Cli.Wrap(Dummy.Program.FilePath).WithArguments("[debug]") |
-            HandleStdOut;
+        var command = Cli.Wrap(Dummy.Program.FilePath).WithArguments("[debug]") | HandleStdOut;
 
         // Act & assert
         try
@@ -70,22 +66,29 @@ public class DirectivesSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"[preview]", "cmd", "param", "-abc", "--option", "foo"},
-            new Dictionary<string, string>
-            {
-                ["ENV_QOP"] = "hello",
-                ["ENV_KIL"] = "world"
-            }
+            new[] { "[preview]", "cmd", "param", "-abc", "--option", "foo" },
+            new Dictionary<string, string> { ["ENV_QOP"] = "hello", ["ENV_KIL"] = "world" }
         );
 
         // Assert
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ContainAllInOrder(
-            "cmd", "<param>", "[-a]", "[-b]", "[-c]", "[--option \"foo\"]",
-            "ENV_QOP", "=", "\"hello\"",
-            "ENV_KIL", "=", "\"world\""
-        );
+        stdOut
+            .Should()
+            .ContainAllInOrder(
+                "cmd",
+                "<param>",
+                "[-a]",
+                "[-b]",
+                "[-c]",
+                "[--option \"foo\"]",
+                "ENV_QOP",
+                "=",
+                "\"hello\"",
+                "ENV_KIL",
+                "=",
+                "\"world\""
+            );
     }
 }

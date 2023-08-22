@@ -14,16 +14,16 @@ public class ParameterMustHaveUniqueNameAnalyzer : AnalyzerBase
     public ParameterMustHaveUniqueNameAnalyzer()
         : base(
             "Parameters must have unique names",
-            "This parameter's name must be unique within the command (comparison IS NOT case sensitive). " +
-            "Specified name: `{0}`. " +
-            "Property bound to another parameter with the same name: `{1}`.")
-    {
-    }
+            "This parameter's name must be unique within the command (comparison IS NOT case sensitive). "
+                + "Specified name: `{0}`. "
+                + "Property bound to another parameter with the same name: `{1}`."
+        ) { }
 
     private void Analyze(
         SyntaxNodeAnalysisContext context,
         PropertyDeclarationSyntax propertyDeclaration,
-        IPropertySymbol property)
+        IPropertySymbol property
+    )
     {
         if (property.ContainingType is null)
             return;
@@ -35,8 +35,7 @@ public class ParameterMustHaveUniqueNameAnalyzer : AnalyzerBase
         if (string.IsNullOrWhiteSpace(parameter.Name))
             return;
 
-        var otherProperties = property
-            .ContainingType
+        var otherProperties = property.ContainingType
             .GetMembers()
             .OfType<IPropertySymbol>()
             .Where(m => !m.Equals(property))
@@ -51,7 +50,13 @@ public class ParameterMustHaveUniqueNameAnalyzer : AnalyzerBase
             if (string.IsNullOrWhiteSpace(otherParameter.Name))
                 continue;
 
-            if (string.Equals(parameter.Name, otherParameter.Name, StringComparison.OrdinalIgnoreCase))
+            if (
+                string.Equals(
+                    parameter.Name,
+                    otherParameter.Name,
+                    StringComparison.OrdinalIgnoreCase
+                )
+            )
             {
                 context.ReportDiagnostic(
                     CreateDiagnostic(

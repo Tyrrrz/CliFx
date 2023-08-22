@@ -16,6 +16,6 @@ internal interface ICommandMemberSymbol
 internal static class CommandMemberSymbolExtensions
 {
     public static bool IsScalar(this ICommandMemberSymbol member) =>
-        member.Property.Type.SpecialType == SpecialType.System_String ||
-        member.Property.Type.TryGetEnumerableUnderlyingType() is null;
+        member.Property.Type.SpecialType == SpecialType.System_String
+        || member.Property.Type.TryGetEnumerableUnderlyingType() is null;
 }

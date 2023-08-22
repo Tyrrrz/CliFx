@@ -12,9 +12,7 @@ namespace CliFx.Tests;
 public class HelpTextSpecs : SpecsBase
 {
     public HelpTextSpecs(ITestOutputHelper testOutput)
-        : base(testOutput)
-    {
-    }
+        : base(testOutput) { }
 
     [Fact]
     public async Task I_can_request_the_help_text_by_running_the_application_without_arguments_if_the_default_command_is_not_defined()
@@ -61,7 +59,7 @@ public class HelpTextSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"--help"},
+            new[] { "--help" },
             new Dictionary<string, string>()
         );
 
@@ -101,7 +99,7 @@ public class HelpTextSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"--help"},
+            new[] { "--help" },
             new Dictionary<string, string>()
         );
 
@@ -146,7 +144,7 @@ public class HelpTextSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"cmd", "--help"},
+            new[] { "cmd", "--help" },
             new Dictionary<string, string>()
         );
 
@@ -191,7 +189,7 @@ public class HelpTextSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"cmd", "sub", "--help"},
+            new[] { "cmd", "sub", "--help" },
             new Dictionary<string, string>()
         );
 
@@ -214,7 +212,7 @@ public class HelpTextSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"invalid-command", "--invalid-option"},
+            new[] { "invalid-command", "--invalid-option" },
             new Dictionary<string, string>()
         );
 
@@ -241,7 +239,7 @@ public class HelpTextSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"--help"},
+            new[] { "--help" },
             new Dictionary<string, string>()
         );
 
@@ -249,11 +247,7 @@ public class HelpTextSpecs : SpecsBase
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ContainAll(
-            "App title",
-            "App description",
-            "App version"
-        );
+        stdOut.Should().ContainAll("App title", "App description", "App version");
     }
 
     [Fact]
@@ -278,7 +272,7 @@ public class HelpTextSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"--help"},
+            new[] { "--help" },
             new Dictionary<string, string>()
         );
 
@@ -286,10 +280,7 @@ public class HelpTextSpecs : SpecsBase
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ContainAllInOrder(
-            "DESCRIPTION",
-            "Description of the default command."
-        );
+        stdOut.Should().ContainAllInOrder("DESCRIPTION", "Description of the default command.");
     }
 
     [Fact]
@@ -320,7 +311,7 @@ public class HelpTextSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"--help"},
+            new[] { "--help" },
             new Dictionary<string, string>()
         );
 
@@ -328,10 +319,7 @@ public class HelpTextSpecs : SpecsBase
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ContainAllInOrder(
-            "USAGE",
-            "[command]", "[...]"
-        );
+        stdOut.Should().ContainAllInOrder("USAGE", "[command]", "[...]");
     }
 
     [Fact]
@@ -365,7 +353,7 @@ public class HelpTextSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"--help"},
+            new[] { "--help" },
             new Dictionary<string, string>()
         );
 
@@ -373,10 +361,7 @@ public class HelpTextSpecs : SpecsBase
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ContainAllInOrder(
-            "USAGE",
-            "<foo>", "<bar>", "<baz...>"
-        );
+        stdOut.Should().ContainAllInOrder("USAGE", "<foo>", "<bar>", "<baz...>");
     }
 
     // https://github.com/Tyrrrz/CliFx/issues/117
@@ -425,10 +410,7 @@ public class HelpTextSpecs : SpecsBase
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ContainAllInOrder(
-            "USAGE",
-            "<foo>", "<bar>", "<baz...>"
-        );
+        stdOut.Should().ContainAllInOrder("USAGE", "<foo>", "<bar>", "<baz...>");
     }
 
     [Fact]
@@ -462,7 +444,7 @@ public class HelpTextSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"--help"},
+            new[] { "--help" },
             new Dictionary<string, string>()
         );
 
@@ -470,10 +452,9 @@ public class HelpTextSpecs : SpecsBase
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ContainAllInOrder(
-            "USAGE",
-            "--foo <value>", "--baz <values...>", "[options]"
-        );
+        stdOut
+            .Should()
+            .ContainAllInOrder("USAGE", "--foo <value>", "--baz <values...>", "[options]");
     }
 
     [Fact]
@@ -504,7 +485,7 @@ public class HelpTextSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"--help"},
+            new[] { "--help" },
             new Dictionary<string, string>()
         );
 
@@ -512,12 +493,16 @@ public class HelpTextSpecs : SpecsBase
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ContainAllInOrder(
-            "PARAMETERS",
-            "foo", "Description of foo.",
-            "OPTIONS",
-            "--bar", "Description of bar."
-        );
+        stdOut
+            .Should()
+            .ContainAllInOrder(
+                "PARAMETERS",
+                "foo",
+                "Description of foo.",
+                "OPTIONS",
+                "--bar",
+                "Description of bar."
+            );
     }
 
     [Fact]
@@ -542,7 +527,7 @@ public class HelpTextSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"--help"},
+            new[] { "--help" },
             new Dictionary<string, string>()
         );
 
@@ -550,11 +535,16 @@ public class HelpTextSpecs : SpecsBase
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ContainAllInOrder(
-            "OPTIONS",
-            "-h", "--help", "Shows help text",
-            "--version", "Shows version information"
-        );
+        stdOut
+            .Should()
+            .ContainAllInOrder(
+                "OPTIONS",
+                "-h",
+                "--help",
+                "Shows help text",
+                "--version",
+                "Shows version information"
+            );
     }
 
     [Fact]
@@ -579,7 +569,7 @@ public class HelpTextSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"cmd", "--help"},
+            new[] { "cmd", "--help" },
             new Dictionary<string, string>()
         );
 
@@ -588,14 +578,9 @@ public class HelpTextSpecs : SpecsBase
 
         var stdOut = FakeConsole.ReadOutputString();
 
-        stdOut.Should().ContainAllInOrder(
-            "OPTIONS",
-            "-h", "--help", "Shows help text"
-        );
+        stdOut.Should().ContainAllInOrder("OPTIONS", "-h", "--help", "Shows help text");
 
-        stdOut.Should().NotContainAny(
-            "--version", "Shows version information"
-        );
+        stdOut.Should().NotContainAny("--version", "Shows version information");
     }
 
     [Fact]
@@ -628,7 +613,7 @@ public class HelpTextSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"--help"},
+            new[] { "--help" },
             new Dictionary<string, string>()
         );
 
@@ -636,12 +621,22 @@ public class HelpTextSpecs : SpecsBase
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ContainAllInOrder(
-            "PARAMETERS",
-            "foo", "Choices:", "One", "Two", "Three",
-            "OPTIONS",
-            "--bar", "Choices:", "One", "Two", "Three"
-        );
+        stdOut
+            .Should()
+            .ContainAllInOrder(
+                "PARAMETERS",
+                "foo",
+                "Choices:",
+                "One",
+                "Two",
+                "Three",
+                "OPTIONS",
+                "--bar",
+                "Choices:",
+                "One",
+                "Two",
+                "Three"
+            );
     }
 
     [Fact]
@@ -674,7 +669,7 @@ public class HelpTextSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"--help"},
+            new[] { "--help" },
             new Dictionary<string, string>()
         );
 
@@ -682,12 +677,22 @@ public class HelpTextSpecs : SpecsBase
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ContainAllInOrder(
-            "PARAMETERS",
-            "foo", "Choices:", "One", "Two", "Three",
-            "OPTIONS",
-            "--bar", "Choices:", "One", "Two", "Three"
-        );
+        stdOut
+            .Should()
+            .ContainAllInOrder(
+                "PARAMETERS",
+                "foo",
+                "Choices:",
+                "One",
+                "Two",
+                "Three",
+                "OPTIONS",
+                "--bar",
+                "Choices:",
+                "One",
+                "Two",
+                "Three"
+            );
     }
 
     [Fact]
@@ -720,7 +725,7 @@ public class HelpTextSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"--help"},
+            new[] { "--help" },
             new Dictionary<string, string>()
         );
 
@@ -728,12 +733,22 @@ public class HelpTextSpecs : SpecsBase
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ContainAllInOrder(
-            "PARAMETERS",
-            "foo", "Choices:", "One", "Two", "Three",
-            "OPTIONS",
-            "--bar", "Choices:", "One", "Two", "Three"
-        );
+        stdOut
+            .Should()
+            .ContainAllInOrder(
+                "PARAMETERS",
+                "foo",
+                "Choices:",
+                "One",
+                "Two",
+                "Three",
+                "OPTIONS",
+                "--bar",
+                "Choices:",
+                "One",
+                "Two",
+                "Three"
+            );
     }
 
     [Fact]
@@ -766,7 +781,7 @@ public class HelpTextSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"--help"},
+            new[] { "--help" },
             new Dictionary<string, string>()
         );
 
@@ -774,11 +789,17 @@ public class HelpTextSpecs : SpecsBase
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ContainAllInOrder(
-            "OPTIONS",
-            "--foo", "Environment variable:", "ENV_FOO",
-            "--bar", "Environment variable:", "ENV_BAR"
-        );
+        stdOut
+            .Should()
+            .ContainAllInOrder(
+                "OPTIONS",
+                "--foo",
+                "Environment variable:",
+                "ENV_FOO",
+                "--bar",
+                "Environment variable:",
+                "ENV_BAR"
+            );
     }
 
     [Fact]
@@ -829,7 +850,7 @@ public class HelpTextSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"--help"},
+            new[] { "--help" },
             new Dictionary<string, string>()
         );
 
@@ -838,16 +859,34 @@ public class HelpTextSpecs : SpecsBase
 
         var stdOut = FakeConsole.ReadOutputString();
 
-        stdOut.Should().ContainAllInOrder(
-            "OPTIONS",
-            "--foo", "Default:", "42",
-            "--bar", "Default:", "hello",
-            "--baz", "Default:", "one", "two", "three",
-            "--qwe", "Default:", "True",
-            "--qop", "Default:", "1337",
-            "--zor", "Default:", "02:03:00",
-            "--lol", "Default:", "Two"
-        );
+        stdOut
+            .Should()
+            .ContainAllInOrder(
+                "OPTIONS",
+                "--foo",
+                "Default:",
+                "42",
+                "--bar",
+                "Default:",
+                "hello",
+                "--baz",
+                "Default:",
+                "one",
+                "two",
+                "three",
+                "--qwe",
+                "Default:",
+                "True",
+                "--qop",
+                "Default:",
+                "1337",
+                "--zor",
+                "Default:",
+                "02:03:00",
+                "--lol",
+                "Default:",
+                "Two"
+            );
 
         stdOut.Should().NotContain("not printed");
     }
@@ -892,7 +931,7 @@ public class HelpTextSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"--help"},
+            new[] { "--help" },
             new Dictionary<string, string>()
         );
 
@@ -901,20 +940,23 @@ public class HelpTextSpecs : SpecsBase
 
         var stdOut = FakeConsole.ReadOutputString();
 
-        stdOut.Should().ContainAllInOrder(
-            "COMMANDS",
-            "cmd1", "Description of one command.",
-            "cmd2", "Description of another command.",
-            // `cmd2 child` will appear as an immediate command because it does not
-            // have a more specific parent.
-            "cmd3 child", "Description of an orphaned command."
-        );
+        stdOut
+            .Should()
+            .ContainAllInOrder(
+                "COMMANDS",
+                "cmd1",
+                "Description of one command.",
+                "cmd2",
+                "Description of another command.",
+                // `cmd2 child` will appear as an immediate command because it does not
+                // have a more specific parent.
+                "cmd3 child",
+                "Description of an orphaned command."
+            );
 
         // `cmd2 child` will still appear in the list of `cmd2` subcommands,
         // but its description will not be visible.
-        stdOut.Should().NotContain(
-            "Description of another command's child command."
-        );
+        stdOut.Should().NotContain("Description of another command's child command.");
     }
 
     [Fact]
@@ -963,7 +1005,7 @@ public class HelpTextSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"--help"},
+            new[] { "--help" },
             new Dictionary<string, string>()
         );
 
@@ -971,11 +1013,18 @@ public class HelpTextSpecs : SpecsBase
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ContainAllInOrder(
-            "COMMANDS",
-            "cmd1", "Subcommands:", "cmd1 child1",
-            "cmd2", "Subcommands:", "cmd2 child1", "cmd2 child2"
-        );
+        stdOut
+            .Should()
+            .ContainAllInOrder(
+                "COMMANDS",
+                "cmd1",
+                "Subcommands:",
+                "cmd1 child1",
+                "cmd2",
+                "Subcommands:",
+                "cmd2 child1",
+                "cmd2 child2"
+            );
     }
 
     [Fact]
@@ -990,7 +1039,7 @@ public class HelpTextSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"--version"},
+            new[] { "--version" },
             new Dictionary<string, string>()
         );
 

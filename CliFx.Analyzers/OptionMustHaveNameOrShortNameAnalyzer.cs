@@ -12,14 +12,14 @@ public class OptionMustHaveNameOrShortNameAnalyzer : AnalyzerBase
     public OptionMustHaveNameOrShortNameAnalyzer()
         : base(
             "Options must have either a name or short name specified",
-            "This option must have either a name or short name specified.")
-    {
-    }
+            "This option must have either a name or short name specified."
+        ) { }
 
     private void Analyze(
         SyntaxNodeAnalysisContext context,
         PropertyDeclarationSyntax propertyDeclaration,
-        IPropertySymbol property)
+        IPropertySymbol property
+    )
     {
         var option = CommandOptionSymbol.TryResolve(property);
         if (option is null)

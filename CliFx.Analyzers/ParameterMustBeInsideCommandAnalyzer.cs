@@ -13,14 +13,14 @@ public class ParameterMustBeInsideCommandAnalyzer : AnalyzerBase
     public ParameterMustBeInsideCommandAnalyzer()
         : base(
             "Parameters must be defined inside commands",
-            $"This parameter must be defined inside a class that implements `{SymbolNames.CliFxCommandInterface}`.")
-    {
-    }
+            $"This parameter must be defined inside a class that implements `{SymbolNames.CliFxCommandInterface}`."
+        ) { }
 
     private void Analyze(
         SyntaxNodeAnalysisContext context,
         PropertyDeclarationSyntax propertyDeclaration,
-        IPropertySymbol property)
+        IPropertySymbol property
+    )
     {
         if (property.ContainingType is null)
             return;
@@ -31,10 +31,9 @@ public class ParameterMustBeInsideCommandAnalyzer : AnalyzerBase
         if (!CommandParameterSymbol.IsParameterProperty(property))
             return;
 
-        var isInsideCommand = property
-            .ContainingType
-            .AllInterfaces
-            .Any(i => i.DisplayNameMatches(SymbolNames.CliFxCommandInterface));
+        var isInsideCommand = property.ContainingType.AllInterfaces.Any(
+            i => i.DisplayNameMatches(SymbolNames.CliFxCommandInterface)
+        );
 
         if (!isInsideCommand)
         {

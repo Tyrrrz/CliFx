@@ -31,8 +31,7 @@ internal static class DynamicCommandBuilder
         };
 
         // Get default CliFx namespaces
-        var defaultCliFxNamespaces = typeof(ICommand)
-            .Assembly
+        var defaultCliFxNamespaces = typeof(ICommand).Assembly
             .GetTypes()
             .Where(t => t.IsPublic)
             .Select(t => t.Namespace)
@@ -41,10 +40,10 @@ internal static class DynamicCommandBuilder
 
         // Append default imports to the source code
         var sourceCodeWithUsings =
-            string.Join(Environment.NewLine, defaultSystemNamespaces.Select(n => $"using {n};")) +
-            string.Join(Environment.NewLine, defaultCliFxNamespaces.Select(n => $"using {n};")) +
-            Environment.NewLine +
-            sourceCode;
+            string.Join(Environment.NewLine, defaultSystemNamespaces.Select(n => $"using {n};"))
+            + string.Join(Environment.NewLine, defaultCliFxNamespaces.Select(n => $"using {n};"))
+            + Environment.NewLine
+            + sourceCode;
 
         // Parse the source code
         var ast = SyntaxFactory.ParseSyntaxTree(
@@ -55,10 +54,14 @@ internal static class DynamicCommandBuilder
         // Compile the code to IL
         var compilation = CSharpCompilation.Create(
             "CliFxTests_DynamicAssembly_" + Guid.NewGuid(),
-            new[] {ast},
+            new[] { ast },
             Net70.References.All
                 .Append(MetadataReference.CreateFromFile(typeof(ICommand).Assembly.Location))
-                .Append(MetadataReference.CreateFromFile(typeof(DynamicCommandBuilder).Assembly.Location)),
+                .Append(
+                    MetadataReference.CreateFromFile(
+                        typeof(DynamicCommandBuilder).Assembly.Location
+                    )
+                ),
             // DLL to avoid having to define the Main() method
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
         );
@@ -82,8 +85,7 @@ internal static class DynamicCommandBuilder
         using var buffer = new MemoryStream();
         var emit = compilation.Emit(buffer);
 
-        var emitErrors = emit
-            .Diagnostics
+        var emitErrors = emit.Diagnostics
             .Where(d => d.Severity >= DiagnosticSeverity.Error)
             .ToArray();
 

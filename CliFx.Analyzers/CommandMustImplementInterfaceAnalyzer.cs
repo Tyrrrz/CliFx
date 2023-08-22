@@ -13,31 +13,28 @@ public class CommandMustImplementInterfaceAnalyzer : AnalyzerBase
     public CommandMustImplementInterfaceAnalyzer()
         : base(
             $"Commands must implement `{SymbolNames.CliFxCommandInterface}` interface",
-            $"This type must implement `{SymbolNames.CliFxCommandInterface}` interface in order to be a valid command.")
-    {
-    }
+            $"This type must implement `{SymbolNames.CliFxCommandInterface}` interface in order to be a valid command."
+        ) { }
 
     private void Analyze(
         SyntaxNodeAnalysisContext context,
         ClassDeclarationSyntax classDeclaration,
-        ITypeSymbol type)
+        ITypeSymbol type
+    )
     {
-        var hasCommandAttribute = type
-            .GetAttributes()
+        var hasCommandAttribute = type.GetAttributes()
             .Select(a => a.AttributeClass)
             .Any(c => c.DisplayNameMatches(SymbolNames.CliFxCommandAttribute));
 
-        var implementsCommandInterface = type
-            .AllInterfaces
-            .Any(i => i.DisplayNameMatches(SymbolNames.CliFxCommandInterface));
+        var implementsCommandInterface = type.AllInterfaces.Any(
+            i => i.DisplayNameMatches(SymbolNames.CliFxCommandInterface)
+        );
 
         // If the attribute is present, but the interface is not implemented,
         // it's very likely a user error.
         if (hasCommandAttribute && !implementsCommandInterface)
         {
-            context.ReportDiagnostic(
-                CreateDiagnostic(classDeclaration.Identifier.GetLocation())
-            );
+            context.ReportDiagnostic(CreateDiagnostic(classDeclaration.Identifier.GetLocation()));
         }
     }
 

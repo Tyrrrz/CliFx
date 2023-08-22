@@ -6,7 +6,8 @@ namespace CliFx.Demo.Domain;
 
 public class LibraryProvider
 {
-    private static string StorageFilePath { get; } = Path.Combine(Directory.GetCurrentDirectory(), "Library.json");
+    private static string StorageFilePath { get; } =
+        Path.Combine(Directory.GetCurrentDirectory(), "Library.json");
 
     private void StoreLibrary(Library library)
     {
@@ -24,7 +25,8 @@ public class LibraryProvider
         return JsonSerializer.Deserialize<Library>(data) ?? Library.Empty;
     }
 
-    public Book? TryGetBook(string title) => GetLibrary().Books.FirstOrDefault(b => b.Title == title);
+    public Book? TryGetBook(string title) =>
+        GetLibrary().Books.FirstOrDefault(b => b.Title == title);
 
     public void AddBook(Book book)
     {

@@ -6,15 +6,15 @@ namespace CliFx.Analyzers.Tests;
 
 public class ParameterMustBeSingleIfNonScalarAnalyzerSpecs
 {
-    private static DiagnosticAnalyzer Analyzer { get; } = new ParameterMustBeSingleIfNonScalarAnalyzer();
+    private static DiagnosticAnalyzer Analyzer { get; } =
+        new ParameterMustBeSingleIfNonScalarAnalyzer();
 
     [Fact]
     public void Analyzer_reports_an_error_if_more_than_one_non_scalar_parameters_are_defined()
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {
@@ -37,8 +37,7 @@ public class ParameterMustBeSingleIfNonScalarAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {
@@ -61,8 +60,7 @@ public class ParameterMustBeSingleIfNonScalarAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {
@@ -85,8 +83,7 @@ public class ParameterMustBeSingleIfNonScalarAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {

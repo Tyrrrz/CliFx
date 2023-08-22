@@ -13,16 +13,16 @@ public class ParameterMustHaveUniqueOrderAnalyzer : AnalyzerBase
     public ParameterMustHaveUniqueOrderAnalyzer()
         : base(
             "Parameters must have unique order",
-            "This parameter's order must be unique within the command. " +
-            "Specified order: {0}. " +
-            "Property bound to another parameter with the same order: `{1}`.")
-    {
-    }
+            "This parameter's order must be unique within the command. "
+                + "Specified order: {0}. "
+                + "Property bound to another parameter with the same order: `{1}`."
+        ) { }
 
     private void Analyze(
         SyntaxNodeAnalysisContext context,
         PropertyDeclarationSyntax propertyDeclaration,
-        IPropertySymbol property)
+        IPropertySymbol property
+    )
     {
         if (property.ContainingType is null)
             return;
@@ -31,8 +31,7 @@ public class ParameterMustHaveUniqueOrderAnalyzer : AnalyzerBase
         if (parameter is null)
             return;
 
-        var otherProperties = property
-            .ContainingType
+        var otherProperties = property.ContainingType
             .GetMembers()
             .OfType<IPropertySymbol>()
             .Where(m => !m.Equals(property))

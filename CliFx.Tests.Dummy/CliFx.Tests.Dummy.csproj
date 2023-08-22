@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CSharpier.MsBuild" Version="0.25.0" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CliFx\CliFx.csproj" />
     <ProjectReference Include="..\CliFx.Analyzers\CliFx.Analyzers.csproj" ReferenceOutputAssembly="false" OutputItemType="analyzer" />
   </ItemGroup>

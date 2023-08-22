@@ -16,9 +16,7 @@ public partial class Benchmarks
         [Option('b', "bool")]
         public bool BoolOption { get; set; }
 
-        public void Execute()
-        {
-        }
+        public void Execute() { }
     }
 
     [Benchmark(Description = "CommandLineParser")]

@@ -6,15 +6,15 @@ namespace CliFx.Analyzers.Tests;
 
 public class OptionMustHaveValidConverterAnalyzerSpecs
 {
-    private static DiagnosticAnalyzer Analyzer { get; } = new OptionMustHaveValidConverterAnalyzer();
+    private static DiagnosticAnalyzer Analyzer { get; } =
+        new OptionMustHaveValidConverterAnalyzer();
 
     [Fact]
     public void Analyzer_reports_an_error_if_an_option_has_a_converter_that_does_not_derive_from_BindingConverter()
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             public class MyConverter
             {
                 public string Convert(string? rawValue) => rawValue;
@@ -39,8 +39,7 @@ public class OptionMustHaveValidConverterAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             public class MyConverter : BindingConverter<int>
             {
                 public override int Convert(string? rawValue) => 42;
@@ -65,8 +64,7 @@ public class OptionMustHaveValidConverterAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             public class MyConverter : BindingConverter<string>
             {
                 public override string Convert(string? rawValue) => rawValue;
@@ -91,8 +89,7 @@ public class OptionMustHaveValidConverterAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             public class MyConverter : BindingConverter<int>
             {
                 public override int Convert(string? rawValue) => 42;
@@ -117,8 +114,7 @@ public class OptionMustHaveValidConverterAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             public class MyConverter : BindingConverter<string>
             {
                 public override string Convert(string? rawValue) => rawValue;
@@ -143,8 +139,7 @@ public class OptionMustHaveValidConverterAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {
@@ -164,8 +159,7 @@ public class OptionMustHaveValidConverterAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {

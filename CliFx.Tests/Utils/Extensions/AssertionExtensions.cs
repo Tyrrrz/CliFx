@@ -8,22 +8,22 @@ namespace CliFx.Tests.Utils.Extensions;
 
 internal static class AssertionExtensions
 {
-    public static void ConsistOfLines(
-        this StringAssertions assertions,
-        IEnumerable<string> lines)
+    public static void ConsistOfLines(this StringAssertions assertions, IEnumerable<string> lines)
     {
-        var actualLines = assertions.Subject.Split(new[] {'\n', '\r'}, StringSplitOptions.RemoveEmptyEntries);
+        var actualLines = assertions.Subject.Split(
+            new[] { '\n', '\r' },
+            StringSplitOptions.RemoveEmptyEntries
+        );
         actualLines.Should().Equal(lines);
     }
 
-    public static void ConsistOfLines(
-        this StringAssertions assertions,
-        params string[] lines) =>
-        assertions.ConsistOfLines((IEnumerable<string>) lines);
+    public static void ConsistOfLines(this StringAssertions assertions, params string[] lines) =>
+        assertions.ConsistOfLines((IEnumerable<string>)lines);
 
     public static AndConstraint<StringAssertions> ContainAllInOrder(
         this StringAssertions assertions,
-        IEnumerable<string> values)
+        IEnumerable<string> values
+    )
     {
         var lastIndex = 0;
 
@@ -46,6 +46,6 @@ internal static class AssertionExtensions
 
     public static AndConstraint<StringAssertions> ContainAllInOrder(
         this StringAssertions assertions,
-        params string[] values) =>
-        assertions.ContainAllInOrder((IEnumerable<string>) values);
+        params string[] values
+    ) => assertions.ContainAllInOrder((IEnumerable<string>)values);
 }

@@ -12,11 +12,10 @@ public class GeneralSpecs
     public void All_analyzers_have_unique_diagnostic_IDs()
     {
         // Arrange
-        var analyzers = typeof(AnalyzerBase)
-            .Assembly
+        var analyzers = typeof(AnalyzerBase).Assembly
             .GetTypes()
             .Where(t => !t.IsAbstract && t.IsAssignableTo(typeof(DiagnosticAnalyzer)))
-            .Select(t => (DiagnosticAnalyzer) Activator.CreateInstance(t)!)
+            .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t)!)
             .ToArray();
 
         // Act

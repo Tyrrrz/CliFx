@@ -18,9 +18,7 @@ internal class AnalyzerAssertions : ReferenceTypeAssertions<DiagnosticAnalyzer, 
     protected override string Identifier { get; } = "analyzer";
 
     public AnalyzerAssertions(DiagnosticAnalyzer analyzer)
-        : base(analyzer)
-    {
-    }
+        : base(analyzer) { }
 
     private Compilation Compile(string sourceCode)
     {
@@ -33,8 +31,7 @@ internal class AnalyzerAssertions : ReferenceTypeAssertions<DiagnosticAnalyzer, 
         };
 
         // Get default CliFx namespaces
-        var defaultCliFxNamespaces = typeof(ICommand)
-            .Assembly
+        var defaultCliFxNamespaces = typeof(ICommand).Assembly
             .GetTypes()
             .Where(t => t.IsPublic)
             .Select(t => t.Namespace)
@@ -43,10 +40,10 @@ internal class AnalyzerAssertions : ReferenceTypeAssertions<DiagnosticAnalyzer, 
 
         // Append default imports to the source code
         var sourceCodeWithUsings =
-            string.Join(Environment.NewLine, defaultSystemNamespaces.Select(n => $"using {n};")) +
-            string.Join(Environment.NewLine, defaultCliFxNamespaces.Select(n => $"using {n};")) +
-            Environment.NewLine +
-            sourceCode;
+            string.Join(Environment.NewLine, defaultSystemNamespaces.Select(n => $"using {n};"))
+            + string.Join(Environment.NewLine, defaultCliFxNamespaces.Select(n => $"using {n};"))
+            + Environment.NewLine
+            + sourceCode;
 
         // Parse the source code
         var ast = SyntaxFactory.ParseSyntaxTree(
@@ -58,8 +55,9 @@ internal class AnalyzerAssertions : ReferenceTypeAssertions<DiagnosticAnalyzer, 
         var compilation = CSharpCompilation.Create(
             "CliFxTests_DynamicAssembly_" + Guid.NewGuid(),
             new[] { ast },
-            Net70.References.All
-                .Append(MetadataReference.CreateFromFile(typeof(ICommand).Assembly.Location)),
+            Net70.References.All.Append(
+                MetadataReference.CreateFromFile(typeof(ICommand).Assembly.Location)
+            ),
             // DLL to avoid having to define the Main() method
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
         );
@@ -103,44 +101,46 @@ internal class AnalyzerAssertions : ReferenceTypeAssertions<DiagnosticAnalyzer, 
         var producedDiagnosticIds = producedDiagnostics.Select(d => d.Id).Distinct().ToArray();
 
         var isSuccessfulAssertion =
-            expectedDiagnosticIds.Intersect(producedDiagnosticIds).Count() ==
-            expectedDiagnosticIds.Length;
+            expectedDiagnosticIds.Intersect(producedDiagnosticIds).Count()
+            == expectedDiagnosticIds.Length;
 
-        Execute.Assertion.ForCondition(isSuccessfulAssertion).FailWith(() =>
-        {
-            var buffer = new StringBuilder();
-
-            buffer.AppendLine("Expected and produced diagnostics do not match.");
-            buffer.AppendLine();
-
-            buffer.AppendLine("Expected diagnostics:");
-
-            foreach (var expectedDiagnostic in expectedDiagnostics)
+        Execute.Assertion
+            .ForCondition(isSuccessfulAssertion)
+            .FailWith(() =>
             {
-                buffer.Append("  - ");
-                buffer.Append(expectedDiagnostic.Id);
+                var buffer = new StringBuilder();
+
+                buffer.AppendLine("Expected and produced diagnostics do not match.");
                 buffer.AppendLine();
-            }
 
-            buffer.AppendLine();
+                buffer.AppendLine("Expected diagnostics:");
 
-            buffer.AppendLine("Produced diagnostics:");
-
-            if (producedDiagnostics.Any())
-            {
-                foreach (var producedDiagnostic in producedDiagnostics)
+                foreach (var expectedDiagnostic in expectedDiagnostics)
                 {
                     buffer.Append("  - ");
-                    buffer.Append(producedDiagnostic);
+                    buffer.Append(expectedDiagnostic.Id);
+                    buffer.AppendLine();
                 }
-            }
-            else
-            {
-                buffer.AppendLine("  < none >");
-            }
 
-            return new FailReason(buffer.ToString());
-        });
+                buffer.AppendLine();
+
+                buffer.AppendLine("Produced diagnostics:");
+
+                if (producedDiagnostics.Any())
+                {
+                    foreach (var producedDiagnostic in producedDiagnostics)
+                    {
+                        buffer.Append("  - ");
+                        buffer.Append(producedDiagnostic);
+                    }
+                }
+                else
+                {
+                    buffer.AppendLine("  < none >");
+                }
+
+                return new FailReason(buffer.ToString());
+            });
     }
 
     public void NotProduceDiagnostics(string sourceCode)
@@ -148,23 +148,25 @@ internal class AnalyzerAssertions : ReferenceTypeAssertions<DiagnosticAnalyzer, 
         var producedDiagnostics = GetProducedDiagnostics(sourceCode);
         var isSuccessfulAssertion = !producedDiagnostics.Any();
 
-        Execute.Assertion.ForCondition(isSuccessfulAssertion).FailWith(() =>
-        {
-            var buffer = new StringBuilder();
-
-            buffer.AppendLine("Expected no produced diagnostics.");
-            buffer.AppendLine();
-
-            buffer.AppendLine("Produced diagnostics:");
-
-            foreach (var producedDiagnostic in producedDiagnostics)
+        Execute.Assertion
+            .ForCondition(isSuccessfulAssertion)
+            .FailWith(() =>
             {
-                buffer.Append("  - ");
-                buffer.Append(producedDiagnostic);
-            }
+                var buffer = new StringBuilder();
 
-            return new FailReason(buffer.ToString());
-        });
+                buffer.AppendLine("Expected no produced diagnostics.");
+                buffer.AppendLine();
+
+                buffer.AppendLine("Produced diagnostics:");
+
+                foreach (var producedDiagnostic in producedDiagnostics)
+                {
+                    buffer.Append("  - ");
+                    buffer.Append(producedDiagnostic);
+                }
+
+                return new FailReason(buffer.ToString());
+            });
     }
 }
 

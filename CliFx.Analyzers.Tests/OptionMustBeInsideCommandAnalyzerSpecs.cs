@@ -13,8 +13,7 @@ public class OptionMustBeInsideCommandAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             public class MyClass
             {
                 [CommandOption("foo")]
@@ -31,8 +30,7 @@ public class OptionMustBeInsideCommandAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {
@@ -52,8 +50,7 @@ public class OptionMustBeInsideCommandAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             public abstract class MyCommand
             {
                 [CommandOption("foo")]
@@ -70,8 +67,7 @@ public class OptionMustBeInsideCommandAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {

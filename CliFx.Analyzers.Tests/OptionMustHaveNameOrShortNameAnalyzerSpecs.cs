@@ -6,15 +6,15 @@ namespace CliFx.Analyzers.Tests;
 
 public class OptionMustHaveNameOrShortNameAnalyzerSpecs
 {
-    private static DiagnosticAnalyzer Analyzer { get; } = new OptionMustHaveNameOrShortNameAnalyzer();
+    private static DiagnosticAnalyzer Analyzer { get; } =
+        new OptionMustHaveNameOrShortNameAnalyzer();
 
     [Fact]
     public void Analyzer_reports_an_error_if_an_option_does_not_have_a_name_or_short_name()
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {
@@ -34,8 +34,7 @@ public class OptionMustHaveNameOrShortNameAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {
@@ -55,8 +54,7 @@ public class OptionMustHaveNameOrShortNameAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {
@@ -76,8 +74,7 @@ public class OptionMustHaveNameOrShortNameAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {

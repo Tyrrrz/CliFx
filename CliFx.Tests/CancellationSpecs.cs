@@ -15,9 +15,7 @@ namespace CliFx.Tests;
 public class CancellationSpecs : SpecsBase
 {
     public CancellationSpecs(ITestOutputHelper testOutput)
-        : base(testOutput)
-    {
-    }
+        : base(testOutput) { }
 
     [Fact(Timeout = 15000)]
     public async Task I_can_configure_the_command_to_listen_to_the_interrupt_signal()
@@ -41,24 +39,20 @@ public class CancellationSpecs : SpecsBase
             PipeTarget.ToStringBuilder(stdOutBuffer)
         );
 
-        var command =
-            Cli.Wrap(Dummy.Program.FilePath).WithArguments("cancel-test") |
-            pipeTarget;
+        var command = Cli.Wrap(Dummy.Program.FilePath).WithArguments("cancel-test") | pipeTarget;
 
         // Act & assert
-        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
-            await command.ExecuteAsync(
-                // Forceful cancellation (not required because we have a timeout)
-                CancellationToken.None,
-                // Graceful cancellation
-                cts.Token
-            )
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(
+            async () =>
+                await command.ExecuteAsync(
+                    // Forceful cancellation (not required because we have a timeout)
+                    CancellationToken.None,
+                    // Graceful cancellation
+                    cts.Token
+                )
         );
 
-        stdOutBuffer.ToString().Trim().Should().ConsistOfLines(
-            "Started.",
-            "Cancelled."
-        );
+        stdOutBuffer.ToString().Trim().Should().ConsistOfLines("Started.", "Cancelled.");
     }
 
     [Fact]
@@ -111,9 +105,6 @@ public class CancellationSpecs : SpecsBase
         exitCode.Should().NotBe(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Trim().Should().ConsistOfLines(
-            "Started.",
-            "Cancelled."
-        );
+        stdOut.Trim().Should().ConsistOfLines("Started.", "Cancelled.");
     }
 }

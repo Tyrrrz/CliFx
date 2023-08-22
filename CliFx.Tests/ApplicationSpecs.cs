@@ -11,9 +11,7 @@ namespace CliFx.Tests;
 public class ApplicationSpecs : SpecsBase
 {
     public ApplicationSpecs(ITestOutputHelper testOutput)
-        : base(testOutput)
-    {
-    }
+        : base(testOutput) { }
 
     [Fact]
     public async Task I_can_create_an_application_with_the_default_configuration()
@@ -24,10 +22,7 @@ public class ApplicationSpecs : SpecsBase
             .UseConsole(FakeConsole)
             .Build();
 
-        var exitCode = await app.RunAsync(
-            Array.Empty<string>(),
-            new Dictionary<string, string>()
-        );
+        var exitCode = await app.RunAsync(Array.Empty<string>(), new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(0);
@@ -40,8 +35,8 @@ public class ApplicationSpecs : SpecsBase
         var app = new CliApplicationBuilder()
             .AddCommand<NoOpCommand>()
             .AddCommandsFrom(typeof(NoOpCommand).Assembly)
-            .AddCommands(new[] {typeof(NoOpCommand)})
-            .AddCommandsFrom(new[] {typeof(NoOpCommand).Assembly})
+            .AddCommands(new[] { typeof(NoOpCommand) })
+            .AddCommandsFrom(new[] { typeof(NoOpCommand).Assembly })
             .AddCommandsFromThisAssembly()
             .AllowDebugMode()
             .AllowPreviewMode()
@@ -53,10 +48,7 @@ public class ApplicationSpecs : SpecsBase
             .UseTypeActivator(Activator.CreateInstance!)
             .Build();
 
-        var exitCode = await app.RunAsync(
-            Array.Empty<string>(),
-            new Dictionary<string, string>()
-        );
+        var exitCode = await app.RunAsync(Array.Empty<string>(), new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(0);
@@ -71,10 +63,7 @@ public class ApplicationSpecs : SpecsBase
             .UseConsole(FakeConsole)
             .Build();
 
-        var exitCode = await app.RunAsync(
-            Array.Empty<string>(),
-            new Dictionary<string, string>()
-        );
+        var exitCode = await app.RunAsync(Array.Empty<string>(), new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().NotBe(0);

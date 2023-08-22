@@ -16,9 +16,7 @@ public partial class Benchmarks
         [NamedArgument('b', "bool", Constraint = NumArgsConstraint.Optional, Const = true)]
         public bool BoolOption { get; set; }
 
-        public void Execute()
-        {
-        }
+        public void Execute() { }
     }
 
     [Benchmark(Description = "Clipr")]

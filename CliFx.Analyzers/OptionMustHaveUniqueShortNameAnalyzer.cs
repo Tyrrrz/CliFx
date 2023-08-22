@@ -13,16 +13,16 @@ public class OptionMustHaveUniqueShortNameAnalyzer : AnalyzerBase
     public OptionMustHaveUniqueShortNameAnalyzer()
         : base(
             "Options must have unique short names",
-            "This option's short name must be unique within the command (comparison IS case sensitive). " +
-            "Specified short name: `{0}` " +
-            "Property bound to another option with the same short name: `{1}`.")
-    {
-    }
+            "This option's short name must be unique within the command (comparison IS case sensitive). "
+                + "Specified short name: `{0}` "
+                + "Property bound to another option with the same short name: `{1}`."
+        ) { }
 
     private void Analyze(
         SyntaxNodeAnalysisContext context,
         PropertyDeclarationSyntax propertyDeclaration,
-        IPropertySymbol property)
+        IPropertySymbol property
+    )
     {
         if (property.ContainingType is null)
             return;
@@ -34,8 +34,7 @@ public class OptionMustHaveUniqueShortNameAnalyzer : AnalyzerBase
         if (option.ShortName is null)
             return;
 
-        var otherProperties = property
-            .ContainingType
+        var otherProperties = property.ContainingType
             .GetMembers()
             .OfType<IPropertySymbol>()
             .Where(m => !m.Equals(property))

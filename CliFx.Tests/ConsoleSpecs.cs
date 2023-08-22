@@ -17,9 +17,7 @@ namespace CliFx.Tests;
 public class ConsoleSpecs : SpecsBase
 {
     public ConsoleSpecs(ITestOutputHelper testOutput)
-        : base(testOutput)
-    {
-    }
+        : base(testOutput) { }
 
     [Fact(Timeout = 15000)]
     public async Task I_can_run_the_application_with_the_default_console_implementation_to_interact_with_the_system_console()
@@ -28,8 +26,7 @@ public class ConsoleSpecs : SpecsBase
 
         // Arrange
         var command =
-            "Hello world" |
-            Cli.Wrap(Dummy.Program.FilePath).WithArguments("console-test");
+            "Hello world" | Cli.Wrap(Dummy.Program.FilePath).WithArguments("console-test");
 
         // Act
         var result = await command.ExecuteBufferedAsync();
@@ -205,10 +202,6 @@ public class ConsoleSpecs : SpecsBase
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Trim().Should().ConsistOfLines(
-            "D0",
-            "A",
-            "Backspace"
-        );
+        stdOut.Trim().Should().ConsistOfLines("D0", "A", "Backspace");
     }
 }

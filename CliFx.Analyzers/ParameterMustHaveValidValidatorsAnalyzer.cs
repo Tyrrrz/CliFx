@@ -13,14 +13,14 @@ public class ParameterMustHaveValidValidatorsAnalyzer : AnalyzerBase
     public ParameterMustHaveValidValidatorsAnalyzer()
         : base(
             $"Parameter validators must derive from `{SymbolNames.CliFxBindingValidatorClass}`",
-            $"Each validator specified for this parameter must derive from a compatible `{SymbolNames.CliFxBindingValidatorClass}`.")
-    {
-    }
+            $"Each validator specified for this parameter must derive from a compatible `{SymbolNames.CliFxBindingValidatorClass}`."
+        ) { }
 
     private void Analyze(
         SyntaxNodeAnalysisContext context,
         PropertyDeclarationSyntax propertyDeclaration,
-        IPropertySymbol property)
+        IPropertySymbol property
+    )
     {
         var parameter = CommandParameterSymbol.TryResolve(property);
         if (parameter is null)
@@ -30,14 +30,16 @@ public class ParameterMustHaveValidValidatorsAnalyzer : AnalyzerBase
         {
             var validatorValueType = validatorType
                 .GetBaseTypes()
-                .FirstOrDefault(t => t.ConstructedFrom.DisplayNameMatches(SymbolNames.CliFxBindingValidatorClass))?
-                .TypeArguments
-                .FirstOrDefault();
+                .FirstOrDefault(
+                    t =>
+                        t.ConstructedFrom.DisplayNameMatches(SymbolNames.CliFxBindingValidatorClass)
+                )
+                ?.TypeArguments.FirstOrDefault();
 
             // Value passed to the validator must be assignable from the property type
             var isCompatible =
-                validatorValueType is not null &&
-                context.Compilation.IsAssignable(property.Type, validatorValueType);
+                validatorValueType is not null
+                && context.Compilation.IsAssignable(property.Type, validatorValueType);
 
             if (!isCompatible)
             {

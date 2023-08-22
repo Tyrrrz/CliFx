@@ -11,9 +11,7 @@ namespace CliFx.Tests;
 public class RoutingSpecs : SpecsBase
 {
     public RoutingSpecs(ITestOutputHelper testOutput)
-        : base(testOutput)
-    {
-    }
+        : base(testOutput) { }
 
     [Fact]
     public async Task I_can_configure_a_command_to_be_executed_by_default_when_the_user_does_not_specify_a_command_name()
@@ -118,7 +116,7 @@ public class RoutingSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"cmd"},
+            new[] { "cmd" },
             new Dictionary<string, string>()
         );
 
@@ -175,7 +173,7 @@ public class RoutingSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"cmd", "child"},
+            new[] { "cmd", "child" },
             new Dictionary<string, string>()
         );
 

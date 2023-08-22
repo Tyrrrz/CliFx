@@ -13,8 +13,7 @@ public class CommandMustBeAnnotatedAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             public class MyCommand : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console) => default;
@@ -30,8 +29,7 @@ public class CommandMustBeAnnotatedAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public abstract class MyCommand : ICommand
             {
@@ -48,8 +46,7 @@ public class CommandMustBeAnnotatedAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             public abstract class MyCommand : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console) => default;
@@ -65,8 +62,7 @@ public class CommandMustBeAnnotatedAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             public class Foo
             {
                 public int Bar { get; init; } = 5;

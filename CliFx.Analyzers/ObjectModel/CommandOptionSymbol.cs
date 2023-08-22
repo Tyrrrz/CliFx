@@ -25,7 +25,8 @@ internal partial class CommandOptionSymbol : ICommandMemberSymbol
         char? shortName,
         bool? isRequired,
         ITypeSymbol? converterType,
-        IReadOnlyList<ITypeSymbol> validatorTypes)
+        IReadOnlyList<ITypeSymbol> validatorTypes
+    )
     {
         Property = property;
         Name = name;
@@ -38,9 +39,14 @@ internal partial class CommandOptionSymbol : ICommandMemberSymbol
 
 internal partial class CommandOptionSymbol
 {
-    private static AttributeData? TryGetOptionAttribute(IPropertySymbol property) => property
-        .GetAttributes()
-        .FirstOrDefault(a => a.AttributeClass?.DisplayNameMatches(SymbolNames.CliFxCommandOptionAttribute) == true);
+    private static AttributeData? TryGetOptionAttribute(IPropertySymbol property) =>
+        property
+            .GetAttributes()
+            .FirstOrDefault(
+                a =>
+                    a.AttributeClass?.DisplayNameMatches(SymbolNames.CliFxCommandOptionAttribute)
+                    == true
+            );
 
     public static CommandOptionSymbol? TryResolve(IPropertySymbol property)
     {
@@ -48,40 +54,45 @@ internal partial class CommandOptionSymbol
         if (attribute is null)
             return null;
 
-        var name = attribute
-            .ConstructorArguments
-            .Where(a => a.Type?.SpecialType == SpecialType.System_String)
-            .Select(a => a.Value)
-            .FirstOrDefault() as string;
+        var name =
+            attribute.ConstructorArguments
+                .Where(a => a.Type?.SpecialType == SpecialType.System_String)
+                .Select(a => a.Value)
+                .FirstOrDefault() as string;
 
-        var shortName = attribute
-            .ConstructorArguments
-            .Where(a => a.Type?.SpecialType == SpecialType.System_Char)
-            .Select(a => a.Value)
-            .FirstOrDefault() as char?;
+        var shortName =
+            attribute.ConstructorArguments
+                .Where(a => a.Type?.SpecialType == SpecialType.System_Char)
+                .Select(a => a.Value)
+                .FirstOrDefault() as char?;
 
-        var isRequired = attribute
-            .NamedArguments
-            .Where(a => a.Key == "IsRequired")
-            .Select(a => a.Value.Value)
-            .FirstOrDefault() as bool?;
+        var isRequired =
+            attribute.NamedArguments
+                .Where(a => a.Key == "IsRequired")
+                .Select(a => a.Value.Value)
+                .FirstOrDefault() as bool?;
 
-        var converter = attribute
-            .NamedArguments
+        var converter = attribute.NamedArguments
             .Where(a => a.Key == "Converter")
             .Select(a => a.Value.Value)
             .Cast<ITypeSymbol?>()
             .FirstOrDefault();
 
-        var validators = attribute
-            .NamedArguments
+        var validators = attribute.NamedArguments
             .Where(a => a.Key == "Validators")
             .SelectMany(a => a.Value.Values)
             .Select(c => c.Value)
             .Cast<ITypeSymbol>()
             .ToArray();
 
-        return new CommandOptionSymbol(property, name, shortName, isRequired, converter, validators);
+        return new CommandOptionSymbol(
+            property,
+            name,
+            shortName,
+            isRequired,
+            converter,
+            validators
+        );
     }
 
     public static bool IsOptionProperty(IPropertySymbol property) =>

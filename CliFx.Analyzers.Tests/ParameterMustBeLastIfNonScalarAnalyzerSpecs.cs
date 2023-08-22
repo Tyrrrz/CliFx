@@ -6,15 +6,15 @@ namespace CliFx.Analyzers.Tests;
 
 public class ParameterMustBeLastIfNonScalarAnalyzerSpecs
 {
-    private static DiagnosticAnalyzer Analyzer { get; } = new ParameterMustBeLastIfNonScalarAnalyzer();
+    private static DiagnosticAnalyzer Analyzer { get; } =
+        new ParameterMustBeLastIfNonScalarAnalyzer();
 
     [Fact]
     public void Analyzer_reports_an_error_if_a_non_scalar_parameter_is_not_the_last_in_order()
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {
@@ -37,8 +37,7 @@ public class ParameterMustBeLastIfNonScalarAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {
@@ -61,8 +60,7 @@ public class ParameterMustBeLastIfNonScalarAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {
@@ -85,8 +83,7 @@ public class ParameterMustBeLastIfNonScalarAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {

@@ -14,10 +14,7 @@ public class CancellationTestCommand : ICommand
         {
             console.Output.WriteLine("Started.");
 
-            await Task.Delay(
-                TimeSpan.FromSeconds(3),
-                console.RegisterCancellationHandler()
-            );
+            await Task.Delay(TimeSpan.FromSeconds(3), console.RegisterCancellationHandler());
 
             console.Output.WriteLine("Completed.");
         }

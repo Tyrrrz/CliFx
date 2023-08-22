@@ -12,15 +12,15 @@ public class OptionMustHaveValidShortNameAnalyzer : AnalyzerBase
     public OptionMustHaveValidShortNameAnalyzer()
         : base(
             "Option short names must be letter characters",
-            "This option's short name must be a single letter character. " +
-            "Specified short name: `{0}`.")
-    {
-    }
+            "This option's short name must be a single letter character. "
+                + "Specified short name: `{0}`."
+        ) { }
 
     private void Analyze(
         SyntaxNodeAnalysisContext context,
         PropertyDeclarationSyntax propertyDeclaration,
-        IPropertySymbol property)
+        IPropertySymbol property
+    )
     {
         var option = CommandOptionSymbol.TryResolve(property);
         if (option is null)
@@ -32,10 +32,7 @@ public class OptionMustHaveValidShortNameAnalyzer : AnalyzerBase
         if (!char.IsLetter(option.ShortName.Value))
         {
             context.ReportDiagnostic(
-                CreateDiagnostic(
-                    propertyDeclaration.Identifier.GetLocation(),
-                    option.ShortName
-                )
+                CreateDiagnostic(propertyDeclaration.Identifier.GetLocation(), option.ShortName)
             );
         }
     }

@@ -6,15 +6,15 @@ namespace CliFx.Analyzers.Tests;
 
 public class ParameterMustHaveUniqueOrderAnalyzerSpecs
 {
-    private static DiagnosticAnalyzer Analyzer { get; } = new ParameterMustHaveUniqueOrderAnalyzer();
+    private static DiagnosticAnalyzer Analyzer { get; } =
+        new ParameterMustHaveUniqueOrderAnalyzer();
 
     [Fact]
     public void Analyzer_reports_an_error_if_a_parameter_has_the_same_order_as_another_parameter()
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {
@@ -37,8 +37,7 @@ public class ParameterMustHaveUniqueOrderAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {
@@ -61,8 +60,7 @@ public class ParameterMustHaveUniqueOrderAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {

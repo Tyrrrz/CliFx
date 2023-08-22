@@ -12,14 +12,14 @@ public class ParameterMustBeRequiredIfPropertyRequiredAnalyzer : AnalyzerBase
     public ParameterMustBeRequiredIfPropertyRequiredAnalyzer()
         : base(
             "Parameters bound to required properties cannot be marked as non-required",
-            "This parameter cannot be marked as non-required because it's bound to a required property.")
-    {
-    }
+            "This parameter cannot be marked as non-required because it's bound to a required property."
+        ) { }
 
     private void Analyze(
         SyntaxNodeAnalysisContext context,
         PropertyDeclarationSyntax propertyDeclaration,
-        IPropertySymbol property)
+        IPropertySymbol property
+    )
     {
         if (property.ContainingType is null)
             return;
@@ -34,11 +34,7 @@ public class ParameterMustBeRequiredIfPropertyRequiredAnalyzer : AnalyzerBase
         if (parameter.IsRequired != false)
             return;
 
-        context.ReportDiagnostic(
-            CreateDiagnostic(
-                propertyDeclaration.Identifier.GetLocation()
-            )
-        );
+        context.ReportDiagnostic(CreateDiagnostic(propertyDeclaration.Identifier.GetLocation()));
     }
 
     public override void Initialize(AnalysisContext context)

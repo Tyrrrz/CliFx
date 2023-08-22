@@ -13,15 +13,15 @@ public class ParameterMustBeSingleIfNonRequiredAnalyzer : AnalyzerBase
     public ParameterMustBeSingleIfNonRequiredAnalyzer()
         : base(
             "Parameters marked as non-required are limited to one per command",
-            "This parameter is non-required so it must be the only such parameter in the command. " +
-            "Property bound to another non-required parameter: `{0}`.")
-    {
-    }
+            "This parameter is non-required so it must be the only such parameter in the command. "
+                + "Property bound to another non-required parameter: `{0}`."
+        ) { }
 
     private void Analyze(
         SyntaxNodeAnalysisContext context,
         PropertyDeclarationSyntax propertyDeclaration,
-        IPropertySymbol property)
+        IPropertySymbol property
+    )
     {
         if (property.ContainingType is null)
             return;
@@ -33,8 +33,7 @@ public class ParameterMustBeSingleIfNonRequiredAnalyzer : AnalyzerBase
         if (parameter.IsRequired != false)
             return;
 
-        var otherProperties = property
-            .ContainingType
+        var otherProperties = property.ContainingType
             .GetMembers()
             .OfType<IPropertySymbol>()
             .Where(m => !m.Equals(property))

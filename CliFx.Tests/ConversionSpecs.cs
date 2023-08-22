@@ -11,9 +11,7 @@ namespace CliFx.Tests;
 public class ConversionSpecs : SpecsBase
 {
     public ConversionSpecs(ITestOutputHelper testOutput)
-        : base(testOutput)
-    {
-    }
+        : base(testOutput) { }
 
     [Fact]
     public async Task I_can_bind_a_parameter_or_an_option_to_a_string_property()
@@ -44,7 +42,7 @@ public class ConversionSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"-f", "xyz"},
+            new[] { "-f", "xyz" },
             new Dictionary<string, string>()
         );
 
@@ -84,7 +82,7 @@ public class ConversionSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"-f", "xyz"},
+            new[] { "-f", "xyz" },
             new Dictionary<string, string>()
         );
 
@@ -133,12 +131,7 @@ public class ConversionSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[]
-            {
-                "-f", "true",
-                "-b", "false",
-                "-c"
-            },
+            new[] { "-f", "true", "-b", "false", "-c" },
             new Dictionary<string, string>()
         );
 
@@ -146,11 +139,7 @@ public class ConversionSpecs : SpecsBase
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ConsistOfLines(
-            "Foo = True",
-            "Bar = False",
-            "Baz = True"
-        );
+        stdOut.Should().ConsistOfLines("Foo = True", "Bar = False", "Baz = True");
     }
 
     [Fact]
@@ -182,7 +171,7 @@ public class ConversionSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"-f", "32"},
+            new[] { "-f", "32" },
             new Dictionary<string, string>()
         );
 
@@ -222,7 +211,7 @@ public class ConversionSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"-f", "32.14"},
+            new[] { "-f", "32.14" },
             new Dictionary<string, string>()
         );
 
@@ -262,7 +251,7 @@ public class ConversionSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"-f", "1995-04-28Z"},
+            new[] { "-f", "1995-04-28Z" },
             new Dictionary<string, string>()
         );
 
@@ -302,7 +291,7 @@ public class ConversionSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"-f", "12:34:56"},
+            new[] { "-f", "12:34:56" },
             new Dictionary<string, string>()
         );
 
@@ -344,7 +333,7 @@ public class ConversionSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"-f", "two"},
+            new[] { "-f", "two" },
             new Dictionary<string, string>()
         );
 
@@ -389,7 +378,7 @@ public class ConversionSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"-b", "123"},
+            new[] { "-b", "123" },
             new Dictionary<string, string>()
         );
 
@@ -397,10 +386,7 @@ public class ConversionSpecs : SpecsBase
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ConsistOfLines(
-            "Foo = ",
-            "Bar = 123"
-        );
+        stdOut.Should().ConsistOfLines("Foo = ", "Bar = 123");
     }
 
     [Fact]
@@ -439,7 +425,7 @@ public class ConversionSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"-b", "two"},
+            new[] { "-b", "two" },
             new Dictionary<string, string>()
         );
 
@@ -447,10 +433,7 @@ public class ConversionSpecs : SpecsBase
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ConsistOfLines(
-            "Foo = ",
-            "Bar = 2"
-        );
+        stdOut.Should().ConsistOfLines("Foo = ", "Bar = 2");
     }
 
     [Fact]
@@ -489,7 +472,7 @@ public class ConversionSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"-f", "xyz"},
+            new[] { "-f", "xyz" },
             new Dictionary<string, string>()
         );
 
@@ -554,7 +537,7 @@ public class ConversionSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"-f", "hello", "-b", "world"},
+            new[] { "-f", "hello", "-b", "world" },
             new Dictionary<string, string>()
         );
 
@@ -562,10 +545,7 @@ public class ConversionSpecs : SpecsBase
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ConsistOfLines(
-            "Foo = hello",
-            "Bar = world"
-        );
+        stdOut.Should().ConsistOfLines("Foo = hello", "Bar = world");
     }
 
     [Fact]
@@ -603,7 +583,7 @@ public class ConversionSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"-f", "hello world"},
+            new[] { "-f", "hello world" },
             new Dictionary<string, string>()
         );
 
@@ -645,7 +625,7 @@ public class ConversionSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"-f", "one", "two", "three"},
+            new[] { "-f", "one", "two", "three" },
             new Dictionary<string, string>()
         );
 
@@ -653,11 +633,7 @@ public class ConversionSpecs : SpecsBase
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ConsistOfLines(
-            "one",
-            "two",
-            "three"
-        );
+        stdOut.Should().ConsistOfLines("one", "two", "three");
     }
 
     [Fact]
@@ -691,7 +667,7 @@ public class ConversionSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"-f", "one", "two", "three"},
+            new[] { "-f", "one", "two", "three" },
             new Dictionary<string, string>()
         );
 
@@ -699,11 +675,7 @@ public class ConversionSpecs : SpecsBase
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ConsistOfLines(
-            "one",
-            "two",
-            "three"
-        );
+        stdOut.Should().ConsistOfLines("one", "two", "three");
     }
 
     [Fact]
@@ -737,7 +709,7 @@ public class ConversionSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"-f", "one", "two", "three"},
+            new[] { "-f", "one", "two", "three" },
             new Dictionary<string, string>()
         );
 
@@ -745,11 +717,7 @@ public class ConversionSpecs : SpecsBase
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ConsistOfLines(
-            "one",
-            "two",
-            "three"
-        );
+        stdOut.Should().ConsistOfLines("one", "two", "three");
     }
 
     [Fact]
@@ -783,7 +751,7 @@ public class ConversionSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"-f", "1", "13", "27"},
+            new[] { "-f", "1", "13", "27" },
             new Dictionary<string, string>()
         );
 
@@ -791,11 +759,7 @@ public class ConversionSpecs : SpecsBase
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ConsistOfLines(
-            "1",
-            "13",
-            "27"
-        );
+        stdOut.Should().ConsistOfLines("1", "13", "27");
     }
 
     [Fact]
@@ -827,7 +791,7 @@ public class ConversionSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"-f", "xyz"},
+            new[] { "-f", "xyz" },
             new Dictionary<string, string>()
         );
 
@@ -870,7 +834,7 @@ public class ConversionSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"-f", "one", "two"},
+            new[] { "-f", "one", "two" },
             new Dictionary<string, string>()
         );
 
@@ -906,7 +870,7 @@ public class ConversionSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"-f", "12.34"},
+            new[] { "-f", "12.34" },
             new Dictionary<string, string>()
         );
 
@@ -952,7 +916,7 @@ public class ConversionSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"-f", "12"},
+            new[] { "-f", "12" },
             new Dictionary<string, string>()
         );
 
@@ -997,7 +961,7 @@ public class ConversionSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"-f", "bar"},
+            new[] { "-f", "bar" },
             new Dictionary<string, string>()
         );
 

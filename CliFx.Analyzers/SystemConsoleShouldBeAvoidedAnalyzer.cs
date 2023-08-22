@@ -15,13 +15,13 @@ public class SystemConsoleShouldBeAvoidedAnalyzer : AnalyzerBase
         : base(
             $"Avoid calling `System.Console` where `{SymbolNames.CliFxConsoleInterface}` is available",
             $"Use the provided `{SymbolNames.CliFxConsoleInterface}` abstraction instead of `System.Console` to ensure that the command can be tested in isolation.",
-            DiagnosticSeverity.Warning)
-    {
-    }
+            DiagnosticSeverity.Warning
+        ) { }
 
     private MemberAccessExpressionSyntax? TryGetSystemConsoleMemberAccess(
         SyntaxNodeAnalysisContext context,
-        SyntaxNode node)
+        SyntaxNode node
+    )
     {
         var currentNode = node;
 
@@ -53,8 +53,7 @@ public class SystemConsoleShouldBeAvoidedAnalyzer : AnalyzerBase
             return;
 
         // Check if IConsole is available in scope as an alternative to System.Console
-        var isConsoleInterfaceAvailable = context
-            .Node
+        var isConsoleInterfaceAvailable = context.Node
             .Ancestors()
             .OfType<MethodDeclarationSyntax>()
             .SelectMany(m => m.ParameterList.Parameters)
@@ -65,9 +64,7 @@ public class SystemConsoleShouldBeAvoidedAnalyzer : AnalyzerBase
 
         if (isConsoleInterfaceAvailable)
         {
-            context.ReportDiagnostic(
-                CreateDiagnostic(systemConsoleMemberAccess.GetLocation())
-            );
+            context.ReportDiagnostic(CreateDiagnostic(systemConsoleMemberAccess.GetLocation()));
         }
     }
 

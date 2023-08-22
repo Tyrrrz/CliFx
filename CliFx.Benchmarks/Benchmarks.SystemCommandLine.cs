@@ -15,18 +15,9 @@ public partial class Benchmarks
         {
             var command = new RootCommand
             {
-                new Option(new[] {"--str", "-s"})
-                {
-                    Argument = new Argument<string?>()
-                },
-                new Option(new[] {"--int", "-i"})
-                {
-                    Argument = new Argument<int>()
-                },
-                new Option(new[] {"--bool", "-b"})
-                {
-                    Argument = new Argument<bool>()
-                }
+                new Option(new[] { "--str", "-s" }) { Argument = new Argument<string?>() },
+                new Option(new[] { "--int", "-i" }) { Argument = new Argument<int>() },
+                new Option(new[] { "--bool", "-b" }) { Argument = new Argument<bool>() }
             };
 
             command.Handler = CommandHandler.Create(

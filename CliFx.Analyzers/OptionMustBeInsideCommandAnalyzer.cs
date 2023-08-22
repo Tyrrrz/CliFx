@@ -13,14 +13,14 @@ public class OptionMustBeInsideCommandAnalyzer : AnalyzerBase
     public OptionMustBeInsideCommandAnalyzer()
         : base(
             "Options must be defined inside commands",
-            $"This option must be defined inside a class that implements `{SymbolNames.CliFxCommandInterface}`.")
-    {
-    }
+            $"This option must be defined inside a class that implements `{SymbolNames.CliFxCommandInterface}`."
+        ) { }
 
     private void Analyze(
         SyntaxNodeAnalysisContext context,
         PropertyDeclarationSyntax propertyDeclaration,
-        IPropertySymbol property)
+        IPropertySymbol property
+    )
     {
         if (property.ContainingType is null)
             return;
@@ -31,10 +31,9 @@ public class OptionMustBeInsideCommandAnalyzer : AnalyzerBase
         if (!CommandOptionSymbol.IsOptionProperty(property))
             return;
 
-        var isInsideCommand = property
-            .ContainingType
-            .AllInterfaces
-            .Any(i => i.DisplayNameMatches(SymbolNames.CliFxCommandInterface));
+        var isInsideCommand = property.ContainingType.AllInterfaces.Any(
+            i => i.DisplayNameMatches(SymbolNames.CliFxCommandInterface)
+        );
 
         if (!isInsideCommand)
         {

@@ -12,9 +12,7 @@ namespace CliFx.Tests;
 public class OptionBindingSpecs : SpecsBase
 {
     public OptionBindingSpecs(ITestOutputHelper testOutput)
-        : base(testOutput)
-    {
-    }
+        : base(testOutput) { }
 
     [Fact]
     public async Task I_can_bind_an_option_to_a_property_and_get_the_value_from_the_corresponding_argument_by_name()
@@ -45,7 +43,7 @@ public class OptionBindingSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"--foo"},
+            new[] { "--foo" },
             new Dictionary<string, string>()
         );
 
@@ -84,10 +82,7 @@ public class OptionBindingSpecs : SpecsBase
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            new[] {"-f"},
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync(new[] { "-f" }, new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(0);
@@ -130,11 +125,7 @@ public class OptionBindingSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[]
-            {
-                "--foo", "one",
-                "--bar", "two"
-            },
+            new[] { "--foo", "one", "--bar", "two" },
             new Dictionary<string, string>()
         );
 
@@ -142,10 +133,7 @@ public class OptionBindingSpecs : SpecsBase
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ConsistOfLines(
-            "Foo = one",
-            "Bar = two"
-        );
+        stdOut.Should().ConsistOfLines("Foo = one", "Bar = two");
     }
 
     [Fact]
@@ -182,11 +170,7 @@ public class OptionBindingSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[]
-            {
-                "-f", "one",
-                "-b", "two"
-            },
+            new[] { "-f", "one", "-b", "two" },
             new Dictionary<string, string>()
         );
 
@@ -194,10 +178,7 @@ public class OptionBindingSpecs : SpecsBase
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ConsistOfLines(
-            "Foo = one",
-            "Bar = two"
-        );
+        stdOut.Should().ConsistOfLines("Foo = one", "Bar = two");
     }
 
     [Fact]
@@ -234,7 +215,7 @@ public class OptionBindingSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"-fb", "value"},
+            new[] { "-fb", "value" },
             new Dictionary<string, string>()
         );
 
@@ -242,10 +223,7 @@ public class OptionBindingSpecs : SpecsBase
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ConsistOfLines(
-            "Foo = ",
-            "Bar = value"
-        );
+        stdOut.Should().ConsistOfLines("Foo = ", "Bar = value");
     }
 
     [Fact]
@@ -279,7 +257,7 @@ public class OptionBindingSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"--foo", "one", "two", "three"},
+            new[] { "--foo", "one", "two", "three" },
             new Dictionary<string, string>()
         );
 
@@ -287,11 +265,7 @@ public class OptionBindingSpecs : SpecsBase
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ConsistOfLines(
-            "one",
-            "two",
-            "three"
-        );
+        stdOut.Should().ConsistOfLines("one", "two", "three");
     }
 
     [Fact]
@@ -325,7 +299,7 @@ public class OptionBindingSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"-f", "one", "two", "three"},
+            new[] { "-f", "one", "two", "three" },
             new Dictionary<string, string>()
         );
 
@@ -333,11 +307,7 @@ public class OptionBindingSpecs : SpecsBase
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ConsistOfLines(
-            "one",
-            "two",
-            "three"
-        );
+        stdOut.Should().ConsistOfLines("one", "two", "three");
     }
 
     [Fact]
@@ -371,12 +341,7 @@ public class OptionBindingSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[]
-            {
-                "--foo", "one",
-                "--foo", "two",
-                "--foo", "three"
-            },
+            new[] { "--foo", "one", "--foo", "two", "--foo", "three" },
             new Dictionary<string, string>()
         );
 
@@ -384,11 +349,7 @@ public class OptionBindingSpecs : SpecsBase
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ConsistOfLines(
-            "one",
-            "two",
-            "three"
-        );
+        stdOut.Should().ConsistOfLines("one", "two", "three");
     }
 
     [Fact]
@@ -422,12 +383,7 @@ public class OptionBindingSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[]
-            {
-                "-f", "one",
-                "-f", "two",
-                "-f", "three"
-            },
+            new[] { "-f", "one", "-f", "two", "-f", "three" },
             new Dictionary<string, string>()
         );
 
@@ -435,11 +391,7 @@ public class OptionBindingSpecs : SpecsBase
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ConsistOfLines(
-            "one",
-            "two",
-            "three"
-        );
+        stdOut.Should().ConsistOfLines("one", "two", "three");
     }
 
     [Fact]
@@ -473,12 +425,7 @@ public class OptionBindingSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[]
-            {
-                "--foo", "one",
-                "-f", "two",
-                "--foo", "three"
-            },
+            new[] { "--foo", "one", "-f", "two", "--foo", "three" },
             new Dictionary<string, string>()
         );
 
@@ -486,11 +433,7 @@ public class OptionBindingSpecs : SpecsBase
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ConsistOfLines(
-            "one",
-            "two",
-            "three"
-        );
+        stdOut.Should().ConsistOfLines("one", "two", "three");
     }
 
     [Fact]
@@ -527,7 +470,7 @@ public class OptionBindingSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"--foo", "one"},
+            new[] { "--foo", "one" },
             new Dictionary<string, string>()
         );
 
@@ -535,10 +478,7 @@ public class OptionBindingSpecs : SpecsBase
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ConsistOfLines(
-            "Foo = one",
-            "Bar = hello"
-        );
+        stdOut.Should().ConsistOfLines("Foo = one", "Bar = hello");
     }
 
     [Fact]
@@ -604,24 +544,13 @@ public class OptionBindingSpecs : SpecsBase
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            new[]
-            {
-                "--foo", "42",
-                "--bar",
-                "--baz", "xyz"
-            }
-        );
+        var exitCode = await application.RunAsync(new[] { "--foo", "42", "--bar", "--baz", "xyz" });
 
         // Assert
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ConsistOfLines(
-            "Foo = 42",
-            "Bar = True",
-            "Baz = xyz"
-        );
+        stdOut.Should().ConsistOfLines("Foo = 42", "Bar = True", "Baz = xyz");
     }
 
     [Fact]
@@ -653,7 +582,7 @@ public class OptionBindingSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"--foo", "-13"},
+            new[] { "--foo", "-13" },
             new Dictionary<string, string>()
         );
 
@@ -725,7 +654,7 @@ public class OptionBindingSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"--foo"},
+            new[] { "--foo" },
             new Dictionary<string, string>()
         );
 
@@ -761,7 +690,7 @@ public class OptionBindingSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"--foo"},
+            new[] { "--foo" },
             new Dictionary<string, string>()
         );
 
@@ -797,11 +726,7 @@ public class OptionBindingSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[]
-            {
-                "--foo", "one",
-                "--bar", "two"
-            },
+            new[] { "--foo", "one", "--bar", "two" },
             new Dictionary<string, string>()
         );
 
@@ -837,7 +762,7 @@ public class OptionBindingSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"--foo", "one", "two", "three"},
+            new[] { "--foo", "one", "two", "three" },
             new Dictionary<string, string>()
         );
 

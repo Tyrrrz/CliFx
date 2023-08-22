@@ -6,15 +6,15 @@ namespace CliFx.Analyzers.Tests;
 
 public class ParameterMustHaveValidConverterAnalyzerSpecs
 {
-    private static DiagnosticAnalyzer Analyzer { get; } = new ParameterMustHaveValidConverterAnalyzer();
+    private static DiagnosticAnalyzer Analyzer { get; } =
+        new ParameterMustHaveValidConverterAnalyzer();
 
     [Fact]
     public void Analyzer_reports_an_error_if_a_parameter_has_a_converter_that_does_not_derive_from_BindingConverter()
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             public class MyConverter
             {
                 public string Convert(string? rawValue) => rawValue;
@@ -39,8 +39,7 @@ public class ParameterMustHaveValidConverterAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             public class MyConverter : BindingConverter<int>
             {
                 public override int Convert(string? rawValue) => 42;
@@ -56,7 +55,6 @@ public class ParameterMustHaveValidConverterAnalyzerSpecs
             }
             """;
 
-
         // Act & assert
         Analyzer.Should().ProduceDiagnostics(code);
     }
@@ -66,8 +64,7 @@ public class ParameterMustHaveValidConverterAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             public class MyConverter : BindingConverter<string>
             {
                 public override string Convert(string? rawValue) => rawValue;
@@ -92,8 +89,7 @@ public class ParameterMustHaveValidConverterAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             public class MyConverter : BindingConverter<int>
             {
                 public override int Convert(string? rawValue) => 42;
@@ -118,8 +114,7 @@ public class ParameterMustHaveValidConverterAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             public class MyConverter : BindingConverter<string>
             {
                 public override string Convert(string? rawValue) => rawValue;
@@ -144,8 +139,7 @@ public class ParameterMustHaveValidConverterAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {
@@ -165,8 +159,7 @@ public class ParameterMustHaveValidConverterAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {

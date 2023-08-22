@@ -6,15 +6,15 @@ namespace CliFx.Analyzers.Tests;
 
 public class ParameterMustBeInsideCommandAnalyzerSpecs
 {
-    private static DiagnosticAnalyzer Analyzer { get; } = new ParameterMustBeInsideCommandAnalyzer();
+    private static DiagnosticAnalyzer Analyzer { get; } =
+        new ParameterMustBeInsideCommandAnalyzer();
 
     [Fact]
     public void Analyzer_reports_an_error_if_a_parameter_is_inside_a_class_that_is_not_a_command()
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             public class MyClass
             {
                 [CommandParameter(0)]
@@ -31,8 +31,7 @@ public class ParameterMustBeInsideCommandAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {
@@ -52,8 +51,7 @@ public class ParameterMustBeInsideCommandAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             public abstract class MyCommand
             {
                 [CommandParameter(0)]
@@ -70,8 +68,7 @@ public class ParameterMustBeInsideCommandAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {

@@ -14,16 +14,16 @@ public class OptionMustHaveUniqueNameAnalyzer : AnalyzerBase
     public OptionMustHaveUniqueNameAnalyzer()
         : base(
             "Options must have unique names",
-            "This option's name must be unique within the command (comparison IS NOT case sensitive). " +
-            "Specified name: `{0}`. " +
-            "Property bound to another option with the same name: `{1}`.")
-    {
-    }
+            "This option's name must be unique within the command (comparison IS NOT case sensitive). "
+                + "Specified name: `{0}`. "
+                + "Property bound to another option with the same name: `{1}`."
+        ) { }
 
     private void Analyze(
         SyntaxNodeAnalysisContext context,
         PropertyDeclarationSyntax propertyDeclaration,
-        IPropertySymbol property)
+        IPropertySymbol property
+    )
     {
         if (property.ContainingType is null)
             return;
@@ -35,8 +35,7 @@ public class OptionMustHaveUniqueNameAnalyzer : AnalyzerBase
         if (string.IsNullOrWhiteSpace(option.Name))
             return;
 
-        var otherProperties = property
-            .ContainingType
+        var otherProperties = property.ContainingType
             .GetMembers()
             .OfType<IPropertySymbol>()
             .Where(m => !m.Equals(property))

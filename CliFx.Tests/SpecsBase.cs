@@ -11,8 +11,7 @@ public abstract class SpecsBase : IDisposable
 
     public FakeInMemoryConsole FakeConsole { get; } = new();
 
-    protected SpecsBase(ITestOutputHelper testOutput) =>
-        TestOutput = testOutput;
+    protected SpecsBase(ITestOutputHelper testOutput) => TestOutput = testOutput;
 
     public void Dispose()
     {

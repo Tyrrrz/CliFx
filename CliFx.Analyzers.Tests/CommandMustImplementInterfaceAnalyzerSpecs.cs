@@ -6,15 +6,15 @@ namespace CliFx.Analyzers.Tests;
 
 public class CommandMustImplementInterfaceAnalyzerSpecs
 {
-    private static DiagnosticAnalyzer Analyzer { get; } = new CommandMustImplementInterfaceAnalyzer();
+    private static DiagnosticAnalyzer Analyzer { get; } =
+        new CommandMustImplementInterfaceAnalyzer();
 
     [Fact]
     public void Analyzer_reports_an_error_if_a_command_does_not_implement_ICommand_interface()
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand
             {
@@ -31,8 +31,7 @@ public class CommandMustImplementInterfaceAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {
@@ -49,8 +48,7 @@ public class CommandMustImplementInterfaceAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             public class Foo
             {
                 public int Bar { get; init; } = 5;

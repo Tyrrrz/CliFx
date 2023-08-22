@@ -6,15 +6,15 @@ namespace CliFx.Analyzers.Tests;
 
 public class SystemConsoleShouldBeAvoidedAnalyzerSpecs
 {
-    private static DiagnosticAnalyzer Analyzer { get; } = new SystemConsoleShouldBeAvoidedAnalyzer();
+    private static DiagnosticAnalyzer Analyzer { get; } =
+        new SystemConsoleShouldBeAvoidedAnalyzer();
 
     [Fact]
     public void Analyzer_reports_an_error_if_a_command_calls_a_method_on_SystemConsole()
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {
@@ -35,8 +35,7 @@ public class SystemConsoleShouldBeAvoidedAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {
@@ -57,8 +56,7 @@ public class SystemConsoleShouldBeAvoidedAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {
@@ -79,8 +77,7 @@ public class SystemConsoleShouldBeAvoidedAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {
@@ -101,8 +98,7 @@ public class SystemConsoleShouldBeAvoidedAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {
@@ -121,8 +117,7 @@ public class SystemConsoleShouldBeAvoidedAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {

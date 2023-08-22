@@ -12,9 +12,7 @@ namespace CliFx.Tests;
 public class ErrorReportingSpecs : SpecsBase
 {
     public ErrorReportingSpecs(ITestOutputHelper testOutput)
-        : base(testOutput)
-    {
-    }
+        : base(testOutput) { }
 
     [Fact]
     public async Task I_can_throw_an_exception_in_a_command_to_report_an_error_with_a_stacktrace()
@@ -50,10 +48,9 @@ public class ErrorReportingSpecs : SpecsBase
         stdOut.Should().BeEmpty();
 
         var stdErr = FakeConsole.ReadErrorString();
-        stdErr.Should().ContainAllInOrder(
-            "System.Exception", "Something went wrong",
-            "at", "CliFx."
-        );
+        stdErr
+            .Should()
+            .ContainAllInOrder("System.Exception", "Something went wrong", "at", "CliFx.");
     }
 
     [Fact]
@@ -90,11 +87,16 @@ public class ErrorReportingSpecs : SpecsBase
         stdOut.Should().BeEmpty();
 
         var stdErr = FakeConsole.ReadErrorString();
-        stdErr.Should().ContainAllInOrder(
-            "System.Exception", "Something went wrong",
-            "System.Exception", "Another exception",
-            "at", "CliFx."
-        );
+        stdErr
+            .Should()
+            .ContainAllInOrder(
+                "System.Exception",
+                "Something went wrong",
+                "System.Exception",
+                "Another exception",
+                "at",
+                "CliFx."
+            );
     }
 
     [Fact]
@@ -168,10 +170,7 @@ public class ErrorReportingSpecs : SpecsBase
         stdOut.Should().BeEmpty();
 
         var stdErr = FakeConsole.ReadErrorString();
-        stdErr.Should().ContainAllInOrder(
-            "CliFx.Exceptions.CommandException",
-            "at", "CliFx."
-        );
+        stdErr.Should().ContainAllInOrder("CliFx.Exceptions.CommandException", "at", "CliFx.");
     }
 
     [Fact]

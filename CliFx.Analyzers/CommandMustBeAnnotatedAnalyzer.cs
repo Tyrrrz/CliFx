@@ -13,14 +13,14 @@ public class CommandMustBeAnnotatedAnalyzer : AnalyzerBase
     public CommandMustBeAnnotatedAnalyzer()
         : base(
             $"Commands must be annotated with `{SymbolNames.CliFxCommandAttribute}`",
-            $"This type must be annotated with `{SymbolNames.CliFxCommandAttribute}` in order to be a valid command.")
-    {
-    }
+            $"This type must be annotated with `{SymbolNames.CliFxCommandAttribute}` in order to be a valid command."
+        ) { }
 
     private void Analyze(
         SyntaxNodeAnalysisContext context,
         ClassDeclarationSyntax classDeclaration,
-        ITypeSymbol type)
+        ITypeSymbol type
+    )
     {
         // Ignore abstract classes, because they may be used to define
         // base implementations for commands, in which case the command
@@ -28,12 +28,11 @@ public class CommandMustBeAnnotatedAnalyzer : AnalyzerBase
         if (type.IsAbstract)
             return;
 
-        var implementsCommandInterface = type
-            .AllInterfaces
-            .Any(i => i.DisplayNameMatches(SymbolNames.CliFxCommandInterface));
+        var implementsCommandInterface = type.AllInterfaces.Any(
+            i => i.DisplayNameMatches(SymbolNames.CliFxCommandInterface)
+        );
 
-        var hasCommandAttribute = type
-            .GetAttributes()
+        var hasCommandAttribute = type.GetAttributes()
             .Select(a => a.AttributeClass)
             .Any(c => c.DisplayNameMatches(SymbolNames.CliFxCommandAttribute));
 
@@ -41,9 +40,7 @@ public class CommandMustBeAnnotatedAnalyzer : AnalyzerBase
         // then it's very likely a user error.
         if (implementsCommandInterface && !hasCommandAttribute)
         {
-            context.ReportDiagnostic(
-                CreateDiagnostic(classDeclaration.Identifier.GetLocation())
-            );
+            context.ReportDiagnostic(CreateDiagnostic(classDeclaration.Identifier.GetLocation()));
         }
     }
 

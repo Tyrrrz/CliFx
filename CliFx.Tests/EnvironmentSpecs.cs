@@ -15,9 +15,7 @@ namespace CliFx.Tests;
 public class EnvironmentSpecs : SpecsBase
 {
     public EnvironmentSpecs(ITestOutputHelper testOutput)
-        : base(testOutput)
-    {
-    }
+        : base(testOutput) { }
 
     [Fact]
     public async Task I_can_configure_an_option_to_fall_back_to_an_environment_variable_if_the_user_does_not_provide_the_corresponding_argument()
@@ -53,22 +51,15 @@ public class EnvironmentSpecs : SpecsBase
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] {"--foo", "42"},
-            new Dictionary<string, string>
-            {
-                ["ENV_FOO"] = "100",
-                ["ENV_BAR"] = "200"
-            }
+            new[] { "--foo", "42" },
+            new Dictionary<string, string> { ["ENV_FOO"] = "100", ["ENV_BAR"] = "200" }
         );
 
         // Assert
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Trim().Should().ConsistOfLines(
-            "42",
-            "200"
-        );
+        stdOut.Trim().Should().ConsistOfLines("42", "200");
     }
 
     [Fact]
@@ -103,20 +94,14 @@ public class EnvironmentSpecs : SpecsBase
         // Act
         var exitCode = await application.RunAsync(
             Array.Empty<string>(),
-            new Dictionary<string, string>
-            {
-                ["ENV_FOO"] = $"bar{Path.PathSeparator}baz"
-            }
+            new Dictionary<string, string> { ["ENV_FOO"] = $"bar{Path.PathSeparator}baz" }
         );
 
         // Assert
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ConsistOfLines(
-            "bar",
-            "baz"
-        );
+        stdOut.Should().ConsistOfLines("bar", "baz");
     }
 
     [Fact]
@@ -149,10 +134,7 @@ public class EnvironmentSpecs : SpecsBase
         // Act
         var exitCode = await application.RunAsync(
             Array.Empty<string>(),
-            new Dictionary<string, string>
-            {
-                ["ENV_FOO"] = $"bar{Path.PathSeparator}baz"
-            }
+            new Dictionary<string, string> { ["ENV_FOO"] = $"bar{Path.PathSeparator}baz" }
         );
 
         // Assert
@@ -171,9 +153,7 @@ public class EnvironmentSpecs : SpecsBase
         // Arrange
         var command = Cli.Wrap(Dummy.Program.FilePath)
             .WithArguments("env-test")
-            .WithEnvironmentVariables(e => e
-                .Set("ENV_TARGET", "Mars")
-            );
+            .WithEnvironmentVariables(e => e.Set("ENV_TARGET", "Mars"));
 
         // Act
         var result = await command.ExecuteBufferedAsync();

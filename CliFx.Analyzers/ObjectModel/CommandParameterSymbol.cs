@@ -25,7 +25,8 @@ internal partial class CommandParameterSymbol : ICommandMemberSymbol
         string? name,
         bool? isRequired,
         ITypeSymbol? converterType,
-        IReadOnlyList<ITypeSymbol> validatorTypes)
+        IReadOnlyList<ITypeSymbol> validatorTypes
+    )
     {
         Property = property;
         Order = order;
@@ -38,9 +39,14 @@ internal partial class CommandParameterSymbol : ICommandMemberSymbol
 
 internal partial class CommandParameterSymbol
 {
-    private static AttributeData? TryGetParameterAttribute(IPropertySymbol property) => property
-        .GetAttributes()
-        .FirstOrDefault(a => a.AttributeClass?.DisplayNameMatches(SymbolNames.CliFxCommandParameterAttribute) == true);
+    private static AttributeData? TryGetParameterAttribute(IPropertySymbol property) =>
+        property
+            .GetAttributes()
+            .FirstOrDefault(
+                a =>
+                    a.AttributeClass?.DisplayNameMatches(SymbolNames.CliFxCommandParameterAttribute)
+                    == true
+            );
 
     public static CommandParameterSymbol? TryResolve(IPropertySymbol property)
     {
@@ -48,32 +54,27 @@ internal partial class CommandParameterSymbol
         if (attribute is null)
             return null;
 
-        var order = (int)attribute
-            .ConstructorArguments
-            .Select(a => a.Value)
-            .First()!;
+        var order = (int)attribute.ConstructorArguments.Select(a => a.Value).First()!;
 
-        var name = attribute
-            .NamedArguments
-            .Where(a => a.Key == "Name")
-            .Select(a => a.Value.Value)
-            .FirstOrDefault() as string;
+        var name =
+            attribute.NamedArguments
+                .Where(a => a.Key == "Name")
+                .Select(a => a.Value.Value)
+                .FirstOrDefault() as string;
 
-        var isRequired = attribute
-            .NamedArguments
-            .Where(a => a.Key == "IsRequired")
-            .Select(a => a.Value.Value)
-            .FirstOrDefault() as bool?;
+        var isRequired =
+            attribute.NamedArguments
+                .Where(a => a.Key == "IsRequired")
+                .Select(a => a.Value.Value)
+                .FirstOrDefault() as bool?;
 
-        var converter = attribute
-            .NamedArguments
+        var converter = attribute.NamedArguments
             .Where(a => a.Key == "Converter")
             .Select(a => a.Value.Value)
             .Cast<ITypeSymbol?>()
             .FirstOrDefault();
 
-        var validators = attribute
-            .NamedArguments
+        var validators = attribute.NamedArguments
             .Where(a => a.Key == "Validators")
             .SelectMany(a => a.Value.Values)
             .Select(c => c.Value)

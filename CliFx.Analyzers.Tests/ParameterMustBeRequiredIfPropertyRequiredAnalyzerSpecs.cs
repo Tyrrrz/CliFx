@@ -6,15 +6,15 @@ namespace CliFx.Analyzers.Tests;
 
 public class ParameterMustBeRequiredIfPropertyRequiredAnalyzerSpecs
 {
-    private static DiagnosticAnalyzer Analyzer { get; } = new ParameterMustBeRequiredIfPropertyRequiredAnalyzer();
+    private static DiagnosticAnalyzer Analyzer { get; } =
+        new ParameterMustBeRequiredIfPropertyRequiredAnalyzer();
 
     [Fact]
     public void Analyzer_reports_an_error_if_a_non_required_parameter_is_bound_to_a_required_property()
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {
@@ -34,8 +34,7 @@ public class ParameterMustBeRequiredIfPropertyRequiredAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {
@@ -55,8 +54,7 @@ public class ParameterMustBeRequiredIfPropertyRequiredAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {
@@ -76,8 +74,7 @@ public class ParameterMustBeRequiredIfPropertyRequiredAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {
@@ -97,8 +94,7 @@ public class ParameterMustBeRequiredIfPropertyRequiredAnalyzerSpecs
     {
         // Arrange
         // lang=csharp
-        const string code =
-            """
+        const string code = """
             [Command]
             public class MyCommand : ICommand
             {
