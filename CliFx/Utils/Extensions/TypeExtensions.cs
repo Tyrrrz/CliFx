@@ -25,8 +25,7 @@ internal static class TypeExtensions
         if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IEnumerable<>))
             return type.GetGenericArguments().FirstOrDefault();
 
-        return type
-            .GetInterfaces()
+        return type.GetInterfaces()
             .Select(TryGetEnumerableUnderlyingType)
             .Where(t => t is not null)
             // Every IEnumerable<T> implements IEnumerable (which is essentially IEnumerable<object>),
@@ -35,15 +34,21 @@ internal static class TypeExtensions
             .MaxBy(t => t != typeof(object));
     }
 
-    public static MethodInfo? TryGetStaticParseMethod(this Type type, bool withFormatProvider = false)
+    public static MethodInfo? TryGetStaticParseMethod(
+        this Type type,
+        bool withFormatProvider = false
+    )
     {
         var argumentTypes = withFormatProvider
-            ? new[] {typeof(string), typeof(IFormatProvider)}
-            : new[] {typeof(string)};
+            ? new[] { typeof(string), typeof(IFormatProvider) }
+            : new[] { typeof(string) };
 
-        return type.GetMethod("Parse",
+        return type.GetMethod(
+            "Parse",
             BindingFlags.Public | BindingFlags.Static,
-            null, argumentTypes, null
+            null,
+            argumentTypes,
+            null
         );
     }
 

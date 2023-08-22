@@ -31,9 +31,7 @@ public partial class ConsoleReader : StreamReader
     /// Initializes an instance of <see cref="ConsoleReader" />.
     /// </summary>
     public ConsoleReader(IConsole console, Stream stream)
-        : this(console, stream, System.Console.InputEncoding)
-    {
-    }
+        : this(console, stream, System.Console.InputEncoding) { }
 
     // The following overrides are required to establish thread-safe behavior
     // in methods deriving from StreamReader.
@@ -99,8 +97,6 @@ public partial class ConsoleReader : StreamReader
 
 public partial class ConsoleReader
 {
-    internal static ConsoleReader Create(IConsole console, Stream stream) => new(
-        console,
-        Stream.Synchronized(stream)
-    );
+    internal static ConsoleReader Create(IConsole console, Stream stream) =>
+        new(console, Stream.Synchronized(stream));
 }

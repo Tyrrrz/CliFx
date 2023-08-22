@@ -10,9 +10,7 @@ namespace CliFx.Formatting;
 internal class ExceptionConsoleFormatter : ConsoleFormatter
 {
     public ExceptionConsoleFormatter(ConsoleWriter consoleWriter)
-        : base(consoleWriter)
-    {
-    }
+        : base(consoleWriter) { }
 
     private void WriteStackFrame(StackFrame stackFrame, int indentLevel)
     {

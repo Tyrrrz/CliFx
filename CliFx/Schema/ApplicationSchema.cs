@@ -14,20 +14,18 @@ internal partial class ApplicationSchema
         Commands = commands;
     }
 
-    public IReadOnlyList<string> GetCommandNames() => Commands
-        .Select(c => c.Name)
-        .WhereNotNullOrWhiteSpace()
-        .ToArray();
+    public IReadOnlyList<string> GetCommandNames() =>
+        Commands.Select(c => c.Name).WhereNotNullOrWhiteSpace().ToArray();
 
-    public CommandSchema? TryFindDefaultCommand() =>
-        Commands.FirstOrDefault(c => c.IsDefault);
+    public CommandSchema? TryFindDefaultCommand() => Commands.FirstOrDefault(c => c.IsDefault);
 
     public CommandSchema? TryFindCommand(string commandName) =>
         Commands.FirstOrDefault(c => c.MatchesName(commandName));
 
     private IReadOnlyList<CommandSchema> GetDescendantCommands(
         IReadOnlyList<CommandSchema> potentialParentCommandSchemas,
-        string? parentCommandName)
+        string? parentCommandName
+    )
     {
         var result = new List<CommandSchema>();
 
@@ -43,7 +41,8 @@ internal partial class ApplicationSchema
 
             var isDescendant =
                 // Every command is a descendant of the default command
-                string.IsNullOrWhiteSpace(parentCommandName) ||
+                string.IsNullOrWhiteSpace(parentCommandName)
+                ||
                 // Otherwise a command is a descendant if it starts with the same name segments
                 potentialParentCommandSchema.Name.StartsWith(
                     parentCommandName + ' ',
@@ -69,9 +68,7 @@ internal partial class ApplicationSchema
         // Filter out descendants of descendants, leave only direct children
         foreach (var descendant in descendants)
         {
-            result.RemoveRange(
-                GetDescendantCommands(descendants, descendant.Name)
-            );
+            result.RemoveRange(GetDescendantCommands(descendants, descendant.Name));
         }
 
         return result;
@@ -80,7 +77,6 @@ internal partial class ApplicationSchema
 
 internal partial class ApplicationSchema
 {
-    public static ApplicationSchema Resolve(IReadOnlyList<Type> commandTypes) => new(
-        commandTypes.Select(CommandSchema.Resolve).ToArray()
-    );
+    public static ApplicationSchema Resolve(IReadOnlyList<Type> commandTypes) =>
+        new(commandTypes.Select(CommandSchema.Resolve).ToArray());
 }

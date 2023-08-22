@@ -29,7 +29,8 @@ public class ApplicationConfiguration
     public ApplicationConfiguration(
         IReadOnlyList<Type> commandTypes,
         bool isDebugModeAllowed,
-        bool isPreviewModeAllowed)
+        bool isPreviewModeAllowed
+    )
     {
         CommandTypes = commandTypes;
         IsDebugModeAllowed = isDebugModeAllowed;

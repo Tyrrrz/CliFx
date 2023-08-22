@@ -41,7 +41,8 @@ public class CliApplication
         ApplicationMetadata metadata,
         ApplicationConfiguration configuration,
         IConsole console,
-        ITypeActivator typeActivator)
+        ITypeActivator typeActivator
+    )
     {
         Metadata = metadata;
         Configuration = configuration;
@@ -58,9 +59,11 @@ public class CliApplication
         Configuration.IsPreviewModeAllowed && commandInput.IsPreviewDirectiveSpecified;
 
     private bool ShouldShowHelpText(CommandSchema commandSchema, CommandInput commandInput) =>
-        commandSchema.IsHelpOptionAvailable && commandInput.IsHelpOptionSpecified ||
+        commandSchema.IsHelpOptionAvailable && commandInput.IsHelpOptionSpecified
+        ||
         // Show help text also if the fallback default command is executed without any arguments
-        commandSchema == FallbackDefaultCommand.Schema && !commandInput.HasArguments;
+        commandSchema == FallbackDefaultCommand.Schema
+            && !commandInput.HasArguments;
 
     private bool ShouldShowVersionText(CommandSchema commandSchema, CommandInput commandInput) =>
         commandSchema.IsVersionOptionAvailable && commandInput.IsVersionOptionSpecified;
@@ -83,7 +86,10 @@ public class CliApplication
             await Task.Delay(100);
     }
 
-    private async ValueTask<int> RunAsync(ApplicationSchema applicationSchema, CommandInput commandInput)
+    private async ValueTask<int> RunAsync(
+        ApplicationSchema applicationSchema,
+        CommandInput commandInput
+    )
     {
         // Console colors may have already been overridden by the parent process,
         // so we need to reset it to make sure that everything we write looks properly.
@@ -104,21 +110,25 @@ public class CliApplication
 
         // Try to get the command schema that matches the input
         var commandSchema =
-            (!string.IsNullOrWhiteSpace(commandInput.CommandName)
-                // If the command name is specified, try to find the command by name.
-                // This should always succeed, because the input parsing relies on
-                // the list of available command names.
-                ? applicationSchema.TryFindCommand(commandInput.CommandName)
-                // Otherwise, try to find the default command
-                : applicationSchema.TryFindDefaultCommand()) ??
+            (
+                !string.IsNullOrWhiteSpace(commandInput.CommandName)
+                    // If the command name is specified, try to find the command by name.
+                    // This should always succeed, because the input parsing relies on
+                    // the list of available command names.
+                    ? applicationSchema.TryFindCommand(commandInput.CommandName)
+                    // Otherwise, try to find the default command
+                    : applicationSchema.TryFindDefaultCommand()
+            )
+            ??
             // If a valid command was not found, use the fallback default command.
             // This is only used as a stub to show the help text.
             FallbackDefaultCommand.Schema;
 
         // Initialize an instance of the command type
-        var commandInstance = commandSchema == FallbackDefaultCommand.Schema
-            ? new FallbackDefaultCommand() // bypass the activator
-            : _typeActivator.CreateInstance<ICommand>(commandSchema.Type);
+        var commandInstance =
+            commandSchema == FallbackDefaultCommand.Schema
+                ? new FallbackDefaultCommand() // bypass the activator
+                : _typeActivator.CreateInstance<ICommand>(commandSchema.Type);
 
         // Assemble the help context
         var helpContext = new HelpContext(
@@ -178,7 +188,8 @@ public class CliApplication
     /// </remarks>
     public async ValueTask<int> RunAsync(
         IReadOnlyList<string> commandLineArguments,
-        IReadOnlyDictionary<string, string> environmentVariables)
+        IReadOnlyDictionary<string, string> environmentVariables
+    )
     {
         try
         {
@@ -213,16 +224,17 @@ public class CliApplication
     /// When running WITHOUT the debugger attached (i.e. in production), this method swallows
     /// all exceptions and reports them to the console.
     /// </remarks>
-    public async ValueTask<int> RunAsync(IReadOnlyList<string> commandLineArguments) => await RunAsync(
-        commandLineArguments,
-        Environment
-            .GetEnvironmentVariables()
-            .ToDictionary<string, string>(
-                RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                    ? StringComparer.OrdinalIgnoreCase
-                    : StringComparer.Ordinal
-            )
-    );
+    public async ValueTask<int> RunAsync(IReadOnlyList<string> commandLineArguments) =>
+        await RunAsync(
+            commandLineArguments,
+            Environment
+                .GetEnvironmentVariables()
+                .ToDictionary<string, string>(
+                    RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                        ? StringComparer.OrdinalIgnoreCase
+                        : StringComparer.Ordinal
+                )
+        );
 
     /// <summary>
     /// Runs the application.
@@ -233,9 +245,11 @@ public class CliApplication
     /// When running WITHOUT the debugger attached (i.e. in production), this method swallows
     /// all exceptions and reports them to the console.
     /// </remarks>
-    public async ValueTask<int> RunAsync() => await RunAsync(
-        Environment.GetCommandLineArgs()
-            .Skip(1) // first element is the file path
-            .ToArray()
-    );
+    public async ValueTask<int> RunAsync() =>
+        await RunAsync(
+            Environment
+                .GetCommandLineArgs()
+                .Skip(1) // first element is the file path
+                .ToArray()
+        );
 }

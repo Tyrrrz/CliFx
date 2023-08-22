@@ -39,8 +39,8 @@ public partial class CliApplicationBuilder
     /// <summary>
     /// Adds a command to the application.
     /// </summary>
-    public CliApplicationBuilder AddCommand<TCommand>() where TCommand : ICommand =>
-        AddCommand(typeof(TCommand));
+    public CliApplicationBuilder AddCommand<TCommand>()
+        where TCommand : ICommand => AddCommand(typeof(TCommand));
 
     /// <summary>
     /// Adds multiple commands to the application.
@@ -62,7 +62,9 @@ public partial class CliApplicationBuilder
     /// </remarks>
     public CliApplicationBuilder AddCommandsFrom(Assembly commandAssembly)
     {
-        foreach (var commandType in commandAssembly.ExportedTypes.Where(CommandSchema.IsCommandType))
+        foreach (
+            var commandType in commandAssembly.ExportedTypes.Where(CommandSchema.IsCommandType)
+        )
             AddCommand(commandType);
 
         return this;
@@ -90,7 +92,8 @@ public partial class CliApplicationBuilder
     /// This method looks for public non-abstract classes that implement <see cref="ICommand" />
     /// and are annotated by <see cref="CommandAttribute" />.
     /// </remarks>
-    public CliApplicationBuilder AddCommandsFromThisAssembly() => AddCommandsFrom(Assembly.GetCallingAssembly());
+    public CliApplicationBuilder AddCommandsFromThisAssembly() =>
+        AddCommandsFrom(Assembly.GetCallingAssembly());
 
     /// <summary>
     /// Specifies whether debug mode (enabled with the [debug] directive) is allowed in the application.
@@ -190,8 +193,9 @@ public partial class CliApplicationBuilder
     /// This method takes a delegate that receives the list of all added command types, so that you can
     /// easily register them with the service provider.
     /// </summary>
-    public CliApplicationBuilder UseTypeActivator(Func<IReadOnlyList<Type>, IServiceProvider> getServiceProvider) =>
-        UseTypeActivator(getServiceProvider(_commandTypes.ToArray()));
+    public CliApplicationBuilder UseTypeActivator(
+        Func<IReadOnlyList<Type>, IServiceProvider> getServiceProvider
+    ) => UseTypeActivator(getServiceProvider(_commandTypes.ToArray()));
 
     /// <summary>
     /// Creates a configured instance of <see cref="CliApplication" />.
@@ -228,8 +232,8 @@ public partial class CliApplicationBuilder
         if (string.IsNullOrWhiteSpace(entryAssemblyName))
         {
             throw new InvalidOperationException(
-                "Failed to infer the default application title. " +
-                $"Please specify it explicitly using `{nameof(SetTitle)}()`."
+                "Failed to infer the default application title. "
+                    + $"Please specify it explicitly using `{nameof(SetTitle)}()`."
             );
         }
 
@@ -241,11 +245,14 @@ public partial class CliApplicationBuilder
         var entryAssemblyFilePath = EnvironmentEx.EntryAssembly?.Location;
         var processFilePath = EnvironmentEx.ProcessPath;
 
-        if (string.IsNullOrWhiteSpace(entryAssemblyFilePath) || string.IsNullOrWhiteSpace(processFilePath))
+        if (
+            string.IsNullOrWhiteSpace(entryAssemblyFilePath)
+            || string.IsNullOrWhiteSpace(processFilePath)
+        )
         {
             throw new InvalidOperationException(
-                "Failed to infer the default application executable name. " +
-                $"Please specify it explicitly using `{nameof(SetExecutableName)}()`."
+                "Failed to infer the default application executable name. "
+                    + $"Please specify it explicitly using `{nameof(SetExecutableName)}()`."
             );
         }
 
@@ -258,8 +265,13 @@ public partial class CliApplicationBuilder
 
         // If the process path has the same name and parent directory as the entry assembly path,
         // but different extension, it's a framework-dependent .NET Core app launched through the apphost.
-        if (PathEx.AreEqual(Path.ChangeExtension(entryAssemblyFilePath, "exe"), processFilePath) ||
-            PathEx.AreEqual(Path.GetFileNameWithoutExtension(entryAssemblyFilePath), processFilePath))
+        if (
+            PathEx.AreEqual(Path.ChangeExtension(entryAssemblyFilePath, "exe"), processFilePath)
+            || PathEx.AreEqual(
+                Path.GetFileNameWithoutExtension(entryAssemblyFilePath),
+                processFilePath
+            )
+        )
         {
             return Path.GetFileNameWithoutExtension(entryAssemblyFilePath);
         }
@@ -274,8 +286,8 @@ public partial class CliApplicationBuilder
         if (entryAssemblyVersion is null)
         {
             throw new InvalidOperationException(
-                "Failed to infer the default application version. " +
-                $"Please specify it explicitly using `{nameof(SetVersion)}()`."
+                "Failed to infer the default application version. "
+                    + $"Please specify it explicitly using `{nameof(SetVersion)}()`."
             );
         }
 

@@ -29,7 +29,8 @@ internal partial class ParameterSchema : IMemberSchema
         bool isRequired,
         string? description,
         Type? converterType,
-        IReadOnlyList<Type> validatorTypes)
+        IReadOnlyList<Type> validatorTypes
+    )
     {
         Property = property;
         Order = order;
@@ -40,9 +41,7 @@ internal partial class ParameterSchema : IMemberSchema
         ValidatorTypes = validatorTypes;
     }
 
-    public string GetFormattedIdentifier() => Property.IsScalar()
-        ? $"<{Name}>"
-        : $"<{Name}...>";
+    public string GetFormattedIdentifier() => Property.IsScalar() ? $"<{Name}>" : $"<{Name}...>";
 }
 
 internal partial class ParameterSchema

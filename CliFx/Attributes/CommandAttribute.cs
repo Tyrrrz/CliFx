@@ -35,7 +35,5 @@ public sealed class CommandAttribute : Attribute
     /// <summary>
     /// Initializes an instance of <see cref="CommandAttribute" />.
     /// </summary>
-    public CommandAttribute()
-    {
-    }
+    public CommandAttribute() { }
 }

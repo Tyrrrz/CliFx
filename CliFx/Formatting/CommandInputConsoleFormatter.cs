@@ -7,9 +7,7 @@ namespace CliFx.Formatting;
 internal class CommandInputConsoleFormatter : ConsoleFormatter
 {
     public CommandInputConsoleFormatter(ConsoleWriter consoleWriter)
-        : base(consoleWriter)
-    {
-    }
+        : base(consoleWriter) { }
 
     private void WriteCommandLineArguments(CommandInput commandInput)
     {
@@ -92,6 +90,8 @@ internal class CommandInputConsoleFormatter : ConsoleFormatter
 
 internal static class CommandInputConsoleFormatterExtensions
 {
-    public static void WriteCommandInput(this ConsoleWriter consoleWriter, CommandInput commandInput) =>
-        new CommandInputConsoleFormatter(consoleWriter).WriteCommandInput(commandInput);
+    public static void WriteCommandInput(
+        this ConsoleWriter consoleWriter,
+        CommandInput commandInput
+    ) => new CommandInputConsoleFormatter(consoleWriter).WriteCommandInput(commandInput);
 }

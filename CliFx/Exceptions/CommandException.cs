@@ -15,8 +15,7 @@ public class CommandException : CliFxException
         string message,
         int exitCode = DefaultExitCode,
         bool showHelp = false,
-        Exception? innerException = null)
-        : base(message, exitCode, showHelp, innerException)
-    {
-    }
+        Exception? innerException = null
+    )
+        : base(message, exitCode, showHelp, innerException) { }
 }

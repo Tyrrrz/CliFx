@@ -66,8 +66,8 @@ public class FakeConsole : IConsole, IDisposable
         _keys.TryDequeue(out var key)
             ? key
             : throw new InvalidOperationException(
-                "Cannot read key because there are no key presses enqueued. " +
-                $"Use the `{nameof(EnqueueKey)}(...)` method to simulate a key press."
+                "Cannot read key because there are no key presses enqueued. "
+                    + $"Use the `{nameof(EnqueueKey)}(...)` method to simulate a key press."
             );
 
     /// <summary>
@@ -83,9 +83,7 @@ public class FakeConsole : IConsole, IDisposable
     }
 
     /// <inheritdoc />
-    public void Clear()
-    {
-    }
+    public void Clear() { }
 
     /// <inheritdoc />
     public CancellationToken RegisterCancellationHandler() => _cancellationTokenSource.Token;

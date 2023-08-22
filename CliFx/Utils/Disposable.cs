@@ -16,12 +16,13 @@ internal partial class Disposable
 {
     public static IDisposable Create(Action dispose) => new Disposable(dispose);
 
-    public static IDisposable Merge(IEnumerable<IDisposable> disposables) => Create(() =>
-    {
-        foreach (var disposable in disposables)
-            disposable.Dispose();
-    });
+    public static IDisposable Merge(IEnumerable<IDisposable> disposables) =>
+        Create(() =>
+        {
+            foreach (var disposable in disposables)
+                disposable.Dispose();
+        });
 
     public static IDisposable Merge(params IDisposable[] disposables) =>
-        Merge((IEnumerable<IDisposable>) disposables);
+        Merge((IEnumerable<IDisposable>)disposables);
 }

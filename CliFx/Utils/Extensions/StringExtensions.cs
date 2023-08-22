@@ -6,9 +6,7 @@ namespace CliFx.Utils.Extensions;
 internal static class StringExtensions
 {
     public static string? NullIfWhiteSpace(this string str) =>
-        !string.IsNullOrWhiteSpace(str)
-            ? str
-            : null;
+        !string.IsNullOrWhiteSpace(str) ? str : null;
 
     public static string Repeat(this char c, int count) => new(c, count);
 
@@ -20,7 +18,8 @@ internal static class StringExtensions
     public static string ToString(
         this object obj,
         IFormatProvider? formatProvider = null,
-        string? format = null) =>
+        string? format = null
+    ) =>
         obj is IFormattable formattable
             ? formattable.ToString(format, formatProvider)
             : obj.ToString();

@@ -71,8 +71,13 @@ internal class NoPreambleEncoding : Encoding
     public override int GetByteCount(string s) => _underlyingEncoding.GetByteCount(s);
 
     [ExcludeFromCodeCoverage]
-    public override int GetBytes(char[] chars, int charIndex, int charCount, byte[] bytes, int byteIndex) =>
-        _underlyingEncoding.GetBytes(chars, charIndex, charCount, bytes, byteIndex);
+    public override int GetBytes(
+        char[] chars,
+        int charIndex,
+        int charCount,
+        byte[] bytes,
+        int byteIndex
+    ) => _underlyingEncoding.GetBytes(chars, charIndex, charCount, bytes, byteIndex);
 
     [ExcludeFromCodeCoverage]
     public override byte[] GetBytes(char[] chars, int index, int count) =>
@@ -82,8 +87,13 @@ internal class NoPreambleEncoding : Encoding
     public override byte[] GetBytes(char[] chars) => _underlyingEncoding.GetBytes(chars);
 
     [ExcludeFromCodeCoverage]
-    public override int GetBytes(string s, int charIndex, int charCount, byte[] bytes, int byteIndex) =>
-        _underlyingEncoding.GetBytes(s, charIndex, charCount, bytes, byteIndex);
+    public override int GetBytes(
+        string s,
+        int charIndex,
+        int charCount,
+        byte[] bytes,
+        int byteIndex
+    ) => _underlyingEncoding.GetBytes(s, charIndex, charCount, bytes, byteIndex);
 
     [ExcludeFromCodeCoverage]
     public override byte[] GetBytes(string s) => _underlyingEncoding.GetBytes(s);
@@ -96,8 +106,13 @@ internal class NoPreambleEncoding : Encoding
     public override int GetCharCount(byte[] bytes) => _underlyingEncoding.GetCharCount(bytes);
 
     [ExcludeFromCodeCoverage]
-    public override int GetChars(byte[] bytes, int byteIndex, int byteCount, char[] chars, int charIndex) =>
-        _underlyingEncoding.GetChars(bytes, byteIndex, byteCount, chars, charIndex);
+    public override int GetChars(
+        byte[] bytes,
+        int byteIndex,
+        int byteCount,
+        char[] chars,
+        int charIndex
+    ) => _underlyingEncoding.GetChars(bytes, byteIndex, byteCount, chars, charIndex);
 
     [ExcludeFromCodeCoverage]
     public override char[] GetChars(byte[] bytes) => _underlyingEncoding.GetChars(bytes);
@@ -122,7 +137,8 @@ internal class NoPreambleEncoding : Encoding
         _underlyingEncoding.GetMaxCharCount(byteCount);
 
     [ExcludeFromCodeCoverage]
-    public override bool IsAlwaysNormalized(NormalizationForm form) => _underlyingEncoding.IsAlwaysNormalized(form);
+    public override bool IsAlwaysNormalized(NormalizationForm form) =>
+        _underlyingEncoding.IsAlwaysNormalized(form);
 
     [ExcludeFromCodeCoverage]
     public override Encoder GetEncoder() => _underlyingEncoding.GetEncoder();
@@ -131,13 +147,11 @@ internal class NoPreambleEncoding : Encoding
     public override Decoder GetDecoder() => _underlyingEncoding.GetDecoder();
 
     [ExcludeFromCodeCoverage]
-    public override object Clone() => new NoPreambleEncoding((Encoding) base.Clone());
+    public override object Clone() => new NoPreambleEncoding((Encoding)base.Clone());
 }
 
 internal static class NoPreambleEncodingExtensions
 {
     public static Encoding WithoutPreamble(this Encoding encoding) =>
-        encoding.GetPreamble().Length > 0
-            ? new NoPreambleEncoding(encoding)
-            : encoding;
+        encoding.GetPreamble().Length > 0 ? new NoPreambleEncoding(encoding) : encoding;
 }

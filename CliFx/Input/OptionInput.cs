@@ -9,11 +9,9 @@ internal class OptionInput
 
     public IReadOnlyList<string> Values { get; }
 
-    public bool IsHelpOption =>
-        OptionSchema.HelpOption.MatchesIdentifier(Identifier);
+    public bool IsHelpOption => OptionSchema.HelpOption.MatchesIdentifier(Identifier);
 
-    public bool IsVersionOption =>
-        OptionSchema.VersionOption.MatchesIdentifier(Identifier);
+    public bool IsVersionOption => OptionSchema.VersionOption.MatchesIdentifier(Identifier);
 
     public OptionInput(string identifier, IReadOnlyList<string> values)
     {
@@ -21,9 +19,10 @@ internal class OptionInput
         Values = values;
     }
 
-    public string GetFormattedIdentifier() => Identifier switch
-    {
-        {Length: >= 2} => "--" + Identifier,
-        _ => '-' + Identifier
-    };
+    public string GetFormattedIdentifier() =>
+        Identifier switch
+        {
+            { Length: >= 2 } => "--" + Identifier,
+            _ => '-' + Identifier
+        };
 }

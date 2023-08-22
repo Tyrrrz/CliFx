@@ -17,7 +17,8 @@ internal class HelpContext
         ApplicationMetadata applicationMetadata,
         ApplicationSchema applicationSchema,
         CommandSchema commandSchema,
-        IReadOnlyDictionary<IMemberSchema, object?> commandDefaultValues)
+        IReadOnlyDictionary<IMemberSchema, object?> commandDefaultValues
+    )
     {
         ApplicationMetadata = applicationMetadata;
         ApplicationSchema = applicationSchema;

@@ -13,8 +13,7 @@ internal class BindablePropertyDescriptor : IPropertyDescriptor
 
     public BindablePropertyDescriptor(PropertyInfo property) => _property = property;
 
-    public object? GetValue(ICommand commandInstance) =>
-        _property.GetValue(commandInstance);
+    public object? GetValue(ICommand commandInstance) => _property.GetValue(commandInstance);
 
     public void SetValue(ICommand commandInstance, object? value) =>
         _property.SetValue(commandInstance, value);

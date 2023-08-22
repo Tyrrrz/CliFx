@@ -31,7 +31,8 @@ internal partial class CommandSchema
         string? name,
         string? description,
         IReadOnlyList<ParameterSchema> parameters,
-        IReadOnlyList<OptionSchema> options)
+        IReadOnlyList<OptionSchema> options
+    )
     {
         Type = type;
         Name = name;
@@ -68,9 +69,9 @@ internal partial class CommandSchema
 internal partial class CommandSchema
 {
     public static bool IsCommandType(Type type) =>
-        type.Implements(typeof(ICommand)) &&
-        type.IsDefined(typeof(CommandAttribute)) &&
-        type is { IsAbstract: false, IsInterface: false };
+        type.Implements(typeof(ICommand))
+        && type.IsDefined(typeof(CommandAttribute))
+        && type is { IsAbstract: false, IsInterface: false };
 
     public static CommandSchema? TryResolve(Type type)
     {
@@ -83,21 +84,22 @@ internal partial class CommandSchema
         var description = attribute?.Description?.Trim();
 
         var implicitOptionSchemas = string.IsNullOrWhiteSpace(name)
-            ? new[] {OptionSchema.HelpOption, OptionSchema.VersionOption}
-            : new[] {OptionSchema.HelpOption};
+            ? new[] { OptionSchema.HelpOption, OptionSchema.VersionOption }
+            : new[] { OptionSchema.HelpOption };
 
         var properties = type
-            // Get properties directly on the command type
-            .GetProperties()
+        // Get properties directly on the command type
+        .GetProperties()
             // Get non-abstract properties on interfaces (to support default interfaces members)
-            .Union(type
-                .GetInterfaces()
-                // Only interfaces implementing ICommand for explicitness
-                .Where(i => i != typeof(ICommand) && i.IsAssignableTo(typeof(ICommand)))
-                .SelectMany(i => i
-                    .GetProperties()
-                    .Where(p => !p.GetMethod.IsAbstract && !p.SetMethod.IsAbstract)
-                )
+            .Union(
+                type.GetInterfaces()
+                    // Only interfaces implementing ICommand for explicitness
+                    .Where(i => i != typeof(ICommand) && i.IsAssignableTo(typeof(ICommand)))
+                    .SelectMany(
+                        i =>
+                            i.GetProperties()
+                                .Where(p => !p.GetMethod.IsAbstract && !p.SetMethod.IsAbstract)
+                    )
             )
             .ToArray();
 
@@ -112,13 +114,7 @@ internal partial class CommandSchema
             .Concat(implicitOptionSchemas)
             .ToArray();
 
-        return new CommandSchema(
-            type,
-            name,
-            description,
-            parameterSchemas,
-            optionSchemas
-        );
+        return new CommandSchema(type, name, description, parameterSchemas, optionSchemas);
     }
 
     public static CommandSchema Resolve(Type type)

@@ -33,7 +33,8 @@ internal partial class OptionSchema : IMemberSchema
         bool isRequired,
         string? description,
         Type? converterType,
-        IReadOnlyList<Type> validatorTypes)
+        IReadOnlyList<Type> validatorTypes
+    )
     {
         Property = property;
         Name = name;
@@ -46,20 +47,18 @@ internal partial class OptionSchema : IMemberSchema
     }
 
     public bool MatchesName(string? name) =>
-        !string.IsNullOrWhiteSpace(Name) &&
-        string.Equals(Name, name, StringComparison.OrdinalIgnoreCase);
+        !string.IsNullOrWhiteSpace(Name)
+        && string.Equals(Name, name, StringComparison.OrdinalIgnoreCase);
 
     public bool MatchesShortName(char? shortName) =>
-        ShortName is not null &&
-        ShortName == shortName;
+        ShortName is not null && ShortName == shortName;
 
     public bool MatchesIdentifier(string identifier) =>
-        MatchesName(identifier) ||
-        identifier.Length == 1 && MatchesShortName(identifier[0]);
+        MatchesName(identifier) || identifier.Length == 1 && MatchesShortName(identifier[0]);
 
     public bool MatchesEnvironmentVariable(string environmentVariableName) =>
-        !string.IsNullOrWhiteSpace(EnvironmentVariable) &&
-        string.Equals(EnvironmentVariable, environmentVariableName, StringComparison.Ordinal);
+        !string.IsNullOrWhiteSpace(EnvironmentVariable)
+        && string.Equals(EnvironmentVariable, environmentVariableName, StringComparison.Ordinal);
 
     public string GetFormattedIdentifier()
     {
@@ -68,9 +67,7 @@ internal partial class OptionSchema : IMemberSchema
         // Short name
         if (ShortName is not null)
         {
-            buffer
-                .Append('-')
-                .Append(ShortName);
+            buffer.Append('-').Append(ShortName);
         }
 
         // Separator
@@ -82,9 +79,7 @@ internal partial class OptionSchema : IMemberSchema
         // Name
         if (!string.IsNullOrWhiteSpace(Name))
         {
-            buffer
-                .Append("--")
-                .Append(Name);
+            buffer.Append("--").Append(Name);
         }
 
         return buffer.ToString();
@@ -120,25 +115,27 @@ internal partial class OptionSchema
 
 internal partial class OptionSchema
 {
-    public static OptionSchema HelpOption { get; } = new(
-        NullPropertyDescriptor.Instance,
-        "help",
-        'h',
-        null,
-        false,
-        "Shows help text.",
-        null,
-        Array.Empty<Type>()
-    );
+    public static OptionSchema HelpOption { get; } =
+        new(
+            NullPropertyDescriptor.Instance,
+            "help",
+            'h',
+            null,
+            false,
+            "Shows help text.",
+            null,
+            Array.Empty<Type>()
+        );
 
-    public static OptionSchema VersionOption { get; } = new(
-        NullPropertyDescriptor.Instance,
-        "version",
-        null,
-        null,
-        false,
-        "Shows version information.",
-        null,
-        Array.Empty<Type>()
-    );
+    public static OptionSchema VersionOption { get; } =
+        new(
+            NullPropertyDescriptor.Instance,
+            "version",
+            null,
+            null,
+            false,
+            "Shows version information.",
+            null,
+            Array.Empty<Type>()
+        );
 }

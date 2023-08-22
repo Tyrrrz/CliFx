@@ -9,9 +9,7 @@ internal partial class NullPropertyDescriptor : IPropertyDescriptor
 
     public object? GetValue(ICommand commandInstance) => null;
 
-    public void SetValue(ICommand commandInstance, object? value)
-    {
-    }
+    public void SetValue(ICommand commandInstance, object? value) { }
 
     public IReadOnlyList<object?> GetValidValues() => Array.Empty<object?>();
 }

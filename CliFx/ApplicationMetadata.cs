@@ -32,7 +32,8 @@ public class ApplicationMetadata
         string title,
         string executableName,
         string version,
-        string? description)
+        string? description
+    )
     {
         Title = title;
         ExecutableName = executableName;

@@ -27,7 +27,9 @@ internal class CommandBinder
         // Custom converter
         if (memberSchema.ConverterType is not null)
         {
-            var converter = _typeActivator.CreateInstance<IBindingConverter>(memberSchema.ConverterType);
+            var converter = _typeActivator.CreateInstance<IBindingConverter>(
+                memberSchema.ConverterType
+            );
             return converter.Convert(rawValue);
         }
 
@@ -88,7 +90,10 @@ internal class CommandBinder
         var parseMethodWithFormatProvider = targetType.TryGetStaticParseMethod(true);
         if (parseMethodWithFormatProvider is not null)
         {
-            return parseMethodWithFormatProvider.Invoke(null, new object?[] { rawValue, _formatProvider });
+            return parseMethodWithFormatProvider.Invoke(
+                null,
+                new object?[] { rawValue, _formatProvider }
+            );
         }
 
         // String-parseable (without IFormatProvider)
@@ -111,7 +116,8 @@ internal class CommandBinder
         IMemberSchema memberSchema,
         IReadOnlyList<string> rawValues,
         Type targetEnumerableType,
-        Type targetElementType)
+        Type targetElementType
+    )
     {
         var array = rawValues
             .Select(v => ConvertSingle(memberSchema, v, targetElementType))
@@ -146,8 +152,11 @@ internal class CommandBinder
         try
         {
             // Non-scalar
-            var enumerableUnderlyingType = memberSchema.Property.Type.TryGetEnumerableUnderlyingType();
-            if (enumerableUnderlyingType is not null && memberSchema.Property.Type != typeof(string))
+            var enumerableUnderlyingType =
+                memberSchema.Property.Type.TryGetEnumerableUnderlyingType();
+            if (
+                enumerableUnderlyingType is not null && memberSchema.Property.Type != typeof(string)
+            )
             {
                 return ConvertMultiple(
                     memberSchema,
@@ -219,7 +228,11 @@ internal class CommandBinder
         }
     }
 
-    private void BindMember(IMemberSchema memberSchema, ICommand commandInstance, IReadOnlyList<string> rawValues)
+    private void BindMember(
+        IMemberSchema memberSchema,
+        ICommand commandInstance,
+        IReadOnlyList<string> rawValues
+    )
     {
         var convertedValue = ConvertMember(memberSchema, rawValues);
         ValidateMember(memberSchema, convertedValue);
@@ -227,11 +240,17 @@ internal class CommandBinder
         memberSchema.Property.SetValue(commandInstance, convertedValue);
     }
 
-    private void BindParameters(CommandInput commandInput, CommandSchema commandSchema, ICommand commandInstance)
+    private void BindParameters(
+        CommandInput commandInput,
+        CommandSchema commandSchema,
+        ICommand commandInstance
+    )
     {
         // Ensure there are no unexpected parameters and that all parameters are provided
         var remainingParameterInputs = commandInput.Parameters.ToList();
-        var remainingRequiredParameterSchemas = commandSchema.Parameters.Where(p => p.IsRequired).ToList();
+        var remainingRequiredParameterSchemas = commandSchema.Parameters
+            .Where(p => p.IsRequired)
+            .ToList();
 
         var position = 0;
 
@@ -290,22 +309,27 @@ internal class CommandBinder
         }
     }
 
-    private void BindOptions(CommandInput commandInput, CommandSchema commandSchema, ICommand commandInstance)
+    private void BindOptions(
+        CommandInput commandInput,
+        CommandSchema commandSchema,
+        ICommand commandInstance
+    )
     {
         // Ensure there are no unrecognized options and that all required options are set
         var remainingOptionInputs = commandInput.Options.ToList();
-        var remainingRequiredOptionSchemas = commandSchema.Options.Where(o => o.IsRequired).ToList();
+        var remainingRequiredOptionSchemas = commandSchema.Options
+            .Where(o => o.IsRequired)
+            .ToList();
 
         foreach (var optionSchema in commandSchema.Options)
         {
-            var optionInputs = commandInput
-                .Options
+            var optionInputs = commandInput.Options
                 .Where(o => optionSchema.MatchesIdentifier(o.Identifier))
                 .ToArray();
 
-            var environmentVariableInput = commandInput
-                .EnvironmentVariables
-                .FirstOrDefault(e => optionSchema.MatchesEnvironmentVariable(e.Name));
+            var environmentVariableInput = commandInput.EnvironmentVariables.FirstOrDefault(
+                e => optionSchema.MatchesEnvironmentVariable(e.Name)
+            );
 
             // Direct input
             if (optionInputs.Any())
@@ -361,7 +385,11 @@ internal class CommandBinder
         }
     }
 
-    public void Bind(CommandInput commandInput, CommandSchema commandSchema, ICommand commandInstance)
+    public void Bind(
+        CommandInput commandInput,
+        CommandSchema commandSchema,
+        ICommand commandInstance
+    )
     {
         BindParameters(commandInput, commandSchema, commandInstance);
         BindOptions(commandInput, commandSchema, commandInstance);

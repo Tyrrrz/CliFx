@@ -18,6 +18,6 @@ internal interface IPropertyDescriptor
 internal static class PropertyDescriptorExtensions
 {
     public static bool IsScalar(this IPropertyDescriptor propertyDescriptor) =>
-        propertyDescriptor.Type == typeof(string) ||
-        propertyDescriptor.Type.TryGetEnumerableUnderlyingType() is null;
+        propertyDescriptor.Type == typeof(string)
+        || propertyDescriptor.Type.TryGetEnumerableUnderlyingType() is null;
 }

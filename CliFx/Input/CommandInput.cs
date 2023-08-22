@@ -18,10 +18,10 @@ internal partial class CommandInput
     public IReadOnlyList<EnvironmentVariableInput> EnvironmentVariables { get; }
 
     public bool HasArguments =>
-        !string.IsNullOrWhiteSpace(CommandName) ||
-        Directives.Any() ||
-        Parameters.Any() ||
-        Options.Any();
+        !string.IsNullOrWhiteSpace(CommandName)
+        || Directives.Any()
+        || Parameters.Any()
+        || Options.Any();
 
     public bool IsDebugDirectiveSpecified => Directives.Any(d => d.IsDebugDirective);
 
@@ -36,7 +36,8 @@ internal partial class CommandInput
         IReadOnlyList<DirectiveInput> directives,
         IReadOnlyList<ParameterInput> parameters,
         IReadOnlyList<OptionInput> options,
-        IReadOnlyList<EnvironmentVariableInput> environmentVariables)
+        IReadOnlyList<EnvironmentVariableInput> environmentVariables
+    )
     {
         CommandName = commandName;
         Directives = directives;
@@ -50,7 +51,8 @@ internal partial class CommandInput
 {
     private static IReadOnlyList<DirectiveInput> ParseDirectives(
         IReadOnlyList<string> commandLineArguments,
-        ref int index)
+        ref int index
+    )
     {
         var result = new List<DirectiveInput>();
 
@@ -73,7 +75,8 @@ internal partial class CommandInput
     private static string? ParseCommandName(
         IReadOnlyList<string> commandLineArguments,
         ISet<string> commandNames,
-        ref int index)
+        ref int index
+    )
     {
         var potentialCommandNameComponents = new List<string>();
         var commandName = default(string?);
@@ -107,7 +110,8 @@ internal partial class CommandInput
 
     private static IReadOnlyList<ParameterInput> ParseParameters(
         IReadOnlyList<string> commandLineArguments,
-        ref int index)
+        ref int index
+    )
     {
         var result = new List<ParameterInput>();
 
@@ -118,13 +122,14 @@ internal partial class CommandInput
 
             var isOptionIdentifier =
                 // Name
-                argument.StartsWith("--", StringComparison.Ordinal) &&
-                argument.Length > 2 &&
-                char.IsLetter(argument[2]) ||
+                argument.StartsWith("--", StringComparison.Ordinal)
+                    && argument.Length > 2
+                    && char.IsLetter(argument[2])
+                ||
                 // Short name
-                argument.StartsWith('-') &&
-                argument.Length > 1 &&
-                char.IsLetter(argument[1]);
+                argument.StartsWith('-')
+                    && argument.Length > 1
+                    && char.IsLetter(argument[1]);
 
             // Break on the first option identifier
             if (isOptionIdentifier)
@@ -138,7 +143,8 @@ internal partial class CommandInput
 
     private static IReadOnlyList<OptionInput> ParseOptions(
         IReadOnlyList<string> commandLineArguments,
-        ref int index)
+        ref int index
+    )
     {
         var result = new List<OptionInput>();
 
@@ -151,9 +157,11 @@ internal partial class CommandInput
             var argument = commandLineArguments[index];
 
             // Name
-            if (argument.StartsWith("--", StringComparison.Ordinal) &&
-                argument.Length > 2 &&
-                char.IsLetter(argument[2]))
+            if (
+                argument.StartsWith("--", StringComparison.Ordinal)
+                && argument.Length > 2
+                && char.IsLetter(argument[2])
+            )
             {
                 // Flush previous
                 if (!string.IsNullOrWhiteSpace(lastOptionIdentifier))
@@ -163,9 +171,7 @@ internal partial class CommandInput
                 lastOptionValues = new List<string>();
             }
             // Short name
-            else if (argument.StartsWith('-') &&
-                     argument.Length > 1 &&
-                     char.IsLetter(argument[1]))
+            else if (argument.StartsWith('-') && argument.Length > 1 && char.IsLetter(argument[1]))
             {
                 foreach (var identifier in argument[1..])
                 {
@@ -194,14 +200,12 @@ internal partial class CommandInput
     public static CommandInput Parse(
         IReadOnlyList<string> commandLineArguments,
         IReadOnlyDictionary<string, string> environmentVariables,
-        IReadOnlyList<string> availableCommandNames)
+        IReadOnlyList<string> availableCommandNames
+    )
     {
         var index = 0;
 
-        var parsedDirectives = ParseDirectives(
-            commandLineArguments,
-            ref index
-        );
+        var parsedDirectives = ParseDirectives(commandLineArguments, ref index);
 
         var parsedCommandName = ParseCommandName(
             commandLineArguments,
@@ -209,15 +213,9 @@ internal partial class CommandInput
             ref index
         );
 
-        var parsedParameters = ParseParameters(
-            commandLineArguments,
-            ref index
-        );
+        var parsedParameters = ParseParameters(commandLineArguments, ref index);
 
-        var parsedOptions = ParseOptions(
-            commandLineArguments,
-            ref index
-        );
+        var parsedOptions = ParseOptions(commandLineArguments, ref index);
 
         var parsedEnvironmentVariables = environmentVariables
             .Select(kvp => new EnvironmentVariableInput(kvp.Key, kvp.Value))

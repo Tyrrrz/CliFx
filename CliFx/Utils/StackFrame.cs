@@ -36,7 +36,8 @@ internal partial class StackFrame
         string methodName,
         IReadOnlyList<StackFrameParameter> parameters,
         string? filePath,
-        string? lineNumber)
+        string? lineNumber
+    )
     {
         ParentType = parentType;
         MethodName = methodName;
@@ -52,8 +53,9 @@ internal partial class StackFrame
     private const string NotSpace = @"[^\x20\t]";
 
     // Taken from https://github.com/atifaziz/StackTraceParser
-    private static readonly Regex Pattern = new(
-        $$"""
+    private static readonly Regex Pattern =
+        new(
+            $$"""
         ^
         {{Space}}*
         \w+ {{Space}}+
@@ -81,13 +83,13 @@ internal partial class StackFrame
         \s*
         $
         """,
-        RegexOptions.IgnoreCase |
-        RegexOptions.Multiline |
-        RegexOptions.ExplicitCapture |
-        RegexOptions.CultureInvariant |
-        RegexOptions.IgnorePatternWhitespace,
-        TimeSpan.FromSeconds(5)
-    );
+            RegexOptions.IgnoreCase
+                | RegexOptions.Multiline
+                | RegexOptions.ExplicitCapture
+                | RegexOptions.CultureInvariant
+                | RegexOptions.IgnorePatternWhitespace,
+            TimeSpan.FromSeconds(5)
+        );
 
     public static IEnumerable<StackFrame> ParseTrace(string stackTrace)
     {
@@ -106,8 +108,7 @@ internal partial class StackFrame
         }
 
         return from m in matches
-            select m.Groups
-            into groups
+            select m.Groups into groups
             let pt = groups["pt"].Captures
             let pn = groups["pn"].Captures
             select new StackFrame(

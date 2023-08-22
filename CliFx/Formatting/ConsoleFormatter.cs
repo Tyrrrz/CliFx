@@ -12,8 +12,7 @@ internal class ConsoleFormatter
 
     public bool IsEmpty => _column == 0 && _row == 0;
 
-    public ConsoleFormatter(ConsoleWriter consoleWriter) =>
-        _consoleWriter = consoleWriter;
+    public ConsoleFormatter(ConsoleWriter consoleWriter) => _consoleWriter = consoleWriter;
 
     public void Write(string? value)
     {

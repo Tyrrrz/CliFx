@@ -25,9 +25,7 @@ public class FakeInMemoryConsole : FakeConsole
     /// Initializes an instance of <see cref="FakeInMemoryConsole" />.
     /// </summary>
     public FakeInMemoryConsole()
-        : this(new MemoryStream(), new MemoryStream(), new MemoryStream())
-    {
-    }
+        : this(new MemoryStream(), new MemoryStream(), new MemoryStream()) { }
 
     /// <summary>
     /// Writes data to the input stream.
@@ -51,9 +49,7 @@ public class FakeInMemoryConsole : FakeConsole
     /// <summary>
     /// Writes data to the input stream.
     /// </summary>
-    public void WriteInput(string data) => WriteInput(
-        Input.CurrentEncoding.GetBytes(data)
-    );
+    public void WriteInput(string data) => WriteInput(Input.CurrentEncoding.GetBytes(data));
 
     /// <summary>
     /// Reads the data written to the output stream.

@@ -32,16 +32,15 @@ public partial class ConsoleWriter : StreamWriter
     /// Initializes an instance of <see cref="ConsoleWriter" />.
     /// </summary>
     public ConsoleWriter(IConsole console, Stream stream)
-        : this(console, stream, System.Console.OutputEncoding)
-    {
-    }
+        : this(console, stream, System.Console.OutputEncoding) { }
 
     // The following overrides are required to establish thread-safe behavior
     // in methods deriving from StreamWriter.
 
     /// <inheritdoc />
     [ExcludeFromCodeCoverage, MethodImpl(MethodImplOptions.Synchronized)]
-    public override void Write(char[] buffer, int index, int count) => base.Write(buffer, index, count);
+    public override void Write(char[] buffer, int index, int count) =>
+        base.Write(buffer, index, count);
 
     /// <inheritdoc />
     [ExcludeFromCodeCoverage, MethodImpl(MethodImplOptions.Synchronized)]
@@ -272,8 +271,6 @@ public partial class ConsoleWriter : StreamWriter
 
 public partial class ConsoleWriter
 {
-    internal static ConsoleWriter Create(IConsole console, Stream stream) => new(
-        console,
-        Stream.Synchronized(stream)
-    ) {AutoFlush = true};
+    internal static ConsoleWriter Create(IConsole console, Stream stream) =>
+        new(console, Stream.Synchronized(stream)) { AutoFlush = true };
 }

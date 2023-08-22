@@ -112,7 +112,10 @@ public static class ConsoleExtensions
     /// Sets the specified foreground color and returns an <see cref="IDisposable" />
     /// that will reset the color back to its previous value upon disposal.
     /// </summary>
-    public static IDisposable WithForegroundColor(this IConsole console, ConsoleColor foregroundColor)
+    public static IDisposable WithForegroundColor(
+        this IConsole console,
+        ConsoleColor foregroundColor
+    )
     {
         var lastColor = console.ForegroundColor;
         console.ForegroundColor = foregroundColor;
@@ -124,7 +127,10 @@ public static class ConsoleExtensions
     /// Sets the specified background color and returns an <see cref="IDisposable" />
     /// that will reset the color back to its previous value upon disposal.
     /// </summary>
-    public static IDisposable WithBackgroundColor(this IConsole console, ConsoleColor backgroundColor)
+    public static IDisposable WithBackgroundColor(
+        this IConsole console,
+        ConsoleColor backgroundColor
+    )
     {
         var lastColor = console.BackgroundColor;
         console.BackgroundColor = backgroundColor;
@@ -139,7 +145,8 @@ public static class ConsoleExtensions
     public static IDisposable WithColors(
         this IConsole console,
         ConsoleColor foregroundColor,
-        ConsoleColor backgroundColor) =>
+        ConsoleColor backgroundColor
+    ) =>
         Disposable.Merge(
             console.WithForegroundColor(foregroundColor),
             console.WithBackgroundColor(backgroundColor)

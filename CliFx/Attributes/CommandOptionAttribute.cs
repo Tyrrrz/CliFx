@@ -81,23 +81,17 @@ public sealed class CommandOptionAttribute : Attribute
     /// Initializes an instance of <see cref="CommandOptionAttribute" />.
     /// </summary>
     public CommandOptionAttribute(string name, char shortName)
-        : this(name, (char?)shortName)
-    {
-    }
+        : this(name, (char?)shortName) { }
 
     /// <summary>
     /// Initializes an instance of <see cref="CommandOptionAttribute" />.
     /// </summary>
     public CommandOptionAttribute(string name)
-        : this(name, null)
-    {
-    }
+        : this(name, null) { }
 
     /// <summary>
     /// Initializes an instance of <see cref="CommandOptionAttribute" />.
     /// </summary>
     public CommandOptionAttribute(char shortName)
-        : this(null, (char?)shortName)
-    {
-    }
+        : this(null, (char?)shortName) { }
 }
