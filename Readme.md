@@ -128,7 +128,7 @@ These bindings provide a way to map command-line arguments into structured input
 The command in the above example serves as a simple logarithm calculator and defines two inputs: a positional parameter for the input value and a named option for the logarithm base.
 In order to execute this command, at minimum, the user needs to provide the input value:
 
-```sh
+```console
 $ dotnet myapp.dll 10000
 
 4
@@ -136,7 +136,7 @@ $ dotnet myapp.dll 10000
 
 They can also pass the `-b|--base` option to override the default logarithm base of `10`:
 
-```sh
+```console
 $ dotnet myapp.dll 729 -b 3
 
 6
@@ -144,7 +144,7 @@ $ dotnet myapp.dll 729 -b 3
 
 In case the user forgets to specify the required `value` parameter, the application will instead exit with an error:
 
-```sh
+```console
 $ dotnet myapp.dll -b 10
 
 Missing required parameter(s):
@@ -153,7 +153,7 @@ Missing required parameter(s):
 
 Out of the box, **CliFx** also provides a built-in `--help` option, which generates a help screen that lists all parameters and options available for the command:
 
-```sh
+```console
 $ dotnet myapp.dll --help
 
 MyApp v1.0
@@ -162,7 +162,7 @@ USAGE
   dotnet myapp.dll <value> [options]
 
 DESCRIPTION
-  Calculates the logarithm of a value.  
+  Calculates the logarithm of a value.
 
 PARAMETERS
 * value             Value whose logarithm is to be found.
@@ -197,7 +197,7 @@ Similarly, unseparated arguments in the form of `myapp -ofile` will be treated a
 
 These rules also make the order of arguments important — command-line string is expected to follow this pattern:
 
-```sh
+```console
 $ myapp [...directives] [command] [...parameters] [...options]
 ```
 
@@ -212,11 +212,11 @@ Besides that, they also differ in the following ways:
 
   - You can make an option required by setting `IsRequired = true` on the corresponding attribute or by adding the `required` keyword to the property declaration (introduced in C# 11):
 
-      ```csharp
-      // Any option can be required or optional without restrictions
-      [CommandOption("foo")]
-      public required string RequiredOption { get; init; }
-      ```
+    ```csharp
+    // Any option can be required or optional without restrictions
+    [CommandOption("foo")]
+    public required string RequiredOption { get; init; }
+    ```
 
   - To make a parameter optional, you can set `IsRequired = false`, but only the last parameter (by order) can be configured in such way:
 
@@ -237,7 +237,7 @@ Besides that, they also differ in the following ways:
     ```
 
   - You can bind a parameter to a non-scalar property, but only if it's the last parameter in the command:
-  
+
     ```csharp
     // Only the last parameter can be non-scalar
     [CommandParameter(0)]
@@ -299,7 +299,7 @@ public class FileSizeCalculatorCommand : ICommand
 }
 ```
 
-```sh
+```console
 $ dotnet myapp.dll file1.bin file2.exe
 
 Total file size: 186368 bytes
@@ -355,7 +355,7 @@ public class SurfaceCalculatorCommand : ICommand
 }
 ```
 
-```sh
+```console
 $ dotnet myapp.dll 0x0 0x10 10x0
 
 Triangle surface area: 50
@@ -404,7 +404,7 @@ For example, running `dotnet myapp.dll cmd1 arg1 -p 42` will execute `FirstComma
 
 The user can also find the list of all available top-level commands in the help text:
 
-```sh
+```console
 $ dotnet myapp.dll --help
 
 MyApp v1.0
@@ -426,7 +426,7 @@ You can run `dotnet myapp.dll [command] --help` to show help on a specific comma
 
 To see the list of commands nested under a specific command, the user can refine their help request by specifying the corresponding command name before the help option:
 
-```sh
+```console
 $ dotnet myapp.dll cmd1 --help
 
 USAGE
@@ -477,7 +477,7 @@ public class DivideCommand : ICommand
 }
 ```
 
-```sh
+```console
 $ dotnet myapp.dll --dividend 10 --divisor 0
 
 Division by zero is not supported.
@@ -551,7 +551,7 @@ public static class Program
 }
 ```
 
-This method also supports `IServiceProvider` through various overloads, which allows you to directly integrate dependency containers that implement this interface. 
+This method also supports `IServiceProvider` through various overloads, which allows you to directly integrate dependency containers that implement this interface.
 For example, this is how to configure your application to use [`Microsoft.Extensions.DependencyInjection`](https://nuget.org/packages/Microsoft.Extensions.DependencyInjection) as the type activator in **CliFx**:
 
 ```csharp
@@ -671,7 +671,7 @@ To do that, pass the corresponding directive before any other command-line argum
 In order to run the application in debug mode, use the `[debug]` directive.
 This will cause the program to launch in a suspended state, waiting for the debugger to attach to the current process:
 
-```sh
+```console
 $ dotnet myapp.dll [debug] cmd -o
 
 Attach debugger to PID 3148 to continue.
@@ -680,7 +680,7 @@ Attach debugger to PID 3148 to continue.
 To run the application in preview mode, use the `[preview]` directive.
 This will short-circuit the execution and instead print the consumed command-line arguments as they were parsed, along with resolved environment variables:
 
-```sh
+```console
 $ dotnet myapp.dll [preview] cmd arg1 arg2 -o foo --option bar1 bar2
 
 Command-line:
