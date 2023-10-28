@@ -11,7 +11,7 @@ on:
         type: boolean
         description: Deploy package
         required: false
-        default: true
+        default: false
   push:
   pull_request:
 
