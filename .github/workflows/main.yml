@@ -5,11 +5,11 @@ on:
     inputs:
       package-version:
         type: string
-        description: Package version string
+        description: Package version
         required: true
       deploy:
         type: boolean
-        description: Whether to deploy the package
+        description: Deploy package
         required: false
         default: true
   push:
