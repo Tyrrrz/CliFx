@@ -6,7 +6,7 @@ on:
       package-version:
         type: string
         description: Package version
-        required: true
+        required: false
       deploy:
         type: boolean
         description: Deploy package
