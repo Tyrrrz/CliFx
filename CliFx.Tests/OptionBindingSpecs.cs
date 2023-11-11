@@ -594,7 +594,7 @@ public class OptionBindingSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task I_can_bind_a_required_option_to_a_property_and_get_an_error_if_the_user_does_not_provide_the_corresponding_argument()
+    public async Task I_can_try_to_bind_a_required_option_to_a_property_and_get_an_error_if_the_user_does_not_provide_the_corresponding_argument()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -630,7 +630,7 @@ public class OptionBindingSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task I_can_bind_a_required_option_to_a_property_and_get_an_error_if_the_user_provides_an_empty_argument()
+    public async Task I_can_try_to_bind_a_required_option_to_a_property_and_get_an_error_if_the_user_provides_an_empty_argument()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -666,7 +666,7 @@ public class OptionBindingSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task I_can_bind_an_option_to_a_non_scalar_property_and_get_an_error_if_the_user_does_not_provide_at_least_one_corresponding_argument()
+    public async Task I_can_try_to_bind_an_option_to_a_non_scalar_property_and_get_an_error_if_the_user_does_not_provide_at_least_one_corresponding_argument()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -702,7 +702,7 @@ public class OptionBindingSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task I_can_bind_options_and_get_an_error_if_the_user_provides_unrecognized_arguments()
+    public async Task I_can_try_to_bind_options_and_get_an_error_if_the_user_provides_unrecognized_arguments()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -738,7 +738,7 @@ public class OptionBindingSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task I_can_bind_an_option_to_a_scalar_property_and_get_an_error_if_the_user_provides_too_many_arguments()
+    public async Task I_can_try_to_bind_an_option_to_a_scalar_property_and_get_an_error_if_the_user_provides_too_many_arguments()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(

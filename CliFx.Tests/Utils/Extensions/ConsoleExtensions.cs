@@ -7,13 +7,13 @@ internal static class ConsoleExtensions
 {
     public static void DumpToTestOutput(
         this FakeInMemoryConsole console,
-        ITestOutputHelper testOutputHelper
+        ITestOutputHelper testOutput
     )
     {
-        testOutputHelper.WriteLine("[*] Captured standard output:");
-        testOutputHelper.WriteLine(console.ReadOutputString());
+        testOutput.WriteLine("[*] Captured standard output:");
+        testOutput.WriteLine(console.ReadOutputString());
 
-        testOutputHelper.WriteLine("[*] Captured standard error:");
-        testOutputHelper.WriteLine(console.ReadErrorString());
+        testOutput.WriteLine("[*] Captured standard error:");
+        testOutput.WriteLine(console.ReadErrorString());
     }
 }

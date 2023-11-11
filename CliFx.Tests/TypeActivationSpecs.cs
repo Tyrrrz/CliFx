@@ -54,7 +54,7 @@ public class TypeActivationSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task I_can_configure_the_application_to_use_the_default_type_activator_and_get_an_error_if_the_requested_type_does_not_have_a_parameterless_constructor()
+    public async Task I_can_try_to_configure_the_application_to_use_the_default_type_activator_and_get_an_error_if_the_requested_type_does_not_have_a_parameterless_constructor()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -187,7 +187,7 @@ public class TypeActivationSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task I_can_configure_the_application_to_use_a_custom_type_activator_and_get_an_error_if_the_requested_type_cannot_be_initialized()
+    public async Task I_can_try_to_configure_the_application_to_use_a_custom_type_activator_and_get_an_error_if_the_requested_type_cannot_be_initialized()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(

@@ -846,7 +846,7 @@ public class ConversionSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task I_can_bind_a_parameter_or_an_option_to_a_property_and_get_an_error_if_the_user_provides_an_invalid_value()
+    public async Task I_can_try_to_bind_a_parameter_or_an_option_to_a_property_and_get_an_error_if_the_user_provides_an_invalid_value()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -882,7 +882,7 @@ public class ConversionSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task I_can_bind_a_parameter_or_an_option_to_a_property_and_get_an_error_if_a_custom_validator_fails()
+    public async Task I_can_try_to_bind_a_parameter_or_an_option_to_a_property_and_get_an_error_if_a_custom_validator_fails()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -928,7 +928,7 @@ public class ConversionSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task I_can_bind_a_parameter_or_an_option_to_a_string_parsable_property_and_get_an_error_if_the_parsing_fails()
+    public async Task I_can_try_to_bind_a_parameter_or_an_option_to_a_string_parsable_property_and_get_an_error_if_the_parsing_fails()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
