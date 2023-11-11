@@ -55,7 +55,7 @@ public class ApplicationSpecs : SpecsBase
     }
 
     [Fact]
-    public async Task I_cannot_add_an_invalid_command_to_the_application()
+    public async Task I_can_try_to_create_an_application_and_get_an_error_if_it_has_invalid_commands()
     {
         // Act
         var app = new CliApplicationBuilder()
