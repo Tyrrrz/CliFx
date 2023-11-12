@@ -57,24 +57,28 @@ internal partial class CommandParameterSymbol
         var order = (int)attribute.ConstructorArguments.Select(a => a.Value).First()!;
 
         var name =
-            attribute.NamedArguments
+            attribute
+                .NamedArguments
                 .Where(a => a.Key == "Name")
                 .Select(a => a.Value.Value)
                 .FirstOrDefault() as string;
 
         var isRequired =
-            attribute.NamedArguments
+            attribute
+                .NamedArguments
                 .Where(a => a.Key == "IsRequired")
                 .Select(a => a.Value.Value)
                 .FirstOrDefault() as bool?;
 
-        var converter = attribute.NamedArguments
+        var converter = attribute
+            .NamedArguments
             .Where(a => a.Key == "Converter")
             .Select(a => a.Value.Value)
             .Cast<ITypeSymbol?>()
             .FirstOrDefault();
 
-        var validators = attribute.NamedArguments
+        var validators = attribute
+            .NamedArguments
             .Where(a => a.Key == "Validators")
             .SelectMany(a => a.Value.Values)
             .Select(c => c.Value)

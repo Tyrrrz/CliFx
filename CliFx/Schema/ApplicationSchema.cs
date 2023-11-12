@@ -44,10 +44,9 @@ internal partial class ApplicationSchema
                 string.IsNullOrWhiteSpace(parentCommandName)
                 ||
                 // Otherwise a command is a descendant if it starts with the same name segments
-                potentialParentCommandSchema.Name.StartsWith(
-                    parentCommandName + ' ',
-                    StringComparison.OrdinalIgnoreCase
-                );
+                potentialParentCommandSchema
+                    .Name
+                    .StartsWith(parentCommandName + ' ', StringComparison.OrdinalIgnoreCase);
 
             if (isDescendant)
                 result.Add(potentialParentCommandSchema);

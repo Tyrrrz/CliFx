@@ -31,7 +31,8 @@ internal class AnalyzerAssertions : ReferenceTypeAssertions<DiagnosticAnalyzer, 
         };
 
         // Get default CliFx namespaces
-        var defaultCliFxNamespaces = typeof(ICommand).Assembly
+        var defaultCliFxNamespaces = typeof(ICommand)
+            .Assembly
             .GetTypes()
             .Where(t => t.IsPublic)
             .Select(t => t.Namespace)
@@ -55,9 +56,10 @@ internal class AnalyzerAssertions : ReferenceTypeAssertions<DiagnosticAnalyzer, 
         var compilation = CSharpCompilation.Create(
             "CliFxTests_DynamicAssembly_" + Guid.NewGuid(),
             new[] { ast },
-            Net70.References.All.Append(
-                MetadataReference.CreateFromFile(typeof(ICommand).Assembly.Location)
-            ),
+            Net70
+                .References
+                .All
+                .Append(MetadataReference.CreateFromFile(typeof(ICommand).Assembly.Location)),
             // DLL to avoid having to define the Main() method
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
         );
@@ -104,7 +106,8 @@ internal class AnalyzerAssertions : ReferenceTypeAssertions<DiagnosticAnalyzer, 
             expectedDiagnosticIds.Intersect(producedDiagnosticIds).Count()
             == expectedDiagnosticIds.Length;
 
-        Execute.Assertion
+        Execute
+            .Assertion
             .ForCondition(isSuccessfulAssertion)
             .FailWith(() =>
             {
@@ -148,7 +151,8 @@ internal class AnalyzerAssertions : ReferenceTypeAssertions<DiagnosticAnalyzer, 
         var producedDiagnostics = GetProducedDiagnostics(sourceCode);
         var isSuccessfulAssertion = !producedDiagnostics.Any();
 
-        Execute.Assertion
+        Execute
+            .Assertion
             .ForCondition(isSuccessfulAssertion)
             .FailWith(() =>
             {

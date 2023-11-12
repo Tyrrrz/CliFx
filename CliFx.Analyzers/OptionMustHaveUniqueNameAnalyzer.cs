@@ -35,7 +35,8 @@ public class OptionMustHaveUniqueNameAnalyzer : AnalyzerBase
         if (string.IsNullOrWhiteSpace(option.Name))
             return;
 
-        var otherProperties = property.ContainingType
+        var otherProperties = property
+            .ContainingType
             .GetMembers()
             .OfType<IPropertySymbol>()
             .Where(m => !m.Equals(property))

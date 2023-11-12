@@ -34,7 +34,8 @@ public class ParameterMustHaveValidValidatorsAnalyzer : AnalyzerBase
                     t =>
                         t.ConstructedFrom.DisplayNameMatches(SymbolNames.CliFxBindingValidatorClass)
                 )
-                ?.TypeArguments.FirstOrDefault();
+                ?.TypeArguments
+                .FirstOrDefault();
 
             // Value passed to the validator must be assignable from the property type
             var isCompatible =

@@ -55,30 +55,35 @@ internal partial class CommandOptionSymbol
             return null;
 
         var name =
-            attribute.ConstructorArguments
+            attribute
+                .ConstructorArguments
                 .Where(a => a.Type?.SpecialType == SpecialType.System_String)
                 .Select(a => a.Value)
                 .FirstOrDefault() as string;
 
         var shortName =
-            attribute.ConstructorArguments
+            attribute
+                .ConstructorArguments
                 .Where(a => a.Type?.SpecialType == SpecialType.System_Char)
                 .Select(a => a.Value)
                 .FirstOrDefault() as char?;
 
         var isRequired =
-            attribute.NamedArguments
+            attribute
+                .NamedArguments
                 .Where(a => a.Key == "IsRequired")
                 .Select(a => a.Value.Value)
                 .FirstOrDefault() as bool?;
 
-        var converter = attribute.NamedArguments
+        var converter = attribute
+            .NamedArguments
             .Where(a => a.Key == "Converter")
             .Select(a => a.Value.Value)
             .Cast<ITypeSymbol?>()
             .FirstOrDefault();
 
-        var validators = attribute.NamedArguments
+        var validators = attribute
+            .NamedArguments
             .Where(a => a.Key == "Validators")
             .SelectMany(a => a.Value.Values)
             .Select(c => c.Value)

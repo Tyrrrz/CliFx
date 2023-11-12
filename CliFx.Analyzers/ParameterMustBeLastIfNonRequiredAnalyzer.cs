@@ -33,7 +33,8 @@ public class ParameterMustBeLastIfNonRequiredAnalyzer : AnalyzerBase
         if (parameter.IsRequired != false)
             return;
 
-        var otherProperties = property.ContainingType
+        var otherProperties = property
+            .ContainingType
             .GetMembers()
             .OfType<IPropertySymbol>()
             .Where(m => !m.Equals(property))

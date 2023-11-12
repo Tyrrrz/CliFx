@@ -31,7 +31,8 @@ internal static class DynamicCommandBuilder
         };
 
         // Get default CliFx namespaces
-        var defaultCliFxNamespaces = typeof(ICommand).Assembly
+        var defaultCliFxNamespaces = typeof(ICommand)
+            .Assembly
             .GetTypes()
             .Where(t => t.IsPublic)
             .Select(t => t.Namespace)
@@ -55,7 +56,9 @@ internal static class DynamicCommandBuilder
         var compilation = CSharpCompilation.Create(
             "CliFxTests_DynamicAssembly_" + Guid.NewGuid(),
             new[] { ast },
-            Net70.References.All
+            Net70
+                .References
+                .All
                 .Append(MetadataReference.CreateFromFile(typeof(ICommand).Assembly.Location))
                 .Append(
                     MetadataReference.CreateFromFile(

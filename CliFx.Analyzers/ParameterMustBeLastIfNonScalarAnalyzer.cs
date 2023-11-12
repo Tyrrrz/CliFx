@@ -33,7 +33,8 @@ public class ParameterMustBeLastIfNonScalarAnalyzer : AnalyzerBase
         if (parameter.IsScalar())
             return;
 
-        var otherProperties = property.ContainingType
+        var otherProperties = property
+            .ContainingType
             .GetMembers()
             .OfType<IPropertySymbol>()
             .Where(m => !m.Equals(property))

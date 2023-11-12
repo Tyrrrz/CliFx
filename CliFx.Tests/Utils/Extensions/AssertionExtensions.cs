@@ -8,14 +8,10 @@ namespace CliFx.Tests.Utils.Extensions;
 
 internal static class AssertionExtensions
 {
-    public static void ConsistOfLines(this StringAssertions assertions, IEnumerable<string> lines)
-    {
-        var actualLines = assertions.Subject.Split(
-            new[] { '\n', '\r' },
-            StringSplitOptions.RemoveEmptyEntries
-        );
-        actualLines.Should().Equal(lines);
-    }
+    public static void ConsistOfLines(this StringAssertions assertions, IEnumerable<string> lines) =>
+        assertions
+            .Subject
+            .Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).Should().Equal(lines);
 
     public static void ConsistOfLines(this StringAssertions assertions, params string[] lines) =>
         assertions.ConsistOfLines((IEnumerable<string>)lines);
@@ -33,9 +29,11 @@ internal static class AssertionExtensions
 
             if (index < 0)
             {
-                Execute.Assertion.FailWith(
-                    $"Expected string '{assertions.Subject}' to contain '{value}' after position {lastIndex}."
-                );
+                Execute
+                    .Assertion
+                    .FailWith(
+                        $"Expected string '{assertions.Subject}' to contain '{value}' after position {lastIndex}."
+                    );
             }
 
             lastIndex = index;

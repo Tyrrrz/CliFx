@@ -35,7 +35,8 @@ public class ParameterMustHaveUniqueNameAnalyzer : AnalyzerBase
         if (string.IsNullOrWhiteSpace(parameter.Name))
             return;
 
-        var otherProperties = property.ContainingType
+        var otherProperties = property
+            .ContainingType
             .GetMembers()
             .OfType<IPropertySymbol>()
             .Where(m => !m.Equals(property))
