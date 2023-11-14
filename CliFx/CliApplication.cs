@@ -229,11 +229,7 @@ public class CliApplication
             commandLineArguments,
             Environment
                 .GetEnvironmentVariables()
-                .ToDictionary<string, string>(
-                    RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                        ? StringComparer.OrdinalIgnoreCase
-                        : StringComparer.Ordinal
-                )
+                .ToDictionary<string, string>(StringComparer.Ordinal)
         );
 
     /// <summary>
