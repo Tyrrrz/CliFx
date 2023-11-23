@@ -1,5 +1,9 @@
 # Changelog
 
+> **Important**:
+> This changelog is no longer maintained and will be removed in the future.
+> Going forward, new versions of this package will have the corresponding release notes published on [GitHub Releases](https://githu.com/Tyrrrz/CliFx/releases).
+
 ## v2.3.5 (16-Nov-2023)
 
 - Fixed an issue where calling `CliApplication.RunAsync(IReadOnlyList<string>)` could fail in very specific scenarios on Windows, if there were two global environment variables with the same name but different casing. (Thanks [@alirezanet](https://github.com/alirezanet))

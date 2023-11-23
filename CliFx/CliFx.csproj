@@ -10,7 +10,7 @@
     <Description>Class-first framework for building command-line interfaces</Description>
     <PackageTags>command line executable interface framework parser arguments cli app application net core</PackageTags>
     <PackageProjectUrl>https://github.com/Tyrrrz/CliFx</PackageProjectUrl>
-    <PackageReleaseNotes>https://github.com/Tyrrrz/CliFx/blob/master/Changelog.md</PackageReleaseNotes>
+    <PackageReleaseNotes>https://github.com/Tyrrrz/CliFx/releases/tag/$(Version)</PackageReleaseNotes>
     <PackageIcon>favicon.png</PackageIcon>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
