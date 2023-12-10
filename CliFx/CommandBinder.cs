@@ -12,22 +12,16 @@ using CliFx.Utils.Extensions;
 
 namespace CliFx;
 
-internal class CommandBinder
+internal class CommandBinder(ITypeActivator typeActivator)
 {
-    private readonly ITypeActivator _typeActivator;
     private readonly IFormatProvider _formatProvider = CultureInfo.InvariantCulture;
-
-    public CommandBinder(ITypeActivator typeActivator)
-    {
-        _typeActivator = typeActivator;
-    }
 
     private object? ConvertSingle(IMemberSchema memberSchema, string? rawValue, Type targetType)
     {
         // Custom converter
         if (memberSchema.ConverterType is not null)
         {
-            var converter = _typeActivator.CreateInstance<IBindingConverter>(
+            var converter = typeActivator.CreateInstance<IBindingConverter>(
                 memberSchema.ConverterType
             );
             return converter.Convert(rawValue);
@@ -213,7 +207,7 @@ internal class CommandBinder
 
         foreach (var validatorType in memberSchema.ValidatorTypes)
         {
-            var validator = _typeActivator.CreateInstance<IBindingValidator>(validatorType);
+            var validator = typeActivator.CreateInstance<IBindingValidator>(validatorType);
             var error = validator.Validate(convertedValue);
 
             if (error is not null)

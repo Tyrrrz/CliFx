@@ -7,15 +7,13 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace CliFx.Analyzers;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public class OptionMustHaveValidShortNameAnalyzer : AnalyzerBase
+public class OptionMustHaveValidShortNameAnalyzer()
+    : AnalyzerBase(
+        "Option short names must be letter characters",
+        "This option's short name must be a single letter character. "
+            + "Specified short name: `{0}`."
+    )
 {
-    public OptionMustHaveValidShortNameAnalyzer()
-        : base(
-            "Option short names must be letter characters",
-            "This option's short name must be a single letter character. "
-                + "Specified short name: `{0}`."
-        ) { }
-
     private void Analyze(
         SyntaxNodeAnalysisContext context,
         PropertyDeclarationSyntax propertyDeclaration,

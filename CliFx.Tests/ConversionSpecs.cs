@@ -8,11 +8,8 @@ using Xunit.Abstractions;
 
 namespace CliFx.Tests;
 
-public class ConversionSpecs : SpecsBase
+public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
 {
-    public ConversionSpecs(ITestOutputHelper testOutput)
-        : base(testOutput) { }
-
     [Fact]
     public async Task I_can_bind_a_parameter_or_an_option_to_a_string_property()
     {

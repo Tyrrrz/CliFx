@@ -9,11 +9,8 @@ using Xunit.Abstractions;
 
 namespace CliFx.Tests;
 
-public class OptionBindingSpecs : SpecsBase
+public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
 {
-    public OptionBindingSpecs(ITestOutputHelper testOutput)
-        : base(testOutput) { }
-
     [Fact]
     public async Task I_can_bind_an_option_to_a_property_and_get_the_value_from_the_corresponding_argument_by_name()
     {

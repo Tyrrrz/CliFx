@@ -3,50 +3,46 @@ using CliFx.Infrastructure;
 
 namespace CliFx.Formatting;
 
-internal class ConsoleFormatter
+internal class ConsoleFormatter(ConsoleWriter consoleWriter)
 {
-    private readonly ConsoleWriter _consoleWriter;
-
     private int _column;
     private int _row;
 
     public bool IsEmpty => _column == 0 && _row == 0;
 
-    public ConsoleFormatter(ConsoleWriter consoleWriter) => _consoleWriter = consoleWriter;
-
     public void Write(string? value)
     {
-        _consoleWriter.Write(value);
+        consoleWriter.Write(value);
         _column += value?.Length ?? 0;
     }
 
     public void Write(char value)
     {
-        _consoleWriter.Write(value);
+        consoleWriter.Write(value);
         _column++;
     }
 
     public void Write(ConsoleColor foregroundColor, string? value)
     {
-        using (_consoleWriter.Console.WithForegroundColor(foregroundColor))
+        using (consoleWriter.Console.WithForegroundColor(foregroundColor))
             Write(value);
     }
 
     public void Write(ConsoleColor foregroundColor, char value)
     {
-        using (_consoleWriter.Console.WithForegroundColor(foregroundColor))
+        using (consoleWriter.Console.WithForegroundColor(foregroundColor))
             Write(value);
     }
 
     public void Write(ConsoleColor foregroundColor, ConsoleColor backgroundColor, string? value)
     {
-        using (_consoleWriter.Console.WithColors(foregroundColor, backgroundColor))
+        using (consoleWriter.Console.WithColors(foregroundColor, backgroundColor))
             Write(value);
     }
 
     public void WriteLine()
     {
-        _consoleWriter.WriteLine();
+        consoleWriter.WriteLine();
         _column = 0;
         _row++;
     }

@@ -8,14 +8,12 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace CliFx.Analyzers;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public class CommandMustBeAnnotatedAnalyzer : AnalyzerBase
+public class CommandMustBeAnnotatedAnalyzer()
+    : AnalyzerBase(
+        $"Commands must be annotated with `{SymbolNames.CliFxCommandAttribute}`",
+        $"This type must be annotated with `{SymbolNames.CliFxCommandAttribute}` in order to be a valid command."
+    )
 {
-    public CommandMustBeAnnotatedAnalyzer()
-        : base(
-            $"Commands must be annotated with `{SymbolNames.CliFxCommandAttribute}`",
-            $"This type must be annotated with `{SymbolNames.CliFxCommandAttribute}` in order to be a valid command."
-        ) { }
-
     private void Analyze(
         SyntaxNodeAnalysisContext context,
         ClassDeclarationSyntax classDeclaration,

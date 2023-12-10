@@ -7,14 +7,12 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace CliFx.Analyzers;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public class OptionMustHaveNameOrShortNameAnalyzer : AnalyzerBase
+public class OptionMustHaveNameOrShortNameAnalyzer()
+    : AnalyzerBase(
+        "Options must have either a name or short name specified",
+        "This option must have either a name or short name specified."
+    )
 {
-    public OptionMustHaveNameOrShortNameAnalyzer()
-        : base(
-            "Options must have either a name or short name specified",
-            "This option must have either a name or short name specified."
-        ) { }
-
     private void Analyze(
         SyntaxNodeAnalysisContext context,
         PropertyDeclarationSyntax propertyDeclaration,

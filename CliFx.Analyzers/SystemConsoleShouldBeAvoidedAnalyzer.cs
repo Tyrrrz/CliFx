@@ -9,15 +9,13 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace CliFx.Analyzers;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public class SystemConsoleShouldBeAvoidedAnalyzer : AnalyzerBase
+public class SystemConsoleShouldBeAvoidedAnalyzer()
+    : AnalyzerBase(
+        $"Avoid calling `System.Console` where `{SymbolNames.CliFxConsoleInterface}` is available",
+        $"Use the provided `{SymbolNames.CliFxConsoleInterface}` abstraction instead of `System.Console` to ensure that the command can be tested in isolation.",
+        DiagnosticSeverity.Warning
+    )
 {
-    public SystemConsoleShouldBeAvoidedAnalyzer()
-        : base(
-            $"Avoid calling `System.Console` where `{SymbolNames.CliFxConsoleInterface}` is available",
-            $"Use the provided `{SymbolNames.CliFxConsoleInterface}` abstraction instead of `System.Console` to ensure that the command can be tested in isolation.",
-            DiagnosticSeverity.Warning
-        ) { }
-
     private MemberAccessExpressionSyntax? TryGetSystemConsoleMemberAccess(
         SyntaxNodeAnalysisContext context,
         SyntaxNode node

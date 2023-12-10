@@ -7,18 +7,11 @@ using CliFx.Infrastructure;
 namespace CliFx.Demo.Commands;
 
 [Command("book list", Description = "Lists all books in the library.")]
-public class BookListCommand : ICommand
+public class BookListCommand(LibraryProvider libraryProvider) : ICommand
 {
-    private readonly LibraryProvider _libraryProvider;
-
-    public BookListCommand(LibraryProvider libraryProvider)
-    {
-        _libraryProvider = libraryProvider;
-    }
-
     public ValueTask ExecuteAsync(IConsole console)
     {
-        var library = _libraryProvider.GetLibrary();
+        var library = libraryProvider.GetLibrary();
 
         for (var i = 0; i < library.Books.Count; i++)
         {

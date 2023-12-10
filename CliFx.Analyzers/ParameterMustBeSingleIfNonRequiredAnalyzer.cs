@@ -8,15 +8,13 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace CliFx.Analyzers;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public class ParameterMustBeSingleIfNonRequiredAnalyzer : AnalyzerBase
+public class ParameterMustBeSingleIfNonRequiredAnalyzer()
+    : AnalyzerBase(
+        "Parameters marked as non-required are limited to one per command",
+        "This parameter is non-required so it must be the only such parameter in the command. "
+            + "Property bound to another non-required parameter: `{0}`."
+    )
 {
-    public ParameterMustBeSingleIfNonRequiredAnalyzer()
-        : base(
-            "Parameters marked as non-required are limited to one per command",
-            "This parameter is non-required so it must be the only such parameter in the command. "
-                + "Property bound to another non-required parameter: `{0}`."
-        ) { }
-
     private void Analyze(
         SyntaxNodeAnalysisContext context,
         PropertyDeclarationSyntax propertyDeclaration,

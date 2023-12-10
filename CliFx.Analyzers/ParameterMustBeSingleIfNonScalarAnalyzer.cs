@@ -8,15 +8,13 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace CliFx.Analyzers;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public class ParameterMustBeSingleIfNonScalarAnalyzer : AnalyzerBase
+public class ParameterMustBeSingleIfNonScalarAnalyzer()
+    : AnalyzerBase(
+        "Parameters of non-scalar types are limited to one per command",
+        "This parameter has a non-scalar type so it must be the only such parameter in the command. "
+            + "Property bound to another non-scalar parameter: `{0}`."
+    )
 {
-    public ParameterMustBeSingleIfNonScalarAnalyzer()
-        : base(
-            "Parameters of non-scalar types are limited to one per command",
-            "This parameter has a non-scalar type so it must be the only such parameter in the command. "
-                + "Property bound to another non-scalar parameter: `{0}`."
-        ) { }
-
     private void Analyze(
         SyntaxNodeAnalysisContext context,
         PropertyDeclarationSyntax propertyDeclaration,

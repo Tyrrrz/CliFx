@@ -7,14 +7,12 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace CliFx.Analyzers;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public class ParameterMustBeRequiredIfPropertyRequiredAnalyzer : AnalyzerBase
+public class ParameterMustBeRequiredIfPropertyRequiredAnalyzer()
+    : AnalyzerBase(
+        "Parameters bound to required properties cannot be marked as non-required",
+        "This parameter cannot be marked as non-required because it's bound to a required property."
+    )
 {
-    public ParameterMustBeRequiredIfPropertyRequiredAnalyzer()
-        : base(
-            "Parameters bound to required properties cannot be marked as non-required",
-            "This parameter cannot be marked as non-required because it's bound to a required property."
-        ) { }
-
     private void Analyze(
         SyntaxNodeAnalysisContext context,
         PropertyDeclarationSyntax propertyDeclaration,

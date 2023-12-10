@@ -7,26 +7,19 @@ using CliFx.Infrastructure;
 namespace CliFx.Demo.Commands;
 
 [Command("book remove", Description = "Removes a book from the library.")]
-public class BookRemoveCommand : ICommand
+public class BookRemoveCommand(LibraryProvider libraryProvider) : ICommand
 {
-    private readonly LibraryProvider _libraryProvider;
-
     [CommandParameter(0, Name = "title", Description = "Title of the book to remove.")]
     public required string Title { get; init; }
 
-    public BookRemoveCommand(LibraryProvider libraryProvider)
-    {
-        _libraryProvider = libraryProvider;
-    }
-
     public ValueTask ExecuteAsync(IConsole console)
     {
-        var book = _libraryProvider.TryGetBook(Title);
+        var book = libraryProvider.TryGetBook(Title);
 
         if (book is null)
             throw new CommandException("Book not found.", 10);
 
-        _libraryProvider.RemoveBook(book);
+        libraryProvider.RemoveBook(book);
 
         console.Output.WriteLine($"Book {Title} removed.");
 

@@ -8,14 +8,12 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace CliFx.Analyzers;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public class ParameterMustHaveValidValidatorsAnalyzer : AnalyzerBase
+public class ParameterMustHaveValidValidatorsAnalyzer()
+    : AnalyzerBase(
+        $"Parameter validators must derive from `{SymbolNames.CliFxBindingValidatorClass}`",
+        $"Each validator specified for this parameter must derive from a compatible `{SymbolNames.CliFxBindingValidatorClass}`."
+    )
 {
-    public ParameterMustHaveValidValidatorsAnalyzer()
-        : base(
-            $"Parameter validators must derive from `{SymbolNames.CliFxBindingValidatorClass}`",
-            $"Each validator specified for this parameter must derive from a compatible `{SymbolNames.CliFxBindingValidatorClass}`."
-        ) { }
-
     private void Analyze(
         SyntaxNodeAnalysisContext context,
         PropertyDeclarationSyntax propertyDeclaration,

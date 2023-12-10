@@ -8,16 +8,14 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace CliFx.Analyzers;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public class OptionMustHaveUniqueShortNameAnalyzer : AnalyzerBase
+public class OptionMustHaveUniqueShortNameAnalyzer()
+    : AnalyzerBase(
+        "Options must have unique short names",
+        "This option's short name must be unique within the command (comparison IS case sensitive). "
+            + "Specified short name: `{0}` "
+            + "Property bound to another option with the same short name: `{1}`."
+    )
 {
-    public OptionMustHaveUniqueShortNameAnalyzer()
-        : base(
-            "Options must have unique short names",
-            "This option's short name must be unique within the command (comparison IS case sensitive). "
-                + "Specified short name: `{0}` "
-                + "Property bound to another option with the same short name: `{1}`."
-        ) { }
-
     private void Analyze(
         SyntaxNodeAnalysisContext context,
         PropertyDeclarationSyntax propertyDeclaration,

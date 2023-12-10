@@ -9,11 +9,8 @@ using Xunit.Abstractions;
 
 namespace CliFx.Tests;
 
-public class HelpTextSpecs : SpecsBase
+public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
 {
-    public HelpTextSpecs(ITestOutputHelper testOutput)
-        : base(testOutput) { }
-
     [Fact]
     public async Task I_can_request_the_help_text_by_running_the_application_without_arguments_if_the_default_command_is_not_defined()
     {

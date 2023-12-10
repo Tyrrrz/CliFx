@@ -9,11 +9,8 @@ using Xunit.Abstractions;
 
 namespace CliFx.Tests;
 
-public class ErrorReportingSpecs : SpecsBase
+public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
 {
-    public ErrorReportingSpecs(ITestOutputHelper testOutput)
-        : base(testOutput) { }
-
     [Fact]
     public async Task I_can_throw_an_exception_in_a_command_to_report_an_error_with_a_stacktrace()
     {

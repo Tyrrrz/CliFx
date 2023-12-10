@@ -8,14 +8,12 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace CliFx.Analyzers;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public class ParameterMustBeInsideCommandAnalyzer : AnalyzerBase
+public class ParameterMustBeInsideCommandAnalyzer()
+    : AnalyzerBase(
+        "Parameters must be defined inside commands",
+        $"This parameter must be defined inside a class that implements `{SymbolNames.CliFxCommandInterface}`."
+    )
 {
-    public ParameterMustBeInsideCommandAnalyzer()
-        : base(
-            "Parameters must be defined inside commands",
-            $"This parameter must be defined inside a class that implements `{SymbolNames.CliFxCommandInterface}`."
-        ) { }
-
     private void Analyze(
         SyntaxNodeAnalysisContext context,
         PropertyDeclarationSyntax propertyDeclaration,

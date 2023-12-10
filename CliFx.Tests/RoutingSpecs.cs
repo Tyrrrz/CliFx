@@ -8,11 +8,8 @@ using Xunit.Abstractions;
 
 namespace CliFx.Tests;
 
-public class RoutingSpecs : SpecsBase
+public class RoutingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
 {
-    public RoutingSpecs(ITestOutputHelper testOutput)
-        : base(testOutput) { }
-
     [Fact]
     public async Task I_can_configure_a_command_to_be_executed_by_default_when_the_user_does_not_specify_a_command_name()
     {

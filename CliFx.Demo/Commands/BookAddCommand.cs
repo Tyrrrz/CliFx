@@ -9,10 +9,8 @@ using CliFx.Infrastructure;
 namespace CliFx.Demo.Commands;
 
 [Command("book add", Description = "Adds a book to the library.")]
-public partial class BookAddCommand : ICommand
+public partial class BookAddCommand(LibraryProvider libraryProvider) : ICommand
 {
-    private readonly LibraryProvider _libraryProvider;
-
     [CommandParameter(0, Name = "title", Description = "Book title.")]
     public required string Title { get; init; }
 
@@ -25,18 +23,13 @@ public partial class BookAddCommand : ICommand
     [CommandOption("isbn", 'n', Description = "Book ISBN.")]
     public Isbn Isbn { get; init; } = CreateRandomIsbn();
 
-    public BookAddCommand(LibraryProvider libraryProvider)
-    {
-        _libraryProvider = libraryProvider;
-    }
-
     public ValueTask ExecuteAsync(IConsole console)
     {
-        if (_libraryProvider.TryGetBook(Title) is not null)
+        if (libraryProvider.TryGetBook(Title) is not null)
             throw new CommandException("Book already exists.", 10);
 
         var book = new Book(Title, Author, Published, Isbn);
-        _libraryProvider.AddBook(book);
+        libraryProvider.AddBook(book);
 
         console.Output.WriteLine("Book added.");
         console.Output.WriteBook(book);

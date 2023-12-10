@@ -10,11 +10,8 @@ using Xunit.Abstractions;
 
 namespace CliFx.Tests;
 
-public class TypeActivationSpecs : SpecsBase
+public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
 {
-    public TypeActivationSpecs(ITestOutputHelper testOutput)
-        : base(testOutput) { }
-
     [Fact]
     public async Task I_can_configure_the_application_to_use_the_default_type_activator_to_initialize_types_through_parameterless_constructors()
     {

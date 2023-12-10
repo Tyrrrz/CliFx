@@ -9,16 +9,14 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace CliFx.Analyzers;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public class OptionMustHaveUniqueNameAnalyzer : AnalyzerBase
+public class OptionMustHaveUniqueNameAnalyzer()
+    : AnalyzerBase(
+        "Options must have unique names",
+        "This option's name must be unique within the command (comparison IS NOT case sensitive). "
+            + "Specified name: `{0}`. "
+            + "Property bound to another option with the same name: `{1}`."
+    )
 {
-    public OptionMustHaveUniqueNameAnalyzer()
-        : base(
-            "Options must have unique names",
-            "This option's name must be unique within the command (comparison IS NOT case sensitive). "
-                + "Specified name: `{0}`. "
-                + "Property bound to another option with the same name: `{1}`."
-        ) { }
-
     private void Analyze(
         SyntaxNodeAnalysisContext context,
         PropertyDeclarationSyntax propertyDeclaration,

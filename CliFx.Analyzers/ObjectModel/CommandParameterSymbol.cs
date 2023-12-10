@@ -5,36 +5,26 @@ using Microsoft.CodeAnalysis;
 
 namespace CliFx.Analyzers.ObjectModel;
 
-internal partial class CommandParameterSymbol : ICommandMemberSymbol
+internal partial class CommandParameterSymbol(
+    IPropertySymbol property,
+    int order,
+    string? name,
+    bool? isRequired,
+    ITypeSymbol? converterType,
+    IReadOnlyList<ITypeSymbol> validatorTypes
+) : ICommandMemberSymbol
 {
-    public IPropertySymbol Property { get; }
+    public IPropertySymbol Property { get; } = property;
 
-    public int Order { get; }
+    public int Order { get; } = order;
 
-    public string? Name { get; }
+    public string? Name { get; } = name;
 
-    public bool? IsRequired { get; }
+    public bool? IsRequired { get; } = isRequired;
 
-    public ITypeSymbol? ConverterType { get; }
+    public ITypeSymbol? ConverterType { get; } = converterType;
 
-    public IReadOnlyList<ITypeSymbol> ValidatorTypes { get; }
-
-    public CommandParameterSymbol(
-        IPropertySymbol property,
-        int order,
-        string? name,
-        bool? isRequired,
-        ITypeSymbol? converterType,
-        IReadOnlyList<ITypeSymbol> validatorTypes
-    )
-    {
-        Property = property;
-        Order = order;
-        Name = name;
-        IsRequired = isRequired;
-        ConverterType = converterType;
-        ValidatorTypes = validatorTypes;
-    }
+    public IReadOnlyList<ITypeSymbol> ValidatorTypes { get; } = validatorTypes;
 }
 
 internal partial class CommandParameterSymbol

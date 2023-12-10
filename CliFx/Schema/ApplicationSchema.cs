@@ -5,14 +5,9 @@ using CliFx.Utils.Extensions;
 
 namespace CliFx.Schema;
 
-internal partial class ApplicationSchema
+internal partial class ApplicationSchema(IReadOnlyList<CommandSchema> commands)
 {
-    public IReadOnlyList<CommandSchema> Commands { get; }
-
-    public ApplicationSchema(IReadOnlyList<CommandSchema> commands)
-    {
-        Commands = commands;
-    }
+    public IReadOnlyList<CommandSchema> Commands { get; } = commands;
 
     public IReadOnlyList<string> GetCommandNames() =>
         Commands.Select(c => c.Name).WhereNotNullOrWhiteSpace().ToArray();

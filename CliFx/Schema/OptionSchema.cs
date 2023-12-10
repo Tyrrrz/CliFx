@@ -7,44 +7,32 @@ using CliFx.Utils.Extensions;
 
 namespace CliFx.Schema;
 
-internal partial class OptionSchema : IMemberSchema
+internal partial class OptionSchema(
+    IPropertyDescriptor property,
+    string? name,
+    char? shortName,
+    string? environmentVariable,
+    bool isRequired,
+    string? description,
+    Type? converterType,
+    IReadOnlyList<Type> validatorTypes
+) : IMemberSchema
 {
-    public IPropertyDescriptor Property { get; }
+    public IPropertyDescriptor Property { get; } = property;
 
-    public string? Name { get; }
+    public string? Name { get; } = name;
 
-    public char? ShortName { get; }
+    public char? ShortName { get; } = shortName;
 
-    public string? EnvironmentVariable { get; }
+    public string? EnvironmentVariable { get; } = environmentVariable;
 
-    public bool IsRequired { get; }
+    public bool IsRequired { get; } = isRequired;
 
-    public string? Description { get; }
+    public string? Description { get; } = description;
 
-    public Type? ConverterType { get; }
+    public Type? ConverterType { get; } = converterType;
 
-    public IReadOnlyList<Type> ValidatorTypes { get; }
-
-    public OptionSchema(
-        IPropertyDescriptor property,
-        string? name,
-        char? shortName,
-        string? environmentVariable,
-        bool isRequired,
-        string? description,
-        Type? converterType,
-        IReadOnlyList<Type> validatorTypes
-    )
-    {
-        Property = property;
-        Name = name;
-        ShortName = shortName;
-        EnvironmentVariable = environmentVariable;
-        IsRequired = isRequired;
-        Description = description;
-        ConverterType = converterType;
-        ValidatorTypes = validatorTypes;
-    }
+    public IReadOnlyList<Type> ValidatorTypes { get; } = validatorTypes;
 
     public bool MatchesName(string? name) =>
         !string.IsNullOrWhiteSpace(Name)

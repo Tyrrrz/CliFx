@@ -3,13 +3,9 @@ using System.Collections.Generic;
 
 namespace CliFx.Utils;
 
-internal partial class Disposable : IDisposable
+internal partial class Disposable(Action dispose) : IDisposable
 {
-    private readonly Action _dispose;
-
-    public Disposable(Action dispose) => _dispose = dispose;
-
-    public void Dispose() => _dispose();
+    public void Dispose() => dispose();
 }
 
 internal partial class Disposable

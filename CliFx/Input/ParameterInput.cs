@@ -1,10 +1,8 @@
 ﻿namespace CliFx.Input;
 
-internal class ParameterInput
+internal class ParameterInput(string value)
 {
-    public string Value { get; }
-
-    public ParameterInput(string value) => Value = value;
+    public string Value { get; } = value;
 
     public string GetFormattedIdentifier() => $"<{Value}>";
 }

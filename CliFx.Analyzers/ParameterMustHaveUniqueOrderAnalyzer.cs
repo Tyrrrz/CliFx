@@ -8,16 +8,14 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace CliFx.Analyzers;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public class ParameterMustHaveUniqueOrderAnalyzer : AnalyzerBase
+public class ParameterMustHaveUniqueOrderAnalyzer()
+    : AnalyzerBase(
+        "Parameters must have unique order",
+        "This parameter's order must be unique within the command. "
+            + "Specified order: {0}. "
+            + "Property bound to another parameter with the same order: `{1}`."
+    )
 {
-    public ParameterMustHaveUniqueOrderAnalyzer()
-        : base(
-            "Parameters must have unique order",
-            "This parameter's order must be unique within the command. "
-                + "Specified order: {0}. "
-                + "Property bound to another parameter with the same order: `{1}`."
-        ) { }
-
     private void Analyze(
         SyntaxNodeAnalysisContext context,
         PropertyDeclarationSyntax propertyDeclaration,

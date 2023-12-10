@@ -4,11 +4,9 @@ using CliFx.Input;
 
 namespace CliFx.Formatting;
 
-internal class CommandInputConsoleFormatter : ConsoleFormatter
+internal class CommandInputConsoleFormatter(ConsoleWriter consoleWriter)
+    : ConsoleFormatter(consoleWriter)
 {
-    public CommandInputConsoleFormatter(ConsoleWriter consoleWriter)
-        : base(consoleWriter) { }
-
     private void WriteCommandLineArguments(CommandInput commandInput)
     {
         Write("Command-line:");

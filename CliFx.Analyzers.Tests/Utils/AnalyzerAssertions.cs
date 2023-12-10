@@ -13,12 +13,10 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace CliFx.Analyzers.Tests.Utils;
 
-internal class AnalyzerAssertions : ReferenceTypeAssertions<DiagnosticAnalyzer, AnalyzerAssertions>
+internal class AnalyzerAssertions(DiagnosticAnalyzer analyzer)
+    : ReferenceTypeAssertions<DiagnosticAnalyzer, AnalyzerAssertions>(analyzer)
 {
-    protected override string Identifier { get; } = "analyzer";
-
-    public AnalyzerAssertions(DiagnosticAnalyzer analyzer)
-        : base(analyzer) { }
+    protected override string Identifier => "analyzer";
 
     private Compilation Compile(string sourceCode)
     {

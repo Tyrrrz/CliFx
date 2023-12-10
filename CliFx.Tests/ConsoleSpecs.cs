@@ -14,11 +14,8 @@ using Xunit.Abstractions;
 
 namespace CliFx.Tests;
 
-public class ConsoleSpecs : SpecsBase
+public class ConsoleSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
 {
-    public ConsoleSpecs(ITestOutputHelper testOutput)
-        : base(testOutput) { }
-
     [Fact(Timeout = 15000)]
     public async Task I_can_run_the_application_with_the_default_console_implementation_to_interact_with_the_system_console()
     {

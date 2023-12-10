@@ -12,11 +12,8 @@ using Xunit.Abstractions;
 
 namespace CliFx.Tests;
 
-public class CancellationSpecs : SpecsBase
+public class CancellationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
 {
-    public CancellationSpecs(ITestOutputHelper testOutput)
-        : base(testOutput) { }
-
     [Fact(Timeout = 15000)]
     public async Task I_can_configure_the_command_to_listen_to_the_interrupt_signal()
     {

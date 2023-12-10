@@ -5,17 +5,24 @@ using CliFx.Utils.Extensions;
 
 namespace CliFx.Input;
 
-internal partial class CommandInput
+internal partial class CommandInput(
+    string? commandName,
+    IReadOnlyList<DirectiveInput> directives,
+    IReadOnlyList<ParameterInput> parameters,
+    IReadOnlyList<OptionInput> options,
+    IReadOnlyList<EnvironmentVariableInput> environmentVariables
+)
 {
-    public string? CommandName { get; }
+    public string? CommandName { get; } = commandName;
 
-    public IReadOnlyList<DirectiveInput> Directives { get; }
+    public IReadOnlyList<DirectiveInput> Directives { get; } = directives;
 
-    public IReadOnlyList<ParameterInput> Parameters { get; }
+    public IReadOnlyList<ParameterInput> Parameters { get; } = parameters;
 
-    public IReadOnlyList<OptionInput> Options { get; }
+    public IReadOnlyList<OptionInput> Options { get; } = options;
 
-    public IReadOnlyList<EnvironmentVariableInput> EnvironmentVariables { get; }
+    public IReadOnlyList<EnvironmentVariableInput> EnvironmentVariables { get; } =
+        environmentVariables;
 
     public bool HasArguments =>
         !string.IsNullOrWhiteSpace(CommandName)
@@ -30,21 +37,6 @@ internal partial class CommandInput
     public bool IsHelpOptionSpecified => Options.Any(o => o.IsHelpOption);
 
     public bool IsVersionOptionSpecified => Options.Any(o => o.IsVersionOption);
-
-    public CommandInput(
-        string? commandName,
-        IReadOnlyList<DirectiveInput> directives,
-        IReadOnlyList<ParameterInput> parameters,
-        IReadOnlyList<OptionInput> options,
-        IReadOnlyList<EnvironmentVariableInput> environmentVariables
-    )
-    {
-        CommandName = commandName;
-        Directives = directives;
-        Parameters = parameters;
-        Options = options;
-        EnvironmentVariables = environmentVariables;
-    }
 }
 
 internal partial class CommandInput

@@ -8,14 +8,12 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace CliFx.Analyzers;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public class ParameterMustHaveValidConverterAnalyzer : AnalyzerBase
+public class ParameterMustHaveValidConverterAnalyzer()
+    : AnalyzerBase(
+        $"Parameter converters must derive from `{SymbolNames.CliFxBindingConverterClass}`",
+        $"Converter specified for this parameter must derive from a compatible `{SymbolNames.CliFxBindingConverterClass}`."
+    )
 {
-    public ParameterMustHaveValidConverterAnalyzer()
-        : base(
-            $"Parameter converters must derive from `{SymbolNames.CliFxBindingConverterClass}`",
-            $"Converter specified for this parameter must derive from a compatible `{SymbolNames.CliFxBindingConverterClass}`."
-        ) { }
-
     private void Analyze(
         SyntaxNodeAnalysisContext context,
         PropertyDeclarationSyntax propertyDeclaration,

@@ -11,11 +11,8 @@ using Xunit.Abstractions;
 
 namespace CliFx.Tests;
 
-public class DirectivesSpecs : SpecsBase
+public class DirectivesSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
 {
-    public DirectivesSpecs(ITestOutputHelper testOutput)
-        : base(testOutput) { }
-
     [Fact(Timeout = 15000)]
     public async Task I_can_use_the_debug_directive_to_make_the_application_wait_for_the_debugger_to_attach()
     {

@@ -10,65 +10,58 @@ namespace CliFx.Utils;
 // https://source.dot.net/#System.Console/ConsoleEncoding.cs,5eedd083a4a4f4a2
 // Majority of overrides are just proxy calls to avoid potentially more expensive base behavior.
 // The important part is the GetPreamble() method that has been overriden to return an empty array.
-internal class NoPreambleEncoding : Encoding
+internal class NoPreambleEncoding(Encoding underlyingEncoding)
+    : Encoding(
+        underlyingEncoding.CodePage,
+        underlyingEncoding.EncoderFallback,
+        underlyingEncoding.DecoderFallback
+    )
 {
-    private readonly Encoding _underlyingEncoding;
+    [ExcludeFromCodeCoverage]
+    public override string EncodingName => underlyingEncoding.EncodingName;
 
     [ExcludeFromCodeCoverage]
-    public override string EncodingName => _underlyingEncoding.EncodingName;
+    public override string BodyName => underlyingEncoding.BodyName;
 
     [ExcludeFromCodeCoverage]
-    public override string BodyName => _underlyingEncoding.BodyName;
+    public override int CodePage => underlyingEncoding.CodePage;
 
     [ExcludeFromCodeCoverage]
-    public override int CodePage => _underlyingEncoding.CodePage;
+    public override int WindowsCodePage => underlyingEncoding.WindowsCodePage;
 
     [ExcludeFromCodeCoverage]
-    public override int WindowsCodePage => _underlyingEncoding.WindowsCodePage;
+    public override string HeaderName => underlyingEncoding.HeaderName;
 
     [ExcludeFromCodeCoverage]
-    public override string HeaderName => _underlyingEncoding.HeaderName;
+    public override string WebName => underlyingEncoding.WebName;
 
     [ExcludeFromCodeCoverage]
-    public override string WebName => _underlyingEncoding.WebName;
+    public override bool IsBrowserDisplay => underlyingEncoding.IsBrowserDisplay;
 
     [ExcludeFromCodeCoverage]
-    public override bool IsBrowserDisplay => _underlyingEncoding.IsBrowserDisplay;
+    public override bool IsBrowserSave => underlyingEncoding.IsBrowserSave;
 
     [ExcludeFromCodeCoverage]
-    public override bool IsBrowserSave => _underlyingEncoding.IsBrowserSave;
+    public override bool IsSingleByte => underlyingEncoding.IsSingleByte;
 
     [ExcludeFromCodeCoverage]
-    public override bool IsSingleByte => _underlyingEncoding.IsSingleByte;
+    public override bool IsMailNewsDisplay => underlyingEncoding.IsMailNewsDisplay;
 
     [ExcludeFromCodeCoverage]
-    public override bool IsMailNewsDisplay => _underlyingEncoding.IsMailNewsDisplay;
-
-    [ExcludeFromCodeCoverage]
-    public override bool IsMailNewsSave => _underlyingEncoding.IsMailNewsSave;
-
-    public NoPreambleEncoding(Encoding underlyingEncoding)
-        : base(
-            underlyingEncoding.CodePage,
-            underlyingEncoding.EncoderFallback,
-            underlyingEncoding.DecoderFallback
-        )
-    {
-        _underlyingEncoding = underlyingEncoding;
-    }
+    public override bool IsMailNewsSave => underlyingEncoding.IsMailNewsSave;
 
     // This is the only part that changes
     public override byte[] GetPreamble() => Array.Empty<byte>();
 
     [ExcludeFromCodeCoverage]
     public override int GetByteCount(char[] chars, int index, int count) =>
-        _underlyingEncoding.GetByteCount(chars, index, count);
+        underlyingEncoding.GetByteCount(chars, index, count);
 
     [ExcludeFromCodeCoverage]
-    public override int GetByteCount(char[] chars) => _underlyingEncoding.GetByteCount(chars);
+    public override int GetByteCount(char[] chars) => underlyingEncoding.GetByteCount(chars);
 
     [ExcludeFromCodeCoverage]
-    public override int GetByteCount(string s) => _underlyingEncoding.GetByteCount(s);
+    public override int GetByteCount(string s) => underlyingEncoding.GetByteCount(s);
 
     [ExcludeFromCodeCoverage]
     public override int GetBytes(
@@ -77,14 +70,14 @@ internal class NoPreambleEncoding : Encoding
         int charCount,
         byte[] bytes,
         int byteIndex
-    ) => _underlyingEncoding.GetBytes(chars, charIndex, charCount, bytes, byteIndex);
+    ) => underlyingEncoding.GetBytes(chars, charIndex, charCount, bytes, byteIndex);
 
     [ExcludeFromCodeCoverage]
     public override byte[] GetBytes(char[] chars, int index, int count) =>
-        _underlyingEncoding.GetBytes(chars, index, count);
+        underlyingEncoding.GetBytes(chars, index, count);
 
     [ExcludeFromCodeCoverage]
-    public override byte[] GetBytes(char[] chars) => _underlyingEncoding.GetBytes(chars);
+    public override byte[] GetBytes(char[] chars) => underlyingEncoding.GetBytes(chars);
 
     [ExcludeFromCodeCoverage]
     public override int GetBytes(
@@ -93,17 +86,17 @@ internal class NoPreambleEncoding : Encoding
         int charCount,
         byte[] bytes,
         int byteIndex
-    ) => _underlyingEncoding.GetBytes(s, charIndex, charCount, bytes, byteIndex);
+    ) => underlyingEncoding.GetBytes(s, charIndex, charCount, bytes, byteIndex);
 
     [ExcludeFromCodeCoverage]
-    public override byte[] GetBytes(string s) => _underlyingEncoding.GetBytes(s);
+    public override byte[] GetBytes(string s) => underlyingEncoding.GetBytes(s);
 
     [ExcludeFromCodeCoverage]
     public override int GetCharCount(byte[] bytes, int index, int count) =>
-        _underlyingEncoding.GetCharCount(bytes, index, count);
+        underlyingEncoding.GetCharCount(bytes, index, count);
 
     [ExcludeFromCodeCoverage]
-    public override int GetCharCount(byte[] bytes) => _underlyingEncoding.GetCharCount(bytes);
+    public override int GetCharCount(byte[] bytes) => underlyingEncoding.GetCharCount(bytes);
 
     [ExcludeFromCodeCoverage]
     public override int GetChars(
@@ -112,39 +105,39 @@ internal class NoPreambleEncoding : Encoding
         int byteCount,
         char[] chars,
         int charIndex
-    ) => _underlyingEncoding.GetChars(bytes, byteIndex, byteCount, chars, charIndex);
+    ) => underlyingEncoding.GetChars(bytes, byteIndex, byteCount, chars, charIndex);
 
     [ExcludeFromCodeCoverage]
-    public override char[] GetChars(byte[] bytes) => _underlyingEncoding.GetChars(bytes);
+    public override char[] GetChars(byte[] bytes) => underlyingEncoding.GetChars(bytes);
 
     [ExcludeFromCodeCoverage]
     public override char[] GetChars(byte[] bytes, int index, int count) =>
-        _underlyingEncoding.GetChars(bytes, index, count);
+        underlyingEncoding.GetChars(bytes, index, count);
 
     [ExcludeFromCodeCoverage]
-    public override string GetString(byte[] bytes) => _underlyingEncoding.GetString(bytes);
+    public override string GetString(byte[] bytes) => underlyingEncoding.GetString(bytes);
 
     [ExcludeFromCodeCoverage]
     public override string GetString(byte[] bytes, int index, int count) =>
-        _underlyingEncoding.GetString(bytes, index, count);
+        underlyingEncoding.GetString(bytes, index, count);
 
     [ExcludeFromCodeCoverage]
     public override int GetMaxByteCount(int charCount) =>
-        _underlyingEncoding.GetMaxByteCount(charCount);
+        underlyingEncoding.GetMaxByteCount(charCount);
 
     [ExcludeFromCodeCoverage]
     public override int GetMaxCharCount(int byteCount) =>
-        _underlyingEncoding.GetMaxCharCount(byteCount);
+        underlyingEncoding.GetMaxCharCount(byteCount);
 
     [ExcludeFromCodeCoverage]
     public override bool IsAlwaysNormalized(NormalizationForm form) =>
-        _underlyingEncoding.IsAlwaysNormalized(form);
+        underlyingEncoding.IsAlwaysNormalized(form);
 
     [ExcludeFromCodeCoverage]
-    public override Encoder GetEncoder() => _underlyingEncoding.GetEncoder();
+    public override Encoder GetEncoder() => underlyingEncoding.GetEncoder();
 
     [ExcludeFromCodeCoverage]
-    public override Decoder GetDecoder() => _underlyingEncoding.GetDecoder();
+    public override Decoder GetDecoder() => underlyingEncoding.GetDecoder();
 
     [ExcludeFromCodeCoverage]
     public override object Clone() => new NoPreambleEncoding((Encoding)base.Clone());

@@ -7,11 +7,9 @@ using CliFx.Utils.Extensions;
 
 namespace CliFx.Formatting;
 
-internal class ExceptionConsoleFormatter : ConsoleFormatter
+internal class ExceptionConsoleFormatter(ConsoleWriter consoleWriter)
+    : ConsoleFormatter(consoleWriter)
 {
-    public ExceptionConsoleFormatter(ConsoleWriter consoleWriter)
-        : base(consoleWriter) { }
-
     private void WriteStackFrame(StackFrame stackFrame, int indentLevel)
     {
         WriteHorizontalMargin(2 + 4 * indentLevel);

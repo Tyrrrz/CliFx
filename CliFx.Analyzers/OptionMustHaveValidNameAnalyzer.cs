@@ -7,15 +7,13 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace CliFx.Analyzers;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public class OptionMustHaveValidNameAnalyzer : AnalyzerBase
+public class OptionMustHaveValidNameAnalyzer()
+    : AnalyzerBase(
+        "Options must have valid names",
+        "This option's name must be at least 2 characters long and must start with a letter. "
+            + "Specified name: `{0}`."
+    )
 {
-    public OptionMustHaveValidNameAnalyzer()
-        : base(
-            "Options must have valid names",
-            "This option's name must be at least 2 characters long and must start with a letter. "
-                + "Specified name: `{0}`."
-        ) { }
-
     private void Analyze(
         SyntaxNodeAnalysisContext context,
         PropertyDeclarationSyntax propertyDeclaration,

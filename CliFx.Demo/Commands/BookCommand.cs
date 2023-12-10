@@ -8,21 +8,14 @@ using CliFx.Infrastructure;
 namespace CliFx.Demo.Commands;
 
 [Command("book", Description = "Retrieves a book from the library.")]
-public class BookCommand : ICommand
+public class BookCommand(LibraryProvider libraryProvider) : ICommand
 {
-    private readonly LibraryProvider _libraryProvider;
-
     [CommandParameter(0, Name = "title", Description = "Title of the book to retrieve.")]
     public required string Title { get; init; }
 
-    public BookCommand(LibraryProvider libraryProvider)
-    {
-        _libraryProvider = libraryProvider;
-    }
-
     public ValueTask ExecuteAsync(IConsole console)
     {
-        var book = _libraryProvider.TryGetBook(Title);
+        var book = libraryProvider.TryGetBook(Title);
 
         if (book is null)
             throw new CommandException("Book not found.", 10);

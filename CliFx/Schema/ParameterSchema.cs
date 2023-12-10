@@ -6,40 +6,29 @@ using CliFx.Utils.Extensions;
 
 namespace CliFx.Schema;
 
-internal partial class ParameterSchema : IMemberSchema
+internal partial class ParameterSchema(
+    IPropertyDescriptor property,
+    int order,
+    string name,
+    bool isRequired,
+    string? description,
+    Type? converterType,
+    IReadOnlyList<Type> validatorTypes
+) : IMemberSchema
 {
-    public IPropertyDescriptor Property { get; }
+    public IPropertyDescriptor Property { get; } = property;
 
-    public int Order { get; }
+    public int Order { get; } = order;
 
-    public string Name { get; }
+    public string Name { get; } = name;
 
-    public bool IsRequired { get; }
+    public bool IsRequired { get; } = isRequired;
 
-    public string? Description { get; }
+    public string? Description { get; } = description;
 
-    public Type? ConverterType { get; }
+    public Type? ConverterType { get; } = converterType;
 
-    public IReadOnlyList<Type> ValidatorTypes { get; }
-
-    public ParameterSchema(
-        IPropertyDescriptor property,
-        int order,
-        string name,
-        bool isRequired,
-        string? description,
-        Type? converterType,
-        IReadOnlyList<Type> validatorTypes
-    )
-    {
-        Property = property;
-        Order = order;
-        Name = name;
-        IsRequired = isRequired;
-        Description = description;
-        ConverterType = converterType;
-        ValidatorTypes = validatorTypes;
-    }
+    public IReadOnlyList<Type> ValidatorTypes { get; } = validatorTypes;
 
     public string GetFormattedIdentifier() => Property.IsScalar() ? $"<{Name}>" : $"<{Name}...>";
 }

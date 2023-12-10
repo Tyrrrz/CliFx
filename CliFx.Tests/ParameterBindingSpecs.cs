@@ -8,11 +8,8 @@ using Xunit.Abstractions;
 
 namespace CliFx.Tests;
 
-public class ParameterBindingSpecs : SpecsBase
+public class ParameterBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
 {
-    public ParameterBindingSpecs(ITestOutputHelper testOutput)
-        : base(testOutput) { }
-
     [Fact]
     public async Task I_can_bind_a_parameter_to_a_property_and_get_the_value_from_the_corresponding_argument()
     {

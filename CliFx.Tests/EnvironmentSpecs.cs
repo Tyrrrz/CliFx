@@ -12,11 +12,8 @@ using Xunit.Abstractions;
 
 namespace CliFx.Tests;
 
-public class EnvironmentSpecs : SpecsBase
+public class EnvironmentSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
 {
-    public EnvironmentSpecs(ITestOutputHelper testOutput)
-        : base(testOutput) { }
-
     [Fact]
     public async Task I_can_configure_an_option_to_fall_back_to_an_environment_variable_if_the_user_does_not_provide_the_corresponding_argument()
     {

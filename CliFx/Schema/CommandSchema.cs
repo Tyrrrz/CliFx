@@ -8,38 +8,29 @@ using CliFx.Utils.Extensions;
 
 namespace CliFx.Schema;
 
-internal partial class CommandSchema
+internal partial class CommandSchema(
+    Type type,
+    string? name,
+    string? description,
+    IReadOnlyList<ParameterSchema> parameters,
+    IReadOnlyList<OptionSchema> options
+)
 {
-    public Type Type { get; }
+    public Type Type { get; } = type;
 
-    public string? Name { get; }
+    public string? Name { get; } = name;
 
-    public string? Description { get; }
+    public string? Description { get; } = description;
 
-    public IReadOnlyList<ParameterSchema> Parameters { get; }
+    public IReadOnlyList<ParameterSchema> Parameters { get; } = parameters;
 
-    public IReadOnlyList<OptionSchema> Options { get; }
+    public IReadOnlyList<OptionSchema> Options { get; } = options;
 
     public bool IsDefault => string.IsNullOrWhiteSpace(Name);
 
     public bool IsHelpOptionAvailable => Options.Contains(OptionSchema.HelpOption);
 
     public bool IsVersionOptionAvailable => Options.Contains(OptionSchema.VersionOption);
-
-    public CommandSchema(
-        Type type,
-        string? name,
-        string? description,
-        IReadOnlyList<ParameterSchema> parameters,
-        IReadOnlyList<OptionSchema> options
-    )
-    {
-        Type = type;
-        Name = name;
-        Description = description;
-        Parameters = parameters;
-        Options = options;
-    }
 
     public bool MatchesName(string? name) =>
         !string.IsNullOrWhiteSpace(Name)

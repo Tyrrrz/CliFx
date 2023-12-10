@@ -6,45 +6,30 @@ using CliFx.Utils.Extensions;
 
 namespace CliFx.Utils;
 
-internal class StackFrameParameter
+internal class StackFrameParameter(string type, string? name)
 {
-    public string Type { get; }
+    public string Type { get; } = type;
 
-    public string? Name { get; }
-
-    public StackFrameParameter(string type, string? name)
-    {
-        Type = type;
-        Name = name;
-    }
+    public string? Name { get; } = name;
 }
 
-internal partial class StackFrame
+internal partial class StackFrame(
+    string parentType,
+    string methodName,
+    IReadOnlyList<StackFrameParameter> parameters,
+    string? filePath,
+    string? lineNumber
+)
 {
-    public string ParentType { get; }
+    public string ParentType { get; } = parentType;
 
-    public string MethodName { get; }
+    public string MethodName { get; } = methodName;
 
-    public IReadOnlyList<StackFrameParameter> Parameters { get; }
+    public IReadOnlyList<StackFrameParameter> Parameters { get; } = parameters;
 
-    public string? FilePath { get; }
+    public string? FilePath { get; } = filePath;
 
-    public string? LineNumber { get; }
-
-    public StackFrame(
-        string parentType,
-        string methodName,
-        IReadOnlyList<StackFrameParameter> parameters,
-        string? filePath,
-        string? lineNumber
-    )
-    {
-        ParentType = parentType;
-        MethodName = methodName;
-        Parameters = parameters;
-        FilePath = filePath;
-        LineNumber = lineNumber;
-    }
+    public string? LineNumber { get; } = lineNumber;
 }
 
 internal partial class StackFrame

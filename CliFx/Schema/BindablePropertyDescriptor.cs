@@ -5,18 +5,14 @@ using CliFx.Utils.Extensions;
 
 namespace CliFx.Schema;
 
-internal class BindablePropertyDescriptor : IPropertyDescriptor
+internal class BindablePropertyDescriptor(PropertyInfo property) : IPropertyDescriptor
 {
-    private readonly PropertyInfo _property;
+    public Type Type => property.PropertyType;
 
-    public Type Type => _property.PropertyType;
-
-    public BindablePropertyDescriptor(PropertyInfo property) => _property = property;
-
-    public object? GetValue(ICommand commandInstance) => _property.GetValue(commandInstance);
+    public object? GetValue(ICommand commandInstance) => property.GetValue(commandInstance);
 
     public void SetValue(ICommand commandInstance, object? value) =>
-        _property.SetValue(commandInstance, value);
+        property.SetValue(commandInstance, value);
 
     public IReadOnlyList<object?> GetValidValues()
     {

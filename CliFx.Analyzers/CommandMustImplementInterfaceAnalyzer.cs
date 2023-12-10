@@ -8,14 +8,12 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace CliFx.Analyzers;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public class CommandMustImplementInterfaceAnalyzer : AnalyzerBase
+public class CommandMustImplementInterfaceAnalyzer()
+    : AnalyzerBase(
+        $"Commands must implement `{SymbolNames.CliFxCommandInterface}` interface",
+        $"This type must implement `{SymbolNames.CliFxCommandInterface}` interface in order to be a valid command."
+    )
 {
-    public CommandMustImplementInterfaceAnalyzer()
-        : base(
-            $"Commands must implement `{SymbolNames.CliFxCommandInterface}` interface",
-            $"This type must implement `{SymbolNames.CliFxCommandInterface}` interface in order to be a valid command."
-        ) { }
-
     private void Analyze(
         SyntaxNodeAnalysisContext context,
         ClassDeclarationSyntax classDeclaration,

@@ -8,11 +8,8 @@ using Xunit.Abstractions;
 
 namespace CliFx.Tests;
 
-public class ApplicationSpecs : SpecsBase
+public class ApplicationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
 {
-    public ApplicationSpecs(ITestOutputHelper testOutput)
-        : base(testOutput) { }
-
     [Fact]
     public async Task I_can_create_an_application_with_the_default_configuration()
     {
