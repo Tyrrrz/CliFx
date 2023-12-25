@@ -86,7 +86,7 @@ internal partial class StackFrame
             // exception so that it's shown to the user.
             throw new FormatException(
                 $"""
-                Could not parse stacktrace:
+                Failed to parse stacktrace:
                 {stackTrace}
                 """
             );
