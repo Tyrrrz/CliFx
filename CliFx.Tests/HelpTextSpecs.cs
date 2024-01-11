@@ -55,10 +55,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            new[] { "--help" },
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync(["--help"], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(0);
@@ -95,10 +92,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            new[] { "--help" },
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync(["--help"], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(0);
@@ -141,7 +135,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] { "cmd", "--help" },
+            ["cmd", "--help"],
             new Dictionary<string, string>()
         );
 
@@ -186,7 +180,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] { "cmd", "sub", "--help" },
+            ["cmd", "sub", "--help"],
             new Dictionary<string, string>()
         );
 
@@ -209,7 +203,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] { "invalid-command", "--invalid-option" },
+            ["invalid-command", "--invalid-option"],
             new Dictionary<string, string>()
         );
 
@@ -235,10 +229,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            new[] { "--help" },
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync(["--help"], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(0);
@@ -268,10 +259,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            new[] { "--help" },
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync(["--help"], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(0);
@@ -307,10 +295,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            new[] { "--help" },
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync(["--help"], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(0);
@@ -349,10 +334,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            new[] { "--help" },
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync(["--help"], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(0);
@@ -398,10 +380,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            new[] { "--help" },
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync(["--help"], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(0);
@@ -440,10 +419,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            new[] { "--help" },
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync(["--help"], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(0);
@@ -481,10 +457,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            new[] { "--help" },
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync(["--help"], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(0);
@@ -523,10 +496,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            new[] { "--help" },
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync(["--help"], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(0);
@@ -566,7 +536,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] { "cmd", "--help" },
+            ["cmd", "--help"],
             new Dictionary<string, string>()
         );
 
@@ -609,10 +579,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            new[] { "--help" },
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync(["--help"], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(0);
@@ -665,10 +632,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            new[] { "--help" },
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync(["--help"], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(0);
@@ -721,10 +685,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            new[] { "--help" },
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync(["--help"], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(0);
@@ -777,10 +738,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            new[] { "--help" },
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync(["--help"], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(0);
@@ -846,10 +804,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            new[] { "--help" },
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync(["--help"], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(0);
@@ -927,10 +882,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            new[] { "--help" },
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync(["--help"], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(0);
@@ -1001,10 +953,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            new[] { "--help" },
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync(["--help"], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(0);
@@ -1035,10 +984,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            new[] { "--version" },
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync(["--version"], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(0);

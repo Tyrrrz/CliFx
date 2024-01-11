@@ -12,27 +12,19 @@ namespace CliFx.Infrastructure;
 /// </summary>
 // Both the underlying stream AND the stream writer must be synchronized!
 // https://github.com/Tyrrrz/CliFx/issues/123
-public partial class ConsoleWriter : StreamWriter
+public partial class ConsoleWriter(IConsole console, Stream stream, Encoding encoding)
+    : StreamWriter(stream, encoding.WithoutPreamble(), 256)
 {
-    /// <summary>
-    /// Console that owns this stream.
-    /// </summary>
-    public IConsole Console { get; }
-
-    /// <summary>
-    /// Initializes an instance of <see cref="ConsoleWriter" />.
-    /// </summary>
-    public ConsoleWriter(IConsole console, Stream stream, Encoding encoding)
-        : base(stream, encoding.WithoutPreamble(), 256)
-    {
-        Console = console;
-    }
-
     /// <summary>
     /// Initializes an instance of <see cref="ConsoleWriter" />.
     /// </summary>
     public ConsoleWriter(IConsole console, Stream stream)
         : this(console, stream, System.Console.OutputEncoding) { }
+
+    /// <summary>
+    /// Console that owns this stream.
+    /// </summary>
+    public IConsole Console { get; } = console;
 
     // The following overrides are required to establish thread-safe behavior
     // in methods deriving from StreamWriter.

@@ -63,7 +63,7 @@ public class DirectivesSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] { "[preview]", "cmd", "param", "-abc", "--option", "foo" },
+            ["[preview]", "cmd", "param", "-abc", "--option", "foo"],
             new Dictionary<string, string> { ["ENV_QOP"] = "hello", ["ENV_KIL"] = "world" }
         );
 

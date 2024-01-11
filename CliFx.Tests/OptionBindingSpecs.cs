@@ -39,10 +39,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            new[] { "--foo" },
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync(["--foo"], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(0);
@@ -79,7 +76,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(new[] { "-f" }, new Dictionary<string, string>());
+        var exitCode = await application.RunAsync(["-f"], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(0);
@@ -122,7 +119,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] { "--foo", "one", "--bar", "two" },
+            ["--foo", "one", "--bar", "two"],
             new Dictionary<string, string>()
         );
 
@@ -167,7 +164,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] { "-f", "one", "-b", "two" },
+            ["-f", "one", "-b", "two"],
             new Dictionary<string, string>()
         );
 
@@ -212,7 +209,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] { "-fb", "value" },
+            ["-fb", "value"],
             new Dictionary<string, string>()
         );
 
@@ -254,7 +251,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] { "--foo", "one", "two", "three" },
+            ["--foo", "one", "two", "three"],
             new Dictionary<string, string>()
         );
 
@@ -296,7 +293,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] { "-f", "one", "two", "three" },
+            ["-f", "one", "two", "three"],
             new Dictionary<string, string>()
         );
 
@@ -338,7 +335,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] { "--foo", "one", "--foo", "two", "--foo", "three" },
+            ["--foo", "one", "--foo", "two", "--foo", "three"],
             new Dictionary<string, string>()
         );
 
@@ -380,7 +377,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] { "-f", "one", "-f", "two", "-f", "three" },
+            ["-f", "one", "-f", "two", "-f", "three"],
             new Dictionary<string, string>()
         );
 
@@ -422,7 +419,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] { "--foo", "one", "-f", "two", "--foo", "three" },
+            ["--foo", "one", "-f", "two", "--foo", "three"],
             new Dictionary<string, string>()
         );
 
@@ -467,7 +464,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] { "--foo", "one" },
+            ["--foo", "one"],
             new Dictionary<string, string>()
         );
 
@@ -541,7 +538,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(new[] { "--foo", "42", "--bar", "--baz", "xyz" });
+        var exitCode = await application.RunAsync(["--foo", "42", "--bar", "--baz", "xyz"]);
 
         // Assert
         exitCode.Should().Be(0);
@@ -579,7 +576,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] { "--foo", "-13" },
+            ["--foo", "-13"],
             new Dictionary<string, string>()
         );
 
@@ -650,10 +647,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            new[] { "--foo" },
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync(["--foo"], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().NotBe(0);
@@ -686,10 +680,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            new[] { "--foo" },
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync(["--foo"], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().NotBe(0);
@@ -723,7 +714,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] { "--foo", "one", "--bar", "two" },
+            ["--foo", "one", "--bar", "two"],
             new Dictionary<string, string>()
         );
 
@@ -759,7 +750,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] { "--foo", "one", "two", "three" },
+            ["--foo", "one", "two", "three"],
             new Dictionary<string, string>()
         );
 

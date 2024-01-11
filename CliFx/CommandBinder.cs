@@ -74,27 +74,24 @@ internal class CommandBinder(ITypeActivator typeActivator)
         }
 
         // String-constructable (FileInfo, etc)
-        var stringConstructor = targetType.GetConstructor(new[] { typeof(string) });
+        var stringConstructor = targetType.GetConstructor([typeof(string)]);
         if (stringConstructor is not null)
         {
-            return stringConstructor.Invoke(new object?[] { rawValue });
+            return stringConstructor.Invoke([rawValue]);
         }
 
         // String-parseable (with IFormatProvider)
         var parseMethodWithFormatProvider = targetType.TryGetStaticParseMethod(true);
         if (parseMethodWithFormatProvider is not null)
         {
-            return parseMethodWithFormatProvider.Invoke(
-                null,
-                new object?[] { rawValue, _formatProvider }
-            );
+            return parseMethodWithFormatProvider.Invoke(null, [rawValue, _formatProvider]);
         }
 
         // String-parseable (without IFormatProvider)
         var parseMethod = targetType.TryGetStaticParseMethod();
         if (parseMethod is not null)
         {
-            return parseMethod.Invoke(null, new object?[] { rawValue });
+            return parseMethod.Invoke(null, [rawValue]);
         }
 
         throw CliFxException.InternalError(
@@ -126,10 +123,10 @@ internal class CommandBinder(ITypeActivator typeActivator)
         }
 
         // Array-constructable (List<T>, HashSet<T>, etc)
-        var arrayConstructor = targetEnumerableType.GetConstructor(new[] { arrayType });
+        var arrayConstructor = targetEnumerableType.GetConstructor([arrayType]);
         if (arrayConstructor is not null)
         {
-            return arrayConstructor.Invoke(new object?[] { array });
+            return arrayConstructor.Invoke([array]);
         }
 
         throw CliFxException.InternalError(
@@ -263,12 +260,9 @@ internal class CommandBinder(ITypeActivator typeActivator)
             if (parameterSchema.Property.IsScalar())
             {
                 var parameterInput = commandInput.Parameters[position];
-
-                var rawValues = new[] { parameterInput.Value };
-                BindMember(parameterSchema, commandInstance, rawValues);
+                BindMember(parameterSchema, commandInstance, [parameterInput.Value]);
 
                 position++;
-
                 remainingParameterInputs.Remove(parameterInput);
             }
             // Non-scalar: take all remaining inputs starting from the current position
@@ -276,11 +270,13 @@ internal class CommandBinder(ITypeActivator typeActivator)
             {
                 var parameterInputs = commandInput.Parameters.Skip(position).ToArray();
 
-                var rawValues = parameterInputs.Select(p => p.Value).ToArray();
-                BindMember(parameterSchema, commandInstance, rawValues);
+                BindMember(
+                    parameterSchema,
+                    commandInstance,
+                    parameterInputs.Select(p => p.Value).ToArray()
+                );
 
                 position += parameterInputs.Length;
-
                 remainingParameterInputs.RemoveRange(parameterInputs);
             }
 
@@ -347,7 +343,7 @@ internal class CommandBinder(ITypeActivator typeActivator)
             else if (environmentVariableInput is not null)
             {
                 var rawValues = optionSchema.Property.IsScalar()
-                    ? new[] { environmentVariableInput.Value }
+                    ? [environmentVariableInput.Value]
                     : environmentVariableInput.SplitValues();
 
                 BindMember(optionSchema, commandInstance, rawValues);

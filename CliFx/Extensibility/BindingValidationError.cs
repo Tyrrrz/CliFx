@@ -3,15 +3,10 @@
 /// <summary>
 /// Represents a validation error.
 /// </summary>
-public class BindingValidationError
+public class BindingValidationError(string message)
 {
     /// <summary>
     /// Error message shown to the user.
     /// </summary>
-    public string Message { get; }
-
-    /// <summary>
-    /// Initializes an instance of <see cref="BindingValidationError" />.
-    /// </summary>
-    public BindingValidationError(string message) => Message = message;
+    public string Message { get; } = message;
 }

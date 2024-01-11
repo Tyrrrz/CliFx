@@ -23,7 +23,7 @@ public class ParameterMustHaveValidValidatorsAnalyzerSpecs
             [Command]
             public class MyCommand : ICommand
             {
-                [CommandParameter(0, Validators = new[] {typeof(MyValidator)})]
+                [CommandParameter(0, Validators = new[] { typeof(MyValidator) })]
                 public required string Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
@@ -48,7 +48,7 @@ public class ParameterMustHaveValidValidatorsAnalyzerSpecs
             [Command]
             public class MyCommand : ICommand
             {
-                [CommandParameter(0, Validators = new[] {typeof(MyValidator)})]
+                [CommandParameter(0, Validators = new[] { typeof(MyValidator) })]
                 public required string Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
@@ -73,7 +73,7 @@ public class ParameterMustHaveValidValidatorsAnalyzerSpecs
             [Command]
             public class MyCommand : ICommand
             {
-                [CommandParameter(0, Validators = new[] {typeof(MyValidator)})]
+                [CommandParameter(0, Validators = new[] { typeof(MyValidator) })]
                 public required string Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;

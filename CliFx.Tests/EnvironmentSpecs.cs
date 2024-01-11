@@ -48,7 +48,7 @@ public class EnvironmentSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutp
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] { "--foo", "42" },
+            ["--foo", "42"],
             new Dictionary<string, string> { ["ENV_FOO"] = "100", ["ENV_BAR"] = "200" }
         );
 

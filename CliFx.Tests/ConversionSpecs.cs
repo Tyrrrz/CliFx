@@ -38,10 +38,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            new[] { "-f", "xyz" },
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync(["-f", "xyz"], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(0);
@@ -78,10 +75,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            new[] { "-f", "xyz" },
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync(["-f", "xyz"], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(0);
@@ -128,7 +122,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] { "-f", "true", "-b", "false", "-c" },
+            ["-f", "true", "-b", "false", "-c"],
             new Dictionary<string, string>()
         );
 
@@ -167,10 +161,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            new[] { "-f", "32" },
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync(["-f", "32"], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(0);
@@ -208,7 +199,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] { "-f", "32.14" },
+            ["-f", "32.14"],
             new Dictionary<string, string>()
         );
 
@@ -248,7 +239,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] { "-f", "1995-04-28Z" },
+            ["-f", "1995-04-28Z"],
             new Dictionary<string, string>()
         );
 
@@ -288,7 +279,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] { "-f", "12:34:56" },
+            ["-f", "12:34:56"],
             new Dictionary<string, string>()
         );
 
@@ -329,10 +320,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            new[] { "-f", "two" },
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync(["-f", "two"], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(0);
@@ -374,10 +362,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            new[] { "-b", "123" },
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync(["-b", "123"], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(0);
@@ -421,10 +406,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            new[] { "-b", "two" },
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync(["-b", "two"], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(0);
@@ -468,10 +450,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            new[] { "-f", "xyz" },
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync(["-f", "xyz"], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(0);
@@ -534,7 +513,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] { "-f", "hello", "-b", "world" },
+            ["-f", "hello", "-b", "world"],
             new Dictionary<string, string>()
         );
 
@@ -580,7 +559,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] { "-f", "hello world" },
+            ["-f", "hello world"],
             new Dictionary<string, string>()
         );
 
@@ -622,7 +601,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] { "-f", "one", "two", "three" },
+            ["-f", "one", "two", "three"],
             new Dictionary<string, string>()
         );
 
@@ -664,7 +643,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] { "-f", "one", "two", "three" },
+            ["-f", "one", "two", "three"],
             new Dictionary<string, string>()
         );
 
@@ -706,7 +685,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] { "-f", "one", "two", "three" },
+            ["-f", "one", "two", "three"],
             new Dictionary<string, string>()
         );
 
@@ -748,7 +727,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] { "-f", "1", "13", "27" },
+            ["-f", "1", "13", "27"],
             new Dictionary<string, string>()
         );
 
@@ -787,10 +766,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            new[] { "-f", "xyz" },
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync(["-f", "xyz"], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().NotBe(0);
@@ -831,7 +807,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] { "-f", "one", "two" },
+            ["-f", "one", "two"],
             new Dictionary<string, string>()
         );
 
@@ -867,7 +843,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] { "-f", "12.34" },
+            ["-f", "12.34"],
             new Dictionary<string, string>()
         );
 
@@ -898,7 +874,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             [Command]
             public class Command : ICommand
             {
-                [CommandOption('f', Validators = new[] {typeof(ValidatorA), typeof(ValidatorB)})]
+                [CommandOption('f', Validators = [typeof(ValidatorA), typeof(ValidatorB)])]
                 public int Foo { get; init; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
@@ -912,10 +888,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            new[] { "-f", "12" },
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync(["-f", "12"], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().NotBe(0);
@@ -957,10 +930,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            new[] { "-f", "bar" },
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync(["-f", "bar"], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().NotBe(0);

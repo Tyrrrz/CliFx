@@ -11,27 +11,19 @@ namespace CliFx.Infrastructure;
 /// </summary>
 // Both the underlying stream AND the stream reader must be synchronized!
 // https://github.com/Tyrrrz/CliFx/issues/123
-public partial class ConsoleReader : StreamReader
+public partial class ConsoleReader(IConsole console, Stream stream, Encoding encoding)
+    : StreamReader(stream, encoding, false, 4096)
 {
-    /// <summary>
-    /// Console that owns this stream.
-    /// </summary>
-    public IConsole Console { get; }
-
-    /// <summary>
-    /// Initializes an instance of <see cref="ConsoleReader" />.
-    /// </summary>
-    public ConsoleReader(IConsole console, Stream stream, Encoding encoding)
-        : base(stream, encoding, false, 4096)
-    {
-        Console = console;
-    }
-
     /// <summary>
     /// Initializes an instance of <see cref="ConsoleReader" />.
     /// </summary>
     public ConsoleReader(IConsole console, Stream stream)
         : this(console, stream, System.Console.InputEncoding) { }
+
+    /// <summary>
+    /// Console that owns this stream.
+    /// </summary>
+    public IConsole Console { get; } = console;
 
     // The following overrides are required to establish thread-safe behavior
     // in methods deriving from StreamReader.

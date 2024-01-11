@@ -112,10 +112,7 @@ public class RoutingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            new[] { "cmd" },
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync(["cmd"], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(0);
@@ -170,7 +167,7 @@ public class RoutingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] { "cmd", "child" },
+            ["cmd", "child"],
             new Dictionary<string, string>()
         );
 

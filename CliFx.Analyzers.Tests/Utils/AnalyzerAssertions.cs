@@ -47,14 +47,14 @@ internal class AnalyzerAssertions(DiagnosticAnalyzer analyzer)
         // Parse the source code
         var ast = SyntaxFactory.ParseSyntaxTree(
             SourceText.From(sourceCodeWithUsings),
-            CSharpParseOptions.Default
+            CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.Preview)
         );
 
         // Compile the code to IL
         var compilation = CSharpCompilation.Create(
             "CliFxTests_DynamicAssembly_" + Guid.NewGuid(),
-            new[] { ast },
-            Net70
+            [ast],
+            Net80
                 .References
                 .All
                 .Append(MetadataReference.CreateFromFile(typeof(ICommand).Assembly.Location)),

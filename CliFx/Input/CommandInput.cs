@@ -160,7 +160,7 @@ internal partial class CommandInput
                     result.Add(new OptionInput(lastOptionIdentifier, lastOptionValues));
 
                 lastOptionIdentifier = argument[2..];
-                lastOptionValues = new List<string>();
+                lastOptionValues = [];
             }
             // Short name
             else if (argument.StartsWith('-') && argument.Length > 1 && char.IsLetter(argument[1]))
@@ -172,7 +172,7 @@ internal partial class CommandInput
                         result.Add(new OptionInput(lastOptionIdentifier, lastOptionValues));
 
                     lastOptionIdentifier = identifier.AsString();
-                    lastOptionValues = new List<string>();
+                    lastOptionValues = [];
                 }
             }
             // Value

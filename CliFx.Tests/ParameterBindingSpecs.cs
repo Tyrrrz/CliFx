@@ -43,10 +43,7 @@ public class ParameterBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            new[] { "one", "two" },
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync(["one", "two"], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(0);
@@ -98,7 +95,7 @@ public class ParameterBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] { "one", "two", "three", "four", "five", "--boo", "xxx" },
+            ["one", "two", "three", "four", "five", "--boo", "xxx"],
             new Dictionary<string, string>()
         );
 
@@ -138,10 +135,7 @@ public class ParameterBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            new[] { "one" },
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync(["one"], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().NotBe(0);
@@ -177,10 +171,7 @@ public class ParameterBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            new[] { "one" },
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync(["one"], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().NotBe(0);
@@ -222,10 +213,7 @@ public class ParameterBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            new[] { "abc" },
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync(["abc"], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(0);
@@ -262,7 +250,7 @@ public class ParameterBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
 
         // Act
         var exitCode = await application.RunAsync(
-            new[] { "one", "two", "three" },
+            ["one", "two", "three"],
             new Dictionary<string, string>()
         );
 

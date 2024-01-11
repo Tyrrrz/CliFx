@@ -6,34 +6,24 @@ namespace CliFx;
 /// <summary>
 /// Configuration of an application.
 /// </summary>
-public class ApplicationConfiguration
+public class ApplicationConfiguration(
+    IReadOnlyList<Type> commandTypes,
+    bool isDebugModeAllowed,
+    bool isPreviewModeAllowed
+)
 {
     /// <summary>
     /// Command types defined in the application.
     /// </summary>
-    public IReadOnlyList<Type> CommandTypes { get; }
+    public IReadOnlyList<Type> CommandTypes { get; } = commandTypes;
 
     /// <summary>
     /// Whether debug mode is allowed in the application.
     /// </summary>
-    public bool IsDebugModeAllowed { get; }
+    public bool IsDebugModeAllowed { get; } = isDebugModeAllowed;
 
     /// <summary>
     /// Whether preview mode is allowed in the application.
     /// </summary>
-    public bool IsPreviewModeAllowed { get; }
-
-    /// <summary>
-    /// Initializes an instance of <see cref="ApplicationConfiguration" />.
-    /// </summary>
-    public ApplicationConfiguration(
-        IReadOnlyList<Type> commandTypes,
-        bool isDebugModeAllowed,
-        bool isPreviewModeAllowed
-    )
-    {
-        CommandTypes = commandTypes;
-        IsDebugModeAllowed = isDebugModeAllowed;
-        IsPreviewModeAllowed = isPreviewModeAllowed;
-    }
+    public bool IsPreviewModeAllowed { get; } = isPreviewModeAllowed;
 }

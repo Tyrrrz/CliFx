@@ -16,7 +16,7 @@ namespace CliFx;
 /// </summary>
 public partial class CliApplicationBuilder
 {
-    private readonly HashSet<Type> _commandTypes = new();
+    private readonly HashSet<Type> _commandTypes = [];
 
     private bool _isDebugModeAllowed = true;
     private bool _isPreviewModeAllowed = true;

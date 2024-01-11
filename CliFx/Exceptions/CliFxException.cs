@@ -5,7 +5,12 @@ namespace CliFx.Exceptions;
 /// <summary>
 /// Exception thrown when there is an error during application execution.
 /// </summary>
-public partial class CliFxException : Exception
+public partial class CliFxException(
+    string message,
+    int exitCode = CliFxException.DefaultExitCode,
+    bool showHelp = false,
+    Exception? innerException = null
+) : Exception(message, innerException)
 {
     internal const int DefaultExitCode = 1;
 
@@ -13,33 +18,17 @@ public partial class CliFxException : Exception
     // provides a default message that is not very useful.
     // This property is used to identify whether this instance was created with
     // a custom message, so that we can avoid printing the default message.
-    internal bool HasCustomMessage { get; }
+    internal bool HasCustomMessage { get; } = !string.IsNullOrWhiteSpace(message);
 
     /// <summary>
     /// Returned exit code.
     /// </summary>
-    public int ExitCode { get; }
+    public int ExitCode { get; } = exitCode;
 
     /// <summary>
     /// Whether to show the help text before exiting.
     /// </summary>
-    public bool ShowHelp { get; }
-
-    /// <summary>
-    /// Initializes an instance of <see cref="CliFxException" />.
-    /// </summary>
-    public CliFxException(
-        string message,
-        int exitCode = DefaultExitCode,
-        bool showHelp = false,
-        Exception? innerException = null
-    )
-        : base(message, innerException)
-    {
-        HasCustomMessage = !string.IsNullOrWhiteSpace(message);
-        ExitCode = exitCode;
-        ShowHelp = showHelp;
-    }
+    public bool ShowHelp { get; } = showHelp;
 }
 
 public partial class CliFxException

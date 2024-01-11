@@ -9,7 +9,7 @@ namespace CliFx.Benchmarks;
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]
 public partial class Benchmarks
 {
-    private static readonly string[] Arguments = { "--str", "hello world", "-i", "13", "-b" };
+    private static readonly string[] Arguments = ["--str", "hello world", "-i", "13", "-b"];
 
     public static void Main() =>
         BenchmarkRunner.Run<Benchmarks>(

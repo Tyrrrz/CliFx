@@ -17,40 +17,24 @@ namespace CliFx;
 /// <summary>
 /// Command-line application facade.
 /// </summary>
-public class CliApplication
+public class CliApplication(
+    ApplicationMetadata metadata,
+    ApplicationConfiguration configuration,
+    IConsole console,
+    ITypeActivator typeActivator
+)
 {
+    private readonly CommandBinder _commandBinder = new(typeActivator);
+
     /// <summary>
     /// Application metadata.
     /// </summary>
-    public ApplicationMetadata Metadata { get; }
+    public ApplicationMetadata Metadata { get; } = metadata;
 
     /// <summary>
     /// Application configuration.
     /// </summary>
-    public ApplicationConfiguration Configuration { get; }
-
-    private readonly IConsole _console;
-    private readonly ITypeActivator _typeActivator;
-
-    private readonly CommandBinder _commandBinder;
-
-    /// <summary>
-    /// Initializes an instance of <see cref="CliApplication" />.
-    /// </summary>
-    public CliApplication(
-        ApplicationMetadata metadata,
-        ApplicationConfiguration configuration,
-        IConsole console,
-        ITypeActivator typeActivator
-    )
-    {
-        Metadata = metadata;
-        Configuration = configuration;
-        _console = console;
-        _typeActivator = typeActivator;
-
-        _commandBinder = new CommandBinder(typeActivator);
-    }
+    public ApplicationConfiguration Configuration { get; } = configuration;
 
     private bool IsDebugModeEnabled(CommandInput commandInput) =>
         Configuration.IsDebugModeAllowed && commandInput.IsDebugDirectiveSpecified;
@@ -70,9 +54,9 @@ public class CliApplication
 
     private async ValueTask PromptDebuggerAsync()
     {
-        using (_console.WithForegroundColor(ConsoleColor.Green))
+        using (console.WithForegroundColor(ConsoleColor.Green))
         {
-            _console
+            console
                 .Output
                 .WriteLine(
                     $"Attach the debugger to process with ID {ProcessEx.GetCurrentProcessId()} to continue."
@@ -93,7 +77,7 @@ public class CliApplication
     {
         // Console colors may have already been overridden by the parent process,
         // so we need to reset it to make sure that everything we write looks properly.
-        _console.ResetColor();
+        console.ResetColor();
 
         // Handle the debug directive
         if (IsDebugModeEnabled(commandInput))
@@ -104,7 +88,7 @@ public class CliApplication
         // Handle the preview directive
         if (IsPreviewModeEnabled(commandInput))
         {
-            _console.Output.WriteCommandInput(commandInput);
+            console.Output.WriteCommandInput(commandInput);
             return 0;
         }
 
@@ -128,7 +112,7 @@ public class CliApplication
         var commandInstance =
             commandSchema == FallbackDefaultCommand.Schema
                 ? new FallbackDefaultCommand() // bypass the activator
-                : _typeActivator.CreateInstance<ICommand>(commandSchema.Type);
+                : typeActivator.CreateInstance<ICommand>(commandSchema.Type);
 
         // Assemble the help context
         var helpContext = new HelpContext(
@@ -141,14 +125,14 @@ public class CliApplication
         // Handle the help option
         if (ShouldShowHelpText(commandSchema, commandInput))
         {
-            _console.Output.WriteHelpText(helpContext);
+            console.Output.WriteHelpText(helpContext);
             return 0;
         }
 
         // Handle the version option
         if (ShouldShowVersionText(commandSchema, commandInput))
         {
-            _console.Output.WriteLine(Metadata.Version);
+            console.Output.WriteLine(Metadata.Version);
             return 0;
         }
 
@@ -160,18 +144,18 @@ public class CliApplication
         {
             // Bind and execute the command
             _commandBinder.Bind(commandInput, commandSchema, commandInstance);
-            await commandInstance.ExecuteAsync(_console);
+            await commandInstance.ExecuteAsync(console);
 
             return 0;
         }
         catch (CliFxException ex)
         {
-            _console.Error.WriteException(ex);
+            console.Error.WriteException(ex);
 
             if (ex.ShowHelp)
             {
-                _console.Output.WriteLine();
-                _console.Output.WriteHelpText(helpContext);
+                console.Output.WriteLine();
+                console.Output.WriteHelpText(helpContext);
             }
 
             return ex.ExitCode;
@@ -211,7 +195,7 @@ public class CliApplication
         // developer, so we don't swallow them in that case.
         catch (Exception ex) when (!Debugger.IsAttached)
         {
-            _console.Error.WriteException(ex);
+            console.Error.WriteException(ex);
             return 1;
         }
     }

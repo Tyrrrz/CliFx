@@ -7,7 +7,7 @@ namespace CliFx.Attributes;
 /// Annotates a property that defines a command parameter.
 /// </summary>
 [AttributeUsage(AttributeTargets.Property)]
-public sealed class CommandParameterAttribute : Attribute
+public sealed class CommandParameterAttribute(int order) : Attribute
 {
     /// <summary>
     /// Parameter order.
@@ -18,7 +18,7 @@ public sealed class CommandParameterAttribute : Attribute
     /// Parameter whose type is a non-scalar (e.g. array), must always be the last in order.
     /// Only one non-scalar parameter is allowed in a command.
     /// </remarks>
-    public int Order { get; }
+    public int Order { get; } = order;
 
     /// <summary>
     /// Whether this parameter is required (default: <c>true</c>).
@@ -62,12 +62,4 @@ public sealed class CommandParameterAttribute : Attribute
     /// Validators must derive from <see cref="BindingValidator{T}" />.
     /// </remarks>
     public Type[] Validators { get; set; } = Array.Empty<Type>();
-
-    /// <summary>
-    /// Initializes an instance of <see cref="CommandParameterAttribute" />.
-    /// </summary>
-    public CommandParameterAttribute(int order)
-    {
-        Order = order;
-    }
 }
