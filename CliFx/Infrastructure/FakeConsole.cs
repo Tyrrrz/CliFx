@@ -6,14 +6,23 @@ using System.Threading;
 namespace CliFx.Infrastructure;
 
 /// <summary>
-/// Implementation of <see cref="IConsole" /> that uses the provided fake
-/// standard input, output, and error streams.
-/// Use this implementation in tests to verify command interactions with the console.
+/// Implementation of <see cref="IConsole" /> that uses the provided fake standard input, output, and error streams.
+/// Use this implementation in tests to verify how a command interacts with the console.
 /// </summary>
 public class FakeConsole : IConsole, IDisposable
 {
     private readonly CancellationTokenSource _cancellationTokenSource = new();
     private readonly ConcurrentQueue<ConsoleKeyInfo> _keys = new();
+
+    /// <summary>
+    /// Initializes an instance of <see cref="FakeConsole" />.
+    /// </summary>
+    public FakeConsole(Stream? input = null, Stream? output = null, Stream? error = null)
+    {
+        Input = new ConsoleReader(this, input ?? Stream.Null);
+        Output = new ConsoleWriter(this, output ?? Stream.Null);
+        Error = new ConsoleWriter(this, error ?? Stream.Null);
+    }
 
     /// <inheritdoc />
     public ConsoleReader Input { get; }
@@ -52,14 +61,9 @@ public class FakeConsole : IConsole, IDisposable
     public int CursorTop { get; set; }
 
     /// <summary>
-    /// Initializes an instance of <see cref="FakeConsole" />.
+    /// Enqueues a simulated key press, which can then be read by calling <see cref="ReadKey" />.
     /// </summary>
-    public FakeConsole(Stream? input = null, Stream? output = null, Stream? error = null)
-    {
-        Input = ConsoleReader.Create(this, input ?? Stream.Null);
-        Output = ConsoleWriter.Create(this, output ?? Stream.Null);
-        Error = ConsoleWriter.Create(this, error ?? Stream.Null);
-    }
+    public void EnqueueKey(ConsoleKeyInfo key) => _keys.Enqueue(key);
 
     /// <inheritdoc />
     public ConsoleKeyInfo ReadKey(bool intercept = false) =>
@@ -69,11 +73,6 @@ public class FakeConsole : IConsole, IDisposable
                 "Cannot read key because there are no key presses enqueued. "
                     + $"Use the `{nameof(EnqueueKey)}(...)` method to simulate a key press."
             );
-
-    /// <summary>
-    /// Enqueues a simulated key press, which can then be read by calling <see cref="ReadKey" />.
-    /// </summary>
-    public void EnqueueKey(ConsoleKeyInfo key) => _keys.Enqueue(key);
 
     /// <inheritdoc />
     public void ResetColor()
@@ -85,11 +84,8 @@ public class FakeConsole : IConsole, IDisposable
     /// <inheritdoc />
     public void Clear() { }
 
-    /// <inheritdoc />
-    public CancellationToken RegisterCancellationHandler() => _cancellationTokenSource.Token;
-
     /// <summary>
-    /// Sends a cancellation signal to the currently executing command.
+    /// Simulates a cancellation request.
     /// </summary>
     /// <remarks>
     /// If the command is not cancellation-aware (i.e. it doesn't call <see cref="IConsole.RegisterCancellationHandler" />),
@@ -107,6 +103,9 @@ public class FakeConsole : IConsole, IDisposable
             _cancellationTokenSource.Cancel();
         }
     }
+
+    /// <inheritdoc />
+    public CancellationToken RegisterCancellationHandler() => _cancellationTokenSource.Token;
 
     /// <inheritdoc />
     public virtual void Dispose() => _cancellationTokenSource.Dispose();

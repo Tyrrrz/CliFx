@@ -10,6 +10,33 @@ namespace CliFx.Attributes;
 public sealed class CommandOptionAttribute : Attribute
 {
     /// <summary>
+    /// Initializes an instance of <see cref="CommandOptionAttribute" />.
+    /// </summary>
+    private CommandOptionAttribute(string? name, char? shortName)
+    {
+        Name = name;
+        ShortName = shortName;
+    }
+
+    /// <summary>
+    /// Initializes an instance of <see cref="CommandOptionAttribute" />.
+    /// </summary>
+    public CommandOptionAttribute(string name, char shortName)
+        : this(name, (char?)shortName) { }
+
+    /// <summary>
+    /// Initializes an instance of <see cref="CommandOptionAttribute" />.
+    /// </summary>
+    public CommandOptionAttribute(string name)
+        : this(name, null) { }
+
+    /// <summary>
+    /// Initializes an instance of <see cref="CommandOptionAttribute" />.
+    /// </summary>
+    public CommandOptionAttribute(char shortName)
+        : this(null, (char?)shortName) { }
+    
+    /// <summary>
     /// Option name.
     /// </summary>
     /// <remarks>
@@ -67,31 +94,4 @@ public sealed class CommandOptionAttribute : Attribute
     /// Validators must derive from <see cref="BindingValidator{T}" />.
     /// </remarks>
     public Type[] Validators { get; set; } = Array.Empty<Type>();
-
-    /// <summary>
-    /// Initializes an instance of <see cref="CommandOptionAttribute" />.
-    /// </summary>
-    private CommandOptionAttribute(string? name, char? shortName)
-    {
-        Name = name;
-        ShortName = shortName;
-    }
-
-    /// <summary>
-    /// Initializes an instance of <see cref="CommandOptionAttribute" />.
-    /// </summary>
-    public CommandOptionAttribute(string name, char shortName)
-        : this(name, (char?)shortName) { }
-
-    /// <summary>
-    /// Initializes an instance of <see cref="CommandOptionAttribute" />.
-    /// </summary>
-    public CommandOptionAttribute(string name)
-        : this(name, null) { }
-
-    /// <summary>
-    /// Initializes an instance of <see cref="CommandOptionAttribute" />.
-    /// </summary>
-    public CommandOptionAttribute(char shortName)
-        : this(null, (char?)shortName) { }
 }

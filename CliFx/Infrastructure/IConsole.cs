@@ -5,47 +5,47 @@ using CliFx.Utils;
 namespace CliFx.Infrastructure;
 
 /// <summary>
-/// Abstraction for the console layer.
+/// Abstraction for interacting with the console layer.
 /// </summary>
 public interface IConsole
 {
     /// <summary>
-    /// Input stream (stdin).
+    /// Console's standard input stream.
     /// </summary>
     ConsoleReader Input { get; }
 
     /// <summary>
-    /// Gets a value that indicates whether input has been redirected from the standard input stream.
+    /// Whether the input stream has been redirected.
     /// </summary>
     bool IsInputRedirected { get; }
 
     /// <summary>
-    /// Output stream (stdout).
+    /// Console's standard output stream.
     /// </summary>
     ConsoleWriter Output { get; }
 
     /// <summary>
-    /// Gets a value that indicates whether output has been redirected from the standard output stream.
+    /// Whether the output stream has been redirected.
     /// </summary>
     bool IsOutputRedirected { get; }
 
     /// <summary>
-    /// Error stream (stderr).
+    /// Console's standard error stream.
     /// </summary>
     ConsoleWriter Error { get; }
 
     /// <summary>
-    /// Gets a value that indicates whether error output has been redirected from the standard error stream.
+    /// Whether the error stream has been redirected.
     /// </summary>
     bool IsErrorRedirected { get; }
 
     /// <summary>
-    /// Gets or sets the foreground color of the console
+    /// Gets or sets the current foreground color of the console.
     /// </summary>
     ConsoleColor ForegroundColor { get; set; }
 
     /// <summary>
-    /// Gets or sets the background color of the console.
+    /// Gets or sets the current background color of the console.
     /// </summary>
     ConsoleColor BackgroundColor { get; set; }
 

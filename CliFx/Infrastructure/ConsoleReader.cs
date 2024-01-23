@@ -11,8 +11,8 @@ namespace CliFx.Infrastructure;
 /// </summary>
 // Both the underlying stream AND the stream reader must be synchronized!
 // https://github.com/Tyrrrz/CliFx/issues/123
-public partial class ConsoleReader(IConsole console, Stream stream, Encoding encoding)
-    : StreamReader(stream, encoding, false, 4096)
+public class ConsoleReader(IConsole console, Stream stream, Encoding encoding)
+    : StreamReader(Stream.Synchronized(stream), encoding, false, 4096)
 {
     /// <summary>
     /// Initializes an instance of <see cref="ConsoleReader" />.
@@ -85,10 +85,4 @@ public partial class ConsoleReader(IConsole console, Stream stream, Encoding enc
     /// <inheritdoc />
     [ExcludeFromCodeCoverage, MethodImpl(MethodImplOptions.Synchronized)]
     protected override void Dispose(bool disposing) => base.Dispose(disposing);
-}
-
-public partial class ConsoleReader
-{
-    internal static ConsoleReader Create(IConsole console, Stream stream) =>
-        new(console, Stream.Synchronized(stream));
 }

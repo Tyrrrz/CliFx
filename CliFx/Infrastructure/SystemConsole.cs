@@ -10,6 +10,16 @@ public class SystemConsole : IConsole, IDisposable
 {
     private CancellationTokenSource? _cancellationTokenSource;
 
+    /// <summary>
+    /// Initializes an instance of <see cref="SystemConsole" />.
+    /// </summary>
+    public SystemConsole()
+    {
+        Input = new ConsoleReader(this, Console.OpenStandardInput());
+        Output = new ConsoleWriter(this, Console.OpenStandardOutput());
+        Error = new ConsoleWriter(this, Console.OpenStandardError());
+    }
+
     /// <inheritdoc />
     public ConsoleReader Input { get; }
 
@@ -68,16 +78,6 @@ public class SystemConsole : IConsole, IDisposable
     {
         get => Console.CursorTop;
         set => Console.CursorTop = value;
-    }
-
-    /// <summary>
-    /// Initializes an instance of <see cref="SystemConsole" />.
-    /// </summary>
-    public SystemConsole()
-    {
-        Input = ConsoleReader.Create(this, Console.OpenStandardInput());
-        Output = ConsoleWriter.Create(this, Console.OpenStandardOutput());
-        Error = ConsoleWriter.Create(this, Console.OpenStandardError());
     }
 
     /// <inheritdoc />

@@ -9,6 +9,16 @@ namespace CliFx.Attributes;
 public sealed class CommandAttribute : Attribute
 {
     /// <summary>
+    /// Initializes an instance of <see cref="CommandAttribute" />.
+    /// </summary>
+    public CommandAttribute(string name) => Name = name;
+
+    /// <summary>
+    /// Initializes an instance of <see cref="CommandAttribute" />.
+    /// </summary>
+    public CommandAttribute() { }
+
+    /// <summary>
     /// Command name.
     /// </summary>
     /// <remarks>
@@ -23,17 +33,4 @@ public sealed class CommandAttribute : Attribute
     /// This is shown to the user in the help text.
     /// </summary>
     public string? Description { get; set; }
-
-    /// <summary>
-    /// Initializes an instance of <see cref="CommandAttribute" />.
-    /// </summary>
-    public CommandAttribute(string name)
-    {
-        Name = name;
-    }
-
-    /// <summary>
-    /// Initializes an instance of <see cref="CommandAttribute" />.
-    /// </summary>
-    public CommandAttribute() { }
 }

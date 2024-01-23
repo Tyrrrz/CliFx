@@ -12,9 +12,18 @@ namespace CliFx.Infrastructure;
 /// </summary>
 // Both the underlying stream AND the stream writer must be synchronized!
 // https://github.com/Tyrrrz/CliFx/issues/123
-public partial class ConsoleWriter(IConsole console, Stream stream, Encoding encoding)
-    : StreamWriter(stream, encoding.WithoutPreamble(), 256)
+public class ConsoleWriter : StreamWriter
 {
+    /// <summary>
+    /// Initializes an instance of <see cref="ConsoleWriter" />.
+    /// </summary>
+    public ConsoleWriter(IConsole console, Stream stream, Encoding encoding)
+        : base(Stream.Synchronized(stream), encoding.WithoutPreamble(), 256)
+    {
+        Console = console;
+        AutoFlush = true;
+    }
+
     /// <summary>
     /// Initializes an instance of <see cref="ConsoleWriter" />.
     /// </summary>
@@ -24,7 +33,7 @@ public partial class ConsoleWriter(IConsole console, Stream stream, Encoding enc
     /// <summary>
     /// Console that owns this stream.
     /// </summary>
-    public IConsole Console { get; } = console;
+    public IConsole Console { get; }
 
     // The following overrides are required to establish thread-safe behavior
     // in methods deriving from StreamWriter.
@@ -259,10 +268,4 @@ public partial class ConsoleWriter(IConsole console, Stream stream, Encoding enc
     /// <inheritdoc />
     [ExcludeFromCodeCoverage, MethodImpl(MethodImplOptions.Synchronized)]
     protected override void Dispose(bool disposing) => base.Dispose(disposing);
-}
-
-public partial class ConsoleWriter
-{
-    internal static ConsoleWriter Create(IConsole console, Stream stream) =>
-        new(console, Stream.Synchronized(stream)) { AutoFlush = true };
 }
