@@ -92,4 +92,7 @@ internal static class CommandInputConsoleFormatterExtensions
         this ConsoleWriter consoleWriter,
         CommandInput commandInput
     ) => new CommandInputConsoleFormatter(consoleWriter).WriteCommandInput(commandInput);
+
+    public static void WriteCommandInput(this IConsole console, CommandInput commandInput) =>
+        console.Output.WriteCommandInput(commandInput);
 }

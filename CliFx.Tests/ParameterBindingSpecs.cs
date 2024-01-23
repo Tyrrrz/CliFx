@@ -28,8 +28,8 @@ public class ParameterBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine("Foo = " + Foo);
-                    console.Output.WriteLine("Bar = " + Bar);
+                    console.WriteLine("Foo = " + Foo);
+                    console.WriteLine("Bar = " + Bar);
 
                     return default;
                 }
@@ -76,11 +76,11 @@ public class ParameterBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine("Foo = " + Foo);
-                    console.Output.WriteLine("Bar = " + Bar);
+                    console.WriteLine("Foo = " + Foo);
+                    console.WriteLine("Bar = " + Bar);
 
                     foreach (var i in Baz)
-                        console.Output.WriteLine("Baz = " + i);
+                        console.WriteLine("Baz = " + i);
 
                     return default;
                 }
@@ -198,8 +198,8 @@ public class ParameterBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine("Foo = " + Foo);
-                    console.Output.WriteLine("Bar = " + Bar);
+                    console.WriteLine("Foo = " + Foo);
+                    console.WriteLine("Bar = " + Bar);
 
                     return default;
                 }

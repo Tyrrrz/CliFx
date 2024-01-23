@@ -25,7 +25,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine(Foo);
+                    console.WriteLine(Foo);
                     return default;
                 }
             }
@@ -62,7 +62,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine(Foo);
+                    console.WriteLine(Foo);
                     return default;
                 }
             }
@@ -105,9 +105,9 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine("Foo = " + Foo);
-                    console.Output.WriteLine("Bar = " + Bar);
-                    console.Output.WriteLine("Baz = " + Baz);
+                    console.WriteLine("Foo = " + Foo);
+                    console.WriteLine("Bar = " + Bar);
+                    console.WriteLine("Baz = " + Baz);
 
                     return default;
                 }
@@ -148,7 +148,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine(Foo);
+                    console.WriteLine(Foo);
                     return default;
                 }
             }
@@ -185,7 +185,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine(Foo.ToString(CultureInfo.InvariantCulture));
+                    console.WriteLine(Foo.ToString(CultureInfo.InvariantCulture));
                     return default;
                 }
             }
@@ -225,7 +225,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine(Foo.ToString("u", CultureInfo.InvariantCulture));
+                    console.WriteLine(Foo.ToString("u", CultureInfo.InvariantCulture));
                     return default;
                 }
             }
@@ -265,7 +265,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine(Foo.ToString(null, CultureInfo.InvariantCulture));
+                    console.WriteLine(Foo.ToString(null, CultureInfo.InvariantCulture));
                     return default;
                 }
             }
@@ -307,7 +307,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine((int) Foo);
+                    console.WriteLine((int) Foo);
                     return default;
                 }
             }
@@ -347,8 +347,8 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine("Foo = " + Foo);
-                    console.Output.WriteLine("Bar = " + Bar);
+                    console.WriteLine("Foo = " + Foo);
+                    console.WriteLine("Bar = " + Bar);
 
                     return default;
                 }
@@ -391,8 +391,8 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine("Foo = " + (int?) Foo);
-                    console.Output.WriteLine("Bar = " + (int?) Bar);
+                    console.WriteLine("Foo = " + (int?) Foo);
+                    console.WriteLine("Bar = " + (int?) Bar);
 
                     return default;
                 }
@@ -437,7 +437,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine(Foo.Value);
+                    console.WriteLine(Foo.Value);
                     return default;
                 }
             }
@@ -497,8 +497,8 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine("Foo = " + Foo.Value);
-                    console.Output.WriteLine("Bar = " + Bar.Value);
+                    console.WriteLine("Foo = " + Foo.Value);
+                    console.WriteLine("Bar = " + Bar.Value);
 
                     return default;
                 }
@@ -545,7 +545,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine(Foo);
+                    console.WriteLine(Foo);
                     return default;
                 }
             }
@@ -586,7 +586,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
                 public ValueTask ExecuteAsync(IConsole console)
                 {
                     foreach (var i in Foo)
-                        console.Output.WriteLine(i);
+                        console.WriteLine(i);
 
                     return default;
                 }
@@ -628,7 +628,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
                 public ValueTask ExecuteAsync(IConsole console)
                 {
                     foreach (var i in Foo)
-                        console.Output.WriteLine(i);
+                        console.WriteLine(i);
 
                     return default;
                 }
@@ -670,7 +670,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
                 public ValueTask ExecuteAsync(IConsole console)
                 {
                     foreach (var i in Foo)
-                        console.Output.WriteLine(i);
+                        console.WriteLine(i);
 
                     return default;
                 }
@@ -712,7 +712,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
                 public ValueTask ExecuteAsync(IConsole console)
                 {
                     foreach (var i in Foo)
-                        console.Output.WriteLine(i);
+                        console.WriteLine(i);
 
                     return default;
                 }

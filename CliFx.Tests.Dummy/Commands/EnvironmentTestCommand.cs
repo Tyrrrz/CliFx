@@ -12,8 +12,7 @@ public class EnvironmentTestCommand : ICommand
 
     public ValueTask ExecuteAsync(IConsole console)
     {
-        console.Output.WriteLine($"Hello {GreetingTarget}!");
-
+        console.WriteLine($"Hello {GreetingTarget}!");
         return default;
     }
 }

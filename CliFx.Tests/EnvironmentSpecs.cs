@@ -32,8 +32,8 @@ public class EnvironmentSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutp
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine(Foo);
-                    console.Output.WriteLine(Bar);
+                    console.WriteLine(Foo);
+                    console.WriteLine(Bar);
 
                     return default;
                 }
@@ -75,7 +75,7 @@ public class EnvironmentSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutp
                 public ValueTask ExecuteAsync(IConsole console)
                 {
                     foreach (var i in Foo)
-                        console.Output.WriteLine(i);
+                        console.WriteLine(i);
 
                     return default;
                 }
@@ -116,7 +116,7 @@ public class EnvironmentSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutp
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine(Foo);
+                    console.WriteLine(Foo);
                     return default;
                 }
             }

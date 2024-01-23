@@ -83,7 +83,7 @@ public class SystemConsoleShouldBeAvoidedAnalyzerSpecs
             {
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine("Hello world");
+                    console.WriteLine("Hello world");
                     return default;
                 }
             }
