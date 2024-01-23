@@ -17,11 +17,11 @@ public class BookRemoveCommand(LibraryProvider libraryProvider) : ICommand
         var book = libraryProvider.TryGetBook(Title);
 
         if (book is null)
-            throw new CommandException("Book not found.", 10);
+            throw new CommandException($"Book '{Title}' not found.", 10);
 
         libraryProvider.RemoveBook(book);
 
-        console.Output.WriteLine($"Book {Title} removed.");
+        console.WriteLine($"Book '{Title}' removed.");
 
         return default;
     }

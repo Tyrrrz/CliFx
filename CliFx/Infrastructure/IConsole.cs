@@ -109,6 +109,43 @@ public interface IConsole
 public static class ConsoleExtensions
 {
     /// <summary>
+    /// Writes a string to the console's output stream.
+    /// </summary>
+    public static void Write(this IConsole console, string? value) => console.Output.Write(value);
+
+    /// <summary>
+    /// Writes an object to the console's output stream.
+    /// </summary>
+    public static void Write(this IConsole console, object? value) => console.Output.Write(value);
+
+    /// <summary>
+    /// Writes an empty line to the console's output stream.
+    /// </summary>
+    public static void WriteLine(this IConsole console) => console.Output.WriteLine();
+
+    /// <summary>
+    /// Writes a string to the console's output stream, followed by a line terminator.
+    /// </summary>
+    public static void WriteLine(this IConsole console, string? value) =>
+        console.Output.WriteLine(value);
+
+    /// <summary>
+    /// Writes an object to the console's output stream, followed by a line terminator.
+    /// </summary>
+    public static void WriteLine(this IConsole console, object? value) =>
+        console.Output.WriteLine(value);
+
+    /// <summary>
+    /// Reads a single character from the console's input stream.
+    /// </summary>
+    public static int Read(this IConsole console) => console.Input.Read();
+
+    /// <summary>
+    /// Reads a line from the console's input stream.
+    /// </summary>
+    public static string? ReadLine(this IConsole console) => console.Input.ReadLine();
+
+    /// <summary>
     /// Sets the specified foreground color and returns an <see cref="IDisposable" />
     /// that will reset the color back to its previous value upon disposal.
     /// </summary>

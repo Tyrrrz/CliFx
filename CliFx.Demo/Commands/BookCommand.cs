@@ -18,9 +18,9 @@ public class BookCommand(LibraryProvider libraryProvider) : ICommand
         var book = libraryProvider.TryGetBook(Title);
 
         if (book is null)
-            throw new CommandException("Book not found.", 10);
+            throw new CommandException($"Book '{Title}' not found.", 10);
 
-        console.Output.WriteBook(book);
+        console.WriteBook(book);
 
         return default;
     }

@@ -26,7 +26,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine(Foo);
+                    console.WriteLine(Foo);
                     return default;
                 }
             }
@@ -63,7 +63,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine(Foo);
+                    console.WriteLine(Foo);
                     return default;
                 }
             }
@@ -103,8 +103,8 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine("Foo = " + Foo);
-                    console.Output.WriteLine("Bar = " + Bar);
+                    console.WriteLine("Foo = " + Foo);
+                    console.WriteLine("Bar = " + Bar);
 
                     return default;
                 }
@@ -148,8 +148,8 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine("Foo = " + Foo);
-                    console.Output.WriteLine("Bar = " + Bar);
+                    console.WriteLine("Foo = " + Foo);
+                    console.WriteLine("Bar = " + Bar);
 
                     return default;
                 }
@@ -193,8 +193,8 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine("Foo = " + Foo);
-                    console.Output.WriteLine("Bar = " + Bar);
+                    console.WriteLine("Foo = " + Foo);
+                    console.WriteLine("Bar = " + Bar);
 
                     return default;
                 }
@@ -236,7 +236,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
                 public ValueTask ExecuteAsync(IConsole console)
                 {
                     foreach (var i in Foo)
-                        console.Output.WriteLine(i);
+                        console.WriteLine(i);
 
                     return default;
                 }
@@ -278,7 +278,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
                 public ValueTask ExecuteAsync(IConsole console)
                 {
                     foreach (var i in Foo)
-                        console.Output.WriteLine(i);
+                        console.WriteLine(i);
 
                     return default;
                 }
@@ -320,7 +320,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
                 public ValueTask ExecuteAsync(IConsole console)
                 {
                     foreach (var i in Foo)
-                        console.Output.WriteLine(i);
+                        console.WriteLine(i);
 
                     return default;
                 }
@@ -362,7 +362,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
                 public ValueTask ExecuteAsync(IConsole console)
                 {
                     foreach (var i in Foo)
-                        console.Output.WriteLine(i);
+                        console.WriteLine(i);
 
                     return default;
                 }
@@ -404,7 +404,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
                 public ValueTask ExecuteAsync(IConsole console)
                 {
                     foreach (var i in Foo)
-                        console.Output.WriteLine(i);
+                        console.WriteLine(i);
 
                     return default;
                 }
@@ -448,8 +448,8 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine("Foo = " + Foo);
-                    console.Output.WriteLine("Bar = " + Bar);
+                    console.WriteLine("Foo = " + Foo);
+                    console.WriteLine("Bar = " + Bar);
 
                     return default;
                 }
@@ -522,9 +522,9 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine("Foo = " + SharedContext.Foo);
-                    console.Output.WriteLine("Bar = " + SharedContext.Bar);
-                    console.Output.WriteLine("Baz = " + Baz);
+                    console.WriteLine("Foo = " + SharedContext.Foo);
+                    console.WriteLine("Bar = " + SharedContext.Bar);
+                    console.WriteLine("Baz = " + Baz);
 
                     return default;
                 }
@@ -562,7 +562,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine(Foo);
+                    console.WriteLine(Foo);
                     return default;
                 }
             }

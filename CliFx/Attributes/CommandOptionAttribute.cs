@@ -35,7 +35,7 @@ public sealed class CommandOptionAttribute : Attribute
     /// </summary>
     public CommandOptionAttribute(char shortName)
         : this(null, (char?)shortName) { }
-    
+
     /// <summary>
     /// Option name.
     /// </summary>

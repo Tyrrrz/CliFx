@@ -17,11 +17,11 @@ public class BookListCommand(LibraryProvider libraryProvider) : ICommand
         {
             // Add margin
             if (i != 0)
-                console.Output.WriteLine();
+                console.WriteLine();
 
             // Render book
             var book = library.Books[i];
-            console.Output.WriteBook(book);
+            console.WriteBook(book);
         }
 
         return default;

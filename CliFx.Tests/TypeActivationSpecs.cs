@@ -24,7 +24,7 @@ public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
             {
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine("foo");
+                    console.WriteLine("foo");
                     return default;
                 }
             }
@@ -102,7 +102,7 @@ public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine(_foo);
+                    console.WriteLine(_foo);
                     return default;
                 }
             }
@@ -144,7 +144,7 @@ public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine(_foo);
+                    console.WriteLine(_foo);
                     return default;
                 }
             }
@@ -195,7 +195,7 @@ public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
             {
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine("foo");
+                    console.WriteLine("foo");
                     return default;
                 }
             }

@@ -66,18 +66,18 @@ public class CancellationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOut
                 {
                     try
                     {
-                        console.Output.WriteLine("Started.");
+                        console.WriteLine("Started.");
 
                         await Task.Delay(
                             TimeSpan.FromSeconds(3),
                             console.RegisterCancellationHandler()
                         );
 
-                        console.Output.WriteLine("Completed.");
+                        console.WriteLine("Completed.");
                     }
                     catch (OperationCanceledException)
                     {
-                        console.Output.WriteLine("Cancelled.");
+                        console.WriteLine("Cancelled.");
                         throw;
                     }
                 }

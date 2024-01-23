@@ -88,7 +88,7 @@ public class CliApplication(
         // Handle the preview directive
         if (IsPreviewModeEnabled(commandInput))
         {
-            console.Output.WriteCommandInput(commandInput);
+            console.WriteCommandInput(commandInput);
             return 0;
         }
 
@@ -125,14 +125,14 @@ public class CliApplication(
         // Handle the help option
         if (ShouldShowHelpText(commandSchema, commandInput))
         {
-            console.Output.WriteHelpText(helpContext);
+            console.WriteHelpText(helpContext);
             return 0;
         }
 
         // Handle the version option
         if (ShouldShowVersionText(commandSchema, commandInput))
         {
-            console.Output.WriteLine(Metadata.Version);
+            console.WriteLine(Metadata.Version);
             return 0;
         }
 
@@ -150,12 +150,12 @@ public class CliApplication(
         }
         catch (CliFxException ex)
         {
-            console.Error.WriteException(ex);
+            console.WriteException(ex);
 
             if (ex.ShowHelp)
             {
-                console.Output.WriteLine();
-                console.Output.WriteHelpText(helpContext);
+                console.WriteLine();
+                console.WriteHelpText(helpContext);
             }
 
             return ex.ExitCode;
@@ -195,7 +195,7 @@ public class CliApplication(
         // developer, so we don't swallow them in that case.
         catch (Exception ex) when (!Debugger.IsAttached)
         {
-            console.Error.WriteException(ex);
+            console.WriteException(ex);
             return 1;
         }
     }

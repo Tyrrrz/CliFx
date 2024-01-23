@@ -22,7 +22,7 @@ public class RoutingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             {
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine("default");
+                    console.WriteLine("default");
                     return default;
                 }
             }
@@ -32,7 +32,7 @@ public class RoutingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             {
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine("cmd");
+                    console.WriteLine("cmd");
                     return default;
                 }
             }
@@ -42,7 +42,7 @@ public class RoutingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             {
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine("cmd child");
+                    console.WriteLine("cmd child");
                     return default;
                 }
             }
@@ -79,7 +79,7 @@ public class RoutingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             {
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine("default");
+                    console.WriteLine("default");
                     return default;
                 }
             }
@@ -89,7 +89,7 @@ public class RoutingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             {
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine("cmd");
+                    console.WriteLine("cmd");
                     return default;
                 }
             }
@@ -99,7 +99,7 @@ public class RoutingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             {
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine("cmd child");
+                    console.WriteLine("cmd child");
                     return default;
                 }
             }
@@ -133,7 +133,7 @@ public class RoutingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             {
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine("default");
+                    console.WriteLine("default");
                     return default;
                 }
             }
@@ -143,7 +143,7 @@ public class RoutingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             {
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine("cmd");
+                    console.WriteLine("cmd");
                     return default;
                 }
             }
@@ -153,7 +153,7 @@ public class RoutingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             {
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine("cmd child");
+                    console.WriteLine("cmd child");
                     return default;
                 }
             }

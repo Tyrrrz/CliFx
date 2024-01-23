@@ -33,4 +33,7 @@ internal static class ConsoleExtensions
         using (writer.Console.WithForegroundColor(ConsoleColor.White))
             writer.WriteLine(book.Isbn);
     }
+
+    public static void WriteBook(this IConsole console, Book book) =>
+        console.Output.WriteBook(book);
 }

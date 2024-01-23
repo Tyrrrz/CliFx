@@ -170,9 +170,9 @@ public class ConsoleSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             {
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.Output.WriteLine(console.ReadKey().Key);
-                    console.Output.WriteLine(console.ReadKey().Key);
-                    console.Output.WriteLine(console.ReadKey().Key);
+                    console.WriteLine(console.ReadKey().Key);
+                    console.WriteLine(console.ReadKey().Key);
+                    console.WriteLine(console.ReadKey().Key);
 
                     return default;
                 }
