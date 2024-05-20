@@ -9,21 +9,13 @@ namespace CliFx.Infrastructure;
 public class DelegateTypeActivator(Func<Type, object> createInstance) : ITypeActivator
 {
     /// <inheritdoc />
-    public object CreateInstance(Type type)
-    {
-        var instance = createInstance(type);
-
-        if (instance is null)
-        {
-            throw CliFxException.InternalError(
-                $"""
-                Failed to create an instance of type `{type.FullName}`, received <null> instead.
-                To fix this, ensure that the provided type activator is configured correctly, as it's not expected to return <null>.
-                If you are relying on a dependency container, this error may indicate that the specified type has not been registered.
-                """
-            );
-        }
-
-        return instance;
-    }
+    public object CreateInstance(Type type) =>
+        createInstance(type)
+        ?? throw CliFxException.InternalError(
+            $"""
+            Failed to create an instance of type `{type.FullName}`, received <null> instead.
+            To fix this, ensure that the provided type activator is configured correctly, as it's not expected to return <null>.
+            If you are relying on a dependency container, this error may indicate that the specified type has not been registered.
+            """
+        );
 }

@@ -32,8 +32,7 @@ public class ParameterMustBeLastIfNonScalarAnalyzer()
             return;
 
         var otherProperties = property
-            .ContainingType
-            .GetMembers()
+            .ContainingType.GetMembers()
             .OfType<IPropertySymbol>()
             .Where(m => !m.Equals(property))
             .ToArray();

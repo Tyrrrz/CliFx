@@ -42,10 +42,11 @@ internal static class CollectionExtensions
     public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(
         this IDictionary dictionary,
         IEqualityComparer<TKey> comparer
-    ) =>
+    )
+        where TKey : notnull =>
         dictionary
             .Cast<DictionaryEntry>()
-            .ToDictionary(entry => (TKey)entry.Key, entry => (TValue)entry.Value, comparer);
+            .ToDictionary(entry => (TKey)entry.Key, entry => (TValue)entry.Value!, comparer);
 
     public static Array ToNonGenericArray<T>(this IEnumerable<T> source, Type elementType)
     {

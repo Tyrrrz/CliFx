@@ -19,7 +19,7 @@ public class OptionMustHaveValidNameAnalyzerSpecs
             {
                 [CommandOption("f")]
                 public string? Foo { get; init; }
-            
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;
@@ -39,7 +39,7 @@ public class OptionMustHaveValidNameAnalyzerSpecs
             {
                 [CommandOption("1foo")]
                 public string? Foo { get; init; }
-            
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;
@@ -59,7 +59,7 @@ public class OptionMustHaveValidNameAnalyzerSpecs
             {
                 [CommandOption("foo")]
                 public string? Foo { get; init; }
-            
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;
@@ -79,7 +79,7 @@ public class OptionMustHaveValidNameAnalyzerSpecs
             {
                 [CommandOption('f')]
                 public string? Foo { get; init; }
-            
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;
@@ -98,7 +98,7 @@ public class OptionMustHaveValidNameAnalyzerSpecs
             public class MyCommand : ICommand
             {
                 public string? Foo { get; init; }
-            
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;

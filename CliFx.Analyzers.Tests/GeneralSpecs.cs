@@ -13,8 +13,7 @@ public class GeneralSpecs
     {
         // Arrange
         var analyzers = typeof(AnalyzerBase)
-            .Assembly
-            .GetTypes()
+            .Assembly.GetTypes()
             .Where(t => !t.IsAbstract && t.IsAssignableTo(typeof(DiagnosticAnalyzer)))
             .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t)!)
             .ToArray();

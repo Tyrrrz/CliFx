@@ -52,8 +52,7 @@ public class SystemConsoleShouldBeAvoidedAnalyzer()
 
         // Check if IConsole is available in scope as an alternative to System.Console
         var isConsoleInterfaceAvailable = context
-            .Node
-            .Ancestors()
+            .Node.Ancestors()
             .OfType<MethodDeclarationSyntax>()
             .SelectMany(m => m.ParameterList.Parameters)
             .Select(p => p.Type)

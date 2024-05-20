@@ -28,12 +28,10 @@ public class OptionMustHaveValidValidatorsAnalyzer()
         {
             var validatorValueType = validatorType
                 .GetBaseTypes()
-                .FirstOrDefault(
-                    t =>
-                        t.ConstructedFrom.DisplayNameMatches(SymbolNames.CliFxBindingValidatorClass)
+                .FirstOrDefault(t =>
+                    t.ConstructedFrom.DisplayNameMatches(SymbolNames.CliFxBindingValidatorClass)
                 )
-                ?.TypeArguments
-                .FirstOrDefault();
+                ?.TypeArguments.FirstOrDefault();
 
             // Value passed to the validator must be assignable from the property type
             var isCompatible =

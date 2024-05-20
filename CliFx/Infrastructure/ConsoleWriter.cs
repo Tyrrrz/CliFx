@@ -45,7 +45,7 @@ public class ConsoleWriter : StreamWriter
 
     /// <inheritdoc />
     [ExcludeFromCodeCoverage, MethodImpl(MethodImplOptions.Synchronized)]
-    public override void Write(char[] buffer) => base.Write(buffer);
+    public override void Write(char[]? buffer) => base.Write(buffer);
 
     /// <inheritdoc />
     [ExcludeFromCodeCoverage, MethodImpl(MethodImplOptions.Synchronized)]
@@ -147,7 +147,7 @@ public class ConsoleWriter : StreamWriter
 
     /// <inheritdoc />
     [ExcludeFromCodeCoverage, MethodImpl(MethodImplOptions.Synchronized)]
-    public override void WriteLine(char[] buffer) => base.WriteLine(buffer);
+    public override void WriteLine(char[]? buffer) => base.WriteLine(buffer);
 
     /// <inheritdoc />
     [ExcludeFromCodeCoverage, MethodImpl(MethodImplOptions.Synchronized)]

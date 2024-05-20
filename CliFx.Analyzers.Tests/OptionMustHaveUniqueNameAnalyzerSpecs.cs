@@ -19,10 +19,10 @@ public class OptionMustHaveUniqueNameAnalyzerSpecs
             {
                 [CommandOption("foo")]
                 public string? Foo { get; init; }
-            
+
                 [CommandOption("foo")]
                 public string? Bar { get; init; }
-            
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;
@@ -42,10 +42,10 @@ public class OptionMustHaveUniqueNameAnalyzerSpecs
             {
                 [CommandOption("foo")]
                 public string? Foo { get; init; }
-            
+
                 [CommandOption("bar")]
                 public string? Bar { get; init; }
-            
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;
@@ -65,7 +65,7 @@ public class OptionMustHaveUniqueNameAnalyzerSpecs
             {
                 [CommandOption('f')]
                 public string? Foo { get; init; }
-            
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;
@@ -84,7 +84,7 @@ public class OptionMustHaveUniqueNameAnalyzerSpecs
             public class MyCommand : ICommand
             {
                 public string? Foo { get; init; }
-            
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;

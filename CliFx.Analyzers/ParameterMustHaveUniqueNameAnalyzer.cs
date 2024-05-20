@@ -34,8 +34,7 @@ public class ParameterMustHaveUniqueNameAnalyzer()
             return;
 
         var otherProperties = property
-            .ContainingType
-            .GetMembers()
+            .ContainingType.GetMembers()
             .OfType<IPropertySymbol>()
             .Where(m => !m.Equals(property))
             .ToArray();

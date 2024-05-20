@@ -20,7 +20,7 @@ public class OptionMustHaveNameOrShortNameAnalyzerSpecs
             {
                 [CommandOption(null)]
                 public string? Foo { get; init; }
-            
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;
@@ -40,7 +40,7 @@ public class OptionMustHaveNameOrShortNameAnalyzerSpecs
             {
                 [CommandOption("foo")]
                 public string? Foo { get; init; }
-            
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;
@@ -60,7 +60,7 @@ public class OptionMustHaveNameOrShortNameAnalyzerSpecs
             {
                 [CommandOption('f')]
                 public string? Foo { get; init; }
-            
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;
@@ -79,7 +79,7 @@ public class OptionMustHaveNameOrShortNameAnalyzerSpecs
             public class MyCommand : ICommand
             {
                 public string? Foo { get; init; }
-            
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;

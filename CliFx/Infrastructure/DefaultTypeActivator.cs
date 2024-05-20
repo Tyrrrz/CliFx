@@ -14,7 +14,13 @@ public class DefaultTypeActivator : ITypeActivator
     {
         try
         {
-            return Activator.CreateInstance(type);
+            return Activator.CreateInstance(type)
+                ?? throw CliFxException.InternalError(
+                    $"""
+                    Failed to create an instance of type `{type.FullName}`, received <null> instead.
+                    This may be caused by the type's constructor being trimmed away.
+                    """
+                );
         }
         // Only catch MemberAccessException because the constructor can throw for its own reasons too
         catch (MemberAccessException ex)

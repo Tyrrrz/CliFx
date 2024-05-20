@@ -19,13 +19,13 @@ public class OptionMustHaveValidValidatorsAnalyzerSpecs
             {
                 public void Validate(string value) {}
             }
-            
+
             [Command]
             public class MyCommand : ICommand
             {
                 [CommandOption("foo", Validators = new[] { typeof(MyValidator) })]
                 public string? Foo { get; init; }
-            
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;
@@ -44,13 +44,13 @@ public class OptionMustHaveValidValidatorsAnalyzerSpecs
             {
                 public override BindingValidationError Validate(int value) => Ok();
             }
-            
+
             [Command]
             public class MyCommand : ICommand
             {
                 [CommandOption("foo", Validators = new[] { typeof(MyValidator) })]
                 public string? Foo { get; init; }
-            
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;
@@ -69,13 +69,13 @@ public class OptionMustHaveValidValidatorsAnalyzerSpecs
             {
                 public override BindingValidationError Validate(string value) => Ok();
             }
-            
+
             [Command]
             public class MyCommand : ICommand
             {
                 [CommandOption("foo", Validators = new[] { typeof(MyValidator) })]
                 public string? Foo { get; init; }
-            
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;
@@ -95,7 +95,7 @@ public class OptionMustHaveValidValidatorsAnalyzerSpecs
             {
                 [CommandOption("foo")]
                 public string? Foo { get; init; }
-            
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;
@@ -114,7 +114,7 @@ public class OptionMustHaveValidValidatorsAnalyzerSpecs
             public class MyCommand : ICommand
             {
                 public string? Foo { get; init; }
-            
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;

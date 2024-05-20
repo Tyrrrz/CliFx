@@ -13,8 +13,7 @@ internal static class AssertionExtensions
         IEnumerable<string> lines
     ) =>
         assertions
-            .Subject
-            .Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
+            .Subject.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
             .Should()
             .Equal(lines);
 
@@ -34,11 +33,9 @@ internal static class AssertionExtensions
 
             if (index < 0)
             {
-                Execute
-                    .Assertion
-                    .FailWith(
-                        $"Expected string '{assertions.Subject}' to contain '{value}' after position {lastIndex}."
-                    );
+                Execute.Assertion.FailWith(
+                    $"Expected string '{assertions.Subject}' to contain '{value}' after position {lastIndex}."
+                );
             }
 
             lastIndex = index;
