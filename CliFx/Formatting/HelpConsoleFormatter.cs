@@ -99,9 +99,9 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
         }
 
         // Child command usage
-        var childCommandSchemas = context
-            .ApplicationSchema
-            .GetChildCommands(context.CommandSchema.Name);
+        var childCommandSchemas = context.ApplicationSchema.GetChildCommands(
+            context.CommandSchema.Name
+        );
 
         if (childCommandSchemas.Any())
         {
@@ -359,8 +359,7 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
     private void WriteCommandChildren()
     {
         var childCommandSchemas = context
-            .ApplicationSchema
-            .GetChildCommands(context.CommandSchema.Name)
+            .ApplicationSchema.GetChildCommands(context.CommandSchema.Name)
             .OrderBy(a => a.Name, StringComparer.Ordinal)
             .ToArray();
 
@@ -393,8 +392,7 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
 
             // Child commands of child command
             var grandChildCommandSchemas = context
-                .ApplicationSchema
-                .GetChildCommands(childCommandSchema.Name)
+                .ApplicationSchema.GetChildCommands(childCommandSchema.Name)
                 .OrderBy(c => c.Name, StringComparer.Ordinal)
                 .ToArray();
 
@@ -418,8 +416,7 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
                         ConsoleColor.Cyan,
                         // Relative to current command (not the parent)
                         grandChildCommandSchema
-                            .Name
-                            ?.Substring(context.CommandSchema.Name?.Length ?? 0)
+                            .Name?.Substring(context.CommandSchema.Name?.Length ?? 0)
                             .Trim()
                     );
                 }

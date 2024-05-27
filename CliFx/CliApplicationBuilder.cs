@@ -186,7 +186,8 @@ public partial class CliApplicationBuilder
     /// Configures the application to use the specified service provider for activating types.
     /// </summary>
     public CliApplicationBuilder UseTypeActivator(IServiceProvider serviceProvider) =>
-        UseTypeActivator(serviceProvider.GetService);
+        // Null returns are handled by DelegateTypeActivator
+        UseTypeActivator(serviceProvider.GetService!);
 
     /// <summary>
     /// Configures the application to use the specified service provider for activating types.

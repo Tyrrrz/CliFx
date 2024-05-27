@@ -24,8 +24,8 @@ public class CommandMustImplementInterfaceAnalyzer()
             .Select(a => a.AttributeClass)
             .Any(c => c.DisplayNameMatches(SymbolNames.CliFxCommandAttribute));
 
-        var implementsCommandInterface = type.AllInterfaces.Any(
-            i => i.DisplayNameMatches(SymbolNames.CliFxCommandInterface)
+        var implementsCommandInterface = type.AllInterfaces.Any(i =>
+            i.DisplayNameMatches(SymbolNames.CliFxCommandInterface)
         );
 
         // If the attribute is present, but the interface is not implemented,

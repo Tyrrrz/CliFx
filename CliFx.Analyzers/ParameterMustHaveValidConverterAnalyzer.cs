@@ -28,13 +28,11 @@ public class ParameterMustHaveValidConverterAnalyzer()
             return;
 
         var converterValueType = parameter
-            .ConverterType
-            .GetBaseTypes()
-            .FirstOrDefault(
-                t => t.ConstructedFrom.DisplayNameMatches(SymbolNames.CliFxBindingConverterClass)
+            .ConverterType.GetBaseTypes()
+            .FirstOrDefault(t =>
+                t.ConstructedFrom.DisplayNameMatches(SymbolNames.CliFxBindingConverterClass)
             )
-            ?.TypeArguments
-            .FirstOrDefault();
+            ?.TypeArguments.FirstOrDefault();
 
         // Value returned by the converter must be assignable to the property type
         var isCompatible =
@@ -45,9 +43,10 @@ public class ParameterMustHaveValidConverterAnalyzer()
                     ? context.Compilation.IsAssignable(converterValueType, property.Type)
                     // Non-scalar (assume we can handle all IEnumerable types for simplicity)
                     : property.Type.TryGetEnumerableUnderlyingType() is { } enumerableUnderlyingType
-                        && context
-                            .Compilation
-                            .IsAssignable(converterValueType, enumerableUnderlyingType)
+                        && context.Compilation.IsAssignable(
+                            converterValueType,
+                            enumerableUnderlyingType
+                        )
             );
 
         if (!isCompatible)

@@ -42,13 +42,15 @@ internal class CommandBinder(ITypeActivator typeActivator)
         // Special case for DateTimeOffset
         if (targetType == typeof(DateTimeOffset))
         {
-            return DateTimeOffset.Parse(rawValue, _formatProvider);
+            // Null reference exception will be handled upstream
+            return DateTimeOffset.Parse(rawValue!, _formatProvider);
         }
 
         // Special case for TimeSpan
         if (targetType == typeof(TimeSpan))
         {
-            return TimeSpan.Parse(rawValue, _formatProvider);
+            // Null reference exception will be handled upstream
+            return TimeSpan.Parse(rawValue!, _formatProvider);
         }
 
         // Enum
@@ -143,10 +145,8 @@ internal class CommandBinder(ITypeActivator typeActivator)
         try
         {
             // Non-scalar
-            var enumerableUnderlyingType = memberSchema
-                .Property
-                .Type
-                .TryGetEnumerableUnderlyingType();
+            var enumerableUnderlyingType =
+                memberSchema.Property.Type.TryGetEnumerableUnderlyingType();
 
             if (
                 enumerableUnderlyingType is not null
@@ -244,8 +244,7 @@ internal class CommandBinder(ITypeActivator typeActivator)
         // Ensure there are no unexpected parameters and that all parameters are provided
         var remainingParameterInputs = commandInput.Parameters.ToList();
         var remainingRequiredParameterSchemas = commandSchema
-            .Parameters
-            .Where(p => p.IsRequired)
+            .Parameters.Where(p => p.IsRequired)
             .ToList();
 
         var position = 0;
@@ -298,7 +297,9 @@ internal class CommandBinder(ITypeActivator typeActivator)
             throw CliFxException.UserError(
                 $"""
                 Missing required parameter(s):
-                {remainingRequiredParameterSchemas.Select(p => p.GetFormattedIdentifier()).JoinToString(" ")}
+                {remainingRequiredParameterSchemas
+                    .Select(p => p.GetFormattedIdentifier())
+                    .JoinToString(" ")}
                 """
             );
         }
@@ -313,20 +314,18 @@ internal class CommandBinder(ITypeActivator typeActivator)
         // Ensure there are no unrecognized options and that all required options are set
         var remainingOptionInputs = commandInput.Options.ToList();
         var remainingRequiredOptionSchemas = commandSchema
-            .Options
-            .Where(o => o.IsRequired)
+            .Options.Where(o => o.IsRequired)
             .ToList();
 
         foreach (var optionSchema in commandSchema.Options)
         {
             var optionInputs = commandInput
-                .Options
-                .Where(o => optionSchema.MatchesIdentifier(o.Identifier))
+                .Options.Where(o => optionSchema.MatchesIdentifier(o.Identifier))
                 .ToArray();
 
-            var environmentVariableInput = commandInput
-                .EnvironmentVariables
-                .FirstOrDefault(e => optionSchema.MatchesEnvironmentVariable(e.Name));
+            var environmentVariableInput = commandInput.EnvironmentVariables.FirstOrDefault(e =>
+                optionSchema.MatchesEnvironmentVariable(e.Name)
+            );
 
             // Direct input
             if (optionInputs.Any())
@@ -376,7 +375,9 @@ internal class CommandBinder(ITypeActivator typeActivator)
             throw CliFxException.UserError(
                 $"""
                 Missing required option(s):
-                {remainingRequiredOptionSchemas.Select(o => o.GetFormattedIdentifier()).JoinToString(", ")}
+                {remainingRequiredOptionSchemas
+                    .Select(o => o.GetFormattedIdentifier())
+                    .JoinToString(", ")}
                 """
             );
         }

@@ -103,7 +103,7 @@ public class SystemConsoleShouldBeAvoidedAnalyzerSpecs
             public class MyCommand : ICommand
             {
                 public void SomeOtherMethod() => Console.WriteLine("Test");
-            
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;

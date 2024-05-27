@@ -29,10 +29,9 @@ public class OptionMustBeInsideCommandAnalyzer()
         if (!CommandOptionSymbol.IsOptionProperty(property))
             return;
 
-        var isInsideCommand = property
-            .ContainingType
-            .AllInterfaces
-            .Any(i => i.DisplayNameMatches(SymbolNames.CliFxCommandInterface));
+        var isInsideCommand = property.ContainingType.AllInterfaces.Any(i =>
+            i.DisplayNameMatches(SymbolNames.CliFxCommandInterface)
+        );
 
         if (!isInsideCommand)
         {

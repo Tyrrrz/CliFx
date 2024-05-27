@@ -86,10 +86,14 @@ internal partial class CommandSchema
                 type.GetInterfaces()
                     // Only interfaces implementing ICommand for explicitness
                     .Where(i => i != typeof(ICommand) && i.IsAssignableTo(typeof(ICommand)))
-                    .SelectMany(
-                        i =>
-                            i.GetProperties()
-                                .Where(p => !p.GetMethod.IsAbstract && !p.SetMethod.IsAbstract)
+                    .SelectMany(i =>
+                        i.GetProperties()
+                            .Where(p =>
+                                p.GetMethod is not null
+                                && !p.GetMethod.IsAbstract
+                                && p.SetMethod is not null
+                                && !p.SetMethod.IsAbstract
+                            )
                     )
             )
             .ToArray();

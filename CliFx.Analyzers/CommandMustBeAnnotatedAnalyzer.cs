@@ -26,8 +26,8 @@ public class CommandMustBeAnnotatedAnalyzer()
         if (type.IsAbstract)
             return;
 
-        var implementsCommandInterface = type.AllInterfaces.Any(
-            i => i.DisplayNameMatches(SymbolNames.CliFxCommandInterface)
+        var implementsCommandInterface = type.AllInterfaces.Any(i =>
+            i.DisplayNameMatches(SymbolNames.CliFxCommandInterface)
         );
 
         var hasCommandAttribute = type.GetAttributes()

@@ -20,10 +20,10 @@ public class OptionMustHaveUniqueShortNameAnalyzerSpecs
             {
                 [CommandOption('f')]
                 public string? Foo { get; init; }
-            
+
                 [CommandOption('f')]
                 public string? Bar { get; init; }
-            
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;
@@ -43,10 +43,10 @@ public class OptionMustHaveUniqueShortNameAnalyzerSpecs
             {
                 [CommandOption('f')]
                 public string? Foo { get; init; }
-            
+
                 [CommandOption('b')]
                 public string? Bar { get; init; }
-            
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;
@@ -66,10 +66,10 @@ public class OptionMustHaveUniqueShortNameAnalyzerSpecs
             {
                 [CommandOption('f')]
                 public string? Foo { get; init; }
-            
+
                 [CommandOption('F')]
                 public string? Bar { get; init; }
-            
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;
@@ -89,7 +89,7 @@ public class OptionMustHaveUniqueShortNameAnalyzerSpecs
             {
                 [CommandOption("foo")]
                 public string? Foo { get; init; }
-            
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;
@@ -108,7 +108,7 @@ public class OptionMustHaveUniqueShortNameAnalyzerSpecs
             public class MyCommand : ICommand
             {
                 public string? Foo { get; init; }
-            
+
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
             """;

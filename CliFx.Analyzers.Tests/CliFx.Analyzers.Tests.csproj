@@ -9,15 +9,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Basic.Reference.Assemblies.Net80" Version="1.4.5" />
-    <PackageReference Include="coverlet.collector" Version="6.0.0" PrivateAssets="all" />
-    <PackageReference Include="CSharpier.MsBuild" Version="0.26.5" PrivateAssets="all" />
+    <PackageReference Include="Basic.Reference.Assemblies.Net80" Version="1.7.2" />
+    <PackageReference Include="coverlet.collector" Version="6.0.2" PrivateAssets="all" />
+    <PackageReference Include="CSharpier.MsBuild" Version="0.28.2" PrivateAssets="all" />
     <PackageReference Include="GitHubActionsTestLogger" Version="2.3.3" PrivateAssets="all" />
     <PackageReference Include="FluentAssertions" Version="6.12.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.7.0" />
-    <PackageReference Include="xunit" Version="2.6.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.9.2" />
+    <PackageReference Include="xunit" Version="2.8.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.0" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>

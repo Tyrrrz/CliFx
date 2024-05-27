@@ -56,11 +56,9 @@ public class CliApplication(
     {
         using (console.WithForegroundColor(ConsoleColor.Green))
         {
-            console
-                .Output
-                .WriteLine(
-                    $"Attach the debugger to process with ID {ProcessEx.GetCurrentProcessId()} to continue."
-                );
+            console.Output.WriteLine(
+                $"Attach the debugger to process with ID {ProcessEx.GetCurrentProcessId()} to continue."
+            );
         }
 
         // Try to also launch the debugger ourselves (only works with Visual Studio)

@@ -32,8 +32,7 @@ internal static class DynamicCommandBuilder
 
         // Get default CliFx namespaces
         var defaultCliFxNamespaces = typeof(ICommand)
-            .Assembly
-            .GetTypes()
+            .Assembly.GetTypes()
             .Where(t => t.IsPublic)
             .Select(t => t.Namespace)
             .Distinct()
@@ -57,9 +56,9 @@ internal static class DynamicCommandBuilder
             "CliFxTests_DynamicAssembly_" + Guid.NewGuid(),
             [ast],
             Net80
-                .References
-                .All
-                .Append(MetadataReference.CreateFromFile(typeof(ICommand).Assembly.Location))
+                .References.All.Append(
+                    MetadataReference.CreateFromFile(typeof(ICommand).Assembly.Location)
+                )
                 .Append(
                     MetadataReference.CreateFromFile(
                         typeof(DynamicCommandBuilder).Assembly.Location
@@ -88,8 +87,8 @@ internal static class DynamicCommandBuilder
         using var buffer = new MemoryStream();
         var emit = compilation.Emit(buffer);
 
-        var emitErrors = emit.Diagnostics
-            .Where(d => d.Severity >= DiagnosticSeverity.Error)
+        var emitErrors = emit
+            .Diagnostics.Where(d => d.Severity >= DiagnosticSeverity.Error)
             .ToArray();
 
         if (emitErrors.Any())

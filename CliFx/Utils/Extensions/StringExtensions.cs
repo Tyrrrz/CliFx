@@ -15,7 +15,7 @@ internal static class StringExtensions
     public static string JoinToString<T>(this IEnumerable<T> source, string separator) =>
         string.Join(separator, source);
 
-    public static string ToString(
+    public static string? ToString(
         this object obj,
         IFormatProvider? formatProvider = null,
         string? format = null
