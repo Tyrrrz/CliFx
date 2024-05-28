@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using CliFx.Exceptions;
 using CliFx.Formatting;
@@ -175,15 +174,14 @@ public class CliApplication(
     {
         try
         {
-            var applicationSchema = ApplicationSchema.Resolve(Configuration.CommandTypes);
-
-            var commandInput = CommandInput.Parse(
-                commandLineArguments,
-                environmentVariables,
-                applicationSchema.GetCommandNames()
+            return await RunAsync(
+                Configuration.Schema,
+                CommandInput.Parse(
+                    commandLineArguments,
+                    environmentVariables,
+                    Configuration.Schema.GetCommandNames()
+                )
             );
-
-            return await RunAsync(applicationSchema, commandInput);
         }
         // To prevent the app from showing the annoying troubleshooting dialog on Windows,
         // we handle all exceptions ourselves and print them to the console.

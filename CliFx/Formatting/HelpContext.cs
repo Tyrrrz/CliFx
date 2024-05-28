@@ -7,7 +7,7 @@ internal class HelpContext(
     ApplicationMetadata applicationMetadata,
     ApplicationSchema applicationSchema,
     CommandSchema commandSchema,
-    IReadOnlyDictionary<IMemberSchema, object?> commandDefaultValues
+    IReadOnlyDictionary<IInputSchema, object?> commandDefaultValues
 )
 {
     public ApplicationMetadata ApplicationMetadata { get; } = applicationMetadata;
@@ -16,6 +16,6 @@ internal class HelpContext(
 
     public CommandSchema CommandSchema { get; } = commandSchema;
 
-    public IReadOnlyDictionary<IMemberSchema, object?> CommandDefaultValues { get; } =
+    public IReadOnlyDictionary<IInputSchema, object?> CommandDefaultValues { get; } =
         commandDefaultValues;
 }

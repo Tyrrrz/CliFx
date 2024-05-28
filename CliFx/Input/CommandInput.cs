@@ -33,10 +33,6 @@ internal partial class CommandInput(
     public bool IsDebugDirectiveSpecified => Directives.Any(d => d.IsDebugDirective);
 
     public bool IsPreviewDirectiveSpecified => Directives.Any(d => d.IsPreviewDirective);
-
-    public bool IsHelpOptionSpecified => Options.Any(o => o.IsHelpOption);
-
-    public bool IsVersionOptionSpecified => Options.Any(o => o.IsVersionOption);
 }
 
 internal partial class CommandInput

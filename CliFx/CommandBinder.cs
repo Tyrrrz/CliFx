@@ -16,14 +16,12 @@ internal class CommandBinder(ITypeActivator typeActivator)
 {
     private readonly IFormatProvider _formatProvider = CultureInfo.InvariantCulture;
 
-    private object? ConvertSingle(IMemberSchema memberSchema, string? rawValue, Type targetType)
+    private object? ConvertSingle(IInputSchema inputSchema, string? rawValue, Type targetType)
     {
         // Custom converter
-        if (memberSchema.ConverterType is not null)
+        if (inputSchema.Converter is not null)
         {
-            var converter = typeActivator.CreateInstance<IBindingConverter>(
-                memberSchema.ConverterType
-            );
+            var converter = typeActivator.CreateInstance<IBindingConverter>(inputSchema.Converter);
             return converter.Convert(rawValue);
         }
 
@@ -71,7 +69,7 @@ internal class CommandBinder(ITypeActivator typeActivator)
         if (nullableUnderlyingType is not null)
         {
             return !string.IsNullOrWhiteSpace(rawValue)
-                ? ConvertSingle(memberSchema, rawValue, nullableUnderlyingType)
+                ? ConvertSingle(inputSchema, rawValue, nullableUnderlyingType)
                 : null;
         }
 
@@ -98,7 +96,7 @@ internal class CommandBinder(ITypeActivator typeActivator)
 
         throw CliFxException.InternalError(
             $"""
-            {memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} has an unsupported underlying property type.
+            {inputSchema.GetKind()} {inputSchema.GetFormattedIdentifier()} has an unsupported underlying property type.
             There is no known way to convert a string value into an instance of type `{targetType.FullName}`.
             To fix this, either change the property to use a supported type or configure a custom converter.
             """
@@ -106,14 +104,14 @@ internal class CommandBinder(ITypeActivator typeActivator)
     }
 
     private object? ConvertMultiple(
-        IMemberSchema memberSchema,
+        IInputSchema inputSchema,
         IReadOnlyList<string> rawValues,
         Type targetEnumerableType,
         Type targetElementType
     )
     {
         var array = rawValues
-            .Select(v => ConvertSingle(memberSchema, v, targetElementType))
+            .Select(v => ConvertSingle(inputSchema, v, targetElementType))
             .ToNonGenericArray(targetElementType);
 
         var arrayType = array.GetType();
@@ -133,30 +131,27 @@ internal class CommandBinder(ITypeActivator typeActivator)
 
         throw CliFxException.InternalError(
             $"""
-            {memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} has an unsupported underlying property type.
+            {inputSchema.GetKind()} {inputSchema.GetFormattedIdentifier()} has an unsupported underlying property type.
             There is no known way to convert an array of `{targetElementType.FullName}` into an instance of type `{targetEnumerableType.FullName}`.
             To fix this, change the property to use a type which can be assigned from an array or a type which has a constructor that accepts an array.
             """
         );
     }
 
-    private object? ConvertMember(IMemberSchema memberSchema, IReadOnlyList<string> rawValues)
+    private object? ConvertMember(IInputSchema inputSchema, IReadOnlyList<string> rawValues)
     {
         try
         {
             // Non-scalar
             var enumerableUnderlyingType =
-                memberSchema.Property.Type.TryGetEnumerableUnderlyingType();
+                inputSchema.Property.Type.TryGetEnumerableUnderlyingType();
 
-            if (
-                enumerableUnderlyingType is not null
-                && memberSchema.Property.Type != typeof(string)
-            )
+            if (enumerableUnderlyingType is not null && inputSchema.Property.Type != typeof(string))
             {
                 return ConvertMultiple(
-                    memberSchema,
+                    inputSchema,
                     rawValues,
-                    memberSchema.Property.Type,
+                    inputSchema.Property.Type,
                     enumerableUnderlyingType
                 );
             }
@@ -165,9 +160,9 @@ internal class CommandBinder(ITypeActivator typeActivator)
             if (rawValues.Count <= 1)
             {
                 return ConvertSingle(
-                    memberSchema,
+                    inputSchema,
                     rawValues.SingleOrDefault(),
-                    memberSchema.Property.Type
+                    inputSchema.Property.Type
                 );
             }
         }
@@ -181,7 +176,7 @@ internal class CommandBinder(ITypeActivator typeActivator)
 
             throw CliFxException.UserError(
                 $"""
-                {memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} cannot be set from the provided argument(s):
+                {inputSchema.GetKind()} {inputSchema.GetFormattedIdentifier()} cannot be set from the provided argument(s):
                 {rawValues.Select(v => '<' + v + '>').JoinToString(" ")}
                 Error: {errorMessage}
                 """,
@@ -192,17 +187,17 @@ internal class CommandBinder(ITypeActivator typeActivator)
         // Mismatch (scalar but too many values)
         throw CliFxException.UserError(
             $"""
-            {memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} expects a single argument, but provided with multiple:
+            {inputSchema.GetKind()} {inputSchema.GetFormattedIdentifier()} expects a single argument, but provided with multiple:
             {rawValues.Select(v => '<' + v + '>').JoinToString(" ")}
             """
         );
     }
 
-    private void ValidateMember(IMemberSchema memberSchema, object? convertedValue)
+    private void ValidateMember(IInputSchema inputSchema, object? convertedValue)
     {
         var errors = new List<BindingValidationError>();
 
-        foreach (var validatorType in memberSchema.ValidatorTypes)
+        foreach (var validatorType in inputSchema.Validators)
         {
             var validator = typeActivator.CreateInstance<IBindingValidator>(validatorType);
             var error = validator.Validate(convertedValue);
@@ -215,7 +210,7 @@ internal class CommandBinder(ITypeActivator typeActivator)
         {
             throw CliFxException.UserError(
                 $"""
-                {memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} has been provided with an invalid value.
+                {inputSchema.GetKind()} {inputSchema.GetFormattedIdentifier()} has been provided with an invalid value.
                 Error(s):
                 {errors.Select(e => "- " + e.Message).JoinToString(Environment.NewLine)}
                 """
@@ -224,15 +219,15 @@ internal class CommandBinder(ITypeActivator typeActivator)
     }
 
     private void BindMember(
-        IMemberSchema memberSchema,
+        IInputSchema inputSchema,
         ICommand commandInstance,
         IReadOnlyList<string> rawValues
     )
     {
-        var convertedValue = ConvertMember(memberSchema, rawValues);
-        ValidateMember(memberSchema, convertedValue);
+        var convertedValue = ConvertMember(inputSchema, rawValues);
+        ValidateMember(inputSchema, convertedValue);
 
-        memberSchema.Property.SetValue(commandInstance, convertedValue);
+        inputSchema.Property.SetValue(commandInstance, convertedValue);
     }
 
     private void BindParameters(

@@ -1,8 +1,16 @@
 ﻿namespace CliFx.Extensibility;
 
-// Used internally to simplify the usage from reflection
-internal interface IBindingConverter
+/// <summary>
+/// Defines a custom conversion for binding command-line arguments to command inputs.
+/// </summary>
+/// <remarks>
+/// To implement your own converter, inherit from <see cref="BindingConverter{T}" /> instead.
+/// </remarks>
+public interface IBindingConverter
 {
+    /// <summary>
+    /// Parses the value from a raw command-line argument.
+    /// </summary>
     object? Convert(string? rawValue);
 }
 
@@ -12,7 +20,7 @@ internal interface IBindingConverter
 public abstract class BindingConverter<T> : IBindingConverter
 {
     /// <summary>
-    /// Parses value from a raw command-line argument.
+    /// Parses the value from a raw command-line argument.
     /// </summary>
     public abstract T Convert(string? rawValue);
 

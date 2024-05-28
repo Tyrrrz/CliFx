@@ -5,33 +5,39 @@ using CliFx.Utils.Extensions;
 
 namespace CliFx.Schema;
 
-internal partial class ApplicationSchema(IReadOnlyList<CommandSchema> commands)
+/// <summary>
+/// Describes the structure of a command-line application.
+/// </summary>
+public class ApplicationSchema(IReadOnlyList<CommandSchema> commands)
 {
+    /// <summary>
+    /// Commands defined in the application.
+    /// </summary>
     public IReadOnlyList<CommandSchema> Commands { get; } = commands;
 
-    public IReadOnlyList<string> GetCommandNames() =>
+    internal IReadOnlyList<string> GetCommandNames() =>
         Commands.Select(c => c.Name).WhereNotNullOrWhiteSpace().ToArray();
 
-    public CommandSchema? TryFindDefaultCommand() => Commands.FirstOrDefault(c => c.IsDefault);
+    internal CommandSchema? TryFindDefaultCommand() => Commands.FirstOrDefault(c => c.IsDefault);
 
-    public CommandSchema? TryFindCommand(string commandName) =>
+    internal CommandSchema? TryFindCommand(string commandName) =>
         Commands.FirstOrDefault(c => c.MatchesName(commandName));
 
     private IReadOnlyList<CommandSchema> GetDescendantCommands(
-        IReadOnlyList<CommandSchema> potentialParentCommandSchemas,
+        IReadOnlyList<CommandSchema> potentialDescendantCommands,
         string? parentCommandName
     )
     {
         var result = new List<CommandSchema>();
 
-        foreach (var potentialParentCommandSchema in potentialParentCommandSchemas)
+        foreach (var potentialDescendantCommand in potentialDescendantCommands)
         {
             // Default commands can't be descendant of anything
-            if (string.IsNullOrWhiteSpace(potentialParentCommandSchema.Name))
+            if (string.IsNullOrWhiteSpace(potentialDescendantCommand.Name))
                 continue;
 
             // Command can't be its own descendant
-            if (potentialParentCommandSchema.MatchesName(parentCommandName))
+            if (potentialDescendantCommand.MatchesName(parentCommandName))
                 continue;
 
             var isDescendant =
@@ -39,22 +45,22 @@ internal partial class ApplicationSchema(IReadOnlyList<CommandSchema> commands)
                 string.IsNullOrWhiteSpace(parentCommandName)
                 ||
                 // Otherwise a command is a descendant if it starts with the same name segments
-                potentialParentCommandSchema.Name.StartsWith(
+                potentialDescendantCommand.Name.StartsWith(
                     parentCommandName + ' ',
                     StringComparison.OrdinalIgnoreCase
                 );
 
             if (isDescendant)
-                result.Add(potentialParentCommandSchema);
+                result.Add(potentialDescendantCommand);
         }
 
         return result;
     }
 
-    public IReadOnlyList<CommandSchema> GetDescendantCommands(string? parentCommandName) =>
+    internal IReadOnlyList<CommandSchema> GetDescendantCommands(string? parentCommandName) =>
         GetDescendantCommands(Commands, parentCommandName);
 
-    public IReadOnlyList<CommandSchema> GetChildCommands(string? parentCommandName)
+    internal IReadOnlyList<CommandSchema> GetChildCommands(string? parentCommandName)
     {
         var descendants = GetDescendantCommands(parentCommandName);
 
@@ -62,16 +68,8 @@ internal partial class ApplicationSchema(IReadOnlyList<CommandSchema> commands)
 
         // Filter out descendants of descendants, leave only direct children
         foreach (var descendant in descendants)
-        {
             result.RemoveRange(GetDescendantCommands(descendants, descendant.Name));
-        }
 
         return result;
     }
-}
-
-internal partial class ApplicationSchema
-{
-    public static ApplicationSchema Resolve(IReadOnlyList<Type> commandTypes) =>
-        new(commandTypes.Select(CommandSchema.Resolve).ToArray());
 }

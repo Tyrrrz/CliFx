@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using CliFx.Exceptions;
 
 namespace CliFx.Infrastructure;
@@ -11,12 +12,17 @@ public interface ITypeActivator
     /// <summary>
     /// Creates an instance of the specified type.
     /// </summary>
-    object CreateInstance(Type type);
+    object CreateInstance(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type
+    );
 }
 
 internal static class TypeActivatorExtensions
 {
-    public static T CreateInstance<T>(this ITypeActivator activator, Type type)
+    public static T CreateInstance<T>(
+        this ITypeActivator activator,
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type
+    )
     {
         if (!typeof(T).IsAssignableFrom(type))
         {

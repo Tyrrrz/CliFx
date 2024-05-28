@@ -1,54 +1,79 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Text;
-using CliFx.Attributes;
-using CliFx.Utils.Extensions;
+using CliFx.Extensibility;
 
 namespace CliFx.Schema;
 
-internal partial class OptionSchema(
-    IPropertyDescriptor property,
+/// <summary>
+/// Describes a command's option.
+/// </summary>
+public class OptionSchema(
+    PropertyDescriptor property,
     string? name,
     char? shortName,
     string? environmentVariable,
     bool isRequired,
     string? description,
-    Type? converterType,
-    IReadOnlyList<Type> validatorTypes
-) : IMemberSchema
+    IBindingConverter? converter,
+    IReadOnlyList<IBindingValidator> validators
+) : IInputSchema
 {
-    public IPropertyDescriptor Property { get; } = property;
+    /// <inheritdoc />
+    public PropertyDescriptor Property { get; } = property;
 
+    /// <inheritdoc />
+    public bool IsScalar { get; }
+
+    /// <inheritdoc />
+    public IReadOnlyList<object?>? ValidValues { get; }
+
+    /// <summary>
+    /// Option name.
+    /// </summary>
     public string? Name { get; } = name;
 
+    /// <summary>
+    /// Option short name.
+    /// </summary>
     public char? ShortName { get; } = shortName;
 
+    /// <summary>
+    /// Environment variable that can be used as a fallback for this option.
+    /// </summary>
     public string? EnvironmentVariable { get; } = environmentVariable;
 
+    /// <summary>
+    /// Whether the option is required.
+    /// </summary>
     public bool IsRequired { get; } = isRequired;
 
+    /// <summary>
+    /// Option description.
+    /// </summary>
     public string? Description { get; } = description;
 
-    public Type? ConverterType { get; } = converterType;
+    /// <inheritdoc />
+    public IBindingConverter? Converter { get; } = converter;
 
-    public IReadOnlyList<Type> ValidatorTypes { get; } = validatorTypes;
+    /// <inheritdoc />
+    public IReadOnlyList<IBindingValidator> Validators { get; } = validators;
 
-    public bool MatchesName(string? name) =>
+    internal bool MatchesName(string? name) =>
         !string.IsNullOrWhiteSpace(Name)
         && string.Equals(Name, name, StringComparison.OrdinalIgnoreCase);
 
-    public bool MatchesShortName(char? shortName) =>
+    internal bool MatchesShortName(char? shortName) =>
         ShortName is not null && ShortName == shortName;
 
-    public bool MatchesIdentifier(string identifier) =>
+    internal bool MatchesIdentifier(string identifier) =>
         MatchesName(identifier) || identifier.Length == 1 && MatchesShortName(identifier[0]);
 
-    public bool MatchesEnvironmentVariable(string environmentVariableName) =>
+    internal bool MatchesEnvironmentVariable(string environmentVariableName) =>
         !string.IsNullOrWhiteSpace(EnvironmentVariable)
         && string.Equals(EnvironmentVariable, environmentVariableName, StringComparison.Ordinal);
 
-    public string GetFormattedIdentifier()
+    internal string GetFormattedIdentifier()
     {
         var buffer = new StringBuilder();
 
@@ -72,58 +97,4 @@ internal partial class OptionSchema(
 
         return buffer.ToString();
     }
-}
-
-internal partial class OptionSchema
-{
-    public static OptionSchema? TryResolve(PropertyInfo property)
-    {
-        var attribute = property.GetCustomAttribute<CommandOptionAttribute>();
-        if (attribute is null)
-            return null;
-
-        // The user may mistakenly specify dashes, thinking it's required, so trim them
-        var name = attribute.Name?.TrimStart('-').Trim();
-        var environmentVariable = attribute.EnvironmentVariable?.Trim();
-        var isRequired = attribute.IsRequired || property.IsRequired();
-        var description = attribute.Description?.Trim();
-
-        return new OptionSchema(
-            new BindablePropertyDescriptor(property),
-            name,
-            attribute.ShortName,
-            environmentVariable,
-            isRequired,
-            description,
-            attribute.Converter,
-            attribute.Validators
-        );
-    }
-}
-
-internal partial class OptionSchema
-{
-    public static OptionSchema HelpOption { get; } =
-        new(
-            NullPropertyDescriptor.Instance,
-            "help",
-            'h',
-            null,
-            false,
-            "Shows help text.",
-            null,
-            Array.Empty<Type>()
-        );
-
-    public static OptionSchema VersionOption { get; } =
-        new(
-            NullPropertyDescriptor.Instance,
-            "version",
-            null,
-            null,
-            false,
-            "Shows version information.",
-            null,
-            Array.Empty<Type>()
-        );
 }
