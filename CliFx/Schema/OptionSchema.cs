@@ -10,6 +10,8 @@ namespace CliFx.Schema;
 /// </summary>
 public class OptionSchema(
     PropertyDescriptor property,
+    bool isScalar,
+    IReadOnlyList<object?>? validValues,
     string? name,
     char? shortName,
     string? environmentVariable,
@@ -23,10 +25,10 @@ public class OptionSchema(
     public PropertyDescriptor Property { get; } = property;
 
     /// <inheritdoc />
-    public bool IsScalar { get; }
+    public bool IsScalar { get; } = isScalar;
 
     /// <inheritdoc />
-    public IReadOnlyList<object?>? ValidValues { get; }
+    public IReadOnlyList<object?>? ValidValues { get; } = validValues;
 
     /// <summary>
     /// Option name.

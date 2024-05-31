@@ -21,8 +21,7 @@ internal class CommandBinder(ITypeActivator typeActivator)
         // Custom converter
         if (inputSchema.Converter is not null)
         {
-            var converter = typeActivator.CreateInstance<IBindingConverter>(inputSchema.Converter);
-            return converter.Convert(rawValue);
+            return inputSchema.Converter.Convert(rawValue);
         }
 
         // Assignable from a string (e.g. string itself, object, etc)
@@ -336,7 +335,7 @@ internal class CommandBinder(ITypeActivator typeActivator)
             // Environment variable
             else if (environmentVariableInput is not null)
             {
-                var rawValues = optionSchema.Property.IsScalar()
+                var rawValues = optionSchema.IsScalar
                     ? [environmentVariableInput.Value]
                     : environmentVariableInput.SplitValues();
 

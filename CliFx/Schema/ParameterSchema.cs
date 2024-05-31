@@ -8,6 +8,8 @@ namespace CliFx.Schema;
 /// </summary>
 public class ParameterSchema(
     PropertyDescriptor property,
+    bool isScalar,
+    IReadOnlyList<object?>? validValues,
     int order,
     string name,
     bool isRequired,
@@ -18,6 +20,12 @@ public class ParameterSchema(
 {
     /// <inheritdoc />
     public PropertyDescriptor Property { get; } = property;
+
+    /// <inheritdoc />
+    public bool IsScalar { get; } = isScalar;
+
+    /// <inheritdoc />
+    public IReadOnlyList<object?>? ValidValues { get; } = validValues;
 
     /// <summary>
     /// Order, in which the parameter is bound from the command-line arguments.
@@ -46,5 +54,5 @@ public class ParameterSchema(
     public IReadOnlyList<IBindingValidator> Validators { get; } = validators;
 
     internal string GetFormattedIdentifier() =>
-        !Property.IsEnumerable ? $"<{Name}>" : $"<{Name}...>";
+        IsScalar ? $"<{Name}>" : $"<{Name}...>";
 }
