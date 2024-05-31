@@ -19,9 +19,9 @@
   <ItemGroup>
     <PackageReference Include="CSharpier.MsBuild" Version="0.28.2" PrivateAssets="all" />
     <!-- Make sure to target the lowest possible version of the compiler for wider support -->
-    <PackageReference Include="Microsoft.CodeAnalysis" Version="3.0.0" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.0.0" PrivateAssets="all" />
-    <PackageReference Include="PolyShim" Version="1.10.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis" Version="4.9.2" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.9.2" PrivateAssets="all" />
+    <PackageReference Include="PolyShim" Version="1.12.0" PrivateAssets="all" />
   </ItemGroup>
 
 </Project>
