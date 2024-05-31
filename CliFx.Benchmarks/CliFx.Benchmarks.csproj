@@ -13,7 +13,7 @@
     <PackageReference Include="CSharpier.MsBuild" Version="0.28.2" PrivateAssets="all" />
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.1.1" />
     <PackageReference Include="PowerArgs" Version="4.0.3" />
-    <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20574.7" />
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
   </ItemGroup>
 
   <ItemGroup>
