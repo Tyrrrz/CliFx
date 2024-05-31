@@ -1,5 +1,4 @@
 ﻿using System.CommandLine;
-using System.CommandLine.Invocation;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 
@@ -9,20 +8,20 @@ public partial class Benchmarks
 {
     public class SystemCommandLineCommand
     {
-        public static int ExecuteHandler(string s, int i, bool b) => 0;
+        public static void ExecuteHandler(string s, int i, bool b) { }
 
         public Task<int> ExecuteAsync(string[] args)
         {
-            var command = new RootCommand
-            {
-                new Option(["--str", "-s"]) { Argument = new Argument<string?>() },
-                new Option(["--int", "-i"]) { Argument = new Argument<int>() },
-                new Option(["--bool", "-b"]) { Argument = new Argument<bool>() }
-            };
+            var stringOption = new Option<string>(["--str", "-s"]);
+            var intOption = new Option<int>(["--int", "-i"]);
+            var boolOption = new Option<bool>(["--bool", "-b"]);
 
-            command.Handler = CommandHandler.Create(
-                typeof(SystemCommandLineCommand).GetMethod(nameof(ExecuteHandler))!
-            );
+            var command = new RootCommand();
+            command.AddOption(stringOption);
+            command.AddOption(intOption);
+            command.AddOption(boolOption);
+
+            command.SetHandler(ExecuteHandler, stringOption, intOption, boolOption);
 
             return command.InvokeAsync(args);
         }
