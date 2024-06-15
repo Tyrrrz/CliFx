@@ -56,14 +56,18 @@ public class SystemConsole : IConsole, IDisposable
     public int WindowWidth
     {
         get => Console.WindowWidth;
+#pragma warning disable CA1416
         set => Console.WindowWidth = value;
+#pragma warning restore CA1416
     }
 
     /// <inheritdoc />
     public int WindowHeight
     {
         get => Console.WindowHeight;
+#pragma warning disable CA1416
         set => Console.WindowHeight = value;
+#pragma warning restore CA1416
     }
 
     /// <inheritdoc />

@@ -6,7 +6,7 @@
 public interface ICommandWithVersionOption : ICommand
 {
     /// <summary>
-    /// Whether the user requested the version information (via the `--version` option).
+    /// Whether the user requested the application version information (via the `--version` option).
     /// </summary>
     bool IsVersionRequested { get; }
 }

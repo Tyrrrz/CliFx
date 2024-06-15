@@ -4,7 +4,7 @@ using CliFx.Extensibility;
 namespace CliFx.Schema;
 
 /// <summary>
-/// Describes an input of a command, which can be either a parameter or an option.
+/// Describes an input binding of a command.
 /// </summary>
 public abstract class InputSchema(
     PropertyBinding property,

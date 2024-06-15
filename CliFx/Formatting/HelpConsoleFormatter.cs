@@ -308,50 +308,49 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
     private void WriteDefaultValue(InputSchema schema)
     {
         var defaultValue = context.CommandDefaultValues.GetValueOrDefault(schema);
-        if (defaultValue is not null)
+        if (defaultValue is null) return;
+
+        // Non-Scalar
+        if (defaultValue is not string && defaultValue is IEnumerable defaultValues)
         {
-            // Non-Scalar
-            if (defaultValue is not string && defaultValue is IEnumerable defaultValues)
+            var elementType =
+                schema.Property.Type.TryGetEnumerableUnderlyingType() ?? typeof(object);
+
+            if (elementType.IsToStringOverriden())
             {
-                var elementType =
-                    defaultValues.GetType().TryGetEnumerableUnderlyingType() ?? typeof(object);
+                Write(ConsoleColor.White, "Default: ");
 
-                if (elementType.IsToStringOverriden())
+                var isFirst = true;
+
+                foreach (var element in defaultValues)
                 {
-                    Write(ConsoleColor.White, "Default: ");
-
-                    var isFirst = true;
-
-                    foreach (var element in defaultValues)
+                    if (isFirst)
                     {
-                        if (isFirst)
-                        {
-                            isFirst = false;
-                        }
-                        else
-                        {
-                            Write(", ");
-                        }
-
-                        Write('"');
-                        Write(element.ToString(CultureInfo.InvariantCulture));
-                        Write('"');
+                        isFirst = false;
+                    }
+                    else
+                    {
+                        Write(", ");
                     }
 
-                    Write('.');
+                    Write('"');
+                    Write(element.ToString(CultureInfo.InvariantCulture));
+                    Write('"');
                 }
-            }
-            else
-            {
-                if (defaultValue.GetType().IsToStringOverriden())
-                {
-                    Write(ConsoleColor.White, "Default: ");
 
-                    Write('"');
-                    Write(defaultValue.ToString(CultureInfo.InvariantCulture));
-                    Write('"');
-                    Write('.');
-                }
+                Write('.');
+            }
+        }
+        else
+        {
+            if (schema.Property.Type.IsToStringOverriden())
+            {
+                Write(ConsoleColor.White, "Default: ");
+
+                Write('"');
+                Write(defaultValue.ToString(CultureInfo.InvariantCulture));
+                Write('"');
+                Write('.');
             }
         }
     }

@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace CliFx.Schema;
 
 /// <summary>
-/// Represents a binding to a CLR property.
+/// Represents a CLR property binding.
 /// </summary>
 public class PropertyBinding(
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces | DynamicallyAccessedMemberTypes.PublicMethods)]
     Type type,
     Func<object, object?> getValue,
     Action<object, object?> setValue
@@ -16,6 +18,7 @@ public class PropertyBinding(
     /// <summary>
     /// Underlying CLR type of the property.
     /// </summary>
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces | DynamicallyAccessedMemberTypes.PublicMethods)]
     public Type Type { get; } = type;
 
     /// <summary>

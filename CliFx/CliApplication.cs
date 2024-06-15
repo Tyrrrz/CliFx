@@ -23,8 +23,6 @@ public class CliApplication(
     ITypeActivator typeActivator
 )
 {
-    private readonly CommandBinder _commandBinder = new(typeActivator);
-
     /// <summary>
     /// Application metadata.
     /// </summary>
@@ -116,7 +114,7 @@ public class CliApplication(
         try
         {
             // Bind the command input to the command instance
-            _commandBinder.Bind(commandInput, commandSchema, commandInstance);
+            commandInstance.Bind(commandSchema, commandInput);
 
             // Handle the version option
             if (commandInstance is ICommandWithVersionOption { IsVersionRequested: true })

@@ -4,6 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <ApplicationIcon>../favicon.ico</ApplicationIcon>
+    <PublishAot>true</PublishAot>
   </PropertyGroup>
 
   <ItemGroup>

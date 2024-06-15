@@ -2,7 +2,7 @@
 
 namespace CliFx.Input;
 
-internal class DirectiveInput(string name)
+public class DirectiveInput(string name)
 {
     public string Name { get; } = name;
 

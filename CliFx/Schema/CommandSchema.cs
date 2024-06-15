@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace CliFx.Schema;
 
 /// <summary>
-/// Describes an individual command.
+/// Describes an individual command, with its parameter and option bindings.
 /// </summary>
 public class CommandSchema(
     [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type,

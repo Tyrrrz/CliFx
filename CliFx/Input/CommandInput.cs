@@ -5,7 +5,10 @@ using CliFx.Utils.Extensions;
 
 namespace CliFx.Input;
 
-internal partial class CommandInput(
+/// <summary>
+/// Describes input for a command.
+/// </summary>
+public partial class CommandInput(
     string? commandName,
     IReadOnlyList<DirectiveInput> directives,
     IReadOnlyList<ParameterInput> parameters,

@@ -3,7 +3,7 @@ using System.IO;
 
 namespace CliFx.Input;
 
-internal class EnvironmentVariableInput(string name, string value)
+public class EnvironmentVariableInput(string name, string value)
 {
     public string Name { get; } = name;
 
