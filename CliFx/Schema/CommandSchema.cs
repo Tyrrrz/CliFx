@@ -16,7 +16,7 @@ public class CommandSchema(
 )
 {
     /// <summary>
-    /// Command's CLR type.
+    /// Underlying CLR type of the command.
     /// </summary>
     [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
     public Type Type { get; } = type;
@@ -25,6 +25,11 @@ public class CommandSchema(
     /// Command name.
     /// </summary>
     public string? Name { get; } = name;
+
+    /// <summary>
+    /// Whether this command is the application's default command.
+    /// </summary>
+    public bool IsDefault { get; } = string.IsNullOrWhiteSpace(name);
 
     /// <summary>
     /// Command description.
@@ -41,19 +46,14 @@ public class CommandSchema(
     /// </summary>
     public IReadOnlyList<OptionSchema> Options { get; } = options;
 
-    /// <summary>
-    /// Whether this command is the application's default command.
-    /// </summary>
-    public bool IsDefault { get; } = string.IsNullOrWhiteSpace(name);
-
     internal bool MatchesName(string? name) =>
         !string.IsNullOrWhiteSpace(Name)
             ? string.Equals(name, Name, StringComparison.OrdinalIgnoreCase)
             : string.IsNullOrWhiteSpace(name);
 
-    internal IReadOnlyDictionary<IInputSchema, object?> GetValues(ICommand instance)
+    internal IReadOnlyDictionary<InputSchema, object?> GetValues(ICommand instance)
     {
-        var result = new Dictionary<IInputSchema, object?>();
+        var result = new Dictionary<InputSchema, object?>();
 
         foreach (var parameterSchema in Parameters)
         {

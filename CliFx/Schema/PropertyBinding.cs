@@ -5,19 +5,19 @@ using System.Linq;
 namespace CliFx.Schema;
 
 /// <summary>
-/// Describes a CLR property.
+/// Represents a binding to a CLR property.
 /// </summary>
 public class PropertyBinding(
-    Type propertyType,
+    Type type,
     Func<object, object?> getValue,
     Action<object, object?> setValue
-    )
+)
 {
     /// <summary>
-    /// Underlying property type.
+    /// Underlying CLR type of the property.
     /// </summary>
-    public Type PropertyType { get; } = propertyType;
-    
+    public Type Type { get; } = type;
+
     /// <summary>
     /// Gets the current value of the property on the specified instance.
     /// </summary>
@@ -27,12 +27,23 @@ public class PropertyBinding(
     /// Sets the value of the property on the specified instance.
     /// </summary>
     public void SetValue(object instance, object? value) => setValue(instance, value);
-}
 
-internal static class PropertyBindingExtensions
-{
-    public static IReadOnlyList<object?>? TryGetValidValues(this PropertyBinding binding) =>
-        binding.PropertyType.IsEnum
-            ? binding.PropertyType.GetEnumValuesAsUnderlyingType().Cast<object?>().ToArray()
-            : null;
+    internal IReadOnlyList<object?>? TryGetValidValues()
+    {
+        if (Type.IsEnum)
+        {
+            var values =
+#if NET7_0_OR_GREATER
+            Type.GetEnumValuesAsUnderlyingType();
+#else
+                // AOT-compatible APIs are not available here, but it's unlikely
+                // someone will be AOT-compiling a net6.0 or older app anyway.
+                Type.GetEnumValues();
+#endif
+
+            return values.Cast<object?>().ToArray();
+        }
+
+        return null;
+    }
 }

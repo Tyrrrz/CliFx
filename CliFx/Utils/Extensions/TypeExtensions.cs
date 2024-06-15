@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 
@@ -8,13 +9,17 @@ namespace CliFx.Utils.Extensions;
 
 internal static class TypeExtensions
 {
-    public static bool Implements(this Type type, Type interfaceType) =>
-        type.GetInterfaces().Contains(interfaceType);
+    public static bool Implements(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces)] this Type type,
+        Type interfaceType
+    ) => type.GetInterfaces().Contains(interfaceType);
 
     public static Type? TryGetNullableUnderlyingType(this Type type) =>
         Nullable.GetUnderlyingType(type);
 
-    public static Type? TryGetEnumerableUnderlyingType(this Type type)
+    public static Type? TryGetEnumerableUnderlyingType(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces)] this Type type
+    )
     {
         if (type.IsPrimitive)
             return null;
@@ -35,24 +40,20 @@ internal static class TypeExtensions
     }
 
     public static MethodInfo? TryGetStaticParseMethod(
-        this Type type,
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] this Type type,
         bool withFormatProvider = false
-    )
-    {
-        var argumentTypes = withFormatProvider
-            ? new[] { typeof(string), typeof(IFormatProvider) }
-            : new[] { typeof(string) };
-
-        return type.GetMethod(
+    ) =>
+        type.GetMethod(
             "Parse",
             BindingFlags.Public | BindingFlags.Static,
             null,
-            argumentTypes,
+            withFormatProvider ? [typeof(string), typeof(IFormatProvider)] : [typeof(string)],
             null
         );
-    }
 
-    public static bool IsToStringOverriden(this Type type)
+    public static bool IsToStringOverriden(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] this Type type
+    )
     {
         var toStringMethod = type.GetMethod(nameof(ToString), Type.EmptyTypes);
         return toStringMethod?.GetBaseDefinition()?.DeclaringType != toStringMethod?.DeclaringType;

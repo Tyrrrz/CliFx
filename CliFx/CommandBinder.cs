@@ -16,7 +16,7 @@ internal class CommandBinder(ITypeActivator typeActivator)
 {
     private readonly IFormatProvider _formatProvider = CultureInfo.InvariantCulture;
 
-    private object? ConvertSingle(IInputSchema inputSchema, string? rawValue, Type targetType)
+    private object? ConvertSingle(InputSchema inputSchema, string? rawValue, Type targetType)
     {
         // Custom converter
         if (inputSchema.Converter is not null)
@@ -103,7 +103,7 @@ internal class CommandBinder(ITypeActivator typeActivator)
     }
 
     private object? ConvertMultiple(
-        IInputSchema inputSchema,
+        InputSchema inputSchema,
         IReadOnlyList<string> rawValues,
         Type targetEnumerableType,
         Type targetElementType
@@ -137,7 +137,7 @@ internal class CommandBinder(ITypeActivator typeActivator)
         );
     }
 
-    private object? ConvertMember(IInputSchema inputSchema, IReadOnlyList<string> rawValues)
+    private object? ConvertMember(InputSchema inputSchema, IReadOnlyList<string> rawValues)
     {
         try
         {
@@ -192,7 +192,7 @@ internal class CommandBinder(ITypeActivator typeActivator)
         );
     }
 
-    private void ValidateMember(IInputSchema inputSchema, object? convertedValue)
+    private void ValidateMember(InputSchema inputSchema, object? convertedValue)
     {
         var errors = new List<BindingValidationError>();
 
@@ -218,7 +218,7 @@ internal class CommandBinder(ITypeActivator typeActivator)
     }
 
     private void BindMember(
-        IInputSchema inputSchema,
+        InputSchema inputSchema,
         ICommand commandInstance,
         IReadOnlyList<string> rawValues
     )
@@ -335,7 +335,7 @@ internal class CommandBinder(ITypeActivator typeActivator)
             // Environment variable
             else if (environmentVariableInput is not null)
             {
-                var rawValues = optionSchema.IsScalar
+                var rawValues = optionSchema.IsSequence
                     ? [environmentVariableInput.Value]
                     : environmentVariableInput.SplitValues();
 

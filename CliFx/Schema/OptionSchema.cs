@@ -6,12 +6,11 @@ using CliFx.Extensibility;
 namespace CliFx.Schema;
 
 /// <summary>
-/// Describes a command's option.
+/// Describes an option input of a command.
 /// </summary>
 public class OptionSchema(
     PropertyBinding property,
-    bool isScalar,
-    IReadOnlyList<object?>? validValues,
+    bool isSequence,
     string? name,
     char? shortName,
     string? environmentVariable,
@@ -19,17 +18,8 @@ public class OptionSchema(
     string? description,
     IBindingConverter? converter,
     IReadOnlyList<IBindingValidator> validators
-) : IInputSchema
+) : InputSchema(property, isSequence, converter, validators)
 {
-    /// <inheritdoc />
-    public PropertyBinding Property { get; } = property;
-
-    /// <inheritdoc />
-    public bool IsScalar { get; } = isScalar;
-
-    /// <inheritdoc />
-    public IReadOnlyList<object?>? ValidValues { get; } = validValues;
-
     /// <summary>
     /// Option name.
     /// </summary>
@@ -54,12 +44,6 @@ public class OptionSchema(
     /// Option description.
     /// </summary>
     public string? Description { get; } = description;
-
-    /// <inheritdoc />
-    public IBindingConverter? Converter { get; } = converter;
-
-    /// <inheritdoc />
-    public IReadOnlyList<IBindingValidator> Validators { get; } = validators;
 
     internal bool MatchesName(string? name) =>
         !string.IsNullOrWhiteSpace(Name)

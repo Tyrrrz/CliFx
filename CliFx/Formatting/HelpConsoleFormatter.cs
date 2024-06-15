@@ -69,7 +69,7 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
             {
                 Write(
                     ConsoleColor.DarkCyan,
-                    parameter.Property.IsScalar() ? $"<{parameter.Name}>" : $"<{parameter.Name}...>"
+                    parameter.IsSequence ? $"<{parameter.Name}...>" : $"<{parameter.Name}>"
                 );
                 Write(' ');
             }
@@ -85,7 +85,7 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
                 );
                 Write(' ');
 
-                Write(ConsoleColor.White, option.Property.IsScalar() ? "<value>" : "<values...>");
+                Write(ConsoleColor.White, option.IsSequence ? "<values...>" : "<value>");
                 Write(' ');
             }
 
@@ -170,8 +170,8 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
             }
 
             // Valid values
-            var validValues = parameterSchema.Property.GetValidValues();
-            if (validValues.Any())
+            var validValues = parameterSchema.Property.TryGetValidValues();
+            if (validValues?.Any() == true)
             {
                 Write(ConsoleColor.White, "Choices: ");
 
@@ -257,8 +257,8 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
             }
 
             // Valid values
-            var validValues = optionSchema.Property.GetValidValues();
-            if (validValues.Any())
+            var validValues = optionSchema.Property.TryGetValidValues();
+            if (validValues?.Any() == true)
             {
                 Write(ConsoleColor.White, "Choices: ");
 
@@ -305,7 +305,7 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
         }
     }
 
-    private void WriteDefaultValue(IMemberSchema schema)
+    private void WriteDefaultValue(InputSchema schema)
     {
         var defaultValue = context.CommandDefaultValues.GetValueOrDefault(schema);
         if (defaultValue is not null)

@@ -175,7 +175,7 @@ public partial class CliApplicationBuilder
     [UnconditionalSuppressMessage(
         "SingleFile",
         "IL3000:Avoid accessing Assembly file path when publishing as a single file",
-        Justification = "The return value of the method is checked to ensure the assembly location is available."
+        Justification = "The file path is checked to ensure the assembly location is available."
     )]
     private static string GetDefaultExecutableName()
     {

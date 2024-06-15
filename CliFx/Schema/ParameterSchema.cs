@@ -4,29 +4,19 @@ using CliFx.Extensibility;
 namespace CliFx.Schema;
 
 /// <summary>
-/// Describes a command's parameter.
+/// Describes a parameter input of a command.
 /// </summary>
 public class ParameterSchema(
     PropertyBinding property,
-    bool isScalar,
-    IReadOnlyList<object?>? validValues,
+    bool isSequence,
     int order,
     string name,
     bool isRequired,
     string? description,
     IBindingConverter? converter,
     IReadOnlyList<IBindingValidator> validators
-) : IInputSchema
+) : InputSchema(property, isSequence, converter, validators)
 {
-    /// <inheritdoc />
-    public PropertyBinding Property { get; } = property;
-
-    /// <inheritdoc />
-    public bool IsScalar { get; } = isScalar;
-
-    /// <inheritdoc />
-    public IReadOnlyList<object?>? ValidValues { get; } = validValues;
-
     /// <summary>
     /// Order, in which the parameter is bound from the command-line arguments.
     /// </summary>
@@ -47,12 +37,5 @@ public class ParameterSchema(
     /// </summary>
     public string? Description { get; } = description;
 
-    /// <inheritdoc />
-    public IBindingConverter? Converter { get; } = converter;
-
-    /// <inheritdoc />
-    public IReadOnlyList<IBindingValidator> Validators { get; } = validators;
-
-    internal string GetFormattedIdentifier() =>
-        IsScalar ? $"<{Name}>" : $"<{Name}...>";
+    internal string GetFormattedIdentifier() => IsSequence ? $"<{Name}>" : $"<{Name}...>";
 }

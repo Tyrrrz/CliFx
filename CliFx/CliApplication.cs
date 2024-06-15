@@ -41,16 +41,6 @@ public class CliApplication(
     private bool IsPreviewModeEnabled(CommandInput commandInput) =>
         Configuration.IsPreviewModeAllowed && commandInput.IsPreviewDirectiveSpecified;
 
-    private bool ShouldShowHelpText(CommandSchema commandSchema, CommandInput commandInput) =>
-        commandSchema.IsHelpOptionAvailable && commandInput.IsHelpOptionSpecified
-        ||
-        // Show help text also if the fallback default command is executed without any arguments
-        commandSchema == FallbackDefaultCommand.Schema
-            && !commandInput.HasArguments;
-
-    private bool ShouldShowVersionText(CommandSchema commandSchema, CommandInput commandInput) =>
-        commandSchema.IsVersionOptionAvailable && commandInput.IsVersionOptionSpecified;
-
     private async ValueTask PromptDebuggerAsync()
     {
         using (console.WithForegroundColor(ConsoleColor.Green))
@@ -119,30 +109,36 @@ public class CliApplication(
             commandSchema.GetValues(commandInstance)
         );
 
-        // Handle the help option
-        if (ShouldShowHelpText(commandSchema, commandInput))
-        {
-            console.WriteHelpText(helpContext);
-            return 0;
-        }
-
-        // Handle the version option
-        if (ShouldShowVersionText(commandSchema, commandInput))
-        {
-            console.WriteLine(Metadata.Version);
-            return 0;
-        }
-
         // Starting from this point, we may produce exceptions that are meant for the
         // end-user of the application (i.e. invalid input, command exception, etc).
         // Catch these exceptions here, print them to the console, and don't let them
         // propagate further.
         try
         {
-            // Bind and execute the command
+            // Bind the command input to the command instance
             _commandBinder.Bind(commandInput, commandSchema, commandInstance);
-            await commandInstance.ExecuteAsync(console);
 
+            // Handle the version option
+            if (commandInstance is ICommandWithVersionOption { IsVersionRequested: true })
+            {
+                console.WriteLine(Metadata.Version);
+                return 0;
+            }
+
+            // Handle the help option
+            if (
+                commandInstance
+                is ICommandWithHelpOption { IsHelpRequested: true }
+                    // Fallback default command always shows help, even if the option is not specified
+                    or FallbackDefaultCommand
+            )
+            {
+                console.WriteHelpText(helpContext);
+                return 0;
+            }
+
+            // Execute the command
+            await commandInstance.ExecuteAsync(console);
             return 0;
         }
         catch (CliFxException ex)
