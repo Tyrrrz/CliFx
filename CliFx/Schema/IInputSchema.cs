@@ -9,20 +9,9 @@ namespace CliFx.Schema;
 public interface IInputSchema
 {
     /// <summary>
-    /// Information about the property that this input is bound to.
+    /// Describes the binding of this input to a CLR property.
     /// </summary>
-    PropertyDescriptor Property { get; }
-
-    /// <summary>
-    /// Whether this input is a scalar (single value) or a sequence (multiple values).
-    /// </summary>
-    bool IsScalar { get; }
-
-    /// <summary>
-    /// Valid values for this input, if applicable.
-    /// If the input does not have a predefined set of valid values, this property is <c>null</c>.
-    /// </summary>
-    IReadOnlyList<object?>? ValidValues { get; }
+    PropertyBinding Property { get; }
 
     /// <summary>
     /// Optional binding converter for this input.

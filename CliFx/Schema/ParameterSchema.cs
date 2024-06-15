@@ -7,7 +7,7 @@ namespace CliFx.Schema;
 /// Describes a command's parameter.
 /// </summary>
 public class ParameterSchema(
-    PropertyDescriptor property,
+    PropertyBinding property,
     bool isScalar,
     IReadOnlyList<object?>? validValues,
     int order,
@@ -19,7 +19,7 @@ public class ParameterSchema(
 ) : IInputSchema
 {
     /// <inheritdoc />
-    public PropertyDescriptor Property { get; } = property;
+    public PropertyBinding Property { get; } = property;
 
     /// <inheritdoc />
     public bool IsScalar { get; } = isScalar;

@@ -9,7 +9,7 @@ namespace CliFx.Schema;
 /// Describes a command's option.
 /// </summary>
 public class OptionSchema(
-    PropertyDescriptor property,
+    PropertyBinding property,
     bool isScalar,
     IReadOnlyList<object?>? validValues,
     string? name,
@@ -22,7 +22,7 @@ public class OptionSchema(
 ) : IInputSchema
 {
     /// <inheritdoc />
-    public PropertyDescriptor Property { get; } = property;
+    public PropertyBinding Property { get; } = property;
 
     /// <inheritdoc />
     public bool IsScalar { get; } = isScalar;

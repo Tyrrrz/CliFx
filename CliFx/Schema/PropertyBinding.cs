@@ -1,24 +1,23 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CliFx.Schema;
 
 /// <summary>
 /// Describes a CLR property.
 /// </summary>
-public class PropertyDescriptor(
-    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces)]
-    Type type,
+public class PropertyBinding(
+    Type propertyType,
     Func<object, object?> getValue,
     Action<object, object?> setValue
-)
+    )
 {
     /// <summary>
-    /// Property's CLR type.
+    /// Underlying property type.
     /// </summary>
-    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces)]
-    public Type Type { get; } = type;
-
+    public Type PropertyType { get; } = propertyType;
+    
     /// <summary>
     /// Gets the current value of the property on the specified instance.
     /// </summary>
@@ -28,4 +27,12 @@ public class PropertyDescriptor(
     /// Sets the value of the property on the specified instance.
     /// </summary>
     public void SetValue(object instance, object? value) => setValue(instance, value);
+}
+
+internal static class PropertyBindingExtensions
+{
+    public static IReadOnlyList<object?>? TryGetValidValues(this PropertyBinding binding) =>
+        binding.PropertyType.IsEnum
+            ? binding.PropertyType.GetEnumValuesAsUnderlyingType().Cast<object?>().ToArray()
+            : null;
 }
