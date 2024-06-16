@@ -6,11 +6,13 @@ using System.Linq;
 namespace CliFx.Schema;
 
 /// <summary>
-/// Represents a CLR property binding.
+/// Represents a wrapper around a CLR property that provides read and write access to its value.
 /// </summary>
 public class PropertyBinding(
-    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces | DynamicallyAccessedMemberTypes.PublicMethods)]
-    Type type,
+    [DynamicallyAccessedMembers(
+        DynamicallyAccessedMemberTypes.Interfaces | DynamicallyAccessedMemberTypes.PublicMethods
+    )]
+        Type type,
     Func<object, object?> getValue,
     Action<object, object?> setValue
 )
@@ -18,7 +20,9 @@ public class PropertyBinding(
     /// <summary>
     /// Underlying CLR type of the property.
     /// </summary>
-    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces | DynamicallyAccessedMemberTypes.PublicMethods)]
+    [DynamicallyAccessedMembers(
+        DynamicallyAccessedMemberTypes.Interfaces | DynamicallyAccessedMemberTypes.PublicMethods
+    )]
     public Type Type { get; } = type;
 
     /// <summary>
@@ -27,7 +31,7 @@ public class PropertyBinding(
     public object? GetValue(object instance) => getValue(instance);
 
     /// <summary>
-    /// Sets the value of the property on the specified instance.
+    /// Sets the current value of the property on the specified instance.
     /// </summary>
     public void SetValue(object instance, object? value) => setValue(instance, value);
 
@@ -40,7 +44,7 @@ public class PropertyBinding(
             Type.GetEnumValuesAsUnderlyingType();
 #else
                 // AOT-compatible APIs are not available here, but it's unlikely
-                // someone will be AOT-compiling a net6.0 or older app anyway.
+                // that someone will be AOT-compiling a net6.0 or older app anyway.
                 Type.GetEnumValues();
 #endif
 

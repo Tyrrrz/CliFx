@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace CliFx.Schema;
 
 /// <summary>
-/// Describes an individual command, with its parameter and option bindings.
+/// Describes an individual command, along with its parameter and option inputs.
 /// </summary>
 public class CommandSchema(
     [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type,
@@ -27,7 +27,7 @@ public class CommandSchema(
     public string? Name { get; } = name;
 
     /// <summary>
-    /// Whether this command is the application's default command.
+    /// Whether the command is the application's default command.
     /// </summary>
     public bool IsDefault { get; } = string.IsNullOrWhiteSpace(name);
 
@@ -37,12 +37,12 @@ public class CommandSchema(
     public string? Description { get; } = description;
 
     /// <summary>
-    /// Command parameters.
+    /// Parameter inputs of the command.
     /// </summary>
     public IReadOnlyList<ParameterSchema> Parameters { get; } = parameters;
 
     /// <summary>
-    /// Command options.
+    /// Option inputs of the command.
     /// </summary>
     public IReadOnlyList<OptionSchema> Options { get; } = options;
 

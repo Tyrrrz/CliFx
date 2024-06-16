@@ -6,7 +6,7 @@ using CliFx.Extensibility;
 namespace CliFx.Schema;
 
 /// <summary>
-/// Describes an option binding of a command.
+/// Describes an option input of a command.
 /// </summary>
 public class OptionSchema(
     PropertyBinding property,

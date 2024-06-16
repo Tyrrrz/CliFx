@@ -4,7 +4,7 @@ using CliFx.Extensibility;
 namespace CliFx.Schema;
 
 /// <summary>
-/// Describes an input binding of a command.
+/// Describes an input of a command.
 /// </summary>
 public abstract class InputSchema(
     PropertyBinding property,
@@ -19,7 +19,7 @@ public abstract class InputSchema(
     public PropertyBinding Property { get; } = property;
 
     /// <summary>
-    /// Whether this input can accept more than one value.
+    /// Whether the input can accept more than one value.
     /// </summary>
     public bool IsSequence { get; } = isSequence;
 

@@ -308,7 +308,8 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
     private void WriteDefaultValue(InputSchema schema)
     {
         var defaultValue = context.CommandDefaultValues.GetValueOrDefault(schema);
-        if (defaultValue is null) return;
+        if (defaultValue is null)
+            return;
 
         // Non-Scalar
         if (defaultValue is not string && defaultValue is IEnumerable defaultValues)

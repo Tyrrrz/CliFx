@@ -3,7 +3,7 @@
 namespace CliFx.Input;
 
 /// <summary>
-/// Describes the materialized input for an option of a command.
+/// Input provided by the means of an option.
 /// </summary>
 public class OptionInput(string identifier, IReadOnlyList<string> values)
 {
@@ -13,7 +13,7 @@ public class OptionInput(string identifier, IReadOnlyList<string> values)
     public string Identifier { get; } = identifier;
 
     /// <summary>
-    /// Provided option values.
+    /// Option value(s).
     /// </summary>
     public IReadOnlyList<string> Values { get; } = values;
 

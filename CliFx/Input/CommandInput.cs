@@ -6,7 +6,7 @@ using CliFx.Utils.Extensions;
 namespace CliFx.Input;
 
 /// <summary>
-/// Describes input for a command.
+/// Input provided by the user for a command.
 /// </summary>
 public partial class CommandInput(
     string? commandName,
@@ -16,29 +16,38 @@ public partial class CommandInput(
     IReadOnlyList<EnvironmentVariableInput> environmentVariables
 )
 {
+    /// <summary>
+    /// Name of the requested command.
+    /// </summary>
     public string? CommandName { get; } = commandName;
 
+    /// <summary>
+    /// Provided directives.
+    /// </summary>
     public IReadOnlyList<DirectiveInput> Directives { get; } = directives;
 
+    /// <summary>
+    /// Provided parameters.
+    /// </summary>
     public IReadOnlyList<ParameterInput> Parameters { get; } = parameters;
 
+    /// <summary>
+    /// Provided options.
+    /// </summary>
     public IReadOnlyList<OptionInput> Options { get; } = options;
 
+    /// <summary>
+    /// Provided environment variables.
+    /// </summary>
     public IReadOnlyList<EnvironmentVariableInput> EnvironmentVariables { get; } =
         environmentVariables;
 
-    public bool HasArguments =>
-        !string.IsNullOrWhiteSpace(CommandName)
-        || Directives.Any()
-        || Parameters.Any()
-        || Options.Any();
+    internal bool IsDebugDirectiveSpecified => Directives.Any(d => d.IsDebugDirective);
 
-    public bool IsDebugDirectiveSpecified => Directives.Any(d => d.IsDebugDirective);
-
-    public bool IsPreviewDirectiveSpecified => Directives.Any(d => d.IsPreviewDirective);
+    internal bool IsPreviewDirectiveSpecified => Directives.Any(d => d.IsPreviewDirective);
 }
 
-internal partial class CommandInput
+public partial class CommandInput
 {
     private static IReadOnlyList<DirectiveInput> ParseDirectives(
         IReadOnlyList<string> commandLineArguments,
@@ -126,7 +135,7 @@ internal partial class CommandInput
             if (isOptionIdentifier)
                 break;
 
-            result.Add(new ParameterInput(argument));
+            result.Add(new ParameterInput(index, argument));
         }
 
         return result;
@@ -188,7 +197,7 @@ internal partial class CommandInput
         return result;
     }
 
-    public static CommandInput Parse(
+    internal static CommandInput Parse(
         IReadOnlyList<string> commandLineArguments,
         IReadOnlyDictionary<string, string> environmentVariables,
         IReadOnlyList<string> availableCommandNames

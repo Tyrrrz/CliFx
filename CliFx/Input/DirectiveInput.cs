@@ -2,13 +2,19 @@
 
 namespace CliFx.Input;
 
+/// <summary>
+/// Input provided by the means of a directive.
+/// </summary>
 public class DirectiveInput(string name)
 {
+    /// <summary>
+    /// Directive name.
+    /// </summary>
     public string Name { get; } = name;
 
-    public bool IsDebugDirective =>
+    internal bool IsDebugDirective =>
         string.Equals(Name, "debug", StringComparison.OrdinalIgnoreCase);
 
-    public bool IsPreviewDirective =>
+    internal bool IsPreviewDirective =>
         string.Equals(Name, "preview", StringComparison.OrdinalIgnoreCase);
 }

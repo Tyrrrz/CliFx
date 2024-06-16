@@ -1,10 +1,15 @@
 ﻿namespace CliFx.Input;
 
 /// <summary>
-/// Describes the materialized input for a parameter of a command.
+/// Input provided by the means of a parameter.
 /// </summary>
-public class ParameterInput(string value)
+public class ParameterInput(int order, string value)
 {
+    /// <summary>
+    /// Parameter order.
+    /// </summary>
+    public int Order { get; } = order;
+
     /// <summary>
     /// Parameter value.
     /// </summary>
