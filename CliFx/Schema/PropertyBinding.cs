@@ -13,8 +13,8 @@ public class PropertyBinding(
         DynamicallyAccessedMemberTypes.Interfaces | DynamicallyAccessedMemberTypes.PublicMethods
     )]
         Type type,
-    Func<object, object?> getValue,
-    Action<object, object?> setValue
+    Func<object, object?> get,
+    Action<object, object?> set
 )
 {
     /// <summary>
@@ -28,12 +28,12 @@ public class PropertyBinding(
     /// <summary>
     /// Gets the current value of the property on the specified instance.
     /// </summary>
-    public object? GetValue(object instance) => getValue(instance);
+    public object? Get(object instance) => get(instance);
 
     /// <summary>
     /// Sets the current value of the property on the specified instance.
     /// </summary>
-    public void SetValue(object instance, object? value) => setValue(instance, value);
+    public void Set(object instance, object? value) => set(instance, value);
 
     internal IReadOnlyList<object?>? TryGetValidValues()
     {
@@ -54,3 +54,20 @@ public class PropertyBinding(
         return null;
     }
 }
+
+// Generic version of the type is used to simplify initialization from the source-generated code
+// and to enforce static references to all the types used in the binding.
+// The non-generic version is used internally by the framework when operating in a dynamic context.
+/// <inheritdoc cref="PropertyBinding" />
+public class PropertyBinding<
+    TObject,
+    [DynamicallyAccessedMembers(
+        DynamicallyAccessedMemberTypes.Interfaces | DynamicallyAccessedMemberTypes.PublicMethods
+    )]
+        TProperty
+>(Func<TObject, TProperty?> get, Action<TObject, TProperty?> set)
+    : PropertyBinding(
+        typeof(TProperty),
+        o => get((TObject)o),
+        (o, v) => set((TObject)o, (TProperty?)v)
+    );

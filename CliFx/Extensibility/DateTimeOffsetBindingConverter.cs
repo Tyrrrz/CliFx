@@ -5,8 +5,9 @@ namespace CliFx.Extensibility;
 /// <summary>
 /// Converter for binding inputs to properties of type <see cref="DateTimeOffset" />.
 /// </summary>
-public class DateTimeOffsetBindingConverter(IFormatProvider formatProvider) : BindingConverter<DateTimeOffset>
+public class DateTimeOffsetBindingConverter : BindingConverter<DateTimeOffset>
 {
     /// <inheritdoc />
-    public override DateTimeOffset Convert(string? rawValue) => DateTimeOffset.Parse(rawValue!, formatProvider);
+    public override DateTimeOffset Convert(string? rawValue, IFormatProvider? formatProvider) =>
+        DateTimeOffset.Parse(rawValue!, formatProvider);
 }

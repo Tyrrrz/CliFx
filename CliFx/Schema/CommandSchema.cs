@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace CliFx.Schema;
 
@@ -11,8 +12,7 @@ public class CommandSchema(
     [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type,
     string? name,
     string? description,
-    IReadOnlyList<ParameterSchema> parameters,
-    IReadOnlyList<OptionSchema> options
+    IReadOnlyList<InputSchema> inputs
 )
 {
     /// <summary>
@@ -37,14 +37,20 @@ public class CommandSchema(
     public string? Description { get; } = description;
 
     /// <summary>
+    /// Inputs (parameters and options) of the command.
+    /// </summary>
+    public IReadOnlyList<InputSchema> Inputs { get; } = inputs;
+
+    /// <summary>
     /// Parameter inputs of the command.
     /// </summary>
-    public IReadOnlyList<ParameterSchema> Parameters { get; } = parameters;
+    public IReadOnlyList<ParameterSchema> Parameters { get; } =
+        inputs.OfType<ParameterSchema>().ToArray();
 
     /// <summary>
     /// Option inputs of the command.
     /// </summary>
-    public IReadOnlyList<OptionSchema> Options { get; } = options;
+    public IReadOnlyList<OptionSchema> Options { get; } = inputs.OfType<OptionSchema>().ToArray();
 
     internal bool MatchesName(string? name) =>
         !string.IsNullOrWhiteSpace(Name)
@@ -57,16 +63,26 @@ public class CommandSchema(
 
         foreach (var parameterSchema in Parameters)
         {
-            var value = parameterSchema.Property.GetValue(instance);
+            var value = parameterSchema.Property.Get(instance);
             result[parameterSchema] = value;
         }
 
         foreach (var optionSchema in Options)
         {
-            var value = optionSchema.Property.GetValue(instance);
+            var value = optionSchema.Property.Get(instance);
             result[optionSchema] = value;
         }
 
         return result;
     }
 }
+
+// Generic version of the type is used to simplify initialization from the source-generated code
+// and to enforce static references to all the types used in the binding.
+// The non-generic version is used internally by the framework when operating in a dynamic context.
+/// <inheritdoc cref="CommandSchema" />
+public class CommandSchema<
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TCommand
+>(string? name, string? description, IReadOnlyList<InputSchema> inputs)
+    : CommandSchema(typeof(TCommand), name, description, inputs)
+    where TCommand : ICommand;

@@ -1,4 +1,6 @@
-﻿namespace CliFx.Extensibility;
+﻿using System;
+
+namespace CliFx.Extensibility;
 
 /// <summary>
 /// Defines a custom conversion for binding command-line arguments to command inputs.
@@ -11,5 +13,5 @@ public interface IBindingConverter
     /// <summary>
     /// Parses the value from a raw command-line argument.
     /// </summary>
-    object? Convert(string? rawValue);
+    object? Convert(string? rawValue, IFormatProvider? formatProvider);
 }

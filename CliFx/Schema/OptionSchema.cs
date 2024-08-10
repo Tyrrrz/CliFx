@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using CliFx.Extensibility;
 
@@ -10,15 +11,14 @@ namespace CliFx.Schema;
 /// </summary>
 public class OptionSchema(
     PropertyBinding property,
-    bool isSequence,
     string? name,
     char? shortName,
     string? environmentVariable,
     bool isRequired,
     string? description,
-    IBindingConverter? converter,
+    IBindingConverter converter,
     IReadOnlyList<IBindingValidator> validators
-) : InputSchema(property, isSequence, converter, validators)
+) : InputSchema(property, converter, validators)
 {
     /// <summary>
     /// Option name.
@@ -84,3 +84,35 @@ public class OptionSchema(
         return buffer.ToString();
     }
 }
+
+// Generic version of the type is used to simplify initialization from the source-generated code
+// and to enforce static references to all the types used in the binding.
+// The non-generic version is used internally by the framework when operating in a dynamic context.
+/// <inheritdoc cref="OptionSchema" />
+public class OptionSchema<
+    TCommand,
+    [DynamicallyAccessedMembers(
+        DynamicallyAccessedMemberTypes.Interfaces | DynamicallyAccessedMemberTypes.PublicMethods
+    )]
+        TProperty
+>(
+    PropertyBinding<TCommand, TProperty> property,
+    string? name,
+    char? shortName,
+    string? environmentVariable,
+    bool isRequired,
+    string? description,
+    BindingConverter<TProperty> converter,
+    IReadOnlyList<BindingValidator<TProperty>> validators
+)
+    : OptionSchema(
+        property,
+        name,
+        shortName,
+        environmentVariable,
+        isRequired,
+        description,
+        converter,
+        validators
+    )
+    where TCommand : ICommand;

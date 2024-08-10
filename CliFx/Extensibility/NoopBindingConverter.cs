@@ -1,4 +1,6 @@
-﻿namespace CliFx.Extensibility;
+﻿using System;
+
+namespace CliFx.Extensibility;
 
 /// <summary>
 /// Converter for binding inputs to properties without any conversion.
@@ -6,5 +8,5 @@
 public class NoopBindingConverter : IBindingConverter
 {
     /// <inheritdoc />
-    public object? Convert(string? rawValue) => rawValue;
+    public object? Convert(string? rawValue, IFormatProvider? formatProvider) => rawValue;
 }

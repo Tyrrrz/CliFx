@@ -10,7 +10,10 @@ namespace CliFx;
 // Fallback command used when the application doesn't have one configured.
 // This command is only used as a stub for help text.
 [Command]
-internal partial class FallbackDefaultCommand : IBindableCommand, ICommandWithHelpOption, ICommandWithVersionOption
+internal partial class FallbackDefaultCommand
+    : IBindableCommand,
+        ICommandWithHelpOption,
+        ICommandWithVersionOption
 {
     [CommandHelpOption]
     public bool IsHelpRequested { get; init; }

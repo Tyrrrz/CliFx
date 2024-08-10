@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using CliFx.Extensibility;
 
 namespace CliFx.Schema;
@@ -8,14 +9,13 @@ namespace CliFx.Schema;
 /// </summary>
 public class ParameterSchema(
     PropertyBinding property,
-    bool isSequence,
     int order,
     string name,
     bool isRequired,
     string? description,
-    IBindingConverter? converter,
+    IBindingConverter converter,
     IReadOnlyList<IBindingValidator> validators
-) : InputSchema(property, isSequence, converter, validators)
+) : InputSchema(property, converter, validators)
 {
     /// <summary>
     /// Order, in which the parameter is bound from the command-line arguments.
@@ -39,3 +39,24 @@ public class ParameterSchema(
 
     internal string GetFormattedIdentifier() => IsSequence ? $"<{Name}>" : $"<{Name}...>";
 }
+
+// Generic version of the type is used to simplify initialization from the source-generated code
+// and to enforce static references to all the types used in the binding.
+// The non-generic version is used internally by the framework when operating in a dynamic context.
+/// <inheritdoc cref="ParameterSchema" />
+public class ParameterSchema<
+    TCommand,
+    [DynamicallyAccessedMembers(
+        DynamicallyAccessedMemberTypes.Interfaces | DynamicallyAccessedMemberTypes.PublicMethods
+    )]
+        TProperty
+>(
+    PropertyBinding<TCommand, TProperty> property,
+    int order,
+    string name,
+    bool isRequired,
+    string? description,
+    BindingConverter<TProperty> converter,
+    IReadOnlyList<BindingValidator<TProperty>> validators
+) : ParameterSchema(property, order, name, isRequired, description, converter, validators)
+    where TCommand : ICommand;

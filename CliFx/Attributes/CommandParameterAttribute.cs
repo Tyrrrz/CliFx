@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using CliFx.Extensibility;
 
 namespace CliFx.Attributes;
@@ -15,8 +16,9 @@ public class CommandParameterAttribute(int order) : Attribute
     /// </summary>
     /// <remarks>
     /// All parameters in a command must have unique order.
-    /// Parameter whose type is a non-scalar (e.g. array), must always be the last in order.
-    /// Only one non-scalar parameter is allowed in a command.
+    /// Parameter whose type is a sequence (e.g. Array, <see cref="List{T}" />; except <see cref="string" />),
+    /// must always be the last parameter based on order.
+    /// Only one sequential parameter is allowed in a command.
     /// </remarks>
     public int Order { get; } = order;
 

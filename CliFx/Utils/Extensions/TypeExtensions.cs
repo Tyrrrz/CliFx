@@ -31,7 +31,7 @@ internal static class TypeExtensions
             return type.GetGenericArguments().FirstOrDefault();
 
         return type.GetInterfaces()
-            .Select(TryGetEnumerableUnderlyingType)
+            .Select(t => TryGetEnumerableUnderlyingType(t))
             .Where(t => t is not null)
             // Every IEnumerable<T> implements IEnumerable (which is essentially IEnumerable<object>),
             // so we try to get a more specific underlying type. Still, if the type only implements
