@@ -9,13 +9,13 @@ using CliFx.Utils.Extensions;
 namespace CliFx.Schema;
 
 /// <summary>
-/// Describes an individual command, along with its parameter and option inputs.
+/// Describes an individual command, along with its inputs.
 /// </summary>
 public class CommandSchema(
     [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type,
     string? name,
     string? description,
-    IReadOnlyList<InputSchema> inputs
+    IReadOnlyList<CommandInputSchema> inputs
 )
 {
     /// <summary>
@@ -40,29 +40,29 @@ public class CommandSchema(
     public string? Description { get; } = description;
 
     /// <summary>
-    /// Inputs (parameters and options) of the command.
+    /// Command inputs.
     /// </summary>
-    public IReadOnlyList<InputSchema> Inputs { get; } = inputs;
+    public IReadOnlyList<CommandInputSchema> Inputs { get; } = inputs;
 
     /// <summary>
     /// Parameter inputs of the command.
     /// </summary>
-    public IReadOnlyList<ParameterSchema> Parameters { get; } =
-        inputs.OfType<ParameterSchema>().ToArray();
+    public IReadOnlyList<CommandParameterSchema> Parameters { get; } =
+        inputs.OfType<CommandParameterSchema>().ToArray();
 
     /// <summary>
     /// Option inputs of the command.
     /// </summary>
-    public IReadOnlyList<OptionSchema> Options { get; } = inputs.OfType<OptionSchema>().ToArray();
+    public IReadOnlyList<CommandOptionSchema> Options { get; } = inputs.OfType<CommandOptionSchema>().ToArray();
 
     internal bool MatchesName(string? name) =>
         !string.IsNullOrWhiteSpace(Name)
             ? string.Equals(name, Name, StringComparison.OrdinalIgnoreCase)
             : string.IsNullOrWhiteSpace(name);
 
-    internal IReadOnlyDictionary<InputSchema, object?> GetValues(ICommand instance)
+    internal IReadOnlyDictionary<CommandInputSchema, object?> GetValues(ICommand instance)
     {
-        var result = new Dictionary<InputSchema, object?>();
+        var result = new Dictionary<CommandInputSchema, object?>();
 
         foreach (var parameterSchema in Parameters)
         {
@@ -135,7 +135,7 @@ public class CommandSchema(
                 $"""
                 Missing required parameter(s):
                 {remainingRequiredParameterSchemas
-                    .Select(p => p.GetFormattedIdentifier())
+                    .Select(p => p.FormattedIdentifier)
                     .JoinToString(" ")}
                 """
             );
@@ -208,7 +208,7 @@ public class CommandSchema(
                 $"""
                 Missing required option(s):
                 {remainingRequiredOptionSchemas
-                    .Select(o => o.GetFormattedIdentifier())
+                    .Select(o => o.FormattedIdentifier)
                     .JoinToString(", ")}
                 """
             );
@@ -222,12 +222,14 @@ public class CommandSchema(
     }
 }
 
-// Generic version of the type is used to simplify initialization from the source-generated code
-// and to enforce static references to all the types used in the binding.
-// The non-generic version is used internally by the framework when operating in a dynamic context.
 /// <inheritdoc cref="CommandSchema" />
+/// <remarks>
+/// Generic version of the type is used to simplify initialization from source-generated code and
+/// to enforce static references to all types used in the binding.
+/// The non-generic version is used internally by the framework when operating in a dynamic context.
+/// </remarks>
 public class CommandSchema<
     [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TCommand
->(string? name, string? description, IReadOnlyList<InputSchema> inputs)
+>(string? name, string? description, IReadOnlyList<CommandInputSchema> inputs)
     : CommandSchema(typeof(TCommand), name, description, inputs)
     where TCommand : ICommand;

@@ -7,7 +7,7 @@ namespace CliFx.Schema;
 /// <summary>
 /// Describes a parameter input of a command.
 /// </summary>
-public class ParameterSchema(
+public class CommandParameterSchema(
     PropertyBinding property,
     int order,
     string name,
@@ -15,8 +15,12 @@ public class ParameterSchema(
     string? description,
     IBindingConverter converter,
     IReadOnlyList<IBindingValidator> validators
-) : InputSchema(property, description, converter, validators)
+) : CommandInputSchema(property, description, converter, validators)
 {
+    internal override string Kind => "Parameter";
+
+    internal override string FormattedIdentifier => IsSequence ? $"<{Name}>" : $"<{Name}...>";
+
     /// <summary>
     /// Order, in which the parameter is bound from the command-line arguments.
     /// </summary>
@@ -31,17 +35,15 @@ public class ParameterSchema(
     /// Whether the parameter is required.
     /// </summary>
     public bool IsRequired { get; } = isRequired;
-
-    internal override string GetKind() => "Parameter";
-
-    internal override string GetFormattedIdentifier() => IsSequence ? $"<{Name}>" : $"<{Name}...>";
 }
 
-// Generic version of the type is used to simplify initialization from the source-generated code
-// and to enforce static references to all the types used in the binding.
-// The non-generic version is used internally by the framework when operating in a dynamic context.
-/// <inheritdoc cref="ParameterSchema" />
-public class ParameterSchema<
+/// <inheritdoc cref="CommandParameterSchema" />
+/// <remarks>
+/// Generic version of the type is used to simplify initialization from source-generated code and
+/// to enforce static references to all types used in the binding.
+/// The non-generic version is used internally by the framework when operating in a dynamic context.
+/// </remarks>
+public class CommandParameterSchema<
     TCommand,
     [DynamicallyAccessedMembers(
         DynamicallyAccessedMemberTypes.Interfaces | DynamicallyAccessedMemberTypes.PublicMethods
@@ -55,5 +57,5 @@ public class ParameterSchema<
     string? description,
     BindingConverter<TProperty> converter,
     IReadOnlyList<BindingValidator<TProperty>> validators
-) : ParameterSchema(property, order, name, isRequired, description, converter, validators)
+) : CommandParameterSchema(property, order, name, isRequired, description, converter, validators)
     where TCommand : ICommand;

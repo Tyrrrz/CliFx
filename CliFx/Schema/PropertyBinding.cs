@@ -55,10 +55,12 @@ public class PropertyBinding(
     }
 }
 
-// Generic version of the type is used to simplify initialization from the source-generated code
-// and to enforce static references to all the types used in the binding.
-// The non-generic version is used internally by the framework when operating in a dynamic context.
 /// <inheritdoc cref="PropertyBinding" />
+/// <remarks>
+/// Generic version of the type is used to simplify initialization from source-generated code and
+/// to enforce static references to all types used in the binding.
+/// The non-generic version is used internally by the framework when operating in a dynamic context.
+/// </remarks>
 public class PropertyBinding<
     TObject,
     [DynamicallyAccessedMembers(

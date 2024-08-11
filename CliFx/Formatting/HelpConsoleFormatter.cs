@@ -305,7 +305,7 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
         }
     }
 
-    private void WriteDefaultValue(InputSchema schema)
+    private void WriteDefaultValue(CommandInputSchema schema)
     {
         var defaultValue = context.CommandDefaultValues.GetValueOrDefault(schema);
         if (defaultValue is null)
