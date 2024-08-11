@@ -5,7 +5,7 @@ using CliFx.Exceptions;
 namespace CliFx.Infrastructure;
 
 /// <summary>
-/// Abstraction for a service that can instantiate objects at runtime.
+/// Abstraction for a service that can instantiate objects at run-time.
 /// </summary>
 public interface ITypeActivator
 {
