@@ -97,7 +97,7 @@ public class CliApplication(
         var commandInstance =
             commandSchema == FallbackDefaultCommand.Schema
                 ? new FallbackDefaultCommand() // bypass the activator
-                : typeActivator.CreateInstance<IBindableCommand>(commandSchema.Type);
+                : typeActivator.CreateInstance<ICommand>(commandSchema.Type);
 
         // Assemble the help context
         var helpContext = new HelpContext(
@@ -113,8 +113,8 @@ public class CliApplication(
         // propagate further.
         try
         {
-            // Bind the command input to the command instance
-            commandInstance.Bind(commandInput);
+            // Activate the command instance with the provided input
+            commandSchema.Activate(commandInput, commandInstance);
 
             // Handle the version option
             if (commandInstance is ICommandWithVersionOption { IsVersionRequested: true })

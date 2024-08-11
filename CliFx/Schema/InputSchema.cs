@@ -28,32 +28,31 @@ public abstract class InputSchema(
     public PropertyBinding Property { get; } = property;
 
     /// <summary>
-    /// Optional binding converter for this input.
+    /// Binding converter used for this input.
     /// </summary>
     public IBindingConverter Converter { get; } = converter;
 
     /// <summary>
-    /// Optional binding validator(s) for this input.
+    /// Binding validator(s) used for this input.
     /// </summary>
     public IReadOnlyList<IBindingValidator> Validators { get; } = validators;
 
-    internal void Validate(object? value)
+    internal abstract string GetKind();
+
+    internal abstract string GetFormattedIdentifier();
+
+    private void Validate(object? value)
     {
-        var errors = new List<BindingValidationError>();
-
-        foreach (var validator in validators)
-        {
-            var error = validator.Validate(value);
-
-            if (error is not null)
-                errors.Add(error);
-        }
+        var errors = Validators
+            .Select(validator => validator.Validate(value))
+            .OfType<BindingValidationError>()
+            .ToArray();
 
         if (errors.Any())
         {
             throw CliFxException.UserError(
                 $"""
-                {memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} has been provided with an invalid value.
+                {GetKind()} {GetFormattedIdentifier()} has been provided with an invalid value.
                 Error(s):
                 {errors.Select(e => "- " + e.Message).JoinToString(Environment.NewLine)}
                 """
@@ -61,34 +60,48 @@ public abstract class InputSchema(
         }
     }
 
-    internal void Set(ICommand command, IReadOnlyList<string?> rawInputs)
+    internal void Activate(ICommand instance, IReadOnlyList<string?> rawInputs)
     {
         var formatProvider = CultureInfo.InvariantCulture;
 
-        // Multiple values expected, single or multiple values provided
-        if (IsSequence)
+        try
         {
-            var value = rawInputs.Select(v => Converter.Convert(v, formatProvider)).ToArray();
-            Validate(value);
+            // Multiple values expected, single or multiple values provided
+            if (IsSequence)
+            {
+                var value = rawInputs.Select(v => Converter.Convert(v, formatProvider)).ToArray();
+                Validate(value);
 
-            Property.Set(command, value);
-        }
-        // Single value expected, single value provided
-        else if (rawInputs.Count <= 1)
-        {
-            var value = Converter.Convert(rawInputs.SingleOrDefault(), formatProvider);
-            Validate(value);
+                Property.SetValue(instance, value);
+            }
+            // Single value expected, single value provided
+            else if (rawInputs.Count <= 1)
+            {
+                var value = Converter.Convert(rawInputs.SingleOrDefault(), formatProvider);
+                Validate(value);
 
-            Property.Set(command, value);
+                Property.SetValue(instance, value);
+            }
+            // Single value expected, multiple values provided
+            else
+            {
+                throw CliFxException.UserError(
+                    $"""
+                     {GetKind()} {GetFormattedIdentifier()} expects a single argument, but provided with multiple:
+                     {rawInputs.Select(v => '<' + v + '>').JoinToString(" ")}
+                     """
+                );
+            }
         }
-        // Single value expected, multiple values provided
-        else
+        catch (Exception ex) when (ex is not CliFxException) // don't wrap CliFxException
         {
             throw CliFxException.UserError(
                 $"""
-                {memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} expects a single argument, but provided with multiple:
-                {rawInputs.Select(v => '<' + v + '>').JoinToString(" ")}
-                """
+                 {GetKind()} {GetFormattedIdentifier()} cannot be set from the provided argument(s):
+                 {rawInputs.Select(v => '<' + v + '>').JoinToString(" ")}
+                 Error: {ex.Message}
+                 """,
+                ex
             );
         }
     }

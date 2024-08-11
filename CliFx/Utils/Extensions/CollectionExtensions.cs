@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -12,16 +11,6 @@ internal static class CollectionExtensions
         var i = 0;
         foreach (var o in source)
             yield return (o, i++);
-    }
-
-    public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T?> source)
-        where T : class
-    {
-        foreach (var i in source)
-        {
-            if (i is not null)
-                yield return i;
-        }
     }
 
     public static IEnumerable<string> WhereNotNullOrWhiteSpace(this IEnumerable<string?> source)
@@ -47,14 +36,4 @@ internal static class CollectionExtensions
         dictionary
             .Cast<DictionaryEntry>()
             .ToDictionary(entry => (TKey)entry.Key, entry => (TValue)entry.Value!, comparer);
-
-    public static Array ToNonGenericArray<T>(this IEnumerable<T> source, Type elementType)
-    {
-        var sourceAsCollection = source as ICollection ?? source.ToArray();
-
-        var array = Array.CreateInstance(elementType, sourceAsCollection.Count);
-        sourceAsCollection.CopyTo(array, 0);
-
-        return array;
-    }
 }

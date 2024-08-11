@@ -3,20 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Reflection;
 
 namespace CliFx.Utils.Extensions;
 
 internal static class TypeExtensions
 {
-    public static bool Implements(
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces)] this Type type,
-        Type interfaceType
-    ) => type.GetInterfaces().Contains(interfaceType);
-
-    public static Type? TryGetNullableUnderlyingType(this Type type) =>
-        Nullable.GetUnderlyingType(type);
-
     public static Type? TryGetEnumerableUnderlyingType(
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces)] this Type type
     )
@@ -39,23 +30,11 @@ internal static class TypeExtensions
             .MaxBy(t => t != typeof(object));
     }
 
-    public static MethodInfo? TryGetStaticParseMethod(
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] this Type type,
-        bool withFormatProvider = false
-    ) =>
-        type.GetMethod(
-            "Parse",
-            BindingFlags.Public | BindingFlags.Static,
-            null,
-            withFormatProvider ? [typeof(string), typeof(IFormatProvider)] : [typeof(string)],
-            null
-        );
-
     public static bool IsToStringOverriden(
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] this Type type
     )
     {
         var toStringMethod = type.GetMethod(nameof(ToString), Type.EmptyTypes);
-        return toStringMethod?.GetBaseDefinition()?.DeclaringType != toStringMethod?.DeclaringType;
+        return toStringMethod?.GetBaseDefinition().DeclaringType != toStringMethod?.DeclaringType;
     }
 }

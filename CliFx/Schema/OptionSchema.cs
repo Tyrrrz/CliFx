@@ -59,7 +59,9 @@ public class OptionSchema(
         !string.IsNullOrWhiteSpace(EnvironmentVariable)
         && string.Equals(EnvironmentVariable, environmentVariableName, StringComparison.Ordinal);
 
-    internal string GetFormattedIdentifier()
+    internal override string GetKind() => "Option";
+
+    internal override string GetFormattedIdentifier()
     {
         var buffer = new StringBuilder();
 

@@ -37,7 +37,9 @@ public class ParameterSchema(
     /// </summary>
     public string? Description { get; } = description;
 
-    internal string GetFormattedIdentifier() => IsSequence ? $"<{Name}>" : $"<{Name}...>";
+    internal override string GetKind() => "Parameter";
+
+    internal override string GetFormattedIdentifier() => IsSequence ? $"<{Name}>" : $"<{Name}...>";
 }
 
 // Generic version of the type is used to simplify initialization from the source-generated code
