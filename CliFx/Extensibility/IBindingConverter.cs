@@ -3,7 +3,7 @@
 namespace CliFx.Extensibility;
 
 /// <summary>
-/// Defines a custom conversion for binding command-line arguments to command inputs.
+/// Defines custom conversion logic for activating command inputs from the corresponding raw command-line arguments.
 /// </summary>
 /// <remarks>
 /// To implement your own converter, inherit from <see cref="BindingConverter{T}" /> instead.

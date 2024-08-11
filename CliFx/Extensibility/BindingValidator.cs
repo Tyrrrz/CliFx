@@ -1,7 +1,7 @@
 ﻿namespace CliFx.Extensibility;
 
 /// <summary>
-/// Base type for custom validators.
+/// Defines custom validation logic for activated command inputs.
 /// </summary>
 public abstract class BindingValidator<T> : IBindingValidator
 {
@@ -15,10 +15,7 @@ public abstract class BindingValidator<T> : IBindingValidator
     /// </summary>
     protected BindingValidationError Error(string message) => new(message);
 
-    /// <summary>
-    /// Validates the value bound to a parameter or an option.
-    /// Returns null if validation is successful, or an error in case of failure.
-    /// </summary>
+    /// <inheritdoc cref="IBindingValidator.Validate" />
     /// <remarks>
     /// You can use the utility methods <see cref="Ok" /> and <see cref="Error" /> to
     /// create an appropriate result.

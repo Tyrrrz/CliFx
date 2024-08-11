@@ -40,7 +40,7 @@ public partial class CliFxException
         Exception? innerException = null
     ) => new(message, DefaultExitCode, false, innerException);
 
-    // User errors are typically caused by invalid input and they're meant for the end-user,
+    // User errors are typically caused by invalid input and are meant for the end-user,
     // so we want to show help.
     internal static CliFxException UserError(string message, Exception? innerException = null) =>
         new(message, DefaultExitCode, true, innerException);
