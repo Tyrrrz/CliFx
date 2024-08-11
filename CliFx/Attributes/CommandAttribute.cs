@@ -4,29 +4,21 @@ namespace CliFx.Attributes;
 
 /// <summary>
 /// Annotates a type that defines a command.
+/// If a command is named, then the user must provide its name through the command-line arguments in order to execute it.
+/// If a command is not named, then it is treated as the application's default command and is executed when no other
+/// command is specified.
 /// </summary>
+/// <remarks>
+/// Only one default command is allowed per application.
+/// All commands registered in an application must have unique names (comparison IS NOT case-sensitive).
+/// </remarks>
 [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-public class CommandAttribute : Attribute
+public class CommandAttribute(string? name = null) : Attribute
 {
-    /// <summary>
-    /// Initializes an instance of <see cref="CommandAttribute" />.
-    /// </summary>
-    public CommandAttribute(string name) => Name = name;
-
-    /// <summary>
-    /// Initializes an instance of <see cref="CommandAttribute" />.
-    /// </summary>
-    public CommandAttribute() { }
-
     /// <summary>
     /// Command name.
     /// </summary>
-    /// <remarks>
-    /// Command can have no name, in which case it's treated as the application's default command.
-    /// Only one default command is allowed in an application.
-    /// All commands registered in an application must have unique names (comparison IS NOT case-sensitive).
-    /// </remarks>
-    public string? Name { get; }
+    public string? Name { get; } = name;
 
     /// <summary>
     /// Command description.

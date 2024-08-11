@@ -14,6 +14,7 @@ namespace CliFx.Schema;
 /// </summary>
 public abstract class InputSchema(
     PropertyBinding property,
+    string? description,
     IBindingConverter converter,
     IReadOnlyList<IBindingValidator> validators
 )
@@ -21,6 +22,11 @@ public abstract class InputSchema(
     internal bool IsSequence { get; } =
         property.Type != typeof(string)
         && property.Type.TryGetEnumerableUnderlyingType() is not null;
+
+    /// <summary>
+    /// Input description, used in the help text.
+    /// </summary>
+    public string? Description { get; } = description;
 
     /// <summary>
     /// CLR property to which this input is bound.
@@ -119,7 +125,8 @@ public abstract class InputSchema<
         TProperty
 >(
     PropertyBinding<TCommand, TProperty> property,
+    string? description,
     BindingConverter<TProperty> converter,
     IReadOnlyList<BindingValidator<TProperty>> validators
-) : InputSchema(property, converter, validators)
+) : InputSchema(property, description, converter, validators)
     where TCommand : ICommand;

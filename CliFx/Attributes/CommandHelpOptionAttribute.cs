@@ -1,8 +1,11 @@
 ﻿namespace CliFx.Attributes;
 
 /// <summary>
-/// Annotates a property that defines the help option for a command.
+/// Binds a property to the help option of a command.
 /// </summary>
+/// <remarks>
+/// This attribute is applied automatically by the framework and should not be used explicitly.
+/// </remarks>
 public class CommandHelpOptionAttribute : CommandOptionAttribute
 {
     /// <summary>

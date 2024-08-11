@@ -4,10 +4,13 @@ using CliFx.Extensibility;
 namespace CliFx.Attributes;
 
 /// <summary>
-/// Annotates a property that defines a command option.
+/// Binds a property to a command option — a command-line input that is identified by a name and/or a short name.
 /// </summary>
+/// <remarks>
+/// All options in a command must have unique names (comparison IS NOT case-sensitive) and short names (comparison IS case-sensitive).
+/// </remarks>
 [AttributeUsage(AttributeTargets.Property)]
-public class CommandOptionAttribute : Attribute
+public class CommandOptionAttribute : CommandInputAttribute
 {
     /// <summary>
     /// Initializes an instance of <see cref="CommandOptionAttribute" />.
@@ -39,20 +42,11 @@ public class CommandOptionAttribute : Attribute
     /// <summary>
     /// Option name.
     /// </summary>
-    /// <remarks>
-    /// Must contain at least two characters and start with a letter.
-    /// Either <see cref="Name" /> or <see cref="ShortName" /> must be set.
-    /// All options in a command must have unique names (comparison IS NOT case-sensitive).
-    /// </remarks>
     public string? Name { get; }
 
     /// <summary>
     /// Option short name.
     /// </summary>
-    /// <remarks>
-    /// Either <see cref="Name" /> or <see cref="ShortName" /> must be set.
-    /// All options in a command must have unique short names (comparison IS case-sensitive).
-    /// </remarks>
     public char? ShortName { get; }
 
     /// <summary>
@@ -70,28 +64,4 @@ public class CommandOptionAttribute : Attribute
     /// has not been explicitly set through command-line arguments.
     /// </summary>
     public string? EnvironmentVariable { get; set; }
-
-    /// <summary>
-    /// Option description.
-    /// This is shown to the user in the help text.
-    /// </summary>
-    public string? Description { get; set; }
-
-    /// <summary>
-    /// Custom converter used for mapping the raw command-line argument into
-    /// a value expected by the underlying property.
-    /// </summary>
-    /// <remarks>
-    /// Converter must derive from <see cref="BindingConverter{T}" />.
-    /// </remarks>
-    public Type? Converter { get; set; }
-
-    /// <summary>
-    /// Custom validators used for verifying the value of the underlying
-    /// property, after it has been bound.
-    /// </summary>
-    /// <remarks>
-    /// Validators must derive from <see cref="BindingValidator{T}" />.
-    /// </remarks>
-    public Type[] Validators { get; set; } = Array.Empty<Type>();
 }

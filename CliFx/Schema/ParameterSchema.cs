@@ -15,7 +15,7 @@ public class ParameterSchema(
     string? description,
     IBindingConverter converter,
     IReadOnlyList<IBindingValidator> validators
-) : InputSchema(property, converter, validators)
+) : InputSchema(property, description, converter, validators)
 {
     /// <summary>
     /// Order, in which the parameter is bound from the command-line arguments.
@@ -31,11 +31,6 @@ public class ParameterSchema(
     /// Whether the parameter is required.
     /// </summary>
     public bool IsRequired { get; } = isRequired;
-
-    /// <summary>
-    /// Parameter description.
-    /// </summary>
-    public string? Description { get; } = description;
 
     internal override string GetKind() => "Parameter";
 

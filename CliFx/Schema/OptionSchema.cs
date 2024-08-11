@@ -18,7 +18,7 @@ public class OptionSchema(
     string? description,
     IBindingConverter converter,
     IReadOnlyList<IBindingValidator> validators
-) : InputSchema(property, converter, validators)
+) : InputSchema(property,description, converter, validators)
 {
     /// <summary>
     /// Option name.
@@ -39,11 +39,6 @@ public class OptionSchema(
     /// Whether the option is required.
     /// </summary>
     public bool IsRequired { get; } = isRequired;
-
-    /// <summary>
-    /// Option description.
-    /// </summary>
-    public string? Description { get; } = description;
 
     internal bool MatchesName(string? name) =>
         !string.IsNullOrWhiteSpace(Name)
