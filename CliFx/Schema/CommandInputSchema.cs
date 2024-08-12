@@ -23,6 +23,11 @@ public abstract class CommandInputSchema(
 
     internal abstract string FormattedIdentifier { get; }
 
+    /// <summary>
+    /// CLR property to which this input is bound.
+    /// </summary>
+    public PropertyBinding Property { get; } = property;
+
     internal bool IsSequence { get; } =
         property.Type != typeof(string)
         && property.Type.TryGetEnumerableUnderlyingType() is not null;
@@ -31,11 +36,6 @@ public abstract class CommandInputSchema(
     /// Input description, used in the help text.
     /// </summary>
     public string? Description { get; } = description;
-
-    /// <summary>
-    /// CLR property to which this input is bound.
-    /// </summary>
-    public PropertyBinding Property { get; } = property;
 
     /// <summary>
     /// Binding converter used for this input.
