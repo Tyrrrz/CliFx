@@ -32,7 +32,7 @@ public class ApplicationSchema(IReadOnlyList<CommandSchema> commands)
 
         foreach (var potentialDescendantCommand in potentialDescendantCommands)
         {
-            // Default commands can't be descendant of anything
+            // Default commands can't be descendants of anything
             if (string.IsNullOrWhiteSpace(potentialDescendantCommand.Name))
                 continue;
 

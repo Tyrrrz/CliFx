@@ -36,7 +36,7 @@ internal class CommandInputConsoleFormatter(ConsoleWriter consoleWriter)
             Write('[');
 
             // Identifier
-            Write(ConsoleColor.White, optionInput.GetFormattedIdentifier());
+            Write(ConsoleColor.White, optionInput.FormattedIdentifier);
 
             // Value(s)
             foreach (var value in optionInput.Values)

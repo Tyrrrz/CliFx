@@ -26,12 +26,27 @@ public partial class CliApplicationBuilder
     private IConsole? _console;
     private ITypeActivator? _typeActivator;
 
+    // TODO:
+    // The source generator should generate an internal extension method for the builder called
+    // AddCommandsFromThisAssembly() that would add all command types from the assembly where the builder is used.
+
     /// <summary>
     /// Adds a command to the application.
     /// </summary>
     public CliApplicationBuilder AddCommand(CommandSchema commandSchema)
     {
         _commandSchemas.Add(commandSchema);
+        return this;
+    }
+
+    /// <summary>
+    /// Adds multiple commands to the application.
+    /// </summary>
+    public CliApplicationBuilder AddCommands(IReadOnlyList<CommandSchema> commandSchemas)
+    {
+        foreach (var commandSchema in commandSchemas)
+            AddCommand(commandSchema);
+
         return this;
     }
 

@@ -6,7 +6,7 @@ using System.Linq;
 namespace CliFx.Schema;
 
 /// <summary>
-/// Represents a wrapper around a CLR property that provides read and write access to its value.
+/// Provides read and write access to a CLR property.
 /// </summary>
 public class PropertyBinding(
     [DynamicallyAccessedMembers(

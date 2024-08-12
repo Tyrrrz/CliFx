@@ -3,7 +3,7 @@
 /// <summary>
 /// Input provided by the means of a parameter.
 /// </summary>
-public class ParameterInput(int order, string value)
+public class CommandParameterInput(int order, string value)
 {
     /// <summary>
     /// Parameter order.

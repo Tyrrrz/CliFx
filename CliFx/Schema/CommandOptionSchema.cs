@@ -18,7 +18,7 @@ public class CommandOptionSchema(
     string? description,
     IBindingConverter converter,
     IReadOnlyList<IBindingValidator> validators
-) : CommandInputSchema(property,description, converter, validators)
+) : CommandInputSchema(property, description, converter, validators)
 {
     internal override string Kind => "Option";
 

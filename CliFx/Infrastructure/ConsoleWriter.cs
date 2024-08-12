@@ -8,11 +8,11 @@ using CliFx.Utils;
 namespace CliFx.Infrastructure;
 
 /// <summary>
-/// Implements a <see cref="TextWriter" /> for writing characters to a console stream.
+/// Implements a <see cref="TextWriter" /> for writing characters or binary data to a console stream.
 /// </summary>
 // Both the underlying stream AND the stream writer must be synchronized!
 // https://github.com/Tyrrrz/CliFx/issues/123
-public class ConsoleWriter : StreamWriter
+public sealed class ConsoleWriter : StreamWriter
 {
     /// <summary>
     /// Initializes an instance of <see cref="ConsoleWriter" />.

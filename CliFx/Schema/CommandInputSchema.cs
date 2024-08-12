@@ -66,7 +66,7 @@ public abstract class CommandInputSchema(
         }
     }
 
-    internal void Activate(ICommand instance, IReadOnlyList<string?> rawInputs)
+    internal void Activate(ICommand instance, IReadOnlyList<string?> rawArguments)
     {
         var formatProvider = CultureInfo.InvariantCulture;
 
@@ -75,15 +75,20 @@ public abstract class CommandInputSchema(
             // Multiple values expected, single or multiple values provided
             if (IsSequence)
             {
-                var value = rawInputs.Select(v => Converter.Convert(v, formatProvider)).ToArray();
+                var value = rawArguments
+                    .Select(v => Converter.Convert(v, formatProvider))
+                    .ToArray();
+
+                // TODO: cast array to the proper type
+
                 Validate(value);
 
                 Property.SetValue(instance, value);
             }
             // Single value expected, single value provided
-            else if (rawInputs.Count <= 1)
+            else if (rawArguments.Count <= 1)
             {
-                var value = Converter.Convert(rawInputs.SingleOrDefault(), formatProvider);
+                var value = Converter.Convert(rawArguments.SingleOrDefault(), formatProvider);
                 Validate(value);
 
                 Property.SetValue(instance, value);
@@ -93,9 +98,9 @@ public abstract class CommandInputSchema(
             {
                 throw CliFxException.UserError(
                     $"""
-                     {Kind} {FormattedIdentifier} expects a single argument, but provided with multiple:
-                     {rawInputs.Select(v => '<' + v + '>').JoinToString(" ")}
-                     """
+                    {Kind} {FormattedIdentifier} expects a single argument, but provided with multiple:
+                    {rawArguments.Select(v => '<' + v + '>').JoinToString(" ")}
+                    """
                 );
             }
         }
@@ -103,16 +108,17 @@ public abstract class CommandInputSchema(
         {
             throw CliFxException.UserError(
                 $"""
-                 {Kind} {FormattedIdentifier} cannot be set from the provided argument(s):
-                 {rawInputs.Select(v => '<' + v + '>').JoinToString(" ")}
-                 Error: {ex.Message}
-                 """,
+                {Kind} {FormattedIdentifier} cannot be set from the provided argument(s):
+                {rawArguments.Select(v => '<' + v + '>').JoinToString(" ")}
+                Error: {ex.Message}
+                """,
                 ex
             );
         }
     }
 
     /// <inheritdoc />
+    [ExcludeFromCodeCoverage]
     public override string ToString() => FormattedIdentifier;
 }
 

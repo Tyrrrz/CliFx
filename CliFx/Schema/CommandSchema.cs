@@ -53,7 +53,8 @@ public class CommandSchema(
     /// <summary>
     /// Option inputs of the command.
     /// </summary>
-    public IReadOnlyList<CommandOptionSchema> Options { get; } = inputs.OfType<CommandOptionSchema>().ToArray();
+    public IReadOnlyList<CommandOptionSchema> Options { get; } =
+        inputs.OfType<CommandOptionSchema>().ToArray();
 
     internal bool MatchesName(string? name) =>
         !string.IsNullOrWhiteSpace(Name)
@@ -79,7 +80,7 @@ public class CommandSchema(
         return result;
     }
 
-    private void ActivateParameters(CommandInput input, ICommand instance)
+    private void ActivateParameters(ICommand instance, CommandInput input)
     {
         // Ensure there are no unexpected parameters and that all parameters are provided
         var remainingParameterInputs = input.Parameters.ToList();
@@ -107,10 +108,7 @@ public class CommandSchema(
             {
                 var parameterInputs = input.Parameters.Skip(position).ToArray();
 
-                parameterSchema.Activate(
-                    instance,
-                    parameterInputs.Select(p => p.Value).ToArray()
-                );
+                parameterSchema.Activate(instance, parameterInputs.Select(p => p.Value).ToArray());
 
                 position += parameterInputs.Length;
                 remainingParameterInputs.RemoveRange(parameterInputs);
@@ -142,12 +140,11 @@ public class CommandSchema(
         }
     }
 
-    private void ActivateOptions(CommandInput input, ICommand instance)
+    private void ActivateOptions(ICommand instance, CommandInput input)
     {
         // Ensure there are no unrecognized options and that all required options are set
         var remainingOptionInputs = input.Options.ToList();
-        var remainingRequiredOptionSchemas = Options.Where(o => o.IsRequired)
-            .ToList();
+        var remainingRequiredOptionSchemas = Options.Where(o => o.IsRequired).ToList();
 
         foreach (var optionSchema in Options)
         {
@@ -197,7 +194,7 @@ public class CommandSchema(
             throw CliFxException.UserError(
                 $"""
                 Unrecognized option(s):
-                {remainingOptionInputs.Select(o => o.GetFormattedIdentifier()).JoinToString(", ")}
+                {remainingOptionInputs.Select(o => o.FormattedIdentifier).JoinToString(", ")}
                 """
             );
         }
@@ -215,11 +212,15 @@ public class CommandSchema(
         }
     }
 
-    internal void Activate(CommandInput input, ICommand instance)
+    internal void Activate(ICommand instance, CommandInput input)
     {
-        ActivateParameters(input, instance);
-        ActivateOptions(input, instance);
+        ActivateParameters(instance, input);
+        ActivateOptions(instance, input);
     }
+
+    /// <inheritdoc />
+    [ExcludeFromCodeCoverage]
+    public override string ToString() => Name ?? "<default>";
 }
 
 /// <inheritdoc cref="CommandSchema" />

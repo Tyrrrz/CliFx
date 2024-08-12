@@ -5,7 +5,7 @@ namespace CliFx.Input;
 /// <summary>
 /// Input provided by the means of a directive.
 /// </summary>
-public class DirectiveInput(string name)
+public class CommandDirectiveInput(string name)
 {
     /// <summary>
     /// Directive name.

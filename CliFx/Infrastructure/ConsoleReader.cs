@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 namespace CliFx.Infrastructure;
 
 /// <summary>
-/// Implements a <see cref="TextReader" /> for reading characters from a console stream.
+/// Implements a <see cref="TextReader" /> for reading characters or binary data from a console stream.
 /// </summary>
 // Both the underlying stream AND the stream reader must be synchronized!
 // https://github.com/Tyrrrz/CliFx/issues/123
-public class ConsoleReader(IConsole console, Stream stream, Encoding encoding)
+public sealed class ConsoleReader(IConsole console, Stream stream, Encoding encoding)
     : StreamReader(Stream.Synchronized(stream), encoding, false, 4096)
 {
     /// <summary>

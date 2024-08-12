@@ -114,7 +114,7 @@ public class CliApplication(
         try
         {
             // Activate the command instance with the provided input
-            commandSchema.Activate(commandInput, commandInstance);
+            commandSchema.Activate(commandInstance, commandInput);
 
             // Handle the version option
             if (commandInstance is ICommandWithVersionOption { IsVersionRequested: true })

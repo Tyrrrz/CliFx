@@ -10,9 +10,9 @@ namespace CliFx.Input;
 /// </summary>
 public partial class CommandInput(
     string? commandName,
-    IReadOnlyList<DirectiveInput> directives,
-    IReadOnlyList<ParameterInput> parameters,
-    IReadOnlyList<OptionInput> options,
+    IReadOnlyList<CommandDirectiveInput> directives,
+    IReadOnlyList<CommandParameterInput> parameters,
+    IReadOnlyList<CommandOptionInput> options,
     IReadOnlyList<EnvironmentVariableInput> environmentVariables
 )
 {
@@ -24,17 +24,17 @@ public partial class CommandInput(
     /// <summary>
     /// Provided directives.
     /// </summary>
-    public IReadOnlyList<DirectiveInput> Directives { get; } = directives;
+    public IReadOnlyList<CommandDirectiveInput> Directives { get; } = directives;
 
     /// <summary>
     /// Provided parameters.
     /// </summary>
-    public IReadOnlyList<ParameterInput> Parameters { get; } = parameters;
+    public IReadOnlyList<CommandParameterInput> Parameters { get; } = parameters;
 
     /// <summary>
     /// Provided options.
     /// </summary>
-    public IReadOnlyList<OptionInput> Options { get; } = options;
+    public IReadOnlyList<CommandOptionInput> Options { get; } = options;
 
     /// <summary>
     /// Provided environment variables.
@@ -49,12 +49,12 @@ public partial class CommandInput(
 
 public partial class CommandInput
 {
-    private static IReadOnlyList<DirectiveInput> ParseDirectives(
+    private static IReadOnlyList<CommandDirectiveInput> ParseDirectives(
         IReadOnlyList<string> commandLineArguments,
         ref int index
     )
     {
-        var result = new List<DirectiveInput>();
+        var result = new List<CommandDirectiveInput>();
 
         // Consume all consecutive directive arguments
         for (; index < commandLineArguments.Count; index++)
@@ -66,7 +66,7 @@ public partial class CommandInput
                 break;
 
             var directiveName = argument.Substring(1, argument.Length - 2);
-            result.Add(new DirectiveInput(directiveName));
+            result.Add(new CommandDirectiveInput(directiveName));
         }
 
         return result;
@@ -108,12 +108,12 @@ public partial class CommandInput
         return commandName;
     }
 
-    private static IReadOnlyList<ParameterInput> ParseParameters(
+    private static IReadOnlyList<CommandParameterInput> ParseParameters(
         IReadOnlyList<string> commandLineArguments,
         ref int index
     )
     {
-        var result = new List<ParameterInput>();
+        var result = new List<CommandParameterInput>();
 
         // Consume all arguments until the first option identifier
         for (; index < commandLineArguments.Count; index++)
@@ -135,18 +135,18 @@ public partial class CommandInput
             if (isOptionIdentifier)
                 break;
 
-            result.Add(new ParameterInput(index, argument));
+            result.Add(new CommandParameterInput(index, argument));
         }
 
         return result;
     }
 
-    private static IReadOnlyList<OptionInput> ParseOptions(
+    private static IReadOnlyList<CommandOptionInput> ParseOptions(
         IReadOnlyList<string> commandLineArguments,
         ref int index
     )
     {
-        var result = new List<OptionInput>();
+        var result = new List<CommandOptionInput>();
 
         var lastOptionIdentifier = default(string?);
         var lastOptionValues = new List<string>();
@@ -165,7 +165,7 @@ public partial class CommandInput
             {
                 // Flush previous
                 if (!string.IsNullOrWhiteSpace(lastOptionIdentifier))
-                    result.Add(new OptionInput(lastOptionIdentifier, lastOptionValues));
+                    result.Add(new CommandOptionInput(lastOptionIdentifier, lastOptionValues));
 
                 lastOptionIdentifier = argument[2..];
                 lastOptionValues = [];
@@ -177,7 +177,7 @@ public partial class CommandInput
                 {
                     // Flush previous
                     if (!string.IsNullOrWhiteSpace(lastOptionIdentifier))
-                        result.Add(new OptionInput(lastOptionIdentifier, lastOptionValues));
+                        result.Add(new CommandOptionInput(lastOptionIdentifier, lastOptionValues));
 
                     lastOptionIdentifier = identifier.AsString();
                     lastOptionValues = [];
@@ -192,7 +192,7 @@ public partial class CommandInput
 
         // Flush the last option
         if (!string.IsNullOrWhiteSpace(lastOptionIdentifier))
-            result.Add(new OptionInput(lastOptionIdentifier, lastOptionValues));
+            result.Add(new CommandOptionInput(lastOptionIdentifier, lastOptionValues));
 
         return result;
     }

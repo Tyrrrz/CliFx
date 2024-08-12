@@ -13,6 +13,16 @@ internal static class CollectionExtensions
             yield return (o, i++);
     }
 
+    public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T?> source)
+        where T : class
+    {
+        foreach (var i in source)
+        {
+            if (i is not null)
+                yield return i;
+        }
+    }
+
     public static IEnumerable<string> WhereNotNullOrWhiteSpace(this IEnumerable<string?> source)
     {
         foreach (var i in source)
