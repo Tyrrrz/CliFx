@@ -13,5 +13,5 @@ public interface IBindingConverter
     /// <summary>
     /// Parses the value from a raw command-line argument.
     /// </summary>
-    object? Convert(string? rawArgument, IFormatProvider? formatProvider);
+    object? Convert(string? rawValue, IFormatProvider? formatProvider);
 }

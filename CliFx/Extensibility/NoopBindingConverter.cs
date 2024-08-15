@@ -8,5 +8,5 @@ namespace CliFx.Extensibility;
 public class NoopBindingConverter : IBindingConverter
 {
     /// <inheritdoc />
-    public object? Convert(string? rawArgument, IFormatProvider? formatProvider) => rawArgument;
+    public object? Convert(string? rawValue, IFormatProvider? formatProvider) => rawValue;
 }

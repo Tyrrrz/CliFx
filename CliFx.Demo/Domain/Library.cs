@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace CliFx.Demo.Domain;
@@ -24,5 +23,5 @@ public partial record Library(IReadOnlyList<Book> Books)
 
 public partial record Library
 {
-    public static Library Empty { get; } = new(Array.Empty<Book>());
+    public static Library Empty { get; } = new([]);
 }

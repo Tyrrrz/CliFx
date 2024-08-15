@@ -8,6 +8,6 @@ namespace CliFx.Extensibility;
 public class BoolBindingConverter : BindingConverter<bool>
 {
     /// <inheritdoc />
-    public override bool Convert(string? rawArgument, IFormatProvider? formatProvider) =>
-        string.IsNullOrWhiteSpace(rawArgument) || bool.Parse(rawArgument);
+    public override bool Convert(string? rawValue, IFormatProvider? formatProvider) =>
+        string.IsNullOrWhiteSpace(rawValue) || bool.Parse(rawValue);
 }

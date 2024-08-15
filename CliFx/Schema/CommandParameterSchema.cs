@@ -27,7 +27,7 @@ public class CommandParameterSchema(
     public int Order { get; } = order;
 
     /// <summary>
-    /// Parameter name.
+    /// Parameter name, used in the help text.
     /// </summary>
     public string Name { get; } = name;
 

@@ -13,8 +13,8 @@ public class PropertyBinding(
         DynamicallyAccessedMemberTypes.Interfaces | DynamicallyAccessedMemberTypes.PublicMethods
     )]
         Type type,
-    Func<object, object?> getValue,
-    Action<object, object?> setValue
+    Func<object, object?> get,
+    Action<object, object?> set
 )
 {
     /// <summary>
@@ -28,12 +28,12 @@ public class PropertyBinding(
     /// <summary>
     /// Gets the current value of the property on the specified instance.
     /// </summary>
-    public object? GetValue(object instance) => getValue(instance);
+    public object? Get(object instance) => get(instance);
 
     /// <summary>
     /// Sets the current value of the property on the specified instance.
     /// </summary>
-    public void SetValue(object instance, object? value) => setValue(instance, value);
+    public void Set(object instance, object? value) => set(instance, value);
 
     internal IReadOnlyList<object?>? TryGetValidValues()
     {
@@ -67,9 +67,9 @@ public class PropertyBinding<
         DynamicallyAccessedMemberTypes.Interfaces | DynamicallyAccessedMemberTypes.PublicMethods
     )]
         TProperty
->(Func<TObject, TProperty?> getValue, Action<TObject, TProperty?> setValue)
+>(Func<TObject, TProperty?> get, Action<TObject, TProperty?> set)
     : PropertyBinding(
         typeof(TProperty),
-        o => getValue((TObject)o),
-        (o, v) => setValue((TObject)o, (TProperty?)v)
+        o => get((TObject)o),
+        (o, v) => set((TObject)o, (TProperty?)v)
     );

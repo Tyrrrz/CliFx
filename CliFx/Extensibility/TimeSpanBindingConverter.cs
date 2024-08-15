@@ -8,6 +8,6 @@ namespace CliFx.Extensibility;
 public class TimeSpanBindingConverter : BindingConverter<TimeSpan>
 {
     /// <inheritdoc />
-    public override TimeSpan Convert(string? rawArgument, IFormatProvider? formatProvider) =>
-        TimeSpan.Parse(rawArgument!, formatProvider);
+    public override TimeSpan Convert(string? rawValue, IFormatProvider? formatProvider) =>
+        TimeSpan.Parse(rawValue!, formatProvider);
 }

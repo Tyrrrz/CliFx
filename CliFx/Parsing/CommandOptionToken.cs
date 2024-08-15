@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
 
-namespace CliFx.Input;
+namespace CliFx.Parsing;
 
 /// <summary>
-/// Input provided by the means of an option.
+/// Command-line arguments that provide one or more values to an option input of a command.
 /// </summary>
-public class CommandOptionInput(string identifier, IReadOnlyList<string> values)
+public class CommandOptionToken(string identifier, IReadOnlyList<string> values)
 {
     /// <summary>
-    /// Option identifier (either the name or the short name).
+    /// Option identifier (either name or short name).
     /// </summary>
     public string Identifier { get; } = identifier;
 

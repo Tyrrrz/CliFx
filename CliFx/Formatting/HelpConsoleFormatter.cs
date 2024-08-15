@@ -20,13 +20,13 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
 
     private void WriteCommandInvocation()
     {
-        Write(context.ApplicationMetadata.ExecutableName);
+        Write(context.Metadata.ExecutableName);
 
         // Command name
-        if (!string.IsNullOrWhiteSpace(context.CommandSchema.Name))
+        if (!string.IsNullOrWhiteSpace(context.Command.Name))
         {
             Write(' ');
-            Write(ConsoleColor.Cyan, context.CommandSchema.Name);
+            Write(ConsoleColor.Cyan, context.Command.Name);
         }
     }
 
@@ -36,16 +36,16 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
             WriteVerticalMargin();
 
         // Title and version
-        Write(ConsoleColor.White, context.ApplicationMetadata.Title);
+        Write(ConsoleColor.White, context.Metadata.Title);
         Write(' ');
-        Write(ConsoleColor.Yellow, context.ApplicationMetadata.Version);
+        Write(ConsoleColor.Yellow, context.Metadata.Version);
         WriteLine();
 
         // Description
-        if (!string.IsNullOrWhiteSpace(context.ApplicationMetadata.Description))
+        if (!string.IsNullOrWhiteSpace(context.Metadata.Description))
         {
             WriteHorizontalMargin();
-            Write(context.ApplicationMetadata.Description);
+            Write(context.Metadata.Description);
             WriteLine();
         }
     }
@@ -65,7 +65,7 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
             Write(' ');
 
             // Parameters
-            foreach (var parameter in context.CommandSchema.Parameters.OrderBy(p => p.Order))
+            foreach (var parameter in context.Command.Parameters.OrderBy(p => p.Order))
             {
                 Write(
                     ConsoleColor.DarkCyan,
@@ -75,7 +75,7 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
             }
 
             // Required options
-            foreach (var option in context.CommandSchema.Options.Where(o => o.IsRequired))
+            foreach (var option in context.Command.Options.Where(o => o.IsRequired))
             {
                 Write(
                     ConsoleColor.Yellow,
@@ -90,7 +90,7 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
             }
 
             // Placeholder for non-required options
-            if (context.CommandSchema.Options.Any(o => !o.IsRequired))
+            if (context.Command.Options.Any(o => !o.IsRequired))
             {
                 Write(ConsoleColor.Yellow, "[options]");
             }
@@ -99,11 +99,9 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
         }
 
         // Child command usage
-        var childCommandSchemas = context.ApplicationSchema.GetChildCommands(
-            context.CommandSchema.Name
-        );
+        var childCommands = context.Application.GetChildCommands(context.Command.Name);
 
-        if (childCommandSchemas.Any())
+        if (childCommands.Any())
         {
             WriteHorizontalMargin();
 
@@ -123,7 +121,7 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
 
     private void WriteCommandDescription()
     {
-        if (string.IsNullOrWhiteSpace(context.CommandSchema.Description))
+        if (string.IsNullOrWhiteSpace(context.Command.Description))
             return;
 
         if (!IsEmpty)
@@ -133,13 +131,13 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
 
         WriteHorizontalMargin();
 
-        Write(context.CommandSchema.Description);
+        Write(context.Command.Description);
         WriteLine();
     }
 
     private void WriteCommandParameters()
     {
-        if (!context.CommandSchema.Parameters.Any())
+        if (!context.Command.Parameters.Any())
             return;
 
         if (!IsEmpty)
@@ -147,9 +145,9 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
 
         WriteHeader("Parameters");
 
-        foreach (var parameterSchema in context.CommandSchema.Parameters.OrderBy(p => p.Order))
+        foreach (var parameter in context.Command.Parameters.OrderBy(p => p.Order))
         {
-            if (parameterSchema.IsRequired)
+            if (parameter.IsRequired)
             {
                 Write(ConsoleColor.Red, "* ");
             }
@@ -158,19 +156,19 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
                 WriteHorizontalMargin();
             }
 
-            Write(ConsoleColor.DarkCyan, $"{parameterSchema.Name}");
+            Write(ConsoleColor.DarkCyan, $"{parameter.Name}");
 
             WriteColumnMargin();
 
             // Description
-            if (!string.IsNullOrWhiteSpace(parameterSchema.Description))
+            if (!string.IsNullOrWhiteSpace(parameter.Description))
             {
-                Write(parameterSchema.Description);
+                Write(parameter.Description);
                 Write(' ');
             }
 
             // Valid values
-            var validValues = parameterSchema.Property.TryGetValidValues();
+            var validValues = parameter.Property.TryGetValidValues();
             if (validValues?.Any() == true)
             {
                 Write(ConsoleColor.White, "Choices: ");
@@ -200,9 +198,9 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
             }
 
             // Default value
-            if (!parameterSchema.IsRequired)
+            if (!parameter.IsRequired)
             {
-                WriteDefaultValue(parameterSchema);
+                WriteDefaultValue(parameter);
             }
 
             WriteLine();
@@ -216,9 +214,7 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
 
         WriteHeader("Options");
 
-        foreach (
-            var optionSchema in context.CommandSchema.Options.OrderByDescending(o => o.IsRequired)
-        )
+        foreach (var optionSchema in context.Command.Options.OrderByDescending(o => o.IsRequired))
         {
             if (optionSchema.IsRequired)
             {
@@ -358,12 +354,12 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
 
     private void WriteCommandChildren()
     {
-        var childCommandSchemas = context
-            .ApplicationSchema.GetChildCommands(context.CommandSchema.Name)
+        var childCommands = context
+            .Application.GetChildCommands(context.Command.Name)
             .OrderBy(a => a.Name, StringComparer.Ordinal)
             .ToArray();
 
-        if (!childCommandSchemas.Any())
+        if (!childCommands.Any())
             return;
 
         if (!IsEmpty)
@@ -371,14 +367,14 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
 
         WriteHeader("Commands");
 
-        foreach (var childCommandSchema in childCommandSchemas)
+        foreach (var childCommandSchema in childCommands)
         {
             // Name
             WriteHorizontalMargin();
             Write(
                 ConsoleColor.Cyan,
                 // Relative to current command
-                childCommandSchema.Name?.Substring(context.CommandSchema.Name?.Length ?? 0).Trim()
+                childCommandSchema.Name?.Substring(context.Command.Name?.Length ?? 0).Trim()
             );
 
             WriteColumnMargin();
@@ -391,17 +387,17 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
             }
 
             // Child commands of child command
-            var grandChildCommandSchemas = context
-                .ApplicationSchema.GetChildCommands(childCommandSchema.Name)
+            var grandChildCommands = context
+                .Application.GetChildCommands(childCommandSchema.Name)
                 .OrderBy(c => c.Name, StringComparer.Ordinal)
                 .ToArray();
 
-            if (grandChildCommandSchemas.Any())
+            if (grandChildCommands.Any())
             {
                 Write(ConsoleColor.White, "Subcommands: ");
 
                 var isFirst = true;
-                foreach (var grandChildCommandSchema in grandChildCommandSchemas)
+                foreach (var grandChildCommandSchema in grandChildCommands)
                 {
                     if (isFirst)
                     {
@@ -416,7 +412,7 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
                         ConsoleColor.Cyan,
                         // Relative to current command (not the parent)
                         grandChildCommandSchema
-                            .Name?.Substring(context.CommandSchema.Name?.Length ?? 0)
+                            .Name?.Substring(context.Command.Name?.Length ?? 0)
                             .Trim()
                     );
                 }

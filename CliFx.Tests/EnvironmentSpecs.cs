@@ -90,7 +90,7 @@ public class EnvironmentSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutp
 
         // Act
         var exitCode = await application.RunAsync(
-            Array.Empty<string>(),
+            [],
             new Dictionary<string, string> { ["ENV_FOO"] = $"bar{Path.PathSeparator}baz" }
         );
 
@@ -130,7 +130,7 @@ public class EnvironmentSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutp
 
         // Act
         var exitCode = await application.RunAsync(
-            Array.Empty<string>(),
+            [],
             new Dictionary<string, string> { ["ENV_FOO"] = $"bar{Path.PathSeparator}baz" }
         );
 

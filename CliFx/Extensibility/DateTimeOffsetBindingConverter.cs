@@ -8,6 +8,6 @@ namespace CliFx.Extensibility;
 public class DateTimeOffsetBindingConverter : BindingConverter<DateTimeOffset>
 {
     /// <inheritdoc />
-    public override DateTimeOffset Convert(string? rawArgument, IFormatProvider? formatProvider) =>
-        DateTimeOffset.Parse(rawArgument!, formatProvider);
+    public override DateTimeOffset Convert(string? rawValue, IFormatProvider? formatProvider) =>
+        DateTimeOffset.Parse(rawValue!, formatProvider);
 }

@@ -9,6 +9,6 @@ public class EnumBindingConverter<T> : BindingConverter<T>
     where T : struct, Enum
 {
     /// <inheritdoc />
-    public override T Convert(string? rawArgument, IFormatProvider? formatProvider) =>
-        (T)Enum.Parse(typeof(T), rawArgument!, true);
+    public override T Convert(string? rawValue, IFormatProvider? formatProvider) =>
+        (T)Enum.Parse(typeof(T), rawValue!, true);
 }

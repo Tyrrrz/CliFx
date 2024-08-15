@@ -94,7 +94,7 @@ public class CancellationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOut
 
         // Act
         var exitCode = await application.RunAsync(
-            Array.Empty<string>(),
+            [],
             new Dictionary<string, string>()
         );
 

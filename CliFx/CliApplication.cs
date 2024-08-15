@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using CliFx.Exceptions;
 using CliFx.Formatting;
 using CliFx.Infrastructure;
-using CliFx.Input;
+using CliFx.Parsing;
 using CliFx.Schema;
 using CliFx.Utils;
 using CliFx.Utils.Extensions;
@@ -33,11 +33,11 @@ public class CliApplication(
     /// </summary>
     public ApplicationConfiguration Configuration { get; } = configuration;
 
-    private bool IsDebugModeEnabled(CommandInput commandInput) =>
-        Configuration.IsDebugModeAllowed && commandInput.IsDebugDirectiveSpecified;
+    private bool IsDebugModeEnabled(CommandArguments commandArguments) =>
+        Configuration.IsDebugModeAllowed && commandArguments.IsDebugDirectiveSpecified;
 
-    private bool IsPreviewModeEnabled(CommandInput commandInput) =>
-        Configuration.IsPreviewModeAllowed && commandInput.IsPreviewDirectiveSpecified;
+    private bool IsPreviewModeEnabled(CommandArguments commandArguments) =>
+        Configuration.IsPreviewModeAllowed && commandArguments.IsPreviewDirectiveSpecified;
 
     private async ValueTask PromptDebuggerAsync()
     {
@@ -57,7 +57,8 @@ public class CliApplication(
 
     private async ValueTask<int> RunAsync(
         ApplicationSchema applicationSchema,
-        CommandInput commandInput
+        CommandArguments commandArguments,
+        IReadOnlyDictionary<string, string?> environmentVariables
     )
     {
         // Console colors may have already been overridden by the parent process,
@@ -65,26 +66,26 @@ public class CliApplication(
         console.ResetColor();
 
         // Handle the debug directive
-        if (IsDebugModeEnabled(commandInput))
+        if (IsDebugModeEnabled(commandArguments))
         {
             await PromptDebuggerAsync();
         }
 
         // Handle the preview directive
-        if (IsPreviewModeEnabled(commandInput))
+        if (IsPreviewModeEnabled(commandArguments))
         {
-            console.WriteCommandInput(commandInput);
+            console.WriteCommandInput(commandArguments);
             return 0;
         }
 
         // Try to get the command schema that matches the input
-        var commandSchema =
+        var command =
             (
-                !string.IsNullOrWhiteSpace(commandInput.CommandName)
+                !string.IsNullOrWhiteSpace(commandArguments.CommandName)
                     // If the command name is specified, try to find the command by name.
                     // This should always succeed, because the input parsing relies on
                     // the list of available command names.
-                    ? applicationSchema.TryFindCommand(commandInput.CommandName)
+                    ? applicationSchema.TryFindCommand(commandArguments.CommandName)
                     // Otherwise, try to find the default command
                     : applicationSchema.TryFindDefaultCommand()
             )
@@ -95,16 +96,16 @@ public class CliApplication(
 
         // Initialize an instance of the command type
         var commandInstance =
-            commandSchema == FallbackDefaultCommand.Schema
+            command == FallbackDefaultCommand.Schema
                 ? new FallbackDefaultCommand() // bypass the activator
-                : typeActivator.CreateInstance<ICommand>(commandSchema.Type);
+                : typeActivator.CreateInstance<ICommand>(command.Type);
 
         // Assemble the help context
         var helpContext = new HelpContext(
             Metadata,
             applicationSchema,
-            commandSchema,
-            commandSchema.GetValues(commandInstance)
+            command,
+            command.GetValues(commandInstance)
         );
 
         // Starting from this point, we may produce exceptions that are meant for the
@@ -113,8 +114,8 @@ public class CliApplication(
         // propagate further.
         try
         {
-            // Activate the command instance with the provided input
-            commandSchema.Activate(commandInstance, commandInput);
+            // Activate the command instance with the provided user input
+            command.Activate(commandInstance, commandArguments, environmentVariables);
 
             // Handle the version option
             if (commandInstance is ICommandWithVersionOption { IsVersionRequested: true })
@@ -163,18 +164,18 @@ public class CliApplication(
     /// </remarks>
     public async ValueTask<int> RunAsync(
         IReadOnlyList<string> commandLineArguments,
-        IReadOnlyDictionary<string, string> environmentVariables
+        IReadOnlyDictionary<string, string?> environmentVariables
     )
     {
         try
         {
             return await RunAsync(
                 Configuration.Schema,
-                CommandInput.Parse(
+                CommandArguments.Parse(
                     commandLineArguments,
-                    environmentVariables,
                     Configuration.Schema.GetCommandNames()
-                )
+                ),
+                environmentVariables
             );
         }
         // To prevent the app from showing the annoying troubleshooting dialog on Windows,
@@ -203,7 +204,7 @@ public class CliApplication(
             commandLineArguments,
             Environment
                 .GetEnvironmentVariables()
-                .ToDictionary<string, string>(StringComparer.Ordinal)
+                .ToDictionary<string, string?>(StringComparer.Ordinal)
         );
 
     /// <summary>

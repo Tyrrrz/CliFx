@@ -9,8 +9,8 @@ public class NullableBindingConverter<T>(BindingConverter<T> innerConverter) : B
     where T : struct
 {
     /// <inheritdoc />
-    public override T? Convert(string? rawArgument, IFormatProvider? formatProvider) =>
-        !string.IsNullOrWhiteSpace(rawArgument)
-            ? innerConverter.Convert(rawArgument, formatProvider)
+    public override T? Convert(string? rawValue, IFormatProvider? formatProvider) =>
+        !string.IsNullOrWhiteSpace(rawValue)
+            ? innerConverter.Convert(rawValue, formatProvider)
             : null;
 }

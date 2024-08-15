@@ -15,6 +15,6 @@ public class DelegateBindingConverter<T>(Func<string?, IFormatProvider?, T> conv
         : this((rawArgument, _) => convert(rawArgument)) { }
 
     /// <inheritdoc />
-    public override T Convert(string? rawArgument, IFormatProvider? formatProvider) =>
-        convert(rawArgument, formatProvider);
+    public override T Convert(string? rawValue, IFormatProvider? formatProvider) =>
+        convert(rawValue, formatProvider);
 }

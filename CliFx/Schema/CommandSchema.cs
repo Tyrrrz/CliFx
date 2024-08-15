@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
 using CliFx.Exceptions;
-using CliFx.Input;
+using CliFx.Parsing;
 using CliFx.Utils.Extensions;
 
 namespace CliFx.Schema;
@@ -65,74 +66,74 @@ public class CommandSchema(
     {
         var result = new Dictionary<CommandInputSchema, object?>();
 
-        foreach (var parameterSchema in Parameters)
+        foreach (var parameter in Parameters)
         {
-            var value = parameterSchema.Property.GetValue(instance);
-            result[parameterSchema] = value;
+            var value = parameter.Property.Get(instance);
+            result[parameter] = value;
         }
 
-        foreach (var optionSchema in Options)
+        foreach (var option in Options)
         {
-            var value = optionSchema.Property.GetValue(instance);
-            result[optionSchema] = value;
+            var value = option.Property.Get(instance);
+            result[option] = value;
         }
 
         return result;
     }
 
-    private void ActivateParameters(ICommand instance, CommandInput input)
+    private void ActivateParameters(ICommand instance, CommandArguments arguments)
     {
         // Ensure there are no unexpected parameters and that all parameters are provided
-        var remainingParameterInputs = input.Parameters.ToList();
-        var remainingRequiredParameterSchemas = Parameters.Where(p => p.IsRequired).ToList();
+        var remainingParameterTokens = arguments.Parameters.ToList();
+        var remainingRequiredParameters = Parameters.Where(p => p.IsRequired).ToList();
 
         var position = 0;
 
-        foreach (var parameterSchema in Parameters.OrderBy(p => p.Order))
+        foreach (var parameter in Parameters.OrderBy(p => p.Order))
         {
             // Break when there are no remaining inputs
-            if (position >= input.Parameters.Count)
+            if (position >= arguments.Parameters.Count)
                 break;
 
-            // Non-sequence: take one input at the current position
-            if (!parameterSchema.IsSequence)
-            {
-                var parameterInput = input.Parameters[position];
-                parameterSchema.Activate(instance, [parameterInput.Value]);
-
-                position++;
-                remainingParameterInputs.Remove(parameterInput);
-            }
             // Sequence: take all remaining inputs starting from the current position
+            if (parameter.IsSequence)
+            {
+                var parameterTokens = arguments.Parameters.Skip(position).ToArray();
+
+                parameter.Activate(instance, parameterTokens.Select(p => p.Value).ToArray());
+
+                position += parameterTokens.Length;
+                remainingParameterTokens.RemoveRange(parameterTokens);
+            }
+            // Non-sequence: take one input at the current position
             else
             {
-                var parameterInputs = input.Parameters.Skip(position).ToArray();
+                var parameterToken = arguments.Parameters[position];
+                parameter.Activate(instance, [parameterToken.Value]);
 
-                parameterSchema.Activate(instance, parameterInputs.Select(p => p.Value).ToArray());
-
-                position += parameterInputs.Length;
-                remainingParameterInputs.RemoveRange(parameterInputs);
+                position++;
+                remainingParameterTokens.Remove(parameterToken);
             }
 
-            remainingRequiredParameterSchemas.Remove(parameterSchema);
+            remainingRequiredParameters.Remove(parameter);
         }
 
-        if (remainingParameterInputs.Any())
+        if (remainingParameterTokens.Any())
         {
             throw CliFxException.UserError(
                 $"""
                 Unexpected parameter(s):
-                {remainingParameterInputs.Select(p => p.GetFormattedIdentifier()).JoinToString(" ")}
+                {remainingParameterTokens.Select(p => p.FormattedIdentifier).JoinToString(" ")}
                 """
             );
         }
 
-        if (remainingRequiredParameterSchemas.Any())
+        if (remainingRequiredParameters.Any())
         {
             throw CliFxException.UserError(
                 $"""
-                Missing required parameter(s):
-                {remainingRequiredParameterSchemas
+                Missing equired parameter(s):
+                {remainingRequiredParameters
                     .Select(p => p.FormattedIdentifier)
                     .JoinToString(" ")}
                 """
@@ -140,45 +141,52 @@ public class CommandSchema(
         }
     }
 
-    private void ActivateOptions(ICommand instance, CommandInput input)
+    private void ActivateOptions(
+        ICommand instance,
+        CommandArguments arguments,
+        IReadOnlyDictionary<string, string?> environmentVariables
+    )
     {
         // Ensure there are no unrecognized options and that all required options are set
-        var remainingOptionInputs = input.Options.ToList();
-        var remainingRequiredOptionSchemas = Options.Where(o => o.IsRequired).ToList();
+        var remainingOptionTokens = arguments.Options.ToList();
+        var remainingRequiredOptions = Options.Where(o => o.IsRequired).ToList();
 
-        foreach (var optionSchema in Options)
+        foreach (var option in Options)
         {
-            var optionInputs = input
-                .Options.Where(o => optionSchema.MatchesIdentifier(o.Identifier))
+            var optionToken = arguments
+                .Options.Where(o => option.MatchesIdentifier(o.Identifier))
                 .ToArray();
 
-            var environmentVariableInput = input.EnvironmentVariables.FirstOrDefault(e =>
-                optionSchema.MatchesEnvironmentVariable(e.Name)
+            var environmentVariable = environmentVariables.FirstOrDefault(v =>
+                option.MatchesEnvironmentVariable(v.Key)
             );
 
             // Direct input
-            if (optionInputs.Any())
+            if (optionToken.Any())
             {
-                var rawValues = optionInputs.SelectMany(o => o.Values).ToArray();
+                var rawValues = optionToken.SelectMany(o => o.Values).ToArray();
 
-                optionSchema.Activate(instance, rawValues);
+                option.Activate(instance, rawValues);
 
                 // Required options need at least one value to be set
                 if (rawValues.Any())
-                    remainingRequiredOptionSchemas.Remove(optionSchema);
+                    remainingRequiredOptions.Remove(option);
             }
             // Environment variable
-            else if (environmentVariableInput is not null)
+            else if (!string.IsNullOrEmpty(environmentVariable.Value))
             {
-                var rawValues = !optionSchema.IsSequence
-                    ? [environmentVariableInput.Value]
-                    : environmentVariableInput.SplitValues();
+                var rawValues = !option.IsSequence
+                    ? [environmentVariable.Value]
+                    : environmentVariable.Value.Split(
+                        Path.PathSeparator,
+                        StringSplitOptions.RemoveEmptyEntries
+                    );
 
-                optionSchema.Activate(instance, rawValues);
+                option.Activate(instance, rawValues);
 
                 // Required options need at least one value to be set
                 if (rawValues.Any())
-                    remainingRequiredOptionSchemas.Remove(optionSchema);
+                    remainingRequiredOptions.Remove(option);
             }
             // No input, skip
             else
@@ -186,25 +194,25 @@ public class CommandSchema(
                 continue;
             }
 
-            remainingOptionInputs.RemoveRange(optionInputs);
+            remainingOptionTokens.RemoveRange(optionToken);
         }
 
-        if (remainingOptionInputs.Any())
+        if (remainingOptionTokens.Any())
         {
             throw CliFxException.UserError(
                 $"""
                 Unrecognized option(s):
-                {remainingOptionInputs.Select(o => o.FormattedIdentifier).JoinToString(", ")}
+                {remainingOptionTokens.Select(o => o.FormattedIdentifier).JoinToString(", ")}
                 """
             );
         }
 
-        if (remainingRequiredOptionSchemas.Any())
+        if (remainingRequiredOptions.Any())
         {
             throw CliFxException.UserError(
                 $"""
                 Missing required option(s):
-                {remainingRequiredOptionSchemas
+                {remainingRequiredOptions
                     .Select(o => o.FormattedIdentifier)
                     .JoinToString(", ")}
                 """
@@ -212,15 +220,19 @@ public class CommandSchema(
         }
     }
 
-    internal void Activate(ICommand instance, CommandInput input)
+    internal void Activate(
+        ICommand instance,
+        CommandArguments arguments,
+        IReadOnlyDictionary<string, string?> environmentVariables
+    )
     {
-        ActivateParameters(instance, input);
-        ActivateOptions(instance, input);
+        ActivateParameters(instance, arguments);
+        ActivateOptions(instance, arguments, environmentVariables);
     }
 
     /// <inheritdoc />
     [ExcludeFromCodeCoverage]
-    public override string ToString() => Name ?? "<default>";
+    public override string ToString() => Name ?? "{default}";
 }
 
 /// <inheritdoc cref="CommandSchema" />

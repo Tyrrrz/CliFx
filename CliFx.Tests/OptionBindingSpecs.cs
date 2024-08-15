@@ -612,7 +612,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
 
         // Act
         var exitCode = await application.RunAsync(
-            Array.Empty<string>(),
+            [],
             new Dictionary<string, string>()
         );
 

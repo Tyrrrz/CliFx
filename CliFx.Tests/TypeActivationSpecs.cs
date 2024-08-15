@@ -39,7 +39,7 @@ public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
 
         // Act
         var exitCode = await application.RunAsync(
-            Array.Empty<string>(),
+            [],
             new Dictionary<string, string>()
         );
 
@@ -75,7 +75,7 @@ public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
 
         // Act
         var exitCode = await application.RunAsync(
-            Array.Empty<string>(),
+            [],
             new Dictionary<string, string>()
         );
 
@@ -117,7 +117,7 @@ public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
 
         // Act
         var exitCode = await application.RunAsync(
-            Array.Empty<string>(),
+            [],
             new Dictionary<string, string>()
         );
 
@@ -172,7 +172,7 @@ public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
 
         // Act
         var exitCode = await application.RunAsync(
-            Array.Empty<string>(),
+            [],
             new Dictionary<string, string>()
         );
 
@@ -210,7 +210,7 @@ public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
 
         // Act
         var exitCode = await application.RunAsync(
-            Array.Empty<string>(),
+            [],
             new Dictionary<string, string>()
         );
 

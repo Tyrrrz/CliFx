@@ -8,8 +8,8 @@ namespace CliFx.Extensibility;
 public abstract class BindingConverter<T> : IBindingConverter
 {
     /// <inheritdoc cref="IBindingConverter.Convert" />
-    public abstract T? Convert(string? rawArgument, IFormatProvider? formatProvider);
+    public abstract T? Convert(string? rawValue, IFormatProvider? formatProvider);
 
-    object? IBindingConverter.Convert(string? rawArgument, IFormatProvider? formatProvider) =>
-        Convert(rawArgument, formatProvider);
+    object? IBindingConverter.Convert(string? rawValue, IFormatProvider? formatProvider) =>
+        Convert(rawValue, formatProvider);
 }

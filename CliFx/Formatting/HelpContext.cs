@@ -4,17 +4,17 @@ using CliFx.Schema;
 namespace CliFx.Formatting;
 
 internal class HelpContext(
-    ApplicationMetadata applicationMetadata,
-    ApplicationSchema applicationSchema,
-    CommandSchema commandSchema,
+    ApplicationMetadata metadata,
+    ApplicationSchema application,
+    CommandSchema command,
     IReadOnlyDictionary<CommandInputSchema, object?> commandDefaultValues
 )
 {
-    public ApplicationMetadata ApplicationMetadata { get; } = applicationMetadata;
+    public ApplicationMetadata Metadata { get; } = metadata;
 
-    public ApplicationSchema ApplicationSchema { get; } = applicationSchema;
+    public ApplicationSchema Application { get; } = application;
 
-    public CommandSchema CommandSchema { get; } = commandSchema;
+    public CommandSchema Command { get; } = command;
 
     public IReadOnlyDictionary<CommandInputSchema, object?> CommandDefaultValues { get; } =
         commandDefaultValues;

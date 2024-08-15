@@ -15,7 +15,7 @@ namespace CliFx;
 /// </summary>
 public partial class CliApplicationBuilder
 {
-    private readonly HashSet<CommandSchema> _commandSchemas = [];
+    private readonly HashSet<CommandSchema> _commands = [];
 
     private bool _isDebugModeAllowed = true;
     private bool _isPreviewModeAllowed = true;
@@ -33,19 +33,19 @@ public partial class CliApplicationBuilder
     /// <summary>
     /// Adds a command to the application.
     /// </summary>
-    public CliApplicationBuilder AddCommand(CommandSchema commandSchema)
+    public CliApplicationBuilder AddCommand(CommandSchema command)
     {
-        _commandSchemas.Add(commandSchema);
+        _commands.Add(command);
         return this;
     }
 
     /// <summary>
     /// Adds multiple commands to the application.
     /// </summary>
-    public CliApplicationBuilder AddCommands(IReadOnlyList<CommandSchema> commandSchemas)
+    public CliApplicationBuilder AddCommands(IReadOnlyList<CommandSchema> commands)
     {
-        foreach (var commandSchema in commandSchemas)
-            AddCommand(commandSchema);
+        foreach (var command in commands)
+            AddCommand(command);
 
         return this;
     }
@@ -157,7 +157,7 @@ public partial class CliApplicationBuilder
         );
 
         var configuration = new ApplicationConfiguration(
-            new ApplicationSchema(_commandSchemas.ToArray()),
+            new ApplicationSchema(_commands.ToArray()),
             _isDebugModeAllowed,
             _isPreviewModeAllowed
         );

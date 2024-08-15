@@ -9,6 +9,6 @@ public class ConvertibleBindingConverter<T> : BindingConverter<T>
     where T : IConvertible
 {
     /// <inheritdoc />
-    public override T? Convert(string? rawArgument, IFormatProvider? formatProvider) =>
-        (T?)System.Convert.ChangeType(rawArgument, typeof(T), formatProvider);
+    public override T? Convert(string? rawValue, IFormatProvider? formatProvider) =>
+        (T?)System.Convert.ChangeType(rawValue, typeof(T), formatProvider);
 }

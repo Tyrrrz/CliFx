@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace CliFx.Input;
+namespace CliFx.Parsing;
 
 /// <summary>
-/// Input provided by the means of a directive.
+/// Command-line argument that sets a directive.
 /// </summary>
-public class CommandDirectiveInput(string name)
+public class CommandDirectiveToken(string name)
 {
     /// <summary>
     /// Directive name.

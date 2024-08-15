@@ -88,7 +88,7 @@ public class ConsoleSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
 
         // Act
         var exitCode = await application.RunAsync(
-            Array.Empty<string>(),
+            [],
             new Dictionary<string, string>()
         );
 
@@ -144,7 +144,7 @@ public class ConsoleSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         FakeConsole.WriteInput("Hello world");
 
         var exitCode = await application.RunAsync(
-            Array.Empty<string>(),
+            [],
             new Dictionary<string, string>()
         );
 
@@ -191,7 +191,7 @@ public class ConsoleSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         FakeConsole.EnqueueKey(new ConsoleKeyInfo('\0', ConsoleKey.Backspace, false, false, false));
 
         var exitCode = await application.RunAsync(
-            Array.Empty<string>(),
+            [],
             new Dictionary<string, string>()
         );
 

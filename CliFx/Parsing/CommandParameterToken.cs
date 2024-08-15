@@ -1,9 +1,9 @@
-﻿namespace CliFx.Input;
+﻿namespace CliFx.Parsing;
 
 /// <summary>
-/// Input provided by the means of a parameter.
+/// Command-line argument that provide a value to a parameter input of a command.
 /// </summary>
-public class CommandParameterInput(int order, string value)
+public class CommandParameterToken(int order, string value)
 {
     /// <summary>
     /// Parameter order.
@@ -15,5 +15,5 @@ public class CommandParameterInput(int order, string value)
     /// </summary>
     public string Value { get; } = value;
 
-    internal string GetFormattedIdentifier() => $"<{Value}>";
+    internal string FormattedIdentifier { get; } = $"<{value}>";
 }

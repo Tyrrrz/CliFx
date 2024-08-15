@@ -22,7 +22,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
 
         // Act
         var exitCode = await application.RunAsync(
-            Array.Empty<string>(),
+            [],
             new Dictionary<string, string>()
         );
 
