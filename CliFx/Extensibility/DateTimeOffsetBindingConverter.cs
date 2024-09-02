@@ -3,7 +3,7 @@
 namespace CliFx.Extensibility;
 
 /// <summary>
-/// Converter for binding command inputs to properties of type <see cref="DateTimeOffset" />.
+/// Converter for activating command inputs bound to properties of type <see cref="DateTimeOffset" />.
 /// </summary>
 public class DateTimeOffsetBindingConverter : BindingConverter<DateTimeOffset>
 {

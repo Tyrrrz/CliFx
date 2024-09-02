@@ -3,7 +3,7 @@
 namespace CliFx.Extensibility;
 
 /// <summary>
-/// Converter for binding command inputs to properties of type <see cref="Enum" />.
+/// Converter for activating command inputs bound to properties of type <see cref="Enum" />.
 /// </summary>
 public class EnumBindingConverter<T> : BindingConverter<T>
     where T : struct, Enum

@@ -3,7 +3,7 @@
 namespace CliFx.Extensibility;
 
 /// <summary>
-/// Converter for binding command inputs to properties of type <see cref="TimeSpan" />.
+/// Converter for activating command inputs bound to properties of type <see cref="TimeSpan" />.
 /// </summary>
 public class TimeSpanBindingConverter : BindingConverter<TimeSpan>
 {

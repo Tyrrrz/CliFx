@@ -3,7 +3,7 @@
 namespace CliFx.Extensibility;
 
 /// <summary>
-/// Converter for binding command inputs to properties using a custom delegate.
+/// Converter for activating command inputs bound to properties using a custom delegate.
 /// </summary>
 public class DelegateBindingConverter<T>(Func<string?, IFormatProvider?, T> convert)
     : BindingConverter<T>

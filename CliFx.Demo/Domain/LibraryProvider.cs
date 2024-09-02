@@ -22,7 +22,8 @@ public class LibraryProvider
 
         var data = File.ReadAllText(StorageFilePath);
 
-        return JsonSerializer.Deserialize(data, LibraryJsonContext.Default.Library) ?? Library.Empty;
+        return JsonSerializer.Deserialize(data, LibraryJsonContext.Default.Library)
+            ?? Library.Empty;
     }
 
     public Book? TryGetBook(string title) =>

@@ -3,7 +3,7 @@
 namespace CliFx.Extensibility;
 
 /// <summary>
-/// Converter for binding command inputs to properties without any conversion.
+/// Converter for activating command inputs bound to properties without performing any conversion.
 /// </summary>
 public class NoopBindingConverter : IBindingConverter
 {

@@ -1,5 +1,4 @@
 ﻿using System;
-using CliFx.Extensibility;
 
 namespace CliFx.Attributes;
 
@@ -7,7 +6,8 @@ namespace CliFx.Attributes;
 /// Binds a property to a command option — a command-line input that is identified by a name and/or a short name.
 /// </summary>
 /// <remarks>
-/// All options in a command must have unique names (comparison IS NOT case-sensitive) and short names (comparison IS case-sensitive).
+/// All options in a command must have unique names (comparison IS NOT case-sensitive)
+/// and short names (comparison IS case-sensitive).
 /// </remarks>
 [AttributeUsage(AttributeTargets.Property)]
 public class CommandOptionAttribute : CommandInputAttribute
@@ -51,7 +51,7 @@ public class CommandOptionAttribute : CommandInputAttribute
 
     /// <summary>
     /// Whether this option is required (default: <c>false</c>).
-    /// If an option is required, the user will get an error if they don't set it.
+    /// If an option is required, the user will get an error when they don't set it.
     /// </summary>
     /// <remarks>
     /// You can use the <c>required</c> keyword on the property (introduced in C# 11) to implicitly

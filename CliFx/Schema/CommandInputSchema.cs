@@ -14,23 +14,21 @@ namespace CliFx.Schema;
 /// </summary>
 public abstract class CommandInputSchema(
     PropertyBinding property,
+    bool isSequence,
     string? description,
     IBindingConverter converter,
     IReadOnlyList<IBindingValidator> validators
 )
 {
-    internal abstract string Kind { get; }
-
-    internal abstract string FormattedIdentifier { get; }
-
     /// <summary>
     /// CLR property to which this input is bound.
     /// </summary>
     public PropertyBinding Property { get; } = property;
 
-    internal bool IsSequence { get; } =
-        property.Type != typeof(string)
-        && property.Type.TryGetEnumerableUnderlyingType() is not null;
+    /// <summary>
+    /// Whether this input is a sequence (i.e. multiple values can be provided).
+    /// </summary>
+    public bool IsSequence { get; } = isSequence;
 
     /// <summary>
     /// Input description, used in the help text.
@@ -51,14 +49,14 @@ public abstract class CommandInputSchema(
     {
         var errors = Validators
             .Select(validator => validator.Validate(value))
-            .OfType<BindingValidationError>()
+            .WhereNotNull()
             .ToArray();
 
         if (errors.Any())
         {
             throw CliFxException.UserError(
                 $"""
-                {Kind} {FormattedIdentifier} has been provided with an invalid value.
+                {this.GetKind()} {this.GetFormattedIdentifier()} has been provided with an invalid value.
                 Error(s):
                 {errors.Select(e => "- " + e.Message).JoinToString(Environment.NewLine)}
                 """
@@ -72,7 +70,7 @@ public abstract class CommandInputSchema(
 
         try
         {
-            // Multiple values expected, single or multiple values provided
+            // Sequential input; zero or more values provided
             if (IsSequence)
             {
                 var values = rawValues.Select(v => Converter.Convert(v, formatProvider)).ToArray();
@@ -80,23 +78,22 @@ public abstract class CommandInputSchema(
                 // TODO: cast array to the proper type
 
                 Validate(values);
-
-                Property.Set(instance, values);
+                Property.SetValue(instance, values);
             }
-            // Single value expected, single value provided
+            // Non-sequential input; zero or one value provided
             else if (rawValues.Count <= 1)
             {
                 var value = Converter.Convert(rawValues.SingleOrDefault(), formatProvider);
-                Validate(value);
 
-                Property.Set(instance, value);
+                Validate(value);
+                Property.SetValue(instance, value);
             }
-            // Single value expected, multiple values provided
+            // Non-sequential input; more than one value provided
             else
             {
                 throw CliFxException.UserError(
                     $"""
-                    {Kind} {FormattedIdentifier} expects a single value, but provided with multiple:
+                    {this.GetKind()} {this.GetFormattedIdentifier()} expects a single value, but provided with multiple:
                     {rawValues.Select(v => '<' + v + '>').JoinToString(" ")}
                     """
                 );
@@ -106,7 +103,7 @@ public abstract class CommandInputSchema(
         {
             throw CliFxException.UserError(
                 $"""
-                {Kind} {FormattedIdentifier} cannot be set from the provided value(s):
+                {this.GetKind()} {this.GetFormattedIdentifier()} cannot be set from the provided value(s):
                 {rawValues.Select(v => '<' + v + '>').JoinToString(" ")}
                 Error: {ex.Message}
                 """,
@@ -117,7 +114,7 @@ public abstract class CommandInputSchema(
 
     /// <inheritdoc />
     [ExcludeFromCodeCoverage]
-    public override string ToString() => FormattedIdentifier;
+    public override string ToString() => this.GetFormattedIdentifier();
 }
 
 /// <inheritdoc cref="CommandInputSchema" />
@@ -134,8 +131,41 @@ public abstract class CommandInputSchema<
         TProperty
 >(
     PropertyBinding<TCommand, TProperty> property,
+    bool isSequence,
     string? description,
     BindingConverter<TProperty> converter,
     IReadOnlyList<BindingValidator<TProperty>> validators
-) : CommandInputSchema(property, description, converter, validators)
+) : CommandInputSchema(property, isSequence, description, converter, validators)
     where TCommand : ICommand;
+
+// Define these as extension methods to avoid exposing them as protected members (i.e. essentially public API)
+internal static class CommandInputSchemaExtensions
+{
+    public static string GetKind(this CommandInputSchema schema) =>
+        schema switch
+        {
+            CommandParameterSchema => "Parameter",
+            CommandOptionSchema => "Option",
+            _ => throw new InvalidOperationException("Unknown input schema type.")
+        };
+
+    public static string GetFormattedIdentifier(this CommandInputSchema schema) =>
+        schema switch
+        {
+            CommandParameterSchema parameter
+                => parameter.IsSequence ? $"<{parameter.Name}>" : $"<{parameter.Name}...>",
+            CommandOptionSchema option
+                => option switch
+                {
+                    { Name: not null, ShortName: not null }
+                        => $"-{option.ShortName}|--{option.Name}",
+                    { Name: not null } => $"--{option.Name}",
+                    { ShortName: not null } => $"-{option.ShortName}",
+                    _
+                        => throw new InvalidOperationException(
+                            "Option must have a name or a short name."
+                        )
+                },
+            _ => throw new ArgumentOutOfRangeException(nameof(schema))
+        };
+}

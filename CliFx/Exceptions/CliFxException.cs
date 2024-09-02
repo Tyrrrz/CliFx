@@ -3,7 +3,7 @@
 namespace CliFx.Exceptions;
 
 /// <summary>
-/// Exception thrown when there is an error during application execution.
+/// Exception thrown within <see cref="CliFx" />.
 /// </summary>
 public partial class CliFxException(
     string message,

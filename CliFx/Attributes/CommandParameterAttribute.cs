@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using CliFx.Extensibility;
 
 namespace CliFx.Attributes;
 
@@ -10,7 +9,7 @@ namespace CliFx.Attributes;
 /// </summary>
 /// <remarks>
 /// All parameters in a command must have unique order values.
-/// If a parameter is bound to a property whose type is a sequence (e.g. Array, <see cref="List{T}" />; except <see cref="string" />),
+/// If a parameter is bound to a property whose type is a sequence (i.e. implements <see cref="IEnumerable{T}"/>; except <see cref="string" />),
 /// then it must have the highest order in the command.
 /// Only one sequential parameter is allowed per command.
 /// </remarks>
@@ -24,7 +23,7 @@ public class CommandParameterAttribute(int order) : CommandInputAttribute
 
     /// <summary>
     /// Whether this parameter is required (default: <c>true</c>).
-    /// If a parameter is required, the user will get an error if they don't set it.
+    /// If a parameter is required, the user will get an error when they don't set it.
     /// </summary>
     /// <remarks>
     /// Parameter marked as non-required must have the highest order in the command.

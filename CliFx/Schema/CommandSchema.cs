@@ -62,24 +62,8 @@ public class CommandSchema(
             ? string.Equals(name, Name, StringComparison.OrdinalIgnoreCase)
             : string.IsNullOrWhiteSpace(name);
 
-    internal IReadOnlyDictionary<CommandInputSchema, object?> GetValues(ICommand instance)
-    {
-        var result = new Dictionary<CommandInputSchema, object?>();
-
-        foreach (var parameter in Parameters)
-        {
-            var value = parameter.Property.Get(instance);
-            result[parameter] = value;
-        }
-
-        foreach (var option in Options)
-        {
-            var value = option.Property.Get(instance);
-            result[option] = value;
-        }
-
-        return result;
-    }
+    internal IReadOnlyDictionary<CommandInputSchema, object?> GetValues(ICommand instance) =>
+        Inputs.ToDictionary(input => input, input => input.Property.GetValue(instance));
 
     private void ActivateParameters(ICommand instance, CommandArguments arguments)
     {
@@ -91,21 +75,20 @@ public class CommandSchema(
 
         foreach (var parameter in Parameters.OrderBy(p => p.Order))
         {
-            // Break when there are no remaining inputs
+            // Break when there are no remaining tokens
             if (position >= arguments.Parameters.Count)
                 break;
 
-            // Sequence: take all remaining inputs starting from the current position
+            // Sequential: take all remaining tokens starting from the current position
             if (parameter.IsSequence)
             {
                 var parameterTokens = arguments.Parameters.Skip(position).ToArray();
-
                 parameter.Activate(instance, parameterTokens.Select(p => p.Value).ToArray());
 
                 position += parameterTokens.Length;
                 remainingParameterTokens.RemoveRange(parameterTokens);
             }
-            // Non-sequence: take one input at the current position
+            // Non-sequential: take one token at the current position
             else
             {
                 var parameterToken = arguments.Parameters[position];
@@ -132,9 +115,9 @@ public class CommandSchema(
         {
             throw CliFxException.UserError(
                 $"""
-                Missing equired parameter(s):
+                Missing required parameter(s):
                 {remainingRequiredParameters
-                    .Select(p => p.FormattedIdentifier)
+                    .Select(p => p.GetFormattedIdentifier())
                     .JoinToString(" ")}
                 """
             );
@@ -153,7 +136,7 @@ public class CommandSchema(
 
         foreach (var option in Options)
         {
-            var optionToken = arguments
+            var optionTokens = arguments
                 .Options.Where(o => option.MatchesIdentifier(o.Identifier))
                 .ToArray();
 
@@ -161,10 +144,10 @@ public class CommandSchema(
                 option.MatchesEnvironmentVariable(v.Key)
             );
 
-            // Direct input
-            if (optionToken.Any())
+            // From arguments
+            if (optionTokens.Any())
             {
-                var rawValues = optionToken.SelectMany(o => o.Values).ToArray();
+                var rawValues = optionTokens.SelectMany(o => o.Values).ToArray();
 
                 option.Activate(instance, rawValues);
 
@@ -172,7 +155,7 @@ public class CommandSchema(
                 if (rawValues.Any())
                     remainingRequiredOptions.Remove(option);
             }
-            // Environment variable
+            // From environment
             else if (!string.IsNullOrEmpty(environmentVariable.Value))
             {
                 var rawValues = !option.IsSequence
@@ -194,7 +177,7 @@ public class CommandSchema(
                 continue;
             }
 
-            remainingOptionTokens.RemoveRange(optionToken);
+            remainingOptionTokens.RemoveRange(optionTokens);
         }
 
         if (remainingOptionTokens.Any())
@@ -213,7 +196,7 @@ public class CommandSchema(
                 $"""
                 Missing required option(s):
                 {remainingRequiredOptions
-                    .Select(o => o.FormattedIdentifier)
+                    .Select(o => o.GetFormattedIdentifier())
                     .JoinToString(", ")}
                 """
             );

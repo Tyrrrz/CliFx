@@ -9,20 +9,17 @@ namespace CliFx.Schema;
 /// </summary>
 public class CommandParameterSchema(
     PropertyBinding property,
+    bool isSequence,
     int order,
     string name,
     bool isRequired,
     string? description,
     IBindingConverter converter,
     IReadOnlyList<IBindingValidator> validators
-) : CommandInputSchema(property, description, converter, validators)
+) : CommandInputSchema(property, isSequence, description, converter, validators)
 {
-    internal override string Kind => "Parameter";
-
-    internal override string FormattedIdentifier => IsSequence ? $"<{Name}>" : $"<{Name}...>";
-
     /// <summary>
-    /// Order, in which the parameter is bound from the command-line arguments.
+    /// Order, in which the parameter is activated from the command-line arguments.
     /// </summary>
     public int Order { get; } = order;
 
@@ -51,11 +48,22 @@ public class CommandParameterSchema<
         TProperty
 >(
     PropertyBinding<TCommand, TProperty> property,
+    bool isSequence,
     int order,
     string name,
     bool isRequired,
     string? description,
     BindingConverter<TProperty> converter,
     IReadOnlyList<BindingValidator<TProperty>> validators
-) : CommandParameterSchema(property, order, name, isRequired, description, converter, validators)
+)
+    : CommandParameterSchema(
+        property,
+        isSequence,
+        order,
+        name,
+        isRequired,
+        description,
+        converter,
+        validators
+    )
     where TCommand : ICommand;

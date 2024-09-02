@@ -5,7 +5,7 @@ using CliFx.Exceptions;
 namespace CliFx.Infrastructure;
 
 /// <summary>
-/// Implementation of <see cref="ITypeActivator" /> that instantiates an object by using a predefined delegate.
+/// Implementation of <see cref="ITypeActivator" /> that instantiates a type by using a predefined delegate.
 /// </summary>
 public class DelegateTypeActivator(Func<Type, object> createInstance) : ITypeActivator
 {
