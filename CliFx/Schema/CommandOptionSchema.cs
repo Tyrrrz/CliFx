@@ -64,7 +64,7 @@ public class CommandOptionSchema(
 public class CommandOptionSchema<
     TCommand,
     [DynamicallyAccessedMembers(
-        DynamicallyAccessedMemberTypes.Interfaces | DynamicallyAccessedMemberTypes.PublicMethods
+        DynamicallyAccessedMemberTypes.PublicMethods
     )]
         TProperty
 >(

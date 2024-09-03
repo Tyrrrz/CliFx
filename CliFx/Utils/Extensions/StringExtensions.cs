@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace CliFx.Utils.Extensions;
 
@@ -14,13 +13,4 @@ internal static class StringExtensions
 
     public static string JoinToString<T>(this IEnumerable<T> source, string separator) =>
         string.Join(separator, source);
-
-    public static string? ToString(
-        this object obj,
-        IFormatProvider? formatProvider = null,
-        string? format = null
-    ) =>
-        obj is IFormattable formattable
-            ? formattable.ToString(format, formatProvider)
-            : obj.ToString();
 }

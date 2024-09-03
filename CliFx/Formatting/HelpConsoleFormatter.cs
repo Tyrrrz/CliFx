@@ -306,12 +306,12 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
         if (defaultValue is null)
             return;
 
-        if (schema.Property.Type.IsToStringOverriden())
+        if (defaultValue is IFormattable formattable)
         {
             Write(ConsoleColor.White, "Default: ");
 
             Write('"');
-            Write(defaultValue.ToString(CultureInfo.InvariantCulture));
+            Write(formattable.ToString(null, CultureInfo.InvariantCulture));
             Write('"');
             Write('.');
         }

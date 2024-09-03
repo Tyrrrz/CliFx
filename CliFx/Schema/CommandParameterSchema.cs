@@ -43,7 +43,7 @@ public class CommandParameterSchema(
 public class CommandParameterSchema<
     TCommand,
     [DynamicallyAccessedMembers(
-        DynamicallyAccessedMemberTypes.Interfaces | DynamicallyAccessedMemberTypes.PublicMethods
+        DynamicallyAccessedMemberTypes.PublicMethods
     )]
         TProperty
 >(

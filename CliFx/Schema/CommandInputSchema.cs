@@ -126,7 +126,7 @@ public abstract class CommandInputSchema(
 public abstract class CommandInputSchema<
     TCommand,
     [DynamicallyAccessedMembers(
-        DynamicallyAccessedMemberTypes.Interfaces | DynamicallyAccessedMemberTypes.PublicMethods
+        DynamicallyAccessedMemberTypes.PublicMethods
     )]
         TProperty
 >(
