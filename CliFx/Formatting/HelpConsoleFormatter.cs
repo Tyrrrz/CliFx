@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Linq;
 using CliFx.Infrastructure;
 using CliFx.Schema;
-using CliFx.Utils.Extensions;
 
 namespace CliFx.Formatting;
 
