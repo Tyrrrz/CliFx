@@ -1,4 +1,4 @@
-﻿namespace CliFx.SourceGeneration;
+﻿namespace CliFx.SourceGeneration.SemanticModel;
 
 internal static class KnownSymbolNames
 {

@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
+using CliFx.SourceGeneration.SemanticModel;
 using CliFx.SourceGeneration.Utils.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -9,7 +9,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace CliFx.SourceGeneration;
 
 [Generator]
-public partial class CommandSchemaGenerator : IIncrementalGenerator
+public class CommandSchemaGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -69,6 +69,13 @@ public partial class CommandSchemaGenerator : IIncrementalGenerator
                 var commandName =
                     commandAttribute.ConstructorArguments.FirstOrDefault().Value as string;
 
+                var commandDescription =
+                    commandAttribute
+                        .NamedArguments.FirstOrDefault(a =>
+                            string.Equals(a.Key, "Description", StringComparison.Ordinal)
+                        )
+                        .Value.Value as string;
+
                 // Get all parameter inputs
                 var parameterSymbols = namedTypeSymbol
                     .GetMembers()
@@ -85,8 +92,9 @@ public partial class CommandSchemaGenerator : IIncrementalGenerator
                         if (parameterAttribute is null)
                             return null;
 
-                        var order =
-                            parameterAttribute.ConstructorArguments.FirstOrDefault().Value as int?;
+                        var isSequence = false; // TODO
+
+                        var order = parameterAttribute.ConstructorArguments.First().Value as int?;
 
                         var isRequired =
                             parameterAttribute
@@ -94,7 +102,7 @@ public partial class CommandSchemaGenerator : IIncrementalGenerator
                                     string.Equals(a.Key, "IsRequired", StringComparison.Ordinal)
                                 )
                                 .Value.Value as bool?
-                            ?? p.IsRequired;
+                            ?? true;
 
                         var name =
                             parameterAttribute
@@ -124,19 +132,25 @@ public partial class CommandSchemaGenerator : IIncrementalGenerator
                             .Value.Values.CastArray<ITypeSymbol>();
 
                         return new CommandParameterSymbol(
-                            new PropertyInfo(
-                                p.Name,
-                                p.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
+                            new PropertyDescriptor(
+                                new TypeDescriptor(
+                                    p.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
+                                ),
+                                p.Name
                             ),
+                            isSequence,
                             order,
                             isRequired,
                             name,
                             description,
-                            converter?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+                            converter
+                                ?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
+                                ?.Pipe(n => new TypeDescriptor(n)),
                             validators
                                 .Select(v =>
                                     v.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
                                 )
+                                .Select(n => new TypeDescriptor(n))
                                 .ToArray()
                         );
                     })
@@ -159,8 +173,41 @@ public partial class CommandSchemaGenerator : IIncrementalGenerator
                         if (optionAttribute is null)
                             return null;
 
-                        var names =
-                            optionAttribute.ConstructorArguments.FirstOrDefault().Value as string[];
+                        var isSequence = false; // TODO
+
+                        var name =
+                            optionAttribute
+                                .ConstructorArguments.Where(a =>
+                                    a.Type?.SpecialType == SpecialType.System_String
+                                )
+                                .Select(a => a.Value)
+                                .FirstOrDefault() as string;
+
+                        var shortName =
+                            optionAttribute
+                                .ConstructorArguments.Where(a =>
+                                    a.Type?.SpecialType == SpecialType.System_Char
+                                )
+                                .Select(a => a.Value)
+                                .FirstOrDefault() as char?;
+
+                        var environmentVariable =
+                            optionAttribute
+                                .NamedArguments.FirstOrDefault(a =>
+                                    string.Equals(
+                                        a.Key,
+                                        "EnvironmentVariable",
+                                        StringComparison.Ordinal
+                                    )
+                                )
+                                .Value.Value as string;
+
+                        var isRequired =
+                            optionAttribute
+                                .NamedArguments.Where(a => a.Key == "IsRequired")
+                                .Select(a => a.Value.Value)
+                                .FirstOrDefault() as bool?
+                            ?? p.IsRequired;
 
                         var description =
                             optionAttribute
@@ -183,17 +230,26 @@ public partial class CommandSchemaGenerator : IIncrementalGenerator
                             .Value.Values.CastArray<ITypeSymbol>();
 
                         return new CommandOptionSymbol(
-                            new PropertyInfo(
-                                p.Name,
-                                p.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
+                            new PropertyDescriptor(
+                                new TypeDescriptor(
+                                    p.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
+                                ),
+                                p.Name
                             ),
-                            names,
+                            isSequence,
+                            name,
+                            shortName,
+                            environmentVariable,
+                            isRequired,
                             description,
-                            converter?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+                            converter
+                                ?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
+                                ?.Pipe(n => new TypeDescriptor(n)),
                             validators
                                 .Select(v =>
                                     v.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
                                 )
+                                .Select(n => new TypeDescriptor(n))
                                 .ToArray()
                         );
                     })
@@ -202,10 +258,14 @@ public partial class CommandSchemaGenerator : IIncrementalGenerator
 
                 return (
                     new CommandSymbol(
-                        namedTypeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+                        new TypeDescriptor(
+                            namedTypeSymbol.ToDisplayString(
+                                SymbolDisplayFormat.FullyQualifiedFormat
+                            )
+                        ),
                         commandName,
-                        parameterSymbols,
-                        optionSymbols
+                        commandDescription,
+                        parameterSymbols.Concat<CommandInputSymbol>(optionSymbols).ToArray()
                     ),
                     null
                 );
@@ -229,33 +289,38 @@ public partial class CommandSchemaGenerator : IIncrementalGenerator
                   using CliFx.Schema;
                   using CliFx.Extensibility;
                   
-                  partial class {{ c.TypeName }}
+                  namespace {{ c.Type.Namespace }};
+                  
+                  partial class {{ c.Type.Name }}
                   {
-                      public static CommandSchema<{{ c.TypeName }}> Schema { get; } = new(
+                      public static CommandSchema<{{ c.Type.FullyQualifiedName }}> Schema { get; } = new(
                           {{ c.Name }},
+                          {{ c.Description }},
                           [
-                              {{ c.Parameters.Select(p =>
+                              {{ c.Inputs.Select(i => i switch {
+                                  CommandParameterSymbol parameter =>
                                   // lang=csharp
                                   $$"""
-                                    new CommandParameterSchema<{{ c.TypeName }}, {{ p.Property.TypeName }}>(
-                                        new PropertyBinding<{{ c.TypeName }}, {{ p.Property.TypeName }}>(
-                                            obj => obj.{{ p.Property.Name }},
-                                            (obj, value) => obj.{{ p.Property.Name }} = value
+                                    new CommandParameterSchema<{{ c.Type.FullyQualifiedName }}, {{ i.Property.Type.FullyQualifiedName }}>(
+                                        new PropertyBinding<{{ c.Type.FullyQualifiedName }}, {{ i.Property.Type.FullyQualifiedName }}>(
+                                            obj => obj.{{ i.Property.Name }},
+                                            (obj, value) => obj.{{ i.Property.Name }} = value
                                         ),
                                         p.Order,
                                         p.IsRequired,
                                         p.Name,
                                         p.Description,
-                                        new {{ p.ConverterTypeName }}(),
+                                        new {{ i.ConverterType.FullyQualifiedName }}(),
                                         [ 
-                                            {{ p.ValidatorTypeNames.Select(v =>
+                                            {{ i.ValidatorTypes.Select(v =>
                                                 // lang=csharp
-                                                $"new {v}()").JoinToString(",\n")
+                                                $"new {v.FullyQualifiedName}()").JoinToString(",\n")
                                             }}
                                         ]
                                     )
-                                    """
-                                  ).JoinToString(",\n")
+                                    """,
+                                  CommandOptionSymbol option => ""
+                                  }).JoinToString(",\n")
                               }}
                           ]
                   }
@@ -265,35 +330,4 @@ public partial class CommandSchemaGenerator : IIncrementalGenerator
             }
         );
     }
-}
-
-public partial class CommandSchemaGenerator
-{
-    // TODO make all types structurally equatable
-    private record PropertyInfo(string Name, string TypeName);
-
-    private record CommandParameterSymbol(
-        PropertyInfo Property,
-        int? Order,
-        bool IsRequired,
-        string? Name,
-        string? Description,
-        string? ConverterTypeName,
-        IReadOnlyList<string> ValidatorTypeNames
-    );
-
-    private record CommandOptionSymbol(
-        PropertyInfo Property,
-        string[] Names,
-        string? Description,
-        string? ConverterTypeName,
-        IReadOnlyList<string> ValidatorTypeNames
-    );
-
-    private record CommandSymbol(
-        string TypeName,
-        string? Name,
-        IReadOnlyList<CommandParameterSymbol> Parameters,
-        IReadOnlyList<CommandOptionSymbol> Options
-    );
 }

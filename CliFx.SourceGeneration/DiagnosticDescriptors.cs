@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using CliFx.SourceGeneration.SemanticModel;
+using Microsoft.CodeAnalysis;
 
 namespace CliFx.SourceGeneration;
 
