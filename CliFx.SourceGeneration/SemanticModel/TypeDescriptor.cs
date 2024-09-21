@@ -1,5 +1,6 @@
 ﻿using System;
 using CliFx.SourceGeneration.Utils.Extensions;
+using Microsoft.CodeAnalysis;
 
 namespace CliFx.SourceGeneration.SemanticModel;
 
@@ -37,4 +38,10 @@ internal partial class TypeDescriptor : IEquatable<TypeDescriptor>
     }
 
     public override int GetHashCode() => FullyQualifiedName.GetHashCode();
+}
+
+internal partial class TypeDescriptor
+{
+    public static TypeDescriptor FromSymbol(ITypeSymbol symbol) =>
+        new(symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
 }

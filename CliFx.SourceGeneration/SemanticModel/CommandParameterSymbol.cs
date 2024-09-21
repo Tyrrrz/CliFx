@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using CliFx.SourceGeneration.Utils.Extensions;
+using Microsoft.CodeAnalysis;
 
 namespace CliFx.SourceGeneration.SemanticModel;
 
@@ -50,4 +53,25 @@ internal partial class CommandParameterSymbol : IEquatable<CommandParameterSymbo
 
     public override int GetHashCode() =>
         HashCode.Combine(base.GetHashCode(), Order, Name, IsRequired);
+}
+
+internal partial class CommandParameterSymbol
+{
+    public static CommandParameterSymbol FromSymbol(
+        IPropertySymbol property,
+        AttributeData attribute
+    ) =>
+        new(
+            PropertyDescriptor.FromSymbol(property),
+            IsSequenceType(property.Type),
+            (int)attribute.ConstructorArguments.First().Value!,
+            attribute.GetNamedArgumentValue("Name", default(string)),
+            attribute.GetNamedArgumentValue("IsRequired", true),
+            attribute.GetNamedArgumentValue("Description", default(string)),
+            TypeDescriptor.FromSymbol(attribute.GetNamedArgumentValue<ITypeSymbol>("Converter")),
+            attribute
+                .GetNamedArgumentValues<ITypeSymbol>("Validators")
+                .Select(TypeDescriptor.FromSymbol)
+                .ToArray()
+        );
 }

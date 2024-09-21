@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.CodeAnalysis;
 
 namespace CliFx.SourceGeneration.SemanticModel;
 
@@ -34,4 +35,10 @@ internal partial class PropertyDescriptor : IEquatable<PropertyDescriptor>
     }
 
     public override int GetHashCode() => HashCode.Combine(Type, Name);
+}
+
+internal partial class PropertyDescriptor
+{
+    public static PropertyDescriptor FromSymbol(IPropertySymbol symbol) =>
+        new(TypeDescriptor.FromSymbol(symbol.Type), symbol.Name);
 }

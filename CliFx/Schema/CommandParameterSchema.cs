@@ -42,10 +42,7 @@ public class CommandParameterSchema(
 /// </remarks>
 public class CommandParameterSchema<
     TCommand,
-    [DynamicallyAccessedMembers(
-        DynamicallyAccessedMemberTypes.PublicMethods
-    )]
-        TProperty
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] TProperty
 >(
     PropertyBinding<TCommand, TProperty> property,
     bool isSequence,

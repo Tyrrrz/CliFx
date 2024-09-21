@@ -125,10 +125,7 @@ public abstract class CommandInputSchema(
 /// </remarks>
 public abstract class CommandInputSchema<
     TCommand,
-    [DynamicallyAccessedMembers(
-        DynamicallyAccessedMemberTypes.PublicMethods
-    )]
-        TProperty
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] TProperty
 >(
     PropertyBinding<TCommand, TProperty> property,
     bool isSequence,

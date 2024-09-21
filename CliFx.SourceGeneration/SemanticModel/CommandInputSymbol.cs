@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.CodeAnalysis;
 
 namespace CliFx.SourceGeneration.SemanticModel;
 
@@ -53,4 +54,13 @@ internal partial class CommandInputSymbol : IEquatable<CommandInputSymbol>
 
     public override int GetHashCode() =>
         HashCode.Combine(Property, IsSequence, Description, ConverterType, ValidatorTypes);
+}
+
+internal partial class CommandInputSymbol
+{
+    public static bool IsSequenceType(ITypeSymbol type) =>
+        type.AllInterfaces.Any(i =>
+            i.SpecialType == SpecialType.System_Collections_Generic_IEnumerable_T
+        )
+        && type.SpecialType != SpecialType.System_String;
 }

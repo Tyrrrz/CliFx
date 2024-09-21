@@ -63,10 +63,7 @@ public class CommandOptionSchema(
 /// </remarks>
 public class CommandOptionSchema<
     TCommand,
-    [DynamicallyAccessedMembers(
-        DynamicallyAccessedMemberTypes.PublicMethods
-    )]
-        TProperty
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] TProperty
 >(
     PropertyBinding<TCommand, TProperty> property,
     bool isSequence,

@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using CliFx.SourceGeneration.Utils.Extensions;
+using Microsoft.CodeAnalysis;
 
 namespace CliFx.SourceGeneration.SemanticModel;
 
@@ -54,4 +57,34 @@ internal partial class CommandOptionSymbol : IEquatable<CommandOptionSymbol>
 
     public override int GetHashCode() =>
         HashCode.Combine(base.GetHashCode(), Name, ShortName, EnvironmentVariable, IsRequired);
+}
+
+internal partial class CommandOptionSymbol
+{
+    public static CommandOptionSymbol FromSymbol(
+        IPropertySymbol property,
+        AttributeData attribute
+    ) =>
+        new(
+            PropertyDescriptor.FromSymbol(property),
+            IsSequenceType(property.Type),
+            attribute
+                .ConstructorArguments.FirstOrDefault(a =>
+                    a.Type?.SpecialType == SpecialType.System_String
+                )
+                .Value as string,
+            attribute
+                .ConstructorArguments.FirstOrDefault(a =>
+                    a.Type?.SpecialType == SpecialType.System_Char
+                )
+                .Value as char?,
+            attribute.GetNamedArgumentValue("EnvironmentVariable", default(string)),
+            attribute.GetNamedArgumentValue("IsRequired", property.IsRequired),
+            attribute.GetNamedArgumentValue("Description", default(string)),
+            TypeDescriptor.FromSymbol(attribute.GetNamedArgumentValue<ITypeSymbol?>("Converter")),
+            attribute
+                .GetNamedArgumentValues<ITypeSymbol>("Validators")
+                .Select(TypeDescriptor.FromSymbol)
+                .ToArray()
+        );
 }
