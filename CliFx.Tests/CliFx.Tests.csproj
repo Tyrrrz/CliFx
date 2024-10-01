@@ -9,7 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Basic.Reference.Assemblies.Net80" Version="1.7.8" />
+    <PackageReference Include="Basic.Reference.Assemblies.Net80" Version="1.7.9" />
     <PackageReference Include="CliWrap" Version="3.6.6" />
     <PackageReference Include="coverlet.collector" Version="6.0.2" PrivateAssets="all" />
     <PackageReference Include="CSharpier.MsBuild" Version="0.29.1" PrivateAssets="all" />
