@@ -17,6 +17,6 @@ internal class OptionInput(string identifier, IReadOnlyList<string> values)
         Identifier switch
         {
             { Length: >= 2 } => "--" + Identifier,
-            _ => '-' + Identifier
+            _ => '-' + Identifier,
         };
 }

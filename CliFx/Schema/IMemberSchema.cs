@@ -21,6 +21,6 @@ internal static class MemberSchemaExtensions
         {
             ParameterSchema => "Parameter",
             OptionSchema => "Option",
-            _ => throw new ArgumentOutOfRangeException(nameof(memberSchema))
+            _ => throw new ArgumentOutOfRangeException(nameof(memberSchema)),
         };
 }

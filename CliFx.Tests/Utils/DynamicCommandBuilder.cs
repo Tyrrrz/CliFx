@@ -27,7 +27,7 @@ internal static class DynamicCommandBuilder
             "System.Collections.Generic",
             "System.Linq",
             "System.Threading.Tasks",
-            "System.Globalization"
+            "System.Globalization",
         };
 
         // Get default CliFx namespaces

@@ -25,7 +25,7 @@ internal class AnalyzerAssertions(DiagnosticAnalyzer analyzer)
         {
             "System",
             "System.Collections.Generic",
-            "System.Threading.Tasks"
+            "System.Threading.Tasks",
         };
 
         // Get default CliFx namespaces
