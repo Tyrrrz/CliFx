@@ -578,6 +578,10 @@ public static class Program
 }
 ```
 
+> **Note**:
+> If you want to use certain advanced features provided by `Microsoft.Extensions.DependencyInjection`, you may need to do a bit of extra work to configure the container properly.
+> For example, to leverage support for keyed services, you need to [manually register an implementation of `IKeyedServiceProvider`](https://github.com/Tyrrrz/CliFx/issues/148).
+
 ### Testing
 
 Thanks to the `IConsole` abstraction, **CliFx** commands can be easily tested in isolation.
