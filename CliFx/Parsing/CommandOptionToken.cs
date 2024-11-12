@@ -16,7 +16,7 @@ public class CommandOptionToken(string identifier, IReadOnlyList<string> values)
         identifier switch
         {
             { Length: >= 2 } => "--" + identifier,
-            _ => '-' + identifier
+            _ => '-' + identifier,
         };
 
     /// <summary>

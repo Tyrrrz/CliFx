@@ -143,26 +143,25 @@ internal static class CommandInputSchemaExtensions
         {
             CommandParameterSchema => "Parameter",
             CommandOptionSchema => "Option",
-            _ => throw new InvalidOperationException("Unknown input schema type.")
+            _ => throw new InvalidOperationException("Unknown input schema type."),
         };
 
     public static string GetFormattedIdentifier(this CommandInputSchema schema) =>
         schema switch
         {
-            CommandParameterSchema parameter
-                => parameter.IsSequence ? $"<{parameter.Name}>" : $"<{parameter.Name}...>",
-            CommandOptionSchema option
-                => option switch
-                {
-                    { Name: not null, ShortName: not null }
-                        => $"-{option.ShortName}|--{option.Name}",
-                    { Name: not null } => $"--{option.Name}",
-                    { ShortName: not null } => $"-{option.ShortName}",
-                    _
-                        => throw new InvalidOperationException(
-                            "Option must have a name or a short name."
-                        )
-                },
-            _ => throw new ArgumentOutOfRangeException(nameof(schema))
+            CommandParameterSchema parameter => parameter.IsSequence
+                ? $"<{parameter.Name}>"
+                : $"<{parameter.Name}...>",
+
+            CommandOptionSchema option => option switch
+            {
+                { Name: not null, ShortName: not null } => $"-{option.ShortName}|--{option.Name}",
+                { Name: not null } => $"--{option.Name}",
+                { ShortName: not null } => $"-{option.ShortName}",
+                _ => throw new InvalidOperationException(
+                    "Option must have a name or a short name."
+                ),
+            },
+            _ => throw new ArgumentOutOfRangeException(nameof(schema)),
         };
 }
