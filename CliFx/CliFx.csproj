@@ -23,10 +23,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CSharpier.MsBuild" Version="0.29.2" PrivateAssets="all" />
+    <PackageReference Include="CSharpier.MsBuild" Version="0.30.6" PrivateAssets="all" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="all" />
-    <PackageReference Include="PolyShim" Version="1.13.0" PrivateAssets="all" />
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
+    <PackageReference Include="PolyShim" Version="1.14.0" PrivateAssets="all" />
+    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.6.0" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
   </ItemGroup>
 
   <!-- Embed the analyzer inside the package -->

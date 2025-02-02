@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using FluentAssertions;
-using FluentAssertions.Execution;
 using FluentAssertions.Primitives;
 
 namespace CliFx.Tests.Utils.Extensions;
@@ -13,7 +12,7 @@ internal static class AssertionExtensions
         params IEnumerable<string> lines
     ) =>
         assertions
-            .Subject.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
+            .Subject.Split(['\n', '\r'], StringSplitOptions.RemoveEmptyEntries)
             .Should()
             .Equal(lines);
 
@@ -30,7 +29,7 @@ internal static class AssertionExtensions
 
             if (index < 0)
             {
-                Execute.Assertion.FailWith(
+                assertions.CurrentAssertionChain.FailWith(
                     $"Expected string '{assertions.Subject}' to contain '{value}' after position {lastIndex}."
                 );
             }

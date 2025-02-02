@@ -8,8 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CSharpier.MsBuild" Version="0.29.2" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
+    <PackageReference Include="CSharpier.MsBuild" Version="0.30.6" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.1" />
   </ItemGroup>
 
   <ItemGroup>
