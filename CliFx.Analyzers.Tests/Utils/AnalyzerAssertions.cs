@@ -13,9 +13,11 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace CliFx.Analyzers.Tests.Utils;
 
-internal class AnalyzerAssertions(DiagnosticAnalyzer analyzer)
-    : ReferenceTypeAssertions<DiagnosticAnalyzer, AnalyzerAssertions>(analyzer)
+internal class AnalyzerAssertions(DiagnosticAnalyzer analyzer, AssertionChain assertionChain)
+    : ReferenceTypeAssertions<DiagnosticAnalyzer, AnalyzerAssertions>(analyzer, assertionChain)
 {
+    private readonly AssertionChain _assertionChain = assertionChain;
+
     protected override string Identifier => "analyzer";
 
     private Compilation Compile(string sourceCode)
@@ -102,8 +104,8 @@ internal class AnalyzerAssertions(DiagnosticAnalyzer analyzer)
             expectedDiagnosticIds.Intersect(producedDiagnosticIds).Count()
             == expectedDiagnosticIds.Length;
 
-        Execute
-            .Assertion.ForCondition(isSuccessfulAssertion)
+        _assertionChain
+            .ForCondition(isSuccessfulAssertion)
             .FailWith(() =>
             {
                 var buffer = new StringBuilder();
@@ -146,8 +148,8 @@ internal class AnalyzerAssertions(DiagnosticAnalyzer analyzer)
         var producedDiagnostics = GetProducedDiagnostics(sourceCode);
         var isSuccessfulAssertion = !producedDiagnostics.Any();
 
-        Execute
-            .Assertion.ForCondition(isSuccessfulAssertion)
+        _assertionChain
+            .ForCondition(isSuccessfulAssertion)
             .FailWith(() =>
             {
                 var buffer = new StringBuilder();
@@ -170,5 +172,6 @@ internal class AnalyzerAssertions(DiagnosticAnalyzer analyzer)
 
 internal static class AnalyzerAssertionsExtensions
 {
-    public static AnalyzerAssertions Should(this DiagnosticAnalyzer analyzer) => new(analyzer);
+    public static AnalyzerAssertions Should(this DiagnosticAnalyzer analyzer) =>
+        new(analyzer, AssertionChain.GetOrCreate());
 }
