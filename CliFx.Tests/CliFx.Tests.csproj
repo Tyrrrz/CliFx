@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -10,13 +10,13 @@
 
   <ItemGroup>
     <PackageReference Include="Basic.Reference.Assemblies.Net80" Version="1.8.0" />
-    <PackageReference Include="CliWrap" Version="3.8.1" />
+    <PackageReference Include="CliWrap" Version="3.8.2" />
     <PackageReference Include="coverlet.collector" Version="6.0.4" PrivateAssets="all" />
     <PackageReference Include="CSharpier.MsBuild" Version="0.30.6" PrivateAssets="all" />
-    <PackageReference Include="FluentAssertions" Version="8.1.1" />
+    <PackageReference Include="FluentAssertions" Version="8.2.0" />
     <PackageReference Include="GitHubActionsTestLogger" Version="2.4.1" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
     <PackageReference Include="PolyShim" Version="1.15.0" PrivateAssets="all" />
     <PackageReference Include="xunit" Version="2.9.3" />
