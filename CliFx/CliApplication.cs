@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using CliFx.Exceptions;
 using CliFx.Formatting;
@@ -43,14 +42,14 @@ public class CliApplication(
         Configuration.IsPreviewModeAllowed && commandInput.IsPreviewDirectiveSpecified;
 
     private bool ShouldShowHelpText(CommandSchema commandSchema, CommandInput commandInput) =>
-        commandSchema.IsHelpOptionAvailable && commandInput.IsHelpOptionSpecified
+        commandSchema.IsImplicitHelpOptionAvailable && commandInput.IsHelpOptionSpecified
         ||
         // Show help text also if the fallback default command is executed without any arguments
         commandSchema == FallbackDefaultCommand.Schema
             && !commandInput.HasArguments;
 
     private bool ShouldShowVersionText(CommandSchema commandSchema, CommandInput commandInput) =>
-        commandSchema.IsVersionOptionAvailable && commandInput.IsVersionOptionSpecified;
+        commandSchema.IsImplicitVersionOptionAvailable && commandInput.IsVersionOptionSpecified;
 
     private async ValueTask PromptDebuggerAsync()
     {

@@ -588,6 +588,86 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
     }
 
     [Fact]
+    public async Task I_can_bind_an_option_to_a_property_with_the_same_identifier_as_the_implicit_help_option_and_get_the_correct_value()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // lang=csharp
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption("help", 'h')]
+                public string? Foo { get; init; }
+
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.WriteLine(Foo);
+                    return default;
+                }
+            }
+            """
+        );
+
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
+
+        // Act
+        var exitCode = await application.RunAsync(
+            ["--help", "me"],
+            new Dictionary<string, string>()
+        );
+
+        // Assert
+        exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
+        stdOut.Trim().Should().Be("me");
+    }
+
+    [Fact]
+    public async Task I_can_bind_an_option_to_a_property_with_the_same_identifier_as_the_implicit_version_option_and_get_the_correct_value()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // lang=csharp
+            """
+            [Command]
+            public class Command : ICommand
+            {
+                [CommandOption("version")]
+                public string? Foo { get; init; }
+
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.WriteLine(Foo);
+                    return default;
+                }
+            }
+            """
+        );
+
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .Build();
+
+        // Act
+        var exitCode = await application.RunAsync(
+            ["--version", "1.2.0"],
+            new Dictionary<string, string>()
+        );
+
+        // Assert
+        exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
+        stdOut.Trim().Should().Be("1.2.0");
+    }
+
+    [Fact]
     public async Task I_can_try_to_bind_a_required_option_to_a_property_and_get_an_error_if_the_user_does_not_provide_the_corresponding_argument()
     {
         // Arrange

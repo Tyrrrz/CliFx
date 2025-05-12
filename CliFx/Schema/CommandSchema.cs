@@ -28,9 +28,10 @@ internal partial class CommandSchema(
 
     public bool IsDefault => string.IsNullOrWhiteSpace(Name);
 
-    public bool IsHelpOptionAvailable => Options.Contains(OptionSchema.HelpOption);
+    public bool IsImplicitHelpOptionAvailable => Options.Contains(OptionSchema.ImplicitHelpOption);
 
-    public bool IsVersionOptionAvailable => Options.Contains(OptionSchema.VersionOption);
+    public bool IsImplicitVersionOptionAvailable =>
+        Options.Contains(OptionSchema.ImplicitVersionOption);
 
     public bool MatchesName(string? name) =>
         !string.IsNullOrWhiteSpace(Name)
@@ -74,10 +75,6 @@ internal partial class CommandSchema
         var name = attribute?.Name?.Trim();
         var description = attribute?.Description?.Trim();
 
-        var implicitOptionSchemas = string.IsNullOrWhiteSpace(name)
-            ? new[] { OptionSchema.HelpOption, OptionSchema.VersionOption }
-            : new[] { OptionSchema.HelpOption };
-
         var properties = type
         // Get properties directly on the command type
         .GetProperties()
@@ -103,11 +100,25 @@ internal partial class CommandSchema
             .WhereNotNull()
             .ToArray();
 
-        var optionSchemas = properties
-            .Select(OptionSchema.TryResolve)
-            .WhereNotNull()
-            .Concat(implicitOptionSchemas)
-            .ToArray();
+        var optionSchemas = properties.Select(OptionSchema.TryResolve).WhereNotNull().ToList();
+
+        // Include implicit options, if appropriate
+        var isImplicitHelpOptionAvailable =
+            // If the command implements its own help option, don't include the implicit one
+            !optionSchemas.Any(o => o.MatchesShortName('h') || o.MatchesName("help"));
+
+        if (isImplicitHelpOptionAvailable)
+            optionSchemas.Add(OptionSchema.ImplicitHelpOption);
+
+        var isImplicitVersionOptionAvailable =
+            // Only the default command can have the version option
+            string.IsNullOrWhiteSpace(name)
+            &&
+            // If the command implements its own version option, don't include the implicit one
+            !optionSchemas.Any(o => o.MatchesName("version"));
+
+        if (isImplicitVersionOptionAvailable)
+            optionSchemas.Add(OptionSchema.ImplicitVersionOption);
 
         return new CommandSchema(type, name, description, parameterSchemas, optionSchemas);
     }
