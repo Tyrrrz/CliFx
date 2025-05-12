@@ -9,9 +9,9 @@ internal class OptionInput(string identifier, IReadOnlyList<string> values)
 
     public IReadOnlyList<string> Values { get; } = values;
 
-    public bool IsHelpOption => OptionSchema.HelpOption.MatchesIdentifier(Identifier);
+    public bool IsHelpOption => OptionSchema.ImplicitHelpOption.MatchesIdentifier(Identifier);
 
-    public bool IsVersionOption => OptionSchema.VersionOption.MatchesIdentifier(Identifier);
+    public bool IsVersionOption => OptionSchema.ImplicitVersionOption.MatchesIdentifier(Identifier);
 
     public string GetFormattedIdentifier() =>
         Identifier switch

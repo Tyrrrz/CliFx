@@ -103,7 +103,7 @@ internal partial class OptionSchema
 
 internal partial class OptionSchema
 {
-    public static OptionSchema HelpOption { get; } =
+    public static OptionSchema ImplicitHelpOption { get; } =
         new(
             NullPropertyDescriptor.Instance,
             "help",
@@ -115,7 +115,7 @@ internal partial class OptionSchema
             Array.Empty<Type>()
         );
 
-    public static OptionSchema VersionOption { get; } =
+    public static OptionSchema ImplicitVersionOption { get; } =
         new(
             NullPropertyDescriptor.Instance,
             "version",
