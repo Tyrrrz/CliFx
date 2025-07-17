@@ -33,7 +33,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     }
 
     [Fact]
-    public async Task I_can_request_the_help_text_by_running_the_application_with_the_help_option()
+    public async Task I_can_request_the_help_text_by_running_the_application_with_the_implicit_help_option()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -64,7 +64,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     }
 
     [Fact]
-    public async Task I_can_request_the_help_text_by_running_the_application_with_the_help_option_even_if_the_default_command_is_not_defined()
+    public async Task I_can_request_the_help_text_by_running_the_application_with_the_implicit_help_option_even_if_the_default_command_is_not_defined()
     {
         // Arrange
         var commandTypes = DynamicCommandBuilder.CompileMany(
@@ -101,7 +101,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     }
 
     [Fact]
-    public async Task I_can_request_the_help_text_for_a_specific_command_by_running_the_application_and_specifying_its_name_with_the_help_option()
+    public async Task I_can_request_the_help_text_for_a_specific_command_by_running_the_application_and_specifying_its_name_with_the_implicit_help_option()
     {
         // Arrange
         var commandTypes = DynamicCommandBuilder.CompileMany(
@@ -146,7 +146,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     }
 
     [Fact]
-    public async Task I_can_request_the_help_text_for_a_specific_nested_command_by_running_the_application_and_specifying_its_name_with_the_help_option()
+    public async Task I_can_request_the_help_text_for_a_specific_nested_command_by_running_the_application_and_specifying_its_name_with_the_implicit_help_option()
     {
         // Arrange
         var commandTypes = DynamicCommandBuilder.CompileMany(
@@ -475,7 +475,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     }
 
     [Fact]
-    public async Task I_can_request_the_help_text_to_see_the_help_and_version_options()
+    public async Task I_can_request_the_help_text_to_see_the_help_and_implicit_version_options()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -514,7 +514,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     }
 
     [Fact]
-    public async Task I_can_request_the_help_text_on_a_named_command_to_see_the_help_option()
+    public async Task I_can_request_the_help_text_on_a_named_command_to_see_the_implicit_help_option()
     {
         // Arrange
         var commandType = DynamicCommandBuilder.Compile(
@@ -973,7 +973,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     }
 
     [Fact]
-    public async Task I_can_request_the_version_text_by_running_the_application_with_the_version_option()
+    public async Task I_can_request_the_version_text_by_running_the_application_with_the_implicit_version_option()
     {
         // Arrange
         var application = new CliApplicationBuilder()
@@ -990,5 +990,73 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
 
         var stdOut = FakeConsole.ReadOutputString();
         stdOut.Trim().Should().Be("v6.9");
+    }
+
+    [Fact]
+    public async Task I_cannot_request_the_help_text_by_running_the_application_with_the_implicit_help_option_if_there_is_an_option_with_the_same_identifier()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // lang=csharp
+            """
+            [Command]
+            public class DefaultCommand : ICommand
+            {
+                [CommandOption("help", 'h')]
+                public string? Foo { get; init; }
+
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
+
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .UseConsole(FakeConsole)
+            .SetDescription("This will be in help text")
+            .Build();
+
+        // Act
+        var exitCode = await application.RunAsync(["--help"], new Dictionary<string, string>());
+
+        // Assert
+        exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
+        stdOut.Should().NotContain("This will be in help text");
+    }
+
+    [Fact]
+    public async Task I_cannot_request_the_version_text_by_running_the_application_with_the_implicit_version_option_if_there_is_an_option_with_the_same_identifier()
+    {
+        // Arrange
+        var commandType = DynamicCommandBuilder.Compile(
+            // lang=csharp
+            """
+            [Command]
+            public class DefaultCommand : ICommand
+            {
+                [CommandOption("version")]
+                public string? Foo { get; init; }
+
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
+
+        var application = new CliApplicationBuilder()
+            .AddCommand(commandType)
+            .SetVersion("v6.9")
+            .UseConsole(FakeConsole)
+            .Build();
+
+        // Act
+        var exitCode = await application.RunAsync(["--version"], new Dictionary<string, string>());
+
+        // Assert
+        exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
+        stdOut.Trim().Should().NotBe("v6.9");
     }
 }
