@@ -41,10 +41,9 @@ internal partial class CommandSymbol(
     private string GenerateSchemaInitializationCode(CommandInputSymbol input) =>
         input switch
         {
-            CommandParameterSymbol parameter
-                =>
-                // lang=csharp
-                $$"""
+            CommandParameterSymbol parameter =>
+            // lang=csharp
+            $$"""
                     new CliFx.Schema.CommandParameterSchema<{{Type.FullyQualifiedName}}, {{parameter
                         .Property
                         .Type
@@ -59,10 +58,9 @@ internal partial class CommandSymbol(
                         // TODO
                     );
                     """,
-            CommandOptionSymbol option
-                =>
-                // lang=csharp
-                $$"""
+            CommandOptionSymbol option =>
+            // lang=csharp
+            $$"""
                     new CliFx.Schema.CommandOptionSchema<{{Type.FullyQualifiedName}}, {{option
                         .Property
                         .Type
@@ -78,7 +76,7 @@ internal partial class CommandSymbol(
                         // TODO
                     );
                     """,
-            _ => throw new ArgumentOutOfRangeException(nameof(input), input, null)
+            _ => throw new ArgumentOutOfRangeException(nameof(input), input, null),
         };
 
     public string GenerateSchemaInitializationCode() =>

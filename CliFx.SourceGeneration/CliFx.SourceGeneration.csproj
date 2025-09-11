@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
@@ -7,7 +6,6 @@
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     <NoWarn>$(NoWarn);RS1035</NoWarn>
   </PropertyGroup>
-
   <PropertyGroup>
     <!--
       Because this project only has a single target framework, the condition in
@@ -15,13 +13,15 @@
     -->
     <Nullable>annotations</Nullable>
   </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="CSharpier.MsBuild" Version="0.28.2" PrivateAssets="all" />
+    <PackageReference Include="CSharpier.MsBuild" Version="1.1.2" PrivateAssets="all" />
     <!-- Make sure to target the lowest possible version of the compiler for wider support -->
     <PackageReference Include="Microsoft.CodeAnalysis" Version="4.11.0" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0" PrivateAssets="all" />
-    <PackageReference Include="PolyShim" Version="1.12.0" PrivateAssets="all" />
+    <PackageReference
+      Include="Microsoft.CodeAnalysis.CSharp"
+      Version="4.11.0"
+      PrivateAssets="all"
+    />
+    <PackageReference Include="PolyShim" Version="1.15.0" PrivateAssets="all" />
   </ItemGroup>
-
 </Project>
