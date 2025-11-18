@@ -172,6 +172,8 @@ internal class AnalyzerAssertions(DiagnosticAnalyzer analyzer, AssertionChain as
 
 internal static class AnalyzerAssertionsExtensions
 {
-    public static AnalyzerAssertions Should(this DiagnosticAnalyzer analyzer) =>
-        new(analyzer, AssertionChain.GetOrCreate());
+    extension(DiagnosticAnalyzer analyzer)
+    {
+        public AnalyzerAssertions Should() => new(analyzer, AssertionChain.GetOrCreate());
+    }
 }

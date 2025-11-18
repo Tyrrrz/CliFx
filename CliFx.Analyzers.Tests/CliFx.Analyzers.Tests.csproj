@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
   </PropertyGroup>
@@ -11,7 +10,7 @@
   <ItemGroup>
     <PackageReference Include="Basic.Reference.Assemblies.Net80" Version="1.8.3" />
     <PackageReference Include="coverlet.collector" Version="6.0.4" PrivateAssets="all" />
-    <PackageReference Include="CSharpier.MsBuild" Version="0.30.6" PrivateAssets="all" />
+    <PackageReference Include="CSharpier.MsBuild" Version="1.2.1" PrivateAssets="all" />
     <PackageReference Include="GitHubActionsTestLogger" Version="2.4.1" PrivateAssets="all" />
     <PackageReference Include="FluentAssertions" Version="8.8.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />
@@ -24,5 +23,4 @@
     <ProjectReference Include="..\CliFx.Analyzers\CliFx.Analyzers.csproj" />
     <ProjectReference Include="..\CliFx\CliFx.csproj" />
   </ItemGroup>
-
 </Project>

@@ -8,7 +8,6 @@ using CliFx.Formatting;
 using CliFx.Infrastructure;
 using CliFx.Input;
 using CliFx.Schema;
-using CliFx.Utils;
 using CliFx.Utils.Extensions;
 
 namespace CliFx;
@@ -56,7 +55,7 @@ public class CliApplication(
         using (console.WithForegroundColor(ConsoleColor.Green))
         {
             console.Output.WriteLine(
-                $"Attach the debugger to process with ID {ProcessEx.GetCurrentProcessId()} to continue."
+                $"Attach the debugger to process with ID {Environment.ProcessId} to continue."
             );
         }
 

@@ -7,41 +7,36 @@ namespace CliFx.Tests.Utils.Extensions;
 
 internal static class AssertionExtensions
 {
-    public static void ConsistOfLines(
-        this StringAssertions assertions,
-        params IEnumerable<string> lines
-    ) =>
-        assertions
-            .Subject.Split(['\n', '\r'], StringSplitOptions.RemoveEmptyEntries)
-            .Should()
-            .Equal(lines);
-
-    public static AndConstraint<StringAssertions> ContainAllInOrder(
-        this StringAssertions assertions,
-        IEnumerable<string> values
-    )
+    extension(StringAssertions assertions)
     {
-        var lastIndex = 0;
+        public void ConsistOfLines(params IEnumerable<string> lines) =>
+            assertions
+                .Subject.Split(['\n', '\r'], StringSplitOptions.RemoveEmptyEntries)
+                .Should()
+                .Equal(lines);
 
-        foreach (var value in values)
+        public AndConstraint<StringAssertions> ContainAllInOrder(IEnumerable<string> values)
         {
-            var index = assertions.Subject.IndexOf(value, lastIndex, StringComparison.Ordinal);
+            var lastIndex = 0;
 
-            if (index < 0)
+            foreach (var value in values)
             {
-                assertions.CurrentAssertionChain.FailWith(
-                    $"Expected string '{assertions.Subject}' to contain '{value}' after position {lastIndex}."
-                );
+                var index = assertions.Subject.IndexOf(value, lastIndex, StringComparison.Ordinal);
+
+                if (index < 0)
+                {
+                    assertions.CurrentAssertionChain.FailWith(
+                        $"Expected string '{assertions.Subject}' to contain '{value}' after position {lastIndex}."
+                    );
+                }
+
+                lastIndex = index;
             }
 
-            lastIndex = index;
+            return new AndConstraint<StringAssertions>(assertions);
         }
 
-        return new AndConstraint<StringAssertions>(assertions);
+        public AndConstraint<StringAssertions> ContainAllInOrder(params string[] values) =>
+            assertions.ContainAllInOrder((IEnumerable<string>)values);
     }
-
-    public static AndConstraint<StringAssertions> ContainAllInOrder(
-        this StringAssertions assertions,
-        params string[] values
-    ) => assertions.ContainAllInOrder((IEnumerable<string>)values);
 }

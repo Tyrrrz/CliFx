@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.Versioning;
 using System.Threading;
 
 namespace CliFx.Infrastructure;
@@ -53,6 +54,7 @@ public class SystemConsole : IConsole, IDisposable
     }
 
     /// <inheritdoc />
+    [SupportedOSPlatform("windows")]
     public int WindowWidth
     {
         get => Console.WindowWidth;
@@ -60,6 +62,7 @@ public class SystemConsole : IConsole, IDisposable
     }
 
     /// <inheritdoc />
+    [SupportedOSPlatform("windows")]
     public int WindowHeight
     {
         get => Console.WindowHeight;

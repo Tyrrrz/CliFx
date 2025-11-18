@@ -8,53 +8,52 @@ namespace CliFx.Utils.Extensions;
 
 internal static class TypeExtensions
 {
-    public static bool Implements(this Type type, Type interfaceType) =>
-        type.GetInterfaces().Contains(interfaceType);
-
-    public static Type? TryGetNullableUnderlyingType(this Type type) =>
-        Nullable.GetUnderlyingType(type);
-
-    public static Type? TryGetEnumerableUnderlyingType(this Type type)
+    extension(Type type)
     {
-        if (type.IsPrimitive)
-            return null;
+        public bool Implements(Type interfaceType) => type.GetInterfaces().Contains(interfaceType);
 
-        if (type == typeof(IEnumerable))
-            return typeof(object);
+        public Type? TryGetNullableUnderlyingType() => Nullable.GetUnderlyingType(type);
 
-        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IEnumerable<>))
-            return type.GetGenericArguments().FirstOrDefault();
+        public Type? TryGetEnumerableUnderlyingType()
+        {
+            if (type.IsPrimitive)
+                return null;
 
-        return type.GetInterfaces()
-            .Select(TryGetEnumerableUnderlyingType)
-            .Where(t => t is not null)
-            // Every IEnumerable<T> implements IEnumerable (which is essentially IEnumerable<object>),
-            // so we try to get a more specific underlying type. Still, if the type only implements
-            // IEnumerable<object> and nothing else, then we'll just return that.
-            .MaxBy(t => t != typeof(object));
-    }
+            if (type == typeof(IEnumerable))
+                return typeof(object);
 
-    public static MethodInfo? TryGetStaticParseMethod(
-        this Type type,
-        bool withFormatProvider = false
-    )
-    {
-        var argumentTypes = withFormatProvider
-            ? new[] { typeof(string), typeof(IFormatProvider) }
-            : new[] { typeof(string) };
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+                return type.GetGenericArguments().FirstOrDefault();
 
-        return type.GetMethod(
-            "Parse",
-            BindingFlags.Public | BindingFlags.Static,
-            null,
-            argumentTypes,
-            null
-        );
-    }
+            return type.GetInterfaces()
+                .Select(TryGetEnumerableUnderlyingType)
+                .Where(t => t is not null)
+                // Every IEnumerable<T> implements IEnumerable (which is essentially IEnumerable<object>),
+                // so we try to get a more specific underlying type. Still, if the type only implements
+                // IEnumerable<object> and nothing else, then we'll just return that.
+                .MaxBy(t => t != typeof(object));
+        }
 
-    public static bool IsToStringOverriden(this Type type)
-    {
-        var toStringMethod = type.GetMethod(nameof(ToString), Type.EmptyTypes);
-        return toStringMethod?.GetBaseDefinition()?.DeclaringType != toStringMethod?.DeclaringType;
+        public MethodInfo? TryGetStaticParseMethod(bool withFormatProvider = false)
+        {
+            var argumentTypes = withFormatProvider
+                ? new[] { typeof(string), typeof(IFormatProvider) }
+                : new[] { typeof(string) };
+
+            return type.GetMethod(
+                "Parse",
+                BindingFlags.Public | BindingFlags.Static,
+                null,
+                argumentTypes,
+                null
+            );
+        }
+
+        public bool IsToStringOverriden()
+        {
+            var toStringMethod = type.GetMethod(nameof(ToString), Type.EmptyTypes);
+            return toStringMethod?.GetBaseDefinition()?.DeclaringType
+                != toStringMethod?.DeclaringType;
+        }
     }
 }

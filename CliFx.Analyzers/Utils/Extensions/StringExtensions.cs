@@ -4,15 +4,14 @@ namespace CliFx.Analyzers.Utils.Extensions;
 
 internal static class StringExtensions
 {
-    public static string TrimEnd(
-        this string str,
-        string sub,
-        StringComparison comparison = StringComparison.Ordinal
-    )
+    extension(string str)
     {
-        while (str.EndsWith(sub, comparison))
-            str = str[..^sub.Length];
+        public string TrimEnd(string sub, StringComparison comparison = StringComparison.Ordinal)
+        {
+            while (str.EndsWith(sub, comparison))
+                str = str[..^sub.Length];
 
-        return str;
+            return str;
+        }
     }
 }

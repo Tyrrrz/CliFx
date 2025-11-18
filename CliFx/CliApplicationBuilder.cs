@@ -6,7 +6,6 @@ using System.Reflection;
 using CliFx.Attributes;
 using CliFx.Infrastructure;
 using CliFx.Schema;
-using CliFx.Utils;
 using CliFx.Utils.Extensions;
 
 namespace CliFx;
@@ -229,7 +228,7 @@ public partial class CliApplicationBuilder
 {
     private static string GetDefaultTitle()
     {
-        var entryAssemblyName = EnvironmentEx.EntryAssembly?.GetName().Name;
+        var entryAssemblyName = Assembly.GetEntryAssembly()?.GetName().Name;
         if (string.IsNullOrWhiteSpace(entryAssemblyName))
         {
             throw new InvalidOperationException(
@@ -243,8 +242,8 @@ public partial class CliApplicationBuilder
 
     private static string GetDefaultExecutableName()
     {
-        var entryAssemblyFilePath = EnvironmentEx.EntryAssembly?.Location;
-        var processFilePath = EnvironmentEx.ProcessPath;
+        var entryAssemblyFilePath = Assembly.GetEntryAssembly()?.Location;
+        var processFilePath = Environment.ProcessPath;
 
         if (
             string.IsNullOrWhiteSpace(entryAssemblyFilePath)
@@ -259,7 +258,7 @@ public partial class CliApplicationBuilder
 
         // If the process path matches the entry assembly path, it's a legacy .NET Framework app
         // or a self-contained .NET Core app.
-        if (PathEx.AreEqual(entryAssemblyFilePath, processFilePath))
+        if (Path.AreEqual(entryAssemblyFilePath, processFilePath))
         {
             return Path.GetFileNameWithoutExtension(entryAssemblyFilePath);
         }
@@ -267,8 +266,8 @@ public partial class CliApplicationBuilder
         // If the process path has the same name and parent directory as the entry assembly path,
         // but different extension, it's a framework-dependent .NET Core app launched through the apphost.
         if (
-            PathEx.AreEqual(Path.ChangeExtension(entryAssemblyFilePath, "exe"), processFilePath)
-            || PathEx.AreEqual(
+            Path.AreEqual(Path.ChangeExtension(entryAssemblyFilePath, "exe"), processFilePath)
+            || Path.AreEqual(
                 Path.GetFileNameWithoutExtension(entryAssemblyFilePath),
                 processFilePath
             )
@@ -283,7 +282,7 @@ public partial class CliApplicationBuilder
 
     private static string GetDefaultVersionText()
     {
-        var entryAssemblyVersion = EnvironmentEx.EntryAssembly?.GetName().Version;
+        var entryAssemblyVersion = Assembly.GetEntryAssembly()?.GetName().Version;
         if (entryAssemblyVersion is null)
         {
             throw new InvalidOperationException(

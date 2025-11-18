@@ -39,14 +39,13 @@ public class CancellationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOut
         var command = Cli.Wrap(Dummy.Program.FilePath).WithArguments("cancel-test") | pipeTarget;
 
         // Act & assert
-        await Assert.ThrowsAnyAsync<OperationCanceledException>(
-            async () =>
-                await command.ExecuteAsync(
-                    // Forceful cancellation (not required because we have a timeout)
-                    CancellationToken.None,
-                    // Graceful cancellation
-                    cts.Token
-                )
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
+            await command.ExecuteAsync(
+                // Forceful cancellation (not required because we have a timeout)
+                CancellationToken.None,
+                // Graceful cancellation
+                cts.Token
+            )
         );
 
         stdOutBuffer.ToString().Trim().Should().ConsistOfLines("Started.", "Cancelled.");
