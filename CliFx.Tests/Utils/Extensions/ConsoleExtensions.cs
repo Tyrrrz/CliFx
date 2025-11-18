@@ -5,15 +5,15 @@ namespace CliFx.Tests.Utils.Extensions;
 
 internal static class ConsoleExtensions
 {
-    public static void DumpToTestOutput(
-        this FakeInMemoryConsole console,
-        ITestOutputHelper testOutput
-    )
+    extension(FakeInMemoryConsole console)
     {
-        testOutput.WriteLine("[*] Captured standard output:");
-        testOutput.WriteLine(console.ReadOutputString());
+        public void DumpToTestOutput(ITestOutputHelper testOutput)
+        {
+            testOutput.WriteLine("[*] Captured standard output:");
+            testOutput.WriteLine(console.ReadOutputString());
 
-        testOutput.WriteLine("[*] Captured standard error:");
-        testOutput.WriteLine(console.ReadErrorString());
+            testOutput.WriteLine("[*] Captured standard error:");
+            testOutput.WriteLine(console.ReadErrorString());
+        }
     }
 }

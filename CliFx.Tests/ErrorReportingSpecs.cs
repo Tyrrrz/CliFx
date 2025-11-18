@@ -32,10 +32,7 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            [],
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync([], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().NotBe(0);
@@ -71,10 +68,7 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            [],
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync([], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().NotBe(0);
@@ -117,10 +111,7 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            [],
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync([], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(69);
@@ -154,10 +145,7 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            [],
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync([], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(69);
@@ -192,10 +180,7 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            [],
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync([], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(69);

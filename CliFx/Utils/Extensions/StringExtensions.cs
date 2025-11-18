@@ -4,13 +4,20 @@ namespace CliFx.Utils.Extensions;
 
 internal static class StringExtensions
 {
-    public static string? NullIfWhiteSpace(this string str) =>
-        !string.IsNullOrWhiteSpace(str) ? str : null;
+    extension(string str)
+    {
+        public string? NullIfWhiteSpace() => !string.IsNullOrWhiteSpace(str) ? str : null;
+    }
 
-    public static string Repeat(this char c, int count) => new(c, count);
+    extension(char c)
+    {
+        public string Repeat(int count) => new(c, count);
 
-    public static string AsString(this char c) => c.Repeat(1);
+        public string AsString() => c.Repeat(1);
+    }
 
-    public static string JoinToString<T>(this IEnumerable<T> source, string separator) =>
-        string.Join(separator, source);
+    extension<T>(IEnumerable<T> source)
+    {
+        public string JoinToString(string separator) => string.Join(separator, source);
+    }
 }

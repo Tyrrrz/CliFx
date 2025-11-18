@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
@@ -8,13 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CSharpier.MsBuild" Version="1.1.2" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.9" />
+    <PackageReference Include="CSharpier.MsBuild" Version="1.2.1" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.10" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\CliFx\CliFx.csproj" />
-    <ProjectReference Include="..\CliFx.SourceGeneration\CliFx.SourceGeneration.csproj" ReferenceOutputAssembly="false" OutputItemType="analyzer" />
+    <ProjectReference
+      Include="..\CliFx.SourceGeneration\CliFx.SourceGeneration.csproj"
+      ReferenceOutputAssembly="false"
+      OutputItemType="analyzer"
+    />
   </ItemGroup>
-
 </Project>

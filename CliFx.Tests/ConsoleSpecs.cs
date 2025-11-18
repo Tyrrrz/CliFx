@@ -87,10 +87,7 @@ public class ConsoleSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            [],
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync([], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(0);
@@ -143,10 +140,7 @@ public class ConsoleSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         // Act
         FakeConsole.WriteInput("Hello world");
 
-        var exitCode = await application.RunAsync(
-            [],
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync([], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(0);
@@ -190,10 +184,7 @@ public class ConsoleSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         FakeConsole.EnqueueKey(new ConsoleKeyInfo('a', ConsoleKey.A, false, false, false));
         FakeConsole.EnqueueKey(new ConsoleKeyInfo('\0', ConsoleKey.Backspace, false, false, false));
 
-        var exitCode = await application.RunAsync(
-            [],
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync([], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(0);

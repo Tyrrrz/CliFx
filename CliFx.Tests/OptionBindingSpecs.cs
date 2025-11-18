@@ -690,10 +690,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            [],
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync([], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().NotBe(0);

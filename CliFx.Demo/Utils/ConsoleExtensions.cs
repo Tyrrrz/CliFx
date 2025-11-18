@@ -6,34 +6,39 @@ namespace CliFx.Demo.Utils;
 
 internal static class ConsoleExtensions
 {
-    public static void WriteBook(this ConsoleWriter writer, Book book)
+    extension(ConsoleWriter writer)
     {
-        // Title
-        using (writer.Console.WithForegroundColor(ConsoleColor.White))
-            writer.WriteLine(book.Title);
+        public void WriteBook(Book book)
+        {
+            // Title
+            using (writer.Console.WithForegroundColor(ConsoleColor.White))
+                writer.WriteLine(book.Title);
 
-        // Author
-        writer.Write("  ");
-        writer.Write("Author: ");
+            // Author
+            writer.Write("  ");
+            writer.Write("Author: ");
 
-        using (writer.Console.WithForegroundColor(ConsoleColor.White))
-            writer.WriteLine(book.Author);
+            using (writer.Console.WithForegroundColor(ConsoleColor.White))
+                writer.WriteLine(book.Author);
 
-        // Published
-        writer.Write("  ");
-        writer.Write("Published: ");
+            // Published
+            writer.Write("  ");
+            writer.Write("Published: ");
 
-        using (writer.Console.WithForegroundColor(ConsoleColor.White))
-            writer.WriteLine($"{book.Published:d}");
+            using (writer.Console.WithForegroundColor(ConsoleColor.White))
+                writer.WriteLine($"{book.Published:d}");
 
-        // ISBN
-        writer.Write("  ");
-        writer.Write("ISBN: ");
+            // ISBN
+            writer.Write("  ");
+            writer.Write("ISBN: ");
 
-        using (writer.Console.WithForegroundColor(ConsoleColor.White))
-            writer.WriteLine(book.Isbn);
+            using (writer.Console.WithForegroundColor(ConsoleColor.White))
+                writer.WriteLine(book.Isbn);
+        }
     }
 
-    public static void WriteBook(this IConsole console, Book book) =>
-        console.Output.WriteBook(book);
+    extension(IConsole console)
+    {
+        public void WriteBook(Book book) => console.Output.WriteBook(book);
+    }
 }

@@ -20,10 +20,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            [],
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync([], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(0);

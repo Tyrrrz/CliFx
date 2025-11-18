@@ -11,6 +11,7 @@
       >true</IsAotCompatible
     >
   </PropertyGroup>
+
   <PropertyGroup>
     <Authors>$(Company)</Authors>
     <Description>Class-first framework for building command-line interfaces</Description>
@@ -21,19 +22,22 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
+
   <ItemGroup>
     <None Include="../favicon.png" Pack="true" PackagePath="" Visible="false" />
   </ItemGroup>
+
   <ItemGroup>
-    <PackageReference Include="CSharpier.MsBuild" Version="1.1.2" PrivateAssets="all" />
+    <PackageReference Include="CSharpier.MsBuild" Version="1.2.1" PrivateAssets="all" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="all" />
-    <PackageReference Include="PolyShim" Version="1.15.0" PrivateAssets="all" />
+    <PackageReference Include="PolyShim" Version="2.0.0" PrivateAssets="all" />
     <PackageReference
       Include="System.Threading.Tasks.Extensions"
-      Version="4.6.3"
+      Version="4.6.0"
       Condition="!$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'netstandard2.1'))"
     />
   </ItemGroup>
+
   <!-- Embed the analyzer inside the package -->
   <ItemGroup>
     <ProjectReference
