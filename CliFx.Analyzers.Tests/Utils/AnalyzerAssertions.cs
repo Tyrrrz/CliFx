@@ -55,7 +55,7 @@ internal class AnalyzerAssertions(DiagnosticAnalyzer analyzer, AssertionChain as
         var compilation = CSharpCompilation.Create(
             "CliFxTests_DynamicAssembly_" + Guid.NewGuid(),
             [ast],
-            Net80.References.All.Append(
+            Net100.References.All.Append(
                 MetadataReference.CreateFromFile(typeof(ICommand).Assembly.Location)
             ),
             // DLL to avoid having to define the Main() method
