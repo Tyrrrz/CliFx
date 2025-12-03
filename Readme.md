@@ -75,11 +75,11 @@ public static class Program
 }
 ```
 
-> **Warning**:
+> [!WARNING]
 > Ensure that your `Main()` method returns the integer exit code provided by `CliApplication.RunAsync()`, as shown in the above example.
 > Exit code is used to communicate execution result to the parent process, so it's important that your program propagates it.
 
-> **Note**:
+> [!NOTE]
 > When calling `CliApplication.RunAsync()`, **CliFx** resolves command-line arguments and environment variables from `Environment.GetCommandLineArgs()` and `Environment.GetEnvironmentVariables()` respectively.
 > You can also provide them manually using one of the alternative overloads.
 
@@ -254,7 +254,7 @@ Besides that, they also differ in the following ways:
   public required string OptionWithFallback { get; init; }
   ```
 
-> **Note**:
+> [!NOTE]
 > **CliFx** has a set of built-in analyzers that detect common errors in command definitions.
 > Your code will not compile if a command contains duplicate options, overlapping parameters, or otherwise invalid configuration.
 
@@ -442,7 +442,7 @@ COMMANDS
 You can run `dotnet myapp.dll cmd1 [command] --help` to show help on a specific command.
 ```
 
-> **Note**:
+> [!NOTE]
 > Defining the default (unnamed) command is not required.
 > If it's absent, running the application without specifying a command will just show the root-level help text.
 
@@ -487,7 +487,7 @@ $ echo $?
 133
 ```
 
-> **Warning**:
+> [!WARNING]
 > Even though exit codes are represented by 32-bit integers in .NET, using values outside the 8-bit unsigned range will cause overflows on Unix systems.
 > To avoid unexpected results, use numbers between 1 and 255 for exit codes that indicate failure.
 
@@ -521,7 +521,7 @@ public class CancellableCommand : ICommand
 }
 ```
 
-> **Warning**:
+> [!WARNING]
 > Cancellation handler is only respected when the user sends the interrupt signal for the first time.
 > If the user decides to issue the signal again, the application will be forcefully terminated without triggering the cancellation token.
 
@@ -578,7 +578,7 @@ public static class Program
 }
 ```
 
-> **Note**:
+> [!NOTE]
 > If you want to use certain advanced features provided by `Microsoft.Extensions.DependencyInjection`, you may need to do a bit of extra work to configure the container properly.
 > For example, to leverage support for keyed services, you need to [manually register an implementation of `IKeyedServiceProvider`](https://github.com/Tyrrrz/CliFx/issues/148).
 

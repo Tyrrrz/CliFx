@@ -413,9 +413,14 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
 
 internal static class HelpConsoleFormatterExtensions
 {
-    public static void WriteHelpText(this ConsoleWriter consoleWriter, HelpContext context) =>
-        new HelpConsoleFormatter(consoleWriter, context).WriteHelpText();
+    extension(ConsoleWriter consoleWriter)
+    {
+        public void WriteHelpText(HelpContext context) =>
+            new HelpConsoleFormatter(consoleWriter, context).WriteHelpText();
+    }
 
-    public static void WriteHelpText(this IConsole console, HelpContext context) =>
-        console.Output.WriteHelpText(context);
+    extension(IConsole console)
+    {
+        public void WriteHelpText(HelpContext context) => console.Output.WriteHelpText(context);
+    }
 }

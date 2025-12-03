@@ -144,6 +144,9 @@ internal class NoPreambleEncoding(Encoding underlyingEncoding)
 
 internal static class NoPreambleEncodingExtensions
 {
-    public static Encoding WithoutPreamble(this Encoding encoding) =>
-        encoding.GetPreamble().Length > 0 ? new NoPreambleEncoding(encoding) : encoding;
+    extension(Encoding encoding)
+    {
+        public Encoding WithoutPreamble() =>
+            encoding.GetPreamble().Length > 0 ? new NoPreambleEncoding(encoding) : encoding;
+    }
 }
