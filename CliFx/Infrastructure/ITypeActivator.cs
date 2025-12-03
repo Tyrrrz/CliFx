@@ -16,15 +16,18 @@ public interface ITypeActivator
 
 internal static class TypeActivatorExtensions
 {
-    public static T CreateInstance<T>(this ITypeActivator activator, Type type)
+    extension(ITypeActivator activator)
     {
-        if (!typeof(T).IsAssignableFrom(type))
+        public T CreateInstance<T>(Type type)
         {
-            throw CliFxException.InternalError(
-                $"Type '{type.FullName}' is not assignable to '{typeof(T).FullName}'."
-            );
-        }
+            if (!typeof(T).IsAssignableFrom(type))
+            {
+                throw CliFxException.InternalError(
+                    $"Type '{type.FullName}' is not assignable to '{typeof(T).FullName}'."
+                );
+            }
 
-        return (T)activator.CreateInstance(type);
+            return (T)activator.CreateInstance(type);
+        }
     }
 }

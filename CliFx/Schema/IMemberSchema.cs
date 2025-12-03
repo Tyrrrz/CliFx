@@ -16,11 +16,14 @@ internal interface IMemberSchema
 
 internal static class MemberSchemaExtensions
 {
-    public static string GetKind(this IMemberSchema memberSchema) =>
-        memberSchema switch
-        {
-            ParameterSchema => "Parameter",
-            OptionSchema => "Option",
-            _ => throw new ArgumentOutOfRangeException(nameof(memberSchema)),
-        };
+    extension(IMemberSchema memberSchema)
+    {
+        public string GetKind() =>
+            memberSchema switch
+            {
+                ParameterSchema => "Parameter",
+                OptionSchema => "Option",
+                _ => throw new ArgumentOutOfRangeException(nameof(memberSchema)),
+            };
+    }
 }

@@ -120,9 +120,14 @@ internal class ExceptionConsoleFormatter(ConsoleWriter consoleWriter)
 
 internal static class ExceptionConsoleFormatterExtensions
 {
-    public static void WriteException(this ConsoleWriter consoleWriter, Exception exception) =>
-        new ExceptionConsoleFormatter(consoleWriter).WriteException(exception);
+    extension(ConsoleWriter consoleWriter)
+    {
+        public void WriteException(Exception exception) =>
+            new ExceptionConsoleFormatter(consoleWriter).WriteException(exception);
+    }
 
-    public static void WriteException(this IConsole console, Exception exception) =>
-        console.Error.WriteException(exception);
+    extension(IConsole console)
+    {
+        public void WriteException(Exception exception) => console.Error.WriteException(exception);
+    }
 }
