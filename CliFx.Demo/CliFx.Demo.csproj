@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="CSharpier.MsBuild" Version="1.2.1" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.10" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.1" />
   </ItemGroup>
 
   <ItemGroup>
