@@ -6,8 +6,8 @@
   <ItemGroup>
     <PackageVersion Include="Basic.Reference.Assemblies.Net100" Version="1.8.4" />
     <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
-    <PackageVersion Include="CliWrap" Version="3.10.0" />
     <PackageVersion Include="clipr" Version="1.6.1" />
+    <PackageVersion Include="CliWrap" Version="3.10.0" />
     <PackageVersion Include="Cocona" Version="2.2.0" />
     <PackageVersion Include="CommandLineParser" Version="2.9.1" />
     <PackageVersion Include="coverlet.collector" Version="6.0.4" />
