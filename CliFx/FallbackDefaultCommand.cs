@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using CliFx.Attributes;
 using CliFx.Infrastructure;
 using CliFx.Schema;
@@ -11,12 +10,16 @@ namespace CliFx;
 [Command]
 internal class FallbackDefaultCommand : ICommand
 {
-#pragma warning disable IL2026
     public static CommandSchema Schema { get; } =
-        CommandSchema.Resolve(typeof(FallbackDefaultCommand));
-#pragma warning restore IL2026
+        new CommandSchema(
+            typeof(FallbackDefaultCommand),
+            null,
+            null,
+            [],
+            [CommandOptionSchema.ImplicitHelpOption, CommandOptionSchema.ImplicitVersionOption]
+        );
 
     // Never actually executed
-    [ExcludeFromCodeCoverage]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public ValueTask ExecuteAsync(IConsole console) => default;
 }

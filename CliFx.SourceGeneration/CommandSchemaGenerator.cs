@@ -26,6 +26,15 @@ public class CommandSchemaGenerator : IIncrementalGenerator
         isEnabledByDefault: true
     );
 
+    private static readonly DiagnosticDescriptor InitOnlyPropertyDiagnostic = new(
+        id: "CLIFX002",
+        title: "Init-only property cannot be source-generated",
+        messageFormat: "Property '{0}' on type '{1}' is init-only and will be skipped by the source generator. Change it to a regular settable property to enable source-generated binding.",
+        category: "CliFx",
+        defaultSeverity: DiagnosticSeverity.Warning,
+        isEnabledByDefault: true
+    );
+
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         var commandDeclarations = context
@@ -92,6 +101,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
 
         var parameters = new List<CommandParameterDescriptor>();
         var options = new List<CommandOptionDescriptor>();
+        var skippedInitOnly = new List<IPropertySymbol>();
 
         foreach (var property in properties)
         {
@@ -104,6 +114,14 @@ public class CommandSchemaGenerator : IIncrementalGenerator
 
             if (paramAttr is not null)
             {
+                // Skip init-only properties — generated setter lambda (c, v) => c.Prop = v
+                // does not compile for init accessors.
+                if (property.SetMethod?.IsInitOnly == true)
+                {
+                    skippedInitOnly.Add(property);
+                    continue;
+                }
+
                 var order = paramAttr
                     .ConstructorArguments.Where(a =>
                         a.Type?.SpecialType == SpecialType.System_Int32
@@ -167,6 +185,14 @@ public class CommandSchemaGenerator : IIncrementalGenerator
 
             if (optAttr is not null)
             {
+                // Skip init-only properties — generated setter lambda (c, v) => c.Prop = v
+                // does not compile for init accessors.
+                if (property.SetMethod?.IsInitOnly == true)
+                {
+                    skippedInitOnly.Add(property);
+                    continue;
+                }
+
                 var optName =
                     optAttr
                         .ConstructorArguments.Where(a =>
@@ -247,7 +273,8 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                     m.Kind == SymbolKind.Field
                     || m.Kind == SymbolKind.Property
                     || m.Kind == SymbolKind.Method
-                )
+                ),
+            skippedInitOnly
         );
     }
 
@@ -278,6 +305,18 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                     Diagnostic.Create(
                         SchemaPropertyAlreadyDefinedDiagnostic,
                         schemaLocation,
+                        command.Type.Name
+                    )
+                );
+            }
+
+            foreach (var skippedProp in command.SkippedInitOnlyProperties)
+            {
+                ctx.ReportDiagnostic(
+                    Diagnostic.Create(
+                        InitOnlyPropertyDiagnostic,
+                        skippedProp.Locations.FirstOrDefault() ?? Location.None,
+                        skippedProp.Name,
                         command.Type.Name
                     )
                 );

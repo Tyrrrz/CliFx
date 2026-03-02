@@ -49,7 +49,7 @@ public class CommandParameterSchema<
     bool isRequired,
     string? description,
     BindingConverter<TProperty>? converter,
-    IReadOnlyList<BindingValidator<TProperty>> validators
+    IReadOnlyList<IBindingValidator> validators
 )
     : CommandParameterSchema(
         property,

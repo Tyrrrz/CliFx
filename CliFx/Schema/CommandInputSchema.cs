@@ -58,7 +58,7 @@ public abstract class CommandInputSchema<
     bool isSequence,
     string? description,
     BindingConverter<TProperty>? converter,
-    IReadOnlyList<BindingValidator<TProperty>> validators
+    IReadOnlyList<IBindingValidator> validators
 ) : CommandInputSchema(property, isSequence, description, converter, validators)
     where TCommand : ICommand;
 

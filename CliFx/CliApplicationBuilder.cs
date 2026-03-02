@@ -234,7 +234,8 @@ public partial class CliApplicationBuilder
         var configuration = new ApplicationConfiguration(
             _commandTypes.ToArray(),
             _isDebugModeAllowed,
-            _isPreviewModeAllowed
+            _isPreviewModeAllowed,
+            _commandSchemas.Count > 0 ? _commandSchemas : null
         );
 
         return new CliApplication(

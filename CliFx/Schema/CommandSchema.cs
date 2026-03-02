@@ -306,9 +306,24 @@ public class CommandSchema<
         name,
         description,
         inputs.OfType<CommandParameterSchema>().ToArray(),
-        inputs.OfType<CommandOptionSchema>().ToArray()
+        AddImplicitOptions(name, inputs.OfType<CommandOptionSchema>().ToList())
     )
-    where TCommand : ICommand;
+    where TCommand : ICommand
+{
+    private static IReadOnlyList<CommandOptionSchema> AddImplicitOptions(
+        string? commandName,
+        List<CommandOptionSchema> options
+    )
+    {
+        if (!options.Any(o => o.MatchesShortName('h') || o.MatchesName("help")))
+            options.Add(CommandOptionSchema.ImplicitHelpOption);
+
+        if (string.IsNullOrWhiteSpace(commandName) && !options.Any(o => o.MatchesName("version")))
+            options.Add(CommandOptionSchema.ImplicitVersionOption);
+
+        return options;
+    }
+}
 
 // Internal null property binding used for implicit options (help, version)
 internal sealed class NullPropertyBinding()

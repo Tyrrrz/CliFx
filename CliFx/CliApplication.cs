@@ -172,7 +172,6 @@ public class CliApplication(
     /// When running WITHOUT the debugger attached (i.e. in production), this method swallows
     /// all exceptions and reports them to the console.
     /// </remarks>
-#pragma warning disable IL2026
     public async ValueTask<int> RunAsync(
         IReadOnlyList<string> commandLineArguments,
         IReadOnlyDictionary<string, string> environmentVariables
@@ -180,7 +179,13 @@ public class CliApplication(
     {
         try
         {
-            var applicationSchema = ApplicationSchema.Resolve(Configuration.CommandTypes);
+            // Use pre-built schemas from the source generator when available;
+            // otherwise fall back to the reflection-based path.
+#pragma warning disable IL2026
+            var applicationSchema = Configuration.CommandSchemas is { Count: > 0 } schemas
+                ? new ApplicationSchema(schemas)
+                : ApplicationSchema.Resolve(Configuration.CommandTypes);
+#pragma warning restore IL2026
 
             var commandInput = CommandInput.Parse(
                 commandLineArguments,
@@ -202,7 +207,6 @@ public class CliApplication(
             return 1;
         }
     }
-#pragma warning restore IL2026
 
     /// <summary>
     /// Runs the application with the specified command-line arguments.

@@ -97,7 +97,7 @@ public class CommandOptionSchema<
     bool isRequired,
     string? description,
     BindingConverter<TProperty>? converter,
-    IReadOnlyList<BindingValidator<TProperty>> validators
+    IReadOnlyList<IBindingValidator> validators
 )
     : CommandOptionSchema(
         property,
