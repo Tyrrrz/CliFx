@@ -22,7 +22,9 @@ public class CommandSchemaGenerator : IIncrementalGenerator
         var commandDeclarations = context
             .SyntaxProvider.CreateSyntaxProvider(
                 predicate: static (node, _) =>
-                    node is ClassDeclarationSyntax cls && cls.AttributeLists.Count > 0,
+                    node is ClassDeclarationSyntax cls
+                    && cls.AttributeLists.Count > 0
+                    && cls.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword)),
                 transform: static (ctx, cancellationToken) =>
                 {
                     var classDeclaration = (ClassDeclarationSyntax)ctx.Node;

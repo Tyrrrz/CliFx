@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 
@@ -10,10 +11,16 @@ internal static class TypeExtensions
 {
     extension(Type type)
     {
+        [RequiresUnreferencedCode(
+            "Uses Type.GetInterfaces() which may not be available after trimming."
+        )]
         public bool Implements(Type interfaceType) => type.GetInterfaces().Contains(interfaceType);
 
         public Type? TryGetNullableUnderlyingType() => Nullable.GetUnderlyingType(type);
 
+        [RequiresUnreferencedCode(
+            "Uses Type.GetInterfaces() which may not be available after trimming."
+        )]
         public Type? TryGetEnumerableUnderlyingType()
         {
             if (type.IsPrimitive)
@@ -34,6 +41,9 @@ internal static class TypeExtensions
                 .MaxBy(t => t != typeof(object));
         }
 
+        [RequiresUnreferencedCode(
+            "Uses Type.GetMethod() which may not be available after trimming."
+        )]
         public MethodInfo? TryGetStaticParseMethod(bool withFormatProvider = false)
         {
             var argumentTypes = withFormatProvider
@@ -49,6 +59,9 @@ internal static class TypeExtensions
             );
         }
 
+        [RequiresUnreferencedCode(
+            "Uses Type.GetMethod() which may not be available after trimming."
+        )]
         public bool IsToStringOverriden()
         {
             var toStringMethod = type.GetMethod(nameof(ToString), Type.EmptyTypes);

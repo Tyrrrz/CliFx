@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -16,6 +17,12 @@ internal class CommandBinder
 {
     private readonly IFormatProvider _formatProvider = CultureInfo.InvariantCulture;
 
+    [RequiresUnreferencedCode(
+        "Uses reflection to convert values. Use a custom IBindingConverter for AOT compatibility."
+    )]
+    [RequiresDynamicCode(
+        "Uses dynamic array creation. Use a custom IBindingConverter for AOT compatibility."
+    )]
     private object? ConvertSingle(CommandInputSchema schema, string? rawValue, Type targetType)
     {
         // Custom converter (set at schema build time)
@@ -99,6 +106,12 @@ internal class CommandBinder
         );
     }
 
+    [RequiresUnreferencedCode(
+        "Uses reflection to convert values. Use a custom IBindingConverter for AOT compatibility."
+    )]
+    [RequiresDynamicCode(
+        "Uses dynamic array creation. Use a custom IBindingConverter for AOT compatibility."
+    )]
     private object? ConvertMultiple(
         CommandInputSchema schema,
         IReadOnlyList<string> rawValues,
@@ -132,6 +145,12 @@ internal class CommandBinder
         );
     }
 
+    [RequiresUnreferencedCode(
+        "Uses reflection to convert values. Use a custom IBindingConverter for AOT compatibility."
+    )]
+    [RequiresDynamicCode(
+        "Uses dynamic array creation. Use a custom IBindingConverter for AOT compatibility."
+    )]
     private object? ConvertMember(CommandInputSchema schema, IReadOnlyList<string> rawValues)
     {
         try
@@ -207,6 +226,12 @@ internal class CommandBinder
         }
     }
 
+    [RequiresUnreferencedCode(
+        "Uses reflection to convert values. Use a custom IBindingConverter for AOT compatibility."
+    )]
+    [RequiresDynamicCode(
+        "Uses dynamic array creation. Use a custom IBindingConverter for AOT compatibility."
+    )]
     private void BindMember(
         CommandInputSchema schema,
         ICommand commandInstance,
@@ -218,6 +243,12 @@ internal class CommandBinder
         schema.Property.SetValue(commandInstance, convertedValue);
     }
 
+    [RequiresUnreferencedCode(
+        "Uses reflection to bind values. Use a custom IBindingConverter for AOT compatibility."
+    )]
+    [RequiresDynamicCode(
+        "Uses dynamic array creation. Use a custom IBindingConverter for AOT compatibility."
+    )]
     private void BindParameters(
         CommandInput commandInput,
         CommandSchema commandSchema,
@@ -284,6 +315,12 @@ internal class CommandBinder
         }
     }
 
+    [RequiresUnreferencedCode(
+        "Uses reflection to bind values. Use a custom IBindingConverter for AOT compatibility."
+    )]
+    [RequiresDynamicCode(
+        "Uses dynamic array creation. Use a custom IBindingConverter for AOT compatibility."
+    )]
     private void BindOptions(
         CommandInput commandInput,
         CommandSchema commandSchema,
@@ -360,6 +397,12 @@ internal class CommandBinder
         }
     }
 
+    [RequiresUnreferencedCode(
+        "Uses reflection to bind values. Use a custom IBindingConverter for AOT compatibility."
+    )]
+    [RequiresDynamicCode(
+        "Uses dynamic array creation. Use a custom IBindingConverter for AOT compatibility."
+    )]
     public void Bind(
         CommandInput commandInput,
         CommandSchema commandSchema,

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace CliFx.Utils.Extensions;
@@ -19,6 +20,9 @@ internal static class CollectionExtensions
             }
         }
 
+        [RequiresDynamicCode(
+            "Uses Array.CreateInstance which requires dynamic code for AOT scenarios."
+        )]
         public Array ToNonGenericArray(Type elementType)
         {
             var sourceAsCollection = source as ICollection ?? source.ToArray();

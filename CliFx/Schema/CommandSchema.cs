@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using CliFx.Attributes;
@@ -13,7 +14,8 @@ namespace CliFx.Schema;
 /// Describes the schema of a command.
 /// </summary>
 public partial class CommandSchema(
-    Type type,
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
+        Type type,
     string? name,
     string? description,
     IReadOnlyList<CommandParameterSchema> parameters,
@@ -23,6 +25,7 @@ public partial class CommandSchema(
     /// <summary>
     /// CLR type of the command.
     /// </summary>
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
     public Type Type { get; } = type;
 
     /// <summary>
@@ -97,6 +100,9 @@ public partial class CommandSchema
     /// <summary>
     /// Checks whether the type is a valid command type.
     /// </summary>
+    [RequiresUnreferencedCode(
+        "Uses reflection to inspect type interfaces and attributes. Not compatible with trimming."
+    )]
     public static bool IsCommandType(Type type) =>
         type.Implements(typeof(ICommand))
         && type.IsDefined(typeof(CommandAttribute))
@@ -106,6 +112,9 @@ public partial class CommandSchema
     /// Tries to resolve the command schema from a CLR type using reflection.
     /// Returns null if the type is not a valid command.
     /// </summary>
+    [RequiresUnreferencedCode(
+        "Uses reflection to resolve the command schema. Use the source-generated Schema property for AOT compatibility."
+    )]
     public static CommandSchema? TryResolve(Type type)
     {
         if (!IsCommandType(type))
@@ -155,6 +164,7 @@ public partial class CommandSchema
         return new CommandSchema(type, name, description, parameterSchemas, optionSchemas);
     }
 
+    [RequiresUnreferencedCode("Uses reflection to build property bindings.")]
     private static PropertyBinding CreatePropertyBinding(PropertyInfo property) =>
         new(
             property.PropertyType,
@@ -162,6 +172,7 @@ public partial class CommandSchema
             (instance, value) => property.SetValue(instance, value)
         );
 
+    [RequiresUnreferencedCode("Uses Activator.CreateInstance to instantiate converters.")]
     private static IBindingConverter? CreateConverter(Type? converterType)
     {
         if (converterType is null)
@@ -177,6 +188,7 @@ public partial class CommandSchema
         return (IBindingConverter)Activator.CreateInstance(converterType)!;
     }
 
+    [RequiresUnreferencedCode("Uses Activator.CreateInstance to instantiate validators.")]
     private static IReadOnlyList<IBindingValidator> CreateValidators(
         IReadOnlyList<Type> validatorTypes
     )
@@ -198,6 +210,7 @@ public partial class CommandSchema
         return validators;
     }
 
+    [RequiresUnreferencedCode("Uses reflection to resolve parameter schemas.")]
     private static CommandParameterSchema? TryResolveParameter(PropertyInfo property)
     {
         var attribute = property.GetCustomAttribute<CommandParameterAttribute>();
@@ -224,6 +237,7 @@ public partial class CommandSchema
         );
     }
 
+    [RequiresUnreferencedCode("Uses reflection to resolve option schemas.")]
     private static CommandOptionSchema? TryResolveOption(PropertyInfo property)
     {
         var attribute = property.GetCustomAttribute<CommandOptionAttribute>();
@@ -256,6 +270,9 @@ public partial class CommandSchema
     /// Resolves the command schema from a CLR type using reflection.
     /// Throws if the type is not a valid command.
     /// </summary>
+    [RequiresUnreferencedCode(
+        "Uses reflection to resolve the command schema. Use the source-generated Schema property for AOT compatibility."
+    )]
     public static CommandSchema Resolve(Type type)
     {
         var schema = TryResolve(type);
@@ -280,11 +297,10 @@ public partial class CommandSchema
 /// <remarks>
 /// Generic version used by source-generated code for static type references and AOT compatibility.
 /// </remarks>
-public class CommandSchema<TCommand>(
-    string? name,
-    string? description,
-    IReadOnlyList<CommandInputSchema> inputs
-)
+public class CommandSchema<
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
+        TCommand
+>(string? name, string? description, IReadOnlyList<CommandInputSchema> inputs)
     : CommandSchema(
         typeof(TCommand),
         name,

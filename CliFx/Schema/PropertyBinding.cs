@@ -31,6 +31,9 @@ public class PropertyBinding(
     /// </summary>
     public void SetValue(object instance, object? value) => setValue(instance, value);
 
+    [RequiresUnreferencedCode(
+        "Uses Type.GetInterfaces() which may not be available after trimming."
+    )]
     private static Type GetEffectiveEnumType(Type type)
     {
         var enumerableUnderlyingType = type.TryGetEnumerableUnderlyingType();
@@ -44,6 +47,9 @@ public class PropertyBinding(
         return type;
     }
 
+    [RequiresUnreferencedCode(
+        "Uses reflection to discover valid enum values. Not compatible with trimming."
+    )]
     internal IReadOnlyList<object?>? TryGetValidValues()
     {
         var effectiveType = GetEffectiveEnumType(Type);

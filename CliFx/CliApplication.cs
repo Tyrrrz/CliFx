@@ -66,6 +66,11 @@ public class CliApplication(
             await Task.Delay(100);
     }
 
+    // The private RunAsync overload calls into the reflection-based binding and help-text paths.
+    // These are suppressed here because the public RunAsync overload is the user-facing entry point
+    // and marking it with [RequiresUnreferencedCode] would be too disruptive for non-AOT consumers.
+    // AOT-compatible consumers should use partial command classes with the source generator.
+#pragma warning disable IL2026, IL3050
     private async ValueTask<int> RunAsync(
         ApplicationSchema applicationSchema,
         CommandInput commandInput
@@ -157,6 +162,7 @@ public class CliApplication(
             return ex.ExitCode;
         }
     }
+#pragma warning restore IL2026, IL3050
 
     /// <summary>
     /// Runs the application with the specified command-line arguments and environment variables.
@@ -166,6 +172,7 @@ public class CliApplication(
     /// When running WITHOUT the debugger attached (i.e. in production), this method swallows
     /// all exceptions and reports them to the console.
     /// </remarks>
+#pragma warning disable IL2026
     public async ValueTask<int> RunAsync(
         IReadOnlyList<string> commandLineArguments,
         IReadOnlyDictionary<string, string> environmentVariables
@@ -195,6 +202,7 @@ public class CliApplication(
             return 1;
         }
     }
+#pragma warning restore IL2026
 
     /// <summary>
     /// Runs the application with the specified command-line arguments.

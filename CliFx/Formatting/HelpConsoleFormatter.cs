@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using CliFx.Infrastructure;
@@ -137,6 +138,7 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
         WriteLine();
     }
 
+    [RequiresUnreferencedCode("Displays default values using runtime type reflection.")]
     private void WriteCommandParameters()
     {
         if (!context.CommandSchema.Parameters.Any())
@@ -210,6 +212,7 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
         }
     }
 
+    [RequiresUnreferencedCode("Displays default values using runtime type reflection.")]
     private void WriteCommandOptions()
     {
         if (!IsEmpty)
@@ -306,6 +309,7 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
         }
     }
 
+    [RequiresUnreferencedCode("Displays default values using runtime type reflection.")]
     private void WriteDefaultValue(CommandInputSchema schema)
     {
         var defaultValue = context.CommandDefaultValues.GetValueOrDefault(schema);
@@ -441,6 +445,7 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
         WriteLine();
     }
 
+    [RequiresUnreferencedCode("Displays default values using runtime type reflection.")]
     public void WriteHelpText()
     {
         WriteApplicationInfo();
@@ -456,12 +461,14 @@ internal static class HelpConsoleFormatterExtensions
 {
     extension(ConsoleWriter consoleWriter)
     {
+        [RequiresUnreferencedCode("Displays default values using runtime type reflection.")]
         public void WriteHelpText(HelpContext context) =>
             new HelpConsoleFormatter(consoleWriter, context).WriteHelpText();
     }
 
     extension(IConsole console)
     {
+        [RequiresUnreferencedCode("Displays default values using runtime type reflection.")]
         public void WriteHelpText(HelpContext context) => console.Output.WriteHelpText(context);
     }
 }

@@ -29,8 +29,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CliFx.Analyzers", "CliFx.An
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CliFx.Analyzers.Tests", "CliFx.Analyzers.Tests\CliFx.Analyzers.Tests.csproj", "{49878E75-2097-4C79-9151-B98A28FBB973}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CliFx.SourceGeneration", "CliFx.SourceGeneration\CliFx.SourceGeneration.csproj", "{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

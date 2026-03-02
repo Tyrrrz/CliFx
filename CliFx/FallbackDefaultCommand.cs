@@ -11,8 +11,10 @@ namespace CliFx;
 [Command]
 internal class FallbackDefaultCommand : ICommand
 {
+#pragma warning disable IL2026
     public static CommandSchema Schema { get; } =
         CommandSchema.Resolve(typeof(FallbackDefaultCommand));
+#pragma warning restore IL2026
 
     // Never actually executed
     [ExcludeFromCodeCoverage]

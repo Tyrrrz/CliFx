@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -70,6 +71,9 @@ public partial class CliApplicationBuilder
     /// This method looks for public non-abstract classes that implement <see cref="ICommand" />
     /// and are annotated by <see cref="CommandAttribute" />.
     /// </remarks>
+    [RequiresUnreferencedCode(
+        "Scans assembly types using reflection. Use AddCommand(CommandSchema) with source-generated schemas for AOT compatibility."
+    )]
     public CliApplicationBuilder AddCommandsFrom(Assembly commandAssembly)
     {
         foreach (
@@ -87,6 +91,9 @@ public partial class CliApplicationBuilder
     /// This method looks for public non-abstract classes that implement <see cref="ICommand" />
     /// and are annotated by <see cref="CommandAttribute" />.
     /// </remarks>
+    [RequiresUnreferencedCode(
+        "Scans assembly types using reflection. Use AddCommand(CommandSchema) with source-generated schemas for AOT compatibility."
+    )]
     public CliApplicationBuilder AddCommandsFrom(IEnumerable<Assembly> commandAssemblies)
     {
         foreach (var commandAssembly in commandAssemblies)
@@ -102,6 +109,9 @@ public partial class CliApplicationBuilder
     /// This method looks for public non-abstract classes that implement <see cref="ICommand" />
     /// and are annotated by <see cref="CommandAttribute" />.
     /// </remarks>
+    [RequiresUnreferencedCode(
+        "Scans assembly types using reflection. Use the source-generated AddCommandsFromThisAssembly() for AOT compatibility."
+    )]
     public CliApplicationBuilder AddCommandsFromThisAssembly() =>
         AddCommandsFrom(Assembly.GetCallingAssembly());
 
@@ -211,6 +221,7 @@ public partial class CliApplicationBuilder
     /// <summary>
     /// Creates a configured instance of <see cref="CliApplication" />.
     /// </summary>
+#pragma warning disable IL3002 // Assembly.Location may return empty string in single-file apps; handled by GetDefaultExecutableName's fallback logic
     public CliApplication Build()
     {
         var metadata = new ApplicationMetadata(
@@ -233,6 +244,7 @@ public partial class CliApplicationBuilder
             _typeActivator ?? new DefaultTypeActivator()
         );
     }
+#pragma warning restore IL3002
 }
 
 public partial class CliApplicationBuilder
@@ -251,6 +263,9 @@ public partial class CliApplicationBuilder
         return entryAssemblyName;
     }
 
+    [RequiresAssemblyFiles(
+        "Uses Assembly.Location to determine executable name. Always returns empty string in single-file apps."
+    )]
     private static string GetDefaultExecutableName()
     {
         var entryAssemblyFilePath = Assembly.GetEntryAssembly()?.Location;

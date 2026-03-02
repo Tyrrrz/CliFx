@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using CliFx.Utils.Extensions;
 
@@ -96,6 +97,9 @@ public partial class ApplicationSchema
     /// <summary>
     /// Resolves the application schema from the given command types using reflection.
     /// </summary>
+    [RequiresUnreferencedCode(
+        "Uses reflection to resolve command schemas. Use pre-built schemas for AOT compatibility."
+    )]
     public static ApplicationSchema Resolve(IReadOnlyList<Type> commandTypes) =>
         new(commandTypes.Select(CommandSchema.Resolve).ToArray());
 }
