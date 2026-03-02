@@ -29,5 +29,6 @@
       PrivateAssets="all"
     />
     <PackageReference Include="PolyShim" PrivateAssets="all" />
+    <PackageReference Include="System.Buffers" PrivateAssets="all" />
   </ItemGroup>
 </Project>

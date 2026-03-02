@@ -69,7 +69,9 @@ internal static class CommandInputSchemaExtensions
         {
             CommandParameterSchema => "Parameter",
             CommandOptionSchema => "Option",
-            _ => throw new InvalidOperationException("Unknown input schema type."),
+            _ => throw new InvalidOperationException(
+                $"Unknown input schema type: '{schema.GetType().Name}'."
+            ),
         };
 
     public static string GetFormattedIdentifier(this CommandInputSchema schema) =>

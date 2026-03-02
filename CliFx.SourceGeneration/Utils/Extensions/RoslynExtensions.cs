@@ -40,8 +40,8 @@ internal static class RoslynExtensions
             .DeclaringSyntaxReferences.Select(r => r.GetSyntax())
             .OfType<PropertyDeclarationSyntax>()
             .SelectMany(p => p.Modifiers)
-            // SyntaxKind.RequiredKeyword = 8447
-            .Any(m => m.IsKind((SyntaxKind)8447));
+            // SyntaxKind.RequiredKeyword is available in Roslyn 4.11+
+            .Any(m => m.IsKind(SyntaxKind.RequiredKeyword));
 
     public static bool ImplementsInterface(this ITypeSymbol type, string interfaceName) =>
         type.AllInterfaces.Any(i => i.DisplayNameMatches(interfaceName))

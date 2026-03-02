@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using CliFx.Utils.Extensions;
 
 namespace CliFx.Schema;
 
@@ -30,16 +31,24 @@ public class PropertyBinding(
     /// </summary>
     public void SetValue(object instance, object? value) => setValue(instance, value);
 
+    private static Type GetEffectiveEnumType(Type type)
+    {
+        var enumerableUnderlyingType = type.TryGetEnumerableUnderlyingType();
+        if (enumerableUnderlyingType is not null)
+            return GetEffectiveEnumType(enumerableUnderlyingType);
+
+        var nullableUnderlyingType = type.TryGetNullableUnderlyingType();
+        if (nullableUnderlyingType is not null)
+            return GetEffectiveEnumType(nullableUnderlyingType);
+
+        return type;
+    }
+
     internal IReadOnlyList<object?>? TryGetValidValues()
     {
-        if (Type.IsEnum)
-        {
-#if NET7_0_OR_GREATER
-            return Type.GetEnumValuesAsUnderlyingType().Cast<object?>().ToArray();
-#else
-            return Type.GetEnumValues().Cast<object?>().ToArray();
-#endif
-        }
+        var effectiveType = GetEffectiveEnumType(Type);
+        if (effectiveType.IsEnum)
+            return Enum.GetNames(effectiveType);
 
         return null;
     }

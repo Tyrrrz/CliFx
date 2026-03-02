@@ -12,7 +12,7 @@ using CliFx.Utils.Extensions;
 
 namespace CliFx;
 
-internal class CommandBinder(ITypeActivator typeActivator)
+internal class CommandBinder
 {
     private readonly IFormatProvider _formatProvider = CultureInfo.InvariantCulture;
 

@@ -162,14 +162,41 @@ public partial class CommandSchema
             (instance, value) => property.SetValue(instance, value)
         );
 
-    private static IBindingConverter? CreateConverter(Type? converterType) =>
-        converterType is not null
-            ? (IBindingConverter)Activator.CreateInstance(converterType)!
-            : null;
+    private static IBindingConverter? CreateConverter(Type? converterType)
+    {
+        if (converterType is null)
+            return null;
+
+        if (!typeof(IBindingConverter).IsAssignableFrom(converterType))
+        {
+            throw CliFxException.InternalError(
+                $"Type `{converterType.FullName}` does not implement `{typeof(IBindingConverter).FullName}`."
+            );
+        }
+
+        return (IBindingConverter)Activator.CreateInstance(converterType)!;
+    }
 
     private static IReadOnlyList<IBindingValidator> CreateValidators(
         IReadOnlyList<Type> validatorTypes
-    ) => validatorTypes.Select(t => (IBindingValidator)Activator.CreateInstance(t)!).ToArray();
+    )
+    {
+        var validators = new IBindingValidator[validatorTypes.Count];
+        for (var i = 0; i < validatorTypes.Count; i++)
+        {
+            var validatorType = validatorTypes[i];
+            if (!typeof(IBindingValidator).IsAssignableFrom(validatorType))
+            {
+                throw CliFxException.InternalError(
+                    $"Type `{validatorType.FullName}` does not implement `{typeof(IBindingValidator).FullName}`."
+                );
+            }
+
+            validators[i] = (IBindingValidator)Activator.CreateInstance(validatorType)!;
+        }
+
+        return validators;
+    }
 
     private static CommandParameterSchema? TryResolveParameter(PropertyInfo property)
     {

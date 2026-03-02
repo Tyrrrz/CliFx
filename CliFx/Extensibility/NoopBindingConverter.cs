@@ -6,5 +6,5 @@ namespace CliFx.Extensibility;
 public class NoopBindingConverter : BindingConverter<string>
 {
     /// <inheritdoc />
-    public override string? Convert(string? rawValue) => rawValue;
+    public override string Convert(string? rawValue) => rawValue!;
 }

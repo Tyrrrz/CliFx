@@ -22,7 +22,7 @@ public class CliApplication(
     ITypeActivator typeActivator
 )
 {
-    private readonly CommandBinder _commandBinder = new(typeActivator);
+    private readonly CommandBinder _commandBinder = new();
 
     /// <summary>
     /// Application metadata.

@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 
 namespace CliFx.SourceGeneration.SemanticModel;
@@ -26,7 +25,6 @@ internal class TypeDescriptor
         return new TypeDescriptor(fqn);
     }
 
-    [return: MaybeNull]
     public static TypeDescriptor? TryFromSymbol(ITypeSymbol? symbol) =>
         symbol is not null ? FromSymbol(symbol) : null;
 }
