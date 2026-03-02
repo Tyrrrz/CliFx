@@ -17,6 +17,15 @@ namespace CliFx.SourceGeneration;
 [Generator]
 public class CommandSchemaGenerator : IIncrementalGenerator
 {
+    private static readonly DiagnosticDescriptor SchemaPropertyAlreadyDefinedDiagnostic = new(
+        id: "CLIFX001",
+        title: "Schema property already defined",
+        messageFormat: "Type '{0}' already defines a 'Schema' member. The source-generated 'Schema' property will be skipped. Rename or remove the existing member to allow the generator to produce the schema.",
+        category: "CliFx",
+        defaultSeverity: DiagnosticSeverity.Warning,
+        isEnabledByDefault: true
+    );
+
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         var commandDeclarations = context
@@ -38,11 +47,11 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                     return TryBuildCommandDescriptor(typeSymbol);
                 }
             )
-            .Where(static d => d is not null);
+            .WhereNotNull();
 
         context.RegisterSourceOutput(
             commandDeclarations.Collect(),
-            static (ctx, commands) => Execute(ctx, commands!)
+            static (ctx, commands) => Execute(ctx, commands)
         );
     }
 
@@ -227,7 +236,19 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             }
         }
 
-        return new CommandDescriptor(type, name, description, parameters, options);
+        return new CommandDescriptor(
+            type,
+            name,
+            description,
+            parameters,
+            options,
+            type.GetMembers("Schema")
+                .Any(m =>
+                    m.Kind == SymbolKind.Field
+                    || m.Kind == SymbolKind.Property
+                    || m.Kind == SymbolKind.Method
+                )
+        );
     }
 
     private static void Execute(
@@ -240,6 +261,28 @@ public class CommandSchemaGenerator : IIncrementalGenerator
 
         foreach (var command in commands)
         {
+            if (command.HasExistingSchemaProperty)
+            {
+                var schemaLocation =
+                    command
+                        .Type.GetMembers("Schema")
+                        .FirstOrDefault(m =>
+                            m.Kind == SymbolKind.Field
+                            || m.Kind == SymbolKind.Property
+                            || m.Kind == SymbolKind.Method
+                        )
+                        ?.Locations.FirstOrDefault()
+                    ?? Location.None;
+
+                ctx.ReportDiagnostic(
+                    Diagnostic.Create(
+                        SchemaPropertyAlreadyDefinedDiagnostic,
+                        schemaLocation,
+                        command.Type.Name
+                    )
+                );
+            }
+
             var source = GenerateCommandSchemaSource(command);
             var hintName = $"{command.Type.ToDisplayString().Replace('.', '_')}_Schema.g.cs";
             ctx.AddSource(hintName, SourceText.From(source, Encoding.UTF8));
@@ -266,13 +309,16 @@ public class CommandSchemaGenerator : IIncrementalGenerator
 
         sb.AppendLine($"partial class {command.Type.Name}");
         sb.AppendLine("{");
-        sb.AppendLine(
-            $"    /// <summary>Generated command schema for <see cref=\"{command.Type.Name}\"/>.</summary>"
-        );
-        sb.AppendLine(
-            $"    public static global::CliFx.Schema.CommandSchema Schema {{ get; }} = BuildSchema();"
-        );
-        sb.AppendLine();
+        if (!command.HasExistingSchemaProperty)
+        {
+            sb.AppendLine(
+                $"    /// <summary>Generated command schema for <see cref=\"{command.Type.Name}\"/>.</summary>"
+            );
+            sb.AppendLine(
+                $"    public static global::CliFx.Schema.CommandSchema Schema {{ get; }} = BuildSchema();"
+            );
+            sb.AppendLine();
+        }
         sb.AppendLine($"    private static global::CliFx.Schema.CommandSchema BuildSchema()");
         sb.AppendLine("    {");
 

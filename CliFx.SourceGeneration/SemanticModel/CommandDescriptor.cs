@@ -8,5 +8,6 @@ internal record CommandDescriptor(
     string? Name,
     string? Description,
     IReadOnlyList<CommandParameterDescriptor> Parameters,
-    IReadOnlyList<CommandOptionDescriptor> Options
+    IReadOnlyList<CommandOptionDescriptor> Options,
+    bool HasExistingSchemaProperty
 );

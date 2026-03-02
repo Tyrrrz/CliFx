@@ -9,6 +9,11 @@ namespace CliFx.SourceGeneration.Utils.Extensions;
 
 internal static class RoslynExtensions
 {
+    public static IncrementalValuesProvider<T> WhereNotNull<T>(
+        this IncrementalValuesProvider<T?> source
+    )
+        where T : class => source.Where(d => d is not null).Select((d, _) => d!);
+
     public static bool DisplayNameMatches(this ISymbol symbol, string name) =>
         string.Equals(
             symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat),

@@ -4,7 +4,7 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <GenerateDependencyFile>true</GenerateDependencyFile>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-    <NoWarn>$(NoWarn);RS1035</NoWarn>
+    <NoWarn>$(NoWarn);RS1035;RS2008</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup>
