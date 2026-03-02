@@ -23,6 +23,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CliFx.Demo", "CliFx.Demo\Cl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CliFx.Tests.Dummy", "CliFx.Tests.Dummy\CliFx.Tests.Dummy.csproj", "{F717347D-8656-44DA-A4A2-BE515E8C4655}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CliFx.SourceGeneration", "CliFx.SourceGeneration\CliFx.SourceGeneration.csproj", "{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CliFx.Analyzers", "CliFx.Analyzers\CliFx.Analyzers.csproj", "{F8460D69-F8CF-405C-A6ED-BED02A21DB42}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CliFx.Analyzers.Tests", "CliFx.Analyzers.Tests\CliFx.Analyzers.Tests.csproj", "{49878E75-2097-4C79-9151-B98A28FBB973}"

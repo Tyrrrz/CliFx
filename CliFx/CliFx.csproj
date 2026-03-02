@@ -2,6 +2,14 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netstandard2.1;net10.0</TargetFrameworks>
     <IsPackable>true</IsPackable>
+    <IsTrimmable
+      Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net6.0'))"
+      >true</IsTrimmable
+    >
+    <IsAotCompatible
+      Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net7.0'))"
+      >true</IsAotCompatible
+    >
   </PropertyGroup>
 
   <PropertyGroup>
@@ -29,72 +37,12 @@
     />
   </ItemGroup>
 
-  <!-- Embed the analyzer inside the package -->
+  <!-- Embed the source generator inside the package -->
   <ItemGroup>
     <ProjectReference
-      Include="../CliFx.Analyzers/CliFx.Analyzers.csproj"
+      Include="../CliFx.SourceGeneration/CliFx.SourceGeneration.csproj"
       ReferenceOutputAssembly="false"
       OutputItemType="analyzer"
-    />
-    <None
-      Include="../CliFx.Analyzers/bin/$(Configuration)/netstandard2.0/CliFx.Analyzers.deps.json"
-      Pack="true"
-      PackagePath="analyzers/dotnet/cs"
-      Visible="false"
-    />
-    <None
-      Include="../CliFx.Analyzers/bin/$(Configuration)/netstandard2.0/CliFx.Analyzers.dll"
-      Pack="true"
-      PackagePath="analyzers/dotnet/cs"
-      Visible="false"
-    />
-    <None
-      Include="../CliFx.Analyzers/bin/$(Configuration)/netstandard2.0/System.Buffers.dll"
-      Pack="true"
-      PackagePath="analyzers/dotnet/cs"
-      Visible="false"
-    />
-    <None
-      Include="../CliFx.Analyzers/bin/$(Configuration)/netstandard2.0/System.Collections.Immutable.dll"
-      Pack="true"
-      PackagePath="analyzers/dotnet/cs"
-      Visible="false"
-    />
-    <None
-      Include="../CliFx.Analyzers/bin/$(Configuration)/netstandard2.0/System.Memory.dll"
-      Pack="true"
-      PackagePath="analyzers/dotnet/cs"
-      Visible="false"
-    />
-    <None
-      Include="../CliFx.Analyzers/bin/$(Configuration)/netstandard2.0/System.Numerics.Vectors.dll"
-      Pack="true"
-      PackagePath="analyzers/dotnet/cs"
-      Visible="false"
-    />
-    <None
-      Include="../CliFx.Analyzers/bin/$(Configuration)/netstandard2.0/System.Reflection.Metadata.dll"
-      Pack="true"
-      PackagePath="analyzers/dotnet/cs"
-      Visible="false"
-    />
-    <None
-      Include="../CliFx.Analyzers/bin/$(Configuration)/netstandard2.0/System.Runtime.CompilerServices.Unsafe.dll"
-      Pack="true"
-      PackagePath="analyzers/dotnet/cs"
-      Visible="false"
-    />
-    <None
-      Include="../CliFx.Analyzers/bin/$(Configuration)/netstandard2.0/System.Text.Encoding.CodePages.dll"
-      Pack="true"
-      PackagePath="analyzers/dotnet/cs"
-      Visible="false"
-    />
-    <None
-      Include="../CliFx.Analyzers/bin/$(Configuration)/netstandard2.0/System.Threading.Tasks.Extensions.dll"
-      Pack="true"
-      PackagePath="analyzers/dotnet/cs"
-      Visible="false"
     />
   </ItemGroup>
 </Project>
