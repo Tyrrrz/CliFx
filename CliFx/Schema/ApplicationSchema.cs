@@ -5,7 +5,7 @@ using CliFx.Utils.Extensions;
 
 namespace CliFx.Schema;
 
-internal partial class ApplicationSchema(IReadOnlyList<CommandSchema> commands)
+public partial class ApplicationSchema(IReadOnlyList<CommandSchema> commands)
 {
     public IReadOnlyList<CommandSchema> Commands { get; } = commands;
 
@@ -70,7 +70,7 @@ internal partial class ApplicationSchema(IReadOnlyList<CommandSchema> commands)
     }
 }
 
-internal partial class ApplicationSchema
+public partial class ApplicationSchema
 {
     public static ApplicationSchema Resolve(IReadOnlyList<Type> commandTypes) =>
         new(commandTypes.Select(CommandSchema.Resolve).ToArray());

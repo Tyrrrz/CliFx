@@ -69,7 +69,7 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
             {
                 Write(
                     ConsoleColor.DarkCyan,
-                    parameter.Property.IsScalar() ? $"<{parameter.Name}>" : $"<{parameter.Name}...>"
+                    !parameter.IsSequence ? $"<{parameter.Name}>" : $"<{parameter.Name}...>"
                 );
                 Write(' ');
             }
@@ -85,7 +85,7 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
                 );
                 Write(' ');
 
-                Write(ConsoleColor.White, option.Property.IsScalar() ? "<value>" : "<values...>");
+                Write(ConsoleColor.White, !option.IsSequence ? "<value>" : "<values...>");
                 Write(' ');
             }
 
@@ -170,7 +170,8 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
             }
 
             // Valid values
-            var validValues = parameterSchema.Property.GetValidValues();
+            var validValues =
+                parameterSchema.Property.TryGetValidValues() ?? Array.Empty<object?>();
             if (validValues.Any())
             {
                 Write(ConsoleColor.White, "Choices: ");
@@ -257,7 +258,7 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
             }
 
             // Valid values
-            var validValues = optionSchema.Property.GetValidValues();
+            var validValues = optionSchema.Property.TryGetValidValues() ?? Array.Empty<object?>();
             if (validValues.Any())
             {
                 Write(ConsoleColor.White, "Choices: ");
@@ -305,7 +306,7 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
         }
     }
 
-    private void WriteDefaultValue(IMemberSchema schema)
+    private void WriteDefaultValue(CommandInputSchema schema)
     {
         var defaultValue = context.CommandDefaultValues.GetValueOrDefault(schema);
         if (defaultValue is not null)

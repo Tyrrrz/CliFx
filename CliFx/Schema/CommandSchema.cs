@@ -1,46 +1,78 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using CliFx.Attributes;
 using CliFx.Exceptions;
+using CliFx.Extensibility;
 using CliFx.Utils.Extensions;
 
 namespace CliFx.Schema;
 
-internal partial class CommandSchema(
+/// <summary>
+/// Describes the schema of a command.
+/// </summary>
+public partial class CommandSchema(
     Type type,
     string? name,
     string? description,
-    IReadOnlyList<ParameterSchema> parameters,
-    IReadOnlyList<OptionSchema> options
+    IReadOnlyList<CommandParameterSchema> parameters,
+    IReadOnlyList<CommandOptionSchema> options
 )
 {
+    /// <summary>
+    /// CLR type of the command.
+    /// </summary>
     public Type Type { get; } = type;
 
+    /// <summary>
+    /// Command name. Null or empty for the default command.
+    /// </summary>
     public string? Name { get; } = name;
 
+    /// <summary>
+    /// Command description shown in help text.
+    /// </summary>
     public string? Description { get; } = description;
 
-    public IReadOnlyList<ParameterSchema> Parameters { get; } = parameters;
+    /// <summary>
+    /// Parameters of the command.
+    /// </summary>
+    public IReadOnlyList<CommandParameterSchema> Parameters { get; } = parameters;
 
-    public IReadOnlyList<OptionSchema> Options { get; } = options;
+    /// <summary>
+    /// Options of the command, including implicit ones.
+    /// </summary>
+    public IReadOnlyList<CommandOptionSchema> Options { get; } = options;
 
+    /// <summary>
+    /// Whether this is the default command (no name).
+    /// </summary>
     public bool IsDefault => string.IsNullOrWhiteSpace(Name);
 
-    public bool IsImplicitHelpOptionAvailable => Options.Contains(OptionSchema.ImplicitHelpOption);
+    /// <summary>
+    /// Whether the implicit --help option is available.
+    /// </summary>
+    public bool IsImplicitHelpOptionAvailable =>
+        Options.Contains(CommandOptionSchema.ImplicitHelpOption);
 
+    /// <summary>
+    /// Whether the implicit --version option is available.
+    /// </summary>
     public bool IsImplicitVersionOptionAvailable =>
-        Options.Contains(OptionSchema.ImplicitVersionOption);
+        Options.Contains(CommandOptionSchema.ImplicitVersionOption);
 
+    /// <summary>
+    /// Whether this command matches the given name.
+    /// </summary>
     public bool MatchesName(string? name) =>
         !string.IsNullOrWhiteSpace(Name)
             ? string.Equals(name, Name, StringComparison.OrdinalIgnoreCase)
             : string.IsNullOrWhiteSpace(name);
 
-    public IReadOnlyDictionary<IMemberSchema, object?> GetValues(ICommand instance)
+    internal IReadOnlyDictionary<CommandInputSchema, object?> GetValues(ICommand instance)
     {
-        var result = new Dictionary<IMemberSchema, object?>();
+        var result = new Dictionary<CommandInputSchema, object?>();
 
         foreach (var parameterSchema in Parameters)
         {
@@ -50,6 +82,8 @@ internal partial class CommandSchema(
 
         foreach (var optionSchema in Options)
         {
+            if (optionSchema.Property is NullPropertyBinding)
+                continue;
             var value = optionSchema.Property.GetValue(instance);
             result[optionSchema] = value;
         }
@@ -58,13 +92,20 @@ internal partial class CommandSchema(
     }
 }
 
-internal partial class CommandSchema
+public partial class CommandSchema
 {
+    /// <summary>
+    /// Checks whether the type is a valid command type.
+    /// </summary>
     public static bool IsCommandType(Type type) =>
         type.Implements(typeof(ICommand))
         && type.IsDefined(typeof(CommandAttribute))
         && type is { IsAbstract: false, IsInterface: false };
 
+    /// <summary>
+    /// Tries to resolve the command schema from a CLR type using reflection.
+    /// Returns null if the type is not a valid command.
+    /// </summary>
     public static CommandSchema? TryResolve(Type type)
     {
         if (!IsCommandType(type))
@@ -75,13 +116,9 @@ internal partial class CommandSchema
         var name = attribute?.Name?.Trim();
         var description = attribute?.Description?.Trim();
 
-        var properties = type
-        // Get properties directly on the command type
-        .GetProperties()
-            // Get non-abstract properties on interfaces (to support default interfaces members)
+        var properties = type.GetProperties()
             .Union(
                 type.GetInterfaces()
-                    // Only interfaces implementing ICommand for explicitness
                     .Where(i => i != typeof(ICommand) && i.IsAssignableTo(typeof(ICommand)))
                     .SelectMany(i =>
                         i.GetProperties()
@@ -96,33 +133,102 @@ internal partial class CommandSchema
             .ToArray();
 
         var parameterSchemas = properties
-            .Select(ParameterSchema.TryResolve)
+            .Select(p => TryResolveParameter(p))
             .WhereNotNull()
             .ToArray();
 
-        var optionSchemas = properties.Select(OptionSchema.TryResolve).WhereNotNull().ToList();
+        var optionSchemas = properties.Select(p => TryResolveOption(p)).WhereNotNull().ToList();
 
-        // Include implicit options, if appropriate
-        var isImplicitHelpOptionAvailable =
-            // If the command implements its own help option, don't include the implicit one
-            !optionSchemas.Any(o => o.MatchesShortName('h') || o.MatchesName("help"));
+        var isImplicitHelpOptionAvailable = !optionSchemas.Any(o =>
+            o.MatchesShortName('h') || o.MatchesName("help")
+        );
 
         if (isImplicitHelpOptionAvailable)
-            optionSchemas.Add(OptionSchema.ImplicitHelpOption);
+            optionSchemas.Add(CommandOptionSchema.ImplicitHelpOption);
 
         var isImplicitVersionOptionAvailable =
-            // Only the default command can have the version option
-            string.IsNullOrWhiteSpace(name)
-            &&
-            // If the command implements its own version option, don't include the implicit one
-            !optionSchemas.Any(o => o.MatchesName("version"));
+            string.IsNullOrWhiteSpace(name) && !optionSchemas.Any(o => o.MatchesName("version"));
 
         if (isImplicitVersionOptionAvailable)
-            optionSchemas.Add(OptionSchema.ImplicitVersionOption);
+            optionSchemas.Add(CommandOptionSchema.ImplicitVersionOption);
 
         return new CommandSchema(type, name, description, parameterSchemas, optionSchemas);
     }
 
+    private static PropertyBinding CreatePropertyBinding(PropertyInfo property) =>
+        new(
+            property.PropertyType,
+            instance => property.GetValue(instance),
+            (instance, value) => property.SetValue(instance, value)
+        );
+
+    private static IBindingConverter? CreateConverter(Type? converterType) =>
+        converterType is not null
+            ? (IBindingConverter)Activator.CreateInstance(converterType)!
+            : null;
+
+    private static IReadOnlyList<IBindingValidator> CreateValidators(
+        IReadOnlyList<Type> validatorTypes
+    ) => validatorTypes.Select(t => (IBindingValidator)Activator.CreateInstance(t)!).ToArray();
+
+    private static CommandParameterSchema? TryResolveParameter(PropertyInfo property)
+    {
+        var attribute = property.GetCustomAttribute<CommandParameterAttribute>();
+        if (attribute is null)
+            return null;
+
+        var name = attribute.Name?.Trim() ?? property.Name.ToLowerInvariant();
+        var isRequired = attribute.IsRequired || property.IsRequired();
+        var description = attribute.Description?.Trim();
+
+        var isSequence =
+            property.PropertyType != typeof(string)
+            && property.PropertyType.TryGetEnumerableUnderlyingType() is not null;
+
+        return new CommandParameterSchema(
+            CreatePropertyBinding(property),
+            isSequence,
+            attribute.Order,
+            name,
+            isRequired,
+            description,
+            CreateConverter(attribute.Converter),
+            CreateValidators(attribute.Validators)
+        );
+    }
+
+    private static CommandOptionSchema? TryResolveOption(PropertyInfo property)
+    {
+        var attribute = property.GetCustomAttribute<CommandOptionAttribute>();
+        if (attribute is null)
+            return null;
+
+        var name = attribute.Name?.TrimStart('-').Trim();
+        var environmentVariable = attribute.EnvironmentVariable?.Trim();
+        var isRequired = attribute.IsRequired || property.IsRequired();
+        var description = attribute.Description?.Trim();
+
+        var isSequence =
+            property.PropertyType != typeof(string)
+            && property.PropertyType.TryGetEnumerableUnderlyingType() is not null;
+
+        return new CommandOptionSchema(
+            CreatePropertyBinding(property),
+            isSequence,
+            name,
+            attribute.ShortName,
+            environmentVariable,
+            isRequired,
+            description,
+            CreateConverter(attribute.Converter),
+            CreateValidators(attribute.Validators)
+        );
+    }
+
+    /// <summary>
+    /// Resolves the command schema from a CLR type using reflection.
+    /// Throws if the type is not a valid command.
+    /// </summary>
     public static CommandSchema Resolve(Type type)
     {
         var schema = TryResolve(type);
@@ -142,3 +248,25 @@ internal partial class CommandSchema
         return schema;
     }
 }
+
+/// <inheritdoc cref="CommandSchema" />
+/// <remarks>
+/// Generic version used by source-generated code for static type references and AOT compatibility.
+/// </remarks>
+public class CommandSchema<TCommand>(
+    string? name,
+    string? description,
+    IReadOnlyList<CommandInputSchema> inputs
+)
+    : CommandSchema(
+        typeof(TCommand),
+        name,
+        description,
+        inputs.OfType<CommandParameterSchema>().ToArray(),
+        inputs.OfType<CommandOptionSchema>().ToArray()
+    )
+    where TCommand : ICommand;
+
+// Internal null property binding used for implicit options (help, version)
+internal sealed class NullPropertyBinding()
+    : PropertyBinding(typeof(object), _ => null, (_, _) => { });

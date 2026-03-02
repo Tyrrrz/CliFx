@@ -16,6 +16,7 @@ namespace CliFx;
 public partial class CliApplicationBuilder
 {
     private readonly HashSet<Type> _commandTypes = [];
+    private readonly List<CommandSchema> _commandSchemas = [];
 
     private bool _isDebugModeAllowed = true;
     private bool _isPreviewModeAllowed = true;
@@ -32,6 +33,16 @@ public partial class CliApplicationBuilder
     public CliApplicationBuilder AddCommand(Type commandType)
     {
         _commandTypes.Add(commandType);
+        return this;
+    }
+
+    /// <summary>
+    /// Adds a command to the application using a pre-built schema (for source-generated path).
+    /// </summary>
+    public CliApplicationBuilder AddCommand(CommandSchema commandSchema)
+    {
+        _commandSchemas.Add(commandSchema);
+        _commandTypes.Add(commandSchema.Type);
         return this;
     }
 

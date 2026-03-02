@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -16,15 +16,12 @@ internal class CommandBinder(ITypeActivator typeActivator)
 {
     private readonly IFormatProvider _formatProvider = CultureInfo.InvariantCulture;
 
-    private object? ConvertSingle(IMemberSchema memberSchema, string? rawValue, Type targetType)
+    private object? ConvertSingle(CommandInputSchema schema, string? rawValue, Type targetType)
     {
-        // Custom converter
-        if (memberSchema.ConverterType is not null)
+        // Custom converter (set at schema build time)
+        if (schema.Converter is not null)
         {
-            var converter = typeActivator.CreateInstance<IBindingConverter>(
-                memberSchema.ConverterType
-            );
-            return converter.Convert(rawValue);
+            return schema.Converter.Convert(rawValue);
         }
 
         // Assignable from a string (e.g. string itself, object, etc)
@@ -42,21 +39,18 @@ internal class CommandBinder(ITypeActivator typeActivator)
         // Special case for DateTimeOffset
         if (targetType == typeof(DateTimeOffset))
         {
-            // Null reference exception will be handled upstream
             return DateTimeOffset.Parse(rawValue!, _formatProvider);
         }
 
         // Special case for TimeSpan
         if (targetType == typeof(TimeSpan))
         {
-            // Null reference exception will be handled upstream
             return TimeSpan.Parse(rawValue!, _formatProvider);
         }
 
         // Enum
         if (targetType.IsEnum)
         {
-            // Null reference exception will be handled upstream
             return Enum.Parse(targetType, rawValue!, true);
         }
 
@@ -71,7 +65,7 @@ internal class CommandBinder(ITypeActivator typeActivator)
         if (nullableUnderlyingType is not null)
         {
             return !string.IsNullOrWhiteSpace(rawValue)
-                ? ConvertSingle(memberSchema, rawValue, nullableUnderlyingType)
+                ? ConvertSingle(schema, rawValue, nullableUnderlyingType)
                 : null;
         }
 
@@ -98,7 +92,7 @@ internal class CommandBinder(ITypeActivator typeActivator)
 
         throw CliFxException.InternalError(
             $"""
-            {memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} has an unsupported underlying property type.
+            {schema.GetKind()} {schema.GetFormattedIdentifier()} has an unsupported underlying property type.
             There is no known way to convert a string value into an instance of type `{targetType.FullName}`.
             To fix this, either change the property to use a supported type or configure a custom converter.
             """
@@ -106,25 +100,23 @@ internal class CommandBinder(ITypeActivator typeActivator)
     }
 
     private object? ConvertMultiple(
-        IMemberSchema memberSchema,
+        CommandInputSchema schema,
         IReadOnlyList<string> rawValues,
         Type targetEnumerableType,
         Type targetElementType
     )
     {
         var array = rawValues
-            .Select(v => ConvertSingle(memberSchema, v, targetElementType))
+            .Select(v => ConvertSingle(schema, v, targetElementType))
             .ToNonGenericArray(targetElementType);
 
         var arrayType = array.GetType();
 
-        // Assignable from an array (T[], IReadOnlyList<T>, etc)
         if (targetEnumerableType.IsAssignableFrom(arrayType))
         {
             return array;
         }
 
-        // Array-constructable (List<T>, HashSet<T>, etc)
         var arrayConstructor = targetEnumerableType.GetConstructor([arrayType]);
         if (arrayConstructor is not null)
         {
@@ -133,55 +125,49 @@ internal class CommandBinder(ITypeActivator typeActivator)
 
         throw CliFxException.InternalError(
             $"""
-            {memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} has an unsupported underlying property type.
+            {schema.GetKind()} {schema.GetFormattedIdentifier()} has an unsupported underlying property type.
             There is no known way to convert an array of `{targetElementType.FullName}` into an instance of type `{targetEnumerableType.FullName}`.
             To fix this, change the property to use a type which can be assigned from an array or a type which has a constructor that accepts an array.
             """
         );
     }
 
-    private object? ConvertMember(IMemberSchema memberSchema, IReadOnlyList<string> rawValues)
+    private object? ConvertMember(CommandInputSchema schema, IReadOnlyList<string> rawValues)
     {
         try
         {
-            // Non-scalar
-            var enumerableUnderlyingType =
-                memberSchema.Property.Type.TryGetEnumerableUnderlyingType();
+            var propertyType = schema.Property.Type;
 
-            if (
-                enumerableUnderlyingType is not null
-                && memberSchema.Property.Type != typeof(string)
-            )
+            // Non-scalar (sequence)
+            if (schema.IsSequence)
             {
-                return ConvertMultiple(
-                    memberSchema,
-                    rawValues,
-                    memberSchema.Property.Type,
-                    enumerableUnderlyingType
-                );
+                var enumerableUnderlyingType = propertyType.TryGetEnumerableUnderlyingType();
+                if (enumerableUnderlyingType is not null)
+                {
+                    return ConvertMultiple(
+                        schema,
+                        rawValues,
+                        propertyType,
+                        enumerableUnderlyingType
+                    );
+                }
             }
 
             // Scalar
             if (rawValues.Count <= 1)
             {
-                return ConvertSingle(
-                    memberSchema,
-                    rawValues.SingleOrDefault(),
-                    memberSchema.Property.Type
-                );
+                return ConvertSingle(schema, rawValues.SingleOrDefault(), propertyType);
             }
         }
-        catch (Exception ex) when (ex is not CliFxException) // don't wrap CliFxException
+        catch (Exception ex) when (ex is not CliFxException)
         {
-            // We use reflection-based invocation which can throw TargetInvocationException.
-            // Unwrap those exceptions to provide a more user-friendly error message.
             var errorMessage = ex is TargetInvocationException invokeEx
                 ? invokeEx.InnerException?.Message ?? invokeEx.Message
                 : ex.Message;
 
             throw CliFxException.UserError(
                 $"""
-                {memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} cannot be set from the provided argument(s):
+                {schema.GetKind()} {schema.GetFormattedIdentifier()} cannot be set from the provided argument(s):
                 {rawValues.Select(v => '<' + v + '>').JoinToString(" ")}
                 Error: {errorMessage}
                 """,
@@ -192,21 +178,19 @@ internal class CommandBinder(ITypeActivator typeActivator)
         // Mismatch (scalar but too many values)
         throw CliFxException.UserError(
             $"""
-            {memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} expects a single argument, but provided with multiple:
+            {schema.GetKind()} {schema.GetFormattedIdentifier()} expects a single argument, but provided with multiple:
             {rawValues.Select(v => '<' + v + '>').JoinToString(" ")}
             """
         );
     }
 
-    private void ValidateMember(IMemberSchema memberSchema, object? convertedValue)
+    private void ValidateMember(CommandInputSchema schema, object? convertedValue)
     {
         var errors = new List<BindingValidationError>();
 
-        foreach (var validatorType in memberSchema.ValidatorTypes)
+        foreach (var validator in schema.Validators)
         {
-            var validator = typeActivator.CreateInstance<IBindingValidator>(validatorType);
             var error = validator.Validate(convertedValue);
-
             if (error is not null)
                 errors.Add(error);
         }
@@ -215,7 +199,7 @@ internal class CommandBinder(ITypeActivator typeActivator)
         {
             throw CliFxException.UserError(
                 $"""
-                {memberSchema.GetKind()} {memberSchema.GetFormattedIdentifier()} has been provided with an invalid value.
+                {schema.GetKind()} {schema.GetFormattedIdentifier()} has been provided with an invalid value.
                 Error(s):
                 {errors.Select(e => "- " + e.Message).JoinToString(Environment.NewLine)}
                 """
@@ -224,15 +208,14 @@ internal class CommandBinder(ITypeActivator typeActivator)
     }
 
     private void BindMember(
-        IMemberSchema memberSchema,
+        CommandInputSchema schema,
         ICommand commandInstance,
         IReadOnlyList<string> rawValues
     )
     {
-        var convertedValue = ConvertMember(memberSchema, rawValues);
-        ValidateMember(memberSchema, convertedValue);
-
-        memberSchema.Property.SetValue(commandInstance, convertedValue);
+        var convertedValue = ConvertMember(schema, rawValues);
+        ValidateMember(schema, convertedValue);
+        schema.Property.SetValue(commandInstance, convertedValue);
     }
 
     private void BindParameters(
@@ -241,7 +224,6 @@ internal class CommandBinder(ITypeActivator typeActivator)
         ICommand commandInstance
     )
     {
-        // Ensure there are no unexpected parameters and that all parameters are provided
         var remainingParameterInputs = commandInput.Parameters.ToList();
         var remainingRequiredParameterSchemas = commandSchema
             .Parameters.Where(p => p.IsRequired)
@@ -251,12 +233,10 @@ internal class CommandBinder(ITypeActivator typeActivator)
 
         foreach (var parameterSchema in commandSchema.Parameters.OrderBy(p => p.Order))
         {
-            // Break when there are no remaining inputs
             if (position >= commandInput.Parameters.Count)
                 break;
 
-            // Scalar: take one input at the current position
-            if (parameterSchema.Property.IsScalar())
+            if (!parameterSchema.IsSequence)
             {
                 var parameterInput = commandInput.Parameters[position];
                 BindMember(parameterSchema, commandInstance, [parameterInput.Value]);
@@ -264,7 +244,6 @@ internal class CommandBinder(ITypeActivator typeActivator)
                 position++;
                 remainingParameterInputs.Remove(parameterInput);
             }
-            // Non-scalar: take all remaining inputs starting from the current position
             else
             {
                 var parameterInputs = commandInput.Parameters.Skip(position).ToArray();
@@ -311,7 +290,6 @@ internal class CommandBinder(ITypeActivator typeActivator)
         ICommand commandInstance
     )
     {
-        // Ensure there are no unrecognized options and that all required options are set
         var remainingOptionInputs = commandInput.Options.ToList();
         var remainingRequiredOptionSchemas = commandSchema
             .Options.Where(o => o.IsRequired)
@@ -319,6 +297,10 @@ internal class CommandBinder(ITypeActivator typeActivator)
 
         foreach (var optionSchema in commandSchema.Options)
         {
+            // Skip implicit options (no property binding)
+            if (optionSchema.Property is NullPropertyBinding)
+                continue;
+
             var optionInputs = commandInput
                 .Options.Where(o => optionSchema.MatchesIdentifier(o.Identifier))
                 .ToArray();
@@ -327,31 +309,26 @@ internal class CommandBinder(ITypeActivator typeActivator)
                 optionSchema.MatchesEnvironmentVariable(e.Name)
             );
 
-            // Direct input
             if (optionInputs.Any())
             {
                 var rawValues = optionInputs.SelectMany(o => o.Values).ToArray();
 
                 BindMember(optionSchema, commandInstance, rawValues);
 
-                // Required options need at least one value to be set
                 if (rawValues.Any())
                     remainingRequiredOptionSchemas.Remove(optionSchema);
             }
-            // Environment variable
             else if (environmentVariableInput is not null)
             {
-                var rawValues = optionSchema.Property.IsScalar()
+                var rawValues = !optionSchema.IsSequence
                     ? [environmentVariableInput.Value]
                     : environmentVariableInput.SplitValues();
 
                 BindMember(optionSchema, commandInstance, rawValues);
 
-                // Required options need at least one value to be set
                 if (rawValues.Any())
                     remainingRequiredOptionSchemas.Remove(optionSchema);
             }
-            // No input, skip
             else
             {
                 continue;
