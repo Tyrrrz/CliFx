@@ -103,7 +103,7 @@ public partial class CommandSchema
     [RequiresUnreferencedCode(
         "Uses reflection to inspect type interfaces and attributes. Not compatible with trimming."
     )]
-    public static bool IsCommandType(Type type) =>
+    internal static bool IsCommandType(Type type) =>
         type.Implements(typeof(ICommand))
         && type.IsDefined(typeof(CommandAttribute))
         && type is { IsAbstract: false, IsInterface: false };
@@ -115,7 +115,7 @@ public partial class CommandSchema
     [RequiresUnreferencedCode(
         "Uses reflection to resolve the command schema. Use the source-generated Schema property for AOT compatibility."
     )]
-    public static CommandSchema? TryResolve(Type type)
+    internal static CommandSchema? TryResolve(Type type)
     {
         if (!IsCommandType(type))
             return null;
@@ -264,32 +264,6 @@ public partial class CommandSchema
             CreateConverter(attribute.Converter),
             CreateValidators(attribute.Validators)
         );
-    }
-
-    /// <summary>
-    /// Resolves the command schema from a CLR type using reflection.
-    /// Throws if the type is not a valid command.
-    /// </summary>
-    [RequiresUnreferencedCode(
-        "Uses reflection to resolve the command schema. Use the source-generated Schema property for AOT compatibility."
-    )]
-    public static CommandSchema Resolve(Type type)
-    {
-        var schema = TryResolve(type);
-        if (schema is null)
-        {
-            throw CliFxException.InternalError(
-                $"""
-                Type `{type.FullName}` is not a valid command type.
-                In order to be a valid command type, it must:
-                - Implement `{typeof(ICommand).FullName}`
-                - Be annotated with `{typeof(CommandAttribute).FullName}`
-                - Not be an abstract class
-                """
-            );
-        }
-
-        return schema;
     }
 }
 

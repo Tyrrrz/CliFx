@@ -13,6 +13,7 @@ internal class HelpContext(
     public ApplicationMetadata ApplicationMetadata { get; } = applicationMetadata;
     public ApplicationSchema ApplicationSchema { get; } = applicationSchema;
     public CommandSchema CommandSchema { get; } = commandSchema;
+
     public IReadOnlyDictionary<CommandInputSchema, object?> CommandDefaultValues { get; } =
         commandDefaultValues;
 }

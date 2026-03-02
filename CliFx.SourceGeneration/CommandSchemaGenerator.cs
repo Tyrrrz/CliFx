@@ -35,6 +35,60 @@ public class CommandSchemaGenerator : IIncrementalGenerator
         isEnabledByDefault: true
     );
 
+    private static readonly DiagnosticDescriptor OptionMustHaveNameOrShortNameDiagnostic = new(
+        id: "CLIFX003",
+        title: "Option must have a name or short name",
+        messageFormat: "Option property '{0}' must have either a name or a short name specified",
+        category: "CliFx",
+        defaultSeverity: DiagnosticSeverity.Warning,
+        isEnabledByDefault: true
+    );
+
+    private static readonly DiagnosticDescriptor OptionNameInvalidDiagnostic = new(
+        id: "CLIFX004",
+        title: "Option name is invalid",
+        messageFormat: "Option name '{0}' on property '{1}' is invalid. Option names must be at least 2 characters long, must not start with a dash, and must not contain whitespace.",
+        category: "CliFx",
+        defaultSeverity: DiagnosticSeverity.Warning,
+        isEnabledByDefault: true
+    );
+
+    private static readonly DiagnosticDescriptor ParameterNameEmptyDiagnostic = new(
+        id: "CLIFX005",
+        title: "Parameter name must not be empty",
+        messageFormat: "Parameter name on property '{0}' must not be null or empty",
+        category: "CliFx",
+        defaultSeverity: DiagnosticSeverity.Warning,
+        isEnabledByDefault: true
+    );
+
+    private static readonly DiagnosticDescriptor OptionsMustHaveUniqueNamesDiagnostic = new(
+        id: "CLIFX006",
+        title: "Options must have unique names and short names",
+        messageFormat: "Option '{0}' on type '{1}' has a duplicate {2} '{3}' (also used by '{4}')",
+        category: "CliFx",
+        defaultSeverity: DiagnosticSeverity.Warning,
+        isEnabledByDefault: true
+    );
+
+    private static readonly DiagnosticDescriptor ParametersMustHaveUniqueOrderDiagnostic = new(
+        id: "CLIFX007",
+        title: "Parameters must have unique order values",
+        messageFormat: "Parameter '{0}' on type '{1}' has a duplicate order value {2} (also used by '{3}')",
+        category: "CliFx",
+        defaultSeverity: DiagnosticSeverity.Warning,
+        isEnabledByDefault: true
+    );
+
+    private static readonly DiagnosticDescriptor ParametersMustHaveUniqueNamesDiagnostic = new(
+        id: "CLIFX008",
+        title: "Parameters must have unique names",
+        messageFormat: "Parameter '{0}' on type '{1}' has a duplicate name '{2}' (also used by '{3}')",
+        category: "CliFx",
+        defaultSeverity: DiagnosticSeverity.Warning,
+        isEnabledByDefault: true
+    );
+
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         var commandDeclarations = context
@@ -102,6 +156,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
         var parameters = new List<CommandParameterDescriptor>();
         var options = new List<CommandOptionDescriptor>();
         var skippedInitOnly = new List<IPropertySymbol>();
+        var diagnostics = new List<Diagnostic>();
 
         foreach (var property in properties)
         {
@@ -136,6 +191,22 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                         .FirstOrDefault()
                     ?? property.Name.ToLowerInvariant();
 
+                // CLIFX005: parameter name must not be empty
+                var explicitName = paramAttr
+                    .NamedArguments.Where(a => a.Key == "Name")
+                    .Select(a => a.Value.Value as string)
+                    .FirstOrDefault();
+                if (explicitName is not null && string.IsNullOrWhiteSpace(explicitName))
+                {
+                    diagnostics.Add(
+                        Diagnostic.Create(
+                            ParameterNameEmptyDiagnostic,
+                            property.Locations.FirstOrDefault() ?? Location.None,
+                            property.Name
+                        )
+                    );
+                }
+
                 var paramIsRequired =
                     paramAttr
                         .NamedArguments.Where(a => a.Key == "IsRequired")
@@ -150,13 +221,15 @@ public class CommandSchemaGenerator : IIncrementalGenerator
 
                 var paramConverterType = paramAttr
                     .NamedArguments.Where(a => a.Key == "Converter")
-                    .Select(a => TypeDescriptor.TryFromSymbol(a.Value.Value as ITypeSymbol))
+                    .Select(a =>
+                        a.Value.Value is ITypeSymbol sym ? TypeDescriptor.FromSymbol(sym) : null
+                    )
                     .FirstOrDefault();
 
                 var paramValidatorTypes = paramAttr
                     .NamedArguments.Where(a => a.Key == "Validators")
                     .SelectMany(a => a.Value.Values)
-                    .Select(v => TypeDescriptor.TryFromSymbol(v.Value as ITypeSymbol))
+                    .Select(v => v.Value is ITypeSymbol sym ? TypeDescriptor.FromSymbol(sym) : null)
                     .Where(t => t is not null)
                     .Select(t => t!)
                     .ToArray();
@@ -217,6 +290,38 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                         .Select(a => a.Value.Value as char?)
                         .FirstOrDefault();
 
+                // CLIFX003: option must have a name or short name
+                if (string.IsNullOrWhiteSpace(optName) && shortName is null)
+                {
+                    diagnostics.Add(
+                        Diagnostic.Create(
+                            OptionMustHaveNameOrShortNameDiagnostic,
+                            property.Locations.FirstOrDefault() ?? Location.None,
+                            property.Name
+                        )
+                    );
+                }
+
+                // CLIFX004: option name must be valid
+                if (!string.IsNullOrWhiteSpace(optName))
+                {
+                    if (
+                        optName.Length < 2
+                        || optName.StartsWith("-", StringComparison.Ordinal)
+                        || optName.Any(char.IsWhiteSpace)
+                    )
+                    {
+                        diagnostics.Add(
+                            Diagnostic.Create(
+                                OptionNameInvalidDiagnostic,
+                                property.Locations.FirstOrDefault() ?? Location.None,
+                                optName,
+                                property.Name
+                            )
+                        );
+                    }
+                }
+
                 var optIsRequired =
                     optAttr
                         .NamedArguments.Where(a => a.Key == "IsRequired")
@@ -236,13 +341,15 @@ public class CommandSchemaGenerator : IIncrementalGenerator
 
                 var optConverterType = optAttr
                     .NamedArguments.Where(a => a.Key == "Converter")
-                    .Select(a => TypeDescriptor.TryFromSymbol(a.Value.Value as ITypeSymbol))
+                    .Select(a =>
+                        a.Value.Value is ITypeSymbol sym ? TypeDescriptor.FromSymbol(sym) : null
+                    )
                     .FirstOrDefault();
 
                 var optValidatorTypes = optAttr
                     .NamedArguments.Where(a => a.Key == "Validators")
                     .SelectMany(a => a.Value.Values)
-                    .Select(v => TypeDescriptor.TryFromSymbol(v.Value as ITypeSymbol))
+                    .Select(v => v.Value is ITypeSymbol sym ? TypeDescriptor.FromSymbol(sym) : null)
                     .Where(t => t is not null)
                     .Select(t => t!)
                     .ToArray();
@@ -262,6 +369,97 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             }
         }
 
+        // CLIFX006: options must have unique names and short names
+        for (var i = 0; i < options.Count; i++)
+        {
+            for (var j = i + 1; j < options.Count; j++)
+            {
+                var a = options[i];
+                var b = options[j];
+
+                if (
+                    !string.IsNullOrWhiteSpace(a.Name)
+                    && string.Equals(a.Name, b.Name, StringComparison.OrdinalIgnoreCase)
+                )
+                {
+                    diagnostics.Add(
+                        Diagnostic.Create(
+                            OptionsMustHaveUniqueNamesDiagnostic,
+                            b.Property.Locations.FirstOrDefault() ?? Location.None,
+                            b.Property.Name,
+                            type.Name,
+                            "name",
+                            b.Name,
+                            a.Property.Name
+                        )
+                    );
+                }
+
+                if (a.ShortName is not null && a.ShortName == b.ShortName)
+                {
+                    diagnostics.Add(
+                        Diagnostic.Create(
+                            OptionsMustHaveUniqueNamesDiagnostic,
+                            b.Property.Locations.FirstOrDefault() ?? Location.None,
+                            b.Property.Name,
+                            type.Name,
+                            "short name",
+                            b.ShortName.ToString(),
+                            a.Property.Name
+                        )
+                    );
+                }
+            }
+        }
+
+        // CLIFX007: parameters must have unique order values
+        for (var i = 0; i < parameters.Count; i++)
+        {
+            for (var j = i + 1; j < parameters.Count; j++)
+            {
+                var a = parameters[i];
+                var b = parameters[j];
+
+                if (a.Order == b.Order)
+                {
+                    diagnostics.Add(
+                        Diagnostic.Create(
+                            ParametersMustHaveUniqueOrderDiagnostic,
+                            b.Property.Locations.FirstOrDefault() ?? Location.None,
+                            b.Property.Name,
+                            type.Name,
+                            b.Order,
+                            a.Property.Name
+                        )
+                    );
+                }
+            }
+        }
+
+        // CLIFX008: parameters must have unique names
+        for (var i = 0; i < parameters.Count; i++)
+        {
+            for (var j = i + 1; j < parameters.Count; j++)
+            {
+                var a = parameters[i];
+                var b = parameters[j];
+
+                if (string.Equals(a.Name, b.Name, StringComparison.OrdinalIgnoreCase))
+                {
+                    diagnostics.Add(
+                        Diagnostic.Create(
+                            ParametersMustHaveUniqueNamesDiagnostic,
+                            b.Property.Locations.FirstOrDefault() ?? Location.None,
+                            b.Property.Name,
+                            type.Name,
+                            b.Name,
+                            a.Property.Name
+                        )
+                    );
+                }
+            }
+        }
+
         return new CommandDescriptor(
             type,
             name,
@@ -274,7 +472,8 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                     || m.Kind == SymbolKind.Property
                     || m.Kind == SymbolKind.Method
                 ),
-            skippedInitOnly
+            skippedInitOnly,
+            diagnostics
         );
     }
 
@@ -322,6 +521,11 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                 );
             }
 
+            foreach (var diagnostic in command.Diagnostics)
+            {
+                ctx.ReportDiagnostic(diagnostic);
+            }
+
             var source = GenerateCommandSchemaSource(command);
             var hintName = $"{command.Type.ToDisplayString().Replace('.', '_')}_Schema.g.cs";
             ctx.AddSource(hintName, SourceText.From(source, Encoding.UTF8));
@@ -331,116 +535,127 @@ public class CommandSchemaGenerator : IIncrementalGenerator
     private static string GenerateCommandSchemaSource(CommandDescriptor command)
     {
         var commandFqn = command.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+        var ns = command.Type.ContainingNamespace?.ToDisplayString();
 
         var sb = new StringBuilder();
-        sb.AppendLine("// <auto-generated/>");
-        sb.AppendLine("using System.Collections.Generic;");
-        sb.AppendLine("using CliFx.Extensibility;");
-        sb.AppendLine("using CliFx.Schema;");
-        sb.AppendLine();
 
-        var ns = command.Type.ContainingNamespace?.ToDisplayString();
+        sb.Append(
+            // lang=csharp
+            """
+            // <auto-generated/>
+            using CliFx.Extensibility;
+            using CliFx.Schema;
+
+            """
+        );
+
         if (!string.IsNullOrEmpty(ns))
         {
-            sb.AppendLine($"namespace {ns};");
-            sb.AppendLine();
+            sb.Append(
+                // lang=csharp
+                $$"""
+                namespace {{ns}};
+
+                """
+            );
         }
 
-        sb.AppendLine($"partial class {command.Type.Name}");
-        sb.AppendLine("{");
+        sb.Append(
+            // lang=csharp
+            $$"""
+            partial class {{command.Type.Name}}
+            {
+            """
+        );
+
         if (!command.HasExistingSchemaProperty)
         {
-            sb.AppendLine(
-                $"    /// <summary>Generated command schema for <see cref=\"{command.Type.Name}\"/>.</summary>"
+            sb.Append(
+                // lang=csharp
+                $$"""
+
+                    /// <summary>Generated command schema for <see cref="{{command.Type.Name}}"/>.</summary>
+                    public static global::CliFx.Schema.CommandSchema Schema { get; } = BuildSchema();
+
+                """
             );
-            sb.AppendLine(
-                $"    public static global::CliFx.Schema.CommandSchema Schema {{ get; }} = BuildSchema();"
-            );
-            sb.AppendLine();
         }
-        sb.AppendLine($"    private static global::CliFx.Schema.CommandSchema BuildSchema()");
-        sb.AppendLine("    {");
 
-        // Build inputs list
-        sb.AppendLine(
-            "        var inputs = new global::System.Collections.Generic.List<global::CliFx.Schema.CommandInputSchema>();"
+        sb.Append(
+            // lang=csharp
+            """
+                private static global::CliFx.Schema.CommandSchema BuildSchema()
+                {
+                    var inputs = new global::System.Collections.Generic.List<global::CliFx.Schema.CommandInputSchema>();
+
+            """
         );
-        sb.AppendLine();
 
-        // Parameters
         foreach (var param in command.Parameters.OrderBy(p => p.Order))
         {
             var propTypeFqn = param.Property.Type.ToDisplayString(
                 SymbolDisplayFormat.FullyQualifiedFormat
             );
             var isSequence = IsSequenceType(param.Property.Type);
-            var nameStr = EscapeString(param.Name);
-            var descStr = EscapeStringOrNull(param.Description);
-            var converterExpr = BuildConverterExpr(param.ConverterType);
-            var validatorsExpr = BuildValidatorsExpr(param.ValidatorTypes);
-            var isRequired = param.IsRequired ? "true" : "false";
 
-            sb.AppendLine(
-                $"        inputs.Add(new global::CliFx.Schema.CommandParameterSchema<{commandFqn}, {propTypeFqn}>("
+            sb.Append(
+                // lang=csharp
+                $$"""
+                        inputs.Add(new global::CliFx.Schema.CommandParameterSchema<{{commandFqn}}, {{propTypeFqn}}>(
+                            new global::CliFx.Schema.PropertyBinding<{{commandFqn}}, {{propTypeFqn}}>(
+                                c => c.{{param.Property.Name}},
+                                (c, v) => c.{{param.Property.Name}} = v),
+                            {{(isSequence ? "true" : "false")}},
+                            {{param.Order}},
+                            {{EscapeString(param.Name)}},
+                            {{(param.IsRequired ? "true" : "false")}},
+                            {{EscapeString(param.Description)}},
+                            {{BuildConverterExpr(param.ConverterType)}},
+                            {{BuildValidatorsExpr(param.ValidatorTypes)}}));
+
+                """
             );
-            sb.AppendLine(
-                $"            new global::CliFx.Schema.PropertyBinding<{commandFqn}, {propTypeFqn}>("
-            );
-            sb.AppendLine($"                c => c.{param.Property.Name},");
-            sb.AppendLine($"                (c, v) => c.{param.Property.Name} = v),");
-            sb.AppendLine($"            {(isSequence ? "true" : "false")},");
-            sb.AppendLine($"            {param.Order},");
-            sb.AppendLine($"            {nameStr},");
-            sb.AppendLine($"            {isRequired},");
-            sb.AppendLine($"            {descStr},");
-            sb.AppendLine($"            {converterExpr},");
-            sb.AppendLine($"            {validatorsExpr}));");
-            sb.AppendLine();
         }
 
-        // Options
         foreach (var opt in command.Options)
         {
             var propTypeFqn = opt.Property.Type.ToDisplayString(
                 SymbolDisplayFormat.FullyQualifiedFormat
             );
             var isSequence = IsSequenceType(opt.Property.Type);
-            var nameStr = EscapeStringOrNull(opt.Name);
             var shortNameStr = opt.ShortName.HasValue ? $"'{opt.ShortName}'" : "null";
-            var envVarStr = EscapeStringOrNull(opt.EnvironmentVariable);
-            var descStr = EscapeStringOrNull(opt.Description);
-            var converterExpr = BuildConverterExpr(opt.ConverterType);
-            var validatorsExpr = BuildValidatorsExpr(opt.ValidatorTypes);
-            var isRequired = opt.IsRequired ? "true" : "false";
 
-            sb.AppendLine(
-                $"        inputs.Add(new global::CliFx.Schema.CommandOptionSchema<{commandFqn}, {propTypeFqn}>("
+            sb.Append(
+                // lang=csharp
+                $$"""
+                        inputs.Add(new global::CliFx.Schema.CommandOptionSchema<{{commandFqn}}, {{propTypeFqn}}>(
+                            new global::CliFx.Schema.PropertyBinding<{{commandFqn}}, {{propTypeFqn}}>(
+                                c => c.{{opt.Property.Name}},
+                                (c, v) => c.{{opt.Property.Name}} = v),
+                            {{(isSequence ? "true" : "false")}},
+                            {{EscapeString(opt.Name)}},
+                            {{shortNameStr}},
+                            {{EscapeString(opt.EnvironmentVariable)}},
+                            {{(opt.IsRequired ? "true" : "false")}},
+                            {{EscapeString(opt.Description)}},
+                            {{BuildConverterExpr(opt.ConverterType)}},
+                            {{BuildValidatorsExpr(opt.ValidatorTypes)}}));
+
+                """
             );
-            sb.AppendLine(
-                $"            new global::CliFx.Schema.PropertyBinding<{commandFqn}, {propTypeFqn}>("
-            );
-            sb.AppendLine($"                c => c.{opt.Property.Name},");
-            sb.AppendLine($"                (c, v) => c.{opt.Property.Name} = v),");
-            sb.AppendLine($"            {(isSequence ? "true" : "false")},");
-            sb.AppendLine($"            {nameStr},");
-            sb.AppendLine($"            {shortNameStr},");
-            sb.AppendLine($"            {envVarStr},");
-            sb.AppendLine($"            {isRequired},");
-            sb.AppendLine($"            {descStr},");
-            sb.AppendLine($"            {converterExpr},");
-            sb.AppendLine($"            {validatorsExpr}));");
-            sb.AppendLine();
         }
 
-        var cmdNameStr = EscapeStringOrNull(command.Name);
-        var cmdDescStr = EscapeStringOrNull(command.Description);
-
-        sb.AppendLine($"        return new global::CliFx.Schema.CommandSchema<{commandFqn}>(");
-        sb.AppendLine($"            {cmdNameStr},");
-        sb.AppendLine($"            {cmdDescStr},");
-        sb.AppendLine("            inputs);");
-        sb.AppendLine("    }");
-        sb.AppendLine("}");
+        sb.Append(
+            // lang=csharp
+            $$"""
+                    return new global::CliFx.Schema.CommandSchema<{{commandFqn}}>(
+                        {{EscapeString(command.Name)}},
+                        {{EscapeString(command.Description)}},
+                        inputs);
+                }
+            }
+            """
+        );
 
         return sb.ToString();
     }
@@ -457,8 +672,6 @@ public class CommandSchemaGenerator : IIncrementalGenerator
 
     private static string EscapeString(string? value) =>
         value is null ? "null" : $"\"{value.Replace("\\", "\\\\").Replace("\"", "\\\"")}\"";
-
-    private static string EscapeStringOrNull(string? value) => EscapeString(value);
 
     private static string BuildConverterExpr(TypeDescriptor? converterType)
     {

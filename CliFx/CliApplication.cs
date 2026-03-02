@@ -184,7 +184,12 @@ public class CliApplication(
 #pragma warning disable IL2026
             var applicationSchema = Configuration.CommandSchemas is { Count: > 0 } schemas
                 ? new ApplicationSchema(schemas)
-                : ApplicationSchema.Resolve(Configuration.CommandTypes);
+                : new ApplicationSchema(
+                    Configuration
+                        .CommandTypes.Select(CommandSchema.TryResolve)
+                        .WhereNotNull()
+                        .ToArray()
+                );
 #pragma warning restore IL2026
 
             var commandInput = CommandInput.Parse(

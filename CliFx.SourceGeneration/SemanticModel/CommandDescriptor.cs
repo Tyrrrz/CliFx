@@ -10,5 +10,6 @@ internal record CommandDescriptor(
     IReadOnlyList<CommandParameterDescriptor> Parameters,
     IReadOnlyList<CommandOptionDescriptor> Options,
     bool HasExistingSchemaProperty,
-    IReadOnlyList<IPropertySymbol> SkippedInitOnlyProperties
+    IReadOnlyList<IPropertySymbol> SkippedInitOnlyProperties,
+    IReadOnlyList<Diagnostic> Diagnostics
 );
