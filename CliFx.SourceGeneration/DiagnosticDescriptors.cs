@@ -4,16 +4,6 @@ namespace CliFx.SourceGeneration;
 
 internal static class DiagnosticDescriptors
 {
-    public static DiagnosticDescriptor SchemaPropertyAlreadyDefined { get; } =
-        new(
-            $"{nameof(CliFx)}_{nameof(SchemaPropertyAlreadyDefined)}",
-            "Command type already defines a 'Schema' member",
-            "Type '{0}' already defines a 'Schema' member. The source-generated 'Schema' property will be skipped. Rename or remove the existing member to allow the generator to produce the schema.",
-            "CliFx",
-            DiagnosticSeverity.Warning,
-            true
-        );
-
     public static DiagnosticDescriptor InitOnlyProperty { get; } =
         new(
             $"{nameof(CliFx)}_{nameof(InitOnlyProperty)}",

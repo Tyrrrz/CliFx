@@ -79,7 +79,6 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             .Select(a => a.Value.Value as string)
             .FirstOrDefault();
 
-        var directProperties = type.GetMembers().OfType<IPropertySymbol>().ToArray();
         var allProperties = GetAllProperties(type);
 
         var parameters = new List<CommandParameterDescriptor>();
@@ -404,7 +403,6 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             description,
             parameters,
             options,
-            directProperties,
             skippedInitOnly,
             diagnostics,
             needsHelpOption,
@@ -422,28 +420,6 @@ public class CommandSchemaGenerator : IIncrementalGenerator
 
         foreach (var command in commands)
         {
-            if (command.UserDefinedProperties.Any(p => p.Name == "Schema"))
-            {
-                var schemaLocation =
-                    command
-                        .Type.GetMembers("Schema")
-                        .FirstOrDefault(m =>
-                            m.Kind == SymbolKind.Field
-                            || m.Kind == SymbolKind.Property
-                            || m.Kind == SymbolKind.Method
-                        )
-                        ?.Locations.FirstOrDefault()
-                    ?? Location.None;
-
-                ctx.ReportDiagnostic(
-                    Diagnostic.Create(
-                        DiagnosticDescriptors.SchemaPropertyAlreadyDefined,
-                        schemaLocation,
-                        command.Type.Name
-                    )
-                );
-            }
-
             foreach (var skippedProp in command.SkippedInitOnlyProperties)
             {
                 ctx.ReportDiagnostic(
@@ -533,18 +509,15 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             );
         }
 
-        if (!command.UserDefinedProperties.Any(p => p.Name == "Schema"))
-        {
-            sb.Append(
-                // lang=csharp
-                $$"""
+        sb.Append(
+            // lang=csharp
+            $$"""
 
-                    /// <summary>Generated command schema for <see cref="{{command.Type.Name}}"/>.</summary>
-                    public static global::CliFx.Schema.CommandSchema Schema { get; } = BuildSchema();
+                /// <summary>Generated command schema for <see cref="{{command.Type.Name}}"/>.</summary>
+                public static global::CliFx.Schema.CommandSchema Schema { get; } = BuildSchema();
 
-                """
-            );
-        }
+            """
+        );
 
         sb.Append(
             // lang=csharp

@@ -9,7 +9,6 @@ internal record CommandDescriptor(
     string? Description,
     IReadOnlyList<CommandParameterDescriptor> Parameters,
     IReadOnlyList<CommandOptionDescriptor> Options,
-    IReadOnlyList<IPropertySymbol> UserDefinedProperties,
     IReadOnlyList<IPropertySymbol> SkippedInitOnlyProperties,
     IReadOnlyList<Diagnostic> Diagnostics,
     bool NeedsHelpOption,

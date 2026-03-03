@@ -76,11 +76,6 @@ public class CliApplicationBuilderExtensionsGenerator : IIncrementalGenerator
 
         foreach (var command in commands)
         {
-            // Commands that already have a Schema property were warned by CommandSchemaGenerator.
-            // They don't have a generated Schema property, so skip them here.
-            if (command.UserDefinedProperties.Any(p => p.Name == "Schema"))
-                continue;
-
             var fqn = command.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
 
             sb.Append(
