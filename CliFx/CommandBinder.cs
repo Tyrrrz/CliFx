@@ -19,7 +19,7 @@ internal class CommandBinder
             throw CliFxException.InternalError(
                 $"""
                 {schema.GetKind()} {schema.GetFormattedIdentifier()} has an unsupported underlying property type.
-                There is no known way to convert a string value into the required type.
+                There is no known way to convert a string value into an instance of type `{schema.Property.Type.FullName}`.
                 To fix this, either change the property to use a supported type or configure a custom converter.
                 """
             );

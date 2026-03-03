@@ -562,10 +562,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                 SymbolDisplayFormat.FullyQualifiedFormat
             );
             var isSequence = IsSequenceType(param.Property.Type);
-            var converterExpr =
-                param.ConverterType != null
-                    ? BuildConverterExpr(param.ConverterType)
-                    : BuildDefaultConverterExpr(param.Property);
+            var converterExpr = GetConverterExpression(param.ConverterType, param.Property);
 
             if (!isSequence)
             {
@@ -616,10 +613,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             );
             var isSequence = IsSequenceType(opt.Property.Type);
             var shortNameStr = opt.ShortName.HasValue ? $"'{opt.ShortName}'" : "null";
-            var converterExpr =
-                opt.ConverterType != null
-                    ? BuildConverterExpr(opt.ConverterType)
-                    : BuildDefaultConverterExpr(opt.Property);
+            var converterExpr = GetConverterExpression(opt.ConverterType, opt.Property);
 
             if (!isSequence)
             {
@@ -762,6 +756,14 @@ public class CommandSchemaGenerator : IIncrementalGenerator
         return $"new {converterType.FullyQualifiedName}()";
     }
 
+    private static string GetConverterExpression(
+        TypeDescriptor? converterType,
+        IPropertySymbol property
+    ) =>
+        converterType is not null
+            ? BuildConverterExpr(converterType)
+            : BuildDefaultConverterExpr(property);
+
     private static string BuildValidatorsExpr(IReadOnlyList<TypeDescriptor> validatorTypes)
     {
         if (validatorTypes.Count == 0)
@@ -803,15 +805,15 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             return "new global::CliFx.Extensibility.BoolBindingConverter()";
 
         // DateTimeOffset
-        if (type.ToDisplayString() == "System.DateTimeOffset")
+        if (type is INamedTypeSymbol { ContainingNamespace.Name: "System", Name: "DateTimeOffset" })
             return "new global::CliFx.Extensibility.DateTimeOffsetBindingConverter()";
 
         // TimeSpan
-        if (type.ToDisplayString() == "System.TimeSpan")
+        if (type is INamedTypeSymbol { ContainingNamespace.Name: "System", Name: "TimeSpan" })
             return "new global::CliFx.Extensibility.TimeSpanBindingConverter()";
 
         // Guid
-        if (type.ToDisplayString() == "System.Guid")
+        if (type is INamedTypeSymbol { ContainingNamespace.Name: "System", Name: "Guid" })
             return "new global::CliFx.Extensibility.GuidBindingConverter()";
 
         // Enum
@@ -833,7 +835,11 @@ public class CommandSchemaGenerator : IIncrementalGenerator
         }
 
         // IConvertible (int, double, char, etc.)
-        if (type.AllInterfaces.Any(i => i.ToDisplayString() == "System.IConvertible"))
+        if (
+            type.AllInterfaces.Any(i =>
+                i.ContainingNamespace?.Name == "System" && i.Name == "IConvertible"
+            )
+        )
             return $"new global::CliFx.Extensibility.ConvertibleBindingConverter<{fqn}>()";
 
         // String-parseable with IFormatProvider: static T Parse(string, IFormatProvider)
@@ -844,7 +850,8 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                 && m.DeclaredAccessibility == Accessibility.Public
                 && m.Parameters.Length == 2
                 && m.Parameters[0].Type.SpecialType == SpecialType.System_String
-                && m.Parameters[1].Type.ToDisplayString() == "System.IFormatProvider"
+                && m.Parameters[1].Type
+                    is { ContainingNamespace.Name: "System", Name: "IFormatProvider" }
                 && SymbolEqualityComparer.Default.Equals(m.ReturnType, type)
             );
         if (parseWithFormatProvider is not null)
