@@ -19,23 +19,38 @@ public class CommandSchemaGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        var commandDeclarations = context
-            .SyntaxProvider.CreateSyntaxProvider(
-                predicate: static (node, _) =>
-                    node is ClassDeclarationSyntax cls
-                    && cls.Modifiers.IndexOf(SyntaxKind.PartialKeyword) >= 0
-                    && cls.AttributeLists.Count > 0,
-                transform: static (ctx, cancellationToken) =>
+        var allCommandNodes = context.SyntaxProvider.ForAttributeWithMetadataName(
+            SymbolNames.CliFxCommandAttribute,
+            predicate: static (node, _) => node is ClassDeclarationSyntax,
+            transform: static (ctx, _) =>
+                (
+                    ClassDeclaration: (ClassDeclarationSyntax)ctx.TargetNode,
+                    Symbol: (INamedTypeSymbol)ctx.TargetSymbol
+                )
+        );
+
+        // Emit diagnostics for [Command] classes that are not partial or don't implement ICommand
+        var diagnostics = allCommandNodes.SelectMany(
+            static (item, _) => GetPrerequisiteDiagnostics(item.ClassDeclaration, item.Symbol)
+        );
+        context.RegisterSourceOutput(
+            diagnostics,
+            static (ctx, diagnostic) => ctx.ReportDiagnostic(diagnostic)
+        );
+
+        // Only process classes that are partial, implement ICommand, and are not abstract
+        var commandDeclarations = allCommandNodes
+            .Select(
+                static (item, _) =>
                 {
-                    var classDeclaration = (ClassDeclarationSyntax)ctx.Node;
-                    var symbol = ctx.SemanticModel.GetDeclaredSymbol(
-                        classDeclaration,
-                        cancellationToken
-                    );
-                    if (symbol is not INamedTypeSymbol typeSymbol)
+                    if (
+                        !item.ClassDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword)
+                        || item.Symbol.IsAbstract
+                        || !item.Symbol.ImplementsInterface(SymbolNames.CliFxCommandInterface)
+                    )
                         return null;
 
-                    return TryBuildCommandDescriptor(typeSymbol);
+                    return TryBuildCommandDescriptor(item.Symbol);
                 }
             )
             .WhereNotNull();
@@ -44,6 +59,33 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             commandDeclarations.Collect(),
             static (ctx, commands) => Execute(ctx, commands)
         );
+    }
+
+    private static IEnumerable<Diagnostic> GetPrerequisiteDiagnostics(
+        ClassDeclarationSyntax classDeclaration,
+        INamedTypeSymbol symbol
+    )
+    {
+        // Abstract classes are intentionally skipped — no diagnostic needed
+        if (symbol.IsAbstract)
+            yield break;
+
+        if (!classDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword))
+        {
+            yield return Diagnostic.Create(
+                DiagnosticDescriptors.CommandMustBePartial,
+                classDeclaration.Identifier.GetLocation(),
+                symbol.Name
+            );
+        }
+        else if (!symbol.ImplementsInterface(SymbolNames.CliFxCommandInterface))
+        {
+            yield return Diagnostic.Create(
+                DiagnosticDescriptors.CommandMustImplementICommand,
+                classDeclaration.Identifier.GetLocation(),
+                symbol.Name
+            );
+        }
     }
 
     internal static CommandDescriptor? TryBuildCommandDescriptor(INamedTypeSymbol type)
@@ -559,6 +601,10 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             }
             else
             {
+                var collectionConverterExpr = BuildCollectionConverterExpr(
+                    param.ConverterType,
+                    param.Property
+                );
                 sb.Append(
                     // lang=csharp
                     $$"""
@@ -571,8 +617,9 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                                 {{EscapeString(param.Name)}},
                                 {{(param.IsRequired ? "true" : "false")}},
                                 {{EscapeString(param.Description)}},
-                                {{converterExpr}},
-                                {{BuildValidatorsExpr(param.ValidatorTypes)}}));
+                                null, // element-level converter unused — collection converter handles conversion
+                                {{BuildValidatorsExpr(param.ValidatorTypes)}},
+                                {{collectionConverterExpr}}));
 
                     """
                 );
@@ -611,6 +658,10 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             }
             else
             {
+                var collectionConverterExpr = BuildCollectionConverterExpr(
+                    opt.ConverterType,
+                    opt.Property
+                );
                 sb.Append(
                     // lang=csharp
                     $$"""
@@ -624,8 +675,9 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                                 {{EscapeString(opt.EnvironmentVariable)}},
                                 {{(opt.IsRequired ? "true" : "false")}},
                                 {{EscapeString(opt.Description)}},
-                                {{converterExpr}},
-                                {{BuildValidatorsExpr(opt.ValidatorTypes)}}));
+                                null, // element-level converter unused — collection converter handles conversion
+                                {{BuildValidatorsExpr(opt.ValidatorTypes)}},
+                                {{collectionConverterExpr}}));
 
                     """
                 );
@@ -871,5 +923,95 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             return string.Empty;
 
         return " : " + string.Join(", ", interfaces);
+    }
+
+    // Builds a DelegateCollectionBindingConverter<TCollection> expression for a sequence property.
+    // Returns "null" if the collection type is not supported for AOT-compatible generation.
+    private static string BuildCollectionConverterExpr(
+        TypeDescriptor? userConverterType,
+        IPropertySymbol property
+    )
+    {
+        var collectionType = property.Type;
+        var elementType = collectionType.TryGetEnumerableUnderlyingType();
+        if (elementType is null)
+            return "null";
+
+        var collectionTypeFqn = collectionType.ToDisplayString(
+            SymbolDisplayFormat.FullyQualifiedFormat
+        );
+        var elementTypeFqn = elementType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+
+        // Get element-level converter expression
+        string? elementConverterExpr;
+        if (userConverterType is not null)
+            elementConverterExpr = $"new {userConverterType.FullyQualifiedName}()";
+        else
+            elementConverterExpr = BuildDefaultConverterExprForScalar(elementType);
+
+        // Build the array fill expression (per-element conversion)
+        string fillExpr;
+        if (elementConverterExpr is null)
+        {
+            // null converter = string pass-through (element is string); ! asserts the arg is non-null
+            fillExpr = $"arr[i] = rawValues[i]!";
+        }
+        else
+        {
+            fillExpr = $"arr[i] = ({elementTypeFqn}){elementConverterExpr}.Convert(rawValues[i])!";
+        }
+
+        // Determine how to construct the collection from T[]
+        string buildExpr;
+        if (collectionType is IArrayTypeSymbol)
+        {
+            // T[] — return the array directly
+            buildExpr = "arr";
+        }
+        else if (collectionType.TypeKind == TypeKind.Interface)
+        {
+            // Interfaces (IReadOnlyList<T>, IList<T>, IEnumerable<T>, etc.) — T[] implements them all
+            buildExpr = "arr";
+        }
+        else if (
+            collectionType is INamedTypeSymbol namedCollection
+            && namedCollection.Constructors.Any(c =>
+                c.DeclaredAccessibility == Accessibility.Public
+                && c.Parameters.Length == 1
+                && (
+                    (
+                        c.Parameters[0].Type is IArrayTypeSymbol arrParam
+                        && SymbolEqualityComparer.Default.Equals(arrParam.ElementType, elementType)
+                    )
+                    || (
+                        c.Parameters[0].Type is INamedTypeSymbol paramType
+                        && paramType.ConstructedFrom.SpecialType
+                            == SpecialType.System_Collections_Generic_IEnumerable_T
+                        && SymbolEqualityComparer.Default.Equals(
+                            paramType.TypeArguments[0],
+                            elementType
+                        )
+                    )
+                )
+            )
+        )
+        {
+            // Concrete type with IEnumerable<T> or T[] constructor (e.g., List<T>)
+            buildExpr = $"new {collectionTypeFqn}(arr)";
+        }
+        else
+        {
+            // Unknown collection type — fall back to runtime reflection
+            return "null";
+        }
+
+        return $$"""
+            new global::CliFx.Extensibility.DelegateCollectionBindingConverter<{{collectionTypeFqn}}>(rawValues =>
+                    {
+                        var arr = new {{elementTypeFqn}}[rawValues.Count];
+                        for (var i = 0; i < rawValues.Count; i++) {{fillExpr}};
+                        return {{buildExpr}};
+                    })
+            """;
     }
 }

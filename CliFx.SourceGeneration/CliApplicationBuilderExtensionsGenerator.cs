@@ -21,19 +21,19 @@ public class CliApplicationBuilderExtensionsGenerator : IIncrementalGenerator
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         var commandDeclarations = context
-            .SyntaxProvider.CreateSyntaxProvider(
-                predicate: static (node, _) =>
-                    node is ClassDeclarationSyntax cls
-                    && cls.Modifiers.IndexOf(SyntaxKind.PartialKeyword) >= 0
-                    && cls.AttributeLists.Count > 0,
-                transform: static (ctx, cancellationToken) =>
+            .SyntaxProvider.ForAttributeWithMetadataName(
+                SymbolNames.CliFxCommandAttribute,
+                predicate: static (node, _) => node is ClassDeclarationSyntax,
+                transform: static (ctx, _) =>
                 {
-                    var classDeclaration = (ClassDeclarationSyntax)ctx.Node;
-                    var symbol = ctx.SemanticModel.GetDeclaredSymbol(
-                        classDeclaration,
-                        cancellationToken
-                    );
-                    if (symbol is not INamedTypeSymbol typeSymbol)
+                    var classDeclaration = (ClassDeclarationSyntax)ctx.TargetNode;
+                    var typeSymbol = (INamedTypeSymbol)ctx.TargetSymbol;
+
+                    if (
+                        !classDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword)
+                        || typeSymbol.IsAbstract
+                        || !typeSymbol.ImplementsInterface(SymbolNames.CliFxCommandInterface)
+                    )
                         return null;
 
                     return CommandSchemaGenerator.TryBuildCommandDescriptor(typeSymbol);

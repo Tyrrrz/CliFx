@@ -71,9 +71,15 @@ internal class CommandBinder
     {
         try
         {
+            // Non-scalar (sequence) with a collection converter (AOT-compatible path)
+            if (schema.IsSequence && schema.CollectionConverter is not null)
+            {
+                return schema.CollectionConverter.ConvertCollection(rawValues);
+            }
+
             var propertyType = schema.Property.Type;
 
-            // Non-scalar (sequence)
+            // Non-scalar (sequence) without a collection converter (reflection fallback)
             if (schema.IsSequence)
             {
                 var enumerableUnderlyingType = propertyType.TryGetEnumerableUnderlyingType();

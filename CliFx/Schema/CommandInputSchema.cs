@@ -13,7 +13,8 @@ public abstract class CommandInputSchema(
     bool isSequence,
     string? description,
     IBindingConverter? converter,
-    IReadOnlyList<IBindingValidator> validators
+    IReadOnlyList<IBindingValidator> validators,
+    ICollectionBindingConverter? collectionConverter = null
 )
 {
     /// <summary>
@@ -33,8 +34,15 @@ public abstract class CommandInputSchema(
 
     /// <summary>
     /// Binding converter used to parse raw strings into the property type.
+    /// For sequence properties, <see cref="CollectionConverter"/> takes precedence when set.
     /// </summary>
     public IBindingConverter? Converter { get; } = converter;
+
+    /// <summary>
+    /// Binding converter used to parse multiple raw strings into the collection property type.
+    /// When set on a sequence property, this is used instead of per-element <see cref="Converter"/>.
+    /// </summary>
+    public ICollectionBindingConverter? CollectionConverter { get; } = collectionConverter;
 
     /// <summary>
     /// Validators run after the value is converted.

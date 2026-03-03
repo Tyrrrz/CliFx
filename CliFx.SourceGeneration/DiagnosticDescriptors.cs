@@ -73,4 +73,24 @@ internal static class DiagnosticDescriptors
             DiagnosticSeverity.Warning,
             true
         );
+
+    public static DiagnosticDescriptor CommandMustBePartial { get; } =
+        new(
+            $"{nameof(CliFx)}_{nameof(CommandMustBePartial)}",
+            "Command class must be declared as partial",
+            "Type '{0}' is decorated with [Command] but is not declared as 'partial'. Declare it as 'partial' to enable source generation.",
+            "CliFx",
+            DiagnosticSeverity.Error,
+            true
+        );
+
+    public static DiagnosticDescriptor CommandMustImplementICommand { get; } =
+        new(
+            $"{nameof(CliFx)}_{nameof(CommandMustImplementICommand)}",
+            "Command class must implement ICommand",
+            "Type '{0}' is decorated with [Command] but does not implement 'ICommand'. Implement 'ICommand' to enable source generation.",
+            "CliFx",
+            DiagnosticSeverity.Error,
+            true
+        );
 }

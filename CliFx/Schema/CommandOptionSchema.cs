@@ -17,8 +17,17 @@ public class CommandOptionSchema(
     bool isRequired,
     string? description,
     IBindingConverter? converter,
-    IReadOnlyList<IBindingValidator> validators
-) : CommandInputSchema(property, isSequence, description, converter, validators)
+    IReadOnlyList<IBindingValidator> validators,
+    ICollectionBindingConverter? collectionConverter = null
+)
+    : CommandInputSchema(
+        property,
+        isSequence,
+        description,
+        converter,
+        validators,
+        collectionConverter
+    )
 {
     /// <summary>
     /// Option name (the --name part).
