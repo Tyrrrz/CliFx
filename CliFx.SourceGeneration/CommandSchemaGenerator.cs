@@ -821,9 +821,9 @@ public class CommandSchemaGenerator : IIncrementalGenerator
         if (type.SpecialType == SpecialType.System_String)
             return null;
 
-        // object — assignable from string, so pass the raw string through as object
+        // object — assignable from string; null converter passes raw string through as object
         if (type.SpecialType == SpecialType.System_Object)
-            return "new global::CliFx.Extensibility.DelegateBindingConverter<global::System.Object>(s => s)";
+            return null;
 
         // bool
         if (type.SpecialType == SpecialType.System_Boolean)
@@ -880,7 +880,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                 && SymbolEqualityComparer.Default.Equals(m.ReturnType, type)
             );
         if (parseWithFormatProvider is not null)
-            return $"new global::CliFx.Extensibility.DelegateBindingConverter<{fqn}>(s => {fqn}.Parse(s!, global::System.Globalization.CultureInfo.InvariantCulture))";
+            return $"new global::CliFx.Extensibility.StringInitializableBindingConverter<{fqn}>(s => {fqn}.Parse(s, global::System.Globalization.CultureInfo.InvariantCulture))";
 
         // String-parseable: static T Parse(string)
         var parseMethod = type.GetMembers("Parse")
@@ -893,7 +893,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                 && SymbolEqualityComparer.Default.Equals(m.ReturnType, type)
             );
         if (parseMethod is not null)
-            return $"new global::CliFx.Extensibility.DelegateBindingConverter<{fqn}>(s => {fqn}.Parse(s!))";
+            return $"new global::CliFx.Extensibility.StringInitializableBindingConverter<{fqn}>(s => {fqn}.Parse(s))";
 
         // String-constructable: public constructor(string)
         if (
@@ -904,7 +904,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                 && c.Parameters[0].Type.SpecialType == SpecialType.System_String
             )
         )
-            return $"new global::CliFx.Extensibility.DelegateBindingConverter<{fqn}>(s => new {fqn}(s!))";
+            return $"new global::CliFx.Extensibility.StringInitializableBindingConverter<{fqn}>(s => new {fqn}(s))";
 
         return null;
     }
@@ -985,7 +985,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             )
         )
         {
-            return $"new global::CliFx.Extensibility.ArrayInitializableCollectionBindingConverter<{elementTypeFqn}, {collectionTypeFqn}>({arrayConverterExpr}, arr => new {collectionTypeFqn}(arr))";
+            return $"new global::CliFx.Extensibility.ArrayInitializableCollectionBindingConverter<{elementTypeFqn}, {collectionTypeFqn}>({elementConverterArg}, arr => new {collectionTypeFqn}(arr))";
         }
 
         // Unknown collection type — user must provide a custom ICollectionBindingConverter
