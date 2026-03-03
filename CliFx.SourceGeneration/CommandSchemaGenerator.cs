@@ -925,7 +925,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
         return " : " + string.Join(", ", interfaces);
     }
 
-    // Builds a DelegateCollectionBindingConverter<TCollection> expression for a sequence property.
+    // Builds a collection converter expression for a sequence property.
     // Returns "null" if the collection type is not supported for AOT-compatible generation.
     private static string BuildCollectionConverterExpr(
         TypeDescriptor? userConverterType,
@@ -942,38 +942,27 @@ public class CommandSchemaGenerator : IIncrementalGenerator
         );
         var elementTypeFqn = elementType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
 
-        // Get element-level converter expression
+        // Get element-level converter expression (null means string pass-through)
         string? elementConverterExpr;
         if (userConverterType is not null)
             elementConverterExpr = $"new {userConverterType.FullyQualifiedName}()";
         else
             elementConverterExpr = BuildDefaultConverterExprForScalar(elementType);
 
-        // Build the array fill expression (per-element conversion)
-        string fillExpr;
-        if (elementConverterExpr is null)
-        {
-            // null converter = string pass-through (element is string); ! asserts the arg is non-null
-            fillExpr = $"arr[i] = rawValues[i]!";
-        }
-        else
-        {
-            fillExpr = $"arr[i] = ({elementTypeFqn}){elementConverterExpr}.Convert(rawValues[i])!";
-        }
+        var elementConverterArg = elementConverterExpr ?? "null";
+        var arrayConverterExpr =
+            $"new global::CliFx.Extensibility.ArrayCollectionBindingConverter<{elementTypeFqn}>({elementConverterArg})";
 
-        // Determine how to construct the collection from T[]
-        string buildExpr;
+        // T[] — return the array directly
         if (collectionType is IArrayTypeSymbol)
-        {
-            // T[] — return the array directly
-            buildExpr = "arr";
-        }
-        else if (collectionType.TypeKind == TypeKind.Interface)
-        {
-            // Interfaces (IReadOnlyList<T>, IList<T>, IEnumerable<T>, etc.) — T[] implements them all
-            buildExpr = "arr";
-        }
-        else if (
+            return arrayConverterExpr;
+
+        // Interface (IReadOnlyList<T>, IEnumerable<T>, etc.) — T[] implements them all
+        if (collectionType.TypeKind == TypeKind.Interface)
+            return arrayConverterExpr;
+
+        // Concrete type with IEnumerable<T> or T[] constructor (e.g., List<T>)
+        if (
             collectionType is INamedTypeSymbol namedCollection
             && namedCollection.Constructors.Any(c =>
                 c.DeclaredAccessibility == Accessibility.Public
@@ -996,22 +985,10 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             )
         )
         {
-            // Concrete type with IEnumerable<T> or T[] constructor (e.g., List<T>)
-            buildExpr = $"new {collectionTypeFqn}(arr)";
-        }
-        else
-        {
-            // Unknown collection type — fall back to runtime reflection
-            return "null";
+            return $"new global::CliFx.Extensibility.ArrayInitializableCollectionBindingConverter<{elementTypeFqn}, {collectionTypeFqn}>({arrayConverterExpr}, arr => new {collectionTypeFqn}(arr))";
         }
 
-        return $$"""
-            new global::CliFx.Extensibility.DelegateCollectionBindingConverter<{{collectionTypeFqn}}>(rawValues =>
-                    {
-                        var arr = new {{elementTypeFqn}}[rawValues.Count];
-                        for (var i = 0; i < rawValues.Count; i++) {{fillExpr}};
-                        return {{buildExpr}};
-                    })
-            """;
+        // Unknown collection type — user must provide a custom ICollectionBindingConverter
+        return "null";
     }
 }

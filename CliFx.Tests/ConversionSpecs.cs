@@ -815,7 +815,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
         exitCode.Should().NotBe(0);
 
         var stdErr = FakeConsole.ReadErrorString();
-        stdErr.Should().Contain("has an unsupported underlying property type");
+        stdErr.Should().Contain("is a sequence property but has no collection converter");
     }
 
     [Fact]

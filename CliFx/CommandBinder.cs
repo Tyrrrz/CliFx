@@ -22,51 +22,6 @@ internal class CommandBinder
         return schema.Converter.Convert(rawValue);
     }
 
-    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode(
-        "Uses dynamic array creation. Use a custom IBindingConverter for AOT compatibility."
-    )]
-    [System.Diagnostics.CodeAnalysis.RequiresDynamicCode(
-        "Uses dynamic array creation. Use a custom IBindingConverter for AOT compatibility."
-    )]
-    private object? ConvertMultiple(
-        CommandInputSchema schema,
-        IReadOnlyList<string> rawValues,
-        Type targetEnumerableType,
-        Type targetElementType
-    )
-    {
-        var array = rawValues
-            .Select(v => ConvertSingle(schema, v))
-            .ToNonGenericArray(targetElementType);
-
-        var arrayType = array.GetType();
-
-        if (targetEnumerableType.IsAssignableFrom(arrayType))
-        {
-            return array;
-        }
-
-        var arrayConstructor = targetEnumerableType.GetConstructor([arrayType]);
-        if (arrayConstructor is not null)
-        {
-            return arrayConstructor.Invoke([array]);
-        }
-
-        throw CliFxException.InternalError(
-            $"""
-            {schema.GetKind()} {schema.GetFormattedIdentifier()} has an unsupported underlying property type.
-            There is no known way to convert an array of `{targetElementType.FullName}` into an instance of type `{targetEnumerableType.FullName}`.
-            To fix this, change the property to use a type which can be assigned from an array or a type which has a constructor that accepts an array.
-            """
-        );
-    }
-
-    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode(
-        "Uses reflection to bind values. Use a custom IBindingConverter for AOT compatibility."
-    )]
-    [System.Diagnostics.CodeAnalysis.RequiresDynamicCode(
-        "Uses dynamic array creation. Use a custom IBindingConverter for AOT compatibility."
-    )]
     private object? ConvertMember(CommandInputSchema schema, IReadOnlyList<string> rawValues)
     {
         try
@@ -74,24 +29,22 @@ internal class CommandBinder
             // Non-scalar (sequence) with a collection converter (AOT-compatible path)
             if (schema.IsSequence && schema.CollectionConverter is not null)
             {
-                return schema.CollectionConverter.ConvertCollection(rawValues);
+                return schema.CollectionConverter.ConvertMany(rawValues);
             }
 
             var propertyType = schema.Property.Type;
 
-            // Non-scalar (sequence) without a collection converter (reflection fallback)
+            // Non-scalar (sequence) without a collection converter
             if (schema.IsSequence)
             {
-                var enumerableUnderlyingType = propertyType.TryGetEnumerableUnderlyingType();
-                if (enumerableUnderlyingType is not null)
-                {
-                    return ConvertMultiple(
-                        schema,
-                        rawValues,
-                        propertyType,
-                        enumerableUnderlyingType
-                    );
-                }
+                throw CliFxException.InternalError(
+                    $"""
+                    {schema.GetKind()} {schema.GetFormattedIdentifier()} is a sequence property but has no collection converter.
+                    To fix this, use the source generator or provide a custom {nameof(
+                        ICollectionBindingConverter
+                    )} via the Converter attribute property.
+                    """
+                );
             }
 
             // Scalar
@@ -148,12 +101,6 @@ internal class CommandBinder
         }
     }
 
-    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode(
-        "Uses reflection to convert values. Use a custom IBindingConverter for AOT compatibility."
-    )]
-    [System.Diagnostics.CodeAnalysis.RequiresDynamicCode(
-        "Uses dynamic array creation. Use a custom IBindingConverter for AOT compatibility."
-    )]
     private void BindMember(
         CommandInputSchema schema,
         ICommand commandInstance,
@@ -183,12 +130,6 @@ internal class CommandBinder
         }
     }
 
-    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode(
-        "Uses reflection to bind values. Use a custom IBindingConverter for AOT compatibility."
-    )]
-    [System.Diagnostics.CodeAnalysis.RequiresDynamicCode(
-        "Uses dynamic array creation. Use a custom IBindingConverter for AOT compatibility."
-    )]
     private void BindParameters(
         CommandInput commandInput,
         CommandSchema commandSchema,
@@ -255,12 +196,6 @@ internal class CommandBinder
         }
     }
 
-    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode(
-        "Uses reflection to bind values. Use a custom IBindingConverter for AOT compatibility."
-    )]
-    [System.Diagnostics.CodeAnalysis.RequiresDynamicCode(
-        "Uses dynamic array creation. Use a custom IBindingConverter for AOT compatibility."
-    )]
     private void BindOptions(
         CommandInput commandInput,
         CommandSchema commandSchema,
@@ -337,12 +272,6 @@ internal class CommandBinder
         }
     }
 
-    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode(
-        "Uses reflection to bind values. Use a custom IBindingConverter for AOT compatibility."
-    )]
-    [System.Diagnostics.CodeAnalysis.RequiresDynamicCode(
-        "Uses dynamic array creation. Use a custom IBindingConverter for AOT compatibility."
-    )]
     public void Bind(
         CommandInput commandInput,
         CommandSchema commandSchema,
