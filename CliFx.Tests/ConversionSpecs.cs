@@ -21,7 +21,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public string? Foo { get; init; }
+                public string? Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -58,7 +58,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public object? Foo { get; init; }
+                public object? Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -95,13 +95,13 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public bool Foo { get; init; }
+                public bool Foo { get; set; }
 
                 [CommandOption('b')]
-                public bool Bar { get; init; }
+                public bool Bar { get; set; }
 
                 [CommandOption('c')]
-                public bool Baz { get; init; }
+                public bool Baz { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -144,7 +144,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public int Foo { get; init; }
+                public int Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -181,7 +181,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public double Foo { get; init; }
+                public double Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -221,7 +221,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public DateTimeOffset Foo { get; init; }
+                public DateTimeOffset Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -261,7 +261,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public TimeSpan Foo { get; init; }
+                public TimeSpan Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -303,7 +303,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public CustomEnum Foo { get; init; }
+                public CustomEnum Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -340,10 +340,10 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public int? Foo { get; init; }
+                public int? Foo { get; set; }
 
                 [CommandOption('b')]
-                public int? Bar { get; init; }
+                public int? Bar { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -384,10 +384,10 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public CustomEnum? Foo { get; init; }
+                public CustomEnum? Foo { get; set; }
 
                 [CommandOption('b')]
-                public CustomEnum? Bar { get; init; }
+                public CustomEnum? Bar { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -433,7 +433,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public CustomType? Foo { get; init; }
+                public CustomType? Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -490,10 +490,10 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public CustomTypeA? Foo { get; init; }
+                public CustomTypeA? Foo { get; set; }
 
                 [CommandOption('b')]
-                public CustomTypeB? Bar { get; init; }
+                public CustomTypeB? Bar { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -541,7 +541,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             public class Command : ICommand
             {
                 [CommandOption('f', Converter = typeof(CustomConverter))]
-                public int Foo { get; init; }
+                public int Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -581,7 +581,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public string[]? Foo { get; init; }
+                public string[]? Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -623,7 +623,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public IReadOnlyList<string>? Foo { get; init; }
+                public IReadOnlyList<string>? Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -665,7 +665,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public List<string>? Foo { get; init; }
+                public List<string>? Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -707,7 +707,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public int[]? Foo { get; init; }
+                public int[]? Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -753,7 +753,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public CustomType? Foo { get; init; }
+                public CustomType? Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -793,7 +793,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public CustomType? Foo { get; init; }
+                public CustomType? Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -829,7 +829,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public int Foo { get; init; }
+                public int Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -875,7 +875,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             public class Command : ICommand
             {
                 [CommandOption('f', Validators = [typeof(ValidatorA), typeof(ValidatorB)])]
-                public int Foo { get; init; }
+                public int Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -917,7 +917,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public CustomType? Foo { get; init; }
+                public CustomType? Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }

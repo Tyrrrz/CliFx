@@ -25,10 +25,10 @@ public class EnvironmentSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutp
             public class Command : ICommand
             {
                 [CommandOption("foo", EnvironmentVariable = "ENV_FOO")]
-                public string? Foo { get; init; }
+                public string? Foo { get; set; }
 
                 [CommandOption("bar", EnvironmentVariable = "ENV_BAR")]
-                public string? Bar { get; init; }
+                public string? Bar { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -70,7 +70,7 @@ public class EnvironmentSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutp
             public class Command : ICommand
             {
                 [CommandOption("foo", EnvironmentVariable = "ENV_FOO")]
-                public IReadOnlyList<string>? Foo { get; init; }
+                public IReadOnlyList<string>? Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -112,7 +112,7 @@ public class EnvironmentSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutp
             public class Command : ICommand
             {
                 [CommandOption("foo", EnvironmentVariable = "ENV_FOO")]
-                public string? Foo { get; init; }
+                public string? Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {

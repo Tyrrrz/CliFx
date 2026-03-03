@@ -196,7 +196,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     {
         // Arrange
         var application = new CliApplicationBuilder()
-            .AddCommand(DynamicCommandBuilder.BuildSchema(typeof(NoOpCommand)))
+            .AddCommand(NoOpCommand.Schema)
             .UseConsole(FakeConsole)
             .SetDescription("This will be in help text")
             .Build();
@@ -315,13 +315,13 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             public class Command : ICommand
             {
                 [CommandParameter(0)]
-                public required string Foo { get; init; }
+                public required string Foo { get; set; }
 
                 [CommandParameter(1)]
-                public required string Bar { get; init; }
+                public required string Bar { get; set; }
 
                 [CommandParameter(2)]
-                public required IReadOnlyList<string> Baz { get; init; }
+                public required IReadOnlyList<string> Baz { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -355,7 +355,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             public abstract class CommandBase : ICommand
             {
                 [CommandParameter(0)]
-                public required string Foo { get; init; }
+                public required string Foo { get; set; }
 
                 public abstract ValueTask ExecuteAsync(IConsole console);
             }
@@ -364,10 +364,10 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             public class Command : CommandBase
             {
                 [CommandParameter(2)]
-                public required IReadOnlyList<string> Baz { get; init; }
+                public required IReadOnlyList<string> Baz { get; set; }
 
                 [CommandParameter(1)]
-                public required string Bar { get; init; }
+                public required string Bar { get; set; }
 
                 public override ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -400,13 +400,13 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             public class Command : ICommand
             {
                 [CommandOption("foo")]
-                public required string Foo { get; init; }
+                public required string Foo { get; set; }
 
                 [CommandOption("bar")]
-                public string? Bar { get; init; }
+                public string? Bar { get; set; }
 
                 [CommandOption("baz")]
-                public required IReadOnlyList<string> Baz { get; init; }
+                public required IReadOnlyList<string> Baz { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -441,10 +441,10 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             public class Command : ICommand
             {
                 [CommandParameter(0, Name = "foo", Description = "Description of foo.")]
-                public string? Foo { get; init; }
+                public string? Foo { get; set; }
 
                 [CommandOption("bar", Description = "Description of bar.")]
-                public string? Bar { get; init; }
+                public string? Bar { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -563,10 +563,10 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             public class Command : ICommand
             {
                 [CommandParameter(0)]
-                public CustomEnum Foo { get; init; }
+                public CustomEnum Foo { get; set; }
 
                 [CommandOption("bar")]
-                public CustomEnum Bar { get; init; }
+                public CustomEnum Bar { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -616,10 +616,10 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             public class Command : ICommand
             {
                 [CommandParameter(0)]
-                public required IReadOnlyList<CustomEnum> Foo { get; init; }
+                public required IReadOnlyList<CustomEnum> Foo { get; set; }
 
                 [CommandOption("bar")]
-                public required IReadOnlyList<CustomEnum> Bar { get; init; }
+                public required IReadOnlyList<CustomEnum> Bar { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -669,10 +669,10 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             public class Command : ICommand
             {
                 [CommandParameter(0)]
-                public CustomEnum? Foo { get; init; }
+                public CustomEnum? Foo { get; set; }
 
                 [CommandOption("bar")]
-                public IReadOnlyList<CustomEnum?>? Bar { get; init; }
+                public IReadOnlyList<CustomEnum?>? Bar { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -722,10 +722,10 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             public class Command : ICommand
             {
                 [CommandOption("foo", EnvironmentVariable = "ENV_FOO")]
-                public CustomEnum Foo { get; init; }
+                public CustomEnum Foo { get; set; }
 
                 [CommandOption("bar", EnvironmentVariable = "ENV_BAR")]
-                public CustomEnum Bar { get; init; }
+                public CustomEnum Bar { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -770,28 +770,28 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             public class Command : ICommand
             {
                 [CommandOption("foo")]
-                public object? Foo { get; init; } = 42;
+                public object? Foo { get; set; } = 42;
 
                 [CommandOption("bar")]
-                public string? Bar { get; init; } = "hello";
+                public string? Bar { get; set; } = "hello";
 
                 [CommandOption("baz")]
-                public IReadOnlyList<string>? Baz { get; init; } = new[] {"one", "two", "three"};
+                public IReadOnlyList<string>? Baz { get; set; } = new[] {"one", "two", "three"};
 
                 [CommandOption("qwe")]
-                public bool Qwe { get; init; } = true;
+                public bool Qwe { get; set; } = true;
 
                 [CommandOption("qop")]
-                public int? Qop { get; init; } = 1337;
+                public int? Qop { get; set; } = 1337;
 
                 [CommandOption("zor")]
-                public TimeSpan Zor { get; init; } = TimeSpan.FromMinutes(123);
+                public TimeSpan Zor { get; set; } = TimeSpan.FromMinutes(123);
 
                 [CommandOption("lol")]
-                public CustomEnum Lol { get; init; } = CustomEnum.Two;
+                public CustomEnum Lol { get; set; } = CustomEnum.Two;
 
                 [CommandOption("hmm")]
-                public required string Hmm { get; init; } = "not printed";
+                public required string Hmm { get; set; } = "not printed";
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -978,7 +978,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     {
         // Arrange
         var application = new CliApplicationBuilder()
-            .AddCommand(DynamicCommandBuilder.BuildSchema(typeof(NoOpCommand)))
+            .AddCommand(NoOpCommand.Schema)
             .SetVersion("v6.9")
             .UseConsole(FakeConsole)
             .Build();
@@ -1004,7 +1004,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             public class DefaultCommand : ICommand
             {
                 [CommandOption("help", 'h')]
-                public string? Foo { get; init; }
+                public string? Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -1038,7 +1038,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             public class DefaultCommand : ICommand
             {
                 [CommandOption("version")]
-                public string? Foo { get; init; }
+                public string? Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }

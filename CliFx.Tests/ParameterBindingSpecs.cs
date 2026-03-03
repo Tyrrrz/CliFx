@@ -21,10 +21,10 @@ public class ParameterBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
             public class Command : ICommand
             {
                 [CommandParameter(0)]
-                public required string Foo { get; init; }
+                public required string Foo { get; set; }
 
                 [CommandParameter(1)]
-                public required string Bar { get; init; }
+                public required string Bar { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -63,16 +63,16 @@ public class ParameterBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
             public class Command : ICommand
             {
                 [CommandParameter(0)]
-                public required string Foo { get; init; }
+                public required string Foo { get; set; }
 
                 [CommandParameter(1)]
-                public required string Bar { get; init; }
+                public required string Bar { get; set; }
 
                 [CommandParameter(2)]
-                public required IReadOnlyList<string> Baz { get; init; }
+                public required IReadOnlyList<string> Baz { get; set; }
 
                 [CommandOption("boo")]
-                public string? Boo { get; init; }
+                public string? Boo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -119,10 +119,10 @@ public class ParameterBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
             public class Command : ICommand
             {
                 [CommandParameter(0)]
-                public required string Foo { get; init; }
+                public required string Foo { get; set; }
 
                 [CommandParameter(1)]
-                public required string Bar { get; init; }
+                public required string Bar { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -155,10 +155,10 @@ public class ParameterBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
             public class Command : ICommand
             {
                 [CommandParameter(0)]
-                public required string Foo { get; init; }
+                public required string Foo { get; set; }
 
                 [CommandParameter(1)]
-                public required IReadOnlyList<string> Bar { get; init; }
+                public required IReadOnlyList<string> Bar { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -191,10 +191,10 @@ public class ParameterBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
             public class Command : ICommand
             {
                 [CommandParameter(0)]
-                public required string Foo { get; init; }
+                public required string Foo { get; set; }
 
                 [CommandParameter(1, IsRequired = false)]
-                public string? Bar { get; init; } = "xyz";
+                public string? Bar { get; set; } = "xyz";
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -233,10 +233,10 @@ public class ParameterBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
             public class Command : ICommand
             {
                 [CommandParameter(0)]
-                public required string Foo { get; init; }
+                public required string Foo { get; set; }
 
                 [CommandParameter(1)]
-                public required string Bar { get; init; }
+                public required string Bar { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }

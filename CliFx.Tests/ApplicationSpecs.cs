@@ -15,7 +15,7 @@ public class ApplicationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutp
     {
         // Act
         var app = new CliApplicationBuilder()
-            .AddCommand(DynamicCommandBuilder.BuildSchema(typeof(NoOpCommand)))
+            .AddCommand(NoOpCommand.Schema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -30,7 +30,7 @@ public class ApplicationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutp
     {
         // Act
         var app = new CliApplicationBuilder()
-            .AddCommand(DynamicCommandBuilder.BuildSchema(typeof(NoOpCommand)))
+            .AddCommand(NoOpCommand.Schema)
             .AllowDebugMode()
             .AllowPreviewMode()
             .SetTitle("test")

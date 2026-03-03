@@ -79,14 +79,15 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             .Select(a => a.Value.Value as string)
             .FirstOrDefault();
 
-        var properties = type.GetMembers().OfType<IPropertySymbol>().ToArray();
+        var directProperties = type.GetMembers().OfType<IPropertySymbol>().ToArray();
+        var allProperties = GetAllProperties(type);
 
         var parameters = new List<CommandParameterDescriptor>();
         var options = new List<CommandOptionDescriptor>();
         var skippedInitOnly = new List<IPropertySymbol>();
         var diagnostics = new List<Diagnostic>();
 
-        foreach (var property in properties)
+        foreach (var property in allProperties)
         {
             var paramAttr = property
                 .GetAttributes()
@@ -394,7 +395,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             description,
             parameters,
             options,
-            properties,
+            directProperties,
             skippedInitOnly,
             diagnostics
         );
@@ -458,7 +459,11 @@ public class CommandSchemaGenerator : IIncrementalGenerator
     private static string GenerateCommandSchemaSource(CommandDescriptor command)
     {
         var commandFqn = command.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-        var ns = command.Type.ContainingNamespace?.ToDisplayString();
+        var containingNs = command.Type.ContainingNamespace;
+        var ns =
+            containingNs is not null && !containingNs.IsGlobalNamespace
+                ? containingNs.ToDisplayString()
+                : null;
 
         var sb = new StringBuilder();
 
@@ -472,7 +477,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             """
         );
 
-        if (!string.IsNullOrEmpty(ns))
+        if (ns is not null)
         {
             sb.Append(
                 // lang=csharp
@@ -581,6 +586,24 @@ public class CommandSchemaGenerator : IIncrementalGenerator
         );
 
         return sb.ToString();
+    }
+
+    // Returns all non-static properties declared on the type and its base classes,
+    // with derived class properties shadowing base class properties of the same name.
+    private static IEnumerable<IPropertySymbol> GetAllProperties(INamedTypeSymbol type)
+    {
+        var seen = new HashSet<string>();
+        var current = (INamedTypeSymbol?)type;
+        while (current is not null && current.SpecialType != SpecialType.System_Object)
+        {
+            foreach (var prop in current.GetMembers().OfType<IPropertySymbol>())
+            {
+                if (!prop.IsStatic && seen.Add(prop.Name))
+                    yield return prop;
+            }
+
+            current = current.BaseType;
+        }
     }
 
     private static bool IsSequenceType(ITypeSymbol type)

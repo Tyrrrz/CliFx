@@ -22,7 +22,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             public class Command : ICommand
             {
                 [CommandOption("foo")]
-                public bool Foo { get; init; }
+                public bool Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -59,7 +59,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public bool Foo { get; init; }
+                public bool Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -96,10 +96,10 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             public class Command : ICommand
             {
                 [CommandOption("foo")]
-                public string? Foo { get; init; }
+                public string? Foo { get; set; }
 
                 [CommandOption("bar")]
-                public string? Bar { get; init; }
+                public string? Bar { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -141,10 +141,10 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public string? Foo { get; init; }
+                public string? Foo { get; set; }
 
                 [CommandOption('b')]
-                public string? Bar { get; init; }
+                public string? Bar { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -186,10 +186,10 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public string? Foo { get; init; }
+                public string? Foo { get; set; }
 
                 [CommandOption('b')]
-                public string? Bar { get; init; }
+                public string? Bar { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -231,7 +231,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             public class Command : ICommand
             {
                 [CommandOption("Foo")]
-                public IReadOnlyList<string>? Foo { get; init; }
+                public IReadOnlyList<string>? Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -273,7 +273,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public IReadOnlyList<string>? Foo { get; init; }
+                public IReadOnlyList<string>? Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -315,7 +315,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             public class Command : ICommand
             {
                 [CommandOption("foo")]
-                public IReadOnlyList<string>? Foo { get; init; }
+                public IReadOnlyList<string>? Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -357,7 +357,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             public class Command : ICommand
             {
                 [CommandOption('f')]
-                public IReadOnlyList<string>? Foo { get; init; }
+                public IReadOnlyList<string>? Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -399,7 +399,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             public class Command : ICommand
             {
                 [CommandOption("foo", 'f')]
-                public IReadOnlyList<string>? Foo { get; init; }
+                public IReadOnlyList<string>? Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -441,10 +441,10 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             public class Command : ICommand
             {
                 [CommandOption("foo")]
-                public string? Foo { get; init; }
+                public string? Foo { get; set; }
 
                 [CommandOption("bar")]
-                public string? Bar { get; init; } = "hello";
+                public string? Bar { get; set; } = "hello";
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -482,48 +482,35 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
         var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
-            public static class SharedContext
-            {
-                public static int Foo { get; set; }
-
-                public static bool Bar { get; set; }
-            }
-
             public interface IHasFoo : ICommand
             {
-                [CommandOption("foo")]
-                public int Foo
-                {
-                    get => SharedContext.Foo;
-                    init => SharedContext.Foo = value;
-                }
             }
 
             public interface IHasBar : ICommand
             {
-                [CommandOption("bar")]
-                public bool Bar
-                {
-                    get => SharedContext.Bar;
-                    init => SharedContext.Bar = value;
-                }
             }
 
             public interface IHasBaz : ICommand
             {
-                public string? Baz { get; init; }
+                public string? Baz { get; set; }
             }
 
             [Command]
             public class Command : IHasFoo, IHasBar, IHasBaz
             {
+                [CommandOption("foo")]
+                public int Foo { get; set; }
+
+                [CommandOption("bar")]
+                public bool Bar { get; set; }
+
                 [CommandOption("baz")]
-                public string? Baz { get; init; }
+                public string? Baz { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.WriteLine("Foo = " + SharedContext.Foo);
-                    console.WriteLine("Bar = " + SharedContext.Bar);
+                    console.WriteLine("Foo = " + Foo);
+                    console.WriteLine("Bar = " + Bar);
                     console.WriteLine("Baz = " + Baz);
 
                     return default;
@@ -558,7 +545,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             public class Command : ICommand
             {
                 [CommandOption("foo")]
-                public string? Foo { get; init; }
+                public string? Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -598,7 +585,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             public class Command : ICommand
             {
                 [CommandOption("help", 'h')]
-                public string? Foo { get; init; }
+                public string? Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -638,7 +625,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             public class Command : ICommand
             {
                 [CommandOption("version")]
-                public string? Foo { get; init; }
+                public string? Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -678,7 +665,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             public class Command : ICommand
             {
                 [CommandOption("foo")]
-                public required string Foo { get; init; }
+                public required string Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -714,7 +701,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             public class Command : ICommand
             {
                 [CommandOption("foo")]
-                public required string Foo { get; init; }
+                public required string Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -747,7 +734,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             public class Command : ICommand
             {
                 [CommandOption("foo")]
-                public required IReadOnlyList<string> Foo { get; init; }
+                public required IReadOnlyList<string> Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -780,7 +767,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             public class Command : ICommand
             {
                 [CommandOption("foo")]
-                public string? Foo { get; init; }
+                public string? Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -816,7 +803,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             public class Command : ICommand
             {
                 [CommandOption("foo")]
-                public string? Foo { get; init; }
+                public string? Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
