@@ -15,7 +15,6 @@ namespace CliFx;
 /// </summary>
 public partial class CliApplicationBuilder
 {
-    private readonly HashSet<Type> _commandTypes = [];
     private readonly List<CommandSchema> _commandSchemas = [];
 
     private bool _isDebugModeAllowed = true;
@@ -28,49 +27,21 @@ public partial class CliApplicationBuilder
     private ITypeActivator? _typeActivator;
 
     /// <summary>
-    /// Adds a command to the application.
-    /// </summary>
-    [RequiresUnreferencedCode(
-        "Resolves the command schema using reflection. Use AddCommand(CommandSchema) with source-generated schemas for AOT compatibility."
-    )]
-    public CliApplicationBuilder AddCommand(Type commandType)
-    {
-        _commandTypes.Add(commandType);
-        var schema = CommandSchema.TryResolve(commandType);
-        if (schema is not null)
-            _commandSchemas.Add(schema);
-        return this;
-    }
-
-    /// <summary>
     /// Adds a command to the application using a pre-built schema (for source-generated path).
     /// </summary>
     public CliApplicationBuilder AddCommand(CommandSchema commandSchema)
     {
         _commandSchemas.Add(commandSchema);
-        _commandTypes.Add(commandSchema.Type);
         return this;
     }
 
     /// <summary>
-    /// Adds a command to the application.
-    /// </summary>
-    [RequiresUnreferencedCode(
-        "Resolves the command schema using reflection. Use AddCommand(CommandSchema) with source-generated schemas for AOT compatibility."
-    )]
-    public CliApplicationBuilder AddCommand<TCommand>()
-        where TCommand : ICommand => AddCommand(typeof(TCommand));
-
-    /// <summary>
     /// Adds multiple commands to the application.
     /// </summary>
-    [RequiresUnreferencedCode(
-        "Resolves command schemas using reflection. Use AddCommand(CommandSchema) with source-generated schemas for AOT compatibility."
-    )]
-    public CliApplicationBuilder AddCommands(IEnumerable<Type> commandTypes)
+    public CliApplicationBuilder AddCommands(IEnumerable<CommandSchema> commandSchemas)
     {
-        foreach (var commandType in commandTypes)
-            AddCommand(commandType);
+        foreach (var commandSchema in commandSchemas)
+            AddCommand(commandSchema);
 
         return this;
     }
@@ -176,7 +147,7 @@ public partial class CliApplicationBuilder
     /// </summary>
     public CliApplicationBuilder UseTypeActivator(
         Func<IReadOnlyList<Type>, IServiceProvider> getServiceProvider
-    ) => UseTypeActivator(getServiceProvider(_commandTypes.ToArray()));
+    ) => UseTypeActivator(getServiceProvider(_commandSchemas.Select(s => s.Type).ToArray()));
 
     /// <summary>
     /// Creates a configured instance of <see cref="CliApplication" />.
@@ -192,10 +163,10 @@ public partial class CliApplicationBuilder
         );
 
         var configuration = new ApplicationConfiguration(
-            _commandTypes.ToArray(),
+            _commandSchemas.Select(s => s.Type).ToArray(),
             _isDebugModeAllowed,
             _isPreviewModeAllowed,
-            _commandSchemas.Count > 0 ? _commandSchemas : null
+            _commandSchemas
         );
 
         return new CliApplication(

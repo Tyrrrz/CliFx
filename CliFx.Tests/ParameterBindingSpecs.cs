@@ -14,7 +14,7 @@ public class ParameterBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
     public async Task I_can_bind_a_parameter_to_a_property_and_get_the_value_from_the_corresponding_argument()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
@@ -38,7 +38,7 @@ public class ParameterBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -56,7 +56,7 @@ public class ParameterBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
     public async Task I_can_bind_a_parameter_to_a_non_scalar_property_and_get_values_from_the_remaining_non_option_arguments()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
@@ -89,7 +89,7 @@ public class ParameterBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -112,7 +112,7 @@ public class ParameterBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
     public async Task I_can_try_to_bind_a_parameter_to_a_property_and_get_an_error_if_the_user_does_not_provide_the_corresponding_argument()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
@@ -130,7 +130,7 @@ public class ParameterBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -148,7 +148,7 @@ public class ParameterBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
     public async Task I_can_try_to_bind_a_parameter_to_a_non_scalar_property_and_get_an_error_if_the_user_does_not_provide_at_least_one_corresponding_argument()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
@@ -166,7 +166,7 @@ public class ParameterBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -184,7 +184,7 @@ public class ParameterBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
     public async Task I_can_bind_a_non_required_parameter_to_a_property_and_get_no_value_if_the_user_does_not_provide_the_corresponding_argument()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
@@ -208,7 +208,7 @@ public class ParameterBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -226,7 +226,7 @@ public class ParameterBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
     public async Task I_can_try_to_bind_parameters_and_get_an_error_if_the_user_provides_too_many_arguments()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
@@ -244,7 +244,7 @@ public class ParameterBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 

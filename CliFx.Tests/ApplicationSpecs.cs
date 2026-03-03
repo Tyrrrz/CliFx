@@ -15,7 +15,7 @@ public class ApplicationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutp
     {
         // Act
         var app = new CliApplicationBuilder()
-            .AddCommand<NoOpCommand>()
+            .AddCommand(DynamicCommandBuilder.BuildSchema(typeof(NoOpCommand)))
             .UseConsole(FakeConsole)
             .Build();
 
@@ -30,7 +30,7 @@ public class ApplicationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutp
     {
         // Act
         var app = new CliApplicationBuilder()
-            .AddCommand<NoOpCommand>()
+            .AddCommand(DynamicCommandBuilder.BuildSchema(typeof(NoOpCommand)))
             .AllowDebugMode()
             .AllowPreviewMode()
             .SetTitle("test")
@@ -48,17 +48,14 @@ public class ApplicationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutp
     }
 
     [Fact]
-    public async Task I_can_try_to_create_an_application_with_invalid_commands_that_get_skipped()
+    public async Task I_can_create_an_application_without_commands_and_it_falls_back_to_help_text()
     {
         // Act
-        var app = new CliApplicationBuilder()
-            .AddCommand(typeof(ApplicationSpecs))
-            .UseConsole(FakeConsole)
-            .Build();
+        var app = new CliApplicationBuilder().UseConsole(FakeConsole).Build();
 
         var exitCode = await app.RunAsync(Array.Empty<string>(), new Dictionary<string, string>());
 
-        // Assert: invalid command types are silently skipped; the app falls back to help text
+        // Assert: app with no commands falls back to help text
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();

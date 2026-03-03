@@ -2,11 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Reflection;
-using CliFx.Attributes;
-using CliFx.Exceptions;
 using CliFx.Extensibility;
-using CliFx.Utils.Extensions;
 
 namespace CliFx.Schema;
 
@@ -95,172 +91,6 @@ public partial class CommandSchema(
     }
 }
 
-public partial class CommandSchema
-{
-    /// <summary>
-    /// Tries to resolve the command schema from a CLR type using reflection.
-    /// Returns null if the type is not a valid command.
-    /// </summary>
-    [RequiresUnreferencedCode(
-        "Uses reflection to resolve the command schema. Use the source-generated Schema property for AOT compatibility."
-    )]
-    internal static CommandSchema? TryResolve(Type type)
-    {
-        if (
-            !type.Implements(typeof(ICommand))
-            || !type.IsDefined(typeof(CommandAttribute))
-            || type.IsAbstract
-            || type.IsInterface
-        )
-            return null;
-
-        var attribute = type.GetCustomAttribute<CommandAttribute>();
-
-        var name = attribute?.Name?.Trim();
-        var description = attribute?.Description?.Trim();
-
-        var properties = type.GetProperties()
-            .Union(
-                type.GetInterfaces()
-                    .Where(i => i != typeof(ICommand) && i.IsAssignableTo(typeof(ICommand)))
-                    .SelectMany(i =>
-                        i.GetProperties()
-                            .Where(p =>
-                                p.GetMethod is not null
-                                && !p.GetMethod.IsAbstract
-                                && p.SetMethod is not null
-                                && !p.SetMethod.IsAbstract
-                            )
-                    )
-            )
-            .ToArray();
-
-        var parameterSchemas = properties
-            .Select(p => TryResolveParameter(p))
-            .WhereNotNull()
-            .ToArray();
-
-        var optionSchemas = properties.Select(p => TryResolveOption(p)).WhereNotNull().ToList();
-
-        var isImplicitHelpOptionAvailable = !optionSchemas.Any(o =>
-            o.MatchesShortName('h') || o.MatchesName("help")
-        );
-
-        if (isImplicitHelpOptionAvailable)
-            optionSchemas.Add(CommandOptionSchema.ImplicitHelpOption);
-
-        var isImplicitVersionOptionAvailable =
-            string.IsNullOrWhiteSpace(name) && !optionSchemas.Any(o => o.MatchesName("version"));
-
-        if (isImplicitVersionOptionAvailable)
-            optionSchemas.Add(CommandOptionSchema.ImplicitVersionOption);
-
-        return new CommandSchema(type, name, description, parameterSchemas, optionSchemas);
-    }
-
-    [RequiresUnreferencedCode("Uses reflection to build property bindings.")]
-    private static PropertyBinding CreatePropertyBinding(PropertyInfo property) =>
-        new(
-            property.PropertyType,
-            instance => property.GetValue(instance),
-            (instance, value) => property.SetValue(instance, value)
-        );
-
-    [RequiresUnreferencedCode("Uses Activator.CreateInstance to instantiate converters.")]
-    private static IBindingConverter? CreateConverter(Type? converterType)
-    {
-        if (converterType is null)
-            return null;
-
-        if (!typeof(IBindingConverter).IsAssignableFrom(converterType))
-        {
-            throw CliFxException.InternalError(
-                $"Type `{converterType.FullName}` does not implement `{typeof(IBindingConverter).FullName}`."
-            );
-        }
-
-        return (IBindingConverter)Activator.CreateInstance(converterType)!;
-    }
-
-    [RequiresUnreferencedCode("Uses Activator.CreateInstance to instantiate validators.")]
-    private static IReadOnlyList<IBindingValidator> CreateValidators(
-        IReadOnlyList<Type> validatorTypes
-    )
-    {
-        var validators = new IBindingValidator[validatorTypes.Count];
-        for (var i = 0; i < validatorTypes.Count; i++)
-        {
-            var validatorType = validatorTypes[i];
-            if (!typeof(IBindingValidator).IsAssignableFrom(validatorType))
-            {
-                throw CliFxException.InternalError(
-                    $"Type `{validatorType.FullName}` does not implement `{typeof(IBindingValidator).FullName}`."
-                );
-            }
-
-            validators[i] = (IBindingValidator)Activator.CreateInstance(validatorType)!;
-        }
-
-        return validators;
-    }
-
-    [RequiresUnreferencedCode("Uses reflection to resolve parameter schemas.")]
-    private static CommandParameterSchema? TryResolveParameter(PropertyInfo property)
-    {
-        var attribute = property.GetCustomAttribute<CommandParameterAttribute>();
-        if (attribute is null)
-            return null;
-
-        var name = attribute.Name?.Trim() ?? property.Name.ToLowerInvariant();
-        var isRequired = attribute.IsRequired || property.IsRequired();
-        var description = attribute.Description?.Trim();
-
-        var isSequence =
-            property.PropertyType != typeof(string)
-            && property.PropertyType.TryGetEnumerableUnderlyingType() is not null;
-
-        return new CommandParameterSchema(
-            CreatePropertyBinding(property),
-            isSequence,
-            attribute.Order,
-            name,
-            isRequired,
-            description,
-            CreateConverter(attribute.Converter),
-            CreateValidators(attribute.Validators)
-        );
-    }
-
-    [RequiresUnreferencedCode("Uses reflection to resolve option schemas.")]
-    private static CommandOptionSchema? TryResolveOption(PropertyInfo property)
-    {
-        var attribute = property.GetCustomAttribute<CommandOptionAttribute>();
-        if (attribute is null)
-            return null;
-
-        var name = attribute.Name?.TrimStart('-').Trim();
-        var environmentVariable = attribute.EnvironmentVariable?.Trim();
-        var isRequired = attribute.IsRequired || property.IsRequired();
-        var description = attribute.Description?.Trim();
-
-        var isSequence =
-            property.PropertyType != typeof(string)
-            && property.PropertyType.TryGetEnumerableUnderlyingType() is not null;
-
-        return new CommandOptionSchema(
-            CreatePropertyBinding(property),
-            isSequence,
-            name,
-            attribute.ShortName,
-            environmentVariable,
-            isRequired,
-            description,
-            CreateConverter(attribute.Converter),
-            CreateValidators(attribute.Validators)
-        );
-    }
-}
-
 /// <inheritdoc cref="CommandSchema" />
 /// <remarks>
 /// Generic version used by source-generated code for static type references and AOT compatibility.
@@ -293,6 +123,8 @@ public class CommandSchema<
     }
 }
 
-// Internal null property binding used for implicit options (help, version)
-internal sealed class NullPropertyBinding()
+/// <summary>
+/// Null property binding used for implicit options (help, version) that have no backing property.
+/// </summary>
+public sealed class NullPropertyBinding()
     : PropertyBinding(typeof(object), _ => null, (_, _) => { });

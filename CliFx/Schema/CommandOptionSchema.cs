@@ -54,7 +54,10 @@ public class CommandOptionSchema(
         !string.IsNullOrWhiteSpace(EnvironmentVariable)
         && string.Equals(EnvironmentVariable, environmentVariableName, StringComparison.Ordinal);
 
-    internal static CommandOptionSchema ImplicitHelpOption { get; } =
+    /// <summary>
+    /// Implicit help option added to commands that don't define their own help option.
+    /// </summary>
+    public static CommandOptionSchema ImplicitHelpOption { get; } =
         new(
             new NullPropertyBinding(),
             false,
@@ -67,7 +70,10 @@ public class CommandOptionSchema(
             Array.Empty<IBindingValidator>()
         );
 
-    internal static CommandOptionSchema ImplicitVersionOption { get; } =
+    /// <summary>
+    /// Implicit version option added to the default command that doesn't define its own version option.
+    /// </summary>
+    public static CommandOptionSchema ImplicitVersionOption { get; } =
         new(
             new NullPropertyBinding(),
             false,

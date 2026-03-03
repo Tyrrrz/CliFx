@@ -37,7 +37,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_can_request_the_help_text_by_running_the_application_with_the_implicit_help_option()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
@@ -49,7 +49,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .SetDescription("This will be in help text")
             .Build();
@@ -68,7 +68,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_can_request_the_help_text_by_running_the_application_with_the_implicit_help_option_even_if_the_default_command_is_not_defined()
     {
         // Arrange
-        var commandTypes = DynamicCommandBuilder.CompileMany(
+        var commandSchemas = DynamicCommandBuilder.CompileMany(
             // lang=csharp
             """
             [Command("cmd")]
@@ -86,7 +86,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommands(commandTypes)
+            .AddCommands(commandSchemas)
             .UseConsole(FakeConsole)
             .SetDescription("This will be in help text")
             .Build();
@@ -105,7 +105,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_can_request_the_help_text_for_a_specific_command_by_running_the_application_and_specifying_its_name_with_the_implicit_help_option()
     {
         // Arrange
-        var commandTypes = DynamicCommandBuilder.CompileMany(
+        var commandSchemas = DynamicCommandBuilder.CompileMany(
             // lang=csharp
             """
             [Command]
@@ -129,7 +129,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommands(commandTypes)
+            .AddCommands(commandSchemas)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -150,7 +150,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_can_request_the_help_text_for_a_specific_nested_command_by_running_the_application_and_specifying_its_name_with_the_implicit_help_option()
     {
         // Arrange
-        var commandTypes = DynamicCommandBuilder.CompileMany(
+        var commandSchemas = DynamicCommandBuilder.CompileMany(
             // lang=csharp
             """
             [Command]
@@ -174,7 +174,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommands(commandTypes)
+            .AddCommands(commandSchemas)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -196,7 +196,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     {
         // Arrange
         var application = new CliApplicationBuilder()
-            .AddCommand<NoOpCommand>()
+            .AddCommand(DynamicCommandBuilder.BuildSchema(typeof(NoOpCommand)))
             .UseConsole(FakeConsole)
             .SetDescription("This will be in help text")
             .Build();
@@ -242,7 +242,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_can_request_the_help_text_to_see_the_command_description()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command(Description = "Description of the default command.")]
@@ -254,7 +254,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -272,7 +272,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_can_request_the_help_text_to_see_the_usage_format_for_a_named_command()
     {
         // Arrange
-        var commandTypes = DynamicCommandBuilder.CompileMany(
+        var commandSchemas = DynamicCommandBuilder.CompileMany(
             // lang=csharp
             """
             [Command]
@@ -290,7 +290,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommands(commandTypes)
+            .AddCommands(commandSchemas)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -308,7 +308,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_can_request_the_help_text_to_see_the_usage_format_for_all_parameters()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
@@ -329,7 +329,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -348,7 +348,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_can_request_the_help_text_to_see_the_usage_format_for_all_parameters_in_the_correct_order()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             // Base members appear last in reflection order
@@ -375,7 +375,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -393,7 +393,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_can_request_the_help_text_to_see_the_usage_format_for_all_required_options()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
@@ -414,7 +414,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -434,7 +434,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_can_request_the_help_text_to_see_the_list_of_all_parameters_and_options()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
@@ -452,7 +452,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -479,7 +479,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_can_request_the_help_text_to_see_the_help_and_implicit_version_options()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
@@ -491,7 +491,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -518,7 +518,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_can_request_the_help_text_on_a_named_command_to_see_the_implicit_help_option()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command("cmd")]
@@ -530,7 +530,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -554,7 +554,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_can_request_the_help_text_to_see_the_list_of_valid_values_for_all_parameters_and_options_bound_to_enum_properties()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             public enum CustomEnum { One, Two, Three }
@@ -574,7 +574,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -607,7 +607,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_can_request_the_help_text_to_see_the_list_of_valid_values_for_all_parameters_and_options_bound_to_non_scalar_enum_properties()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             public enum CustomEnum { One, Two, Three }
@@ -627,7 +627,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -660,7 +660,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_can_request_the_help_text_to_see_the_list_of_valid_values_for_all_parameters_and_options_bound_to_nullable_enum_properties()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             public enum CustomEnum { One, Two, Three }
@@ -680,7 +680,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -713,7 +713,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_can_request_the_help_text_to_see_the_environment_variables_of_options_that_use_them_as_fallback()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             public enum CustomEnum { One, Two, Three }
@@ -733,7 +733,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -761,7 +761,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_can_request_the_help_text_to_see_the_default_values_of_non_required_options()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             public enum CustomEnum { One, Two, Three }
@@ -799,7 +799,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -847,7 +847,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_can_request_the_help_text_to_see_the_list_of_all_immediate_child_commands()
     {
         // Arrange
-        var commandTypes = DynamicCommandBuilder.CompileMany(
+        var commandSchemas = DynamicCommandBuilder.CompileMany(
             // lang=csharp
             """
             [Command("cmd1", Description = "Description of one command.")]
@@ -877,7 +877,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommands(commandTypes)
+            .AddCommands(commandSchemas)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -912,7 +912,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_can_request_the_help_text_to_see_the_list_of_all_immediate_grand_child_commands()
     {
         // Arrange
-        var commandTypes = DynamicCommandBuilder.CompileMany(
+        var commandSchemas = DynamicCommandBuilder.CompileMany(
             // lang=csharp
             """
             [Command("cmd1")]
@@ -948,7 +948,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommands(commandTypes)
+            .AddCommands(commandSchemas)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -978,7 +978,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     {
         // Arrange
         var application = new CliApplicationBuilder()
-            .AddCommand<NoOpCommand>()
+            .AddCommand(DynamicCommandBuilder.BuildSchema(typeof(NoOpCommand)))
             .SetVersion("v6.9")
             .UseConsole(FakeConsole)
             .Build();
@@ -997,7 +997,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_cannot_request_the_help_text_by_running_the_application_with_the_implicit_help_option_if_there_is_an_option_with_the_same_identifier()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
@@ -1012,7 +1012,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .SetDescription("This will be in help text")
             .Build();
@@ -1031,7 +1031,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_cannot_request_the_version_text_by_running_the_application_with_the_implicit_version_option_if_there_is_an_option_with_the_same_identifier()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
@@ -1046,7 +1046,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .SetVersion("v6.9")
             .UseConsole(FakeConsole)
             .Build();

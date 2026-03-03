@@ -16,7 +16,7 @@ public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
     public async Task I_can_configure_the_application_to_use_the_default_type_activator_to_initialize_types_through_parameterless_constructors()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
@@ -32,7 +32,7 @@ public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .UseTypeActivator(new DefaultTypeActivator())
             .Build();
@@ -54,7 +54,7 @@ public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
     public async Task I_can_try_to_configure_the_application_to_use_the_default_type_activator_and_get_an_error_if_the_requested_type_does_not_have_a_parameterless_constructor()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
@@ -68,7 +68,7 @@ public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .UseTypeActivator(new DefaultTypeActivator())
             .Build();
@@ -90,7 +90,7 @@ public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
     public async Task I_can_configure_the_application_to_use_a_custom_type_activator_to_initialize_types_using_a_delegate()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
@@ -110,7 +110,7 @@ public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .UseTypeActivator(type => Activator.CreateInstance(type, "Hello world")!)
             .Build();
@@ -132,7 +132,7 @@ public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
     public async Task I_can_configure_the_application_to_use_a_custom_type_activator_to_initialize_types_using_a_service_provider()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
@@ -152,7 +152,7 @@ public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .UseTypeActivator(commandTypes =>
             {
@@ -187,7 +187,7 @@ public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
     public async Task I_can_try_to_configure_the_application_to_use_a_custom_type_activator_and_get_an_error_if_the_requested_type_cannot_be_initialized()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
@@ -203,7 +203,7 @@ public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .UseTypeActivator((Type _) => null!)
             .Build();
