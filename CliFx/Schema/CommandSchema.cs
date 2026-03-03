@@ -53,13 +53,13 @@ public partial class CommandSchema(
     /// Whether the implicit --help option is available.
     /// </summary>
     public bool IsImplicitHelpOptionAvailable =>
-        Options.Contains(CommandOptionSchema.ImplicitHelpOption);
+        typeof(global::CliFx.ICommandWithHelpOption).IsAssignableFrom(Type);
 
     /// <summary>
     /// Whether the implicit --version option is available.
     /// </summary>
     public bool IsImplicitVersionOptionAvailable =>
-        Options.Contains(CommandOptionSchema.ImplicitVersionOption);
+        typeof(global::CliFx.ICommandWithVersionOption).IsAssignableFrom(Type);
 
     /// <summary>
     /// Whether this command matches the given name.
@@ -104,24 +104,9 @@ public class CommandSchema<
         name,
         description,
         inputs.OfType<CommandParameterSchema>().ToArray(),
-        AddImplicitOptions(name, inputs.OfType<CommandOptionSchema>().ToList())
+        inputs.OfType<CommandOptionSchema>().ToArray()
     )
-    where TCommand : ICommand
-{
-    private static IReadOnlyList<CommandOptionSchema> AddImplicitOptions(
-        string? commandName,
-        List<CommandOptionSchema> options
-    )
-    {
-        if (!options.Any(o => o.MatchesShortName('h') || o.MatchesName("help")))
-            options.Add(CommandOptionSchema.ImplicitHelpOption);
-
-        if (string.IsNullOrWhiteSpace(commandName) && !options.Any(o => o.MatchesName("version")))
-            options.Add(CommandOptionSchema.ImplicitVersionOption);
-
-        return options;
-    }
-}
+    where TCommand : ICommand;
 
 /// <summary>
 /// Null property binding used for implicit options (help, version) that have no backing property.

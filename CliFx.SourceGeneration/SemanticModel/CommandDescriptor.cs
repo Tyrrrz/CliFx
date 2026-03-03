@@ -11,5 +11,7 @@ internal record CommandDescriptor(
     IReadOnlyList<CommandOptionDescriptor> Options,
     IReadOnlyList<IPropertySymbol> UserDefinedProperties,
     IReadOnlyList<IPropertySymbol> SkippedInitOnlyProperties,
-    IReadOnlyList<Diagnostic> Diagnostics
+    IReadOnlyList<Diagnostic> Diagnostics,
+    bool NeedsHelpOption,
+    bool NeedsVersionOption
 );

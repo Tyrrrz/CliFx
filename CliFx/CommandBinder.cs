@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using CliFx.Exceptions;
@@ -15,101 +13,24 @@ namespace CliFx;
 
 internal class CommandBinder
 {
-    private readonly IFormatProvider _formatProvider = CultureInfo.InvariantCulture;
-
-    [RequiresUnreferencedCode(
-        "Uses reflection to convert values. Use a custom IBindingConverter for AOT compatibility."
-    )]
-    [RequiresDynamicCode(
-        "Uses dynamic array creation. Use a custom IBindingConverter for AOT compatibility."
-    )]
-    private object? ConvertSingle(CommandInputSchema schema, string? rawValue, Type targetType)
+    private static object? ConvertSingle(CommandInputSchema schema, string? rawValue)
     {
-        // Custom converter (set at schema build time)
-        if (schema.Converter is not null)
-        {
-            return schema.Converter.Convert(rawValue);
-        }
+        if (schema.Converter is null)
+            throw CliFxException.InternalError(
+                $"""
+                {schema.GetKind()} {schema.GetFormattedIdentifier()} has an unsupported underlying property type.
+                There is no known way to convert a string value into the required type.
+                To fix this, either change the property to use a supported type or configure a custom converter.
+                """
+            );
 
-        // Assignable from a string (e.g. string itself, object, etc)
-        if (targetType.IsAssignableFrom(typeof(string)))
-        {
-            return rawValue;
-        }
-
-        // Special case for bool
-        if (targetType == typeof(bool))
-        {
-            return string.IsNullOrWhiteSpace(rawValue) || bool.Parse(rawValue);
-        }
-
-        // Special case for DateTimeOffset
-        if (targetType == typeof(DateTimeOffset))
-        {
-            return DateTimeOffset.Parse(rawValue!, _formatProvider);
-        }
-
-        // Special case for TimeSpan
-        if (targetType == typeof(TimeSpan))
-        {
-            return TimeSpan.Parse(rawValue!, _formatProvider);
-        }
-
-        // Enum
-        if (targetType.IsEnum)
-        {
-            return Enum.Parse(targetType, rawValue!, true);
-        }
-
-        // Convertible primitives (int, double, char, etc)
-        if (targetType.Implements(typeof(IConvertible)))
-        {
-            return Convert.ChangeType(rawValue, targetType, _formatProvider);
-        }
-
-        // Nullable<T>
-        var nullableUnderlyingType = targetType.TryGetNullableUnderlyingType();
-        if (nullableUnderlyingType is not null)
-        {
-            return !string.IsNullOrWhiteSpace(rawValue)
-                ? ConvertSingle(schema, rawValue, nullableUnderlyingType)
-                : null;
-        }
-
-        // String-constructable (FileInfo, etc)
-        var stringConstructor = targetType.GetConstructor([typeof(string)]);
-        if (stringConstructor is not null)
-        {
-            return stringConstructor.Invoke([rawValue]);
-        }
-
-        // String-parseable (with IFormatProvider)
-        var parseMethodWithFormatProvider = targetType.TryGetStaticParseMethod(true);
-        if (parseMethodWithFormatProvider is not null)
-        {
-            return parseMethodWithFormatProvider.Invoke(null, [rawValue, _formatProvider]);
-        }
-
-        // String-parseable (without IFormatProvider)
-        var parseMethod = targetType.TryGetStaticParseMethod();
-        if (parseMethod is not null)
-        {
-            return parseMethod.Invoke(null, [rawValue]);
-        }
-
-        throw CliFxException.InternalError(
-            $"""
-            {schema.GetKind()} {schema.GetFormattedIdentifier()} has an unsupported underlying property type.
-            There is no known way to convert a string value into an instance of type `{targetType.FullName}`.
-            To fix this, either change the property to use a supported type or configure a custom converter.
-            """
-        );
+        return schema.Converter.Convert(rawValue);
     }
 
-    [RequiresUnreferencedCode(
-        "Uses reflection to convert values. Use a custom IBindingConverter for AOT compatibility."
+    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode(
+        "Uses dynamic array creation. Use a custom IBindingConverter for AOT compatibility."
     )]
-    [RequiresDynamicCode(
+    [System.Diagnostics.CodeAnalysis.RequiresDynamicCode(
         "Uses dynamic array creation. Use a custom IBindingConverter for AOT compatibility."
     )]
     private object? ConvertMultiple(
@@ -120,7 +41,7 @@ internal class CommandBinder
     )
     {
         var array = rawValues
-            .Select(v => ConvertSingle(schema, v, targetElementType))
+            .Select(v => ConvertSingle(schema, v))
             .ToNonGenericArray(targetElementType);
 
         var arrayType = array.GetType();
@@ -145,10 +66,10 @@ internal class CommandBinder
         );
     }
 
-    [RequiresUnreferencedCode(
-        "Uses reflection to convert values. Use a custom IBindingConverter for AOT compatibility."
+    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode(
+        "Uses reflection to bind values. Use a custom IBindingConverter for AOT compatibility."
     )]
-    [RequiresDynamicCode(
+    [System.Diagnostics.CodeAnalysis.RequiresDynamicCode(
         "Uses dynamic array creation. Use a custom IBindingConverter for AOT compatibility."
     )]
     private object? ConvertMember(CommandInputSchema schema, IReadOnlyList<string> rawValues)
@@ -175,7 +96,7 @@ internal class CommandBinder
             // Scalar
             if (rawValues.Count <= 1)
             {
-                return ConvertSingle(schema, rawValues.SingleOrDefault(), propertyType);
+                return ConvertSingle(schema, rawValues.SingleOrDefault());
             }
         }
         catch (Exception ex) when (ex is not CliFxException)
@@ -226,10 +147,10 @@ internal class CommandBinder
         }
     }
 
-    [RequiresUnreferencedCode(
+    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode(
         "Uses reflection to convert values. Use a custom IBindingConverter for AOT compatibility."
     )]
-    [RequiresDynamicCode(
+    [System.Diagnostics.CodeAnalysis.RequiresDynamicCode(
         "Uses dynamic array creation. Use a custom IBindingConverter for AOT compatibility."
     )]
     private void BindMember(
@@ -243,10 +164,10 @@ internal class CommandBinder
         schema.Property.SetValue(commandInstance, convertedValue);
     }
 
-    [RequiresUnreferencedCode(
+    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode(
         "Uses reflection to bind values. Use a custom IBindingConverter for AOT compatibility."
     )]
-    [RequiresDynamicCode(
+    [System.Diagnostics.CodeAnalysis.RequiresDynamicCode(
         "Uses dynamic array creation. Use a custom IBindingConverter for AOT compatibility."
     )]
     private void BindParameters(
@@ -315,10 +236,10 @@ internal class CommandBinder
         }
     }
 
-    [RequiresUnreferencedCode(
+    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode(
         "Uses reflection to bind values. Use a custom IBindingConverter for AOT compatibility."
     )]
-    [RequiresDynamicCode(
+    [System.Diagnostics.CodeAnalysis.RequiresDynamicCode(
         "Uses dynamic array creation. Use a custom IBindingConverter for AOT compatibility."
     )]
     private void BindOptions(
@@ -397,10 +318,10 @@ internal class CommandBinder
         }
     }
 
-    [RequiresUnreferencedCode(
+    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode(
         "Uses reflection to bind values. Use a custom IBindingConverter for AOT compatibility."
     )]
-    [RequiresDynamicCode(
+    [System.Diagnostics.CodeAnalysis.RequiresDynamicCode(
         "Uses dynamic array creation. Use a custom IBindingConverter for AOT compatibility."
     )]
     public void Bind(

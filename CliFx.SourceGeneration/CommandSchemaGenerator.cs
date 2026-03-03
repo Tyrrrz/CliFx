@@ -389,6 +389,15 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             }
         }
 
+        var needsHelpOption = !options.Any(o =>
+            string.Equals(o.Name, "help", StringComparison.OrdinalIgnoreCase) || o.ShortName == 'h'
+        );
+        var needsVersionOption =
+            string.IsNullOrWhiteSpace(name)
+            && !options.Any(o =>
+                string.Equals(o.Name, "version", StringComparison.OrdinalIgnoreCase)
+            );
+
         return new CommandDescriptor(
             type,
             name,
@@ -397,7 +406,9 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             options,
             directProperties,
             skippedInitOnly,
-            diagnostics
+            diagnostics,
+            needsHelpOption,
+            needsVersionOption
         );
     }
 
@@ -491,10 +502,36 @@ public class CommandSchemaGenerator : IIncrementalGenerator
         sb.Append(
             // lang=csharp
             $$"""
-            partial class {{command.Type.Name}}
+            partial class {{command.Type.Name}}{{BuildInterfaceList(command)}}
             {
             """
         );
+
+        if (command.NeedsHelpOption)
+        {
+            sb.Append(
+                // lang=csharp
+                """
+
+                    /// <summary>Whether the user requested help (via the -h|--help option).</summary>
+                    public bool IsHelpRequested { get; set; }
+
+                """
+            );
+        }
+
+        if (command.NeedsVersionOption)
+        {
+            sb.Append(
+                // lang=csharp
+                """
+
+                    /// <summary>Whether the user requested version information (via the --version option).</summary>
+                    public bool IsVersionRequested { get; set; }
+
+                """
+            );
+        }
 
         if (!command.UserDefinedProperties.Any(p => p.Name == "Schema"))
         {
@@ -525,24 +562,51 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                 SymbolDisplayFormat.FullyQualifiedFormat
             );
             var isSequence = IsSequenceType(param.Property.Type);
+            var converterExpr =
+                param.ConverterType != null
+                    ? BuildConverterExpr(param.ConverterType)
+                    : BuildDefaultConverterExpr(param.Property);
 
-            sb.Append(
-                // lang=csharp
-                $$"""
-                        inputs.Add(new global::CliFx.Schema.CommandParameterSchema<{{commandFqn}}, {{propTypeFqn}}>(
-                            new global::CliFx.Schema.PropertyBinding<{{commandFqn}}, {{propTypeFqn}}>(
-                                c => c.{{param.Property.Name}},
-                                (c, v) => c.{{param.Property.Name}} = v),
-                            {{(isSequence ? "true" : "false")}},
-                            {{param.Order}},
-                            {{EscapeString(param.Name)}},
-                            {{(param.IsRequired ? "true" : "false")}},
-                            {{EscapeString(param.Description)}},
-                            {{BuildConverterExpr(param.ConverterType)}},
-                            {{BuildValidatorsExpr(param.ValidatorTypes)}}));
+            if (!isSequence)
+            {
+                sb.Append(
+                    // lang=csharp
+                    $$"""
+                            inputs.Add(new global::CliFx.Schema.CommandParameterSchema<{{commandFqn}}, {{propTypeFqn}}>(
+                                new global::CliFx.Schema.PropertyBinding<{{commandFqn}}, {{propTypeFqn}}>(
+                                    c => c.{{param.Property.Name}},
+                                    (c, v) => c.{{param.Property.Name}} = v),
+                                false,
+                                {{param.Order}},
+                                {{EscapeString(param.Name)}},
+                                {{(param.IsRequired ? "true" : "false")}},
+                                {{EscapeString(param.Description)}},
+                                {{converterExpr}},
+                                {{BuildValidatorsExpr(param.ValidatorTypes)}}));
 
-                """
-            );
+                    """
+                );
+            }
+            else
+            {
+                sb.Append(
+                    // lang=csharp
+                    $$"""
+                            inputs.Add(new global::CliFx.Schema.CommandParameterSchema(
+                                new global::CliFx.Schema.PropertyBinding<{{commandFqn}}, {{propTypeFqn}}>(
+                                    c => c.{{param.Property.Name}},
+                                    (c, v) => c.{{param.Property.Name}} = v),
+                                true,
+                                {{param.Order}},
+                                {{EscapeString(param.Name)}},
+                                {{(param.IsRequired ? "true" : "false")}},
+                                {{EscapeString(param.Description)}},
+                                {{converterExpr}},
+                                {{BuildValidatorsExpr(param.ValidatorTypes)}}));
+
+                    """
+                );
+            }
         }
 
         foreach (var opt in command.Options)
@@ -552,22 +616,94 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             );
             var isSequence = IsSequenceType(opt.Property.Type);
             var shortNameStr = opt.ShortName.HasValue ? $"'{opt.ShortName}'" : "null";
+            var converterExpr =
+                opt.ConverterType != null
+                    ? BuildConverterExpr(opt.ConverterType)
+                    : BuildDefaultConverterExpr(opt.Property);
 
+            if (!isSequence)
+            {
+                sb.Append(
+                    // lang=csharp
+                    $$"""
+                            inputs.Add(new global::CliFx.Schema.CommandOptionSchema<{{commandFqn}}, {{propTypeFqn}}>(
+                                new global::CliFx.Schema.PropertyBinding<{{commandFqn}}, {{propTypeFqn}}>(
+                                    c => c.{{opt.Property.Name}},
+                                    (c, v) => c.{{opt.Property.Name}} = v),
+                                false,
+                                {{EscapeString(opt.Name)}},
+                                {{shortNameStr}},
+                                {{EscapeString(opt.EnvironmentVariable)}},
+                                {{(opt.IsRequired ? "true" : "false")}},
+                                {{EscapeString(opt.Description)}},
+                                {{converterExpr}},
+                                {{BuildValidatorsExpr(opt.ValidatorTypes)}}));
+
+                    """
+                );
+            }
+            else
+            {
+                sb.Append(
+                    // lang=csharp
+                    $$"""
+                            inputs.Add(new global::CliFx.Schema.CommandOptionSchema(
+                                new global::CliFx.Schema.PropertyBinding<{{commandFqn}}, {{propTypeFqn}}>(
+                                    c => c.{{opt.Property.Name}},
+                                    (c, v) => c.{{opt.Property.Name}} = v),
+                                true,
+                                {{EscapeString(opt.Name)}},
+                                {{shortNameStr}},
+                                {{EscapeString(opt.EnvironmentVariable)}},
+                                {{(opt.IsRequired ? "true" : "false")}},
+                                {{EscapeString(opt.Description)}},
+                                {{converterExpr}},
+                                {{BuildValidatorsExpr(opt.ValidatorTypes)}}));
+
+                    """
+                );
+            }
+        }
+
+        if (command.NeedsHelpOption)
+        {
             sb.Append(
                 // lang=csharp
                 $$"""
-                        inputs.Add(new global::CliFx.Schema.CommandOptionSchema<{{commandFqn}}, {{propTypeFqn}}>(
-                            new global::CliFx.Schema.PropertyBinding<{{commandFqn}}, {{propTypeFqn}}>(
-                                c => c.{{opt.Property.Name}},
-                                (c, v) => c.{{opt.Property.Name}} = v),
-                            {{(isSequence ? "true" : "false")}},
-                            {{EscapeString(opt.Name)}},
-                            {{shortNameStr}},
-                            {{EscapeString(opt.EnvironmentVariable)}},
-                            {{(opt.IsRequired ? "true" : "false")}},
-                            {{EscapeString(opt.Description)}},
-                            {{BuildConverterExpr(opt.ConverterType)}},
-                            {{BuildValidatorsExpr(opt.ValidatorTypes)}}));
+                        inputs.Add(new global::CliFx.Schema.CommandOptionSchema<{{commandFqn}}, bool>(
+                            new global::CliFx.Schema.PropertyBinding<{{commandFqn}}, bool>(
+                                c => c.IsHelpRequested,
+                                (c, v) => c.IsHelpRequested = v),
+                            false,
+                            "help",
+                            'h',
+                            null,
+                            false,
+                            "Shows help text.",
+                            new global::CliFx.Extensibility.BoolBindingConverter(),
+                            global::System.Array.Empty<global::CliFx.Extensibility.IBindingValidator>()));
+
+                """
+            );
+        }
+
+        if (command.NeedsVersionOption)
+        {
+            sb.Append(
+                // lang=csharp
+                $$"""
+                        inputs.Add(new global::CliFx.Schema.CommandOptionSchema<{{commandFqn}}, bool>(
+                            new global::CliFx.Schema.PropertyBinding<{{commandFqn}}, bool>(
+                                c => c.IsVersionRequested,
+                                (c, v) => c.IsVersionRequested = v),
+                            false,
+                            "version",
+                            null,
+                            null,
+                            false,
+                            "Shows version information.",
+                            new global::CliFx.Extensibility.BoolBindingConverter(),
+                            global::System.Array.Empty<global::CliFx.Extensibility.IBindingValidator>()));
 
                 """
             );
@@ -633,5 +769,127 @@ public class CommandSchemaGenerator : IIncrementalGenerator
 
         var items = string.Join(", ", validatorTypes.Select(v => $"new {v.FullyQualifiedName}()"));
         return $"new global::CliFx.Extensibility.IBindingValidator[] {{ {items} }}";
+    }
+
+    private static string BuildDefaultConverterExpr(IPropertySymbol property)
+    {
+        var type = property.Type;
+
+        // For sequence types, use the element type's converter
+        if (IsSequenceType(type))
+        {
+            var elementType = type.TryGetEnumerableUnderlyingType();
+            if (elementType is not null)
+                return BuildDefaultConverterExprForScalar(elementType) ?? "null";
+        }
+
+        return BuildDefaultConverterExprForScalar(type) ?? "null";
+    }
+
+    private static string? BuildDefaultConverterExprForScalar(ITypeSymbol type)
+    {
+        var fqn = type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+
+        // string
+        if (type.SpecialType == SpecialType.System_String)
+            return "new global::CliFx.Extensibility.NoopBindingConverter()";
+
+        // object — assignable from string, so pass the raw string through as object
+        if (type.SpecialType == SpecialType.System_Object)
+            return "new global::CliFx.Extensibility.DelegateBindingConverter<global::System.Object>(s => s)";
+
+        // bool
+        if (type.SpecialType == SpecialType.System_Boolean)
+            return "new global::CliFx.Extensibility.BoolBindingConverter()";
+
+        // DateTimeOffset
+        if (type.ToDisplayString() == "System.DateTimeOffset")
+            return "new global::CliFx.Extensibility.DateTimeOffsetBindingConverter()";
+
+        // TimeSpan
+        if (type.ToDisplayString() == "System.TimeSpan")
+            return "new global::CliFx.Extensibility.TimeSpanBindingConverter()";
+
+        // Guid
+        if (type.ToDisplayString() == "System.Guid")
+            return "new global::CliFx.Extensibility.GuidBindingConverter()";
+
+        // Enum
+        if (type.TypeKind == TypeKind.Enum)
+            return $"new global::CliFx.Extensibility.EnumBindingConverter<{fqn}>()";
+
+        // Nullable<T>
+        if (
+            type is INamedTypeSymbol { IsValueType: true } named
+            && named.ConstructedFrom.SpecialType == SpecialType.System_Nullable_T
+        )
+        {
+            var innerType = named.TypeArguments[0];
+            var innerFqn = innerType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+            var innerConverterExpr = BuildDefaultConverterExprForScalar(innerType);
+            if (innerConverterExpr is null)
+                return null;
+            return $"new global::CliFx.Extensibility.NullableBindingConverter<{innerFqn}>({innerConverterExpr})";
+        }
+
+        // IConvertible (int, double, char, etc.)
+        if (type.AllInterfaces.Any(i => i.ToDisplayString() == "System.IConvertible"))
+            return $"new global::CliFx.Extensibility.ConvertibleBindingConverter<{fqn}>()";
+
+        // String-parseable with IFormatProvider: static T Parse(string, IFormatProvider)
+        var parseWithFormatProvider = type.GetMembers("Parse")
+            .OfType<IMethodSymbol>()
+            .FirstOrDefault(m =>
+                m.IsStatic
+                && m.DeclaredAccessibility == Accessibility.Public
+                && m.Parameters.Length == 2
+                && m.Parameters[0].Type.SpecialType == SpecialType.System_String
+                && m.Parameters[1].Type.ToDisplayString() == "System.IFormatProvider"
+                && SymbolEqualityComparer.Default.Equals(m.ReturnType, type)
+            );
+        if (parseWithFormatProvider is not null)
+            return $"new global::CliFx.Extensibility.DelegateBindingConverter<{fqn}>(s => {fqn}.Parse(s!, global::System.Globalization.CultureInfo.InvariantCulture))";
+
+        // String-parseable: static T Parse(string)
+        var parseMethod = type.GetMembers("Parse")
+            .OfType<IMethodSymbol>()
+            .FirstOrDefault(m =>
+                m.IsStatic
+                && m.DeclaredAccessibility == Accessibility.Public
+                && m.Parameters.Length == 1
+                && m.Parameters[0].Type.SpecialType == SpecialType.System_String
+                && SymbolEqualityComparer.Default.Equals(m.ReturnType, type)
+            );
+        if (parseMethod is not null)
+            return $"new global::CliFx.Extensibility.DelegateBindingConverter<{fqn}>(s => {fqn}.Parse(s!))";
+
+        // String-constructable: public constructor(string)
+        if (
+            type is INamedTypeSymbol namedConstructable
+            && namedConstructable.Constructors.Any(c =>
+                c.DeclaredAccessibility == Accessibility.Public
+                && c.Parameters.Length == 1
+                && c.Parameters[0].Type.SpecialType == SpecialType.System_String
+            )
+        )
+            return $"new global::CliFx.Extensibility.DelegateBindingConverter<{fqn}>(s => new {fqn}(s!))";
+
+        return null;
+    }
+
+    private static string BuildInterfaceList(CommandDescriptor command)
+    {
+        var interfaces = new List<string>();
+
+        if (command.NeedsHelpOption)
+            interfaces.Add("global::CliFx.ICommandWithHelpOption");
+
+        if (command.NeedsVersionOption)
+            interfaces.Add("global::CliFx.ICommandWithVersionOption");
+
+        if (interfaces.Count == 0)
+            return string.Empty;
+
+        return " : " + string.Join(", ", interfaces);
     }
 }

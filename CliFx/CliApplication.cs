@@ -40,15 +40,19 @@ public class CliApplication(
     private bool IsPreviewModeEnabled(CommandInput commandInput) =>
         Configuration.IsPreviewModeAllowed && commandInput.IsPreviewDirectiveSpecified;
 
-    private bool ShouldShowHelpText(CommandSchema commandSchema, CommandInput commandInput) =>
-        commandSchema.IsImplicitHelpOptionAvailable && commandInput.IsHelpOptionSpecified
+    private bool ShouldShowHelpText(
+        CommandSchema commandSchema,
+        ICommand commandInstance,
+        CommandInput commandInput
+    ) =>
+        commandInstance is ICommandWithHelpOption && commandInput.IsHelpOptionSpecified
         ||
         // Show help text also if the fallback default command is executed without any arguments
         commandSchema == FallbackDefaultCommand.Schema
             && !commandInput.HasArguments;
 
-    private bool ShouldShowVersionText(CommandSchema commandSchema, CommandInput commandInput) =>
-        commandSchema.IsImplicitVersionOptionAvailable && commandInput.IsVersionOptionSpecified;
+    private bool ShouldShowVersionText(ICommand commandInstance, CommandInput commandInput) =>
+        commandInstance is ICommandWithVersionOption && commandInput.IsVersionOptionSpecified;
 
     private async ValueTask PromptDebuggerAsync()
     {
@@ -124,14 +128,14 @@ public class CliApplication(
         );
 
         // Handle the help option
-        if (ShouldShowHelpText(commandSchema, commandInput))
+        if (ShouldShowHelpText(commandSchema, commandInstance, commandInput))
         {
             console.WriteHelpText(helpContext);
             return 0;
         }
 
         // Handle the version option
-        if (ShouldShowVersionText(commandSchema, commandInput))
+        if (ShouldShowVersionText(commandInstance, commandInput))
         {
             console.WriteLine(Metadata.Version);
             return 0;
