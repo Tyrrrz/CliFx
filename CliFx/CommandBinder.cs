@@ -15,14 +15,9 @@ internal class CommandBinder
 {
     private static object? ConvertSingle(CommandInputSchema schema, string? rawValue)
     {
+        // Null converter means pass-through (used for string-typed properties)
         if (schema.Converter is null)
-            throw CliFxException.InternalError(
-                $"""
-                {schema.GetKind()} {schema.GetFormattedIdentifier()} has an unsupported underlying property type.
-                There is no known way to convert a string value into an instance of type `{schema.Property.Type.FullName}`.
-                To fix this, either change the property to use a supported type or configure a custom converter.
-                """
-            );
+            return rawValue;
 
         return schema.Converter.Convert(rawValue);
     }
@@ -161,7 +156,25 @@ internal class CommandBinder
     {
         var convertedValue = ConvertMember(schema, rawValues);
         ValidateMember(schema, convertedValue);
-        schema.Property.SetValue(commandInstance, convertedValue);
+        try
+        {
+            schema.Property.SetValue(commandInstance, convertedValue);
+        }
+        catch (Exception ex) when (ex is not CliFxException)
+        {
+            var errorMessage = ex is TargetInvocationException invokeEx
+                ? invokeEx.InnerException?.Message ?? ex.Message
+                : ex.Message;
+
+            throw CliFxException.UserError(
+                $"""
+                {schema.GetKind()} {schema.GetFormattedIdentifier()} cannot be set from the provided argument(s):
+                {rawValues.Select(v => '<' + v + '>').JoinToString(" ")}
+                Error: {errorMessage}
+                """,
+                ex
+            );
+        }
     }
 
     [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode(

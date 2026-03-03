@@ -792,9 +792,9 @@ public class CommandSchemaGenerator : IIncrementalGenerator
     {
         var fqn = type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
 
-        // string
+        // string — no conversion needed (null converter = pass-through)
         if (type.SpecialType == SpecialType.System_String)
-            return "new global::CliFx.Extensibility.NoopBindingConverter()";
+            return null;
 
         // object — assignable from string, so pass the raw string through as object
         if (type.SpecialType == SpecialType.System_Object)

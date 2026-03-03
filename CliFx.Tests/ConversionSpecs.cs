@@ -772,7 +772,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
         exitCode.Should().NotBe(0);
 
         var stdErr = FakeConsole.ReadErrorString();
-        stdErr.Should().Contain("has an unsupported underlying property type");
+        stdErr.Should().Contain("cannot be set from the provided argument");
     }
 
     [Fact]
