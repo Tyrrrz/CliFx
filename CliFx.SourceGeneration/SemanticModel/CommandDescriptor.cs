@@ -9,7 +9,7 @@ internal record CommandDescriptor(
     string? Description,
     IReadOnlyList<CommandParameterDescriptor> Parameters,
     IReadOnlyList<CommandOptionDescriptor> Options,
-    bool HasExistingSchemaProperty,
+    IReadOnlyList<IPropertySymbol> UserDefinedProperties,
     IReadOnlyList<IPropertySymbol> SkippedInitOnlyProperties,
     IReadOnlyList<Diagnostic> Diagnostics
 );

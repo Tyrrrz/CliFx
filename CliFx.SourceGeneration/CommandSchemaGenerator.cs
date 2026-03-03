@@ -394,12 +394,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             description,
             parameters,
             options,
-            type.GetMembers("Schema")
-                .Any(m =>
-                    m.Kind == SymbolKind.Field
-                    || m.Kind == SymbolKind.Property
-                    || m.Kind == SymbolKind.Method
-                ),
+            properties,
             skippedInitOnly,
             diagnostics
         );
@@ -415,7 +410,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
 
         foreach (var command in commands)
         {
-            if (command.HasExistingSchemaProperty)
+            if (command.UserDefinedProperties.Any(p => p.Name == "Schema"))
             {
                 var schemaLocation =
                     command
@@ -496,7 +491,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             """
         );
 
-        if (!command.HasExistingSchemaProperty)
+        if (!command.UserDefinedProperties.Any(p => p.Name == "Schema"))
         {
             sb.Append(
                 // lang=csharp
