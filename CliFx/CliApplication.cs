@@ -179,18 +179,7 @@ public class CliApplication(
     {
         try
         {
-            // Use pre-built schemas from the source generator when available;
-            // otherwise fall back to the reflection-based path.
-#pragma warning disable IL2026
-            var applicationSchema = Configuration.CommandSchemas is { Count: > 0 } schemas
-                ? new ApplicationSchema(schemas)
-                : new ApplicationSchema(
-                    Configuration
-                        .CommandTypes.Select(CommandSchema.TryResolve)
-                        .WhereNotNull()
-                        .ToArray()
-                );
-#pragma warning restore IL2026
+            var applicationSchema = new ApplicationSchema(Configuration.CommandSchemas ?? []);
 
             var commandInput = CommandInput.Parse(
                 commandLineArguments,

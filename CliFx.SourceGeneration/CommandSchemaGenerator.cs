@@ -17,78 +17,6 @@ namespace CliFx.SourceGeneration;
 [Generator]
 public class CommandSchemaGenerator : IIncrementalGenerator
 {
-    private static readonly DiagnosticDescriptor SchemaPropertyAlreadyDefinedDiagnostic = new(
-        id: "CLIFX001",
-        title: "Schema property already defined",
-        messageFormat: "Type '{0}' already defines a 'Schema' member. The source-generated 'Schema' property will be skipped. Rename or remove the existing member to allow the generator to produce the schema.",
-        category: "CliFx",
-        defaultSeverity: DiagnosticSeverity.Warning,
-        isEnabledByDefault: true
-    );
-
-    private static readonly DiagnosticDescriptor InitOnlyPropertyDiagnostic = new(
-        id: "CLIFX002",
-        title: "Init-only property cannot be source-generated",
-        messageFormat: "Property '{0}' on type '{1}' is init-only and will be skipped by the source generator. Change it to a regular settable property to enable source-generated binding.",
-        category: "CliFx",
-        defaultSeverity: DiagnosticSeverity.Warning,
-        isEnabledByDefault: true
-    );
-
-    private static readonly DiagnosticDescriptor OptionMustHaveNameOrShortNameDiagnostic = new(
-        id: "CLIFX003",
-        title: "Option must have a name or short name",
-        messageFormat: "Option property '{0}' must have either a name or a short name specified",
-        category: "CliFx",
-        defaultSeverity: DiagnosticSeverity.Warning,
-        isEnabledByDefault: true
-    );
-
-    private static readonly DiagnosticDescriptor OptionNameInvalidDiagnostic = new(
-        id: "CLIFX004",
-        title: "Option name is invalid",
-        messageFormat: "Option name '{0}' on property '{1}' is invalid. Option names must be at least 2 characters long, must not start with a dash, and must not contain whitespace.",
-        category: "CliFx",
-        defaultSeverity: DiagnosticSeverity.Warning,
-        isEnabledByDefault: true
-    );
-
-    private static readonly DiagnosticDescriptor ParameterNameEmptyDiagnostic = new(
-        id: "CLIFX005",
-        title: "Parameter name must not be empty",
-        messageFormat: "Parameter name on property '{0}' must not be null or empty",
-        category: "CliFx",
-        defaultSeverity: DiagnosticSeverity.Warning,
-        isEnabledByDefault: true
-    );
-
-    private static readonly DiagnosticDescriptor OptionsMustHaveUniqueNamesDiagnostic = new(
-        id: "CLIFX006",
-        title: "Options must have unique names and short names",
-        messageFormat: "Option '{0}' on type '{1}' has a duplicate {2} '{3}' (also used by '{4}')",
-        category: "CliFx",
-        defaultSeverity: DiagnosticSeverity.Warning,
-        isEnabledByDefault: true
-    );
-
-    private static readonly DiagnosticDescriptor ParametersMustHaveUniqueOrderDiagnostic = new(
-        id: "CLIFX007",
-        title: "Parameters must have unique order values",
-        messageFormat: "Parameter '{0}' on type '{1}' has a duplicate order value {2} (also used by '{3}')",
-        category: "CliFx",
-        defaultSeverity: DiagnosticSeverity.Warning,
-        isEnabledByDefault: true
-    );
-
-    private static readonly DiagnosticDescriptor ParametersMustHaveUniqueNamesDiagnostic = new(
-        id: "CLIFX008",
-        title: "Parameters must have unique names",
-        messageFormat: "Parameter '{0}' on type '{1}' has a duplicate name '{2}' (also used by '{3}')",
-        category: "CliFx",
-        defaultSeverity: DiagnosticSeverity.Warning,
-        isEnabledByDefault: true
-    );
-
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         var commandDeclarations = context
@@ -200,7 +128,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                 {
                     diagnostics.Add(
                         Diagnostic.Create(
-                            ParameterNameEmptyDiagnostic,
+                            DiagnosticDescriptors.ParameterNameEmpty,
                             property.Locations.FirstOrDefault() ?? Location.None,
                             property.Name
                         )
@@ -295,7 +223,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                 {
                     diagnostics.Add(
                         Diagnostic.Create(
-                            OptionMustHaveNameOrShortNameDiagnostic,
+                            DiagnosticDescriptors.OptionMustHaveNameOrShortName,
                             property.Locations.FirstOrDefault() ?? Location.None,
                             property.Name
                         )
@@ -313,7 +241,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                     {
                         diagnostics.Add(
                             Diagnostic.Create(
-                                OptionNameInvalidDiagnostic,
+                                DiagnosticDescriptors.OptionNameInvalid,
                                 property.Locations.FirstOrDefault() ?? Location.None,
                                 optName,
                                 property.Name
@@ -384,7 +312,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                 {
                     diagnostics.Add(
                         Diagnostic.Create(
-                            OptionsMustHaveUniqueNamesDiagnostic,
+                            DiagnosticDescriptors.OptionsMustHaveUniqueNames,
                             b.Property.Locations.FirstOrDefault() ?? Location.None,
                             b.Property.Name,
                             type.Name,
@@ -399,7 +327,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                 {
                     diagnostics.Add(
                         Diagnostic.Create(
-                            OptionsMustHaveUniqueNamesDiagnostic,
+                            DiagnosticDescriptors.OptionsMustHaveUniqueNames,
                             b.Property.Locations.FirstOrDefault() ?? Location.None,
                             b.Property.Name,
                             type.Name,
@@ -424,7 +352,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                 {
                     diagnostics.Add(
                         Diagnostic.Create(
-                            ParametersMustHaveUniqueOrderDiagnostic,
+                            DiagnosticDescriptors.ParametersMustHaveUniqueOrder,
                             b.Property.Locations.FirstOrDefault() ?? Location.None,
                             b.Property.Name,
                             type.Name,
@@ -448,7 +376,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                 {
                     diagnostics.Add(
                         Diagnostic.Create(
-                            ParametersMustHaveUniqueNamesDiagnostic,
+                            DiagnosticDescriptors.ParametersMustHaveUniqueNames,
                             b.Property.Locations.FirstOrDefault() ?? Location.None,
                             b.Property.Name,
                             type.Name,
@@ -502,7 +430,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
 
                 ctx.ReportDiagnostic(
                     Diagnostic.Create(
-                        SchemaPropertyAlreadyDefinedDiagnostic,
+                        DiagnosticDescriptors.SchemaPropertyAlreadyDefined,
                         schemaLocation,
                         command.Type.Name
                     )
@@ -513,7 +441,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             {
                 ctx.ReportDiagnostic(
                     Diagnostic.Create(
-                        InitOnlyPropertyDiagnostic,
+                        DiagnosticDescriptors.InitOnlyProperty,
                         skippedProp.Locations.FirstOrDefault() ?? Location.None,
                         skippedProp.Name,
                         command.Type.Name

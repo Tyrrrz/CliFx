@@ -31,9 +31,15 @@ public partial class CliApplicationBuilder
     /// <summary>
     /// Adds a command to the application.
     /// </summary>
+    [RequiresUnreferencedCode(
+        "Resolves the command schema using reflection. Use AddCommand(CommandSchema) with source-generated schemas for AOT compatibility."
+    )]
     public CliApplicationBuilder AddCommand(Type commandType)
     {
         _commandTypes.Add(commandType);
+        var schema = CommandSchema.TryResolve(commandType);
+        if (schema is not null)
+            _commandSchemas.Add(schema);
         return this;
     }
 
@@ -50,12 +56,18 @@ public partial class CliApplicationBuilder
     /// <summary>
     /// Adds a command to the application.
     /// </summary>
+    [RequiresUnreferencedCode(
+        "Resolves the command schema using reflection. Use AddCommand(CommandSchema) with source-generated schemas for AOT compatibility."
+    )]
     public CliApplicationBuilder AddCommand<TCommand>()
         where TCommand : ICommand => AddCommand(typeof(TCommand));
 
     /// <summary>
     /// Adds multiple commands to the application.
     /// </summary>
+    [RequiresUnreferencedCode(
+        "Resolves command schemas using reflection. Use AddCommand(CommandSchema) with source-generated schemas for AOT compatibility."
+    )]
     public CliApplicationBuilder AddCommands(IEnumerable<Type> commandTypes)
     {
         foreach (var commandType in commandTypes)
