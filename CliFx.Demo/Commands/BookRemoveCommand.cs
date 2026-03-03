@@ -7,10 +7,10 @@ using CliFx.Infrastructure;
 namespace CliFx.Demo.Commands;
 
 [Command("book remove", Description = "Removes a book from the library.")]
-public class BookRemoveCommand(LibraryProvider libraryProvider) : ICommand
+public partial class BookRemoveCommand(LibraryProvider libraryProvider) : ICommand
 {
     [CommandParameter(0, Name = "title", Description = "Title of the book to remove.")]
-    public required string Title { get; init; }
+    public required string Title { get; set; }
 
     public ValueTask ExecuteAsync(IConsole console)
     {

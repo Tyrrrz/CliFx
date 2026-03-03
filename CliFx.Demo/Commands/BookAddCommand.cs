@@ -9,16 +9,16 @@ using CliFx.Infrastructure;
 namespace CliFx.Demo.Commands;
 
 [Command("book add", Description = "Adds a book to the library.")]
-public class BookAddCommand(LibraryProvider libraryProvider) : ICommand
+public partial class BookAddCommand(LibraryProvider libraryProvider) : ICommand
 {
     [CommandParameter(0, Name = "title", Description = "Book title.")]
-    public required string Title { get; init; }
+    public required string Title { get; set; }
 
     [CommandOption("author", 'a', Description = "Book author.")]
-    public required string Author { get; init; }
+    public required string Author { get; set; }
 
     [CommandOption("published", 'p', Description = "Book publish date.")]
-    public DateTimeOffset Published { get; init; } =
+    public DateTimeOffset Published { get; set; } =
         new(
             Random.Shared.Next(1800, 2020),
             Random.Shared.Next(1, 12),
@@ -30,7 +30,7 @@ public class BookAddCommand(LibraryProvider libraryProvider) : ICommand
         );
 
     [CommandOption("isbn", 'n', Description = "Book ISBN.")]
-    public Isbn Isbn { get; init; } =
+    public Isbn Isbn { get; set; } =
         new(
             Random.Shared.Next(0, 999),
             Random.Shared.Next(0, 99),

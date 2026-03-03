@@ -12,5 +12,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CliFx\CliFx.csproj" />
+    <ProjectReference
+      Include="..\CliFx.SourceGeneration\CliFx.SourceGeneration.csproj"
+      ReferenceOutputAssembly="false"
+      OutputItemType="analyzer"
+    />
   </ItemGroup>
 </Project>

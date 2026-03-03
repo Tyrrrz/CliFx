@@ -4,7 +4,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using CliFx.Attributes;
 using CliFx.Infrastructure;
 using CliFx.Schema;
 using CliFx.Utils.Extensions;
@@ -75,57 +74,6 @@ public partial class CliApplicationBuilder
 
         return this;
     }
-
-    /// <summary>
-    /// Adds commands from the specified assembly to the application.
-    /// </summary>
-    /// <remarks>
-    /// This method looks for public non-abstract classes that implement <see cref="ICommand" />
-    /// and are annotated by <see cref="CommandAttribute" />.
-    /// </remarks>
-    [RequiresUnreferencedCode(
-        "Scans assembly types using reflection. Use AddCommand(CommandSchema) with source-generated schemas for AOT compatibility."
-    )]
-    public CliApplicationBuilder AddCommandsFrom(Assembly commandAssembly)
-    {
-        foreach (
-            var commandType in commandAssembly.ExportedTypes.Where(CommandSchema.IsCommandType)
-        )
-            AddCommand(commandType);
-
-        return this;
-    }
-
-    /// <summary>
-    /// Adds commands from the specified assemblies to the application.
-    /// </summary>
-    /// <remarks>
-    /// This method looks for public non-abstract classes that implement <see cref="ICommand" />
-    /// and are annotated by <see cref="CommandAttribute" />.
-    /// </remarks>
-    [RequiresUnreferencedCode(
-        "Scans assembly types using reflection. Use AddCommand(CommandSchema) with source-generated schemas for AOT compatibility."
-    )]
-    public CliApplicationBuilder AddCommandsFrom(IEnumerable<Assembly> commandAssemblies)
-    {
-        foreach (var commandAssembly in commandAssemblies)
-            AddCommandsFrom(commandAssembly);
-
-        return this;
-    }
-
-    /// <summary>
-    /// Adds commands from the calling assembly to the application.
-    /// </summary>
-    /// <remarks>
-    /// This method looks for public non-abstract classes that implement <see cref="ICommand" />
-    /// and are annotated by <see cref="CommandAttribute" />.
-    /// </remarks>
-    [RequiresUnreferencedCode(
-        "Scans assembly types using reflection. Use the source-generated AddCommandsFromThisAssembly() for AOT compatibility."
-    )]
-    public CliApplicationBuilder AddCommandsFromThisAssembly() =>
-        AddCommandsFrom(Assembly.GetCallingAssembly());
 
     /// <summary>
     /// Specifies whether debug mode (enabled with the [debug] directive) is allowed in the application.

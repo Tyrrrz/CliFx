@@ -6,7 +6,7 @@ using CliFx.Infrastructure;
 namespace CliFx.Tests.Dummy.Commands;
 
 [Command("cancel-test")]
-public class CancellationTestCommand : ICommand
+public partial class CancellationTestCommand : ICommand
 {
     public async ValueTask ExecuteAsync(IConsole console)
     {

@@ -46,7 +46,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
         );
     }
 
-    private static CommandDescriptor? TryBuildCommandDescriptor(INamedTypeSymbol type)
+    internal static CommandDescriptor? TryBuildCommandDescriptor(INamedTypeSymbol type)
     {
         // Must implement ICommand
         if (!type.ImplementsInterface(SymbolNames.CliFxCommandInterface))

@@ -15,7 +15,7 @@ public class ApplicationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutp
     {
         // Act
         var app = new CliApplicationBuilder()
-            .AddCommandsFromThisAssembly()
+            .AddCommand<NoOpCommand>()
             .UseConsole(FakeConsole)
             .Build();
 
@@ -31,10 +31,6 @@ public class ApplicationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutp
         // Act
         var app = new CliApplicationBuilder()
             .AddCommand<NoOpCommand>()
-            .AddCommandsFrom(typeof(NoOpCommand).Assembly)
-            .AddCommands([typeof(NoOpCommand)])
-            .AddCommandsFrom([typeof(NoOpCommand).Assembly])
-            .AddCommandsFromThisAssembly()
             .AllowDebugMode()
             .AllowPreviewMode()
             .SetTitle("test")

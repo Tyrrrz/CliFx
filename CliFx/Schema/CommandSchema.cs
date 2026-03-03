@@ -98,17 +98,6 @@ public partial class CommandSchema(
 public partial class CommandSchema
 {
     /// <summary>
-    /// Checks whether the type is a valid command type.
-    /// </summary>
-    [RequiresUnreferencedCode(
-        "Uses reflection to inspect type interfaces and attributes. Not compatible with trimming."
-    )]
-    internal static bool IsCommandType(Type type) =>
-        type.Implements(typeof(ICommand))
-        && type.IsDefined(typeof(CommandAttribute))
-        && type is { IsAbstract: false, IsInterface: false };
-
-    /// <summary>
     /// Tries to resolve the command schema from a CLR type using reflection.
     /// Returns null if the type is not a valid command.
     /// </summary>
@@ -117,7 +106,12 @@ public partial class CommandSchema
     )]
     internal static CommandSchema? TryResolve(Type type)
     {
-        if (!IsCommandType(type))
+        if (
+            !type.Implements(typeof(ICommand))
+            || !type.IsDefined(typeof(CommandAttribute))
+            || type.IsAbstract
+            || type.IsInterface
+        )
             return null;
 
         var attribute = type.GetCustomAttribute<CommandAttribute>();
