@@ -34,9 +34,9 @@ internal static class DiagnosticDescriptors
             true
         );
 
-    public static DiagnosticDescriptor ParameterNameEmpty { get; } =
+    public static DiagnosticDescriptor ParameterMustHaveName { get; } =
         new(
-            $"{nameof(CliFx)}_{nameof(ParameterNameEmpty)}",
+            $"{nameof(CliFx)}_{nameof(ParameterMustHaveName)}",
             "Command parameter name must not be empty",
             "Parameter name on property '{0}' must not be null or empty.",
             "CliFx",

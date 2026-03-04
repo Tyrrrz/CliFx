@@ -194,7 +194,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                 {
                     diagnostics.Add(
                         Diagnostic.Create(
-                            DiagnosticDescriptors.ParameterNameEmpty,
+                            DiagnosticDescriptors.ParameterMustHaveName,
                             property.Locations.FirstOrDefault() ?? Location.None,
                             property.Name
                         )
@@ -461,25 +461,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             }
         }
 
-        var needsHelpOption = !options.Any(o =>
-            string.Equals(o.Name, "help", StringComparison.OrdinalIgnoreCase) || o.ShortName == 'h'
-        );
-        var needsVersionOption =
-            string.IsNullOrWhiteSpace(name)
-            && !options.Any(o =>
-                string.Equals(o.Name, "version", StringComparison.OrdinalIgnoreCase)
-            );
-
-        return new CommandDescriptor(
-            type,
-            name,
-            description,
-            parameters,
-            options,
-            diagnostics,
-            needsHelpOption,
-            needsVersionOption
-        );
+        return new CommandDescriptor(type, name, description, parameters, options, diagnostics);
     }
 
     private static void Execute(
@@ -556,9 +538,20 @@ public class CommandSchemaGenerator : IIncrementalGenerator
 
         // Build interface list inline
         var interfaces = new List<string>();
-        if (command.NeedsHelpOption)
+        // Every command gets a help option unless the user already defined one
+        var needsHelpOption = !command.Options.Any(o =>
+            string.Equals(o.Name, "help", StringComparison.OrdinalIgnoreCase) || o.ShortName == 'h'
+        );
+        // Only default commands get a version option, unless the user already defined one
+        var needsVersionOption =
+            string.IsNullOrWhiteSpace(command.Name)
+            && !command.Options.Any(o =>
+                string.Equals(o.Name, "version", StringComparison.OrdinalIgnoreCase)
+            );
+
+        if (needsHelpOption)
             interfaces.Add("global::CliFx.ICommandWithHelpOption");
-        if (command.NeedsVersionOption)
+        if (needsVersionOption)
             interfaces.Add("global::CliFx.ICommandWithVersionOption");
         var interfaceList =
             interfaces.Count > 0 ? " : " + string.Join(", ", interfaces) : string.Empty;
@@ -571,7 +564,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             """
         );
 
-        if (command.NeedsHelpOption)
+        if (needsHelpOption)
         {
             sb.Append(
                 // lang=csharp
@@ -584,7 +577,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             );
         }
 
-        if (command.NeedsVersionOption)
+        if (needsVersionOption)
         {
             sb.Append(
                 // lang=csharp
@@ -724,7 +717,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             }
         }
 
-        if (command.NeedsHelpOption)
+        if (needsHelpOption)
         {
             sb.Append(
                 // lang=csharp
@@ -746,7 +739,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             );
         }
 
-        if (command.NeedsVersionOption)
+        if (needsVersionOption)
         {
             sb.Append(
                 // lang=csharp

@@ -9,7 +9,5 @@ internal record CommandDescriptor(
     string? Description,
     IReadOnlyList<CommandParameterDescriptor> Parameters,
     IReadOnlyList<CommandOptionDescriptor> Options,
-    IReadOnlyList<Diagnostic> Diagnostics,
-    bool NeedsHelpOption,
-    bool NeedsVersionOption
+    IReadOnlyList<Diagnostic> Diagnostics
 );
