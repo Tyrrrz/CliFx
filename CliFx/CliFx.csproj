@@ -39,7 +39,7 @@
   <!-- Embed the source generator inside the package -->
   <ItemGroup>
     <ProjectReference
-      Include="../CliFx.SourceGeneration/CliFx.SourceGeneration.csproj"
+      Include="..\CliFx.Generators\CliFx.Generators.csproj"
       ReferenceOutputAssembly="false"
       OutputItemType="analyzer"
     />

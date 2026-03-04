@@ -26,7 +26,7 @@
     <ProjectReference Include="..\CliFx.Tests.Dummy\CliFx.Tests.Dummy.csproj" />
     <ProjectReference Include="..\CliFx\CliFx.csproj" />
     <ProjectReference
-      Include="..\CliFx.SourceGeneration\CliFx.SourceGeneration.csproj"
+      Include="..\CliFx.Generators\CliFx.Generators.csproj"
       OutputItemType="analyzer"
     />
   </ItemGroup>
