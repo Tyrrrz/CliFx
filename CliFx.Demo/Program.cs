@@ -5,15 +5,15 @@ using Microsoft.Extensions.DependencyInjection;
 return await new CliApplicationBuilder()
     .SetDescription("Demo application showcasing CliFx features.")
     .AddCommandsFromThisAssembly()
-    .UseTypeActivator(commandTypes =>
+    .UseTypeActivator(commandSchemas =>
     {
         // We use Microsoft.Extensions.DependencyInjection for injecting dependencies in commands
         var services = new ServiceCollection();
         services.AddSingleton<LibraryProvider>();
 
         // Register all commands as transient services
-        foreach (var commandType in commandTypes)
-            services.AddTransient(commandType);
+        foreach (var commandSchema in commandSchemas)
+            services.AddTransient(commandSchema.Type);
 
         return services.BuildServiceProvider();
     })
