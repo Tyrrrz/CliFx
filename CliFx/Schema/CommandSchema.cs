@@ -89,6 +89,12 @@ public partial class CommandSchema(
 
         return result;
     }
+
+    /// <inheritdoc />
+    public override bool Equals(object? obj) => obj is CommandSchema other && Type == other.Type;
+
+    /// <inheritdoc />
+    public override int GetHashCode() => Type.GetHashCode();
 }
 
 /// <inheritdoc cref="CommandSchema" />

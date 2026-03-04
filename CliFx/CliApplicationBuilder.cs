@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using CliFx.Infrastructure;
 using CliFx.Schema;
@@ -27,7 +25,7 @@ public partial class CliApplicationBuilder
     private ITypeActivator? _typeActivator;
 
     /// <summary>
-    /// Adds a command to the application using a pre-built schema (for source-generated path).
+    /// Adds a command to the application.
     /// </summary>
     public CliApplicationBuilder AddCommand(CommandSchema commandSchema)
     {
@@ -142,17 +140,16 @@ public partial class CliApplicationBuilder
 
     /// <summary>
     /// Configures the application to use the specified service provider for activating types.
-    /// This method takes a delegate that receives the list of all added command types, so that you can
+    /// This method takes a delegate that receives the list of all added command schemas, so that you can
     /// easily register them with the service provider.
     /// </summary>
     public CliApplicationBuilder UseTypeActivator(
-        Func<IReadOnlyList<Type>, IServiceProvider> getServiceProvider
-    ) => UseTypeActivator(getServiceProvider(_commandSchemas.Select(s => s.Type).ToArray()));
+        Func<IReadOnlyList<CommandSchema>, IServiceProvider> getServiceProvider
+    ) => UseTypeActivator(getServiceProvider([.. _commandSchemas]));
 
     /// <summary>
     /// Creates a configured instance of <see cref="CliApplication" />.
     /// </summary>
-#pragma warning disable IL3002 // Assembly.Location may return empty string in single-file apps; handled by GetDefaultExecutableName's fallback logic
     public CliApplication Build()
     {
         var metadata = new ApplicationMetadata(
@@ -163,10 +160,9 @@ public partial class CliApplicationBuilder
         );
 
         var configuration = new ApplicationConfiguration(
-            _commandSchemas.Select(s => s.Type).ToArray(),
+            [.. _commandSchemas],
             _isDebugModeAllowed,
-            _isPreviewModeAllowed,
-            [.. _commandSchemas]
+            _isPreviewModeAllowed
         );
 
         return new CliApplication(
@@ -176,7 +172,6 @@ public partial class CliApplicationBuilder
             _typeActivator ?? new DefaultTypeActivator()
         );
     }
-#pragma warning restore IL3002
 }
 
 public partial class CliApplicationBuilder
@@ -195,18 +190,10 @@ public partial class CliApplicationBuilder
         return entryAssemblyName;
     }
 
-    [RequiresAssemblyFiles(
-        "Uses Assembly.Location to determine executable name. Always returns empty string in single-file apps."
-    )]
     private static string GetDefaultExecutableName()
     {
-        var entryAssemblyFilePath = Assembly.GetEntryAssembly()?.Location;
         var processFilePath = Environment.ProcessPath;
-
-        if (
-            string.IsNullOrWhiteSpace(entryAssemblyFilePath)
-            || string.IsNullOrWhiteSpace(processFilePath)
-        )
+        if (string.IsNullOrWhiteSpace(processFilePath))
         {
             throw new InvalidOperationException(
                 "Failed to infer the default application executable name. "
@@ -214,28 +201,7 @@ public partial class CliApplicationBuilder
             );
         }
 
-        // If the process path matches the entry assembly path, it's a legacy .NET Framework app
-        // or a self-contained .NET Core app.
-        if (Path.AreEqual(entryAssemblyFilePath, processFilePath))
-        {
-            return Path.GetFileNameWithoutExtension(entryAssemblyFilePath);
-        }
-
-        // If the process path has the same name and parent directory as the entry assembly path,
-        // but different extension, it's a framework-dependent .NET Core app launched through the apphost.
-        if (
-            Path.AreEqual(Path.ChangeExtension(entryAssemblyFilePath, "exe"), processFilePath)
-            || Path.AreEqual(
-                Path.GetFileNameWithoutExtension(entryAssemblyFilePath),
-                processFilePath
-            )
-        )
-        {
-            return Path.GetFileNameWithoutExtension(entryAssemblyFilePath);
-        }
-
-        // Otherwise, it's a framework-dependent .NET Core app launched through the .NET CLI
-        return "dotnet " + Path.GetFileName(entryAssemblyFilePath);
+        return Path.GetFileNameWithoutExtension(processFilePath);
     }
 
     private static string GetDefaultVersionText()

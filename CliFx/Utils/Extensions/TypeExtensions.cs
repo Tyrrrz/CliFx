@@ -44,24 +44,6 @@ internal static class TypeExtensions
         [RequiresUnreferencedCode(
             "Uses Type.GetMethod() which may not be available after trimming."
         )]
-        public MethodInfo? TryGetStaticParseMethod(bool withFormatProvider = false)
-        {
-            var argumentTypes = withFormatProvider
-                ? new[] { typeof(string), typeof(IFormatProvider) }
-                : new[] { typeof(string) };
-
-            return type.GetMethod(
-                "Parse",
-                BindingFlags.Public | BindingFlags.Static,
-                null,
-                argumentTypes,
-                null
-            );
-        }
-
-        [RequiresUnreferencedCode(
-            "Uses Type.GetMethod() which may not be available after trimming."
-        )]
         public bool IsToStringOverriden()
         {
             var toStringMethod = type.GetMethod(nameof(ToString), Type.EmptyTypes);

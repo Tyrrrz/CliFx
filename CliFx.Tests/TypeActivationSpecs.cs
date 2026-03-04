@@ -154,15 +154,15 @@ public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
         var application = new CliApplicationBuilder()
             .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
-            .UseTypeActivator(commandTypes =>
+            .UseTypeActivator(commandSchemas =>
             {
                 var services = new ServiceCollection();
 
-                foreach (var serviceType in commandTypes)
+                foreach (var schema in commandSchemas)
                 {
                     services.AddSingleton(
-                        serviceType,
-                        Activator.CreateInstance(serviceType, "Hello world")!
+                        schema.Type,
+                        Activator.CreateInstance(schema.Type, "Hello world")!
                     );
                 }
 

@@ -13,16 +13,7 @@ namespace CliFx;
 
 internal class CommandBinder
 {
-    private static object? ConvertSingle(CommandInputSchema schema, string? rawValue)
-    {
-        // Null converter means pass-through (used for string-typed properties)
-        if (schema.Converter is null)
-            return rawValue;
-
-        return schema.Converter.Convert(rawValue);
-    }
-
-    private object? ConvertMember(CommandInputSchema schema, IReadOnlyList<string> rawValues)
+    private object? Convert(CommandInputSchema schema, IReadOnlyList<string> rawValues)
     {
         try
         {
@@ -31,8 +22,6 @@ internal class CommandBinder
             {
                 return schema.CollectionConverter.ConvertMany(rawValues);
             }
-
-            var propertyType = schema.Property.Type;
 
             // Non-scalar (sequence) without a collection converter
             if (schema.IsSequence)
@@ -50,7 +39,12 @@ internal class CommandBinder
             // Scalar
             if (rawValues.Count <= 1)
             {
-                return ConvertSingle(schema, rawValues.SingleOrDefault());
+                var rawValue = rawValues.SingleOrDefault();
+                // Null converter means pass-through (used for string-typed properties)
+                if (schema.Converter is null)
+                    return rawValue;
+
+                return schema.Converter.Convert(rawValue);
             }
         }
         catch (Exception ex) when (ex is not CliFxException)
@@ -107,7 +101,7 @@ internal class CommandBinder
         IReadOnlyList<string> rawValues
     )
     {
-        var convertedValue = ConvertMember(schema, rawValues);
+        var convertedValue = Convert(schema, rawValues);
         ValidateMember(schema, convertedValue);
         try
         {

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
 using CliFx.Attributes;
 using CliFx.Infrastructure;
 
@@ -11,6 +12,6 @@ namespace CliFx;
 internal partial class FallbackDefaultCommand : ICommand
 {
     // Never actually executed
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     public ValueTask ExecuteAsync(IConsole console) => default;
 }

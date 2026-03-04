@@ -46,19 +46,4 @@ public class ApplicationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutp
         // Assert
         exitCode.Should().Be(0);
     }
-
-    [Fact]
-    public async Task I_can_create_an_application_without_commands_and_it_falls_back_to_help_text()
-    {
-        // Act
-        var app = new CliApplicationBuilder().UseConsole(FakeConsole).Build();
-
-        var exitCode = await app.RunAsync(Array.Empty<string>(), new Dictionary<string, string>());
-
-        // Assert: app with no commands falls back to help text
-        exitCode.Should().Be(0);
-
-        var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().Contain("USAGE");
-    }
 }

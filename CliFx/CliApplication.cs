@@ -183,7 +183,7 @@ public class CliApplication(
     {
         try
         {
-            var applicationSchema = new ApplicationSchema(Configuration.CommandSchemas ?? []);
+            var applicationSchema = new ApplicationSchema(Configuration.CommandSchemas);
 
             var commandInput = CommandInput.Parse(
                 commandLineArguments,

@@ -837,10 +837,6 @@ public class CommandSchemaGenerator : IIncrementalGenerator
         if (type is INamedTypeSymbol { ContainingNamespace.Name: "System", Name: "TimeSpan" })
             return "new global::CliFx.Extensibility.TimeSpanBindingConverter()";
 
-        // Guid
-        if (type is INamedTypeSymbol { ContainingNamespace.Name: "System", Name: "Guid" })
-            return "new global::CliFx.Extensibility.GuidBindingConverter()";
-
         // Enum
         if (type.TypeKind == TypeKind.Enum)
             return $"new global::CliFx.Extensibility.EnumBindingConverter<{fqn}>()";

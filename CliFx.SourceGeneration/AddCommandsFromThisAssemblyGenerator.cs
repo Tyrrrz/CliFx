@@ -16,7 +16,7 @@ namespace CliFx.SourceGeneration;
 /// command schemas from the current compilation in one call.
 /// </summary>
 [Generator]
-public class CliApplicationBuilderExtensionsGenerator : IIncrementalGenerator
+public class AddCommandsFromThisAssemblyGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {

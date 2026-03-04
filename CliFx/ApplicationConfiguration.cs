@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using CliFx.Schema;
 
 namespace CliFx;
@@ -8,16 +7,15 @@ namespace CliFx;
 /// Configuration of an application.
 /// </summary>
 public class ApplicationConfiguration(
-    IReadOnlyList<Type> commandTypes,
+    IReadOnlyList<CommandSchema> commandSchemas,
     bool isDebugModeAllowed,
-    bool isPreviewModeAllowed,
-    IReadOnlyList<CommandSchema>? commandSchemas = null
+    bool isPreviewModeAllowed
 )
 {
     /// <summary>
-    /// Command types defined in the application.
+    /// Command schemas registered in the application.
     /// </summary>
-    public IReadOnlyList<Type> CommandTypes { get; } = commandTypes;
+    public IReadOnlyList<CommandSchema> CommandSchemas { get; } = commandSchemas;
 
     /// <summary>
     /// Whether debug mode is allowed in the application.
@@ -28,11 +26,4 @@ public class ApplicationConfiguration(
     /// Whether preview mode is allowed in the application.
     /// </summary>
     public bool IsPreviewModeAllowed { get; } = isPreviewModeAllowed;
-
-    /// <summary>
-    /// Pre-built command schemas (e.g., from the source generator).
-    /// When non-null and non-empty, these are used directly by <see cref="CliApplication" />
-    /// instead of resolving schemas from <see cref="CommandTypes" /> via reflection.
-    /// </summary>
-    public IReadOnlyList<CommandSchema>? CommandSchemas { get; } = commandSchemas;
 }

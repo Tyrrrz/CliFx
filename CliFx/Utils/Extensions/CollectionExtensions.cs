@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace CliFx.Utils.Extensions;
@@ -18,19 +17,6 @@ internal static class CollectionExtensions
                 if (i is not null)
                     yield return i;
             }
-        }
-
-        [RequiresDynamicCode(
-            "Uses Array.CreateInstance which requires dynamic code for AOT scenarios."
-        )]
-        public Array ToNonGenericArray(Type elementType)
-        {
-            var sourceAsCollection = source as ICollection ?? source.ToArray();
-
-            var array = Array.CreateInstance(elementType, sourceAsCollection.Count);
-            sourceAsCollection.CopyTo(array, 0);
-
-            return array;
         }
     }
 
