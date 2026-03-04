@@ -880,7 +880,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                 && SymbolEqualityComparer.Default.Equals(m.ReturnType, type)
             );
         if (parseWithFormatProvider is not null)
-            return $"new global::CliFx.Extensibility.StringInitializableBindingConverter<{fqn}>(s => {fqn}.Parse(s, global::System.Globalization.CultureInfo.InvariantCulture))";
+            return $"new global::CliFx.Extensibility.DelegateBindingConverter<{fqn}>(s => {fqn}.Parse(s!, global::System.Globalization.CultureInfo.InvariantCulture))";
 
         // String-parseable: static T Parse(string)
         var parseMethod = type.GetMembers("Parse")
@@ -893,7 +893,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                 && SymbolEqualityComparer.Default.Equals(m.ReturnType, type)
             );
         if (parseMethod is not null)
-            return $"new global::CliFx.Extensibility.StringInitializableBindingConverter<{fqn}>(s => {fqn}.Parse(s))";
+            return $"new global::CliFx.Extensibility.DelegateBindingConverter<{fqn}>(s => {fqn}.Parse(s!))";
 
         // String-constructable: public constructor(string)
         if (
@@ -904,7 +904,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                 && c.Parameters[0].Type.SpecialType == SpecialType.System_String
             )
         )
-            return $"new global::CliFx.Extensibility.StringInitializableBindingConverter<{fqn}>(s => new {fqn}(s))";
+            return $"new global::CliFx.Extensibility.DelegateBindingConverter<{fqn}>(s => new {fqn}(s!))";
 
         return null;
     }
