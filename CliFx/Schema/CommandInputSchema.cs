@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using CliFx.Extensibility;
@@ -13,8 +12,8 @@ public abstract class CommandInputSchema(
     bool isSequence,
     string? description,
     IBindingConverter? converter,
-    IReadOnlyList<IBindingValidator> validators,
-    ISequenceBindingConverter? sequenceConverter = null
+    ISequenceBindingConverter? sequenceConverter,
+    IReadOnlyList<IBindingValidator> validators
 )
 {
     /// <summary>
@@ -66,36 +65,7 @@ public abstract class CommandInputSchema<
     bool isSequence,
     string? description,
     BindingConverter<TProperty>? converter,
+    SequenceBindingConverter<TProperty>? sequenceConverter,
     IReadOnlyList<IBindingValidator> validators
-) : CommandInputSchema(property, isSequence, description, converter, validators)
+) : CommandInputSchema(property, isSequence, description, converter, sequenceConverter, validators)
     where TCommand : ICommand;
-
-internal static class CommandInputSchemaExtensions
-{
-    public static string GetKind(this CommandInputSchema schema) =>
-        schema switch
-        {
-            CommandParameterSchema => "Parameter",
-            CommandOptionSchema => "Option",
-            _ => throw new InvalidOperationException(
-                $"Unknown input schema type: '{schema.GetType().Name}'."
-            ),
-        };
-
-    public static string GetFormattedIdentifier(this CommandInputSchema schema) =>
-        schema switch
-        {
-            CommandParameterSchema parameter => parameter.IsSequence
-                ? $"<{parameter.Name}...>"
-                : $"<{parameter.Name}>",
-
-            CommandOptionSchema option => option switch
-            {
-                { Name: not null, ShortName: not null } => $"-{option.ShortName}|--{option.Name}",
-                { Name: not null } => $"--{option.Name}",
-                { ShortName: not null } => $"-{option.ShortName}",
-                _ => throw new InvalidOperationException("Option must have a name or short name."),
-            },
-            _ => throw new ArgumentOutOfRangeException(nameof(schema)),
-        };
-}

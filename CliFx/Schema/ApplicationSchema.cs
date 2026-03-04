@@ -8,28 +8,19 @@ namespace CliFx.Schema;
 /// <summary>
 /// Describes the schema of the application, including all registered commands.
 /// </summary>
-public partial class ApplicationSchema(IReadOnlyList<CommandSchema> commands)
+public class ApplicationSchema(IReadOnlyList<CommandSchema> commands)
 {
     /// <summary>
     /// All registered commands.
     /// </summary>
     public IReadOnlyList<CommandSchema> Commands { get; } = commands;
 
-    /// <summary>
-    /// Gets the names of all non-default commands.
-    /// </summary>
-    public IReadOnlyList<string> GetCommandNames() =>
+    internal IReadOnlyList<string> GetCommandNames() =>
         Commands.Select(c => c.Name).WhereNotNullOrWhiteSpace().ToArray();
 
-    /// <summary>
-    /// Tries to find the default command (the one with no name).
-    /// </summary>
-    public CommandSchema? TryFindDefaultCommand() => Commands.FirstOrDefault(c => c.IsDefault);
+    internal CommandSchema? TryFindDefaultCommand() => Commands.FirstOrDefault(c => c.IsDefault);
 
-    /// <summary>
-    /// Tries to find a command by name.
-    /// </summary>
-    public CommandSchema? TryFindCommand(string commandName) =>
+    internal CommandSchema? TryFindCommand(string commandName) =>
         Commands.FirstOrDefault(c => c.MatchesName(commandName));
 
     private IReadOnlyList<CommandSchema> GetDescendantCommands(
@@ -66,16 +57,10 @@ public partial class ApplicationSchema(IReadOnlyList<CommandSchema> commands)
         return result;
     }
 
-    /// <summary>
-    /// Gets all commands that are descendants of the command with the given name.
-    /// </summary>
-    public IReadOnlyList<CommandSchema> GetDescendantCommands(string? parentCommandName) =>
+    internal IReadOnlyList<CommandSchema> GetDescendantCommands(string? parentCommandName) =>
         GetDescendantCommands(Commands, parentCommandName);
 
-    /// <summary>
-    /// Gets the direct child commands of the command with the given name.
-    /// </summary>
-    public IReadOnlyList<CommandSchema> GetChildCommands(string? parentCommandName)
+    internal IReadOnlyList<CommandSchema> GetChildCommands(string? parentCommandName)
     {
         var descendants = GetDescendantCommands(parentCommandName);
 

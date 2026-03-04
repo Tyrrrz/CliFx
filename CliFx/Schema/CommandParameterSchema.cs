@@ -15,9 +15,9 @@ public class CommandParameterSchema(
     bool isRequired,
     string? description,
     IBindingConverter? converter,
-    IReadOnlyList<IBindingValidator> validators,
-    ISequenceBindingConverter? sequenceConverter = null
-) : CommandInputSchema(property, isSequence, description, converter, validators, sequenceConverter)
+    ISequenceBindingConverter? sequenceConverter,
+    IReadOnlyList<IBindingValidator> validators
+) : CommandInputSchema(property, isSequence, description, converter, sequenceConverter, validators)
 {
     /// <summary>
     /// Position order of this parameter.
@@ -50,6 +50,7 @@ public class CommandParameterSchema<
     bool isRequired,
     string? description,
     BindingConverter<TProperty>? converter,
+    SequenceBindingConverter<TProperty>? sequenceConverter,
     IReadOnlyList<IBindingValidator> validators
 )
     : CommandParameterSchema(
@@ -60,6 +61,7 @@ public class CommandParameterSchema<
         isRequired,
         description,
         converter,
+        sequenceConverter,
         validators
     )
     where TCommand : ICommand;

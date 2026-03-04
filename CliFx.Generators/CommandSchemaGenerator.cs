@@ -598,6 +598,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                                     {{(param.IsRequired ? "true" : "false")}},
                                     {{EscapeString(param.Description)}},
                                     {{converterExpr}},
+                                    null,
                                     {{BuildValidatorsExpr(param.ValidatorTypes)}}),
 
                     """
@@ -605,14 +606,14 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             }
             else
             {
-                var SequenceConverterExpr = BuildSequenceConverterExpr(
+                var sequenceConverterExpr = BuildSequenceConverterExpr(
                     param.ConverterType,
                     param.Property
                 );
                 sb.Append(
                     // lang=csharp
                     $$"""
-                                new global::CliFx.Schema.CommandParameterSchema(
+                                new global::CliFx.Schema.CommandParameterSchema<{{commandFqn}}, {{propTypeFqn}}>(
                                     new global::CliFx.Schema.PropertyBinding<{{commandFqn}}, {{propTypeFqn}}>(
                                         "{{param.Property.Name}}",
                                         c => c.{{param.Property.Name}},
@@ -622,9 +623,9 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                                     {{EscapeString(param.Name)}},
                                     {{(param.IsRequired ? "true" : "false")}},
                                     {{EscapeString(param.Description)}},
-                                    null, // element-level converter unused — collection converter handles conversion
-                                    {{BuildValidatorsExpr(param.ValidatorTypes)}},
-                                    {{SequenceConverterExpr}}),
+                                    null,
+                                    {{sequenceConverterExpr}},
+                                    {{BuildValidatorsExpr(param.ValidatorTypes)}}),
 
                     """
                 );
@@ -657,6 +658,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                                     {{(opt.IsRequired ? "true" : "false")}},
                                     {{EscapeString(opt.Description)}},
                                     {{converterExpr}},
+                                    null,
                                     {{BuildValidatorsExpr(opt.ValidatorTypes)}}),
 
                     """
@@ -664,14 +666,14 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             }
             else
             {
-                var SequenceConverterExpr = BuildSequenceConverterExpr(
+                var sequenceConverterExpr = BuildSequenceConverterExpr(
                     opt.ConverterType,
                     opt.Property
                 );
                 sb.Append(
                     // lang=csharp
                     $$"""
-                                new global::CliFx.Schema.CommandOptionSchema(
+                                new global::CliFx.Schema.CommandOptionSchema<{{commandFqn}}, {{propTypeFqn}}>(
                                     new global::CliFx.Schema.PropertyBinding<{{commandFqn}}, {{propTypeFqn}}>(
                                         "{{opt.Property.Name}}",
                                         c => c.{{opt.Property.Name}},
@@ -682,9 +684,9 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                                     {{EscapeString(opt.EnvironmentVariable)}},
                                     {{(opt.IsRequired ? "true" : "false")}},
                                     {{EscapeString(opt.Description)}},
-                                    null, // element-level converter unused — collection converter handles conversion
-                                    {{BuildValidatorsExpr(opt.ValidatorTypes)}},
-                                    {{SequenceConverterExpr}}),
+                                    null,
+                                    {{sequenceConverterExpr}},
+                                    {{BuildValidatorsExpr(opt.ValidatorTypes)}}),
 
                     """
                 );
@@ -708,6 +710,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                                 false,
                                 "Shows help text.",
                                 new global::CliFx.Extensibility.BoolBindingConverter(),
+                                null,
                                 global::System.Array.Empty<global::CliFx.Extensibility.IBindingValidator>()),
 
                 """
@@ -731,6 +734,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                                 false,
                                 "Shows version information.",
                                 new global::CliFx.Extensibility.BoolBindingConverter(),
+                                null,
                                 global::System.Array.Empty<global::CliFx.Extensibility.IBindingValidator>()),
 
                 """

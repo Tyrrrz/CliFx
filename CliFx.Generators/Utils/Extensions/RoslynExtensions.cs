@@ -14,44 +14,49 @@ internal static class RoslynExtensions
     )
         where T : class => source.Where(d => d is not null).Select((d, _) => d!);
 
-    public static bool DisplayNameMatches(this ISymbol symbol, string name) =>
-        string.Equals(
-            symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat),
-            name,
-            StringComparison.Ordinal
-        );
-
-    public static IEnumerable<INamedTypeSymbol> GetBaseTypes(this ITypeSymbol type)
+    extension(ISymbol symbol)
     {
-        var current = type.BaseType;
-
-        while (current is not null)
-        {
-            yield return current;
-            current = current.BaseType;
-        }
+        public bool DisplayNameMatches(string name) =>
+            string.Equals(
+                symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat),
+                name,
+                StringComparison.Ordinal
+            );
     }
 
-    public static ITypeSymbol? TryGetEnumerableUnderlyingType(this ITypeSymbol type) =>
-        type
-            .AllInterfaces.FirstOrDefault(i =>
-                i.ConstructedFrom.SpecialType
-                == SpecialType.System_Collections_Generic_IEnumerable_T
-            )
-            ?.TypeArguments[0];
+    extension(ITypeSymbol type)
+    {
+        public IEnumerable<INamedTypeSymbol> GetBaseTypes()
+        {
+            var current = type.BaseType;
 
-    public static bool IsRequired(this IPropertySymbol property) =>
-        property
-            .DeclaringSyntaxReferences.Select(r => r.GetSyntax())
-            .OfType<PropertyDeclarationSyntax>()
-            .SelectMany(p => p.Modifiers)
-            // SyntaxKind.RequiredKeyword is available in Roslyn 4.11+
-            .Any(m => m.IsKind(SyntaxKind.RequiredKeyword));
+            while (current is not null)
+            {
+                yield return current;
+                current = current.BaseType;
+            }
+        }
 
-    public static bool ImplementsInterface(this ITypeSymbol type, string interfaceName) =>
-        type.AllInterfaces.Any(i => i.DisplayNameMatches(interfaceName))
-        || type.DisplayNameMatches(interfaceName);
+        public ITypeSymbol? TryGetEnumerableUnderlyingType() =>
+            type
+                .AllInterfaces.FirstOrDefault(i =>
+                    i.ConstructedFrom.SpecialType
+                    == SpecialType.System_Collections_Generic_IEnumerable_T
+                )
+                ?.TypeArguments[0];
 
-    public static bool InheritsFrom(this ITypeSymbol type, string baseTypeName) =>
-        type.GetBaseTypes().Any(b => b.ConstructedFrom.DisplayNameMatches(baseTypeName));
+        public bool ImplementsInterface(string interfaceName) =>
+            type.AllInterfaces.Any(i => i.DisplayNameMatches(interfaceName))
+            || type.DisplayNameMatches(interfaceName);
+    }
+
+    extension(IPropertySymbol property)
+    {
+        public bool IsRequired() =>
+            property
+                .DeclaringSyntaxReferences.Select(r => r.GetSyntax())
+                .OfType<PropertyDeclarationSyntax>()
+                .SelectMany(p => p.Modifiers)
+                .Any(m => m.IsKind(SyntaxKind.RequiredKeyword));
+    }
 }
