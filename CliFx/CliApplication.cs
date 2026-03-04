@@ -113,10 +113,22 @@ public class CliApplication(
             commandSchema.GetValues(commandInstance)
         );
 
-        // Handle the help option (checked before binding so that missing required params/options
-        // do not prevent help from being shown when --help is explicitly requested)
+        // Bind the command. Options are bound first so that IsHelpRequested / IsVersionRequested
+        // are set even if subsequent required-option or parameter validation fails.
+        // We capture any binding error so that it can be suppressed when help/version is requested.
+        CliFxException? bindingError = null;
+        try
+        {
+            _commandBinder.Bind(commandInput, commandSchema, commandInstance);
+        }
+        catch (CliFxException ex)
+        {
+            bindingError = ex;
+        }
+
+        // Handle the help option — supersedes any binding error
         if (
-            commandInstance is ICommandWithHelpOption && commandInput.IsHelpOptionSpecified
+            commandInstance is ICommandWithHelpOption { IsHelpRequested: true }
             || commandSchema == FallbackDefaultCommand.Schema && !commandInput.HasArguments
         )
         {
@@ -124,11 +136,25 @@ public class CliApplication(
             return 0;
         }
 
-        // Handle the version option
-        if (commandInstance is ICommandWithVersionOption && commandInput.IsVersionOptionSpecified)
+        // Handle the version option — supersedes any binding error
+        if (commandInstance is ICommandWithVersionOption { IsVersionRequested: true })
         {
             console.WriteLine(Metadata.Version);
             return 0;
+        }
+
+        // If binding failed and neither help nor version was requested, report the error
+        if (bindingError is not null)
+        {
+            console.WriteException(bindingError);
+
+            if (bindingError.ShowHelp)
+            {
+                console.WriteLine();
+                console.WriteHelpText(helpContext);
+            }
+
+            return bindingError.ExitCode;
         }
 
         // Starting from this point, we may produce exceptions that are meant for the
@@ -137,8 +163,6 @@ public class CliApplication(
         // propagate further.
         try
         {
-            // Bind and execute the command
-            _commandBinder.Bind(commandInput, commandSchema, commandInstance);
             await commandInstance.ExecuteAsync(console);
 
             return 0;

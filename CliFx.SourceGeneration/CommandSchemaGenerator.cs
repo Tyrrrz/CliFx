@@ -156,21 +156,6 @@ public class CommandSchemaGenerator : IIncrementalGenerator
 
             if (paramAttr is not null)
             {
-                // Skip init-only properties — generated setter lambda (c, v) => c.Prop = v
-                // does not compile for init accessors.
-                if (property.SetMethod?.IsInitOnly == true)
-                {
-                    diagnostics.Add(
-                        Diagnostic.Create(
-                            DiagnosticDescriptors.InitOnlyProperty,
-                            property.Locations.FirstOrDefault() ?? Location.None,
-                            property.Name,
-                            type.Name
-                        )
-                    );
-                    continue;
-                }
-
                 var order = paramAttr
                     .ConstructorArguments.Where(a =>
                         a.Type?.SpecialType == SpecialType.System_Int32
@@ -252,21 +237,6 @@ public class CommandSchemaGenerator : IIncrementalGenerator
 
             if (optAttr is not null)
             {
-                // Skip init-only properties — generated setter lambda (c, v) => c.Prop = v
-                // does not compile for init accessors.
-                if (property.SetMethod?.IsInitOnly == true)
-                {
-                    diagnostics.Add(
-                        Diagnostic.Create(
-                            DiagnosticDescriptors.InitOnlyProperty,
-                            property.Locations.FirstOrDefault() ?? Location.None,
-                            property.Name,
-                            type.Name
-                        )
-                    );
-                    continue;
-                }
-
                 var optName =
                     optAttr
                         .ConstructorArguments.Where(a =>

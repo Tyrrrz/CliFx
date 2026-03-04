@@ -272,7 +272,9 @@ internal class CommandBinder
         ICommand commandInstance
     )
     {
-        BindParameters(commandInput, commandSchema, commandInstance);
+        // Bind options first so that IsHelpRequested / IsVersionRequested are set
+        // before parameter binding, enabling the caller to check them after Bind() returns.
         BindOptions(commandInput, commandSchema, commandInstance);
+        BindParameters(commandInput, commandSchema, commandInstance);
     }
 }

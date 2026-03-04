@@ -4,16 +4,6 @@ namespace CliFx.SourceGeneration;
 
 internal static class DiagnosticDescriptors
 {
-    public static DiagnosticDescriptor InitOnlyProperty { get; } =
-        new(
-            $"{nameof(CliFx)}_{nameof(InitOnlyProperty)}",
-            "Init-only command property cannot be source-generated",
-            "Property '{0}' on type '{1}' is init-only and will be skipped by the source generator. Change it to a regular settable property to enable source-generated binding.",
-            "CliFx",
-            DiagnosticSeverity.Warning,
-            true
-        );
-
     public static DiagnosticDescriptor OptionMustHaveNameOrShortName { get; } =
         new(
             $"{nameof(CliFx)}_{nameof(OptionMustHaveNameOrShortName)}",

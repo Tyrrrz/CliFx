@@ -8,13 +8,6 @@ internal class OptionInput(string identifier, IReadOnlyList<string> values)
 
     public IReadOnlyList<string> Values { get; } = values;
 
-    public bool IsHelpOption =>
-        string.Equals(Identifier, "help", System.StringComparison.OrdinalIgnoreCase)
-        || (Identifier.Length == 1 && Identifier[0] == 'h');
-
-    public bool IsVersionOption =>
-        string.Equals(Identifier, "version", System.StringComparison.OrdinalIgnoreCase);
-
     public string GetFormattedIdentifier() =>
         Identifier switch
         {
