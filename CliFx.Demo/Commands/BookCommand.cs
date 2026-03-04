@@ -8,10 +8,10 @@ using CliFx.Infrastructure;
 namespace CliFx.Demo.Commands;
 
 [Command("book", Description = "Retrieves a book from the library.")]
-public class BookCommand(LibraryProvider libraryProvider) : ICommand
+public partial class BookCommand(LibraryProvider libraryProvider) : ICommand
 {
     [CommandParameter(0, Name = "title", Description = "Title of the book to retrieve.")]
-    public required string Title { get; init; }
+    public required string Title { get; set; }
 
     public ValueTask ExecuteAsync(IConsole console)
     {

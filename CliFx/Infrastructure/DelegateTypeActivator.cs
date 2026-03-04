@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using CliFx.Exceptions;
 
 namespace CliFx.Infrastructure;
@@ -9,7 +10,10 @@ namespace CliFx.Infrastructure;
 public class DelegateTypeActivator(Func<Type, object> createInstance) : ITypeActivator
 {
     /// <inheritdoc />
-    public object CreateInstance(Type type) =>
+    public object CreateInstance(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
+            Type type
+    ) =>
         createInstance(type)
         ?? throw CliFxException.InternalError(
             $"""

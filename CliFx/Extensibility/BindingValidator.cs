@@ -1,8 +1,17 @@
 ﻿namespace CliFx.Extensibility;
 
-// Used internally to simplify the usage from reflection
-internal interface IBindingValidator
+/// <summary>
+/// Defines custom validation logic for activated command inputs.
+/// </summary>
+/// <remarks>
+/// To implement your own validator, inherit from <see cref="BindingValidator{T}" /> instead.
+/// </remarks>
+public interface IBindingValidator
 {
+    /// <summary>
+    /// Validates the input value.
+    /// Returns <c>null</c> if the validation is successful, or an error in case of failure.
+    /// </summary>
     BindingValidationError? Validate(object? value);
 }
 
@@ -25,10 +34,6 @@ public abstract class BindingValidator<T> : IBindingValidator
     /// Validates the value bound to a parameter or an option.
     /// Returns null if validation is successful, or an error in case of failure.
     /// </summary>
-    /// <remarks>
-    /// You can use the utility methods <see cref="Ok" /> and <see cref="Error" /> to
-    /// create an appropriate result.
-    /// </remarks>
     public abstract BindingValidationError? Validate(T? value);
 
     BindingValidationError? IBindingValidator.Validate(object? value) => Validate((T?)value);

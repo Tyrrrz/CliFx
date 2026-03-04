@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Basic.Reference.Assemblies;
+using CliFx.Schema;
+using CliFx.SourceGeneration;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
@@ -17,7 +19,7 @@ namespace CliFx.Tests.Utils;
 // Language proposal: https://github.com/dotnet/csharplang/discussions/130
 internal static class DynamicCommandBuilder
 {
-    public static IReadOnlyList<Type> CompileMany(string sourceCode)
+    public static IReadOnlyList<CommandSchema> CompileMany(string sourceCode)
     {
         // Get default system namespaces
         var defaultSystemNamespaces = new[]
@@ -68,7 +70,17 @@ internal static class DynamicCommandBuilder
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
         );
 
-        var compilationErrors = compilation
+        // Run the source generator to produce Schema properties on [Command] classes
+        CSharpGeneratorDriver
+            .Create(
+                generators: [new CommandSchemaGenerator().AsSourceGenerator()],
+                parseOptions: CSharpParseOptions.Default.WithLanguageVersion(
+                    LanguageVersion.Preview
+                )
+            )
+            .RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out _);
+
+        var compilationErrors = updatedCompilation
             .GetDiagnostics()
             .Where(d => d.Severity >= DiagnosticSeverity.Error)
             .ToArray();
@@ -85,7 +97,7 @@ internal static class DynamicCommandBuilder
 
         // Emit the code to an in-memory buffer
         using var buffer = new MemoryStream();
-        var emit = compilation.Emit(buffer);
+        var emit = updatedCompilation.Emit(buffer);
 
         var emitErrors = emit
             .Diagnostics.Where(d => d.Severity >= DiagnosticSeverity.Error)
@@ -104,7 +116,7 @@ internal static class DynamicCommandBuilder
         // Load the generated assembly
         var generatedAssembly = Assembly.Load(buffer.ToArray());
 
-        // Return all defined commands
+        // Return schemas for all defined commands via the source-generated Schema property
         var commandTypes = generatedAssembly
             .GetTypes()
             .Where(t => t.IsAssignableTo(typeof(ICommand)) && !t.IsAbstract)
@@ -117,19 +129,25 @@ internal static class DynamicCommandBuilder
             );
         }
 
-        return commandTypes;
+        return commandTypes
+            .Select(t =>
+                (CommandSchema)
+                    t.GetProperty("Schema", BindingFlags.Public | BindingFlags.Static)!
+                        .GetValue(null)!
+            )
+            .ToArray();
     }
 
-    public static Type Compile(string sourceCode)
+    public static CommandSchema Compile(string sourceCode)
     {
-        var commandTypes = CompileMany(sourceCode);
-        if (commandTypes.Count > 1)
+        var commandSchemas = CompileMany(sourceCode);
+        if (commandSchemas.Count > 1)
         {
             throw new InvalidOperationException(
                 "There are more than one command definitions in the provided source code."
             );
         }
 
-        return commandTypes.Single();
+        return commandSchemas.Single();
     }
 }

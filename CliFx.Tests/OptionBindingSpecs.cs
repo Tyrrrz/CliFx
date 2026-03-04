@@ -15,14 +15,14 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
     public async Task I_can_bind_an_option_to_a_property_and_get_the_value_from_the_corresponding_argument_by_name()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption("foo")]
-                public bool Foo { get; init; }
+                public bool Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -34,7 +34,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -52,14 +52,14 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
     public async Task I_can_bind_an_option_to_a_property_and_get_the_value_from_the_corresponding_argument_by_short_name()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption('f')]
-                public bool Foo { get; init; }
+                public bool Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -71,7 +71,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -89,17 +89,17 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
     public async Task I_can_bind_an_option_to_a_property_and_get_the_value_from_the_corresponding_argument_set_by_name()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption("foo")]
-                public string? Foo { get; init; }
+                public string? Foo { get; set; }
 
                 [CommandOption("bar")]
-                public string? Bar { get; init; }
+                public string? Bar { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -113,7 +113,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -134,17 +134,17 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
     public async Task I_can_bind_an_option_to_a_property_and_get_the_value_from_the_corresponding_argument_set_by_short_name()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption('f')]
-                public string? Foo { get; init; }
+                public string? Foo { get; set; }
 
                 [CommandOption('b')]
-                public string? Bar { get; init; }
+                public string? Bar { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -158,7 +158,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -179,17 +179,17 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
     public async Task I_can_bind_an_option_to_a_property_and_get_the_value_from_the_corresponding_argument_stack_by_short_name()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption('f')]
-                public string? Foo { get; init; }
+                public string? Foo { get; set; }
 
                 [CommandOption('b')]
-                public string? Bar { get; init; }
+                public string? Bar { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -203,7 +203,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -224,14 +224,14 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
     public async Task I_can_bind_an_option_to_a_non_scalar_property_and_get_the_values_from_the_corresponding_arguments_by_name()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption("Foo")]
-                public IReadOnlyList<string>? Foo { get; init; }
+                public IReadOnlyList<string>? Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -245,7 +245,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -266,14 +266,14 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
     public async Task I_can_bind_an_option_to_a_non_scalar_property_and_get_the_values_from_the_corresponding_arguments_by_short_name()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption('f')]
-                public IReadOnlyList<string>? Foo { get; init; }
+                public IReadOnlyList<string>? Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -287,7 +287,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -308,14 +308,14 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
     public async Task I_can_bind_an_option_to_a_non_scalar_property_and_get_the_values_from_the_corresponding_argument_sets_by_name()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption("foo")]
-                public IReadOnlyList<string>? Foo { get; init; }
+                public IReadOnlyList<string>? Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -329,7 +329,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -350,14 +350,14 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
     public async Task I_can_bind_an_option_to_a_non_scalar_property_and_get_the_values_from_the_corresponding_argument_sets_by_short_name()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption('f')]
-                public IReadOnlyList<string>? Foo { get; init; }
+                public IReadOnlyList<string>? Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -371,7 +371,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -392,14 +392,14 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
     public async Task I_can_bind_an_option_to_a_non_scalar_property_and_get_the_values_from_the_corresponding_argument_sets_by_name_or_short_name()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption("foo", 'f')]
-                public IReadOnlyList<string>? Foo { get; init; }
+                public IReadOnlyList<string>? Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -413,7 +413,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -434,17 +434,17 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
     public async Task I_can_bind_an_option_to_a_property_and_get_no_value_if_the_user_does_not_provide_the_corresponding_argument()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption("foo")]
-                public string? Foo { get; init; }
+                public string? Foo { get; set; }
 
                 [CommandOption("bar")]
-                public string? Bar { get; init; } = "hello";
+                public string? Bar { get; set; } = "hello";
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -458,7 +458,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -479,51 +479,38 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
     public async Task I_can_bind_an_option_to_a_property_through_multiple_inheritance()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
-            public static class SharedContext
-            {
-                public static int Foo { get; set; }
-
-                public static bool Bar { get; set; }
-            }
-
             public interface IHasFoo : ICommand
             {
-                [CommandOption("foo")]
-                public int Foo
-                {
-                    get => SharedContext.Foo;
-                    init => SharedContext.Foo = value;
-                }
             }
 
             public interface IHasBar : ICommand
             {
-                [CommandOption("bar")]
-                public bool Bar
-                {
-                    get => SharedContext.Bar;
-                    init => SharedContext.Bar = value;
-                }
             }
 
             public interface IHasBaz : ICommand
             {
-                public string? Baz { get; init; }
+                public string? Baz { get; set; }
             }
 
             [Command]
-            public class Command : IHasFoo, IHasBar, IHasBaz
+            public partial class Command : IHasFoo, IHasBar, IHasBaz
             {
+                [CommandOption("foo")]
+                public int Foo { get; set; }
+
+                [CommandOption("bar")]
+                public bool Bar { get; set; }
+
                 [CommandOption("baz")]
-                public string? Baz { get; init; }
+                public string? Baz { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
-                    console.WriteLine("Foo = " + SharedContext.Foo);
-                    console.WriteLine("Bar = " + SharedContext.Bar);
+                    console.WriteLine("Foo = " + Foo);
+                    console.WriteLine("Bar = " + Bar);
                     console.WriteLine("Baz = " + Baz);
 
                     return default;
@@ -533,7 +520,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -551,14 +538,14 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
     public async Task I_can_bind_an_option_to_a_property_and_get_the_correct_value_if_the_user_provides_an_argument_containing_a_negative_number()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption("foo")]
-                public string? Foo { get; init; }
+                public string? Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -570,7 +557,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -591,14 +578,14 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
     public async Task I_can_bind_an_option_to_a_property_with_the_same_identifier_as_the_implicit_help_option_and_get_the_correct_value()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption("help", 'h')]
-                public string? Foo { get; init; }
+                public string? Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -610,7 +597,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -631,14 +618,14 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
     public async Task I_can_bind_an_option_to_a_property_with_the_same_identifier_as_the_implicit_version_option_and_get_the_correct_value()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption("version")]
-                public string? Foo { get; init; }
+                public string? Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -650,7 +637,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -671,14 +658,14 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
     public async Task I_can_try_to_bind_a_required_option_to_a_property_and_get_an_error_if_the_user_does_not_provide_the_corresponding_argument()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption("foo")]
-                public required string Foo { get; init; }
+                public required string Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -686,7 +673,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -707,14 +694,14 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
     public async Task I_can_try_to_bind_a_required_option_to_a_property_and_get_an_error_if_the_user_provides_an_empty_argument()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption("foo")]
-                public required string Foo { get; init; }
+                public required string Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -722,7 +709,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -740,14 +727,14 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
     public async Task I_can_try_to_bind_an_option_to_a_non_scalar_property_and_get_an_error_if_the_user_does_not_provide_at_least_one_corresponding_argument()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption("foo")]
-                public required IReadOnlyList<string> Foo { get; init; }
+                public required IReadOnlyList<string> Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -755,7 +742,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -773,14 +760,14 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
     public async Task I_can_try_to_bind_options_and_get_an_error_if_the_user_provides_unrecognized_arguments()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption("foo")]
-                public string? Foo { get; init; }
+                public string? Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -788,7 +775,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -809,14 +796,14 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
     public async Task I_can_try_to_bind_an_option_to_a_scalar_property_and_get_an_error_if_the_user_provides_too_many_arguments()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption("foo")]
-                public string? Foo { get; init; }
+                public string? Foo { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -824,7 +811,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 

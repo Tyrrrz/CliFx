@@ -44,11 +44,11 @@ public class DirectivesSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
     public async Task I_can_use_the_preview_directive_to_make_the_application_print_the_parsed_command_input()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command("cmd")]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -56,7 +56,7 @@ public class DirectivesSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .AllowPreviewMode()
             .Build();

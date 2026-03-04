@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using CliFx.Schema;
 
 namespace CliFx;
 
@@ -7,15 +7,15 @@ namespace CliFx;
 /// Configuration of an application.
 /// </summary>
 public class ApplicationConfiguration(
-    IReadOnlyList<Type> commandTypes,
+    IReadOnlyList<CommandSchema> commandSchemas,
     bool isDebugModeAllowed,
     bool isPreviewModeAllowed
 )
 {
     /// <summary>
-    /// Command types defined in the application.
+    /// Command schemas registered in the application.
     /// </summary>
-    public IReadOnlyList<Type> CommandTypes { get; } = commandTypes;
+    public IReadOnlyList<CommandSchema> CommandSchemas { get; } = commandSchemas;
 
     /// <summary>
     /// Whether debug mode is allowed in the application.

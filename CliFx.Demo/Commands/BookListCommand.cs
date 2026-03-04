@@ -7,7 +7,7 @@ using CliFx.Infrastructure;
 namespace CliFx.Demo.Commands;
 
 [Command("book list", Description = "Lists all books in the library.")]
-public class BookListCommand(LibraryProvider libraryProvider) : ICommand
+public partial class BookListCommand(LibraryProvider libraryProvider) : ICommand
 {
     public ValueTask ExecuteAsync(IConsole console)
     {

@@ -22,7 +22,7 @@ public class CliApplication(
     ITypeActivator typeActivator
 )
 {
-    private readonly CommandBinder _commandBinder = new(typeActivator);
+    private readonly CommandBinder _commandBinder = new();
 
     /// <summary>
     /// Application metadata.
@@ -40,16 +40,6 @@ public class CliApplication(
     private bool IsPreviewModeEnabled(CommandInput commandInput) =>
         Configuration.IsPreviewModeAllowed && commandInput.IsPreviewDirectiveSpecified;
 
-    private bool ShouldShowHelpText(CommandSchema commandSchema, CommandInput commandInput) =>
-        commandSchema.IsImplicitHelpOptionAvailable && commandInput.IsHelpOptionSpecified
-        ||
-        // Show help text also if the fallback default command is executed without any arguments
-        commandSchema == FallbackDefaultCommand.Schema
-            && !commandInput.HasArguments;
-
-    private bool ShouldShowVersionText(CommandSchema commandSchema, CommandInput commandInput) =>
-        commandSchema.IsImplicitVersionOptionAvailable && commandInput.IsVersionOptionSpecified;
-
     private async ValueTask PromptDebuggerAsync()
     {
         using (console.WithForegroundColor(ConsoleColor.Green))
@@ -66,6 +56,11 @@ public class CliApplication(
             await Task.Delay(100);
     }
 
+    // WriteHelpText uses TryGetValidValues() which relies on reflection for enum valid values display.
+    // This is suppressed here because the public RunAsync is the user-facing entry point and marking it
+    // with [RequiresUnreferencedCode] would be too disruptive. For full AOT compatibility, the source
+    // generator should emit valid enum values statically (see PropertyBinding.TryGetValidValues).
+#pragma warning disable IL2026
     private async ValueTask<int> RunAsync(
         ApplicationSchema applicationSchema,
         CommandInput commandInput
@@ -118,18 +113,48 @@ public class CliApplication(
             commandSchema.GetValues(commandInstance)
         );
 
-        // Handle the help option
-        if (ShouldShowHelpText(commandSchema, commandInput))
+        // Bind the command. Options are bound first so that IsHelpRequested / IsVersionRequested
+        // are set even if subsequent required-option or parameter validation fails.
+        // We capture any binding error so that it can be suppressed when help/version is requested.
+        CliFxException? bindingError = null;
+        try
+        {
+            _commandBinder.Bind(commandInput, commandSchema, commandInstance);
+        }
+        catch (CliFxException ex)
+        {
+            bindingError = ex;
+        }
+
+        // Handle the help option — supersedes any binding error
+        if (
+            commandInstance is ICommandWithHelpOption { IsHelpRequested: true }
+            || commandSchema == FallbackDefaultCommand.Schema && !commandInput.HasArguments
+        )
         {
             console.WriteHelpText(helpContext);
             return 0;
         }
 
-        // Handle the version option
-        if (ShouldShowVersionText(commandSchema, commandInput))
+        // Handle the version option — supersedes any binding error
+        if (commandInstance is ICommandWithVersionOption { IsVersionRequested: true })
         {
             console.WriteLine(Metadata.Version);
             return 0;
+        }
+
+        // If binding failed and neither help nor version was requested, report the error
+        if (bindingError is not null)
+        {
+            console.WriteException(bindingError);
+
+            if (bindingError.ShowHelp)
+            {
+                console.WriteLine();
+                console.WriteHelpText(helpContext);
+            }
+
+            return bindingError.ExitCode;
         }
 
         // Starting from this point, we may produce exceptions that are meant for the
@@ -138,8 +163,6 @@ public class CliApplication(
         // propagate further.
         try
         {
-            // Bind and execute the command
-            _commandBinder.Bind(commandInput, commandSchema, commandInstance);
             await commandInstance.ExecuteAsync(console);
 
             return 0;
@@ -157,6 +180,7 @@ public class CliApplication(
             return ex.ExitCode;
         }
     }
+#pragma warning restore IL2026
 
     /// <summary>
     /// Runs the application with the specified command-line arguments and environment variables.
@@ -173,7 +197,7 @@ public class CliApplication(
     {
         try
         {
-            var applicationSchema = ApplicationSchema.Resolve(Configuration.CommandTypes);
+            var applicationSchema = new ApplicationSchema(Configuration.CommandSchemas);
 
             var commandInput = CommandInput.Parse(
                 commandLineArguments,

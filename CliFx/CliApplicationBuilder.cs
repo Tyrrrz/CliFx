@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using CliFx.Attributes;
 using CliFx.Infrastructure;
 using CliFx.Schema;
 using CliFx.Utils.Extensions;
@@ -15,7 +13,7 @@ namespace CliFx;
 /// </summary>
 public partial class CliApplicationBuilder
 {
-    private readonly HashSet<Type> _commandTypes = [];
+    private readonly HashSet<CommandSchema> _commandSchemas = [];
 
     private bool _isDebugModeAllowed = true;
     private bool _isPreviewModeAllowed = true;
@@ -29,70 +27,22 @@ public partial class CliApplicationBuilder
     /// <summary>
     /// Adds a command to the application.
     /// </summary>
-    public CliApplicationBuilder AddCommand(Type commandType)
+    public CliApplicationBuilder AddCommand(CommandSchema commandSchema)
     {
-        _commandTypes.Add(commandType);
+        _commandSchemas.Add(commandSchema);
         return this;
     }
-
-    /// <summary>
-    /// Adds a command to the application.
-    /// </summary>
-    public CliApplicationBuilder AddCommand<TCommand>()
-        where TCommand : ICommand => AddCommand(typeof(TCommand));
 
     /// <summary>
     /// Adds multiple commands to the application.
     /// </summary>
-    public CliApplicationBuilder AddCommands(IEnumerable<Type> commandTypes)
+    public CliApplicationBuilder AddCommands(IEnumerable<CommandSchema> commandSchemas)
     {
-        foreach (var commandType in commandTypes)
-            AddCommand(commandType);
+        foreach (var commandSchema in commandSchemas)
+            AddCommand(commandSchema);
 
         return this;
     }
-
-    /// <summary>
-    /// Adds commands from the specified assembly to the application.
-    /// </summary>
-    /// <remarks>
-    /// This method looks for public non-abstract classes that implement <see cref="ICommand" />
-    /// and are annotated by <see cref="CommandAttribute" />.
-    /// </remarks>
-    public CliApplicationBuilder AddCommandsFrom(Assembly commandAssembly)
-    {
-        foreach (
-            var commandType in commandAssembly.ExportedTypes.Where(CommandSchema.IsCommandType)
-        )
-            AddCommand(commandType);
-
-        return this;
-    }
-
-    /// <summary>
-    /// Adds commands from the specified assemblies to the application.
-    /// </summary>
-    /// <remarks>
-    /// This method looks for public non-abstract classes that implement <see cref="ICommand" />
-    /// and are annotated by <see cref="CommandAttribute" />.
-    /// </remarks>
-    public CliApplicationBuilder AddCommandsFrom(IEnumerable<Assembly> commandAssemblies)
-    {
-        foreach (var commandAssembly in commandAssemblies)
-            AddCommandsFrom(commandAssembly);
-
-        return this;
-    }
-
-    /// <summary>
-    /// Adds commands from the calling assembly to the application.
-    /// </summary>
-    /// <remarks>
-    /// This method looks for public non-abstract classes that implement <see cref="ICommand" />
-    /// and are annotated by <see cref="CommandAttribute" />.
-    /// </remarks>
-    public CliApplicationBuilder AddCommandsFromThisAssembly() =>
-        AddCommandsFrom(Assembly.GetCallingAssembly());
 
     /// <summary>
     /// Specifies whether debug mode (enabled with the [debug] directive) is allowed in the application.
@@ -190,12 +140,12 @@ public partial class CliApplicationBuilder
 
     /// <summary>
     /// Configures the application to use the specified service provider for activating types.
-    /// This method takes a delegate that receives the list of all added command types, so that you can
-    /// easily register them with the service provider.
+    /// This method takes a delegate that receives the list of all added command schemas, so that you can
+    /// easily register their types with the service provider.
     /// </summary>
     public CliApplicationBuilder UseTypeActivator(
-        Func<IReadOnlyList<Type>, IServiceProvider> getServiceProvider
-    ) => UseTypeActivator(getServiceProvider(_commandTypes.ToArray()));
+        Func<IReadOnlyList<CommandSchema>, IServiceProvider> getServiceProvider
+    ) => UseTypeActivator(getServiceProvider([.. _commandSchemas]));
 
     /// <summary>
     /// Creates a configured instance of <see cref="CliApplication" />.
@@ -210,7 +160,7 @@ public partial class CliApplicationBuilder
         );
 
         var configuration = new ApplicationConfiguration(
-            _commandTypes.ToArray(),
+            [.. _commandSchemas],
             _isDebugModeAllowed,
             _isPreviewModeAllowed
         );
@@ -242,13 +192,8 @@ public partial class CliApplicationBuilder
 
     private static string GetDefaultExecutableName()
     {
-        var entryAssemblyFilePath = Assembly.GetEntryAssembly()?.Location;
         var processFilePath = Environment.ProcessPath;
-
-        if (
-            string.IsNullOrWhiteSpace(entryAssemblyFilePath)
-            || string.IsNullOrWhiteSpace(processFilePath)
-        )
+        if (string.IsNullOrWhiteSpace(processFilePath))
         {
             throw new InvalidOperationException(
                 "Failed to infer the default application executable name. "
@@ -256,28 +201,7 @@ public partial class CliApplicationBuilder
             );
         }
 
-        // If the process path matches the entry assembly path, it's a legacy .NET Framework app
-        // or a self-contained .NET Core app.
-        if (Path.AreEqual(entryAssemblyFilePath, processFilePath))
-        {
-            return Path.GetFileNameWithoutExtension(entryAssemblyFilePath);
-        }
-
-        // If the process path has the same name and parent directory as the entry assembly path,
-        // but different extension, it's a framework-dependent .NET Core app launched through the apphost.
-        if (
-            Path.AreEqual(Path.ChangeExtension(entryAssemblyFilePath, "exe"), processFilePath)
-            || Path.AreEqual(
-                Path.GetFileNameWithoutExtension(entryAssemblyFilePath),
-                processFilePath
-            )
-        )
-        {
-            return Path.GetFileNameWithoutExtension(entryAssemblyFilePath);
-        }
-
-        // Otherwise, it's a framework-dependent .NET Core app launched through the .NET CLI
-        return "dotnet " + Path.GetFileName(entryAssemblyFilePath);
+        return Path.GetFileNameWithoutExtension(processFilePath);
     }
 
     private static string GetDefaultVersionText()

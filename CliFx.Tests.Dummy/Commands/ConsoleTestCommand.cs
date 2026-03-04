@@ -6,7 +6,7 @@ using CliFx.Infrastructure;
 namespace CliFx.Tests.Dummy.Commands;
 
 [Command("console-test")]
-public class ConsoleTestCommand : ICommand
+public partial class ConsoleTestCommand : ICommand
 {
     public ValueTask ExecuteAsync(IConsole console)
     {

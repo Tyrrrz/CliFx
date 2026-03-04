@@ -9,7 +9,7 @@ namespace CliFx.Benchmarks;
 public partial class Benchmarks
 {
     [Command]
-    public class CliFxCommand : ICommand
+    public partial class CliFxCommand : ICommand
     {
         [CommandOption("str", 's')]
         public string? StrOption { get; set; }
@@ -26,7 +26,7 @@ public partial class Benchmarks
     [Benchmark(Description = "CliFx", Baseline = true)]
     public async ValueTask<int> ExecuteWithCliFx() =>
         await new CliApplicationBuilder()
-            .AddCommand<CliFxCommand>()
+            .AddCommand(CliFxCommand.Schema)
             .Build()
             .RunAsync(Arguments, new Dictionary<string, string>());
 }

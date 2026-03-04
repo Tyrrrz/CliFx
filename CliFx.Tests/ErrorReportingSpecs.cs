@@ -15,11 +15,11 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
     public async Task I_can_throw_an_exception_in_a_command_to_report_an_error_with_a_stacktrace()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console) =>
                     throw new Exception("Something went wrong");
@@ -28,7 +28,7 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -54,11 +54,11 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
     public async Task I_can_throw_an_exception_with_an_inner_exception_in_a_command_to_report_an_error_with_a_stacktrace()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console) =>
                     throw new Exception("Something went wrong", new Exception("Another exception"));
@@ -67,7 +67,7 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -100,11 +100,11 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
     public async Task I_can_throw_an_exception_in_a_command_to_report_an_error_and_exit_with_the_specified_code()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console) =>
                     throw new CommandException("Something went wrong", 69);
@@ -113,7 +113,7 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -137,11 +137,11 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
     public async Task I_can_throw_an_exception_without_a_message_in_a_command_to_report_an_error_with_a_stacktrace()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console) =>
                     throw new CommandException("", 69);
@@ -150,7 +150,7 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -174,11 +174,11 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
     public async Task I_can_throw_an_exception_in_a_command_to_report_an_error_and_print_the_help_text()
     {
         // Arrange
-        var commandType = DynamicCommandBuilder.Compile(
+        var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console) =>
                     throw new CommandException("Something went wrong", 69, true);
@@ -187,7 +187,7 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandType)
+            .AddCommand(commandSchema)
             .UseConsole(FakeConsole)
             .SetDescription("This will be in help text")
             .Build();
