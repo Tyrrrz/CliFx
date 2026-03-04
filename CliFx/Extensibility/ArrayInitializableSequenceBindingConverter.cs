@@ -5,14 +5,14 @@ namespace CliFx.Extensibility;
 
 /// <summary>
 /// Collection converter that first converts raw values into a <typeparamref name="TElement" /> array
-/// (via an <see cref="ArrayCollectionBindingConverter{TElement}" /> created internally) and then produces
+/// (via an <see cref="ArraySequenceBindingConverter{TElement}" /> created internally) and then produces
 /// the final <typeparamref name="TCollection" /> using a caller-supplied factory delegate.
 /// Suitable for array-initializable concrete collection types such as <see cref="System.Collections.Generic.List{T}" />.
 /// </summary>
-public class ArrayInitializableCollectionBindingConverter<TElement, TCollection>
-    : CollectionBindingConverter<TCollection>
+public class ArrayInitializableSequenceBindingConverter<TElement, TCollection>
+    : SequenceBindingConverter<TCollection>
 {
-    private readonly ArrayCollectionBindingConverter<TElement> _arrayConverter;
+    private readonly ArraySequenceBindingConverter<TElement> _arrayConverter;
     private readonly Func<TElement[], TCollection> _collectionFactory;
 
     /// <summary>
@@ -20,12 +20,12 @@ public class ArrayInitializableCollectionBindingConverter<TElement, TCollection>
     /// </summary>
     /// <param name="elementConverter">Per-element converter; <see langword="null" /> means string pass-through.</param>
     /// <param name="collectionFactory">Factory that constructs the target collection from the element array.</param>
-    public ArrayInitializableCollectionBindingConverter(
+    public ArrayInitializableSequenceBindingConverter(
         BindingConverter<TElement>? elementConverter,
         Func<TElement[], TCollection> collectionFactory
     )
     {
-        _arrayConverter = new ArrayCollectionBindingConverter<TElement>(elementConverter);
+        _arrayConverter = new ArraySequenceBindingConverter<TElement>(elementConverter);
         _collectionFactory = collectionFactory;
     }
 

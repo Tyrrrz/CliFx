@@ -61,5 +61,5 @@ public sealed class CommandParameterAttribute(int order) : Attribute
     /// <remarks>
     /// Validators must derive from <see cref="BindingValidator{T}" />.
     /// </remarks>
-    public Type[] Validators { get; set; } = Array.Empty<Type>();
+    public Type[] Validators { get; set; } = [];
 }

@@ -92,10 +92,7 @@ public class CancellationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOut
         FakeConsole.RequestCancellation(TimeSpan.FromSeconds(0.2));
 
         // Act
-        var exitCode = await application.RunAsync(
-            Array.Empty<string>(),
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync([], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().NotBe(0);

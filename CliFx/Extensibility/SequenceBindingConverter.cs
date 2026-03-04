@@ -6,9 +6,9 @@ namespace CliFx.Extensibility;
 /// Defines custom conversion logic for activating sequence command inputs from multiple raw command-line arguments.
 /// </summary>
 /// <remarks>
-/// To implement your own collection converter, inherit from <see cref="CollectionBindingConverter{T}" /> instead.
+/// To implement your own collection converter, inherit from <see cref="SequenceBindingConverter{T}" /> instead.
 /// </remarks>
-public interface ICollectionBindingConverter
+public interface ISequenceBindingConverter
 {
     /// <summary>
     /// Converts multiple raw command-line argument values into the target collection type.
@@ -19,13 +19,13 @@ public interface ICollectionBindingConverter
 /// <summary>
 /// Base type for custom collection converters.
 /// </summary>
-public abstract class CollectionBindingConverter<T> : ICollectionBindingConverter
+public abstract class SequenceBindingConverter<T> : ISequenceBindingConverter
 {
     /// <summary>
     /// Converts multiple raw command-line argument values into the target collection type.
     /// </summary>
     public abstract T ConvertMany(IReadOnlyList<string?> rawValues);
 
-    object? ICollectionBindingConverter.ConvertMany(IReadOnlyList<string?> rawValues) =>
+    object? ISequenceBindingConverter.ConvertMany(IReadOnlyList<string?> rawValues) =>
         ConvertMany(rawValues);
 }

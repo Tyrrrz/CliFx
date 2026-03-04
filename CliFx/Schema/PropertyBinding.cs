@@ -9,15 +9,20 @@ namespace CliFx.Schema;
 /// Provides read and write access to a CLR property.
 /// </summary>
 public class PropertyBinding(
-    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] Type type,
+    string name,
+    Type type,
     Func<object, object?> getValue,
     Action<object, object?> setValue
 )
 {
     /// <summary>
+    /// Property name.
+    /// </summary>
+    public string Name { get; } = name;
+
+    /// <summary>
     /// Underlying CLR type of the property.
     /// </summary>
-    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)]
     public Type Type { get; } = type;
 
     /// <summary>
@@ -63,11 +68,13 @@ public class PropertyBinding(
 /// <remarks>
 /// Generic version used by source-generated code for static type references and AOT compatibility.
 /// </remarks>
-public class PropertyBinding<
-    TObject,
-    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] TProperty
->(Func<TObject, TProperty?> getValue, Action<TObject, TProperty?> setValue)
+public class PropertyBinding<TObject, TProperty>(
+    string name,
+    Func<TObject, TProperty?> getValue,
+    Action<TObject, TProperty?> setValue
+)
     : PropertyBinding(
+        name,
         typeof(TProperty),
         o => getValue((TObject)o),
         (o, v) => setValue((TObject)o, (TProperty?)v)

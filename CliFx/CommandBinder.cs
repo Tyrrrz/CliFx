@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 using CliFx.Exceptions;
 using CliFx.Extensibility;
-using CliFx.Infrastructure;
 using CliFx.Input;
 using CliFx.Schema;
 using CliFx.Utils.Extensions;
@@ -17,34 +16,31 @@ internal class CommandBinder
     {
         try
         {
-            // Non-scalar (sequence) with a collection converter (AOT-compatible path)
-            if (schema.IsSequence && schema.CollectionConverter is not null)
+            // Sequence input with a sequence converter
+            if (schema.IsSequence && schema.SequenceConverter is not null)
             {
-                return schema.CollectionConverter.ConvertMany(rawValues);
+                return schema.SequenceConverter.ConvertMany(rawValues);
             }
 
-            // Non-scalar (sequence) without a collection converter
+            // Sequence input without a sequence converter
             if (schema.IsSequence)
             {
                 throw CliFxException.InternalError(
                     $"""
                     {schema.GetKind()} {schema.GetFormattedIdentifier()} is a sequence property but has no collection converter.
                     To fix this, use the source generator or provide a custom {nameof(
-                        ICollectionBindingConverter
+                        ISequenceBindingConverter
                     )} via the Converter attribute property.
                     """
                 );
             }
 
-            // Scalar
+            // Scalar input
             if (rawValues.Count <= 1)
             {
                 var rawValue = rawValues.SingleOrDefault();
-                // Null converter means pass-through (used for string-typed properties)
-                if (schema.Converter is null)
-                    return rawValue;
 
-                return schema.Converter.Convert(rawValue);
+                return schema.Converter is not null ? schema.Converter.Convert(rawValue) : rawValue;
             }
         }
         catch (Exception ex) when (ex is not CliFxException)
@@ -103,6 +99,7 @@ internal class CommandBinder
     {
         var convertedValue = Convert(schema, rawValues);
         ValidateMember(schema, convertedValue);
+
         try
         {
             schema.Property.SetValue(commandInstance, convertedValue);
@@ -126,18 +123,16 @@ internal class CommandBinder
 
     private void BindParameters(
         CommandInput commandInput,
-        CommandSchema commandSchema,
-        ICommand commandInstance
+        IReadOnlyList<CommandParameterSchema> parameterSchemas,
+        ICommand commandInstance,
+        bool reportUnrecognizedAndMissing = true
     )
     {
         var remainingParameterInputs = commandInput.Parameters.ToList();
-        var remainingRequiredParameterSchemas = commandSchema
-            .Parameters.Where(p => p.IsRequired)
-            .ToList();
+        var remainingRequiredParameterSchemas = parameterSchemas.Where(p => p.IsRequired).ToList();
 
         var position = 0;
-
-        foreach (var parameterSchema in commandSchema.Parameters.OrderBy(p => p.Order))
+        foreach (var parameterSchema in parameterSchemas.OrderBy(p => p.Order))
         {
             if (position >= commandInput.Parameters.Count)
                 break;
@@ -167,46 +162,47 @@ internal class CommandBinder
             remainingRequiredParameterSchemas.Remove(parameterSchema);
         }
 
-        if (remainingParameterInputs.Any())
+        if (reportUnrecognizedAndMissing && remainingParameterInputs.Any())
         {
             throw CliFxException.UserError(
                 $"""
-                Unexpected parameter(s):
+                Unrecognized parameter(s):
                 {remainingParameterInputs.Select(p => p.GetFormattedIdentifier()).JoinToString(" ")}
                 """
             );
         }
 
-        if (remainingRequiredParameterSchemas.Any())
+        if (reportUnrecognizedAndMissing && remainingRequiredParameterSchemas.Any())
         {
             throw CliFxException.UserError(
                 $"""
-                Missing required parameter(s):
-                {remainingRequiredParameterSchemas
-                    .Select(p => p.GetFormattedIdentifier())
-                    .JoinToString(" ")}
-                """
+                 Missing required parameter(s):
+                 {remainingRequiredParameterSchemas
+                     .Select(p => p.GetFormattedIdentifier())
+                     .JoinToString(" ")}
+                 """
             );
         }
     }
 
-    private void BindOptions(
+    private void BindParameters(
         CommandInput commandInput,
         CommandSchema commandSchema,
         ICommand commandInstance
+    ) => BindParameters(commandInput, commandSchema.Parameters, commandInstance);
+
+    private void BindOptions(
+        CommandInput commandInput,
+        IReadOnlyList<CommandOptionSchema> optionSchemas,
+        ICommand commandInstance,
+        bool reportUnrecognizedAndMissing = true
     )
     {
         var remainingOptionInputs = commandInput.Options.ToList();
-        var remainingRequiredOptionSchemas = commandSchema
-            .Options.Where(o => o.IsRequired)
-            .ToList();
+        var remainingRequiredOptionSchemas = optionSchemas.Where(o => o.IsRequired).ToList();
 
-        foreach (var optionSchema in commandSchema.Options)
+        foreach (var optionSchema in optionSchemas)
         {
-            // Skip implicit options (no property binding)
-            if (optionSchema.Property is NullPropertyBinding)
-                continue;
-
             var optionInputs = commandInput
                 .Options.Where(o => optionSchema.MatchesIdentifier(o.Identifier))
                 .ToArray();
@@ -243,7 +239,7 @@ internal class CommandBinder
             remainingOptionInputs.RemoveRange(optionInputs);
         }
 
-        if (remainingOptionInputs.Any())
+        if (reportUnrecognizedAndMissing && remainingOptionInputs.Any())
         {
             throw CliFxException.UserError(
                 $"""
@@ -253,7 +249,7 @@ internal class CommandBinder
             );
         }
 
-        if (remainingRequiredOptionSchemas.Any())
+        if (reportUnrecognizedAndMissing && remainingRequiredOptionSchemas.Any())
         {
             throw CliFxException.UserError(
                 $"""
@@ -266,15 +262,61 @@ internal class CommandBinder
         }
     }
 
+    private void BindOptions(
+        CommandInput commandInput,
+        CommandSchema commandSchema,
+        ICommand commandInstance
+    ) => BindOptions(commandInput, commandSchema.Options, commandInstance);
+
+    public void BindHelpAndVersionOptions(
+        CommandInput commandInput,
+        CommandSchema commandSchema,
+        ICommand commandInstance
+    )
+    {
+        var options = new List<CommandOptionSchema>(2);
+
+        if (commandInstance is ICommandWithHelpOption)
+        {
+            var option = commandSchema.Options.FirstOrDefault(o =>
+                string.Equals(
+                    o.Property.Name,
+                    nameof(ICommandWithHelpOption.IsHelpRequested),
+                    StringComparison.OrdinalIgnoreCase
+                )
+            );
+
+            if (option is not null)
+                options.Add(option);
+        }
+
+        if (commandInstance is ICommandWithVersionOption)
+        {
+            var option = commandSchema.Options.FirstOrDefault(o =>
+                string.Equals(
+                    o.Property.Name,
+                    nameof(ICommandWithVersionOption.IsVersionRequested),
+                    StringComparison.OrdinalIgnoreCase
+                )
+            );
+
+            if (option is not null)
+                options.Add(option);
+        }
+
+        if (!options.Any())
+            return;
+
+        BindOptions(commandInput, options, commandInstance, false);
+    }
+
     public void Bind(
         CommandInput commandInput,
         CommandSchema commandSchema,
         ICommand commandInstance
     )
     {
-        // Bind options first so that IsHelpRequested / IsVersionRequested are set
-        // before parameter binding, enabling the caller to check them after Bind() returns.
-        BindOptions(commandInput, commandSchema, commandInstance);
         BindParameters(commandInput, commandSchema, commandInstance);
+        BindOptions(commandInput, commandSchema, commandInstance);
     }
 }

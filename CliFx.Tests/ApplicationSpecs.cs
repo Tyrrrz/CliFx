@@ -19,7 +19,7 @@ public class ApplicationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutp
             .UseConsole(FakeConsole)
             .Build();
 
-        var exitCode = await app.RunAsync(Array.Empty<string>(), new Dictionary<string, string>());
+        var exitCode = await app.RunAsync([], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(0);

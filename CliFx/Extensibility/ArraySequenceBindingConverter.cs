@@ -9,7 +9,7 @@ namespace CliFx.Extensibility;
 /// <see cref="System.Collections.Generic.IEnumerable{T}" />, <see cref="System.Collections.Generic.IReadOnlyList{T}" />,
 /// and any other interface implemented by arrays.
 /// </summary>
-public class ArrayCollectionBindingConverter<TElement> : CollectionBindingConverter<TElement[]>
+public class ArraySequenceBindingConverter<TElement> : SequenceBindingConverter<TElement[]>
 {
     private readonly BindingConverter<TElement>? _elementConverter;
 
@@ -18,7 +18,7 @@ public class ArrayCollectionBindingConverter<TElement> : CollectionBindingConver
     /// When <paramref name="elementConverter" /> is <see langword="null" />, raw values are passed
     /// through as-is; <typeparamref name="TElement" /> must be <see cref="string" /> in that case.
     /// </summary>
-    public ArrayCollectionBindingConverter(BindingConverter<TElement>? elementConverter = null)
+    public ArraySequenceBindingConverter(BindingConverter<TElement>? elementConverter = null)
     {
         if (elementConverter is null && typeof(TElement) != typeof(string))
         {

@@ -51,7 +51,7 @@ internal class NoPreambleEncoding(Encoding underlyingEncoding)
     public override bool IsMailNewsSave => underlyingEncoding.IsMailNewsSave;
 
     // This is the only part that changes
-    public override byte[] GetPreamble() => Array.Empty<byte>();
+    public override byte[] GetPreamble() => [];
 
     [ExcludeFromCodeCoverage]
     public override int GetByteCount(char[] chars, int index, int count) =>

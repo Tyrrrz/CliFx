@@ -172,8 +172,7 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
             }
 
             // Valid values
-            var validValues =
-                parameterSchema.Property.TryGetValidValues() ?? Array.Empty<object?>();
+            var validValues = parameterSchema.Property.TryGetValidValues() ?? [];
             if (validValues.Any())
             {
                 Write(ConsoleColor.White, "Choices: ");
@@ -261,7 +260,7 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
             }
 
             // Valid values
-            var validValues = optionSchema.Property.TryGetValidValues() ?? Array.Empty<object?>();
+            var validValues = optionSchema.Property.TryGetValidValues() ?? [];
             if (validValues.Any())
             {
                 Write(ConsoleColor.White, "Choices: ");

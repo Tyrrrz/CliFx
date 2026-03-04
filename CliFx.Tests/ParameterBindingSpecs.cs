@@ -258,6 +258,6 @@ public class ParameterBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
         exitCode.Should().NotBe(0);
 
         var stdErr = FakeConsole.ReadErrorString();
-        stdErr.Should().Contain("Unexpected parameter(s)");
+        stdErr.Should().Contain("Unrecognized parameter(s)");
     }
 }

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using CliFx.Extensibility;
 
 namespace CliFx.Schema;
 
@@ -50,18 +49,6 @@ public partial class CommandSchema(
     public bool IsDefault => string.IsNullOrWhiteSpace(Name);
 
     /// <summary>
-    /// Whether the implicit --help option is available.
-    /// </summary>
-    public bool IsImplicitHelpOptionAvailable =>
-        typeof(ICommandWithHelpOption).IsAssignableFrom(Type);
-
-    /// <summary>
-    /// Whether the implicit --version option is available.
-    /// </summary>
-    public bool IsImplicitVersionOptionAvailable =>
-        typeof(ICommandWithVersionOption).IsAssignableFrom(Type);
-
-    /// <summary>
     /// Whether this command matches the given name.
     /// </summary>
     public bool MatchesName(string? name) =>
@@ -87,12 +74,48 @@ public partial class CommandSchema(
 
         return result;
     }
+}
+
+public partial class CommandSchema : IEquatable<CommandSchema>
+{
+    /// <inheritdoc />
+    public bool Equals(CommandSchema? other)
+    {
+        if (other is null)
+            return false;
+        if (ReferenceEquals(this, other))
+            return true;
+
+        return Type == other.Type;
+    }
 
     /// <inheritdoc />
-    public override bool Equals(object? obj) => obj is CommandSchema other && Type == other.Type;
+    public override bool Equals(object? obj)
+    {
+        if (obj is null)
+            return false;
+        if (ReferenceEquals(this, obj))
+            return true;
+        if (obj.GetType() != GetType())
+            return false;
+
+        return Equals((CommandSchema)obj);
+    }
 
     /// <inheritdoc />
     public override int GetHashCode() => Type.GetHashCode();
+
+    /// <summary>
+    /// Equality operator.
+    /// </summary>
+    public static bool operator ==(CommandSchema? left, CommandSchema? right) =>
+        Equals(left, right);
+
+    /// <summary>
+    /// Equality operator.
+    /// </summary>
+    public static bool operator !=(CommandSchema? left, CommandSchema? right) =>
+        !Equals(left, right);
 }
 
 /// <inheritdoc cref="CommandSchema" />
@@ -111,9 +134,3 @@ public class CommandSchema<
         inputs.OfType<CommandOptionSchema>().ToArray()
     )
     where TCommand : ICommand;
-
-/// <summary>
-/// Null property binding used for implicit options (help, version) that have no backing property.
-/// </summary>
-public sealed class NullPropertyBinding()
-    : PropertyBinding(typeof(object), _ => null, (_, _) => { });

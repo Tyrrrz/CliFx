@@ -44,7 +44,7 @@ public class CliApplication(
     {
         using (console.WithForegroundColor(ConsoleColor.Green))
         {
-            console.Output.WriteLine(
+            console.WriteLine(
                 $"Attach the debugger to process with ID {Environment.ProcessId} to continue."
             );
         }
@@ -113,48 +113,44 @@ public class CliApplication(
             commandSchema.GetValues(commandInstance)
         );
 
-        // Bind the command. Options are bound first so that IsHelpRequested / IsVersionRequested
-        // are set even if subsequent required-option or parameter validation fails.
-        // We capture any binding error so that it can be suppressed when help/version is requested.
-        CliFxException? bindingError = null;
+        if (commandInstance is ICommandWithHelpOption or ICommandWithVersionOption)
+        {
+            _commandBinder.BindHelpAndVersionOptions(commandInput, commandSchema, commandInstance);
+
+            // Help text
+            if (
+                commandInstance is ICommandWithHelpOption { IsHelpRequested: true }
+                || commandSchema == FallbackDefaultCommand.Schema && !commandInput.HasArguments
+            )
+            {
+                console.WriteHelpText(helpContext);
+                return 0;
+            }
+
+            // Version text
+            if (commandInstance is ICommandWithVersionOption { IsVersionRequested: true })
+            {
+                console.WriteLine(Metadata.Version);
+                return 0;
+            }
+        }
+
+        // Bind the command
         try
         {
             _commandBinder.Bind(commandInput, commandSchema, commandInstance);
         }
         catch (CliFxException ex)
         {
-            bindingError = ex;
-        }
+            console.WriteException(ex);
 
-        // Handle the help option — supersedes any binding error
-        if (
-            commandInstance is ICommandWithHelpOption { IsHelpRequested: true }
-            || commandSchema == FallbackDefaultCommand.Schema && !commandInput.HasArguments
-        )
-        {
-            console.WriteHelpText(helpContext);
-            return 0;
-        }
-
-        // Handle the version option — supersedes any binding error
-        if (commandInstance is ICommandWithVersionOption { IsVersionRequested: true })
-        {
-            console.WriteLine(Metadata.Version);
-            return 0;
-        }
-
-        // If binding failed and neither help nor version was requested, report the error
-        if (bindingError is not null)
-        {
-            console.WriteException(bindingError);
-
-            if (bindingError.ShowHelp)
+            if (ex.ShowHelp)
             {
                 console.WriteLine();
                 console.WriteHelpText(helpContext);
             }
 
-            return bindingError.ExitCode;
+            return ex.ExitCode;
         }
 
         // Starting from this point, we may produce exceptions that are meant for the

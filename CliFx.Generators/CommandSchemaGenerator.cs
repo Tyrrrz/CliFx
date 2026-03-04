@@ -35,27 +35,27 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             {
                 // Abstract classes are intentionally skipped — no diagnostic needed
                 if (item.Symbol.IsAbstract)
-                    return Array.Empty<Diagnostic>();
+                    return [];
 
                 if (!item.ClassDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword))
-                    return new[]
-                    {
+                    return
+                    [
                         Diagnostic.Create(
                             DiagnosticDescriptors.CommandMustBePartial,
                             item.ClassDeclaration.Identifier.GetLocation(),
                             item.Symbol.Name
                         ),
-                    };
+                    ];
 
                 if (!item.Symbol.ImplementsInterface(SymbolNames.CliFxCommandInterface))
-                    return new[]
-                    {
+                    return
+                    [
                         Diagnostic.Create(
                             DiagnosticDescriptors.CommandMustImplementICommand,
                             item.ClassDeclaration.Identifier.GetLocation(),
                             item.Symbol.Name
                         ),
-                    };
+                    ];
 
                 return Array.Empty<Diagnostic>();
             }
@@ -589,6 +589,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                     $$"""
                                 new global::CliFx.Schema.CommandParameterSchema<{{commandFqn}}, {{propTypeFqn}}>(
                                     new global::CliFx.Schema.PropertyBinding<{{commandFqn}}, {{propTypeFqn}}>(
+                                        "{{param.Property.Name}}",
                                         c => c.{{param.Property.Name}},
                                         (c, v) => c.{{param.Property.Name}} = v),
                                     false,
@@ -604,7 +605,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             }
             else
             {
-                var collectionConverterExpr = BuildCollectionConverterExpr(
+                var SequenceConverterExpr = BuildSequenceConverterExpr(
                     param.ConverterType,
                     param.Property
                 );
@@ -613,6 +614,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                     $$"""
                                 new global::CliFx.Schema.CommandParameterSchema(
                                     new global::CliFx.Schema.PropertyBinding<{{commandFqn}}, {{propTypeFqn}}>(
+                                        "{{param.Property.Name}}",
                                         c => c.{{param.Property.Name}},
                                         (c, v) => c.{{param.Property.Name}} = v),
                                     true,
@@ -622,7 +624,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                                     {{EscapeString(param.Description)}},
                                     null, // element-level converter unused — collection converter handles conversion
                                     {{BuildValidatorsExpr(param.ValidatorTypes)}},
-                                    {{collectionConverterExpr}}),
+                                    {{SequenceConverterExpr}}),
 
                     """
                 );
@@ -645,6 +647,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                     $$"""
                                 new global::CliFx.Schema.CommandOptionSchema<{{commandFqn}}, {{propTypeFqn}}>(
                                     new global::CliFx.Schema.PropertyBinding<{{commandFqn}}, {{propTypeFqn}}>(
+                                        "{{opt.Property.Name}}",
                                         c => c.{{opt.Property.Name}},
                                         (c, v) => c.{{opt.Property.Name}} = v),
                                     false,
@@ -661,7 +664,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             }
             else
             {
-                var collectionConverterExpr = BuildCollectionConverterExpr(
+                var SequenceConverterExpr = BuildSequenceConverterExpr(
                     opt.ConverterType,
                     opt.Property
                 );
@@ -670,6 +673,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                     $$"""
                                 new global::CliFx.Schema.CommandOptionSchema(
                                     new global::CliFx.Schema.PropertyBinding<{{commandFqn}}, {{propTypeFqn}}>(
+                                        "{{opt.Property.Name}}",
                                         c => c.{{opt.Property.Name}},
                                         (c, v) => c.{{opt.Property.Name}} = v),
                                     true,
@@ -680,7 +684,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                                     {{EscapeString(opt.Description)}},
                                     null, // element-level converter unused — collection converter handles conversion
                                     {{BuildValidatorsExpr(opt.ValidatorTypes)}},
-                                    {{collectionConverterExpr}}),
+                                    {{SequenceConverterExpr}}),
 
                     """
                 );
@@ -694,6 +698,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                 $$"""
                             new global::CliFx.Schema.CommandOptionSchema<{{commandFqn}}, bool>(
                                 new global::CliFx.Schema.PropertyBinding<{{commandFqn}}, bool>(
+                                    "IsHelpRequested",
                                     c => c.IsHelpRequested,
                                     (c, v) => c.IsHelpRequested = v),
                                 false,
@@ -716,6 +721,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                 $$"""
                             new global::CliFx.Schema.CommandOptionSchema<{{commandFqn}}, bool>(
                                 new global::CliFx.Schema.PropertyBinding<{{commandFqn}}, bool>(
+                                    "IsVersionRequested",
                                     c => c.IsVersionRequested,
                                     (c, v) => c.IsVersionRequested = v),
                                 false,
@@ -886,7 +892,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
 
     // Builds a collection converter expression for a sequence property.
     // Returns "null" if the collection type is not supported for AOT-compatible generation.
-    private static string BuildCollectionConverterExpr(
+    private static string BuildSequenceConverterExpr(
         TypeDescriptor? userConverterType,
         IPropertySymbol property
     )
@@ -910,7 +916,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
 
         var elementConverterArg = elementConverterExpr ?? "null";
         var arrayConverterExpr =
-            $"new global::CliFx.Extensibility.ArrayCollectionBindingConverter<{elementTypeFqn}>({elementConverterArg})";
+            $"new global::CliFx.Extensibility.ArraySequenceBindingConverter<{elementTypeFqn}>({elementConverterArg})";
 
         // T[] — return the array directly
         if (collectionType is IArrayTypeSymbol)
@@ -944,10 +950,10 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             )
         )
         {
-            return $"new global::CliFx.Extensibility.ArrayInitializableCollectionBindingConverter<{elementTypeFqn}, {collectionTypeFqn}>({elementConverterArg}, arr => new {collectionTypeFqn}(arr))";
+            return $"new global::CliFx.Extensibility.ArrayInitializableSequenceBindingConverter<{elementTypeFqn}, {collectionTypeFqn}>({elementConverterArg}, arr => new {collectionTypeFqn}(arr))";
         }
 
-        // Unknown collection type — user must provide a custom ICollectionBindingConverter
+        // Unknown collection type — user must provide a custom ISequenceBindingConverter
         return "null";
     }
 }

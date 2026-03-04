@@ -9,9 +9,6 @@ namespace CliFx.Attributes;
 [AttributeUsage(AttributeTargets.Property)]
 public sealed class CommandOptionAttribute : Attribute
 {
-    /// <summary>
-    /// Initializes an instance of <see cref="CommandOptionAttribute" />.
-    /// </summary>
     private CommandOptionAttribute(string? name, char? shortName)
     {
         Name = name;
@@ -93,5 +90,5 @@ public sealed class CommandOptionAttribute : Attribute
     /// <remarks>
     /// Validators must derive from <see cref="BindingValidator{T}" />.
     /// </remarks>
-    public Type[] Validators { get; set; } = Array.Empty<Type>();
+    public Type[] Validators { get; set; } = [];
 }
