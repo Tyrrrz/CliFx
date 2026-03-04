@@ -11,11 +11,6 @@ internal static class TypeExtensions
 {
     extension(Type type)
     {
-        [RequiresUnreferencedCode(
-            "Uses Type.GetInterfaces() which may not be available after trimming."
-        )]
-        public bool Implements(Type interfaceType) => type.GetInterfaces().Contains(interfaceType);
-
         public Type? TryGetNullableUnderlyingType() => Nullable.GetUnderlyingType(type);
 
         [RequiresUnreferencedCode(

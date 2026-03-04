@@ -98,7 +98,7 @@ public class AddCommandsFromThisAssemblyGenerator : IIncrementalGenerator
         );
 
         ctx.AddSource(
-            "CliApplicationBuilderExtensions.g.cs",
+            "AddCommandsFromThisAssembly.g.cs",
             SourceText.From(sb.ToString(), Encoding.UTF8)
         );
     }

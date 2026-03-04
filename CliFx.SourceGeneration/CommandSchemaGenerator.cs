@@ -31,7 +31,34 @@ public class CommandSchemaGenerator : IIncrementalGenerator
 
         // Emit diagnostics for [Command] classes that are not partial or don't implement ICommand
         var diagnostics = allCommandNodes.SelectMany(
-            static (item, _) => GetPrerequisiteDiagnostics(item.ClassDeclaration, item.Symbol)
+            static (item, _) =>
+            {
+                // Abstract classes are intentionally skipped — no diagnostic needed
+                if (item.Symbol.IsAbstract)
+                    return Array.Empty<Diagnostic>();
+
+                if (!item.ClassDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword))
+                    return new[]
+                    {
+                        Diagnostic.Create(
+                            DiagnosticDescriptors.CommandMustBePartial,
+                            item.ClassDeclaration.Identifier.GetLocation(),
+                            item.Symbol.Name
+                        ),
+                    };
+
+                if (!item.Symbol.ImplementsInterface(SymbolNames.CliFxCommandInterface))
+                    return new[]
+                    {
+                        Diagnostic.Create(
+                            DiagnosticDescriptors.CommandMustImplementICommand,
+                            item.ClassDeclaration.Identifier.GetLocation(),
+                            item.Symbol.Name
+                        ),
+                    };
+
+                return Array.Empty<Diagnostic>();
+            }
         );
         context.RegisterSourceOutput(
             diagnostics,
@@ -59,33 +86,6 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             commandDeclarations.Collect(),
             static (ctx, commands) => Execute(ctx, commands)
         );
-    }
-
-    private static IEnumerable<Diagnostic> GetPrerequisiteDiagnostics(
-        ClassDeclarationSyntax classDeclaration,
-        INamedTypeSymbol symbol
-    )
-    {
-        // Abstract classes are intentionally skipped — no diagnostic needed
-        if (symbol.IsAbstract)
-            yield break;
-
-        if (!classDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword))
-        {
-            yield return Diagnostic.Create(
-                DiagnosticDescriptors.CommandMustBePartial,
-                classDeclaration.Identifier.GetLocation(),
-                symbol.Name
-            );
-        }
-        else if (!symbol.ImplementsInterface(SymbolNames.CliFxCommandInterface))
-        {
-            yield return Diagnostic.Create(
-                DiagnosticDescriptors.CommandMustImplementICommand,
-                classDeclaration.Identifier.GetLocation(),
-                symbol.Name
-            );
-        }
     }
 
     internal static CommandDescriptor? TryBuildCommandDescriptor(INamedTypeSymbol type)
@@ -126,6 +126,24 @@ public class CommandSchemaGenerator : IIncrementalGenerator
         var parameters = new List<CommandParameterDescriptor>();
         var options = new List<CommandOptionDescriptor>();
         var diagnostics = new List<Diagnostic>();
+
+        // Returns all non-static properties declared on the type and its base classes,
+        // with derived class properties shadowing base class properties of the same name.
+        static IEnumerable<IPropertySymbol> GetAllProperties(INamedTypeSymbol t)
+        {
+            var seen = new HashSet<string>();
+            var current = (INamedTypeSymbol?)t;
+            while (current is not null && current.SpecialType != SpecialType.System_Object)
+            {
+                foreach (var prop in current.GetMembers().OfType<IPropertySymbol>())
+                {
+                    if (!prop.IsStatic && seen.Add(prop.Name))
+                        yield return prop;
+                }
+
+                current = current.BaseType;
+            }
+        }
 
         foreach (var property in allProperties)
         {
@@ -768,24 +786,6 @@ public class CommandSchemaGenerator : IIncrementalGenerator
         return sb.ToString();
     }
 
-    // Returns all non-static properties declared on the type and its base classes,
-    // with derived class properties shadowing base class properties of the same name.
-    private static IEnumerable<IPropertySymbol> GetAllProperties(INamedTypeSymbol type)
-    {
-        var seen = new HashSet<string>();
-        var current = (INamedTypeSymbol?)type;
-        while (current is not null && current.SpecialType != SpecialType.System_Object)
-        {
-            foreach (var prop in current.GetMembers().OfType<IPropertySymbol>())
-            {
-                if (!prop.IsStatic && seen.Add(prop.Name))
-                    yield return prop;
-            }
-
-            current = current.BaseType;
-        }
-    }
-
     private static bool IsSequenceType(ITypeSymbol type)
     {
         if (type.SpecialType == SpecialType.System_String)
@@ -802,22 +802,11 @@ public class CommandSchemaGenerator : IIncrementalGenerator
     private static string GetConverterExpression(
         TypeDescriptor? converterType,
         IPropertySymbol property
-    ) =>
-        converterType is not null
-            ? $"new {converterType.FullyQualifiedName}()"
-            : BuildDefaultConverterExpr(property);
-
-    private static string BuildValidatorsExpr(IReadOnlyList<TypeDescriptor> validatorTypes)
+    )
     {
-        if (validatorTypes.Count == 0)
-            return "global::System.Array.Empty<global::CliFx.Extensibility.IBindingValidator>()";
+        if (converterType is not null)
+            return $"new {converterType.FullyQualifiedName}()";
 
-        var items = string.Join(", ", validatorTypes.Select(v => $"new {v.FullyQualifiedName}()"));
-        return $"new global::CliFx.Extensibility.IBindingValidator[] {{ {items} }}";
-    }
-
-    private static string BuildDefaultConverterExpr(IPropertySymbol property)
-    {
         var type = property.Type;
 
         // For sequence types, use the element type's converter
@@ -829,6 +818,15 @@ public class CommandSchemaGenerator : IIncrementalGenerator
         }
 
         return BuildDefaultConverterExprForScalar(type) ?? "null";
+    }
+
+    private static string BuildValidatorsExpr(IReadOnlyList<TypeDescriptor> validatorTypes)
+    {
+        if (validatorTypes.Count == 0)
+            return "global::System.Array.Empty<global::CliFx.Extensibility.IBindingValidator>()";
+
+        var items = string.Join(", ", validatorTypes.Select(v => $"new {v.FullyQualifiedName}()"));
+        return $"new global::CliFx.Extensibility.IBindingValidator[] {{ {items} }}";
     }
 
     private static string? BuildDefaultConverterExprForScalar(ITypeSymbol type)

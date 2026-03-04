@@ -7,19 +7,6 @@ namespace CliFx.Utils.Extensions;
 
 internal static class CollectionExtensions
 {
-    extension<T>(IEnumerable<T?> source)
-        where T : class
-    {
-        public IEnumerable<T> WhereNotNull()
-        {
-            foreach (var i in source)
-            {
-                if (i is not null)
-                    yield return i;
-            }
-        }
-    }
-
     extension(IEnumerable<string?> source)
     {
         public IEnumerable<string> WhereNotNullOrWhiteSpace()
