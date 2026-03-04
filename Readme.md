@@ -1,9 +1,9 @@
 # CliFx
 
-[![Status](https://img.shields.io/badge/status-maintenance-ffd700.svg)](https://github.com/Tyrrrz/.github/blob/master/docs/project-status.md)
+[![Status](https://img.shields.io/badge/status-maintenance-ffd700.svg)](https://github.com/Tyrrrz/.github/blob/prime/docs/project-status.md)
 [![Made in Ukraine](https://img.shields.io/badge/made_in-ukraine-ffd700.svg?labelColor=0057b7)](https://tyrrrz.me/ukraine)
-[![Build](https://img.shields.io/github/actions/workflow/status/Tyrrrz/CliFx/main.yml?branch=master)](https://github.com/Tyrrrz/CliFx/actions)
-[![Coverage](https://img.shields.io/codecov/c/github/Tyrrrz/CliFx/master)](https://codecov.io/gh/Tyrrrz/CliFx)
+[![Build](https://img.shields.io/github/actions/workflow/status/Tyrrrz/CliFx/main.yml?branch=prime)](https://github.com/Tyrrrz/CliFx/actions)
+[![Coverage](https://img.shields.io/codecov/c/github/Tyrrrz/CliFx/prime)](https://codecov.io/gh/Tyrrrz/CliFx)
 [![Version](https://img.shields.io/nuget/v/CliFx.svg)](https://nuget.org/packages/CliFx)
 [![Downloads](https://img.shields.io/nuget/dt/CliFx.svg)](https://nuget.org/packages/CliFx)
 [![Discord](https://img.shields.io/discord/869237470565392384?label=discord)](https://discord.gg/2SUWKFnHSm)
@@ -22,7 +22,7 @@
 **CliFx** is a simple to use, yet powerful framework for building command-line applications.
 Its primary goal is to completely take over the user input layer, allowing you to forget about infrastructural concerns and instead focus on writing your application.
 
-## Terms of use<sup>[[?]](https://github.com/Tyrrrz/.github/blob/master/docs/why-so-political.md)</sup>
+## Terms of use<sup>[[?]](https://github.com/Tyrrrz/.github/blob/prime/docs/why-so-political.md)</sup>
 
 By using this project or its source code, for any purpose and in any shape or form, you grant your **implicit agreement** to all the following statements:
 
@@ -209,7 +209,6 @@ Parameters are bound from the command-line arguments based on the order they app
 Besides that, they also differ in the following ways:
 
 - Parameters are required by default, while options are not.
-
   - You can make an option required by setting `IsRequired = true` on the corresponding attribute or by adding the `required` keyword to the property declaration (introduced in C# 11):
 
     ```csharp
@@ -227,7 +226,6 @@ Besides that, they also differ in the following ways:
     ```
 
 - Parameters are primarily used for scalar (non-enumerable) properties, while options can be used for both scalar and non-scalar properties.
-
   - You can bind an option to a property of a non-scalar type, such as `IReadOnlyList<T>`:
 
     ```csharp
