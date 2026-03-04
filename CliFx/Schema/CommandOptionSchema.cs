@@ -62,38 +62,6 @@ public class CommandOptionSchema(
     internal bool MatchesEnvironmentVariable(string environmentVariableName) =>
         !string.IsNullOrWhiteSpace(EnvironmentVariable)
         && string.Equals(EnvironmentVariable, environmentVariableName, StringComparison.Ordinal);
-
-    /// <summary>
-    /// Implicit help option added to commands that don't define their own help option.
-    /// </summary>
-    public static CommandOptionSchema ImplicitHelpOption { get; } =
-        new(
-            new NullPropertyBinding(),
-            false,
-            "help",
-            'h',
-            null,
-            false,
-            "Shows help text.",
-            null,
-            Array.Empty<IBindingValidator>()
-        );
-
-    /// <summary>
-    /// Implicit version option added to the default command that doesn't define its own version option.
-    /// </summary>
-    public static CommandOptionSchema ImplicitVersionOption { get; } =
-        new(
-            new NullPropertyBinding(),
-            false,
-            "version",
-            null,
-            null,
-            false,
-            "Shows version information.",
-            null,
-            Array.Empty<IBindingValidator>()
-        );
 }
 
 /// <inheritdoc cref="CommandOptionSchema" />

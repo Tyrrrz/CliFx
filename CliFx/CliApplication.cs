@@ -40,20 +40,6 @@ public class CliApplication(
     private bool IsPreviewModeEnabled(CommandInput commandInput) =>
         Configuration.IsPreviewModeAllowed && commandInput.IsPreviewDirectiveSpecified;
 
-    private bool ShouldShowHelpText(
-        CommandSchema commandSchema,
-        ICommand commandInstance,
-        CommandInput commandInput
-    ) =>
-        commandInstance is ICommandWithHelpOption && commandInput.IsHelpOptionSpecified
-        ||
-        // Show help text also if the fallback default command is executed without any arguments
-        commandSchema == FallbackDefaultCommand.Schema
-            && !commandInput.HasArguments;
-
-    private bool ShouldShowVersionText(ICommand commandInstance, CommandInput commandInput) =>
-        commandInstance is ICommandWithVersionOption && commandInput.IsVersionOptionSpecified;
-
     private async ValueTask PromptDebuggerAsync()
     {
         using (console.WithForegroundColor(ConsoleColor.Green))
@@ -70,11 +56,11 @@ public class CliApplication(
             await Task.Delay(100);
     }
 
-    // The private RunAsync overload calls into the reflection-based binding and help-text paths.
-    // These are suppressed here because the public RunAsync overload is the user-facing entry point
-    // and marking it with [RequiresUnreferencedCode] would be too disruptive for non-AOT consumers.
-    // AOT-compatible consumers should use partial command classes with the source generator.
-#pragma warning disable IL2026, IL3050
+    // WriteHelpText uses TryGetValidValues() which relies on reflection for enum valid values display.
+    // This is suppressed here because the public RunAsync is the user-facing entry point and marking it
+    // with [RequiresUnreferencedCode] would be too disruptive. For full AOT compatibility, the source
+    // generator should emit valid enum values statically (see PropertyBinding.TryGetValidValues).
+#pragma warning disable IL2026
     private async ValueTask<int> RunAsync(
         ApplicationSchema applicationSchema,
         CommandInput commandInput
@@ -127,15 +113,19 @@ public class CliApplication(
             commandSchema.GetValues(commandInstance)
         );
 
-        // Handle the help option
-        if (ShouldShowHelpText(commandSchema, commandInstance, commandInput))
+        // Handle the help option (checked before binding so that missing required params/options
+        // do not prevent help from being shown when --help is explicitly requested)
+        if (
+            commandInstance is ICommandWithHelpOption && commandInput.IsHelpOptionSpecified
+            || commandSchema == FallbackDefaultCommand.Schema && !commandInput.HasArguments
+        )
         {
             console.WriteHelpText(helpContext);
             return 0;
         }
 
         // Handle the version option
-        if (ShouldShowVersionText(commandInstance, commandInput))
+        if (commandInstance is ICommandWithVersionOption && commandInput.IsVersionOptionSpecified)
         {
             console.WriteLine(Metadata.Version);
             return 0;
@@ -166,7 +156,7 @@ public class CliApplication(
             return ex.ExitCode;
         }
     }
-#pragma warning restore IL2026, IL3050
+#pragma warning restore IL2026
 
     /// <summary>
     /// Runs the application with the specified command-line arguments and environment variables.
