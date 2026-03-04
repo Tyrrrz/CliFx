@@ -919,16 +919,15 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             elementConverterExpr = BuildDefaultConverterExprForScalar(elementType);
 
         var elementConverterArg = elementConverterExpr ?? "null";
-        var arrayConverterExpr =
-            $"new global::CliFx.Extensibility.ArraySequenceBindingConverter<{elementTypeFqn}>({elementConverterArg})";
 
-        // T[] — return the array directly
+        // T[] — use the single-type-parameter convenience form
         if (collectionType is IArrayTypeSymbol)
-            return arrayConverterExpr;
+            return $"new global::CliFx.Extensibility.ArraySequenceBindingConverter<{elementTypeFqn}>({elementConverterArg})";
 
-        // Interface (IReadOnlyList<T>, IEnumerable<T>, etc.) — T[] implements them all
+        // Interface (IReadOnlyList<T>, IEnumerable<T>, etc.) — T[] is assignable to any of these;
+        // use the two-type-parameter form so the result type matches TSequence directly.
         if (collectionType.TypeKind == TypeKind.Interface)
-            return arrayConverterExpr;
+            return $"new global::CliFx.Extensibility.ArraySequenceBindingConverter<{elementTypeFqn}, {collectionTypeFqn}>({elementConverterArg})";
 
         // Concrete type with IEnumerable<T> or T[] constructor (e.g., List<T>)
         if (

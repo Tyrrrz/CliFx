@@ -3,27 +3,26 @@ using System.Collections.Generic;
 namespace CliFx.Extensibility;
 
 /// <summary>
-/// Defines custom conversion logic for activating sequence command inputs from multiple raw command-line arguments.
+/// Defines custom conversion logic for activating sequential command inputs
+/// from the corresponding multiple raw command-line arguments.
 /// </summary>
 /// <remarks>
-/// To implement your own collection converter, inherit from <see cref="SequenceBindingConverter{T}" /> instead.
+/// To implement your own sequence converter, inherit from <see cref="SequenceBindingConverter{T}" /> instead.
 /// </remarks>
 public interface ISequenceBindingConverter
 {
     /// <summary>
-    /// Converts multiple raw command-line argument values into the target collection type.
+    /// Parses values from multiple raw command-line arguments.
     /// </summary>
     object? ConvertMany(IReadOnlyList<string?> rawValues);
 }
 
 /// <summary>
-/// Base type for custom collection converters.
+/// Base type for custom sequence converters.
 /// </summary>
 public abstract class SequenceBindingConverter<T> : ISequenceBindingConverter
 {
-    /// <summary>
-    /// Converts multiple raw command-line argument values into the target collection type.
-    /// </summary>
+    /// <inheritdoc cref="ISequenceBindingConverter.ConvertMany" />
     public abstract T ConvertMany(IReadOnlyList<string?> rawValues);
 
     object? ISequenceBindingConverter.ConvertMany(IReadOnlyList<string?> rawValues) =>

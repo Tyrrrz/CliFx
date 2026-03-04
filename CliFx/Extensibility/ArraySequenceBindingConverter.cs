@@ -5,11 +5,14 @@ namespace CliFx.Extensibility;
 
 /// <summary>
 /// Collection converter that produces a <typeparamref name="TElement" /> array by applying an optional
-/// per-element <see cref="BindingConverter{T}" />.  The resulting array is assignable to
-/// <see cref="System.Collections.Generic.IEnumerable{T}" />, <see cref="System.Collections.Generic.IReadOnlyList{T}" />,
-/// and any other interface implemented by arrays.
+/// per-element <see cref="BindingConverter{T}" /> and then casts it to
+/// <typeparamref name="TSequence" />.  This works for any <typeparamref name="TSequence" /> that
+/// is assignable from <typeparamref name="TElement" />[], such as
+/// <see cref="System.Collections.Generic.IEnumerable{T}" />,
+/// <see cref="System.Collections.Generic.IReadOnlyList{T}" />, or <typeparamref name="TElement" />[].
 /// </summary>
-public class ArraySequenceBindingConverter<TElement> : SequenceBindingConverter<TElement[]>
+public class ArraySequenceBindingConverter<TElement, TSequence>
+    : SequenceBindingConverter<TSequence>
 {
     private readonly BindingConverter<TElement>? _elementConverter;
 
@@ -32,7 +35,7 @@ public class ArraySequenceBindingConverter<TElement> : SequenceBindingConverter<
     }
 
     /// <inheritdoc />
-    public override TElement[] ConvertMany(IReadOnlyList<string?> rawValues)
+    public override TSequence ConvertMany(IReadOnlyList<string?> rawValues)
     {
         var result = new TElement[rawValues.Count];
         for (var i = 0; i < rawValues.Count; i++)
@@ -43,6 +46,18 @@ public class ArraySequenceBindingConverter<TElement> : SequenceBindingConverter<
                 : (TElement)(object)(rawValues[i]!);
         }
 
-        return result;
+        return (TSequence)(object)result;
     }
+}
+
+/// <summary>
+/// Convenience specialization of <see cref="ArraySequenceBindingConverter{TElement, TSequence}" />
+/// where <typeparamref name="TElement" />[] is both the element container and the target collection type.
+/// </summary>
+public class ArraySequenceBindingConverter<TElement>
+    : ArraySequenceBindingConverter<TElement, TElement[]>
+{
+    /// <inheritdoc />
+    public ArraySequenceBindingConverter(BindingConverter<TElement>? elementConverter = null)
+        : base(elementConverter) { }
 }
