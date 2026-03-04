@@ -20,7 +20,7 @@ public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -58,7 +58,7 @@ public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 public Command(string foo) {}
 
@@ -94,7 +94,7 @@ public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 private readonly string _foo;
 
@@ -136,7 +136,7 @@ public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 private readonly string _foo;
 
@@ -191,7 +191,7 @@ public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console)
                 {

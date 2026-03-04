@@ -19,7 +19,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption("foo")]
                 public bool Foo { get; set; }
@@ -56,7 +56,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption('f')]
                 public bool Foo { get; set; }
@@ -93,7 +93,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption("foo")]
                 public string? Foo { get; set; }
@@ -138,7 +138,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption('f')]
                 public string? Foo { get; set; }
@@ -183,7 +183,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption('f')]
                 public string? Foo { get; set; }
@@ -228,7 +228,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption("Foo")]
                 public IReadOnlyList<string>? Foo { get; set; }
@@ -270,7 +270,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption('f')]
                 public IReadOnlyList<string>? Foo { get; set; }
@@ -312,7 +312,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption("foo")]
                 public IReadOnlyList<string>? Foo { get; set; }
@@ -354,7 +354,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption('f')]
                 public IReadOnlyList<string>? Foo { get; set; }
@@ -396,7 +396,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption("foo", 'f')]
                 public IReadOnlyList<string>? Foo { get; set; }
@@ -438,7 +438,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption("foo")]
                 public string? Foo { get; set; }
@@ -496,7 +496,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             }
 
             [Command]
-            public class Command : IHasFoo, IHasBar, IHasBaz
+            public partial class Command : IHasFoo, IHasBar, IHasBaz
             {
                 [CommandOption("foo")]
                 public int Foo { get; set; }
@@ -542,7 +542,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption("foo")]
                 public string? Foo { get; set; }
@@ -582,7 +582,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption("help", 'h')]
                 public string? Foo { get; set; }
@@ -622,7 +622,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption("version")]
                 public string? Foo { get; set; }
@@ -662,7 +662,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption("foo")]
                 public required string Foo { get; set; }
@@ -698,7 +698,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption("foo")]
                 public required string Foo { get; set; }
@@ -731,7 +731,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption("foo")]
                 public required IReadOnlyList<string> Foo { get; set; }
@@ -764,7 +764,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption("foo")]
                 public string? Foo { get; set; }
@@ -800,7 +800,7 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption("foo")]
                 public string? Foo { get; set; }

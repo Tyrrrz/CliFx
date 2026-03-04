@@ -125,7 +125,6 @@ public class CommandSchemaGenerator : IIncrementalGenerator
 
         var parameters = new List<CommandParameterDescriptor>();
         var options = new List<CommandOptionDescriptor>();
-        var skippedInitOnly = new List<IPropertySymbol>();
         var diagnostics = new List<Diagnostic>();
 
         foreach (var property in allProperties)
@@ -143,7 +142,14 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                 // does not compile for init accessors.
                 if (property.SetMethod?.IsInitOnly == true)
                 {
-                    skippedInitOnly.Add(property);
+                    diagnostics.Add(
+                        Diagnostic.Create(
+                            DiagnosticDescriptors.InitOnlyProperty,
+                            property.Locations.FirstOrDefault() ?? Location.None,
+                            property.Name,
+                            type.Name
+                        )
+                    );
                     continue;
                 }
 
@@ -232,7 +238,14 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                 // does not compile for init accessors.
                 if (property.SetMethod?.IsInitOnly == true)
                 {
-                    skippedInitOnly.Add(property);
+                    diagnostics.Add(
+                        Diagnostic.Create(
+                            DiagnosticDescriptors.InitOnlyProperty,
+                            property.Locations.FirstOrDefault() ?? Location.None,
+                            property.Name,
+                            type.Name
+                        )
+                    );
                     continue;
                 }
 
@@ -445,7 +458,6 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             description,
             parameters,
             options,
-            skippedInitOnly,
             diagnostics,
             needsHelpOption,
             needsVersionOption
@@ -462,18 +474,6 @@ public class CommandSchemaGenerator : IIncrementalGenerator
 
         foreach (var command in commands)
         {
-            foreach (var skippedProp in command.SkippedInitOnlyProperties)
-            {
-                ctx.ReportDiagnostic(
-                    Diagnostic.Create(
-                        DiagnosticDescriptors.InitOnlyProperty,
-                        skippedProp.Locations.FirstOrDefault() ?? Location.None,
-                        skippedProp.Name,
-                        command.Type.Name
-                    )
-                );
-            }
-
             foreach (var diagnostic in command.Diagnostics)
             {
                 ctx.ReportDiagnostic(diagnostic);
@@ -493,6 +493,15 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             containingNs is not null && !containingNs.IsGlobalNamespace
                 ? containingNs.ToDisplayString()
                 : null;
+
+        // Collect containing types from outermost to innermost (for nested class support)
+        var containingTypes = new List<INamedTypeSymbol>();
+        var ct = command.Type.ContainingType;
+        while (ct is not null)
+        {
+            containingTypes.Insert(0, ct);
+            ct = ct.ContainingType;
+        }
 
         var sb = new StringBuilder();
 
@@ -517,10 +526,29 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             );
         }
 
+        // Open containing type wrappers (for nested classes)
+        foreach (var containingType in containingTypes)
+        {
+            // Use MinimallyQualifiedFormat to include type parameters (e.g., Foo<T>) without namespace
+            sb.AppendLine(
+                $"partial class {containingType.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)}"
+            );
+            sb.AppendLine("{");
+        }
+
+        // Build interface list inline
+        var interfaces = new List<string>();
+        if (command.NeedsHelpOption)
+            interfaces.Add("global::CliFx.ICommandWithHelpOption");
+        if (command.NeedsVersionOption)
+            interfaces.Add("global::CliFx.ICommandWithVersionOption");
+        var interfaceList =
+            interfaces.Count > 0 ? " : " + string.Join(", ", interfaces) : string.Empty;
+
         sb.Append(
             // lang=csharp
             $$"""
-            partial class {{command.Type.Name}}{{BuildInterfaceList(command)}}
+            partial class {{command.Type.Name}}{{interfaceList}}
             {
             """
         );
@@ -556,18 +584,12 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             $$"""
 
                 /// <summary>Generated command schema for <see cref="{{command.Type.Name}}"/>.</summary>
-                public static global::CliFx.Schema.CommandSchema Schema { get; } = BuildSchema();
-
-            """
-        );
-
-        sb.Append(
-            // lang=csharp
-            """
-                private static global::CliFx.Schema.CommandSchema BuildSchema()
-                {
-                    var inputs = new global::System.Collections.Generic.List<global::CliFx.Schema.CommandInputSchema>();
-
+                public static global::CliFx.Schema.CommandSchema Schema { get; } =
+                    new global::CliFx.Schema.CommandSchema<{{commandFqn}}>(
+                        {{EscapeString(command.Name)}},
+                        {{EscapeString(command.Description)}},
+                        new global::CliFx.Schema.CommandInputSchema[]
+                        {
             """
         );
 
@@ -584,17 +606,17 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                 sb.Append(
                     // lang=csharp
                     $$"""
-                            inputs.Add(new global::CliFx.Schema.CommandParameterSchema<{{commandFqn}}, {{propTypeFqn}}>(
-                                new global::CliFx.Schema.PropertyBinding<{{commandFqn}}, {{propTypeFqn}}>(
-                                    c => c.{{param.Property.Name}},
-                                    (c, v) => c.{{param.Property.Name}} = v),
-                                false,
-                                {{param.Order}},
-                                {{EscapeString(param.Name)}},
-                                {{(param.IsRequired ? "true" : "false")}},
-                                {{EscapeString(param.Description)}},
-                                {{converterExpr}},
-                                {{BuildValidatorsExpr(param.ValidatorTypes)}}));
+                                new global::CliFx.Schema.CommandParameterSchema<{{commandFqn}}, {{propTypeFqn}}>(
+                                    new global::CliFx.Schema.PropertyBinding<{{commandFqn}}, {{propTypeFqn}}>(
+                                        c => c.{{param.Property.Name}},
+                                        (c, v) => c.{{param.Property.Name}} = v),
+                                    false,
+                                    {{param.Order}},
+                                    {{EscapeString(param.Name)}},
+                                    {{(param.IsRequired ? "true" : "false")}},
+                                    {{EscapeString(param.Description)}},
+                                    {{converterExpr}},
+                                    {{BuildValidatorsExpr(param.ValidatorTypes)}}),
 
                     """
                 );
@@ -608,18 +630,18 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                 sb.Append(
                     // lang=csharp
                     $$"""
-                            inputs.Add(new global::CliFx.Schema.CommandParameterSchema(
-                                new global::CliFx.Schema.PropertyBinding<{{commandFqn}}, {{propTypeFqn}}>(
-                                    c => c.{{param.Property.Name}},
-                                    (c, v) => c.{{param.Property.Name}} = v),
-                                true,
-                                {{param.Order}},
-                                {{EscapeString(param.Name)}},
-                                {{(param.IsRequired ? "true" : "false")}},
-                                {{EscapeString(param.Description)}},
-                                null, // element-level converter unused — collection converter handles conversion
-                                {{BuildValidatorsExpr(param.ValidatorTypes)}},
-                                {{collectionConverterExpr}}));
+                                new global::CliFx.Schema.CommandParameterSchema(
+                                    new global::CliFx.Schema.PropertyBinding<{{commandFqn}}, {{propTypeFqn}}>(
+                                        c => c.{{param.Property.Name}},
+                                        (c, v) => c.{{param.Property.Name}} = v),
+                                    true,
+                                    {{param.Order}},
+                                    {{EscapeString(param.Name)}},
+                                    {{(param.IsRequired ? "true" : "false")}},
+                                    {{EscapeString(param.Description)}},
+                                    null, // element-level converter unused — collection converter handles conversion
+                                    {{BuildValidatorsExpr(param.ValidatorTypes)}},
+                                    {{collectionConverterExpr}}),
 
                     """
                 );
@@ -640,18 +662,18 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                 sb.Append(
                     // lang=csharp
                     $$"""
-                            inputs.Add(new global::CliFx.Schema.CommandOptionSchema<{{commandFqn}}, {{propTypeFqn}}>(
-                                new global::CliFx.Schema.PropertyBinding<{{commandFqn}}, {{propTypeFqn}}>(
-                                    c => c.{{opt.Property.Name}},
-                                    (c, v) => c.{{opt.Property.Name}} = v),
-                                false,
-                                {{EscapeString(opt.Name)}},
-                                {{shortNameStr}},
-                                {{EscapeString(opt.EnvironmentVariable)}},
-                                {{(opt.IsRequired ? "true" : "false")}},
-                                {{EscapeString(opt.Description)}},
-                                {{converterExpr}},
-                                {{BuildValidatorsExpr(opt.ValidatorTypes)}}));
+                                new global::CliFx.Schema.CommandOptionSchema<{{commandFqn}}, {{propTypeFqn}}>(
+                                    new global::CliFx.Schema.PropertyBinding<{{commandFqn}}, {{propTypeFqn}}>(
+                                        c => c.{{opt.Property.Name}},
+                                        (c, v) => c.{{opt.Property.Name}} = v),
+                                    false,
+                                    {{EscapeString(opt.Name)}},
+                                    {{shortNameStr}},
+                                    {{EscapeString(opt.EnvironmentVariable)}},
+                                    {{(opt.IsRequired ? "true" : "false")}},
+                                    {{EscapeString(opt.Description)}},
+                                    {{converterExpr}},
+                                    {{BuildValidatorsExpr(opt.ValidatorTypes)}}),
 
                     """
                 );
@@ -665,19 +687,19 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                 sb.Append(
                     // lang=csharp
                     $$"""
-                            inputs.Add(new global::CliFx.Schema.CommandOptionSchema(
-                                new global::CliFx.Schema.PropertyBinding<{{commandFqn}}, {{propTypeFqn}}>(
-                                    c => c.{{opt.Property.Name}},
-                                    (c, v) => c.{{opt.Property.Name}} = v),
-                                true,
-                                {{EscapeString(opt.Name)}},
-                                {{shortNameStr}},
-                                {{EscapeString(opt.EnvironmentVariable)}},
-                                {{(opt.IsRequired ? "true" : "false")}},
-                                {{EscapeString(opt.Description)}},
-                                null, // element-level converter unused — collection converter handles conversion
-                                {{BuildValidatorsExpr(opt.ValidatorTypes)}},
-                                {{collectionConverterExpr}}));
+                                new global::CliFx.Schema.CommandOptionSchema(
+                                    new global::CliFx.Schema.PropertyBinding<{{commandFqn}}, {{propTypeFqn}}>(
+                                        c => c.{{opt.Property.Name}},
+                                        (c, v) => c.{{opt.Property.Name}} = v),
+                                    true,
+                                    {{EscapeString(opt.Name)}},
+                                    {{shortNameStr}},
+                                    {{EscapeString(opt.EnvironmentVariable)}},
+                                    {{(opt.IsRequired ? "true" : "false")}},
+                                    {{EscapeString(opt.Description)}},
+                                    null, // element-level converter unused — collection converter handles conversion
+                                    {{BuildValidatorsExpr(opt.ValidatorTypes)}},
+                                    {{collectionConverterExpr}}),
 
                     """
                 );
@@ -689,18 +711,18 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             sb.Append(
                 // lang=csharp
                 $$"""
-                        inputs.Add(new global::CliFx.Schema.CommandOptionSchema<{{commandFqn}}, bool>(
-                            new global::CliFx.Schema.PropertyBinding<{{commandFqn}}, bool>(
-                                c => c.IsHelpRequested,
-                                (c, v) => c.IsHelpRequested = v),
-                            false,
-                            "help",
-                            'h',
-                            null,
-                            false,
-                            "Shows help text.",
-                            new global::CliFx.Extensibility.BoolBindingConverter(),
-                            global::System.Array.Empty<global::CliFx.Extensibility.IBindingValidator>()));
+                            new global::CliFx.Schema.CommandOptionSchema<{{commandFqn}}, bool>(
+                                new global::CliFx.Schema.PropertyBinding<{{commandFqn}}, bool>(
+                                    c => c.IsHelpRequested,
+                                    (c, v) => c.IsHelpRequested = v),
+                                false,
+                                "help",
+                                'h',
+                                null,
+                                false,
+                                "Shows help text.",
+                                new global::CliFx.Extensibility.BoolBindingConverter(),
+                                global::System.Array.Empty<global::CliFx.Extensibility.IBindingValidator>()),
 
                 """
             );
@@ -711,18 +733,18 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             sb.Append(
                 // lang=csharp
                 $$"""
-                        inputs.Add(new global::CliFx.Schema.CommandOptionSchema<{{commandFqn}}, bool>(
-                            new global::CliFx.Schema.PropertyBinding<{{commandFqn}}, bool>(
-                                c => c.IsVersionRequested,
-                                (c, v) => c.IsVersionRequested = v),
-                            false,
-                            "version",
-                            null,
-                            null,
-                            false,
-                            "Shows version information.",
-                            new global::CliFx.Extensibility.BoolBindingConverter(),
-                            global::System.Array.Empty<global::CliFx.Extensibility.IBindingValidator>()));
+                            new global::CliFx.Schema.CommandOptionSchema<{{commandFqn}}, bool>(
+                                new global::CliFx.Schema.PropertyBinding<{{commandFqn}}, bool>(
+                                    c => c.IsVersionRequested,
+                                    (c, v) => c.IsVersionRequested = v),
+                                false,
+                                "version",
+                                null,
+                                null,
+                                false,
+                                "Shows version information.",
+                                new global::CliFx.Extensibility.BoolBindingConverter(),
+                                global::System.Array.Empty<global::CliFx.Extensibility.IBindingValidator>()),
 
                 """
             );
@@ -730,15 +752,18 @@ public class CommandSchemaGenerator : IIncrementalGenerator
 
         sb.Append(
             // lang=csharp
-            $$"""
-                    return new global::CliFx.Schema.CommandSchema<{{commandFqn}}>(
-                        {{EscapeString(command.Name)}},
-                        {{EscapeString(command.Description)}},
-                        inputs);
-                }
-            }
+            """
+                        }); // end of CommandInputSchema[] array initializer
+                } // end of partial class
             """
         );
+
+        // Close containing type wrappers (for nested classes)
+        foreach (var _ in containingTypes)
+        {
+            sb.AppendLine();
+            sb.AppendLine("}");
+        }
 
         return sb.ToString();
     }
@@ -774,19 +799,12 @@ public class CommandSchemaGenerator : IIncrementalGenerator
     private static string EscapeString(string? value) =>
         value is null ? "null" : $"\"{value.Replace("\\", "\\\\").Replace("\"", "\\\"")}\"";
 
-    private static string BuildConverterExpr(TypeDescriptor? converterType)
-    {
-        if (converterType is null)
-            return "null";
-        return $"new {converterType.FullyQualifiedName}()";
-    }
-
     private static string GetConverterExpression(
         TypeDescriptor? converterType,
         IPropertySymbol property
     ) =>
         converterType is not null
-            ? BuildConverterExpr(converterType)
+            ? $"new {converterType.FullyQualifiedName}()"
             : BuildDefaultConverterExpr(property);
 
     private static string BuildValidatorsExpr(IReadOnlyList<TypeDescriptor> validatorTypes)
@@ -903,22 +921,6 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             return $"new global::CliFx.Extensibility.DelegateBindingConverter<{fqn}>(s => new {fqn}(s!))";
 
         return null;
-    }
-
-    private static string BuildInterfaceList(CommandDescriptor command)
-    {
-        var interfaces = new List<string>();
-
-        if (command.NeedsHelpOption)
-            interfaces.Add("global::CliFx.ICommandWithHelpOption");
-
-        if (command.NeedsVersionOption)
-            interfaces.Add("global::CliFx.ICommandWithVersionOption");
-
-        if (interfaces.Count == 0)
-            return string.Empty;
-
-        return " : " + string.Join(", ", interfaces);
     }
 
     // Builds a collection converter expression for a sequence property.

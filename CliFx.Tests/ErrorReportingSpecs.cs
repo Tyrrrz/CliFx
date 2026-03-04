@@ -19,7 +19,7 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console) =>
                     throw new Exception("Something went wrong");
@@ -58,7 +58,7 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console) =>
                     throw new Exception("Something went wrong", new Exception("Another exception"));
@@ -104,7 +104,7 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console) =>
                     throw new CommandException("Something went wrong", 69);
@@ -141,7 +141,7 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console) =>
                     throw new CommandException("", 69);
@@ -178,7 +178,7 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console) =>
                     throw new CommandException("Something went wrong", 69, true);

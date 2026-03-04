@@ -18,7 +18,7 @@ public class ParameterBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandParameter(0)]
                 public required string Foo { get; set; }
@@ -60,7 +60,7 @@ public class ParameterBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandParameter(0)]
                 public required string Foo { get; set; }
@@ -116,7 +116,7 @@ public class ParameterBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandParameter(0)]
                 public required string Foo { get; set; }
@@ -152,7 +152,7 @@ public class ParameterBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandParameter(0)]
                 public required string Foo { get; set; }
@@ -188,7 +188,7 @@ public class ParameterBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandParameter(0)]
                 public required string Foo { get; set; }
@@ -230,7 +230,7 @@ public class ParameterBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandParameter(0)]
                 public required string Foo { get; set; }

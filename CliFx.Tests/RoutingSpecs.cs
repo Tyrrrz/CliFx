@@ -18,7 +18,7 @@ public class RoutingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             // lang=csharp
             """
             [Command]
-            public class DefaultCommand : ICommand
+            public partial class DefaultCommand : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -28,7 +28,7 @@ public class RoutingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             }
 
             [Command("cmd")]
-            public class NamedCommand : ICommand
+            public partial class NamedCommand : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -38,7 +38,7 @@ public class RoutingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             }
 
             [Command("cmd child")]
-            public class NamedChildCommand : ICommand
+            public partial class NamedChildCommand : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -75,7 +75,7 @@ public class RoutingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             // lang=csharp
             """
             [Command]
-            public class DefaultCommand : ICommand
+            public partial class DefaultCommand : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -85,7 +85,7 @@ public class RoutingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             }
 
             [Command("cmd")]
-            public class NamedCommand : ICommand
+            public partial class NamedCommand : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -95,7 +95,7 @@ public class RoutingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             }
 
             [Command("cmd child")]
-            public class NamedChildCommand : ICommand
+            public partial class NamedChildCommand : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -129,7 +129,7 @@ public class RoutingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             // lang=csharp
             """
             [Command]
-            public class DefaultCommand : ICommand
+            public partial class DefaultCommand : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -139,7 +139,7 @@ public class RoutingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             }
 
             [Command("cmd")]
-            public class NamedCommand : ICommand
+            public partial class NamedCommand : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -149,7 +149,7 @@ public class RoutingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             }
 
             [Command("cmd child")]
-            public class NamedChildCommand : ICommand
+            public partial class NamedChildCommand : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console)
                 {

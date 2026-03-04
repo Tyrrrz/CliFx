@@ -8,7 +8,6 @@ using CliFx.Schema;
 using CliFx.SourceGeneration;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
 namespace CliFx.Tests.Utils;
@@ -20,28 +19,6 @@ namespace CliFx.Tests.Utils;
 // Language proposal: https://github.com/dotnet/csharplang/discussions/130
 internal static class DynamicCommandBuilder
 {
-    // Rewrites [Command] classes to be `partial` so the source generator can process them.
-    private class AddPartialToCommandClassRewriter : CSharpSyntaxRewriter
-    {
-        public override SyntaxNode? VisitClassDeclaration(ClassDeclarationSyntax node)
-        {
-            var hasCommandAttr = node
-                .AttributeLists.SelectMany(al => al.Attributes)
-                .Any(a => a.Name.ToString() is "Command" or "CommandAttribute");
-
-            if (hasCommandAttr && !node.Modifiers.Any(SyntaxKind.PartialKeyword))
-            {
-                node = node.AddModifiers(
-                    SyntaxFactory
-                        .Token(SyntaxKind.PartialKeyword)
-                        .WithLeadingTrivia(SyntaxFactory.Whitespace(" "))
-                );
-            }
-
-            return base.VisitClassDeclaration(node);
-        }
-    }
-
     public static IReadOnlyList<CommandSchema> CompileMany(string sourceCode)
     {
         // Get default system namespaces
@@ -75,10 +52,6 @@ internal static class DynamicCommandBuilder
             SourceText.From(sourceCodeWithUsings),
             CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.Preview)
         );
-
-        // Add `partial` modifier to all [Command] classes so the source generator can process them
-        var rewriter = new AddPartialToCommandClassRewriter();
-        ast = ast.WithRootAndOptions(rewriter.Visit(ast.GetRoot()), ast.Options);
 
         // Compile the code to IL
         var compilation = CSharpCompilation.Create(

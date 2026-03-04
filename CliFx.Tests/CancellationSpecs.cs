@@ -59,7 +59,7 @@ public class CancellationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOut
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 public async ValueTask ExecuteAsync(IConsole console)
                 {

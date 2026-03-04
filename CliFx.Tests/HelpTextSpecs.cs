@@ -41,7 +41,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             // lang=csharp
             """
             [Command]
-            public class DefaultCommand : ICommand
+            public partial class DefaultCommand : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -72,13 +72,13 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             // lang=csharp
             """
             [Command("cmd")]
-            public class NamedCommand : ICommand
+            public partial class NamedCommand : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
 
             [Command("cmd child")]
-            public class NamedChildCommand : ICommand
+            public partial class NamedChildCommand : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -109,19 +109,19 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             // lang=csharp
             """
             [Command]
-            public class DefaultCommand : ICommand
+            public partial class DefaultCommand : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
 
             [Command("cmd", Description = "Description of a named command.")]
-            public class NamedCommand : ICommand
+            public partial class NamedCommand : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
 
             [Command("cmd child")]
-            public class NamedChildCommand : ICommand
+            public partial class NamedChildCommand : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -154,19 +154,19 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             // lang=csharp
             """
             [Command]
-            public class DefaultCommand : ICommand
+            public partial class DefaultCommand : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
 
             [Command("cmd")]
-            public class NamedCommand : ICommand
+            public partial class NamedCommand : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
 
             [Command("cmd child", Description = "Description of a named child command.")]
-            public class NamedChildCommand : ICommand
+            public partial class NamedChildCommand : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -246,7 +246,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             // lang=csharp
             """
             [Command(Description = "Description of the default command.")]
-            public class DefaultCommand : ICommand
+            public partial class DefaultCommand : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -276,13 +276,13 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             // lang=csharp
             """
             [Command]
-            public class DefaultCommand : ICommand
+            public partial class DefaultCommand : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
 
             [Command("cmd")]
-            public class NamedCommand : ICommand
+            public partial class NamedCommand : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -312,7 +312,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandParameter(0)]
                 public required string Foo { get; set; }
@@ -361,7 +361,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             }
 
             [Command]
-            public class Command : CommandBase
+            public partial class Command : CommandBase
             {
                 [CommandParameter(2)]
                 public required IReadOnlyList<string> Baz { get; set; }
@@ -397,7 +397,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption("foo")]
                 public required string Foo { get; set; }
@@ -438,7 +438,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandParameter(0, Name = "foo", Description = "Description of foo.")]
                 public string? Foo { get; set; }
@@ -483,7 +483,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -522,7 +522,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             // lang=csharp
             """
             [Command("cmd")]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -560,7 +560,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             public enum CustomEnum { One, Two, Three }
 
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandParameter(0)]
                 public CustomEnum Foo { get; set; }
@@ -613,7 +613,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             public enum CustomEnum { One, Two, Three }
 
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandParameter(0)]
                 public required IReadOnlyList<CustomEnum> Foo { get; set; }
@@ -666,7 +666,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             public enum CustomEnum { One, Two, Three }
 
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandParameter(0)]
                 public CustomEnum? Foo { get; set; }
@@ -719,7 +719,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             public enum CustomEnum { One, Two, Three }
 
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption("foo", EnvironmentVariable = "ENV_FOO")]
                 public CustomEnum Foo { get; set; }
@@ -767,7 +767,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             public enum CustomEnum { One, Two, Three }
 
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption("foo")]
                 public object? Foo { get; set; } = 42;
@@ -851,25 +851,25 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             // lang=csharp
             """
             [Command("cmd1", Description = "Description of one command.")]
-            public class FirstCommand : ICommand
+            public partial class FirstCommand : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
 
             [Command("cmd2", Description = "Description of another command.")]
-            public class SecondCommand : ICommand
+            public partial class SecondCommand : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
 
             [Command("cmd2 child", Description = "Description of another command's child command.")]
-            public class SecondCommandChildCommand : ICommand
+            public partial class SecondCommandChildCommand : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
 
             [Command("cmd3 child", Description = "Description of an orphaned command.")]
-            public class ThirdCommandChildCommand : ICommand
+            public partial class ThirdCommandChildCommand : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -916,31 +916,31 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             // lang=csharp
             """
             [Command("cmd1")]
-            public class FirstCommand : ICommand
+            public partial class FirstCommand : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
 
             [Command("cmd1 child1")]
-            public class FirstCommandFirstChildCommand : ICommand
+            public partial class FirstCommandFirstChildCommand : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
 
             [Command("cmd2")]
-            public class SecondCommand : ICommand
+            public partial class SecondCommand : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
 
             [Command("cmd2 child11")]
-            public class SecondCommandFirstChildCommand : ICommand
+            public partial class SecondCommandFirstChildCommand : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
 
             [Command("cmd2 child2")]
-            public class SecondCommandSecondChildCommand : ICommand
+            public partial class SecondCommandSecondChildCommand : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }
@@ -1001,7 +1001,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             // lang=csharp
             """
             [Command]
-            public class DefaultCommand : ICommand
+            public partial class DefaultCommand : ICommand
             {
                 [CommandOption("help", 'h')]
                 public string? Foo { get; set; }
@@ -1035,7 +1035,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             // lang=csharp
             """
             [Command]
-            public class DefaultCommand : ICommand
+            public partial class DefaultCommand : ICommand
             {
                 [CommandOption("version")]
                 public string? Foo { get; set; }

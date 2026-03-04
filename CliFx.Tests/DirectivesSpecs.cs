@@ -48,7 +48,7 @@ public class DirectivesSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             // lang=csharp
             """
             [Command("cmd")]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }

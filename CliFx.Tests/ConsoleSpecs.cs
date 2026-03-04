@@ -60,7 +60,7 @@ public class ConsoleSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -121,7 +121,7 @@ public class ConsoleSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console)
                 {
@@ -166,7 +166,7 @@ public class ConsoleSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 public ValueTask ExecuteAsync(IConsole console)
                 {

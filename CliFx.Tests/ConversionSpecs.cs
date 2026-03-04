@@ -18,7 +18,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption('f')]
                 public string? Foo { get; set; }
@@ -55,7 +55,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption('f')]
                 public object? Foo { get; set; }
@@ -92,7 +92,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption('f')]
                 public bool Foo { get; set; }
@@ -141,7 +141,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption('f')]
                 public int Foo { get; set; }
@@ -178,7 +178,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption('f')]
                 public double Foo { get; set; }
@@ -218,7 +218,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption('f')]
                 public DateTimeOffset Foo { get; set; }
@@ -258,7 +258,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption('f')]
                 public TimeSpan Foo { get; set; }
@@ -300,7 +300,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             public enum CustomEnum { One = 1, Two = 2, Three = 3 }
 
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption('f')]
                 public CustomEnum Foo { get; set; }
@@ -337,7 +337,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption('f')]
                 public int? Foo { get; set; }
@@ -381,7 +381,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             public enum CustomEnum { One = 1, Two = 2, Three = 3 }
 
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption('f')]
                 public CustomEnum? Foo { get; set; }
@@ -430,7 +430,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             }
 
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption('f')]
                 public CustomType? Foo { get; set; }
@@ -487,7 +487,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             }
 
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption('f')]
                 public CustomTypeA? Foo { get; set; }
@@ -538,7 +538,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             }
 
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption('f', Converter = typeof(CustomConverter))]
                 public int Foo { get; set; }
@@ -578,7 +578,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption('f')]
                 public string[]? Foo { get; set; }
@@ -620,7 +620,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption('f')]
                 public IReadOnlyList<string>? Foo { get; set; }
@@ -662,7 +662,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption('f')]
                 public List<string>? Foo { get; set; }
@@ -704,7 +704,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption('f')]
                 public int[]? Foo { get; set; }
@@ -750,7 +750,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             }
 
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption('f')]
                 public CustomType? Foo { get; set; }
@@ -790,7 +790,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             }
 
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption('f')]
                 public CustomType? Foo { get; set; }
@@ -826,7 +826,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption('f')]
                 public int Foo { get; set; }
@@ -872,7 +872,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             }
 
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption('f', Validators = [typeof(ValidatorA), typeof(ValidatorB)])]
                 public int Foo { get; set; }
@@ -914,7 +914,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
             }
 
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption('f')]
                 public CustomType? Foo { get; set; }

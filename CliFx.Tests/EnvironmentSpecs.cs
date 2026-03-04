@@ -22,7 +22,7 @@ public class EnvironmentSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutp
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption("foo", EnvironmentVariable = "ENV_FOO")]
                 public string? Foo { get; set; }
@@ -67,7 +67,7 @@ public class EnvironmentSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutp
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption("foo", EnvironmentVariable = "ENV_FOO")]
                 public IReadOnlyList<string>? Foo { get; set; }
@@ -109,7 +109,7 @@ public class EnvironmentSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutp
             // lang=csharp
             """
             [Command]
-            public class Command : ICommand
+            public partial class Command : ICommand
             {
                 [CommandOption("foo", EnvironmentVariable = "ENV_FOO")]
                 public string? Foo { get; set; }
