@@ -15,7 +15,7 @@ namespace CliFx;
 /// </summary>
 public partial class CliApplicationBuilder
 {
-    private readonly List<CommandSchema> _commandSchemas = [];
+    private readonly HashSet<CommandSchema> _commandSchemas = [];
 
     private bool _isDebugModeAllowed = true;
     private bool _isPreviewModeAllowed = true;
@@ -166,7 +166,7 @@ public partial class CliApplicationBuilder
             _commandSchemas.Select(s => s.Type).ToArray(),
             _isDebugModeAllowed,
             _isPreviewModeAllowed,
-            _commandSchemas
+            [.. _commandSchemas]
         );
 
         return new CliApplication(
