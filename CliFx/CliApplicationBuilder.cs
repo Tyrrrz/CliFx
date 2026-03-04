@@ -141,7 +141,7 @@ public partial class CliApplicationBuilder
     /// <summary>
     /// Configures the application to use the specified service provider for activating types.
     /// This method takes a delegate that receives the list of all added command schemas, so that you can
-    /// easily register them with the service provider.
+    /// easily register their types with the service provider.
     /// </summary>
     public CliApplicationBuilder UseTypeActivator(
         Func<IReadOnlyList<CommandSchema>, IServiceProvider> getServiceProvider

@@ -53,13 +53,13 @@ public partial class CommandSchema(
     /// Whether the implicit --help option is available.
     /// </summary>
     public bool IsImplicitHelpOptionAvailable =>
-        typeof(global::CliFx.ICommandWithHelpOption).IsAssignableFrom(Type);
+        typeof(ICommandWithHelpOption).IsAssignableFrom(Type);
 
     /// <summary>
     /// Whether the implicit --version option is available.
     /// </summary>
     public bool IsImplicitVersionOptionAvailable =>
-        typeof(global::CliFx.ICommandWithVersionOption).IsAssignableFrom(Type);
+        typeof(ICommandWithVersionOption).IsAssignableFrom(Type);
 
     /// <summary>
     /// Whether this command matches the given name.
@@ -81,8 +81,6 @@ public partial class CommandSchema(
 
         foreach (var optionSchema in Options)
         {
-            if (optionSchema.Property is NullPropertyBinding)
-                continue;
             var value = optionSchema.Property.GetValue(instance);
             result[optionSchema] = value;
         }
