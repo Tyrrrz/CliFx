@@ -113,6 +113,7 @@ public class CliApplication(
             commandSchema.GetValues(commandInstance)
         );
 
+        // Perform a limited command binding to check if the help or version options were specified by the user
         if (commandInstance is ICommandWithHelpOption or ICommandWithVersionOption)
         {
             _commandBinder.BindHelpAndVersionOptions(commandInput, commandSchema, commandInstance);
