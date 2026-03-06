@@ -510,9 +510,11 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             );
 
         if (needsHelpOption)
-            interfaces.Add("global::CliFx.ICommandWithHelpOption");
+            interfaces.Add("global::CliFx.Schema.IHasHelpOption");
+
         if (needsVersionOption)
-            interfaces.Add("global::CliFx.ICommandWithVersionOption");
+            interfaces.Add("global::CliFx.Schema.IHasVersionOption");
+
         var interfaceList =
             interfaces.Count > 0 ? " : " + string.Join(", ", interfaces) : string.Empty;
 

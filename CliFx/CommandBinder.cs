@@ -276,12 +276,12 @@ internal class CommandBinder
     {
         var optionSchemas = new List<CommandOptionSchema>(2);
 
-        if (commandInstance is ICommandWithHelpOption)
+        if (commandInstance is IHasHelpOption)
         {
             var optionSchema = commandSchema.Options.FirstOrDefault(o =>
                 string.Equals(
                     o.Property.Name,
-                    nameof(ICommandWithHelpOption.IsHelpRequested),
+                    nameof(IHasHelpOption.IsHelpRequested),
                     StringComparison.OrdinalIgnoreCase
                 )
             );
@@ -290,12 +290,12 @@ internal class CommandBinder
                 optionSchemas.Add(optionSchema);
         }
 
-        if (commandInstance is ICommandWithVersionOption)
+        if (commandInstance is IHasVersionOption)
         {
             var optionSchema = commandSchema.Options.FirstOrDefault(o =>
                 string.Equals(
                     o.Property.Name,
-                    nameof(ICommandWithVersionOption.IsVersionRequested),
+                    nameof(IHasVersionOption.IsVersionRequested),
                     StringComparison.OrdinalIgnoreCase
                 )
             );

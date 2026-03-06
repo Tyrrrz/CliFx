@@ -1,4 +1,3 @@
-using System;
 using CliFx.SourceGeneration.Utils.Extensions;
 using Microsoft.CodeAnalysis;
 
@@ -11,13 +10,15 @@ internal record TypeDescriptor(ITypeSymbol Symbol)
     public string Name { get; } =
         Symbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
 
-    public string FullyQualifiedName { get; } =
-        Symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) is { } fqn
-        && fqn.StartsWith("global::", StringComparison.Ordinal)
-            ? fqn.Substring("global::".Length)
-            : Symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+    public string GlobalFullyQualifiedName { get; } =
+        Symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
 
-    public string GlobalFullyQualifiedName => $"global::{FullyQualifiedName}";
+    public string FullyQualifiedName { get; } =
+        Symbol.ToDisplayString(
+            SymbolDisplayFormat.FullyQualifiedFormat.WithGlobalNamespaceStyle(
+                SymbolDisplayGlobalNamespaceStyle.OmittedAsContaining
+            )
+        );
 
     public override string ToString() => GlobalFullyQualifiedName;
 }

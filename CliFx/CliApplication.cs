@@ -114,13 +114,13 @@ public class CliApplication(
         );
 
         // Perform a limited command binding to check if the help or version options were specified by the user
-        if (commandInstance is ICommandWithHelpOption or ICommandWithVersionOption)
+        if (commandInstance is IHasHelpOption or IHasVersionOption)
         {
             _commandBinder.BindHelpAndVersionOptions(commandInput, commandSchema, commandInstance);
 
             // Help text
             if (
-                commandInstance is ICommandWithHelpOption { IsHelpRequested: true }
+                commandInstance is IHasHelpOption { IsHelpRequested: true }
                 || commandSchema == FallbackDefaultCommand.Schema && !commandInput.HasArguments
             )
             {
@@ -129,7 +129,7 @@ public class CliApplication(
             }
 
             // Version text
-            if (commandInstance is ICommandWithVersionOption { IsVersionRequested: true })
+            if (commandInstance is IHasVersionOption { IsVersionRequested: true })
             {
                 console.WriteLine(Metadata.Version);
                 return 0;
