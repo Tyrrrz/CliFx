@@ -7,7 +7,6 @@ internal record CommandOptionDescriptor(
     string? Name,
     char? ShortName,
     string? EnvironmentVariable,
-    bool IsRequired,
     string? Description,
     TypeDescriptor? ConverterType,
     IReadOnlyList<TypeDescriptor> ValidatorTypes

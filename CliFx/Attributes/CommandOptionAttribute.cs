@@ -53,16 +53,6 @@ public sealed class CommandOptionAttribute : Attribute
     public char? ShortName { get; }
 
     /// <summary>
-    /// Whether this option is required (default: <c>false</c>).
-    /// If an option is required, the user will get an error if they don't set it.
-    /// </summary>
-    /// <remarks>
-    /// You can use the <c>required</c> keyword on the property (introduced in C# 11) to implicitly
-    /// set <see cref="IsRequired" /> to <c>true</c>.
-    /// </remarks>
-    public bool IsRequired { get; set; }
-
-    /// <summary>
     /// Environment variable whose value will be used as a fallback if the option
     /// has not been explicitly set through command-line arguments.
     /// </summary>

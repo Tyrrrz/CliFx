@@ -172,13 +172,6 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                     );
                 }
 
-                var isRequired =
-                    parameterAttribute
-                        .NamedArguments.Where(a => a.Key == "IsRequired")
-                        .Select(a => a.Value.Value as bool?)
-                        .FirstOrDefault()
-                    ?? propertyDescriptor.Symbol.IsRequired();
-
                 var description = parameterAttribute
                     .NamedArguments.Where(a => a.Key == "Description")
                     .Select(a => a.Value.Value as string)
@@ -202,7 +195,6 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                         propertyDescriptor,
                         order,
                         name,
-                        isRequired,
                         description,
                         converterTypeDescriptor,
                         validatorTypeDescriptors
@@ -278,13 +270,6 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                     }
                 }
 
-                var isRequired =
-                    optionAttribute
-                        .NamedArguments.Where(a => a.Key == "IsRequired")
-                        .Select(a => a.Value.Value as bool?)
-                        .FirstOrDefault()
-                    ?? propertyDescriptor.Symbol.IsRequired();
-
                 var description = optionAttribute
                     .NamedArguments.Where(a => a.Key == "Description")
                     .Select(a => a.Value.Value as string)
@@ -314,7 +299,6 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                         name,
                         shortName,
                         environmentVariable,
-                        isRequired,
                         description,
                         converterTypeDescriptor,
                         validatorTypeDescriptors
@@ -587,7 +571,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                                     false,
                                     {{param.Order}},
                                     {{EscapeString(param.Name)}},
-                                    {{(param.IsRequired ? "true" : "false")}},
+                                    {{(param.Property.IsRequired ? "true" : "false")}},
                                     {{EscapeString(param.Description)}},
                                     {{converterExpr}},
                                     null,
@@ -613,7 +597,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                                     true,
                                     {{param.Order}},
                                     {{EscapeString(param.Name)}},
-                                    {{(param.IsRequired ? "true" : "false")}},
+                                    {{(param.Property.IsRequired ? "true" : "false")}},
                                     {{EscapeString(param.Description)}},
                                     null,
                                     {{sequenceConverterExpr}},
@@ -647,7 +631,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                                     {{EscapeString(opt.Name)}},
                                     {{shortNameStr}},
                                     {{EscapeString(opt.EnvironmentVariable)}},
-                                    {{(opt.IsRequired ? "true" : "false")}},
+                                    {{(opt.Property.IsRequired ? "true" : "false")}},
                                     {{EscapeString(opt.Description)}},
                                     {{converterExpr}},
                                     null,
@@ -674,7 +658,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                                     {{EscapeString(opt.Name)}},
                                     {{shortNameStr}},
                                     {{EscapeString(opt.EnvironmentVariable)}},
-                                    {{(opt.IsRequired ? "true" : "false")}},
+                                    {{(opt.Property.IsRequired ? "true" : "false")}},
                                     {{EscapeString(opt.Description)}},
                                     null,
                                     {{sequenceConverterExpr}},

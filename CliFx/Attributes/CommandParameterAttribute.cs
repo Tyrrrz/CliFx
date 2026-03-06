@@ -21,16 +21,6 @@ public sealed class CommandParameterAttribute(int order) : Attribute
     public int Order { get; } = order;
 
     /// <summary>
-    /// Whether this parameter is required (default: <c>true</c>).
-    /// If a parameter is required, the user will get an error if they don't set it.
-    /// </summary>
-    /// <remarks>
-    /// Parameter marked as non-required must always be the last in order.
-    /// Only one non-required parameter is allowed in a command.
-    /// </remarks>
-    public bool IsRequired { get; set; } = true;
-
-    /// <summary>
     /// Parameter name.
     /// This is shown to the user in the help text.
     /// </summary>

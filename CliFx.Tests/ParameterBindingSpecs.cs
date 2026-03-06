@@ -193,7 +193,7 @@ public class ParameterBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
                 [CommandParameter(0)]
                 public required string Foo { get; set; }
 
-                [CommandParameter(1, IsRequired = false)]
+                [CommandParameter(1)]
                 public string? Bar { get; set; } = "xyz";
 
                 public ValueTask ExecuteAsync(IConsole console)
