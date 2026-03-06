@@ -24,6 +24,11 @@ public static class Program
             "false"
         );
 
-        await new CliApplicationBuilder().AddCommandsFromThisAssembly().Build().RunAsync();
+        await new CliApplicationBuilder()
+            .AddCommandsFromThisAssembly()
+            .AllowDebugMode()
+            .AllowPreviewMode()
+            .Build()
+            .RunAsync();
     }
 }
