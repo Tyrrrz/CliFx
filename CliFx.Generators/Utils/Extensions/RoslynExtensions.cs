@@ -26,14 +26,26 @@ internal static class RoslynExtensions
 
     extension(ITypeSymbol type)
     {
-        public IEnumerable<INamedTypeSymbol> GetBaseTypes()
+        public IEnumerable<IPropertySymbol> GetProperties(bool includeInherited = true)
         {
-            var current = type.BaseType;
+            var propertyNames = new HashSet<string>();
+            var containingType = type;
 
-            while (current is not null)
+            while (
+                containingType is not null
+                && containingType.SpecialType != SpecialType.System_Object
+            )
             {
-                yield return current;
-                current = current.BaseType;
+                foreach (var property in containingType.GetMembers().OfType<IPropertySymbol>())
+                {
+                    if (propertyNames.Add(property.Name))
+                        yield return property;
+                }
+
+                if (includeInherited)
+                    containingType = containingType.BaseType;
+                else
+                    yield break;
             }
         }
 
@@ -48,6 +60,25 @@ internal static class RoslynExtensions
         public bool ImplementsInterface(string interfaceName) =>
             type.AllInterfaces.Any(i => i.DisplayNameMatches(interfaceName))
             || type.DisplayNameMatches(interfaceName);
+
+        /// <summary>
+        /// Returns the effective accessibility of the type by walking up the containment chain
+        /// and returning the most restrictive accessibility encountered.
+        /// </summary>
+        public Accessibility GetActualAccessibility()
+        {
+            var current = type;
+            var accessibility = Accessibility.Public;
+
+            while (current is not null)
+            {
+                if (current.DeclaredAccessibility < accessibility)
+                    accessibility = current.DeclaredAccessibility;
+                current = current.ContainingType;
+            }
+
+            return accessibility;
+        }
     }
 
     extension(IPropertySymbol property)

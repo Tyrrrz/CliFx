@@ -73,7 +73,7 @@ internal static class DynamicCommandBuilder
         // Run the source generator to produce Schema properties on [Command] classes
         CSharpGeneratorDriver
             .Create(
-                generators: [new CommandSchemaGenerator().AsSourceGenerator()],
+                [new CommandSchemaGenerator().AsSourceGenerator()],
                 parseOptions: CSharpParseOptions.Default.WithLanguageVersion(
                     LanguageVersion.Preview
                 )

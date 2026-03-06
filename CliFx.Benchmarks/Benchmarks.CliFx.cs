@@ -9,7 +9,7 @@ namespace CliFx.Benchmarks;
 public partial class Benchmarks
 {
     [Command]
-    public partial class CliFxCommand : ICommand
+    private partial class CliFxCommand : ICommand
     {
         [CommandOption("str", 's')]
         public string? StrOption { get; set; }

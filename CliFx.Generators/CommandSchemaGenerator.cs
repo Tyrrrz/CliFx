@@ -19,10 +19,10 @@ public class CommandSchemaGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        var allCommandNodes = context.SyntaxProvider.ForAttributeWithMetadataName(
+        var commandNodes = context.SyntaxProvider.ForAttributeWithMetadataName(
             SymbolNames.CliFxCommandAttribute,
-            predicate: static (node, _) => node is ClassDeclarationSyntax,
-            transform: static (ctx, _) =>
+            static (node, _) => node is ClassDeclarationSyntax,
+            static (ctx, _) =>
                 (
                     ClassDeclaration: (ClassDeclarationSyntax)ctx.TargetNode,
                     Symbol: (INamedTypeSymbol)ctx.TargetSymbol
@@ -30,7 +30,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
         );
 
         // Emit diagnostics for [Command] classes that are not partial or don't implement ICommand
-        var diagnostics = allCommandNodes.SelectMany(
+        var diagnostics = commandNodes.SelectMany(
             static (item, _) =>
             {
                 // Abstract classes are intentionally skipped — no diagnostic needed
@@ -66,7 +66,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
         );
 
         // Only process classes that are partial, implement ICommand, and are not abstract
-        var commandDeclarations = allCommandNodes
+        var commandDeclarations = commandNodes
             .Select(
                 static (item, _) =>
                 {
@@ -95,258 +95,241 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             return null;
 
         // Must have [Command] attribute
-        var commandAttr = type.GetAttributes()
+        var commandAttribute = type.GetAttributes()
             .FirstOrDefault(a =>
                 a.AttributeClass?.DisplayNameMatches(SymbolNames.CliFxCommandAttribute) == true
             );
-        if (commandAttr is null)
+
+        if (commandAttribute is null)
             return null;
 
         // Must be a concrete class
         if (type.IsAbstract)
             return null;
 
-        var name =
-            commandAttr
+        var commandName =
+            commandAttribute
                 .NamedArguments.Where(a => a.Key == "Name")
                 .Select(a => a.Value.Value as string)
                 .FirstOrDefault()
-            ?? commandAttr
+            ?? commandAttribute
                 .ConstructorArguments.Where(a => a.Type?.SpecialType == SpecialType.System_String)
                 .Select(a => a.Value as string)
                 .FirstOrDefault();
 
-        var description = commandAttr
+        var commandDescription = commandAttribute
             .NamedArguments.Where(a => a.Key == "Description")
             .Select(a => a.Value.Value as string)
             .FirstOrDefault();
 
-        var allProperties = GetAllProperties(type);
-
-        var parameters = new List<CommandParameterDescriptor>();
-        var options = new List<CommandOptionDescriptor>();
+        var parameterDescriptors = new List<CommandParameterDescriptor>();
+        var optionDescriptors = new List<CommandOptionDescriptor>();
         var diagnostics = new List<Diagnostic>();
 
-        // Returns all non-static properties declared on the type and its base classes,
-        // with derived class properties shadowing base class properties of the same name.
-        static IEnumerable<IPropertySymbol> GetAllProperties(INamedTypeSymbol t)
+        foreach (
+            var propertyDescriptor in type.GetProperties()
+                .Where(p => !p.IsStatic)
+                .Select(p => new PropertyDescriptor(p))
+        )
         {
-            var seen = new HashSet<string>();
-            var current = (INamedTypeSymbol?)t;
-            while (current is not null && current.SpecialType != SpecialType.System_Object)
-            {
-                foreach (var prop in current.GetMembers().OfType<IPropertySymbol>())
-                {
-                    if (!prop.IsStatic && seen.Add(prop.Name))
-                        yield return prop;
-                }
-
-                current = current.BaseType;
-            }
-        }
-
-        foreach (var property in allProperties)
-        {
-            var paramAttr = property
-                .GetAttributes()
+            var parameterAttribute = propertyDescriptor
+                .Symbol.GetAttributes()
                 .FirstOrDefault(a =>
                     a.AttributeClass?.DisplayNameMatches(SymbolNames.CliFxCommandParameterAttribute)
                     == true
                 );
 
-            if (paramAttr is not null)
+            if (parameterAttribute is not null)
             {
-                var order = paramAttr
+                var order = parameterAttribute
                     .ConstructorArguments.Where(a =>
                         a.Type?.SpecialType == SpecialType.System_Int32
                     )
                     .Select(a => (int)(a.Value ?? 0))
                     .FirstOrDefault();
 
-                var paramName =
-                    paramAttr
+                var name =
+                    parameterAttribute
                         .NamedArguments.Where(a => a.Key == "Name")
                         .Select(a => a.Value.Value as string)
                         .FirstOrDefault()
-                    ?? property.Name.ToLowerInvariant();
+                    ?? propertyDescriptor.Name.ToLowerInvariant();
 
                 // CLIFX005: parameter name must not be empty
-                var explicitName = paramAttr
+                var explicitName = parameterAttribute
                     .NamedArguments.Where(a => a.Key == "Name")
                     .Select(a => a.Value.Value as string)
                     .FirstOrDefault();
+
                 if (explicitName is not null && string.IsNullOrWhiteSpace(explicitName))
                 {
                     diagnostics.Add(
                         Diagnostic.Create(
                             DiagnosticDescriptors.ParameterMustHaveName,
-                            property.Locations.FirstOrDefault() ?? Location.None,
-                            property.Name
+                            propertyDescriptor.Symbol.Locations.FirstOrDefault() ?? Location.None,
+                            propertyDescriptor.Name
                         )
                     );
                 }
 
-                var paramIsRequired =
-                    paramAttr
+                var isRequired =
+                    parameterAttribute
                         .NamedArguments.Where(a => a.Key == "IsRequired")
                         .Select(a => a.Value.Value as bool?)
                         .FirstOrDefault()
-                    ?? property.IsRequired();
+                    ?? propertyDescriptor.Symbol.IsRequired();
 
-                var paramDescription = paramAttr
+                var description = parameterAttribute
                     .NamedArguments.Where(a => a.Key == "Description")
                     .Select(a => a.Value.Value as string)
                     .FirstOrDefault();
 
-                var paramConverterType = paramAttr
+                var converterTypeDescriptor = parameterAttribute
                     .NamedArguments.Where(a => a.Key == "Converter")
-                    .Select(a =>
-                        a.Value.Value is ITypeSymbol sym ? TypeDescriptor.FromSymbol(sym) : null
-                    )
+                    .Select(a => a.Value.Value is ITypeSymbol sym ? (TypeDescriptor)new(sym) : null)
                     .FirstOrDefault();
 
-                var paramValidatorTypes = paramAttr
+                var validatorTypeDescriptors = parameterAttribute
                     .NamedArguments.Where(a => a.Key == "Validators")
                     .SelectMany(a => a.Value.Values)
-                    .Select(v => v.Value is ITypeSymbol sym ? TypeDescriptor.FromSymbol(sym) : null)
+                    .Select(v => v.Value is ITypeSymbol sym ? (TypeDescriptor)new(sym) : null)
                     .Where(t => t is not null)
                     .Select(t => t!)
                     .ToArray();
 
-                parameters.Add(
+                parameterDescriptors.Add(
                     new CommandParameterDescriptor(
-                        property,
+                        propertyDescriptor,
                         order,
-                        paramName,
-                        paramIsRequired,
-                        paramDescription,
-                        paramConverterType,
-                        paramValidatorTypes
+                        name,
+                        isRequired,
+                        description,
+                        converterTypeDescriptor,
+                        validatorTypeDescriptors
                     )
                 );
 
                 continue;
             }
 
-            var optAttr = property
-                .GetAttributes()
+            var optionAttribute = propertyDescriptor
+                .Symbol.GetAttributes()
                 .FirstOrDefault(a =>
                     a.AttributeClass?.DisplayNameMatches(SymbolNames.CliFxCommandOptionAttribute)
                     == true
                 );
 
-            if (optAttr is not null)
+            if (optionAttribute is not null)
             {
-                var optName =
-                    optAttr
+                var name =
+                    optionAttribute
                         .ConstructorArguments.Where(a =>
                             a.Type?.SpecialType == SpecialType.System_String
                         )
                         .Select(a => a.Value as string)
                         .FirstOrDefault()
-                    ?? optAttr
+                    ?? optionAttribute
                         .NamedArguments.Where(a => a.Key == "Name")
                         .Select(a => a.Value.Value as string)
                         .FirstOrDefault();
 
                 var shortName =
-                    optAttr
+                    optionAttribute
                         .ConstructorArguments.Where(a =>
                             a.Type?.SpecialType == SpecialType.System_Char
                         )
                         .Select(a => a.Value as char?)
                         .FirstOrDefault()
-                    ?? optAttr
+                    ?? optionAttribute
                         .NamedArguments.Where(a => a.Key == "ShortName")
                         .Select(a => a.Value.Value as char?)
                         .FirstOrDefault();
 
                 // CLIFX003: option must have a name or short name
-                if (string.IsNullOrWhiteSpace(optName) && shortName is null)
+                if (string.IsNullOrWhiteSpace(name) && shortName is null)
                 {
                     diagnostics.Add(
                         Diagnostic.Create(
                             DiagnosticDescriptors.OptionMustHaveNameOrShortName,
-                            property.Locations.FirstOrDefault() ?? Location.None,
-                            property.Name
+                            propertyDescriptor.Symbol.Locations.FirstOrDefault() ?? Location.None,
+                            propertyDescriptor.Name
                         )
                     );
                 }
 
                 // CLIFX004: option name must be valid
-                if (!string.IsNullOrWhiteSpace(optName))
+                if (!string.IsNullOrWhiteSpace(name))
                 {
                     if (
-                        optName.Length < 2
-                        || optName.StartsWith("-", StringComparison.Ordinal)
-                        || optName.Any(char.IsWhiteSpace)
+                        name.Length < 2
+                        || name.StartsWith("-", StringComparison.Ordinal)
+                        || name.Any(char.IsWhiteSpace)
                     )
                     {
                         diagnostics.Add(
                             Diagnostic.Create(
                                 DiagnosticDescriptors.OptionNameInvalid,
-                                property.Locations.FirstOrDefault() ?? Location.None,
-                                optName,
-                                property.Name
+                                propertyDescriptor.Symbol.Locations.FirstOrDefault()
+                                    ?? Location.None,
+                                name,
+                                propertyDescriptor.Name
                             )
                         );
                     }
                 }
 
-                var optIsRequired =
-                    optAttr
+                var isRequired =
+                    optionAttribute
                         .NamedArguments.Where(a => a.Key == "IsRequired")
                         .Select(a => a.Value.Value as bool?)
                         .FirstOrDefault()
-                    ?? property.IsRequired();
+                    ?? propertyDescriptor.Symbol.IsRequired();
 
-                var optDescription = optAttr
+                var description = optionAttribute
                     .NamedArguments.Where(a => a.Key == "Description")
                     .Select(a => a.Value.Value as string)
                     .FirstOrDefault();
 
-                var envVar = optAttr
+                var environmentVariable = optionAttribute
                     .NamedArguments.Where(a => a.Key == "EnvironmentVariable")
                     .Select(a => a.Value.Value as string)
                     .FirstOrDefault();
 
-                var optConverterType = optAttr
+                var converterTypeDescriptor = optionAttribute
                     .NamedArguments.Where(a => a.Key == "Converter")
-                    .Select(a =>
-                        a.Value.Value is ITypeSymbol sym ? TypeDescriptor.FromSymbol(sym) : null
-                    )
+                    .Select(a => a.Value.Value is ITypeSymbol sym ? (TypeDescriptor)new(sym) : null)
                     .FirstOrDefault();
 
-                var optValidatorTypes = optAttr
+                var validatorTypeDescriptors = optionAttribute
                     .NamedArguments.Where(a => a.Key == "Validators")
                     .SelectMany(a => a.Value.Values)
-                    .Select(v => v.Value is ITypeSymbol sym ? TypeDescriptor.FromSymbol(sym) : null)
+                    .Select(v => v.Value is ITypeSymbol sym ? (TypeDescriptor)new(sym) : null)
                     .Where(t => t is not null)
                     .Select(t => t!)
                     .ToArray();
 
-                options.Add(
+                optionDescriptors.Add(
                     new CommandOptionDescriptor(
-                        property,
-                        optName,
+                        propertyDescriptor,
+                        name,
                         shortName,
-                        envVar,
-                        optIsRequired,
-                        optDescription,
-                        optConverterType,
-                        optValidatorTypes
+                        environmentVariable,
+                        isRequired,
+                        description,
+                        converterTypeDescriptor,
+                        validatorTypeDescriptors
                     )
                 );
             }
         }
 
         // CLIFX006: options must have unique names and short names
-        for (var i = 0; i < options.Count; i++)
+        for (var i = 0; i < optionDescriptors.Count; i++)
         {
-            for (var j = i + 1; j < options.Count; j++)
+            for (var j = i + 1; j < optionDescriptors.Count; j++)
             {
-                var a = options[i];
-                var b = options[j];
+                var a = optionDescriptors[i];
+                var b = optionDescriptors[j];
 
                 if (
                     !string.IsNullOrWhiteSpace(a.Name)
@@ -356,7 +339,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                     diagnostics.Add(
                         Diagnostic.Create(
                             DiagnosticDescriptors.OptionsMustHaveUniqueNames,
-                            b.Property.Locations.FirstOrDefault() ?? Location.None,
+                            b.Property.Symbol.Locations.FirstOrDefault() ?? Location.None,
                             b.Property.Name,
                             type.Name,
                             "name",
@@ -371,7 +354,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                     diagnostics.Add(
                         Diagnostic.Create(
                             DiagnosticDescriptors.OptionsMustHaveUniqueNames,
-                            b.Property.Locations.FirstOrDefault() ?? Location.None,
+                            b.Property.Symbol.Locations.FirstOrDefault() ?? Location.None,
                             b.Property.Name,
                             type.Name,
                             "short name",
@@ -384,19 +367,19 @@ public class CommandSchemaGenerator : IIncrementalGenerator
         }
 
         // CLIFX007: parameters must have unique order values
-        for (var i = 0; i < parameters.Count; i++)
+        for (var i = 0; i < parameterDescriptors.Count; i++)
         {
-            for (var j = i + 1; j < parameters.Count; j++)
+            for (var j = i + 1; j < parameterDescriptors.Count; j++)
             {
-                var a = parameters[i];
-                var b = parameters[j];
+                var a = parameterDescriptors[i];
+                var b = parameterDescriptors[j];
 
                 if (a.Order == b.Order)
                 {
                     diagnostics.Add(
                         Diagnostic.Create(
                             DiagnosticDescriptors.ParametersMustHaveUniqueOrder,
-                            b.Property.Locations.FirstOrDefault() ?? Location.None,
+                            b.Property.Symbol.Locations.FirstOrDefault() ?? Location.None,
                             b.Property.Name,
                             type.Name,
                             b.Order,
@@ -408,19 +391,19 @@ public class CommandSchemaGenerator : IIncrementalGenerator
         }
 
         // CLIFX008: parameters must have unique names
-        for (var i = 0; i < parameters.Count; i++)
+        for (var i = 0; i < parameterDescriptors.Count; i++)
         {
-            for (var j = i + 1; j < parameters.Count; j++)
+            for (var j = i + 1; j < parameterDescriptors.Count; j++)
             {
-                var a = parameters[i];
-                var b = parameters[j];
+                var a = parameterDescriptors[i];
+                var b = parameterDescriptors[j];
 
                 if (string.Equals(a.Name, b.Name, StringComparison.OrdinalIgnoreCase))
                 {
                     diagnostics.Add(
                         Diagnostic.Create(
                             DiagnosticDescriptors.ParametersMustHaveUniqueNames,
-                            b.Property.Locations.FirstOrDefault() ?? Location.None,
+                            b.Property.Symbol.Locations.FirstOrDefault() ?? Location.None,
                             b.Property.Name,
                             type.Name,
                             b.Name,
@@ -431,7 +414,14 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             }
         }
 
-        return new CommandDescriptor(type, name, description, parameters, options, diagnostics);
+        return new CommandDescriptor(
+            new TypeDescriptor(type),
+            commandName,
+            commandDescription,
+            parameterDescriptors,
+            optionDescriptors,
+            diagnostics
+        );
     }
 
     private static void Execute(
@@ -450,15 +440,15 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             }
 
             var source = GenerateCommandSchemaSource(command);
-            var hintName = $"{command.Type.ToDisplayString().Replace('.', '_')}_Schema.g.cs";
+            var hintName = $"{command.Type.FullyQualifiedName.Replace('.', '_')}_Schema.g.cs";
             ctx.AddSource(hintName, SourceText.From(source, Encoding.UTF8));
         }
     }
 
     private static string GenerateCommandSchemaSource(CommandDescriptor command)
     {
-        var commandFqn = command.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-        var containingNs = command.Type.ContainingNamespace;
+        var commandFqn = command.Type.FullyQualifiedName;
+        var containingNs = command.Type.Symbol.ContainingNamespace;
         var ns =
             containingNs is not null && !containingNs.IsGlobalNamespace
                 ? containingNs.ToDisplayString()
@@ -466,7 +456,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
 
         // Collect containing types from outermost to innermost (for nested class support)
         var containingTypes = new List<INamedTypeSymbol>();
-        var ct = command.Type.ContainingType;
+        var ct = command.Type.Symbol.ContainingType;
         while (ct is not null)
         {
             containingTypes.Insert(0, ct);
@@ -576,11 +566,11 @@ public class CommandSchemaGenerator : IIncrementalGenerator
 
         foreach (var param in command.Parameters.OrderBy(p => p.Order))
         {
-            var propTypeFqn = param.Property.Type.ToDisplayString(
-                SymbolDisplayFormat.FullyQualifiedFormat
-            );
-            var isSequence = IsSequenceType(param.Property.Type);
-            var converterExpr = GetConverterExpression(param.ConverterType, param.Property);
+            var propTypeFqn = param.Property.Type.FullyQualifiedName;
+            var isSequence =
+                param.Property.Type.Symbol.SpecialType != SpecialType.System_String
+                && param.Property.Type.Symbol.TryGetEnumerableUnderlyingType() is not null;
+            var converterExpr = GetConverterExpression(param.ConverterType, param.Property.Symbol);
 
             if (!isSequence)
             {
@@ -608,7 +598,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             {
                 var sequenceConverterExpr = BuildSequenceConverterExpr(
                     param.ConverterType,
-                    param.Property
+                    param.Property.Symbol
                 );
                 sb.Append(
                     // lang=csharp
@@ -634,12 +624,12 @@ public class CommandSchemaGenerator : IIncrementalGenerator
 
         foreach (var opt in command.Options)
         {
-            var propTypeFqn = opt.Property.Type.ToDisplayString(
-                SymbolDisplayFormat.FullyQualifiedFormat
-            );
-            var isSequence = IsSequenceType(opt.Property.Type);
+            var propTypeFqn = opt.Property.Type.FullyQualifiedName;
+            var isSequence =
+                opt.Property.Type.Symbol.SpecialType != SpecialType.System_String
+                && opt.Property.Type.Symbol.TryGetEnumerableUnderlyingType() is not null;
             var shortNameStr = opt.ShortName.HasValue ? $"'{opt.ShortName}'" : "null";
-            var converterExpr = GetConverterExpression(opt.ConverterType, opt.Property);
+            var converterExpr = GetConverterExpression(opt.ConverterType, opt.Property.Symbol);
 
             if (!isSequence)
             {
@@ -668,7 +658,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             {
                 var sequenceConverterExpr = BuildSequenceConverterExpr(
                     opt.ConverterType,
-                    opt.Property
+                    opt.Property.Symbol
                 );
                 sb.Append(
                     // lang=csharp
@@ -759,16 +749,6 @@ public class CommandSchemaGenerator : IIncrementalGenerator
         return sb.ToString();
     }
 
-    private static bool IsSequenceType(ITypeSymbol type)
-    {
-        if (type.SpecialType == SpecialType.System_String)
-            return false;
-
-        return type.AllInterfaces.Any(i =>
-            i.ConstructedFrom.SpecialType == SpecialType.System_Collections_Generic_IEnumerable_T
-        );
-    }
-
     private static string EscapeString(string? value) =>
         value is null ? "null" : $"\"{value.Replace("\\", "\\\\").Replace("\"", "\\\"")}\"";
 
@@ -783,7 +763,10 @@ public class CommandSchemaGenerator : IIncrementalGenerator
         var type = property.Type;
 
         // For sequence types, use the element type's converter
-        if (IsSequenceType(type))
+        if (
+            type.SpecialType != SpecialType.System_String
+            && type.TryGetEnumerableUnderlyingType() is not null
+        )
         {
             var elementType = type.TryGetEnumerableUnderlyingType();
             if (elementType is not null)

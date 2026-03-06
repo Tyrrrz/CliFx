@@ -1,10 +1,9 @@
 using System.Collections.Generic;
-using Microsoft.CodeAnalysis;
 
 namespace CliFx.SourceGeneration.SemanticModel;
 
 internal record CommandOptionDescriptor(
-    IPropertySymbol Property,
+    PropertyDescriptor Property,
     string? Name,
     char? ShortName,
     string? EnvironmentVariable,
