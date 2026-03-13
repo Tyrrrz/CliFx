@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace CliFx.SourceGeneration.SemanticModel;
+namespace CliFx.Generators.SemanticModel;
 
 internal record CommandOptionDescriptor(
     PropertyDescriptor Property,

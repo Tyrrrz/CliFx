@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace CliFx.SourceGeneration.Utils.Extensions;
+namespace CliFx.Generators.Utils.Extensions;
 
 internal static class RoslynExtensions
 {

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 
-namespace CliFx.SourceGeneration.SemanticModel;
+namespace CliFx.Generators.SemanticModel;
 
 internal record CommandDescriptor(
     TypeDescriptor Type,

@@ -1,6 +1,6 @@
 using Microsoft.CodeAnalysis;
 
-namespace CliFx.SourceGeneration;
+namespace CliFx.Generators;
 
 internal static class DiagnosticDescriptors
 {

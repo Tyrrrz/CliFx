@@ -5,7 +5,6 @@
     <GenerateDependencyFile>true</GenerateDependencyFile>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     <NoWarn>$(NoWarn);RS1035;RS2008</NoWarn>
-    <RootNamespace>CliFx.SourceGeneration</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup>
