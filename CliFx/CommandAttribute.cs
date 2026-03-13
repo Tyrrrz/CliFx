@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CliFx.Attributes;
+namespace CliFx;
 
 /// <summary>
 /// Annotates a type that defines a command.

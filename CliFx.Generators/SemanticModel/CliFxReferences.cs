@@ -20,11 +20,11 @@ internal sealed class CliFxReferences(Compilation compilation)
 
     /// <summary>Checked via <c>Symbol</c> equality in attribute matching inside TryBuildCommandDescriptor.</summary>
     public TypeDescriptor CommandParameterAttribute { get; } =
-        new(compilation.GetTypeByMetadataName("CliFx.Attributes.CommandParameterAttribute")!);
+        new(compilation.GetTypeByMetadataName("CliFx.CommandParameterAttribute")!);
 
     /// <summary>Checked via <c>Symbol</c> equality in attribute matching inside TryBuildCommandDescriptor.</summary>
     public TypeDescriptor CommandOptionAttribute { get; } =
-        new(compilation.GetTypeByMetadataName("CliFx.Attributes.CommandOptionAttribute")!);
+        new(compilation.GetTypeByMetadataName("CliFx.CommandOptionAttribute")!);
 
     /// <summary>Open generic base class — used to check whether a user type is a custom converter.</summary>
     public TypeDescriptor BindingConverter { get; } =
@@ -119,7 +119,7 @@ internal sealed class CliFxReferences(Compilation compilation)
     /// <c>ForAttributeWithMetadataName</c> at generator-initialize time,
     /// before a <see cref="Compilation"/> is available.
     /// </summary>
-    public const string CommandAttributeMetadataName = "CliFx.Attributes.CommandAttribute";
+    public const string CommandAttributeMetadataName = "CliFx.CommandAttribute";
 
     public static CliFxReferences From(Compilation compilation) => new(compilation);
 }

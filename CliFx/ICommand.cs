@@ -7,7 +7,7 @@ namespace CliFx;
 /// Entry point through which the user interacts with the command-line application.
 /// </summary>
 /// <remarks>
-/// Should be marked with <see cref="Attributes.CommandAttribute" /> to be a registrable command.
+/// Should be marked with <see cref="CommandAttribute" /> to be a registrable command.
 /// </remarks>
 public interface ICommand
 {

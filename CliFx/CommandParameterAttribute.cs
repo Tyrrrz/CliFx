@@ -1,7 +1,7 @@
 ﻿using System;
 using CliFx.Infrastructure.Binding;
 
-namespace CliFx.Attributes;
+namespace CliFx;
 
 /// <summary>
 /// Annotates a property that defines a command parameter.
