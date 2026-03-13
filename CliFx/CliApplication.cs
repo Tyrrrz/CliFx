@@ -34,12 +34,6 @@ public class CliApplication(
     /// </summary>
     public ApplicationConfiguration Configuration { get; } = configuration;
 
-    private bool IsDebugModeEnabled(CommandInput commandInput) =>
-        Configuration.IsDebugModeAllowed && commandInput.IsDebugDirectiveSpecified;
-
-    private bool IsPreviewModeEnabled(CommandInput commandInput) =>
-        Configuration.IsPreviewModeAllowed && commandInput.IsPreviewDirectiveSpecified;
-
     private async ValueTask PromptDebuggerAsync()
     {
         using (console.WithForegroundColor(ConsoleColor.Green))
@@ -71,13 +65,13 @@ public class CliApplication(
         console.ResetColor();
 
         // Handle the debug directive
-        if (IsDebugModeEnabled(commandInput))
+        if (Configuration.IsDebugModeAllowed && commandInput.IsDebugDirectiveSpecified)
         {
             await PromptDebuggerAsync();
         }
 
         // Handle the preview directive
-        if (IsPreviewModeEnabled(commandInput))
+        if (Configuration.IsPreviewModeAllowed && commandInput.IsPreviewDirectiveSpecified)
         {
             console.WriteCommandInput(commandInput);
             return 0;
@@ -136,30 +130,16 @@ public class CliApplication(
             }
         }
 
-        // Bind the command
-        try
-        {
-            _commandBinder.Bind(commandInput, commandSchema, commandInstance);
-        }
-        catch (CliFxException ex)
-        {
-            console.WriteException(ex);
-
-            if (ex.ShowHelp)
-            {
-                console.WriteLine();
-                console.WriteHelpText(helpContext);
-            }
-
-            return ex.ExitCode;
-        }
-
         // Starting from this point, we may produce exceptions that are meant for the
-        // end-user of the application (i.e. invalid input, command exception, etc).
+        // end-user of the application (i.e. invalid input, command exception, etc.).
         // Catch these exceptions here, print them to the console, and don't let them
         // propagate further.
         try
         {
+            // Bind the command inputs from the command line
+            _commandBinder.Bind(commandInput, commandSchema, commandInstance);
+
+            // Execute the command
             await commandInstance.ExecuteAsync(console);
 
             return 0;
@@ -246,7 +226,8 @@ public class CliApplication(
         await RunAsync(
             Environment
                 .GetCommandLineArgs()
-                .Skip(1) // first element is the file path
+                // First element is the file path
+                .Skip(1)
                 .ToArray()
         );
 }

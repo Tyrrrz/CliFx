@@ -4,13 +4,14 @@ using CliFx.Infrastructure;
 
 namespace CliFx;
 
-// Fallback command used when the application doesn't have one configured.
-// This command is only used as a stub for help text.
-// The Schema property, IsHelpRequested, and IsVersionRequested are source-generated.
+// Default command for when an application doesn't have one registered.
+// It's only used as a stub to show help text when the application is executed
+// without specifying a command, or when the specified command fails to resolve.
 [Command]
 internal partial class FallbackDefaultCommand : ICommand
 {
-    // Never actually executed
+    // Never actually executed. CliFx intercepts this specific command implementation
+    // and always shows help text, even when it wasn't explicitly requested.
     [ExcludeFromCodeCoverage]
     public ValueTask ExecuteAsync(IConsole console) => default;
 }

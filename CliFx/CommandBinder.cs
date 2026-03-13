@@ -92,17 +92,17 @@ internal class CommandBinder
     }
 
     private void BindMember(
-        CommandInputSchema schema,
-        ICommand commandInstance,
-        IReadOnlyList<string> rawValues
+        IReadOnlyList<string> inputRawValues,
+        CommandInputSchema inputSchema,
+        ICommand commandInstance
     )
     {
-        var convertedValue = Convert(schema, rawValues);
-        ValidateMember(schema, convertedValue);
+        var convertedValue = Convert(inputSchema, inputRawValues);
+        ValidateMember(inputSchema, convertedValue);
 
         try
         {
-            schema.Property.SetValue(commandInstance, convertedValue);
+            inputSchema.Property.SetValue(commandInstance, convertedValue);
         }
         catch (Exception ex) when (ex is not CliFxException)
         {
@@ -112,8 +112,8 @@ internal class CommandBinder
 
             throw CliFxException.UserError(
                 $"""
-                {schema.GetKind()} {schema.GetFormattedIdentifier()} cannot be set from the provided argument(s):
-                {rawValues.Select(v => '<' + v + '>').JoinToString(" ")}
+                {inputSchema.GetKind()} {inputSchema.GetFormattedIdentifier()} cannot be set from the provided argument(s):
+                {inputRawValues.Select(v => '<' + v + '>').JoinToString(" ")}
                 Error: {errorMessage}
                 """,
                 ex
@@ -125,7 +125,7 @@ internal class CommandBinder
         CommandInput commandInput,
         IReadOnlyList<CommandParameterSchema> parameterSchemas,
         ICommand commandInstance,
-        bool reportUnrecognizedAndMissing = true
+        bool throwOnUnrecognizedAndMissing = true
     )
     {
         var remainingParameterInputs = commandInput.Parameters.ToList();
@@ -140,7 +140,7 @@ internal class CommandBinder
             if (!parameterSchema.IsSequence)
             {
                 var parameterInput = commandInput.Parameters[position];
-                BindMember(parameterSchema, commandInstance, [parameterInput.Value]);
+                BindMember([parameterInput.Value], parameterSchema, commandInstance);
 
                 position++;
                 remainingParameterInputs.Remove(parameterInput);
@@ -150,9 +150,9 @@ internal class CommandBinder
                 var parameterInputs = commandInput.Parameters.Skip(position).ToArray();
 
                 BindMember(
+                    parameterInputs.Select(p => p.Value).ToArray(),
                     parameterSchema,
-                    commandInstance,
-                    parameterInputs.Select(p => p.Value).ToArray()
+                    commandInstance
                 );
 
                 position += parameterInputs.Length;
@@ -162,26 +162,31 @@ internal class CommandBinder
             remainingRequiredParameterSchemas.Remove(parameterSchema);
         }
 
-        if (reportUnrecognizedAndMissing && remainingParameterInputs.Any())
+        if (throwOnUnrecognizedAndMissing)
         {
-            throw CliFxException.UserError(
-                $"""
-                Unrecognized parameter(s):
-                {remainingParameterInputs.Select(p => p.GetFormattedIdentifier()).JoinToString(" ")}
-                """
-            );
-        }
+            if (remainingParameterInputs.Any())
+            {
+                throw CliFxException.UserError(
+                    $"""
+                    Unrecognized parameter(s):
+                    {remainingParameterInputs.Select(p => p.GetFormattedIdentifier()).JoinToString(
+                        " "
+                    )}
+                    """
+                );
+            }
 
-        if (reportUnrecognizedAndMissing && remainingRequiredParameterSchemas.Any())
-        {
-            throw CliFxException.UserError(
-                $"""
-                 Missing required parameter(s):
-                 {remainingRequiredParameterSchemas
-                     .Select(p => p.GetFormattedIdentifier())
-                     .JoinToString(" ")}
-                 """
-            );
+            if (remainingRequiredParameterSchemas.Any())
+            {
+                throw CliFxException.UserError(
+                    $"""
+                     Missing required parameter(s):
+                     {remainingRequiredParameterSchemas
+                         .Select(p => p.GetFormattedIdentifier())
+                         .JoinToString(" ")}
+                     """
+                );
+            }
         }
     }
 
@@ -195,7 +200,7 @@ internal class CommandBinder
         CommandInput commandInput,
         IReadOnlyList<CommandOptionSchema> optionSchemas,
         ICommand commandInstance,
-        bool reportUnrecognizedAndMissing = true
+        bool throwOnUnrecognizedAndMissing = true
     )
     {
         var remainingOptionInputs = commandInput.Options.ToList();
@@ -215,7 +220,7 @@ internal class CommandBinder
             {
                 var rawValues = optionInputs.SelectMany(o => o.Values).ToArray();
 
-                BindMember(optionSchema, commandInstance, rawValues);
+                BindMember(rawValues, optionSchema, commandInstance);
 
                 if (rawValues.Any())
                     remainingRequiredOptionSchemas.Remove(optionSchema);
@@ -226,7 +231,7 @@ internal class CommandBinder
                     ? [environmentVariableInput.Value]
                     : environmentVariableInput.SplitValues();
 
-                BindMember(optionSchema, commandInstance, rawValues);
+                BindMember(rawValues, optionSchema, commandInstance);
 
                 if (rawValues.Any())
                     remainingRequiredOptionSchemas.Remove(optionSchema);
@@ -239,26 +244,31 @@ internal class CommandBinder
             remainingOptionInputs.RemoveRange(optionInputs);
         }
 
-        if (reportUnrecognizedAndMissing && remainingOptionInputs.Any())
+        if (throwOnUnrecognizedAndMissing)
         {
-            throw CliFxException.UserError(
-                $"""
-                Unrecognized option(s):
-                {remainingOptionInputs.Select(o => o.GetFormattedIdentifier()).JoinToString(", ")}
-                """
-            );
-        }
+            if (remainingOptionInputs.Any())
+            {
+                throw CliFxException.UserError(
+                    $"""
+                    Unrecognized option(s):
+                    {remainingOptionInputs.Select(o => o.GetFormattedIdentifier()).JoinToString(
+                        ", "
+                    )}
+                    """
+                );
+            }
 
-        if (reportUnrecognizedAndMissing && remainingRequiredOptionSchemas.Any())
-        {
-            throw CliFxException.UserError(
-                $"""
-                Missing required option(s):
-                {remainingRequiredOptionSchemas
-                    .Select(o => o.GetFormattedIdentifier())
-                    .JoinToString(", ")}
-                """
-            );
+            if (remainingRequiredOptionSchemas.Any())
+            {
+                throw CliFxException.UserError(
+                    $"""
+                     Missing required option(s):
+                     {remainingRequiredOptionSchemas
+                         .Select(o => o.GetFormattedIdentifier())
+                         .JoinToString(", ")}
+                     """
+                );
+            }
         }
     }
 

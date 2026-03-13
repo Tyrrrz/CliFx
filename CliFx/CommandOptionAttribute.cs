@@ -60,7 +60,7 @@ public sealed class CommandOptionAttribute : Attribute
 
     /// <summary>
     /// Option description.
-    /// This is shown to the user in the help text.
+    /// Used for display purposes in the help text.
     /// </summary>
     public string? Description { get; set; }
 

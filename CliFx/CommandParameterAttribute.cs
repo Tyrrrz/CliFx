@@ -10,19 +10,23 @@ namespace CliFx;
 public sealed class CommandParameterAttribute(int order) : Attribute
 {
     /// <summary>
-    /// Parameter order.
+    /// Relative parameter order.
     /// Higher order means the parameter appears later, lower order means it appears earlier.
     /// </summary>
     /// <remarks>
-    /// All parameters in a command must have unique order.
-    /// Parameter whose type is a non-scalar (e.g. array), must always be the last in order.
-    /// Only one non-scalar parameter is allowed in a command.
+    /// <para>
+    /// All parameters in a command must have unique order values.
+    /// </para>
+    /// <para>
+    /// Sequence-based parameters must always appear last.
+    /// Only one sequence-based parameter is allowed in a command.
+    /// </para>
     /// </remarks>
     public int Order { get; } = order;
 
     /// <summary>
     /// Parameter name.
-    /// This is shown to the user in the help text.
+    /// Used for display purposes in the help text.
     /// </summary>
     /// <remarks>
     /// If this isn't specified, parameter name is inferred from the property name.
@@ -31,7 +35,7 @@ public sealed class CommandParameterAttribute(int order) : Attribute
 
     /// <summary>
     /// Parameter description.
-    /// This is shown to the user in the help text.
+    /// Used for display purposes in the help text.
     /// </summary>
     public string? Description { get; set; }
 
