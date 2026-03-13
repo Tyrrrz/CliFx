@@ -1,5 +1,5 @@
 ﻿using System;
-using CliFx.Extensibility;
+using CliFx.Infrastructure.Binding;
 
 namespace CliFx.Attributes;
 
@@ -51,16 +51,6 @@ public sealed class CommandOptionAttribute : Attribute
     /// All options in a command must have unique short names (comparison IS case-sensitive).
     /// </remarks>
     public char? ShortName { get; }
-
-    /// <summary>
-    /// Whether this option is required (default: <c>false</c>).
-    /// If an option is required, the user will get an error if they don't set it.
-    /// </summary>
-    /// <remarks>
-    /// You can use the <c>required</c> keyword on the property (introduced in C# 11) to implicitly
-    /// set <see cref="IsRequired" /> to <c>true</c>.
-    /// </remarks>
-    public bool IsRequired { get; set; }
 
     /// <summary>
     /// Environment variable whose value will be used as a fallback if the option

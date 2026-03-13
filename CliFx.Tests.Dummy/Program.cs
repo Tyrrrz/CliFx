@@ -1,22 +1,22 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace CliFx.Tests.Dummy;
 
-// This dummy application is used in tests for scenarios that require an external process to properly verify
+// This dummy application is used in tests where an external process is required
+// to properly verify the library's behavior.
 public static class Program
 {
     // Path to the apphost
     public static string FilePath { get; } =
         Path.ChangeExtension(
             Assembly.GetExecutingAssembly().Location,
-            RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "exe" : null
+            OperatingSystem.IsWindows() ? "exe" : null
         );
 
-    public static async Task Main()
+    public static async Task<int> Main()
     {
         // Make sure color codes are not produced because we rely on the output in tests
         Environment.SetEnvironmentVariable(
@@ -24,7 +24,7 @@ public static class Program
             "false"
         );
 
-        await new CliApplicationBuilder()
+        return await new CliApplicationBuilder()
             .AddCommandsFromThisAssembly()
             .AllowDebugMode()
             .AllowPreviewMode()

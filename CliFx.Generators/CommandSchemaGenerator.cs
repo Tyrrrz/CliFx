@@ -19,8 +19,12 @@ public class CommandSchemaGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
+        var cliFxRefs = context.CompilationProvider.Select(
+            static (compilation, _) => CliFxReferences.From(compilation)
+        );
+
         var commandNodes = context.SyntaxProvider.ForAttributeWithMetadataName(
-            SymbolNames.CliFxCommandAttribute,
+            CliFxReferences.CommandAttributeMetadataName,
             static (node, _) => node is ClassDeclarationSyntax,
             static (ctx, _) =>
                 (
@@ -29,10 +33,14 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                 )
         );
 
+        var commandNodesWithWkt = commandNodes.Combine(cliFxRefs);
+
         // Emit diagnostics for [Command] classes that are not partial or don't implement ICommand
-        var diagnostics = commandNodes.SelectMany(
-            static (item, _) =>
+        var diagnostics = commandNodesWithWkt.SelectMany(
+            static (pair, _) =>
             {
+                var (item, cliFxRefs) = pair;
+
                 // Abstract classes are intentionally skipped — no diagnostic needed
                 if (item.Symbol.IsAbstract)
                     return [];
@@ -47,7 +55,11 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                         ),
                     ];
 
-                if (!item.Symbol.ImplementsInterface(SymbolNames.CliFxCommandInterface))
+                if (
+                    !item.Symbol.AllInterfaces.Any(i =>
+                        SymbolEqualityComparer.Default.Equals(i, cliFxRefs.ICommand.Symbol)
+                    )
+                )
                     return
                     [
                         Diagnostic.Create(
@@ -66,38 +78,48 @@ public class CommandSchemaGenerator : IIncrementalGenerator
         );
 
         // Only process classes that are partial, implement ICommand, and are not abstract
-        var commandDeclarations = commandNodes
+        var commandDeclarations = commandNodesWithWkt
             .Select(
-                static (item, _) =>
+                static (pair, _) =>
                 {
+                    var (item, wkt) = pair;
                     if (
                         !item.ClassDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword)
                         || item.Symbol.IsAbstract
-                        || !item.Symbol.ImplementsInterface(SymbolNames.CliFxCommandInterface)
+                        || !item.Symbol.AllInterfaces.Any(i =>
+                            SymbolEqualityComparer.Default.Equals(i, wkt.ICommand.Symbol)
+                        )
                     )
                         return null;
 
-                    return TryBuildCommandDescriptor(item.Symbol);
+                    return TryBuildCommandDescriptor(item.Symbol, wkt);
                 }
             )
             .WhereNotNull();
 
         context.RegisterSourceOutput(
-            commandDeclarations.Collect(),
-            static (ctx, commands) => Execute(ctx, commands)
+            commandDeclarations.Collect().Combine(cliFxRefs),
+            static (ctx, pair) => Execute(ctx, pair.Left, pair.Right)
         );
     }
 
-    internal static CommandDescriptor? TryBuildCommandDescriptor(INamedTypeSymbol type)
+    internal static CommandDescriptor? TryBuildCommandDescriptor(
+        INamedTypeSymbol type,
+        CliFxReferences wkt
+    )
     {
         // Must implement ICommand
-        if (!type.ImplementsInterface(SymbolNames.CliFxCommandInterface))
+        if (
+            !type.AllInterfaces.Any(i =>
+                SymbolEqualityComparer.Default.Equals(i, wkt.ICommand.Symbol)
+            )
+        )
             return null;
 
         // Must have [Command] attribute
         var commandAttribute = type.GetAttributes()
             .FirstOrDefault(a =>
-                a.AttributeClass?.DisplayNameMatches(SymbolNames.CliFxCommandAttribute) == true
+                SymbolEqualityComparer.Default.Equals(a.AttributeClass, wkt.CommandAttribute.Symbol)
             );
 
         if (commandAttribute is null)
@@ -135,8 +157,10 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             var parameterAttribute = propertyDescriptor
                 .Symbol.GetAttributes()
                 .FirstOrDefault(a =>
-                    a.AttributeClass?.DisplayNameMatches(SymbolNames.CliFxCommandParameterAttribute)
-                    == true
+                    SymbolEqualityComparer.Default.Equals(
+                        a.AttributeClass,
+                        wkt.CommandParameterAttribute.Symbol
+                    )
                 );
 
             if (parameterAttribute is not null)
@@ -172,13 +196,6 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                     );
                 }
 
-                var isRequired =
-                    parameterAttribute
-                        .NamedArguments.Where(a => a.Key == "IsRequired")
-                        .Select(a => a.Value.Value as bool?)
-                        .FirstOrDefault()
-                    ?? propertyDescriptor.Symbol.IsRequired();
-
                 var description = parameterAttribute
                     .NamedArguments.Where(a => a.Key == "Description")
                     .Select(a => a.Value.Value as string)
@@ -186,13 +203,13 @@ public class CommandSchemaGenerator : IIncrementalGenerator
 
                 var converterTypeDescriptor = parameterAttribute
                     .NamedArguments.Where(a => a.Key == "Converter")
-                    .Select(a => a.Value.Value is ITypeSymbol sym ? (TypeDescriptor)new(sym) : null)
+                    .Select(a => a.Value.Value is ITypeSymbol sym ? new TypeDescriptor(sym) : null)
                     .FirstOrDefault();
 
                 var validatorTypeDescriptors = parameterAttribute
                     .NamedArguments.Where(a => a.Key == "Validators")
                     .SelectMany(a => a.Value.Values)
-                    .Select(v => v.Value is ITypeSymbol sym ? (TypeDescriptor)new(sym) : null)
+                    .Select(v => v.Value is ITypeSymbol sym ? new TypeDescriptor(sym) : null)
                     .Where(t => t is not null)
                     .Select(t => t!)
                     .ToArray();
@@ -202,7 +219,6 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                         propertyDescriptor,
                         order,
                         name,
-                        isRequired,
                         description,
                         converterTypeDescriptor,
                         validatorTypeDescriptors
@@ -215,8 +231,10 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             var optionAttribute = propertyDescriptor
                 .Symbol.GetAttributes()
                 .FirstOrDefault(a =>
-                    a.AttributeClass?.DisplayNameMatches(SymbolNames.CliFxCommandOptionAttribute)
-                    == true
+                    SymbolEqualityComparer.Default.Equals(
+                        a.AttributeClass,
+                        wkt.CommandOptionAttribute.Symbol
+                    )
                 );
 
             if (optionAttribute is not null)
@@ -278,13 +296,6 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                     }
                 }
 
-                var isRequired =
-                    optionAttribute
-                        .NamedArguments.Where(a => a.Key == "IsRequired")
-                        .Select(a => a.Value.Value as bool?)
-                        .FirstOrDefault()
-                    ?? propertyDescriptor.Symbol.IsRequired();
-
                 var description = optionAttribute
                     .NamedArguments.Where(a => a.Key == "Description")
                     .Select(a => a.Value.Value as string)
@@ -297,13 +308,13 @@ public class CommandSchemaGenerator : IIncrementalGenerator
 
                 var converterTypeDescriptor = optionAttribute
                     .NamedArguments.Where(a => a.Key == "Converter")
-                    .Select(a => a.Value.Value is ITypeSymbol sym ? (TypeDescriptor)new(sym) : null)
+                    .Select(a => a.Value.Value is ITypeSymbol sym ? new TypeDescriptor(sym) : null)
                     .FirstOrDefault();
 
                 var validatorTypeDescriptors = optionAttribute
                     .NamedArguments.Where(a => a.Key == "Validators")
                     .SelectMany(a => a.Value.Values)
-                    .Select(v => v.Value is ITypeSymbol sym ? (TypeDescriptor)new(sym) : null)
+                    .Select(v => v.Value is ITypeSymbol sym ? new TypeDescriptor(sym) : null)
                     .Where(t => t is not null)
                     .Select(t => t!)
                     .ToArray();
@@ -314,7 +325,6 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                         name,
                         shortName,
                         environmentVariable,
-                        isRequired,
                         description,
                         converterTypeDescriptor,
                         validatorTypeDescriptors
@@ -426,7 +436,8 @@ public class CommandSchemaGenerator : IIncrementalGenerator
 
     private static void Execute(
         SourceProductionContext ctx,
-        IReadOnlyList<CommandDescriptor> commands
+        IReadOnlyList<CommandDescriptor> commands,
+        CliFxReferences wkt
     )
     {
         if (commands.Count == 0)
@@ -439,13 +450,16 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                 ctx.ReportDiagnostic(diagnostic);
             }
 
-            var source = GenerateCommandSchemaSource(command);
+            var source = GenerateCommandSchemaSource(command, wkt);
             var hintName = $"{command.Type.FullyQualifiedName.Replace('.', '_')}_Schema.g.cs";
             ctx.AddSource(hintName, SourceText.From(source, Encoding.UTF8));
         }
     }
 
-    private static string GenerateCommandSchemaSource(CommandDescriptor command)
+    private static string GenerateCommandSchemaSource(
+        CommandDescriptor command,
+        CliFxReferences wkt
+    )
     {
         var commandFqn = command.Type.FullyQualifiedName;
         var containingNs = command.Type.Symbol.ContainingNamespace;
@@ -463,14 +477,20 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             ct = ct.ContainingType;
         }
 
+        // Namespace strings for the using directives in the emitted file.
+        // All CliFx type FQNs are emitted directly via wkt.TypeName
+        // (TypeDescriptor.ToString() returns the global:: form).
+        var nsBinding = wkt.IBindingValidator.Symbol.ContainingNamespace.ToDisplayString();
+        var nsSchema = wkt.CommandSchema.Symbol.ContainingNamespace.ToDisplayString();
+
         var sb = new StringBuilder();
 
         sb.Append(
             // lang=csharp
-            """
+            $$"""
             // <auto-generated/>
-            using CliFx.Extensibility;
-            using CliFx.Schema;
+            using {{nsBinding}};
+            using {{nsSchema}};
 
             """
         );
@@ -510,9 +530,11 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             );
 
         if (needsHelpOption)
-            interfaces.Add("global::CliFx.ICommandWithHelpOption");
+            interfaces.Add(wkt.IHasHelpOption.ToString());
+
         if (needsVersionOption)
-            interfaces.Add("global::CliFx.ICommandWithVersionOption");
+            interfaces.Add(wkt.IHasVersionOption.ToString());
+
         var interfaceList =
             interfaces.Count > 0 ? " : " + string.Join(", ", interfaces) : string.Empty;
 
@@ -555,11 +577,11 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             $$"""
 
                 /// <summary>Generated command schema for <see cref="{{command.Type.Name}}"/>.</summary>
-                public static global::CliFx.Schema.CommandSchema Schema { get; } =
-                    new global::CliFx.Schema.CommandSchema<{{commandFqn}}>(
+                public static {{wkt.CommandSchema}} Schema { get; } =
+                    new {{wkt.CommandSchema}}<{{commandFqn}}>(
                         {{EscapeString(command.Name)}},
                         {{EscapeString(command.Description)}},
-                        new global::CliFx.Schema.CommandInputSchema[]
+                        new {{wkt.CommandInputSchema}}[]
                         {
             """
         );
@@ -570,26 +592,30 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             var isSequence =
                 param.Property.Type.Symbol.SpecialType != SpecialType.System_String
                 && param.Property.Type.Symbol.TryGetEnumerableUnderlyingType() is not null;
-            var converterExpr = GetConverterExpression(param.ConverterType, param.Property.Symbol);
+            var converterExpr = GetConverterExpression(
+                param.ConverterType,
+                param.Property.Symbol,
+                wkt
+            );
 
             if (!isSequence)
             {
                 sb.Append(
                     // lang=csharp
                     $$"""
-                                new global::CliFx.Schema.CommandParameterSchema<{{commandFqn}}, {{propTypeFqn}}>(
-                                    new global::CliFx.Schema.PropertyBinding<{{commandFqn}}, {{propTypeFqn}}>(
+                                new {{wkt.CommandParameterSchema}}<{{commandFqn}}, {{propTypeFqn}}>(
+                                    new {{wkt.PropertyBinding}}<{{commandFqn}}, {{propTypeFqn}}>(
                                         "{{param.Property.Name}}",
                                         c => c.{{param.Property.Name}},
                                         (c, v) => c.{{param.Property.Name}} = v),
                                     false,
                                     {{param.Order}},
                                     {{EscapeString(param.Name)}},
-                                    {{(param.IsRequired ? "true" : "false")}},
+                                    {{(param.Property.IsRequired ? "true" : "false")}},
                                     {{EscapeString(param.Description)}},
                                     {{converterExpr}},
                                     null,
-                                    {{BuildValidatorsExpr(param.ValidatorTypes)}}),
+                                    {{BuildValidatorsExpr(param.ValidatorTypes, wkt)}}),
 
                     """
                 );
@@ -598,24 +624,25 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             {
                 var sequenceConverterExpr = BuildSequenceConverterExpr(
                     param.ConverterType,
-                    param.Property.Symbol
+                    param.Property.Symbol,
+                    wkt
                 );
                 sb.Append(
                     // lang=csharp
                     $$"""
-                                new global::CliFx.Schema.CommandParameterSchema<{{commandFqn}}, {{propTypeFqn}}>(
-                                    new global::CliFx.Schema.PropertyBinding<{{commandFqn}}, {{propTypeFqn}}>(
+                                new {{wkt.CommandParameterSchema}}<{{commandFqn}}, {{propTypeFqn}}>(
+                                    new {{wkt.PropertyBinding}}<{{commandFqn}}, {{propTypeFqn}}>(
                                         "{{param.Property.Name}}",
                                         c => c.{{param.Property.Name}},
                                         (c, v) => c.{{param.Property.Name}} = v),
                                     true,
                                     {{param.Order}},
                                     {{EscapeString(param.Name)}},
-                                    {{(param.IsRequired ? "true" : "false")}},
+                                    {{(param.Property.IsRequired ? "true" : "false")}},
                                     {{EscapeString(param.Description)}},
                                     null,
                                     {{sequenceConverterExpr}},
-                                    {{BuildValidatorsExpr(param.ValidatorTypes)}}),
+                                    {{BuildValidatorsExpr(param.ValidatorTypes, wkt)}}),
 
                     """
                 );
@@ -629,15 +656,15 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                 opt.Property.Type.Symbol.SpecialType != SpecialType.System_String
                 && opt.Property.Type.Symbol.TryGetEnumerableUnderlyingType() is not null;
             var shortNameStr = opt.ShortName.HasValue ? $"'{opt.ShortName}'" : "null";
-            var converterExpr = GetConverterExpression(opt.ConverterType, opt.Property.Symbol);
+            var converterExpr = GetConverterExpression(opt.ConverterType, opt.Property.Symbol, wkt);
 
             if (!isSequence)
             {
                 sb.Append(
                     // lang=csharp
                     $$"""
-                                new global::CliFx.Schema.CommandOptionSchema<{{commandFqn}}, {{propTypeFqn}}>(
-                                    new global::CliFx.Schema.PropertyBinding<{{commandFqn}}, {{propTypeFqn}}>(
+                                new {{wkt.CommandOptionSchema}}<{{commandFqn}}, {{propTypeFqn}}>(
+                                    new {{wkt.PropertyBinding}}<{{commandFqn}}, {{propTypeFqn}}>(
                                         "{{opt.Property.Name}}",
                                         c => c.{{opt.Property.Name}},
                                         (c, v) => c.{{opt.Property.Name}} = v),
@@ -645,11 +672,11 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                                     {{EscapeString(opt.Name)}},
                                     {{shortNameStr}},
                                     {{EscapeString(opt.EnvironmentVariable)}},
-                                    {{(opt.IsRequired ? "true" : "false")}},
+                                    {{(opt.Property.IsRequired ? "true" : "false")}},
                                     {{EscapeString(opt.Description)}},
                                     {{converterExpr}},
                                     null,
-                                    {{BuildValidatorsExpr(opt.ValidatorTypes)}}),
+                                    {{BuildValidatorsExpr(opt.ValidatorTypes, wkt)}}),
 
                     """
                 );
@@ -658,13 +685,14 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             {
                 var sequenceConverterExpr = BuildSequenceConverterExpr(
                     opt.ConverterType,
-                    opt.Property.Symbol
+                    opt.Property.Symbol,
+                    wkt
                 );
                 sb.Append(
                     // lang=csharp
                     $$"""
-                                new global::CliFx.Schema.CommandOptionSchema<{{commandFqn}}, {{propTypeFqn}}>(
-                                    new global::CliFx.Schema.PropertyBinding<{{commandFqn}}, {{propTypeFqn}}>(
+                                new {{wkt.CommandOptionSchema}}<{{commandFqn}}, {{propTypeFqn}}>(
+                                    new {{wkt.PropertyBinding}}<{{commandFqn}}, {{propTypeFqn}}>(
                                         "{{opt.Property.Name}}",
                                         c => c.{{opt.Property.Name}},
                                         (c, v) => c.{{opt.Property.Name}} = v),
@@ -672,11 +700,11 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                                     {{EscapeString(opt.Name)}},
                                     {{shortNameStr}},
                                     {{EscapeString(opt.EnvironmentVariable)}},
-                                    {{(opt.IsRequired ? "true" : "false")}},
+                                    {{(opt.Property.IsRequired ? "true" : "false")}},
                                     {{EscapeString(opt.Description)}},
                                     null,
                                     {{sequenceConverterExpr}},
-                                    {{BuildValidatorsExpr(opt.ValidatorTypes)}}),
+                                    {{BuildValidatorsExpr(opt.ValidatorTypes, wkt)}}),
 
                     """
                 );
@@ -688,8 +716,8 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             sb.Append(
                 // lang=csharp
                 $$"""
-                            new global::CliFx.Schema.CommandOptionSchema<{{commandFqn}}, bool>(
-                                new global::CliFx.Schema.PropertyBinding<{{commandFqn}}, bool>(
+                            new {{wkt.CommandOptionSchema}}<{{commandFqn}}, bool>(
+                                new {{wkt.PropertyBinding}}<{{commandFqn}}, bool>(
                                     "IsHelpRequested",
                                     c => c.IsHelpRequested,
                                     (c, v) => c.IsHelpRequested = v),
@@ -699,9 +727,9 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                                 null,
                                 false,
                                 "Shows help text.",
-                                new global::CliFx.Extensibility.BoolBindingConverter(),
+                                new {{wkt.BoolBindingConverter}}(),
                                 null,
-                                global::System.Array.Empty<global::CliFx.Extensibility.IBindingValidator>()),
+                                global::System.Array.Empty<{{wkt.IBindingValidator}}>()),
 
                 """
             );
@@ -712,8 +740,8 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             sb.Append(
                 // lang=csharp
                 $$"""
-                            new global::CliFx.Schema.CommandOptionSchema<{{commandFqn}}, bool>(
-                                new global::CliFx.Schema.PropertyBinding<{{commandFqn}}, bool>(
+                            new {{wkt.CommandOptionSchema}}<{{commandFqn}}, bool>(
+                                new {{wkt.PropertyBinding}}<{{commandFqn}}, bool>(
                                     "IsVersionRequested",
                                     c => c.IsVersionRequested,
                                     (c, v) => c.IsVersionRequested = v),
@@ -723,9 +751,9 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                                 null,
                                 false,
                                 "Shows version information.",
-                                new global::CliFx.Extensibility.BoolBindingConverter(),
+                                new {{wkt.BoolBindingConverter}}(),
                                 null,
-                                global::System.Array.Empty<global::CliFx.Extensibility.IBindingValidator>()),
+                                global::System.Array.Empty<{{wkt.IBindingValidator}}>()),
 
                 """
             );
@@ -754,11 +782,12 @@ public class CommandSchemaGenerator : IIncrementalGenerator
 
     private static string GetConverterExpression(
         TypeDescriptor? converterType,
-        IPropertySymbol property
+        IPropertySymbol property,
+        CliFxReferences wkt
     )
     {
         if (converterType is not null)
-            return $"new {converterType.FullyQualifiedName}()";
+            return $"new {converterType.GlobalFullyQualifiedName}()";
 
         var type = property.Type;
 
@@ -770,22 +799,28 @@ public class CommandSchemaGenerator : IIncrementalGenerator
         {
             var elementType = type.TryGetEnumerableUnderlyingType();
             if (elementType is not null)
-                return BuildDefaultConverterExprForScalar(elementType) ?? "null";
+                return BuildDefaultConverterExprForScalar(elementType, wkt) ?? "null";
         }
 
-        return BuildDefaultConverterExprForScalar(type) ?? "null";
+        return BuildDefaultConverterExprForScalar(type, wkt) ?? "null";
     }
 
-    private static string BuildValidatorsExpr(IReadOnlyList<TypeDescriptor> validatorTypes)
+    private static string BuildValidatorsExpr(
+        IReadOnlyList<TypeDescriptor> validatorTypes,
+        CliFxReferences wkt
+    )
     {
         if (validatorTypes.Count == 0)
-            return "global::System.Array.Empty<global::CliFx.Extensibility.IBindingValidator>()";
+            return $"global::System.Array.Empty<{wkt.IBindingValidator}>()";
 
-        var items = string.Join(", ", validatorTypes.Select(v => $"new {v.FullyQualifiedName}()"));
-        return $"new global::CliFx.Extensibility.IBindingValidator[] {{ {items} }}";
+        var items = string.Join(
+            ", ",
+            validatorTypes.Select(v => $"new {v.GlobalFullyQualifiedName}()")
+        );
+        return $"new {wkt.IBindingValidator}[] {{ {items} }}";
     }
 
-    private static string? BuildDefaultConverterExprForScalar(ITypeSymbol type)
+    private static string? BuildDefaultConverterExprForScalar(ITypeSymbol type, CliFxReferences wkt)
     {
         var fqn = type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
 
@@ -799,19 +834,19 @@ public class CommandSchemaGenerator : IIncrementalGenerator
 
         // bool
         if (type.SpecialType == SpecialType.System_Boolean)
-            return "new global::CliFx.Extensibility.BoolBindingConverter()";
+            return $"new {wkt.BoolBindingConverter}()";
 
         // DateTimeOffset
         if (type is INamedTypeSymbol { ContainingNamespace.Name: "System", Name: "DateTimeOffset" })
-            return "new global::CliFx.Extensibility.DateTimeOffsetBindingConverter()";
+            return $"new {wkt.DateTimeOffsetBindingConverter}()";
 
         // TimeSpan
         if (type is INamedTypeSymbol { ContainingNamespace.Name: "System", Name: "TimeSpan" })
-            return "new global::CliFx.Extensibility.TimeSpanBindingConverter()";
+            return $"new {wkt.TimeSpanBindingConverter}()";
 
         // Enum
         if (type.TypeKind == TypeKind.Enum)
-            return $"new global::CliFx.Extensibility.EnumBindingConverter<{fqn}>()";
+            return $"new {wkt.EnumBindingConverter.GlobalBase}<{fqn}>()";
 
         // Nullable<T>
         if (
@@ -821,10 +856,10 @@ public class CommandSchemaGenerator : IIncrementalGenerator
         {
             var innerType = named.TypeArguments[0];
             var innerFqn = innerType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-            var innerConverterExpr = BuildDefaultConverterExprForScalar(innerType);
+            var innerConverterExpr = BuildDefaultConverterExprForScalar(innerType, wkt);
             if (innerConverterExpr is null)
                 return null;
-            return $"new global::CliFx.Extensibility.NullableBindingConverter<{innerFqn}>({innerConverterExpr})";
+            return $"new {wkt.NullableBindingConverter.GlobalBase}<{innerFqn}>({innerConverterExpr})";
         }
 
         // IConvertible (int, double, char, etc.)
@@ -833,7 +868,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                 i.ContainingNamespace?.Name == "System" && i.Name == "IConvertible"
             )
         )
-            return $"new global::CliFx.Extensibility.ConvertibleBindingConverter<{fqn}>()";
+            return $"new {wkt.ConvertibleBindingConverter.GlobalBase}<{fqn}>()";
 
         // String-parseable with IFormatProvider: static T Parse(string, IFormatProvider)
         var parseWithFormatProvider = type.GetMembers("Parse")
@@ -848,7 +883,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                 && SymbolEqualityComparer.Default.Equals(m.ReturnType, type)
             );
         if (parseWithFormatProvider is not null)
-            return $"new global::CliFx.Extensibility.DelegateBindingConverter<{fqn}>(s => {fqn}.Parse(s!, global::System.Globalization.CultureInfo.InvariantCulture))";
+            return $"new {wkt.DelegateBindingConverter.GlobalBase}<{fqn}>(s => {fqn}.Parse(s!, global::System.Globalization.CultureInfo.InvariantCulture))";
 
         // String-parseable: static T Parse(string)
         var parseMethod = type.GetMembers("Parse")
@@ -861,7 +896,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                 && SymbolEqualityComparer.Default.Equals(m.ReturnType, type)
             );
         if (parseMethod is not null)
-            return $"new global::CliFx.Extensibility.DelegateBindingConverter<{fqn}>(s => {fqn}.Parse(s!))";
+            return $"new {wkt.DelegateBindingConverter.GlobalBase}<{fqn}>(s => {fqn}.Parse(s!))";
 
         // String-constructable: public constructor(string)
         if (
@@ -872,7 +907,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                 && c.Parameters[0].Type.SpecialType == SpecialType.System_String
             )
         )
-            return $"new global::CliFx.Extensibility.DelegateBindingConverter<{fqn}>(s => new {fqn}(s!))";
+            return $"new {wkt.DelegateBindingConverter.GlobalBase}<{fqn}>(s => new {fqn}(s!))";
 
         return null;
     }
@@ -881,7 +916,8 @@ public class CommandSchemaGenerator : IIncrementalGenerator
     // Returns "null" if the collection type is not supported for AOT-compatible generation.
     private static string BuildSequenceConverterExpr(
         TypeDescriptor? userConverterType,
-        IPropertySymbol property
+        IPropertySymbol property,
+        CliFxReferences wkt
     )
     {
         var collectionType = property.Type;
@@ -897,20 +933,20 @@ public class CommandSchemaGenerator : IIncrementalGenerator
         // Get element-level converter expression (null means string pass-through)
         string? elementConverterExpr;
         if (userConverterType is not null)
-            elementConverterExpr = $"new {userConverterType.FullyQualifiedName}()";
+            elementConverterExpr = $"new {userConverterType.GlobalFullyQualifiedName}()";
         else
-            elementConverterExpr = BuildDefaultConverterExprForScalar(elementType);
+            elementConverterExpr = BuildDefaultConverterExprForScalar(elementType, wkt);
 
         var elementConverterArg = elementConverterExpr ?? "null";
 
         // T[] — use the single-type-parameter convenience form
         if (collectionType is IArrayTypeSymbol)
-            return $"new global::CliFx.Extensibility.ArraySequenceBindingConverter<{elementTypeFqn}>({elementConverterArg})";
+            return $"new {wkt.ArraySequenceBindingConverter.GlobalBase}<{elementTypeFqn}>({elementConverterArg})";
 
         // Interface (IReadOnlyList<T>, IEnumerable<T>, etc.) — T[] is assignable to any of these;
         // use the two-type-parameter form so the result type matches TSequence directly.
         if (collectionType.TypeKind == TypeKind.Interface)
-            return $"new global::CliFx.Extensibility.ArraySequenceBindingConverter<{elementTypeFqn}, {collectionTypeFqn}>({elementConverterArg})";
+            return $"new {wkt.ArraySequenceBindingConverter.GlobalBase}<{elementTypeFqn}, {collectionTypeFqn}>({elementConverterArg})";
 
         // Concrete type with IEnumerable<T> or T[] constructor (e.g., List<T>)
         if (
@@ -936,7 +972,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             )
         )
         {
-            return $"new global::CliFx.Extensibility.ArrayInitializableSequenceBindingConverter<{elementTypeFqn}, {collectionTypeFqn}>({elementConverterArg}, arr => new {collectionTypeFqn}(arr))";
+            return $"new {wkt.ArrayInitializableSequenceBindingConverter.GlobalBase}<{elementTypeFqn}, {collectionTypeFqn}>({elementConverterArg}, arr => new {collectionTypeFqn}(arr))";
         }
 
         // Unknown collection type — user must provide a custom ISequenceBindingConverter

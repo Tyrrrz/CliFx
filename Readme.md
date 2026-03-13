@@ -209,7 +209,7 @@ Parameters are bound from the command-line arguments based on the order they app
 Besides that, they also differ in the following ways:
 
 - Parameters are required by default, while options are not.
-  - You can make an option required by setting `IsRequired = true` on the corresponding attribute or by adding the `required` keyword to the property declaration (introduced in C# 11):
+  - You can make an option required by adding the `required` keyword to the property declaration (introduced in C# 11):
 
     ```csharp
     // Any option can be required or optional without restrictions
@@ -217,11 +217,11 @@ Besides that, they also differ in the following ways:
     public required string RequiredOption { get; init; }
     ```
 
-  - To make a parameter optional, you can set `IsRequired = false`, but only the last parameter (by order) can be configured in such way:
+  - To make a parameter optional, omit the `required` keyword, but only the last parameter (by order) can be configured in such way:
 
     ```csharp
     // Only the last parameter can be optional
-    [CommandParameter(0, IsRequired = false)]
+    [CommandParameter(0)]
     public string? OptionalParameter { get; init; }
     ```
 

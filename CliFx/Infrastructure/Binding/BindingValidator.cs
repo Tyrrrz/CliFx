@@ -1,4 +1,4 @@
-﻿namespace CliFx.Extensibility;
+namespace CliFx.Infrastructure.Binding;
 
 /// <summary>
 /// Defines custom validation logic for activated command inputs.

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace CliFx.Extensibility;
+namespace CliFx.Infrastructure.Binding;
 
 /// <summary>
 /// Collection converter that first converts raw values into a <typeparamref name="TElement" /> array

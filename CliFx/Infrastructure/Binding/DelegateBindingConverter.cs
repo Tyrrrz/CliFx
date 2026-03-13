@@ -1,6 +1,6 @@
 using System;
 
-namespace CliFx.Extensibility;
+namespace CliFx.Infrastructure.Binding;
 
 /// <summary>
 /// Converter for activating command inputs bound to properties using a custom delegate.

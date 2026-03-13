@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using CliFx.Extensibility;
+using CliFx.Infrastructure.Binding;
 
 namespace CliFx.Schema;
 

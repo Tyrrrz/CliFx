@@ -1,4 +1,4 @@
-namespace CliFx.Extensibility;
+namespace CliFx.Infrastructure.Binding;
 
 /// <summary>
 /// Converter for activating command inputs bound to properties of type <see cref="System.Nullable{T}" />.
