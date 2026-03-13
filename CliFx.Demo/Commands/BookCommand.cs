@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using CliFx.Attributes;
 using CliFx.Demo.Domain;
-using CliFx.Demo.Utils;
 using CliFx.Exceptions;
 using CliFx.Infrastructure;
 
@@ -16,7 +15,6 @@ public partial class BookCommand(LibraryProvider libraryProvider) : ICommand
     public ValueTask ExecuteAsync(IConsole console)
     {
         var book = libraryProvider.TryGetBook(Title);
-
         if (book is null)
             throw new CommandException($"Book '{Title}' not found.", 10);
 

@@ -15,12 +15,10 @@ public partial class BookRemoveCommand(LibraryProvider libraryProvider) : IComma
     public ValueTask ExecuteAsync(IConsole console)
     {
         var book = libraryProvider.TryGetBook(Title);
-
         if (book is null)
             throw new CommandException($"Book '{Title}' not found.", 10);
 
         libraryProvider.RemoveBook(book);
-
         console.WriteLine($"Book '{Title}' removed.");
 
         return default;

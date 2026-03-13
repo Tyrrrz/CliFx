@@ -1,8 +1,7 @@
 ﻿using System;
-using CliFx.Demo.Domain;
 using CliFx.Infrastructure;
 
-namespace CliFx.Demo.Utils;
+namespace CliFx.Demo.Domain;
 
 internal static class ConsoleExtensions
 {

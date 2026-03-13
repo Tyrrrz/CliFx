@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using CliFx.Attributes;
 using CliFx.Demo.Domain;
-using CliFx.Demo.Utils;
 using CliFx.Exceptions;
 using CliFx.Infrastructure;
 
