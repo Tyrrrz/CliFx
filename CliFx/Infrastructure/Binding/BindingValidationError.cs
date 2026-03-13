@@ -1,4 +1,4 @@
-﻿namespace CliFx.Extensibility;
+namespace CliFx.Infrastructure.Binding;
 
 /// <summary>
 /// Represents a validation error.

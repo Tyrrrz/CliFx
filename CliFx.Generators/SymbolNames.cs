@@ -7,6 +7,8 @@ internal static class SymbolNames
     public const string CliFxCommandParameterAttribute =
         "CliFx.Attributes.CommandParameterAttribute";
     public const string CliFxCommandOptionAttribute = "CliFx.Attributes.CommandOptionAttribute";
-    public const string CliFxBindingConverterClass = "CliFx.Extensibility.BindingConverter<T>";
-    public const string CliFxBindingValidatorClass = "CliFx.Extensibility.BindingValidator<T>";
+    public const string CliFxBindingConverterClass =
+        "CliFx.Infrastructure.Binding.BindingConverter<T>";
+    public const string CliFxBindingValidatorClass =
+        "CliFx.Infrastructure.Binding.BindingValidator<T>";
 }

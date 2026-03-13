@@ -1,5 +1,5 @@
 ﻿using System;
-using CliFx.Extensibility;
+using CliFx.Infrastructure.Binding;
 
 namespace CliFx.Attributes;
 

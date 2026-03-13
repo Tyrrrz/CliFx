@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace CliFx.Extensibility;
+namespace CliFx.Infrastructure.Binding;
 
 /// <summary>
 /// Defines custom conversion logic for activating sequential command inputs
