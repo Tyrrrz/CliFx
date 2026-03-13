@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using CliFx.Exceptions;
+using CliFx.Input;
+using CliFx.Utils.Extensions;
 
 namespace CliFx.Schema;
 
@@ -27,6 +30,11 @@ public partial class CommandSchema(
     /// Command name. Null or empty for the default command.
     /// </summary>
     public string? Name { get; } = name;
+    
+    /// <summary>
+    /// Whether this is the default command (no name).
+    /// </summary>
+    public bool IsDefault => string.IsNullOrWhiteSpace(Name);
 
     /// <summary>
     /// Command description shown in help text.
@@ -39,19 +47,11 @@ public partial class CommandSchema(
     public IReadOnlyList<CommandParameterSchema> Parameters { get; } = parameters;
 
     /// <summary>
-    /// Options of the command, including implicit ones.
+    /// Options of the command.
     /// </summary>
     public IReadOnlyList<CommandOptionSchema> Options { get; } = options;
 
-    /// <summary>
-    /// Whether this is the default command (no name).
-    /// </summary>
-    public bool IsDefault => string.IsNullOrWhiteSpace(Name);
-
-    /// <summary>
-    /// Whether this command matches the given name.
-    /// </summary>
-    public bool MatchesName(string? name) =>
+    internal bool MatchesName(string? name) =>
         !string.IsNullOrWhiteSpace(Name)
             ? string.Equals(name, Name, StringComparison.OrdinalIgnoreCase)
             : string.IsNullOrWhiteSpace(name);
@@ -73,6 +73,194 @@ public partial class CommandSchema(
         }
 
         return result;
+    }
+
+    private void BindParameters(
+        CommandInput input,
+        IReadOnlyList<CommandParameterSchema> parameters,
+        ICommand instance,
+        bool throwOnUnrecognizedAndMissing = true
+    )
+    {
+        var remainingParameterInputs = input.Parameters.ToList();
+        var remainingRequiredParameters = parameters.Where(p => p.IsRequired).ToList();
+
+        var position = 0;
+        foreach (var parameter in parameters.OrderBy(p => p.Order))
+        {
+            if (position >= input.Parameters.Count)
+                break;
+
+            if (!parameter.IsSequence)
+            {
+                var parameterInput = input.Parameters[position];
+                parameter.Bind([parameterInput.Value], instance);
+
+                position++;
+                remainingParameterInputs.Remove(parameterInput);
+            }
+            else
+            {
+                var parameterInputs = input.Parameters.Skip(position).ToArray();
+
+                parameter.Bind(
+                    parameterInputs.Select(p => p.Value).ToArray(),
+                    instance
+                );
+
+                position += parameterInputs.Length;
+                remainingParameterInputs.RemoveRange(parameterInputs);
+            }
+
+            remainingRequiredParameters.Remove(parameter);
+        }
+
+        if (throwOnUnrecognizedAndMissing)
+        {
+            if (remainingParameterInputs.Any())
+            {
+                throw CliFxException.UserError(
+                    $"""
+                    Unrecognized parameter(s):
+                    {remainingParameterInputs.Select(p => p.GetFormattedIdentifier()).JoinToString(
+                        " "
+                    )}
+                    """
+                );
+            }
+
+            if (remainingRequiredParameters.Any())
+            {
+                throw CliFxException.UserError(
+                    $"""
+                     Missing required parameter(s):
+                     {remainingRequiredParameters
+                         .Select(p => p.GetFormattedIdentifier())
+                         .JoinToString(" ")}
+                     """
+                );
+            }
+        }
+    }
+
+    private void BindOptions(
+        CommandInput input,
+        IReadOnlyList<CommandOptionSchema> options,
+        ICommand instance,
+        bool throwOnUnrecognizedAndMissing = true
+    )
+    {
+        var remainingOptionInputs = input.Options.ToList();
+        var remainingRequiredOptions = options.Where(o => o.IsRequired).ToList();
+
+        foreach (var option in options)
+        {
+            var optionInputs = input
+                .Options.Where(o => option.MatchesIdentifier(o.Identifier))
+                .ToArray();
+
+            var environmentVariableInput = input.EnvironmentVariables.FirstOrDefault(e =>
+                option.MatchesEnvironmentVariable(e.Name)
+            );
+
+            if (optionInputs.Any())
+            {
+                var rawValues = optionInputs.SelectMany(o => o.Values).ToArray();
+
+                option.Bind(rawValues, instance);
+
+                if (rawValues.Any())
+                    remainingRequiredOptions.Remove(option);
+            }
+            else if (environmentVariableInput is not null)
+            {
+                var rawValues = !option.IsSequence
+                    ? [environmentVariableInput.Value]
+                    : environmentVariableInput.SplitValues();
+
+                option.Bind(rawValues, instance);
+
+                if (rawValues.Any())
+                    remainingRequiredOptions.Remove(option);
+            }
+            else
+            {
+                continue;
+            }
+
+            remainingOptionInputs.RemoveRange(optionInputs);
+        }
+
+        if (throwOnUnrecognizedAndMissing)
+        {
+            if (remainingOptionInputs.Any())
+            {
+                throw CliFxException.UserError(
+                    $"""
+                    Unrecognized option(s):
+                    {remainingOptionInputs.Select(o => o.GetFormattedIdentifier()).JoinToString(
+                        ", "
+                    )}
+                    """
+                );
+            }
+
+            if (remainingRequiredOptions.Any())
+            {
+                throw CliFxException.UserError(
+                    $"""
+                     Missing required option(s):
+                     {remainingRequiredOptions
+                         .Select(o => o.GetFormattedIdentifier())
+                         .JoinToString(", ")}
+                     """
+                );
+            }
+        }
+    }
+
+    internal void BindHelpAndVersionOptions(CommandInput input, ICommand instance)
+    {
+        var options = new List<CommandOptionSchema>(2);
+
+        if (instance is IHasHelpOption)
+        {
+            var optionSchema = Options.FirstOrDefault(o =>
+                string.Equals(
+                    o.Property.Name,
+                    nameof(IHasHelpOption.IsHelpRequested),
+                    StringComparison.OrdinalIgnoreCase
+                )
+            );
+
+            if (optionSchema is not null)
+                options.Add(optionSchema);
+        }
+
+        if (instance is IHasVersionOption)
+        {
+            var optionSchema = Options.FirstOrDefault(o =>
+                string.Equals(
+                    o.Property.Name,
+                    nameof(IHasVersionOption.IsVersionRequested),
+                    StringComparison.OrdinalIgnoreCase
+                )
+            );
+
+            if (optionSchema is not null)
+                options.Add(optionSchema);
+        }
+
+        if (!options.Any())
+            return;
+
+        BindOptions(input, options, instance, false);
+    }
+
+    internal void Bind(CommandInput input, ICommand instance)
+    {
+        BindParameters(input, Parameters, instance);
+        BindOptions(input, Options, instance);
     }
 }
 

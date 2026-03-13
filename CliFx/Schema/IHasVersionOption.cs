@@ -12,7 +12,7 @@
 public interface IHasVersionOption
 {
     /// <summary>
-    /// Whether the user requested the application version information (via the <c>--version</c> option).
+    /// Whether the user requested the application version information.
     /// </summary>
     /// <remarks>
     /// If this property is <c>true</c>, the version text is automatically rendered by the framework,

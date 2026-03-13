@@ -22,8 +22,6 @@ public class CliApplication(
     ITypeActivator typeActivator
 )
 {
-    private readonly CommandBinder _commandBinder = new();
-
     /// <summary>
     /// Application metadata.
     /// </summary>
@@ -110,7 +108,7 @@ public class CliApplication(
         // Perform a limited command binding to check if the help or version options were specified by the user
         if (commandInstance is IHasHelpOption or IHasVersionOption)
         {
-            _commandBinder.BindHelpAndVersionOptions(commandInput, commandSchema, commandInstance);
+            commandSchema.BindHelpAndVersionOptions(commandInput, commandInstance);
 
             // Help text
             if (
@@ -137,7 +135,7 @@ public class CliApplication(
         try
         {
             // Bind the command inputs from the command line
-            _commandBinder.Bind(commandInput, commandSchema, commandInstance);
+            commandSchema.Bind(commandInput, commandInstance);
 
             // Execute the command
             await commandInstance.ExecuteAsync(console);

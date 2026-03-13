@@ -5,22 +5,16 @@ using CliFx.Utils.Extensions;
 
 namespace CliFx.Schema;
 
-/// <summary>
-/// Describes the schema of the application, including all registered commands.
-/// </summary>
-public class ApplicationSchema(IReadOnlyList<CommandSchema> commands)
+internal class ApplicationSchema(IReadOnlyList<CommandSchema> commands)
 {
-    /// <summary>
-    /// All registered commands.
-    /// </summary>
     public IReadOnlyList<CommandSchema> Commands { get; } = commands;
 
-    internal IReadOnlyList<string> GetCommandNames() =>
+    public IReadOnlyList<string> GetCommandNames() =>
         Commands.Select(c => c.Name).WhereNotNullOrWhiteSpace().ToArray();
 
-    internal CommandSchema? TryFindDefaultCommand() => Commands.FirstOrDefault(c => c.IsDefault);
+    public CommandSchema? TryFindDefaultCommand() => Commands.FirstOrDefault(c => c.IsDefault);
 
-    internal CommandSchema? TryFindCommand(string commandName) =>
+    public CommandSchema? TryFindCommand(string commandName) =>
         Commands.FirstOrDefault(c => c.MatchesName(commandName));
 
     private IReadOnlyList<CommandSchema> GetDescendantCommands(
@@ -57,10 +51,10 @@ public class ApplicationSchema(IReadOnlyList<CommandSchema> commands)
         return result;
     }
 
-    internal IReadOnlyList<CommandSchema> GetDescendantCommands(string? parentCommandName) =>
+    public IReadOnlyList<CommandSchema> GetDescendantCommands(string? parentCommandName) =>
         GetDescendantCommands(Commands, parentCommandName);
 
-    internal IReadOnlyList<CommandSchema> GetChildCommands(string? parentCommandName)
+    public IReadOnlyList<CommandSchema> GetChildCommands(string? parentCommandName)
     {
         var descendants = GetDescendantCommands(parentCommandName);
 
