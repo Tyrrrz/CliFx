@@ -13,6 +13,17 @@ namespace CliFx.Tests;
 
 public class DirectivesSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
 {
+    [Fact]
+    public void Debug_and_preview_modes_are_opt_in_by_default()
+    {
+        // Arrange
+        var application = new CliApplicationBuilder().UseConsole(FakeConsole).Build();
+
+        // Assert
+        application.Configuration.IsDebugModeAllowed.Should().BeFalse();
+        application.Configuration.IsPreviewModeAllowed.Should().BeFalse();
+    }
+
     [Fact(Timeout = 15000)]
     public async Task I_can_use_the_debug_directive_to_make_the_application_wait_for_the_debugger_to_attach()
     {

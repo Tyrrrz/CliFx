@@ -15,8 +15,8 @@ public partial class CliApplicationBuilder
 {
     private readonly HashSet<CommandSchema> _commandSchemas = [];
 
-    private bool _isDebugModeAllowed = true;
-    private bool _isPreviewModeAllowed = true;
+    private bool _isDebugModeAllowed;
+    private bool _isPreviewModeAllowed;
     private string? _title;
     private string? _executableName;
     private string? _version;
