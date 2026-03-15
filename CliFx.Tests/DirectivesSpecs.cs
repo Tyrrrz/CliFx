@@ -17,7 +17,7 @@ public class DirectivesSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
     public void Debug_and_preview_modes_are_opt_in_by_default()
     {
         // Arrange
-        var application = new CliApplicationBuilder().Build();
+        var application = new CliApplicationBuilder().UseConsole(FakeConsole).Build();
 
         // Assert
         application.Configuration.IsDebugModeAllowed.Should().BeFalse();
