@@ -76,7 +76,7 @@ public class AddCommandsFromThisAssemblyGenerator : IIncrementalGenerator
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         var cliFxRefs = context.CompilationProvider.Select(
-            static (compilation, _) => CliFxReferences.From(compilation)
+            static (compilation, _) => new CliFxReferences(compilation)
         );
 
         var commandDeclarations = context
