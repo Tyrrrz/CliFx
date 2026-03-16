@@ -5,7 +5,7 @@ namespace CliFx.Infrastructure.Binding;
 /// <summary>
 /// Converter for activating command inputs bound to properties of type <see cref="Enum" />.
 /// </summary>
-public class EnumBindingConverter<T> : BindingConverter<T>
+public class EnumScalarBindingConverter<T> : ScalarBindingConverter<T>
     where T : struct, Enum
 {
     /// <inheritdoc />

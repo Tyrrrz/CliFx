@@ -14,10 +14,9 @@ namespace CliFx.Schema;
 /// </summary>
 public abstract class CommandInputSchema(
     PropertyBinding property,
-    bool isSequence,
+    bool isRequired,
     string? description,
-    IBindingConverter? converter,
-    ISequenceBindingConverter? sequenceConverter,
+    IBindingConverter converter,
     IReadOnlyList<IBindingValidator> validators
 )
 {
@@ -27,9 +26,14 @@ public abstract class CommandInputSchema(
     public PropertyBinding Property { get; } = property;
 
     /// <summary>
+    /// Whether this option must be provided.
+    /// </summary>
+    public bool IsRequired { get; } = isRequired;
+
+    /// <summary>
     /// Whether this input accepts multiple values (sequence property).
     /// </summary>
-    public bool IsSequence { get; } = isSequence;
+    public bool IsSequence => Converter.IsSequence;
 
     /// <summary>
     /// Description shown in the help text.
@@ -37,19 +41,12 @@ public abstract class CommandInputSchema(
     public string? Description { get; } = description;
 
     /// <summary>
-    /// Binding converter used to parse raw strings into the property type.
-    /// For sequence properties, <see cref="SequenceConverter"/> takes precedence when set.
+    /// Binding converter used to convert raw command-line argument(s) to the target property type.
     /// </summary>
-    public IBindingConverter? Converter { get; } = converter;
+    public IBindingConverter Converter { get; } = converter;
 
     /// <summary>
-    /// Binding converter used to parse multiple raw strings into the collection property type.
-    /// When set on a sequence property, this is used instead of per-element <see cref="Converter"/>.
-    /// </summary>
-    public ISequenceBindingConverter? SequenceConverter { get; } = sequenceConverter;
-
-    /// <summary>
-    /// Validators run after the value is converted.
+    /// Binding validators used to validate the converted value before setting it to the target property.
     /// </summary>
     public IReadOnlyList<IBindingValidator> Validators { get; } = validators;
 
@@ -57,29 +54,7 @@ public abstract class CommandInputSchema(
     {
         try
         {
-            if (IsSequence)
-            {
-                // Sequence input with a sequence converter
-                if (SequenceConverter is not null)
-                    return SequenceConverter.ConvertMany(rawValues);
-
-                // Sequence input without a sequence converter
-                throw CliFxException.InternalError(
-                    $"""
-                     {this.GetKind()} {this.GetFormattedIdentifier()} is a sequence property but has no collection converter.
-                     To fix this, use the source generator or provide a custom {nameof(
-                         ISequenceBindingConverter
-                     )} via the Converter attribute property.
-                     """
-                );
-            }
-
-            // Regular input
-            if (rawValues.Count <= 1)
-            {
-                var rawValue = rawValues.SingleOrDefault();
-                return Converter is not null ? Converter.Convert(rawValue) : rawValue;
-            }
+            return Converter.Convert(rawValues);
         }
         catch (Exception ex) when (ex is not CliFxException)
         {
@@ -96,14 +71,6 @@ public abstract class CommandInputSchema(
                 ex
             );
         }
-
-        // Mismatch (scalar but too many values)
-        throw CliFxException.UserError(
-            $"""
-            {this.GetKind()} {this.GetFormattedIdentifier()} expects a single argument, but provided with multiple:
-            {rawValues.Select(v => '<' + v + '>').JoinToString(" ")}
-            """
-        );
     }
 
     internal void Validate(object? convertedValue)
@@ -129,7 +96,7 @@ public abstract class CommandInputSchema(
         }
     }
 
-    internal void Bind(IReadOnlyList<string> rawValues, ICommand instance)
+    internal void Activate(IReadOnlyList<string> rawValues, ICommand instance)
     {
         var convertedValue = Convert(rawValues);
         Validate(convertedValue);
@@ -169,10 +136,9 @@ public abstract class CommandInputSchema<
     [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] TProperty
 >(
     PropertyBinding<TCommand, TProperty> property,
-    bool isSequence,
+    bool isRequired,
     string? description,
-    BindingConverter<TProperty>? converter,
-    SequenceBindingConverter<TProperty>? sequenceConverter,
-    IReadOnlyList<IBindingValidator> validators
-) : CommandInputSchema(property, isSequence, description, converter, sequenceConverter, validators)
+    BindingConverter<TProperty> converter,
+    IReadOnlyList<BindingValidator<TProperty>> validators
+) : CommandInputSchema(property, isRequired, description, converter, validators)
     where TCommand : ICommand;

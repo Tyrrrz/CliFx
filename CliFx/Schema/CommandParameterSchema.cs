@@ -9,15 +9,13 @@ namespace CliFx.Schema;
 /// </summary>
 public class CommandParameterSchema(
     PropertyBinding property,
-    bool isSequence,
     int order,
     string name,
     bool isRequired,
     string? description,
-    IBindingConverter? converter,
-    ISequenceBindingConverter? sequenceConverter,
+    IBindingConverter converter,
     IReadOnlyList<IBindingValidator> validators
-) : CommandInputSchema(property, isSequence, description, converter, sequenceConverter, validators)
+) : CommandInputSchema(property, isRequired, description, converter, validators)
 {
     /// <summary>
     /// Position order of this parameter.
@@ -28,11 +26,6 @@ public class CommandParameterSchema(
     /// Parameter name, shown in the help text.
     /// </summary>
     public string Name { get; } = name;
-
-    /// <summary>
-    /// Whether this parameter must be provided.
-    /// </summary>
-    public bool IsRequired { get; } = isRequired;
 }
 
 /// <inheritdoc cref="CommandParameterSchema" />
@@ -44,24 +37,11 @@ public class CommandParameterSchema<
     [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] TProperty
 >(
     PropertyBinding<TCommand, TProperty> property,
-    bool isSequence,
     int order,
     string name,
     bool isRequired,
     string? description,
-    BindingConverter<TProperty>? converter,
-    SequenceBindingConverter<TProperty>? sequenceConverter,
-    IReadOnlyList<IBindingValidator> validators
-)
-    : CommandParameterSchema(
-        property,
-        isSequence,
-        order,
-        name,
-        isRequired,
-        description,
-        converter,
-        sequenceConverter,
-        validators
-    )
+    BindingConverter<TProperty> converter,
+    IReadOnlyList<BindingValidator<TProperty>> validators
+) : CommandParameterSchema(property, order, name, isRequired, description, converter, validators)
     where TCommand : ICommand;

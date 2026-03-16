@@ -78,10 +78,15 @@ internal static class DynamicCommandBuilder
                     LanguageVersion.Preview
                 )
             )
-            .RunGeneratorsAndUpdateCompilation(compilation, out var updatedCompilation, out _);
+            .RunGeneratorsAndUpdateCompilation(
+                compilation,
+                out var updatedCompilation,
+                out var generatorDiagnostics
+            );
 
         var compilationErrors = updatedCompilation
             .GetDiagnostics()
+            .Concat(generatorDiagnostics)
             .Where(d => d.Severity >= DiagnosticSeverity.Error)
             .ToArray();
 

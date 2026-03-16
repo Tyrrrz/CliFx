@@ -83,4 +83,14 @@ internal static class DiagnosticDescriptors
             DiagnosticSeverity.Error,
             true
         );
+
+    public static DiagnosticDescriptor ConverterNotInferrable { get; } =
+        new(
+            $"{nameof(CliFx)}_{nameof(ConverterNotInferrable)}",
+            "No binding converter can be inferred for the property type",
+            "Property '{0}' of type '{1}' has no applicable default binding converter and no custom converter was specified. Provide a converter via the Converter property of the attribute.",
+            "CliFx",
+            DiagnosticSeverity.Error,
+            true
+        );
 }

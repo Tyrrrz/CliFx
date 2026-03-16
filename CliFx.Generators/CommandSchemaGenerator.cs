@@ -165,9 +165,14 @@ public class CommandSchemaGenerator : IIncrementalGenerator
 
             if (parameterAttribute is not null)
             {
-                parameterDescriptors.Add(
-                    BuildParameterDescriptor(property, parameterAttribute, diagnostics)
+                var descriptor = BuildParameterDescriptor(
+                    property,
+                    parameterAttribute,
+                    diagnostics,
+                    refs
                 );
+                if (descriptor is not null)
+                    parameterDescriptors.Add(descriptor);
                 continue;
             }
 
@@ -182,9 +187,14 @@ public class CommandSchemaGenerator : IIncrementalGenerator
 
             if (optionAttribute is not null)
             {
-                optionDescriptors.Add(
-                    BuildOptionDescriptor(property, optionAttribute, diagnostics)
+                var descriptor = BuildOptionDescriptor(
+                    property,
+                    optionAttribute,
+                    diagnostics,
+                    refs
                 );
+                if (descriptor is not null)
+                    optionDescriptors.Add(descriptor);
             }
         }
 
@@ -289,10 +299,11 @@ public class CommandSchemaGenerator : IIncrementalGenerator
         );
     }
 
-    private static CommandParameterDescriptor BuildParameterDescriptor(
+    private static CommandParameterDescriptor? BuildParameterDescriptor(
         PropertyDescriptor property,
         AttributeData attribute,
-        List<Diagnostic> diagnostics
+        List<Diagnostic> diagnostics,
+        CliFxReferences refs
     )
     {
         var order = attribute
@@ -315,19 +326,35 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             );
         }
 
+        var converterType = (
+            attribute.NamedArguments.FirstOrDefault(a => a.Key == "Converter").Value.Value
+            as ITypeSymbol
+        )
+            is { } converterSym
+            ? new TypeDescriptor(converterSym)
+            : null;
+
+        // Emit an error and drop the property if no converter can be inferred.
+        if (BuildConverterExpr(converterType, property.Symbol, refs) is null)
+        {
+            diagnostics.Add(
+                Diagnostic.Create(
+                    DiagnosticDescriptors.ConverterNotInferrable,
+                    property.Symbol.Locations.FirstOrDefault() ?? Location.None,
+                    property.Name,
+                    property.Type.FullyQualifiedName
+                )
+            );
+            return null;
+        }
+
         return new CommandParameterDescriptor(
             property,
             order,
             name,
             attribute.NamedArguments.FirstOrDefault(a => a.Key == "Description").Value.Value
                 as string,
-            (
-                attribute.NamedArguments.FirstOrDefault(a => a.Key == "Converter").Value.Value
-                as ITypeSymbol
-            )
-                is { } converterSym
-                ? new TypeDescriptor(converterSym)
-                : null,
+            converterType,
             attribute
                 .NamedArguments.Where(a => a.Key == "Validators")
                 .SelectMany(a => a.Value.Values)
@@ -339,10 +366,11 @@ public class CommandSchemaGenerator : IIncrementalGenerator
         );
     }
 
-    private static CommandOptionDescriptor BuildOptionDescriptor(
+    private static CommandOptionDescriptor? BuildOptionDescriptor(
         PropertyDescriptor property,
         AttributeData attribute,
-        List<Diagnostic> diagnostics
+        List<Diagnostic> diagnostics,
+        CliFxReferences refs
     )
     {
         var name =
@@ -391,6 +419,28 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             );
         }
 
+        var converterType = (
+            attribute.NamedArguments.FirstOrDefault(a => a.Key == "Converter").Value.Value
+            as ITypeSymbol
+        )
+            is { } converterSym
+            ? new TypeDescriptor(converterSym)
+            : null;
+
+        // Emit an error and drop the property if no converter can be inferred.
+        if (BuildConverterExpr(converterType, property.Symbol, refs) is null)
+        {
+            diagnostics.Add(
+                Diagnostic.Create(
+                    DiagnosticDescriptors.ConverterNotInferrable,
+                    property.Symbol.Locations.FirstOrDefault() ?? Location.None,
+                    property.Name,
+                    property.Type.FullyQualifiedName
+                )
+            );
+            return null;
+        }
+
         return new CommandOptionDescriptor(
             property,
             name,
@@ -399,13 +449,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                 as string,
             attribute.NamedArguments.FirstOrDefault(a => a.Key == "Description").Value.Value
                 as string,
-            (
-                attribute.NamedArguments.FirstOrDefault(a => a.Key == "Converter").Value.Value
-                as ITypeSymbol
-            )
-                is { } converterSym
-                ? new TypeDescriptor(converterSym)
-                : null,
+            converterType,
             attribute
                 .NamedArguments.Where(a => a.Key == "Validators")
                 .SelectMany(a => a.Value.Values)
@@ -592,9 +636,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
     )
     {
         var propertyTypeFqn = param.Property.Type.FullyQualifiedName;
-        var (converterArg, sequenceConverterArg) = param.Property.IsSequenceType
-            ? ("null", BuildSequenceConverterExpr(param.ConverterType, param.Property.Symbol, refs))
-            : (GetConverterExpression(param.ConverterType, param.Property.Symbol, refs), "null");
+        var converterExpr = BuildConverterExpr(param.ConverterType, param.Property.Symbol, refs)!;
 
         sb.Append(
             // lang=csharp
@@ -604,14 +646,12 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                                 "{{param.Property.Name}}",
                                 c => c.{{param.Property.Name}},
                                 (c, v) => c.{{param.Property.Name}} = v),
-                            {{(param.Property.IsSequenceType ? "true" : "false")}},
                             {{param.Order}},
                             {{EscapeString(param.Name)}},
                             {{(param.Property.IsRequired ? "true" : "false")}},
                             {{EscapeString(param.Description)}},
-                            {{converterArg}},
-                            {{sequenceConverterArg}},
-                            {{BuildValidatorsExpr(param.ValidatorTypes, refs)}}),
+                            {{converterExpr}},
+                            {{BuildValidatorsExpr(param.ValidatorTypes, propertyTypeFqn, refs)}}),
 
             """
         );
@@ -626,12 +666,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
     {
         var propertyTypeFqn = option.Property.Type.FullyQualifiedName;
         var shortNameArg = option.ShortName.HasValue ? $"'{option.ShortName}'" : "null";
-        var (converterArg, sequenceConverterArg) = option.Property.IsSequenceType
-            ? (
-                "null",
-                BuildSequenceConverterExpr(option.ConverterType, option.Property.Symbol, refs)
-            )
-            : (GetConverterExpression(option.ConverterType, option.Property.Symbol, refs), "null");
+        var converterExpr = BuildConverterExpr(option.ConverterType, option.Property.Symbol, refs)!;
 
         sb.Append(
             // lang=csharp
@@ -641,15 +676,13 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                                 "{{option.Property.Name}}",
                                 c => c.{{option.Property.Name}},
                                 (c, v) => c.{{option.Property.Name}} = v),
-                            {{(option.Property.IsSequenceType ? "true" : "false")}},
                             {{EscapeString(option.Name)}},
                             {{shortNameArg}},
                             {{EscapeString(option.EnvironmentVariable)}},
                             {{(option.Property.IsRequired ? "true" : "false")}},
                             {{EscapeString(option.Description)}},
-                            {{converterArg}},
-                            {{sequenceConverterArg}},
-                            {{BuildValidatorsExpr(option.ValidatorTypes, refs)}}),
+                            {{converterExpr}},
+                            {{BuildValidatorsExpr(option.ValidatorTypes, propertyTypeFqn, refs)}}),
 
             """
         );
@@ -669,15 +702,13 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                                 "IsHelpRequested",
                                 c => c.IsHelpRequested,
                                 (c, v) => c.IsHelpRequested = v),
-                            false,
                             "help",
                             'h',
                             null,
                             false,
                             "Shows help text.",
-                            new {{refs.BoolBindingConverter}}(),
-                            null,
-                            global::System.Array.Empty<{{refs.IBindingValidator}}>()),
+                            new {{refs.BoolScalarBindingConverter}}(),
+                            global::System.Array.Empty<{{refs.BindingValidator.GlobalBaseFullyQualifiedName}}<bool>>()),
 
             """
         );
@@ -697,15 +728,13 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                                 "IsVersionRequested",
                                 c => c.IsVersionRequested,
                                 (c, v) => c.IsVersionRequested = v),
-                            false,
                             "version",
                             null,
                             null,
                             false,
                             "Shows version information.",
-                            new {{refs.BoolBindingConverter}}(),
-                            null,
-                            global::System.Array.Empty<{{refs.IBindingValidator}}>()),
+                            new {{refs.BoolScalarBindingConverter}}(),
+                            global::System.Array.Empty<{{refs.BindingValidator.GlobalBaseFullyQualifiedName}}<bool>>()),
 
             """
         );
@@ -714,72 +743,59 @@ public class CommandSchemaGenerator : IIncrementalGenerator
     private static string EscapeString(string? value) =>
         value is null ? "null" : $"\"{value.Replace("\\", "\\\\").Replace("\"", "\\\"")}\"";
 
-    private static string GetConverterExpression(
-        TypeDescriptor? converterType,
+    // Returns a single BindingConverter<TProperty> expression — either scalar or sequence.
+    // Returns null if no converter can be inferred (caller must report a diagnostic and skip emission).
+    private static string? BuildConverterExpr(
+        TypeDescriptor? userConverterType,
         IPropertySymbol property,
         CliFxReferences refs
     )
     {
-        if (converterType is not null)
-            return $"new {converterType.GlobalFullyQualifiedName}()";
+        // User-supplied converter takes precedence and is used as-is.
+        if (userConverterType is not null)
+            return $"new {userConverterType.GlobalFullyQualifiedName}()";
 
         var type = property.Type;
 
-        // For sequence types, use the element type's converter
+        // Sequence types: build a default sequence converter (wrapping a scalar element converter).
         if (
             type.SpecialType != SpecialType.System_String
             && type.TryGetEnumerableUnderlyingType() is { } elementType
         )
-            return BuildDefaultConverterExprForScalar(elementType, refs) ?? "null";
+            return BuildDefaultSequenceConverterExpr(elementType, type, refs);
 
-        return BuildDefaultConverterExprForScalar(type, refs) ?? "null";
+        // Scalar types: build a default scalar converter (or null for string/object pass-through).
+        return BuildDefaultScalarConverterExpr(type, refs);
     }
 
-    private static string BuildValidatorsExpr(
-        IReadOnlyList<TypeDescriptor> validatorTypes,
-        CliFxReferences refs
-    )
-    {
-        if (validatorTypes.Count == 0)
-            return $"global::System.Array.Empty<{refs.IBindingValidator}>()";
-
-        var items = string.Join(
-            ", ",
-            validatorTypes.Select(v => $"new {v.GlobalFullyQualifiedName}()")
-        );
-        return $"new {refs.IBindingValidator}[] {{ {items} }}";
-    }
-
-    private static string? BuildDefaultConverterExprForScalar(
-        ITypeSymbol type,
-        CliFxReferences refs
-    )
+    private static string? BuildDefaultScalarConverterExpr(ITypeSymbol type, CliFxReferences refs)
     {
         var typeFqn = type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
 
-        // string — no conversion needed (null converter = pass-through)
+        // string — no conversion needed; use the no-op pass-through converter
         if (type.SpecialType == SpecialType.System_String)
-            return null;
+            return $"new {refs.StringScalarBindingConverter}()";
 
-        // object — assignable from string; null converter passes raw string through as object
+        // object — assignable from string, but needs BindingConverter<object> not BindingConverter<string>,
+        // so use a delegate converter that simply passes the raw string through as object.
         if (type.SpecialType == SpecialType.System_Object)
-            return null;
+            return $"new {refs.DelegateScalarBindingConverter.GlobalBaseFullyQualifiedName}<global::System.Object>(s => s)";
 
         // bool
         if (type.SpecialType == SpecialType.System_Boolean)
-            return $"new {refs.BoolBindingConverter}()";
+            return $"new {refs.BoolScalarBindingConverter}()";
 
         // DateTimeOffset
         if (type is INamedTypeSymbol { ContainingNamespace.Name: "System", Name: "DateTimeOffset" })
-            return $"new {refs.DateTimeOffsetBindingConverter}()";
+            return $"new {refs.DateTimeOffsetScalarBindingConverter}()";
 
         // TimeSpan
         if (type is INamedTypeSymbol { ContainingNamespace.Name: "System", Name: "TimeSpan" })
-            return $"new {refs.TimeSpanBindingConverter}()";
+            return $"new {refs.TimeSpanScalarBindingConverter}()";
 
         // Enum
         if (type.TypeKind == TypeKind.Enum)
-            return $"new {refs.EnumBindingConverter.GlobalBaseFullyQualifiedName}<{typeFqn}>()";
+            return $"new {refs.EnumScalarBindingConverter.GlobalBaseFullyQualifiedName}<{typeFqn}>()";
 
         // Nullable<T>
         if (
@@ -789,10 +805,10 @@ public class CommandSchemaGenerator : IIncrementalGenerator
         {
             var innerType = named.TypeArguments[0];
             var innerFqn = innerType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-            var innerConverterExpr = BuildDefaultConverterExprForScalar(innerType, refs);
+            var innerConverterExpr = BuildDefaultScalarConverterExpr(innerType, refs);
             if (innerConverterExpr is null)
                 return null;
-            return $"new {refs.NullableBindingConverter.GlobalBaseFullyQualifiedName}<{innerFqn}>({innerConverterExpr})";
+            return $"new {refs.NullableScalarBindingConverter.GlobalBaseFullyQualifiedName}<{innerFqn}>({innerConverterExpr})";
         }
 
         // IConvertible (int, double, char, etc.)
@@ -801,7 +817,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                 i.ContainingNamespace?.Name == "System" && i.Name == "IConvertible"
             )
         )
-            return $"new {refs.ConvertibleBindingConverter.GlobalBaseFullyQualifiedName}<{typeFqn}>()";
+            return $"new {refs.ConvertibleScalarBindingConverter.GlobalBaseFullyQualifiedName}<{typeFqn}>()";
 
         // String-parseable with IFormatProvider: static T Parse(string, IFormatProvider)
         var parseWithFormatProvider = type.GetMembers("Parse")
@@ -816,7 +832,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                 && SymbolEqualityComparer.Default.Equals(m.ReturnType, type)
             );
         if (parseWithFormatProvider is not null)
-            return $"new {refs.DelegateBindingConverter.GlobalBaseFullyQualifiedName}<{typeFqn}>(s => {typeFqn}.Parse(s!, global::System.Globalization.CultureInfo.InvariantCulture))";
+            return $"new {refs.DelegateScalarBindingConverter.GlobalBaseFullyQualifiedName}<{typeFqn}>(s => {typeFqn}.Parse(s!, global::System.Globalization.CultureInfo.InvariantCulture))";
 
         // String-parseable: static T Parse(string)
         var parseMethod = type.GetMembers("Parse")
@@ -829,7 +845,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                 && SymbolEqualityComparer.Default.Equals(m.ReturnType, type)
             );
         if (parseMethod is not null)
-            return $"new {refs.DelegateBindingConverter.GlobalBaseFullyQualifiedName}<{typeFqn}>(s => {typeFqn}.Parse(s!))";
+            return $"new {refs.DelegateScalarBindingConverter.GlobalBaseFullyQualifiedName}<{typeFqn}>(s => {typeFqn}.Parse(s!))";
 
         // String-constructable: public constructor(string)
         if (
@@ -840,32 +856,25 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                 && c.Parameters[0].Type.SpecialType == SpecialType.System_String
             )
         )
-            return $"new {refs.DelegateBindingConverter.GlobalBaseFullyQualifiedName}<{typeFqn}>(s => new {typeFqn}(s!))";
+            return $"new {refs.DelegateScalarBindingConverter.GlobalBaseFullyQualifiedName}<{typeFqn}>(s => new {typeFqn}(s!))";
 
         return null;
     }
 
-    // Builds a collection converter expression for a sequence property.
-    // Returns "null" if the collection type is not supported for AOT-compatible generation.
-    private static string BuildSequenceConverterExpr(
-        TypeDescriptor? userConverterType,
-        IPropertySymbol property,
+    // Builds a default sequence converter expression for a sequence property.
+    // Returns null if the collection type is not supported for AOT-compatible generation.
+    private static string? BuildDefaultSequenceConverterExpr(
+        ITypeSymbol elementType,
+        ITypeSymbol collectionType,
         CliFxReferences refs
     )
     {
-        var collectionType = property.Type;
-        var elementType = collectionType.TryGetEnumerableUnderlyingType();
-        if (elementType is null)
-            return "null";
-
         var collectionTypeFqn = collectionType.ToDisplayString(
             SymbolDisplayFormat.FullyQualifiedFormat
         );
         var elementTypeFqn = elementType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
 
-        var elementConverterArg = userConverterType is not null
-            ? $"new {userConverterType.GlobalFullyQualifiedName}()"
-            : BuildDefaultConverterExprForScalar(elementType, refs) ?? "null";
+        var elementConverterArg = BuildDefaultScalarConverterExpr(elementType, refs) ?? "null";
 
         // T[] — use the single-type-parameter convenience form
         if (collectionType is IArrayTypeSymbol)
@@ -903,7 +912,26 @@ public class CommandSchemaGenerator : IIncrementalGenerator
             return $"new {refs.ArrayInitializableSequenceBindingConverter.GlobalBaseFullyQualifiedName}<{elementTypeFqn}, {collectionTypeFqn}>({elementConverterArg}, arr => new {collectionTypeFqn}(arr))";
         }
 
-        // Unknown collection type — user must provide a custom ISequenceBindingConverter
-        return "null";
+        // Unknown collection type — user must provide a custom SequenceBindingConverter
+        return null;
+    }
+
+    private static string BuildValidatorsExpr(
+        IReadOnlyList<TypeDescriptor> validatorTypes,
+        string propertyTypeFqn,
+        CliFxReferences refs
+    )
+    {
+        var validatorBaseType =
+            $"{refs.BindingValidator.GlobalBaseFullyQualifiedName}<{propertyTypeFqn}>";
+
+        if (validatorTypes.Count == 0)
+            return $"global::System.Array.Empty<{validatorBaseType}>()";
+
+        var items = string.Join(
+            ", ",
+            validatorTypes.Select(v => $"new {v.GlobalFullyQualifiedName}()")
+        );
+        return $"new {validatorBaseType}[] {{ {items} }}";
     }
 }

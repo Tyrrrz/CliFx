@@ -57,46 +57,54 @@ internal sealed class CliFxReferences(Compilation compilation)
         new(compilation.GetTypeByMetadataName("CliFx.Schema.PropertyBinding")!);
     public TypeDescriptor IBindingValidator { get; } =
         new(compilation.GetTypeByMetadataName("CliFx.Infrastructure.Binding.IBindingValidator")!);
-    public TypeDescriptor BoolBindingConverter { get; } =
-        new(
-            compilation.GetTypeByMetadataName("CliFx.Infrastructure.Binding.BoolBindingConverter")!
-        );
-    public TypeDescriptor DateTimeOffsetBindingConverter { get; } =
+    public TypeDescriptor StringScalarBindingConverter { get; } =
         new(
             compilation.GetTypeByMetadataName(
-                "CliFx.Infrastructure.Binding.DateTimeOffsetBindingConverter"
+                "CliFx.Infrastructure.Binding.StringScalarBindingConverter"
             )!
         );
-    public TypeDescriptor TimeSpanBindingConverter { get; } =
+    public TypeDescriptor BoolScalarBindingConverter { get; } =
         new(
             compilation.GetTypeByMetadataName(
-                "CliFx.Infrastructure.Binding.TimeSpanBindingConverter"
+                "CliFx.Infrastructure.Binding.BoolScalarBindingConverter"
+            )!
+        );
+    public TypeDescriptor DateTimeOffsetScalarBindingConverter { get; } =
+        new(
+            compilation.GetTypeByMetadataName(
+                "CliFx.Infrastructure.Binding.DateTimeOffsetScalarBindingConverter"
+            )!
+        );
+    public TypeDescriptor TimeSpanScalarBindingConverter { get; } =
+        new(
+            compilation.GetTypeByMetadataName(
+                "CliFx.Infrastructure.Binding.TimeSpanScalarBindingConverter"
             )!
         );
 
     // Open-generic types — use .GlobalBase when appending concrete type arguments.
-    public TypeDescriptor EnumBindingConverter { get; } =
+    public TypeDescriptor EnumScalarBindingConverter { get; } =
         new(
             compilation.GetTypeByMetadataName(
-                "CliFx.Infrastructure.Binding.EnumBindingConverter`1"
+                "CliFx.Infrastructure.Binding.EnumScalarBindingConverter`1"
             )!
         );
-    public TypeDescriptor NullableBindingConverter { get; } =
+    public TypeDescriptor NullableScalarBindingConverter { get; } =
         new(
             compilation.GetTypeByMetadataName(
-                "CliFx.Infrastructure.Binding.NullableBindingConverter`1"
+                "CliFx.Infrastructure.Binding.NullableScalarBindingConverter`1"
             )!
         );
-    public TypeDescriptor ConvertibleBindingConverter { get; } =
+    public TypeDescriptor ConvertibleScalarBindingConverter { get; } =
         new(
             compilation.GetTypeByMetadataName(
-                "CliFx.Infrastructure.Binding.ConvertibleBindingConverter`1"
+                "CliFx.Infrastructure.Binding.ConvertibleScalarBindingConverter`1"
             )!
         );
-    public TypeDescriptor DelegateBindingConverter { get; } =
+    public TypeDescriptor DelegateScalarBindingConverter { get; } =
         new(
             compilation.GetTypeByMetadataName(
-                "CliFx.Infrastructure.Binding.DelegateBindingConverter`1"
+                "CliFx.Infrastructure.Binding.DelegateScalarBindingConverter`1"
             )!
         );
     public TypeDescriptor ArraySequenceBindingConverter { get; } =

@@ -6,7 +6,7 @@ namespace CliFx.Infrastructure.Binding;
 /// <summary>
 /// Converter for activating command inputs bound to properties of type <see cref="TimeSpan" />.
 /// </summary>
-public class TimeSpanBindingConverter : BindingConverter<TimeSpan>
+public class TimeSpanScalarBindingConverter : ScalarBindingConverter<TimeSpan>
 {
     /// <inheritdoc />
     public override TimeSpan Convert(string? rawValue) =>

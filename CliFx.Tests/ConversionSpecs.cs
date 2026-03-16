@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using CliFx.Tests.Utils;
 using CliFx.Tests.Utils.Extensions;
@@ -531,7 +532,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
         var commandSchema = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
-            public class CustomConverter : BindingConverter<int>
+            public class CustomConverter : ScalarBindingConverter<int>
             {
                 public override int Convert(string rawValue) =>
                     rawValue.Length;
@@ -739,83 +740,60 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
     }
 
     [Fact]
-    public async Task I_can_try_to_bind_a_parameter_or_an_option_to_a_property_and_get_an_error_if_it_is_of_an_unsupported_type()
+    public void I_can_try_to_bind_a_parameter_or_an_option_to_a_property_and_get_an_error_if_it_is_of_an_unsupported_type()
     {
-        // Arrange
-        var commandSchema = DynamicCommandBuilder.Compile(
-            // lang=csharp
-            """
-            public class CustomType
-            {
-            }
-
-            [Command]
-            public partial class Command : ICommand
-            {
-                [CommandOption('f')]
-                public CustomType? Foo { get; set; }
-
-                public ValueTask ExecuteAsync(IConsole console) => default;
-            }
-            """
-        );
-
-        var application = new CliApplicationBuilder()
-            .AddCommand(commandSchema)
-            .UseConsole(FakeConsole)
-            .Build();
-
         // Act
-        var exitCode = await application.RunAsync(["-f", "xyz"], new Dictionary<string, string>());
+        var act = () =>
+            DynamicCommandBuilder.Compile(
+                // lang=csharp
+                """
+                public class CustomType
+                {
+                }
+
+                [Command]
+                public partial class Command : ICommand
+                {
+                    [CommandOption('f')]
+                    public CustomType? Foo { get; set; }
+
+                    public ValueTask ExecuteAsync(IConsole console) => default;
+                }
+                """
+            );
 
         // Assert
-        exitCode.Should().NotBe(0);
-
-        var stdErr = FakeConsole.ReadErrorString();
-        stdErr.Should().Contain("cannot be set from the provided argument");
+        act.Should().Throw<InvalidOperationException>().WithMessage("*ConverterNotInferrable*");
     }
 
     [Fact]
-    public async Task I_can_try_to_bind_a_parameter_or_an_option_to_a_non_scalar_property_and_get_an_error_if_it_is_of_an_unsupported_type()
+    public void I_can_try_to_bind_a_parameter_or_an_option_to_a_non_scalar_property_and_get_an_error_if_it_is_of_an_unsupported_type()
     {
-        // Arrange
-        var commandSchema = DynamicCommandBuilder.Compile(
-            // lang=csharp
-            """
-            public class CustomType : IEnumerable<object>
-            {
-                public IEnumerator<object> GetEnumerator() => Enumerable.Empty<object>().GetEnumerator();
-
-                IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-            }
-
-            [Command]
-            public partial class Command : ICommand
-            {
-                [CommandOption('f')]
-                public CustomType? Foo { get; set; }
-
-                public ValueTask ExecuteAsync(IConsole console) => default;
-            }
-            """
-        );
-
-        var application = new CliApplicationBuilder()
-            .AddCommand(commandSchema)
-            .UseConsole(FakeConsole)
-            .Build();
-
         // Act
-        var exitCode = await application.RunAsync(
-            ["-f", "one", "two"],
-            new Dictionary<string, string>()
-        );
+        var act = () =>
+            DynamicCommandBuilder.Compile(
+                // lang=csharp
+                """
+                public class CustomType : IEnumerable<object>
+                {
+                    public IEnumerator<object> GetEnumerator() => Enumerable.Empty<object>().GetEnumerator();
+
+                    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+                }
+
+                [Command]
+                public partial class Command : ICommand
+                {
+                    [CommandOption('f')]
+                    public CustomType? Foo { get; set; }
+
+                    public ValueTask ExecuteAsync(IConsole console) => default;
+                }
+                """
+            );
 
         // Assert
-        exitCode.Should().NotBe(0);
-
-        var stdErr = FakeConsole.ReadErrorString();
-        stdErr.Should().Contain("is a sequence property but has no collection converter");
+        act.Should().Throw<InvalidOperationException>().WithMessage("*ConverterNotInferrable*");
     }
 
     [Fact]

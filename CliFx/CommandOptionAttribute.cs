@@ -3,7 +3,7 @@
 namespace CliFx;
 
 /// <summary>
-/// Binds an option input of a command to a property.
+/// Binds a property to an option input of a command.
 /// </summary>
 [AttributeUsage(AttributeTargets.Property)]
 public sealed class CommandOptionAttribute : CommandInputAttribute

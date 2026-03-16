@@ -10,16 +10,14 @@ namespace CliFx.Schema;
 /// </summary>
 public class CommandOptionSchema(
     PropertyBinding property,
-    bool isSequence,
     string? name,
     char? shortName,
     string? environmentVariable,
     bool isRequired,
     string? description,
-    IBindingConverter? converter,
-    ISequenceBindingConverter? sequenceConverter,
+    IBindingConverter converter,
     IReadOnlyList<IBindingValidator> validators
-) : CommandInputSchema(property, isSequence, description, converter, sequenceConverter, validators)
+) : CommandInputSchema(property, isRequired, description, converter, validators)
 {
     /// <summary>
     /// Option name (the --name part).
@@ -35,11 +33,6 @@ public class CommandOptionSchema(
     /// Environment variable used as a fallback for this option.
     /// </summary>
     public string? EnvironmentVariable { get; } = environmentVariable;
-
-    /// <summary>
-    /// Whether this option must be provided.
-    /// </summary>
-    public bool IsRequired { get; } = isRequired;
 
     internal bool MatchesName(string? name) =>
         !string.IsNullOrWhiteSpace(Name)
@@ -65,26 +58,22 @@ public class CommandOptionSchema<
     [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] TProperty
 >(
     PropertyBinding<TCommand, TProperty> property,
-    bool isSequence,
     string? name,
     char? shortName,
     string? environmentVariable,
     bool isRequired,
     string? description,
-    BindingConverter<TProperty>? converter,
-    SequenceBindingConverter<TProperty>? sequenceConverter,
-    IReadOnlyList<IBindingValidator> validators
+    BindingConverter<TProperty> converter,
+    IReadOnlyList<BindingValidator<TProperty>> validators
 )
     : CommandOptionSchema(
         property,
-        isSequence,
         name,
         shortName,
         environmentVariable,
         isRequired,
         description,
         converter,
-        sequenceConverter,
         validators
     )
     where TCommand : ICommand;

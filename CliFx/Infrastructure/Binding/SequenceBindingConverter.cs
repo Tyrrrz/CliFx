@@ -1,30 +1,10 @@
-using System.Collections.Generic;
-
 namespace CliFx.Infrastructure.Binding;
 
 /// <summary>
-/// Defines custom conversion logic for activating sequential command inputs
-/// from the corresponding multiple raw command-line arguments.
+/// Base type for sequence (multi-value) converters.
 /// </summary>
-/// <remarks>
-/// To implement your own sequence converter, inherit from <see cref="SequenceBindingConverter{T}" /> instead.
-/// </remarks>
-public interface ISequenceBindingConverter
+public abstract class SequenceBindingConverter<T> : BindingConverter<T>
 {
-    /// <summary>
-    /// Parses values from multiple raw command-line arguments.
-    /// </summary>
-    object? ConvertMany(IReadOnlyList<string?> rawValues);
-}
-
-/// <summary>
-/// Base type for custom sequence converters.
-/// </summary>
-public abstract class SequenceBindingConverter<T> : ISequenceBindingConverter
-{
-    /// <inheritdoc cref="ISequenceBindingConverter.ConvertMany" />
-    public abstract T ConvertMany(IReadOnlyList<string?> rawValues);
-
-    object? ISequenceBindingConverter.ConvertMany(IReadOnlyList<string?> rawValues) =>
-        ConvertMany(rawValues);
+    /// <inheritdoc />
+    public override bool IsSequence => true;
 }

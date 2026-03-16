@@ -75,7 +75,7 @@ public partial class CommandSchema(
         return result;
     }
 
-    private void BindParameters(
+    private void ActivateParameters(
         CommandInput input,
         IReadOnlyList<CommandParameterSchema> parameters,
         ICommand instance,
@@ -94,7 +94,7 @@ public partial class CommandSchema(
             if (!parameter.IsSequence)
             {
                 var parameterInput = input.Parameters[position];
-                parameter.Bind([parameterInput.Value], instance);
+                parameter.Activate([parameterInput.Value], instance);
 
                 position++;
                 remainingParameterInputs.Remove(parameterInput);
@@ -103,7 +103,7 @@ public partial class CommandSchema(
             {
                 var parameterInputs = input.Parameters.Skip(position).ToArray();
 
-                parameter.Bind(parameterInputs.Select(p => p.Value).ToArray(), instance);
+                parameter.Activate(parameterInputs.Select(p => p.Value).ToArray(), instance);
 
                 position += parameterInputs.Length;
                 remainingParameterInputs.RemoveRange(parameterInputs);
@@ -140,7 +140,7 @@ public partial class CommandSchema(
         }
     }
 
-    private void BindOptions(
+    private void ActivateOptions(
         CommandInput input,
         IReadOnlyList<CommandOptionSchema> options,
         ICommand instance,
@@ -164,7 +164,7 @@ public partial class CommandSchema(
             {
                 var rawValues = optionInputs.SelectMany(o => o.Values).ToArray();
 
-                option.Bind(rawValues, instance);
+                option.Activate(rawValues, instance);
 
                 if (rawValues.Any())
                     remainingRequiredOptions.Remove(option);
@@ -175,7 +175,7 @@ public partial class CommandSchema(
                     ? [environmentVariableInput.Value]
                     : environmentVariableInput.SplitValues();
 
-                option.Bind(rawValues, instance);
+                option.Activate(rawValues, instance);
 
                 if (rawValues.Any())
                     remainingRequiredOptions.Remove(option);
@@ -216,7 +216,7 @@ public partial class CommandSchema(
         }
     }
 
-    internal void BindHelpAndVersionOptions(CommandInput input, ICommand instance)
+    internal void ActivateHelpAndVersionOptions(CommandInput input, ICommand instance)
     {
         var options = new List<CommandOptionSchema>(2);
 
@@ -251,13 +251,13 @@ public partial class CommandSchema(
         if (!options.Any())
             return;
 
-        BindOptions(input, options, instance, false);
+        ActivateOptions(input, options, instance, false);
     }
 
-    internal void Bind(CommandInput input, ICommand instance)
+    internal void Activate(CommandInput input, ICommand instance)
     {
-        BindParameters(input, Parameters, instance);
-        BindOptions(input, Options, instance);
+        ActivateParameters(input, Parameters, instance);
+        ActivateOptions(input, Options, instance);
     }
 }
 

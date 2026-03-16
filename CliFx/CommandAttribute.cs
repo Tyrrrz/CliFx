@@ -3,7 +3,7 @@
 namespace CliFx;
 
 /// <summary>
-/// Annotates a type that defines a command.
+/// Binds a class to a command.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class, Inherited = false)]
 public sealed class CommandAttribute(string? name) : Attribute
@@ -19,7 +19,7 @@ public sealed class CommandAttribute(string? name) : Attribute
     /// </summary>
     /// <remarks>
     /// Command can have no name, in which case it's treated as the application's default command.
-    /// Only one default command is allowed in an application.
+    /// Only one default command is allowed to be registered in an application.
     /// All commands registered in an application must have unique names (comparison IS NOT case-sensitive).
     /// </remarks>
     public string? Name { get; } = name;

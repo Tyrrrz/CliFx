@@ -821,6 +821,6 @@ public class OptionBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOu
         exitCode.Should().NotBe(0);
 
         var stdErr = FakeConsole.ReadErrorString();
-        stdErr.Should().Contain("expects a single argument, but provided with multiple");
+        stdErr.Should().Contain("Expected a single argument, but provided with multiple");
     }
 }

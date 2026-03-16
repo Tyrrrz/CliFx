@@ -4,7 +4,7 @@ using CliFx.Infrastructure.Binding;
 namespace CliFx;
 
 /// <summary>
-/// Binds an input (parameter or option) of a command to a property.
+/// Binds a property to an input (parameter or option) of a command.
 /// </summary>
 public abstract class CommandInputAttribute : Attribute
 {
@@ -28,7 +28,7 @@ public abstract class CommandInputAttribute : Attribute
     public Type? Converter { get; set; }
 
     /// <summary>
-    /// Custom validator(s) used for verifying the value of this input after activation. 
+    /// Custom validator(s) used for verifying the value of this input after activation.
     /// </summary>
     /// <remarks>
     /// Validators must derive from <see cref="IBindingValidator" />.

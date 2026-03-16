@@ -3,7 +3,7 @@
 namespace CliFx;
 
 /// <summary>
-/// Binds a parameter input of a command to a property.
+/// Binds a property to a parameter input of a command.
 /// </summary>
 [AttributeUsage(AttributeTargets.Property)]
 public sealed class CommandParameterAttribute(int order) : CommandInputAttribute
