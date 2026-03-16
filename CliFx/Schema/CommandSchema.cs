@@ -23,6 +23,7 @@ public partial class CommandSchema(
     /// <summary>
     /// CLR type of the command.
     /// </summary>
+    // This DAM is required solely for the default type activator, which relies on public parameterless constructors
     [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
     public Type Type { get; } = type;
 
@@ -56,7 +57,7 @@ public partial class CommandSchema(
             ? string.Equals(name, Name, StringComparison.OrdinalIgnoreCase)
             : string.IsNullOrWhiteSpace(name);
 
-    internal IReadOnlyDictionary<CommandInputSchema, object?> GetValues(ICommand instance)
+    internal IReadOnlyDictionary<CommandInputSchema, object?> GetInputValues(ICommand instance)
     {
         var result = new Dictionary<CommandInputSchema, object?>();
 
@@ -76,9 +77,9 @@ public partial class CommandSchema(
     }
 
     private void ActivateParameters(
-        CommandInput input,
         IReadOnlyList<CommandParameterSchema> parameters,
         ICommand instance,
+        CommandInput input,
         bool throwOnUnrecognizedAndMissing = true
     )
     {
@@ -94,7 +95,7 @@ public partial class CommandSchema(
             if (!parameter.IsSequence)
             {
                 var parameterInput = input.Parameters[position];
-                parameter.Activate([parameterInput.Value], instance);
+                parameter.Activate(instance, [parameterInput.Value]);
 
                 position++;
                 remainingParameterInputs.Remove(parameterInput);
@@ -103,7 +104,7 @@ public partial class CommandSchema(
             {
                 var parameterInputs = input.Parameters.Skip(position).ToArray();
 
-                parameter.Activate(parameterInputs.Select(p => p.Value).ToArray(), instance);
+                parameter.Activate(instance, parameterInputs.Select(p => p.Value).ToArray());
 
                 position += parameterInputs.Length;
                 remainingParameterInputs.RemoveRange(parameterInputs);
@@ -141,9 +142,9 @@ public partial class CommandSchema(
     }
 
     private void ActivateOptions(
-        CommandInput input,
         IReadOnlyList<CommandOptionSchema> options,
         ICommand instance,
+        CommandInput input,
         bool throwOnUnrecognizedAndMissing = true
     )
     {
@@ -164,7 +165,7 @@ public partial class CommandSchema(
             {
                 var rawValues = optionInputs.SelectMany(o => o.Values).ToArray();
 
-                option.Activate(rawValues, instance);
+                option.Activate(instance, rawValues);
 
                 if (rawValues.Any())
                     remainingRequiredOptions.Remove(option);
@@ -175,7 +176,7 @@ public partial class CommandSchema(
                     ? [environmentVariableInput.Value]
                     : environmentVariableInput.SplitValues();
 
-                option.Activate(rawValues, instance);
+                option.Activate(instance, rawValues);
 
                 if (rawValues.Any())
                     remainingRequiredOptions.Remove(option);
@@ -216,7 +217,7 @@ public partial class CommandSchema(
         }
     }
 
-    internal void ActivateHelpAndVersionOptions(CommandInput input, ICommand instance)
+    internal void ActivateHelpAndVersionOptions(ICommand instance, CommandInput input)
     {
         var options = new List<CommandOptionSchema>(2);
 
@@ -251,13 +252,13 @@ public partial class CommandSchema(
         if (!options.Any())
             return;
 
-        ActivateOptions(input, options, instance, false);
+        ActivateOptions(options, instance, input, false);
     }
 
-    internal void Activate(CommandInput input, ICommand instance)
+    internal void Activate(ICommand instance, CommandInput input)
     {
-        ActivateParameters(input, Parameters, instance);
-        ActivateOptions(input, Options, instance);
+        ActivateParameters(Parameters, instance, input);
+        ActivateOptions(Options, instance, input);
     }
 }
 

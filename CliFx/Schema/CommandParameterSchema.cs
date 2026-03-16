@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using CliFx.Infrastructure.Binding;
 
 namespace CliFx.Schema;
@@ -32,10 +31,7 @@ public class CommandParameterSchema(
 /// <remarks>
 /// Generic version used by source-generated code for static type references and AOT compatibility.
 /// </remarks>
-public class CommandParameterSchema<
-    TCommand,
-    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] TProperty
->(
+public class CommandParameterSchema<TCommand, TProperty>(
     PropertyBinding<TCommand, TProperty> property,
     int order,
     string name,

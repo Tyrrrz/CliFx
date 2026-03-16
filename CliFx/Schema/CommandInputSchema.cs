@@ -50,39 +50,14 @@ public abstract class CommandInputSchema(
     /// </summary>
     public IReadOnlyList<IBindingValidator> Validators { get; } = validators;
 
-    internal object? Convert(IReadOnlyList<string> rawValues)
+    internal void Activate(ICommand instance, IReadOnlyList<string> rawValues)
     {
-        try
-        {
-            return Converter.Convert(rawValues);
-        }
-        catch (Exception ex) when (ex is not CliFxException)
-        {
-            var errorMessage = ex is TargetInvocationException invokeEx
-                ? invokeEx.InnerException?.Message ?? invokeEx.Message
-                : ex.Message;
+        var value = Converter.Convert(rawValues);
 
-            throw CliFxException.UserError(
-                $"""
-                {this.GetKind()} {this.GetFormattedIdentifier()} cannot be set from the provided argument(s):
-                {rawValues.Select(v => '<' + v + '>').JoinToString(" ")}
-                Error: {errorMessage}
-                """,
-                ex
-            );
-        }
-    }
-
-    internal void Validate(object? convertedValue)
-    {
-        var errors = new List<BindingValidationError>();
-
-        foreach (var validator in Validators)
-        {
-            var error = validator.Validate(convertedValue);
-            if (error is not null)
-                errors.Add(error);
-        }
+        var errors = Validators
+            .Select(validator => validator.Validate(value))
+            .OfType<BindingValidationError>()
+            .ToArray();
 
         if (errors.Any())
         {
@@ -94,28 +69,18 @@ public abstract class CommandInputSchema(
                 """
             );
         }
-    }
-
-    internal void Activate(IReadOnlyList<string> rawValues, ICommand instance)
-    {
-        var convertedValue = Convert(rawValues);
-        Validate(convertedValue);
 
         try
         {
-            Property.SetValue(instance, convertedValue);
+            Property.SetValue(instance, value);
         }
         catch (Exception ex) when (ex is not CliFxException)
         {
-            var errorMessage = ex is TargetInvocationException invokeEx
-                ? invokeEx.InnerException?.Message ?? ex.Message
-                : ex.Message;
-
             throw CliFxException.UserError(
                 $"""
                 {this.GetKind()} {this.GetFormattedIdentifier()} cannot be set from the provided argument(s):
                 {rawValues.Select(v => '<' + v + '>').JoinToString(" ")}
-                Error: {errorMessage}
+                Error: {ex.Message}
                 """,
                 ex
             );
@@ -131,10 +96,7 @@ public abstract class CommandInputSchema(
 /// <remarks>
 /// Generic version used by source-generated code for static type references and AOT compatibility.
 /// </remarks>
-public abstract class CommandInputSchema<
-    TCommand,
-    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] TProperty
->(
+public abstract class CommandInputSchema<TCommand, TProperty>(
     PropertyBinding<TCommand, TProperty> property,
     bool isRequired,
     string? description,

@@ -102,13 +102,13 @@ public class CliApplication(
             Metadata,
             applicationSchema,
             commandSchema,
-            commandSchema.GetValues(commandInstance)
+            commandSchema.GetInputValues(commandInstance)
         );
 
-        // Perform a limited command binding to check if the help or version options were specified by the user
+        // Perform a limited command activation to check if the help or version options were specified by the user
         if (commandInstance is IHasHelpOption or IHasVersionOption)
         {
-            commandSchema.ActivateHelpAndVersionOptions(commandInput, commandInstance);
+            commandSchema.ActivateHelpAndVersionOptions(commandInstance, commandInput);
 
             // Help text
             if (
@@ -134,8 +134,8 @@ public class CliApplication(
         // propagate further.
         try
         {
-            // Bind the command inputs from the command line
-            commandSchema.Activate(commandInput, commandInstance);
+            // Activate the command inputs from the command line
+            commandSchema.Activate(commandInstance, commandInput);
 
             // Execute the command
             await commandInstance.ExecuteAsync(console);

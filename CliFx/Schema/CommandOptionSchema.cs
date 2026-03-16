@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using CliFx.Infrastructure.Binding;
 
 namespace CliFx.Schema;
@@ -53,10 +52,7 @@ public class CommandOptionSchema(
 /// <remarks>
 /// Generic version used by source-generated code for static type references and AOT compatibility.
 /// </remarks>
-public class CommandOptionSchema<
-    TCommand,
-    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] TProperty
->(
+public class CommandOptionSchema<TCommand, TProperty>(
     PropertyBinding<TCommand, TProperty> property,
     string? name,
     char? shortName,
