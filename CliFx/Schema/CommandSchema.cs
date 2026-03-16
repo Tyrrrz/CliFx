@@ -30,7 +30,7 @@ public partial class CommandSchema(
     /// Command name. Null or empty for the default command.
     /// </summary>
     public string? Name { get; } = name;
-    
+
     /// <summary>
     /// Whether this is the default command (no name).
     /// </summary>
@@ -103,10 +103,7 @@ public partial class CommandSchema(
             {
                 var parameterInputs = input.Parameters.Skip(position).ToArray();
 
-                parameter.Bind(
-                    parameterInputs.Select(p => p.Value).ToArray(),
-                    instance
-                );
+                parameter.Bind(parameterInputs.Select(p => p.Value).ToArray(), instance);
 
                 position += parameterInputs.Length;
                 remainingParameterInputs.RemoveRange(parameterInputs);

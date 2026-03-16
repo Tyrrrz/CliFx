@@ -154,7 +154,7 @@ public abstract class CommandInputSchema(
             );
         }
     }
-    
+
     /// <inheritdoc />
     [ExcludeFromCodeCoverage]
     public override string ToString() => this.GetFormattedIdentifier();
