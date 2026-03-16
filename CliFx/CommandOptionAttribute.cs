@@ -1,13 +1,12 @@
 ﻿using System;
-using CliFx.Infrastructure.Binding;
 
 namespace CliFx;
 
 /// <summary>
-/// Annotates a property that defines a command option.
+/// Binds an option input of a command to a property.
 /// </summary>
 [AttributeUsage(AttributeTargets.Property)]
-public sealed class CommandOptionAttribute : Attribute
+public sealed class CommandOptionAttribute : CommandInputAttribute
 {
     private CommandOptionAttribute(string? name, char? shortName)
     {
@@ -57,28 +56,4 @@ public sealed class CommandOptionAttribute : Attribute
     /// has not been explicitly set through command-line arguments.
     /// </summary>
     public string? EnvironmentVariable { get; set; }
-
-    /// <summary>
-    /// Option description.
-    /// Used for display purposes in the help text.
-    /// </summary>
-    public string? Description { get; set; }
-
-    /// <summary>
-    /// Custom converter used for mapping the raw command-line argument into
-    /// a value expected by the underlying property.
-    /// </summary>
-    /// <remarks>
-    /// Converter must derive from <see cref="BindingConverter{T}" />.
-    /// </remarks>
-    public Type? Converter { get; set; }
-
-    /// <summary>
-    /// Custom validators used for verifying the value of the underlying
-    /// property, after it has been bound.
-    /// </summary>
-    /// <remarks>
-    /// Validators must derive from <see cref="BindingValidator{T}" />.
-    /// </remarks>
-    public Type[] Validators { get; set; } = [];
 }

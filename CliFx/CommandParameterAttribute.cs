@@ -1,13 +1,12 @@
 ﻿using System;
-using CliFx.Infrastructure.Binding;
 
 namespace CliFx;
 
 /// <summary>
-/// Annotates a property that defines a command parameter.
+/// Binds a parameter input of a command to a property.
 /// </summary>
 [AttributeUsage(AttributeTargets.Property)]
-public sealed class CommandParameterAttribute(int order) : Attribute
+public sealed class CommandParameterAttribute(int order) : CommandInputAttribute
 {
     /// <summary>
     /// Relative parameter order.
@@ -32,28 +31,4 @@ public sealed class CommandParameterAttribute(int order) : Attribute
     /// If this isn't specified, parameter name is inferred from the property name.
     /// </remarks>
     public string? Name { get; set; }
-
-    /// <summary>
-    /// Parameter description.
-    /// Used for display purposes in the help text.
-    /// </summary>
-    public string? Description { get; set; }
-
-    /// <summary>
-    /// Custom converter used for mapping the raw command-line argument into
-    /// a value expected by the underlying property.
-    /// </summary>
-    /// <remarks>
-    /// Converter must derive from <see cref="BindingConverter{T}" />.
-    /// </remarks>
-    public Type? Converter { get; set; }
-
-    /// <summary>
-    /// Custom validators used for verifying the value of the underlying
-    /// property, after it has been bound.
-    /// </summary>
-    /// <remarks>
-    /// Validators must derive from <see cref="BindingValidator{T}" />.
-    /// </remarks>
-    public Type[] Validators { get; set; } = [];
 }
