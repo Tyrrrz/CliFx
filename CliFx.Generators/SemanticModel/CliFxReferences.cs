@@ -57,10 +57,14 @@ internal sealed class CliFxReferences(Compilation compilation)
         Resolve(compilation, "CliFx.Schema.PropertyBinding");
     public TypeDescriptor StringScalarBindingConverter { get; } =
         Resolve(compilation, "CliFx.Infrastructure.Binding.StringScalarBindingConverter");
+    public TypeDescriptor ObjectScalarBindingConverter { get; } =
+        Resolve(compilation, "CliFx.Infrastructure.Binding.ObjectScalarBindingConverter");
     public TypeDescriptor BoolScalarBindingConverter { get; } =
         Resolve(compilation, "CliFx.Infrastructure.Binding.BoolScalarBindingConverter");
     public TypeDescriptor DateTimeOffsetScalarBindingConverter { get; } =
         Resolve(compilation, "CliFx.Infrastructure.Binding.DateTimeOffsetScalarBindingConverter");
+    public TypeDescriptor DateTimeScalarBindingConverter { get; } =
+        Resolve(compilation, "CliFx.Infrastructure.Binding.DateTimeScalarBindingConverter");
     public TypeDescriptor TimeSpanScalarBindingConverter { get; } =
         Resolve(compilation, "CliFx.Infrastructure.Binding.TimeSpanScalarBindingConverter");
 

@@ -10,4 +10,7 @@ internal record CommandDescriptor(
     IReadOnlyList<CommandParameterDescriptor> Parameters,
     IReadOnlyList<CommandOptionDescriptor> Options,
     IReadOnlyList<Diagnostic> Diagnostics
-);
+)
+{
+    public bool IsDefault => string.IsNullOrWhiteSpace(Name);
+}

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Reflection;
 using CliFx.Exceptions;
 using CliFx.Infrastructure.Binding;
 using CliFx.Utils.Extensions;

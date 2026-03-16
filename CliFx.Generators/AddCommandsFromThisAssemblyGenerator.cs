@@ -106,7 +106,7 @@ public class AddCommandsFromThisAssemblyGenerator : IIncrementalGenerator
                         return null;
                     }
 
-                    return CommandSchemaGenerator.TryBuildCommandDescriptor(item.Symbol, cliFxRefs);
+                    return new CommandDescriptorBuilder(cliFxRefs).TryBuild(item.Symbol);
                 }
             )
             .WhereNotNull();

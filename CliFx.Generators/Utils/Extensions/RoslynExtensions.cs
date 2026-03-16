@@ -26,26 +26,39 @@ internal static class RoslynExtensions
 
     extension(ITypeSymbol type)
     {
+        public IEnumerable<ITypeSymbol> GetContainingTypes()
+        {
+            var containingType = type.ContainingType;
+            while (containingType is not null)
+            {
+                yield return containingType;
+                containingType = containingType.ContainingType;
+            }
+        }
+
+        public IEnumerable<ITypeSymbol> GetBaseTypes()
+        {
+            var baseType = type.BaseType;
+            while (baseType is not null)
+            {
+                yield return baseType;
+                baseType = baseType.ContainingType;
+            }
+        }
+
         public IEnumerable<IPropertySymbol> GetProperties(bool includeInherited = true)
         {
             var propertyNames = new HashSet<string>();
-            var containingType = type;
 
-            while (
-                containingType is not null
-                && containingType.SpecialType != SpecialType.System_Object
+            foreach (
+                var currentType in includeInherited ? type.GetBaseTypes().Prepend(type) : [type]
             )
             {
-                foreach (var property in containingType.GetMembers().OfType<IPropertySymbol>())
+                foreach (var property in currentType.GetMembers().OfType<IPropertySymbol>())
                 {
                     if (propertyNames.Add(property.Name))
                         yield return property;
                 }
-
-                if (includeInherited)
-                    containingType = containingType.BaseType;
-                else
-                    yield break;
             }
         }
 
@@ -57,24 +70,14 @@ internal static class RoslynExtensions
                 )
                 ?.TypeArguments[0];
 
-        public bool ImplementsInterface(string interfaceName) =>
-            type.AllInterfaces.Any(i => i.DisplayNameMatches(interfaceName))
-            || type.DisplayNameMatches(interfaceName);
-
-        /// <summary>
-        /// Returns the effective accessibility of the type by walking up the containment chain
-        /// and returning the most restrictive accessibility encountered.
-        /// </summary>
         public Accessibility GetActualAccessibility()
         {
-            var current = type;
-            var accessibility = Accessibility.Public;
+            var accessibility = type.DeclaredAccessibility;
 
-            while (current is not null)
+            foreach (var currentType in type.GetContainingTypes())
             {
-                if (current.DeclaredAccessibility < accessibility)
-                    accessibility = current.DeclaredAccessibility;
-                current = current.ContainingType;
+                if (currentType.DeclaredAccessibility < accessibility)
+                    accessibility = currentType.DeclaredAccessibility;
             }
 
             return accessibility;
