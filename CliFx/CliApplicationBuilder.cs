@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using CliFx.Binding;
 using CliFx.Infrastructure;
-using CliFx.Schema;
 using CliFx.Utils.Extensions;
 
 namespace CliFx;
@@ -13,7 +13,7 @@ namespace CliFx;
 /// </summary>
 public partial class CliApplicationBuilder
 {
-    private readonly HashSet<CommandSchema> _commandSchemas = [];
+    private readonly HashSet<CommandDescriptor> _commandDescriptors = [];
 
     private bool _isDebugModeAllowed = true;
     private bool _isPreviewModeAllowed = true;
@@ -27,19 +27,19 @@ public partial class CliApplicationBuilder
     /// <summary>
     /// Adds a command to the application.
     /// </summary>
-    public CliApplicationBuilder AddCommand(CommandSchema commandSchema)
+    public CliApplicationBuilder AddCommand(CommandDescriptor commandDescriptor)
     {
-        _commandSchemas.Add(commandSchema);
+        _commandDescriptors.Add(commandDescriptor);
         return this;
     }
 
     /// <summary>
     /// Adds multiple commands to the application.
     /// </summary>
-    public CliApplicationBuilder AddCommands(IEnumerable<CommandSchema> commandSchemas)
+    public CliApplicationBuilder AddCommands(IEnumerable<CommandDescriptor> commandDescriptors)
     {
-        foreach (var commandSchema in commandSchemas)
-            AddCommand(commandSchema);
+        foreach (var commandDescriptor in commandDescriptors)
+            AddCommand(commandDescriptor);
 
         return this;
     }
@@ -140,12 +140,12 @@ public partial class CliApplicationBuilder
 
     /// <summary>
     /// Configures the application to use the specified service provider for activating types.
-    /// This method takes a delegate that receives the list of all added command schemas, so that you can
+    /// This method takes a delegate that receives the list of all added command descriptors, so that you can
     /// easily register their types with the service provider.
     /// </summary>
     public CliApplicationBuilder UseTypeActivator(
-        Func<IReadOnlyList<CommandSchema>, IServiceProvider> getServiceProvider
-    ) => UseTypeActivator(getServiceProvider([.. _commandSchemas]));
+        Func<IReadOnlyList<CommandDescriptor>, IServiceProvider> getServiceProvider
+    ) => UseTypeActivator(getServiceProvider([.. _commandDescriptors]));
 
     /// <summary>
     /// Creates a configured instance of <see cref="CliApplication" />.
@@ -160,7 +160,7 @@ public partial class CliApplicationBuilder
         );
 
         var configuration = new ApplicationConfiguration(
-            [.. _commandSchemas],
+            [.. _commandDescriptors],
             _isDebugModeAllowed,
             _isPreviewModeAllowed
         );

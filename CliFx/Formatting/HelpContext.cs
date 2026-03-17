@@ -1,19 +1,19 @@
 using System.Collections.Generic;
-using CliFx.Schema;
+using CliFx.Binding;
 
 namespace CliFx.Formatting;
 
 internal class HelpContext(
     ApplicationMetadata applicationMetadata,
-    ApplicationSchema applicationSchema,
-    CommandSchema commandSchema,
-    IReadOnlyDictionary<CommandInputSchema, object?> commandDefaultValues
+    ApplicationDescriptor applicationDescriptor,
+    CommandDescriptor commandDescriptor,
+    IReadOnlyDictionary<CommandInputDescriptor, object?> commandDefaultValues
 )
 {
     public ApplicationMetadata ApplicationMetadata { get; } = applicationMetadata;
-    public ApplicationSchema ApplicationSchema { get; } = applicationSchema;
-    public CommandSchema CommandSchema { get; } = commandSchema;
+    public ApplicationDescriptor ApplicationDescriptor { get; } = applicationDescriptor;
+    public CommandDescriptor CommandDescriptor { get; } = commandDescriptor;
 
-    public IReadOnlyDictionary<CommandInputSchema, object?> CommandDefaultValues { get; } =
+    public IReadOnlyDictionary<CommandInputDescriptor, object?> CommandDefaultValues { get; } =
         commandDefaultValues;
 }

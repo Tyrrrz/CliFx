@@ -17,7 +17,7 @@ internal static class CollectionExtensions
             }
         }
     }
-    
+
     extension(IEnumerable<string?> source)
     {
         public IEnumerable<string> WhereNotNullOrWhiteSpace()

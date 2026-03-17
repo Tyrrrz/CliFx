@@ -16,9 +16,9 @@ internal sealed class CommandSchemaEmitter(CliFxReferences refs)
                 ? command.Type.Symbol.ContainingNamespace.ToDisplayString()
                 : null;
 
-        var interfaces = new List<string>(2) { refs.IHasHelpOption.ToString() };
+        var interfaces = new List<string>(2) { refs.ICommandWithHelpOption.ToString() };
         if (command.IsDefault)
-            interfaces.Add(refs.IHasVersionOption.ToString());
+            interfaces.Add(refs.ICommandWithVersionOption.ToString());
 
         var interfaceList =
             interfaces.Count > 0 ? " : " + string.Join(", ", interfaces) : string.Empty;
@@ -81,12 +81,12 @@ internal sealed class CommandSchemaEmitter(CliFxReferences refs)
         sb.Append(
             $$"""
 
-                /// <summary>Generated command schema for <see cref="{{command.Type.Name}}"/>.</summary>
-                public static {{refs.CommandSchema}} Schema { get; } =
-                    new {{refs.CommandSchema}}<{{command.Type.FullyQualifiedName}}>(
+                /// <summary>Generated command descriptor for <see cref="{{command.Type.Name}}"/>.</summary>
+                public static {{refs.CommandDescriptor}} Descriptor { get; } =
+                    new {{refs.CommandDescriptor}}<{{command.Type.FullyQualifiedName}}>(
                         {{EncodeString(command.Name)}},
                         {{EncodeString(command.Description)}},
-                        new {{refs.CommandInputSchema}}[]
+                        new {{refs.CommandInputDescriptor}}[]
                         {
             """
         );
@@ -95,8 +95,8 @@ internal sealed class CommandSchemaEmitter(CliFxReferences refs)
             sb.Append(
                 // lang=csharp
                 $$"""
-                            new {{refs.CommandParameterSchema}}<{{command.Type.FullyQualifiedName}}, {{param.Property.Type.FullyQualifiedName}}>(
-                                new {{refs.PropertyBinding}}<{{command.Type.FullyQualifiedName}}, {{param.Property.Type.FullyQualifiedName}}>(
+                            new {{refs.CommandParameterDescriptor}}<{{command.Type.FullyQualifiedName}}, {{param.Property.Type.FullyQualifiedName}}>(
+                                new {{refs.PropertyDescriptor}}<{{command.Type.FullyQualifiedName}}, {{param.Property.Type.FullyQualifiedName}}>(
                                     "{{param.Property.Name}}",
                                     c => c.{{param.Property.Name}},
                                     (c, v) => c.{{param.Property.Name}} = v),
@@ -120,8 +120,8 @@ internal sealed class CommandSchemaEmitter(CliFxReferences refs)
             sb.Append(
                 // lang=csharp
                 $$"""
-                            new {{refs.CommandOptionSchema}}<{{command.Type.FullyQualifiedName}}, {{option.Property.Type.FullyQualifiedName}}>(
-                                new {{refs.PropertyBinding}}<{{command.Type.FullyQualifiedName}}, {{option.Property.Type.FullyQualifiedName}}>(
+                            new {{refs.CommandOptionDescriptor}}<{{command.Type.FullyQualifiedName}}, {{option.Property.Type.FullyQualifiedName}}>(
+                                new {{refs.PropertyDescriptor}}<{{command.Type.FullyQualifiedName}}, {{option.Property.Type.FullyQualifiedName}}>(
                                     "{{option.Property.Name}}",
                                     c => c.{{option.Property.Name}},
                                     (c, v) => c.{{option.Property.Name}} = v),
@@ -145,8 +145,8 @@ internal sealed class CommandSchemaEmitter(CliFxReferences refs)
         sb.Append(
             // lang=csharp
             $$"""
-                        new {{refs.CommandOptionSchema}}<{{command.Type.FullyQualifiedName}}, bool>(
-                            new {{refs.PropertyBinding}}<{{command.Type.FullyQualifiedName}}, bool>(
+                        new {{refs.CommandOptionDescriptor}}<{{command.Type.FullyQualifiedName}}, bool>(
+                            new {{refs.PropertyDescriptor}}<{{command.Type.FullyQualifiedName}}, bool>(
                                 "IsHelpRequested",
                                 c => c.IsHelpRequested,
                                 (c, v) => c.IsHelpRequested = v),
@@ -155,8 +155,8 @@ internal sealed class CommandSchemaEmitter(CliFxReferences refs)
                             null,
                             false,
                             "Shows help text.",
-                            new {{refs.BoolScalarBindingConverter}}(),
-                            global::System.Array.Empty<{{refs.BindingValidator.GlobalBaseFullyQualifiedName}}<bool>>()),
+                            new {{refs.BoolScalarInputConverter}}(),
+                            global::System.Array.Empty<{{refs.InputValidator.GlobalBaseFullyQualifiedName}}<bool>>()),
 
             """
         );
@@ -165,8 +165,8 @@ internal sealed class CommandSchemaEmitter(CliFxReferences refs)
             sb.Append(
                 // lang=csharp
                 $$"""
-                            new {{refs.CommandOptionSchema}}<{{command.Type.FullyQualifiedName}}, bool>(
-                                new {{refs.PropertyBinding}}<{{command.Type.FullyQualifiedName}}, bool>(
+                            new {{refs.CommandOptionDescriptor}}<{{command.Type.FullyQualifiedName}}, bool>(
+                                new {{refs.PropertyDescriptor}}<{{command.Type.FullyQualifiedName}}, bool>(
                                     "IsVersionRequested",
                                     c => c.IsVersionRequested,
                                     (c, v) => c.IsVersionRequested = v),
@@ -175,8 +175,8 @@ internal sealed class CommandSchemaEmitter(CliFxReferences refs)
                                 null,
                                 false,
                                 "Shows version information.",
-                                new {{refs.BoolScalarBindingConverter}}(),
-                                global::System.Array.Empty<{{refs.BindingValidator.GlobalBaseFullyQualifiedName}}<bool>>()),
+                                new {{refs.BoolScalarInputConverter}}(),
+                                global::System.Array.Empty<{{refs.InputValidator.GlobalBaseFullyQualifiedName}}<bool>>()),
 
                 """
             );
@@ -232,31 +232,31 @@ internal sealed class CommandSchemaEmitter(CliFxReferences refs)
 
         // string
         if (type.SpecialType == SpecialType.System_String)
-            return $"new {refs.StringScalarBindingConverter}()";
+            return $"new {refs.StringScalarInputConverter}()";
 
         // object
         if (type.SpecialType == SpecialType.System_Object)
-            return $"new {refs.ObjectScalarBindingConverter}()";
+            return $"new {refs.ObjectScalarInputConverter}()";
 
         // bool
         if (type.SpecialType == SpecialType.System_Boolean)
-            return $"new {refs.BoolScalarBindingConverter}()";
+            return $"new {refs.BoolScalarInputConverter}()";
 
         // DateTimeOffset
         if (type is INamedTypeSymbol { ContainingNamespace.Name: "System", Name: "DateTimeOffset" })
-            return $"new {refs.DateTimeOffsetScalarBindingConverter}()";
+            return $"new {refs.DateTimeOffsetScalarInputConverter}()";
 
         // DateTime
         if (type is INamedTypeSymbol { ContainingNamespace.Name: "System", Name: "DateTime" })
-            return $"new {refs.DateTimeScalarBindingConverter}()";
+            return $"new {refs.DateTimeScalarInputConverter}()";
 
         // TimeSpan
         if (type is INamedTypeSymbol { ContainingNamespace.Name: "System", Name: "TimeSpan" })
-            return $"new {refs.TimeSpanScalarBindingConverter}()";
+            return $"new {refs.TimeSpanScalarInputConverter}()";
 
         // Enum
         if (type.TypeKind == TypeKind.Enum)
-            return $"new {refs.EnumScalarBindingConverter.GlobalBaseFullyQualifiedName}<{typeFqn}>()";
+            return $"new {refs.EnumScalarInputConverter.GlobalBaseFullyQualifiedName}<{typeFqn}>()";
 
         // Nullable<T>
         if (
@@ -269,7 +269,7 @@ internal sealed class CommandSchemaEmitter(CliFxReferences refs)
             var innerConverterExpr = TryBuildDefaultScalarConverterExpr(innerType);
             if (innerConverterExpr is null)
                 return null;
-            return $"new {refs.NullableScalarBindingConverter.GlobalBaseFullyQualifiedName}<{innerFqn}>({innerConverterExpr})";
+            return $"new {refs.NullableScalarInputConverter.GlobalBaseFullyQualifiedName}<{innerFqn}>({innerConverterExpr})";
         }
 
         // String-parseable with IFormatProvider: static T Parse(string, IFormatProvider)
@@ -286,7 +286,7 @@ internal sealed class CommandSchemaEmitter(CliFxReferences refs)
             );
 
         if (parseMethodWithFormatProvider is not null)
-            return $"new {refs.DelegateScalarBindingConverter.GlobalBaseFullyQualifiedName}<{typeFqn}>(s => {typeFqn}.Parse(s!, global::System.Globalization.CultureInfo.InvariantCulture))";
+            return $"new {refs.DelegateScalarInputConverter.GlobalBaseFullyQualifiedName}<{typeFqn}>(s => {typeFqn}.Parse(s!, global::System.Globalization.CultureInfo.InvariantCulture))";
 
         // String-parseable: static T Parse(string)
         var parseMethod = type.GetMembers("Parse")
@@ -300,7 +300,7 @@ internal sealed class CommandSchemaEmitter(CliFxReferences refs)
             );
 
         if (parseMethod is not null)
-            return $"new {refs.DelegateScalarBindingConverter.GlobalBaseFullyQualifiedName}<{typeFqn}>(s => {typeFqn}.Parse(s!))";
+            return $"new {refs.DelegateScalarInputConverter.GlobalBaseFullyQualifiedName}<{typeFqn}>(s => {typeFqn}.Parse(s!))";
 
         // String-constructable: ctor(string)
         if (
@@ -312,7 +312,7 @@ internal sealed class CommandSchemaEmitter(CliFxReferences refs)
             )
         )
         {
-            return $"new {refs.DelegateScalarBindingConverter.GlobalBaseFullyQualifiedName}<{typeFqn}>(s => new {typeFqn}(s!))";
+            return $"new {refs.DelegateScalarInputConverter.GlobalBaseFullyQualifiedName}<{typeFqn}>(s => new {typeFqn}(s!))";
         }
 
         // IConvertible
@@ -322,7 +322,7 @@ internal sealed class CommandSchemaEmitter(CliFxReferences refs)
             )
         )
         {
-            return $"new {refs.ConvertibleScalarBindingConverter.GlobalBaseFullyQualifiedName}<{typeFqn}>()";
+            return $"new {refs.ConvertibleScalarInputConverter.GlobalBaseFullyQualifiedName}<{typeFqn}>()";
         }
 
         return null;
@@ -343,11 +343,11 @@ internal sealed class CommandSchemaEmitter(CliFxReferences refs)
 
         // T[]
         if (collectionType is IArrayTypeSymbol)
-            return $"new {refs.ArraySequenceBindingConverter.GlobalBaseFullyQualifiedName}<{elementTypeFqn}>({elementConverterArg})";
+            return $"new {refs.ArraySequenceInputConverter.GlobalBaseFullyQualifiedName}<{elementTypeFqn}>({elementConverterArg})";
 
         // Interface (IReadOnlyList<T>, IEnumerable<T>, etc.)
         if (collectionType.TypeKind == TypeKind.Interface)
-            return $"new {refs.ArraySequenceBindingConverter.GlobalBaseFullyQualifiedName}<{elementTypeFqn}, {collectionTypeFqn}>({elementConverterArg})";
+            return $"new {refs.ArraySequenceInputConverter.GlobalBaseFullyQualifiedName}<{elementTypeFqn}, {collectionTypeFqn}>({elementConverterArg})";
 
         // Concrete type with IEnumerable<T> or T[] constructor (e.g., List<T>)
         if (
@@ -373,7 +373,7 @@ internal sealed class CommandSchemaEmitter(CliFxReferences refs)
             )
         )
         {
-            return $"new {refs.ArrayInitializableSequenceBindingConverter.GlobalBaseFullyQualifiedName}<{elementTypeFqn}, {collectionTypeFqn}>({elementConverterArg}, arr => new {collectionTypeFqn}(arr))";
+            return $"new {refs.ArrayInitializableSequenceInputConverter.GlobalBaseFullyQualifiedName}<{elementTypeFqn}, {collectionTypeFqn}>({elementConverterArg}, arr => new {collectionTypeFqn}(arr))";
         }
 
         return null;
@@ -389,7 +389,7 @@ internal sealed class CommandSchemaEmitter(CliFxReferences refs)
     )
     {
         var validatorBaseType =
-            $"{refs.BindingValidator.GlobalBaseFullyQualifiedName}<{propertyTypeFqn}>";
+            $"{refs.InputValidator.GlobalBaseFullyQualifiedName}<{propertyTypeFqn}>";
 
         if (validatorTypes.Count == 0)
             return $"global::System.Array.Empty<{validatorBaseType}>()";

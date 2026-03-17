@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using CliFx.Binding;
 using CliFx.Demo.Domain;
 using CliFx.Exceptions;
 using CliFx.Infrastructure;

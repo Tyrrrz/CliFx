@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.Text;
 namespace CliFx.Generators.SemanticModel;
 
 /// <summary>
-/// Carries all contextual data for a single command's schema generation pass:
+/// Carries all contextual data for a single command's descriptor generation pass:
 /// the CliFx type references resolved from the compilation, the built command
 /// descriptor (including accumulated diagnostics), and the ready-to-emit source
 /// text with its hint name.  An instance is created as a discrete step in the
@@ -39,7 +39,7 @@ internal sealed class CommandSchemaContext(
     public static CommandSchemaContext Create(CommandDescriptor descriptor, CliFxReferences refs)
     {
         var source = new CommandSchemaEmitter(refs).GenerateSource(descriptor);
-        var hintName = $"{descriptor.Type.FullyQualifiedName.Replace('.', '_')}_Schema.g.cs";
+        var hintName = $"{descriptor.Type.FullyQualifiedName.Replace('.', '_')}_Descriptor.g.cs";
         return new CommandSchemaContext(refs, descriptor, hintName, source);
     }
 

@@ -11,88 +11,74 @@ namespace CliFx.Generators.SemanticModel;
 internal sealed class CliFxReferences(Compilation compilation)
 {
     // ── Roslyn type-check symbols ────────────────────────────────────────────
-    /// <summary>Checked via <c>Symbol</c> equality to verify a class implements ICommand.</summary>
     public TypeDescriptor ICommand { get; } = Resolve(compilation, "CliFx.ICommand");
 
-    /// <summary>Checked via <c>Symbol</c> equality in attribute matching inside TryBuildCommandDescriptor.</summary>
     public TypeDescriptor CommandAttribute { get; } =
         Resolve(compilation, CommandAttributeMetadataName);
 
-    /// <summary>Checked via <c>Symbol</c> equality in attribute matching inside TryBuildCommandDescriptor.</summary>
     public TypeDescriptor CommandParameterAttribute { get; } =
-        Resolve(compilation, "CliFx.CommandParameterAttribute");
+        Resolve(compilation, "CliFx.Binding.CommandParameterAttribute");
 
-    /// <summary>Checked via <c>Symbol</c> equality in attribute matching inside TryBuildCommandDescriptor.</summary>
     public TypeDescriptor CommandOptionAttribute { get; } =
-        Resolve(compilation, "CliFx.CommandOptionAttribute");
+        Resolve(compilation, "CliFx.Binding.CommandOptionAttribute");
 
     /// <summary>Open generic base class — used to check whether a user type is a custom converter.</summary>
-    public TypeDescriptor BindingConverter { get; } =
-        Resolve(compilation, "CliFx.Infrastructure.Binding.BindingConverter`1");
+    public TypeDescriptor InputConverter { get; } =
+        Resolve(compilation, "CliFx.Activation.InputConverter`1");
 
     /// <summary>Open generic base class — used to check whether a user type is a custom validator.</summary>
-    public TypeDescriptor BindingValidator { get; } =
-        Resolve(compilation, "CliFx.Infrastructure.Binding.BindingValidator`1");
+    public TypeDescriptor InputValidator { get; } =
+        Resolve(compilation, "CliFx.Activation.InputValidator`1");
 
     // ── Code-emission symbols ────────────────────────────────────────────────
-    // Non-generic types: use ToString() directly in interpolations.
-    // Open-generic types: use .GlobalBase when emitting a concrete instantiation.
     public TypeDescriptor CliApplicationBuilder { get; } =
         Resolve(compilation, "CliFx.CliApplicationBuilder");
-    public TypeDescriptor IHasHelpOption { get; } =
-        Resolve(compilation, "CliFx.Schema.IHasHelpOption");
-    public TypeDescriptor IHasVersionOption { get; } =
-        Resolve(compilation, "CliFx.Schema.IHasVersionOption");
+    public TypeDescriptor ICommandWithHelpOption { get; } =
+        Resolve(compilation, "CliFx.ICommandWithHelpOption");
+    public TypeDescriptor ICommandWithVersionOption { get; } =
+        Resolve(compilation, "CliFx.ICommandWithVersionOption");
 
-    // Non-generic base versions — ToString() gives the bare global:: name used in emission.
-    public TypeDescriptor CommandSchema { get; } =
-        Resolve(compilation, "CliFx.Schema.CommandSchema");
-    public TypeDescriptor CommandInputSchema { get; } =
-        Resolve(compilation, "CliFx.Schema.CommandInputSchema");
-    public TypeDescriptor CommandParameterSchema { get; } =
-        Resolve(compilation, "CliFx.Schema.CommandParameterSchema");
-    public TypeDescriptor CommandOptionSchema { get; } =
-        Resolve(compilation, "CliFx.Schema.CommandOptionSchema");
-    public TypeDescriptor PropertyBinding { get; } =
-        Resolve(compilation, "CliFx.Schema.PropertyBinding");
-    public TypeDescriptor StringScalarBindingConverter { get; } =
-        Resolve(compilation, "CliFx.Infrastructure.Binding.StringScalarBindingConverter");
-    public TypeDescriptor ObjectScalarBindingConverter { get; } =
-        Resolve(compilation, "CliFx.Infrastructure.Binding.ObjectScalarBindingConverter");
-    public TypeDescriptor BoolScalarBindingConverter { get; } =
-        Resolve(compilation, "CliFx.Infrastructure.Binding.BoolScalarBindingConverter");
-    public TypeDescriptor DateTimeOffsetScalarBindingConverter { get; } =
-        Resolve(compilation, "CliFx.Infrastructure.Binding.DateTimeOffsetScalarBindingConverter");
-    public TypeDescriptor DateTimeScalarBindingConverter { get; } =
-        Resolve(compilation, "CliFx.Infrastructure.Binding.DateTimeScalarBindingConverter");
-    public TypeDescriptor TimeSpanScalarBindingConverter { get; } =
-        Resolve(compilation, "CliFx.Infrastructure.Binding.TimeSpanScalarBindingConverter");
+    public TypeDescriptor CommandDescriptor { get; } =
+        Resolve(compilation, "CliFx.Binding.CommandDescriptor");
+    public TypeDescriptor CommandInputDescriptor { get; } =
+        Resolve(compilation, "CliFx.Binding.CommandInputDescriptor");
+    public TypeDescriptor CommandParameterDescriptor { get; } =
+        Resolve(compilation, "CliFx.Binding.CommandParameterDescriptor");
+    public TypeDescriptor CommandOptionDescriptor { get; } =
+        Resolve(compilation, "CliFx.Binding.CommandOptionDescriptor");
+    public TypeDescriptor PropertyDescriptor { get; } =
+        Resolve(compilation, "CliFx.Binding.PropertyDescriptor");
+    public TypeDescriptor StringScalarInputConverter { get; } =
+        Resolve(compilation, "CliFx.Activation.StringScalarInputConverter");
+    public TypeDescriptor ObjectScalarInputConverter { get; } =
+        Resolve(compilation, "CliFx.Activation.ObjectScalarInputConverter");
+    public TypeDescriptor BoolScalarInputConverter { get; } =
+        Resolve(compilation, "CliFx.Activation.BoolScalarInputConverter");
+    public TypeDescriptor DateTimeOffsetScalarInputConverter { get; } =
+        Resolve(compilation, "CliFx.Activation.DateTimeOffsetScalarInputConverter");
+    public TypeDescriptor DateTimeScalarInputConverter { get; } =
+        Resolve(compilation, "CliFx.Activation.DateTimeScalarInputConverter");
+    public TypeDescriptor TimeSpanScalarInputConverter { get; } =
+        Resolve(compilation, "CliFx.Activation.TimeSpanScalarInputConverter");
 
-    // Open-generic types — use .GlobalBase when appending concrete type arguments.
-    public TypeDescriptor EnumScalarBindingConverter { get; } =
-        Resolve(compilation, "CliFx.Infrastructure.Binding.EnumScalarBindingConverter`1");
-    public TypeDescriptor NullableScalarBindingConverter { get; } =
-        Resolve(compilation, "CliFx.Infrastructure.Binding.NullableScalarBindingConverter`1");
-    public TypeDescriptor ConvertibleScalarBindingConverter { get; } =
-        Resolve(compilation, "CliFx.Infrastructure.Binding.ConvertibleScalarBindingConverter`1");
-    public TypeDescriptor DelegateScalarBindingConverter { get; } =
-        Resolve(compilation, "CliFx.Infrastructure.Binding.DelegateScalarBindingConverter`1");
-    public TypeDescriptor ArraySequenceBindingConverter { get; } =
-        Resolve(compilation, "CliFx.Infrastructure.Binding.ArraySequenceBindingConverter`1");
-    public TypeDescriptor ArrayInitializableSequenceBindingConverter { get; } =
-        Resolve(
-            compilation,
-            "CliFx.Infrastructure.Binding.ArrayInitializableSequenceBindingConverter`2"
-        );
+    public TypeDescriptor EnumScalarInputConverter { get; } =
+        Resolve(compilation, "CliFx.Activation.EnumScalarInputConverter`1");
+    public TypeDescriptor NullableScalarInputConverter { get; } =
+        Resolve(compilation, "CliFx.Activation.NullableScalarInputConverter`1");
+    public TypeDescriptor ConvertibleScalarInputConverter { get; } =
+        Resolve(compilation, "CliFx.Activation.ConvertibleScalarInputConverter`1");
+    public TypeDescriptor DelegateScalarInputConverter { get; } =
+        Resolve(compilation, "CliFx.Activation.DelegateScalarInputConverter`1");
+    public TypeDescriptor ArraySequenceInputConverter { get; } =
+        Resolve(compilation, "CliFx.Activation.ArraySequenceInputConverter`1");
+    public TypeDescriptor ArrayInitializableSequenceInputConverter { get; } =
+        Resolve(compilation, "CliFx.Activation.ArrayInitializableSequenceInputConverter`2");
 
     // ────────────────────────────────────────────────────────────────────────
     /// <summary>
     /// Metadata name of the <c>[Command]</c> attribute.
-    /// Exposed as a constant so it can be passed to
-    /// <c>ForAttributeWithMetadataName</c> at generator-initialize time,
-    /// before a <see cref="Compilation"/> is available.
     /// </summary>
-    public const string CommandAttributeMetadataName = "CliFx.CommandAttribute";
+    public const string CommandAttributeMetadataName = "CliFx.Binding.CommandAttribute";
 
     private static TypeDescriptor Resolve(Compilation compilation, string metadataName) =>
         new(

@@ -44,7 +44,7 @@ public class DirectivesSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
     public async Task I_can_use_the_preview_directive_to_make_the_application_print_the_parsed_command_input()
     {
         // Arrange
-        var commandSchema = DynamicCommandBuilder.Compile(
+        var commandDescriptor = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command("cmd")]
@@ -56,7 +56,7 @@ public class DirectivesSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandSchema)
+            .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .AllowPreviewMode()
             .Build();

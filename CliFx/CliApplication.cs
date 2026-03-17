@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using CliFx.Activation;
+using CliFx.Binding;
 using CliFx.Exceptions;
 using CliFx.Formatting;
 using CliFx.Infrastructure;
-using CliFx.Input;
-using CliFx.Schema;
+using CliFx.Parsing;
 using CliFx.Utils.Extensions;
 
 namespace CliFx;
@@ -51,69 +52,73 @@ public class CliApplication(
     // WriteHelpText uses TryGetValidValues() which relies on reflection for enum valid values display.
     // This is suppressed here because the public RunAsync is the user-facing entry point and marking it
     // with [RequiresUnreferencedCode] would be too disruptive. For full AOT compatibility, the source
-    // generator should emit valid enum values statically (see PropertyBinding.TryGetValidValues).
+    // generator should emit valid enum values statically (see PropertyDescriptor.TryGetValidValues).
 #pragma warning disable IL2026
     private async ValueTask<int> RunAsync(
-        ApplicationSchema applicationSchema,
-        CommandInput commandInput
+        ApplicationDescriptor applicationDescriptor,
+        ParsedCommandLine commandLine
     )
     {
-        // Console colors may have already been overridden by the parent process,
-        // so we need to reset it to make sure that everything we write looks properly.
         console.ResetColor();
 
         // Handle the debug directive
-        if (Configuration.IsDebugModeAllowed && commandInput.IsDebugDirectiveSpecified)
+        if (Configuration.IsDebugModeAllowed && commandLine.IsDebugDirectiveSpecified)
         {
             await PromptDebuggerAsync();
         }
 
         // Handle the preview directive
-        if (Configuration.IsPreviewModeAllowed && commandInput.IsPreviewDirectiveSpecified)
+        if (Configuration.IsPreviewModeAllowed && commandLine.IsPreviewDirectiveSpecified)
         {
-            console.WriteCommandInput(commandInput);
+            console.WriteCommandInput(commandLine);
             return 0;
         }
 
         // Try to get the command schema that matches the input
-        var commandSchema =
+        var commandDescriptor =
             (
-                !string.IsNullOrWhiteSpace(commandInput.CommandName)
+                !string.IsNullOrWhiteSpace(commandLine.CommandName)
                     // If the command name is specified, try to find the command by name.
                     // This should always succeed, because the input parsing relies on
                     // the list of available command names.
-                    ? applicationSchema.TryFindCommand(commandInput.CommandName)
+                    ? applicationDescriptor.TryFindCommand(commandLine.CommandName)
                     // Otherwise, try to find the default command
-                    : applicationSchema.TryFindDefaultCommand()
+                    : applicationDescriptor.TryFindDefaultCommand()
             )
             ??
             // If a valid command was not found, use the fallback default command.
             // This is only used as a stub to show the help text.
-            FallbackDefaultCommand.Schema;
+            FallbackDefaultCommand.Descriptor;
 
         // Initialize an instance of the command type
         var commandInstance =
-            commandSchema == FallbackDefaultCommand.Schema
+            commandDescriptor == FallbackDefaultCommand.Descriptor
                 ? new FallbackDefaultCommand() // bypass the activator
-                : typeActivator.CreateInstance<ICommand>(commandSchema.Type);
+                : typeActivator.CreateInstance<ICommand>(commandDescriptor.Type);
 
         // Assemble the help context
         var helpContext = new HelpContext(
             Metadata,
-            applicationSchema,
-            commandSchema,
-            commandSchema.GetInputValues(commandInstance)
+            applicationDescriptor,
+            commandDescriptor,
+            commandDescriptor.Inputs.ToDictionary(
+                inputDescriptor => inputDescriptor,
+                inputDescriptor => inputDescriptor.Property.GetValue(commandInstance)
+            )
         );
 
         // Perform a limited command activation to check if the help or version options were specified by the user
-        if (commandInstance is IHasHelpOption or IHasVersionOption)
+        if (commandInstance is ICommandWithHelpOption or ICommandWithVersionOption)
         {
-            commandSchema.ActivateHelpAndVersionOptions(commandInstance, commandInput);
+            new CommandActivator(commandDescriptor, commandInstance).ActivateHelpAndVersionOptions(
+                commandLine
+            );
 
             // Help text
             if (
-                commandInstance is IHasHelpOption { IsHelpRequested: true }
-                || commandSchema == FallbackDefaultCommand.Schema && !commandInput.HasArguments
+                commandInstance is ICommandWithHelpOption { IsHelpRequested: true }
+                || commandDescriptor == FallbackDefaultCommand.Descriptor
+                    && !commandLine.HasArguments
             )
             {
                 console.WriteHelpText(helpContext);
@@ -121,7 +126,7 @@ public class CliApplication(
             }
 
             // Version text
-            if (commandInstance is IHasVersionOption { IsVersionRequested: true })
+            if (commandInstance is ICommandWithVersionOption { IsVersionRequested: true })
             {
                 console.WriteLine(Metadata.Version);
                 return 0;
@@ -135,7 +140,7 @@ public class CliApplication(
         try
         {
             // Activate the command inputs from the command line
-            commandSchema.Activate(commandInstance, commandInput);
+            new CommandActivator(commandDescriptor, commandInstance).Activate(commandLine);
 
             // Execute the command
             await commandInstance.ExecuteAsync(console);
@@ -172,15 +177,15 @@ public class CliApplication(
     {
         try
         {
-            var applicationSchema = new ApplicationSchema(Configuration.CommandSchemas);
+            var applicationDescriptor = new ApplicationDescriptor(Configuration.CommandDescriptors);
 
-            var commandInput = CommandInput.Parse(
+            var commandLine = ParsedCommandLine.Parse(
                 commandLineArguments,
                 environmentVariables,
-                applicationSchema.GetCommandNames()
+                applicationDescriptor.GetCommandNames()
             );
 
-            return await RunAsync(applicationSchema, commandInput);
+            return await RunAsync(applicationDescriptor, commandLine);
         }
         // To prevent the app from showing the annoying troubleshooting dialog on Windows,
         // we handle all exceptions ourselves and print them to the console.

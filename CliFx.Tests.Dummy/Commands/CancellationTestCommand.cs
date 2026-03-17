@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using CliFx.Binding;
 using CliFx.Infrastructure;
 
 namespace CliFx.Tests.Dummy.Commands;

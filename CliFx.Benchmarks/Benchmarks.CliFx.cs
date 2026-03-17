@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
+using CliFx.Binding;
 using CliFx.Infrastructure;
 
 namespace CliFx.Benchmarks;
@@ -25,7 +26,7 @@ public partial class Benchmarks
     [Benchmark(Description = "CliFx", Baseline = true)]
     public async ValueTask<int> ExecuteWithCliFx() =>
         await new CliApplicationBuilder()
-            .AddCommand(CliFxCommand.Schema)
+            .AddCommand(CliFxCommand.Descriptor)
             .Build()
             .RunAsync(Arguments, new Dictionary<string, string>());
 }

@@ -4,22 +4,18 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Basic.Reference.Assemblies;
+using CliFx.Binding;
 using CliFx.Generators;
-using CliFx.Schema;
+using CliFx.Tests.Utils.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
 
 namespace CliFx.Tests.Utils;
 
-// This class uses Roslyn to compile commands dynamically.
-// It allows us to collocate commands with tests more easily, which helps a lot when reasoning about them.
-// Unfortunately, this comes at a cost of static typing, but this is still a worthwhile trade off.
-// Maybe one day C# will allow declaring classes inside methods and doing this will no longer be necessary.
-// Language proposal: https://github.com/dotnet/csharplang/discussions/130
 internal static class DynamicCommandBuilder
 {
-    public static IReadOnlyList<CommandSchema> CompileMany(string sourceCode)
+    public static IReadOnlyList<CommandDescriptor> CompileMany(string sourceCode)
     {
         // Get default system namespaces
         var defaultSystemNamespaces = new[]
@@ -37,7 +33,7 @@ internal static class DynamicCommandBuilder
             .Assembly.GetTypes()
             .Where(t => t.IsPublic)
             .Select(t => t.Namespace)
-            .Distinct()
+            .Distinct(StringComparer.Ordinal)
             .ToArray();
 
         // Append default imports to the source code
@@ -48,7 +44,7 @@ internal static class DynamicCommandBuilder
             + sourceCode;
 
         // Parse the source code
-        var ast = SyntaxFactory.ParseSyntaxTree(
+        var syntaxTree = SyntaxFactory.ParseSyntaxTree(
             SourceText.From(sourceCodeWithUsings),
             CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.Preview)
         );
@@ -56,7 +52,7 @@ internal static class DynamicCommandBuilder
         // Compile the code to IL
         var compilation = CSharpCompilation.Create(
             "CliFxTests_DynamicAssembly_" + Guid.NewGuid(),
-            [ast],
+            [syntaxTree],
             Net100
                 .References.All.Append(
                     MetadataReference.CreateFromFile(typeof(ICommand).Assembly.Location)
@@ -136,23 +132,24 @@ internal static class DynamicCommandBuilder
 
         return commandTypes
             .Select(t =>
-                (CommandSchema)
-                    t.GetProperty("Schema", BindingFlags.Public | BindingFlags.Static)!
-                        .GetValue(null)!
+                (CommandDescriptor?)
+                    t.GetProperty("Descriptor", BindingFlags.Public | BindingFlags.Static)!
+                        .GetValue(null)
             )
+            .WhereNotNull()
             .ToArray();
     }
 
-    public static CommandSchema Compile(string sourceCode)
+    public static CommandDescriptor Compile(string sourceCode)
     {
-        var commandSchemas = CompileMany(sourceCode);
-        if (commandSchemas.Count > 1)
+        var commandDescriptors = CompileMany(sourceCode);
+        if (commandDescriptors.Count > 1)
         {
             throw new InvalidOperationException(
                 "There are more than one command definitions in the provided source code."
             );
         }
 
-        return commandSchemas.Single();
+        return commandDescriptors.Single();
     }
 }

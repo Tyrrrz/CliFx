@@ -14,7 +14,7 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
     public async Task I_can_throw_an_exception_in_a_command_to_report_an_error_with_a_stacktrace()
     {
         // Arrange
-        var commandSchema = DynamicCommandBuilder.Compile(
+        var commandDescriptor = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
@@ -27,7 +27,7 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandSchema)
+            .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -50,7 +50,7 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
     public async Task I_can_throw_an_exception_with_an_inner_exception_in_a_command_to_report_an_error_with_a_stacktrace()
     {
         // Arrange
-        var commandSchema = DynamicCommandBuilder.Compile(
+        var commandDescriptor = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
@@ -63,7 +63,7 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandSchema)
+            .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -93,7 +93,7 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
     public async Task I_can_throw_an_exception_in_a_command_to_report_an_error_and_exit_with_the_specified_code()
     {
         // Arrange
-        var commandSchema = DynamicCommandBuilder.Compile(
+        var commandDescriptor = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
@@ -106,7 +106,7 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandSchema)
+            .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -127,7 +127,7 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
     public async Task I_can_throw_an_exception_without_a_message_in_a_command_to_report_an_error_with_a_stacktrace()
     {
         // Arrange
-        var commandSchema = DynamicCommandBuilder.Compile(
+        var commandDescriptor = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
@@ -140,7 +140,7 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandSchema)
+            .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -161,7 +161,7 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
     public async Task I_can_throw_an_exception_in_a_command_to_report_an_error_and_print_the_help_text()
     {
         // Arrange
-        var commandSchema = DynamicCommandBuilder.Compile(
+        var commandDescriptor = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
@@ -174,7 +174,7 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandSchema)
+            .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .SetDescription("This will be in help text")
             .Build();

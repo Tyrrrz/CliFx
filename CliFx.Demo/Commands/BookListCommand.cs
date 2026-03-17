@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using CliFx.Binding;
 using CliFx.Demo.Domain;
 using CliFx.Infrastructure;
 

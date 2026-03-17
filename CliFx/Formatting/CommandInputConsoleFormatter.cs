@@ -1,13 +1,13 @@
 ﻿using System;
 using CliFx.Infrastructure;
-using CliFx.Input;
+using CliFx.Parsing;
 
 namespace CliFx.Formatting;
 
 internal class CommandInputConsoleFormatter(ConsoleWriter consoleWriter)
     : ConsoleFormatter(consoleWriter)
 {
-    private void WriteCommandLineArguments(CommandInput commandInput)
+    private void WriteCommandLineArguments(ParsedCommandLine commandLine)
     {
         Write("Command-line:");
         WriteLine();
@@ -15,31 +15,29 @@ internal class CommandInputConsoleFormatter(ConsoleWriter consoleWriter)
         WriteHorizontalMargin();
 
         // Command name
-        if (!string.IsNullOrWhiteSpace(commandInput.CommandName))
+        if (!string.IsNullOrWhiteSpace(commandLine.CommandName))
         {
-            Write(ConsoleColor.Cyan, commandInput.CommandName);
+            Write(ConsoleColor.Cyan, commandLine.CommandName);
             Write(' ');
         }
 
-        // Parameters
-        foreach (var parameterInput in commandInput.Parameters)
+        // Positional arguments
+        foreach (var positionalArgument in commandLine.PositionalArguments)
         {
             Write('<');
-            Write(ConsoleColor.White, parameterInput.Value);
+            Write(ConsoleColor.White, positionalArgument.Value);
             Write('>');
             Write(' ');
         }
 
         // Options
-        foreach (var optionInput in commandInput.Options)
+        foreach (var parsedOption in commandLine.Options)
         {
             Write('[');
 
-            // Identifier
-            Write(ConsoleColor.White, optionInput.GetFormattedIdentifier());
+            Write(ConsoleColor.White, parsedOption.GetFormattedIdentifier());
 
-            // Value(s)
-            foreach (var value in optionInput.Values)
+            foreach (var value in parsedOption.Values)
             {
                 Write(' ');
                 Write('"');
@@ -54,35 +52,30 @@ internal class CommandInputConsoleFormatter(ConsoleWriter consoleWriter)
         WriteLine();
     }
 
-    private void WriteEnvironmentVariables(CommandInput commandInput)
+    private void WriteEnvironmentVariables(ParsedCommandLine commandLine)
     {
         Write("Environment:");
         WriteLine();
 
-        // Environment variables
-        foreach (var environmentVariableInput in commandInput.EnvironmentVariables)
+        foreach (var parsedEnvironmentVariable in commandLine.EnvironmentVariables)
         {
             WriteHorizontalMargin();
 
-            // Name
-            Write(ConsoleColor.White, environmentVariableInput.Name);
-
+            Write(ConsoleColor.White, parsedEnvironmentVariable.Name);
             Write('=');
-
-            // Value
             Write('"');
-            Write(environmentVariableInput.Value);
+            Write(parsedEnvironmentVariable.Value);
             Write('"');
 
             WriteLine();
         }
     }
 
-    public void WriteCommandInput(CommandInput commandInput)
+    public void WriteCommandInput(ParsedCommandLine commandLine)
     {
-        WriteCommandLineArguments(commandInput);
+        WriteCommandLineArguments(commandLine);
         WriteLine();
-        WriteEnvironmentVariables(commandInput);
+        WriteEnvironmentVariables(commandLine);
     }
 }
 
@@ -90,12 +83,12 @@ internal static class CommandInputConsoleFormatterExtensions
 {
     public static void WriteCommandInput(
         this ConsoleWriter consoleWriter,
-        CommandInput commandInput
-    ) => new CommandInputConsoleFormatter(consoleWriter).WriteCommandInput(commandInput);
+        ParsedCommandLine commandLine
+    ) => new CommandInputConsoleFormatter(consoleWriter).WriteCommandInput(commandLine);
 
     extension(IConsole console)
     {
-        public void WriteCommandInput(CommandInput commandInput) =>
-            console.Output.WriteCommandInput(commandInput);
+        public void WriteCommandInput(ParsedCommandLine commandLine) =>
+            console.Output.WriteCommandInput(commandLine);
     }
 }

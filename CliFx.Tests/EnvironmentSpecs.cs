@@ -17,7 +17,7 @@ public class EnvironmentSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutp
     public async Task I_can_configure_an_option_to_fall_back_to_an_environment_variable_if_the_user_does_not_provide_the_corresponding_argument()
     {
         // Arrange
-        var commandSchema = DynamicCommandBuilder.Compile(
+        var commandDescriptor = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
@@ -41,7 +41,7 @@ public class EnvironmentSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutp
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandSchema)
+            .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -62,7 +62,7 @@ public class EnvironmentSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutp
     public async Task I_can_configure_an_option_bound_to_a_non_scalar_property_to_fall_back_to_an_environment_variable_if_the_user_does_not_provide_the_corresponding_argument()
     {
         // Arrange
-        var commandSchema = DynamicCommandBuilder.Compile(
+        var commandDescriptor = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
@@ -83,7 +83,7 @@ public class EnvironmentSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutp
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandSchema)
+            .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -104,7 +104,7 @@ public class EnvironmentSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutp
     public async Task I_can_configure_an_option_bound_to_a_scalar_property_to_fall_back_to_an_environment_variable_while_ignoring_path_separators()
     {
         // Arrange
-        var commandSchema = DynamicCommandBuilder.Compile(
+        var commandDescriptor = DynamicCommandBuilder.Compile(
             // lang=csharp
             """
             [Command]
@@ -123,7 +123,7 @@ public class EnvironmentSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutp
         );
 
         var application = new CliApplicationBuilder()
-            .AddCommand(commandSchema)
+            .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
 

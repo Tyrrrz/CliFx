@@ -43,12 +43,12 @@ public class AddCommandsFromThisAssemblyGenerator : IIncrementalGenerator
               namespace {{cliFxRefs.CliApplicationBuilder.Symbol.ContainingNamespace.ToDisplayString()}};
 
               /// <summary>
-              /// Provides an extension method for registering all source-generated command schemas from the same assembly as the caller.
+              /// Provides an extension method for registering all source-generated command descriptors from the same assembly as the caller.
               /// </summary>
               internal static class AddCommandsFromThisAssemblyExtension
               {
                   /// <summary>
-                  /// Registers all non-private source-generated command schemas from the same assembly as the caller.
+                  /// Registers all non-private source-generated command descriptors from the same assembly as the caller.
                   /// </summary>
                   internal static {{cliFxRefs.CliApplicationBuilder}} AddCommandsFromThisAssembly(
                       this {{cliFxRefs.CliApplicationBuilder}} builder
@@ -58,7 +58,7 @@ public class AddCommandsFromThisAssemblyGenerator : IIncrementalGenerator
                           Environment.NewLine,
                           publicCommands.Select(c =>
                               // lang=csharp
-                              $"builder.AddCommand({c.Type}.Schema);"
+                              $"builder.AddCommand({c.Type}.Descriptor);"
                           )
                       )}}
 

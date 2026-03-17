@@ -14,7 +14,7 @@ public class ApplicationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutp
     {
         // Act
         var app = new CliApplicationBuilder()
-            .AddCommand(NoOpCommand.Schema)
+            .AddCommand(NoOpCommand.Descriptor)
             .UseConsole(FakeConsole)
             .Build();
 
