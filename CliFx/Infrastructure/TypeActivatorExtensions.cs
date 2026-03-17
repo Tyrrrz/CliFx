@@ -1,7 +1,6 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using CliFx.Binding;
-using CliFx.Exceptions;
 
 namespace CliFx.Infrastructure;
 

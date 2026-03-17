@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using CliFx.Activation;
 using CliFx.Binding;
-using CliFx.Exceptions;
 using CliFx.Formatting;
 using CliFx.Infrastructure;
 using CliFx.Parsing;

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CliFx.Exceptions;
+namespace CliFx;
 
 /// <summary>
 /// Exception thrown when a command cannot proceed with its normal execution due to an error.

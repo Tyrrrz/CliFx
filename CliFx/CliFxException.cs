@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CliFx.Exceptions;
+namespace CliFx;
 
 /// <summary>
 /// Exception thrown when there is an error during application execution.

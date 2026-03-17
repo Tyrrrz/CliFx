@@ -154,7 +154,7 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
         stdOut.Should().BeEmpty();
 
         var stdErr = FakeConsole.ReadErrorString();
-        stdErr.Should().ContainAllInOrder("CliFx.Exceptions.CommandException", "at", "CliFx.");
+        stdErr.Should().ContainAllInOrder("CliFx.CommandException", "at", "CliFx.");
     }
 
     [Fact]

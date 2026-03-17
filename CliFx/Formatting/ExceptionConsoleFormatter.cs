@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using CliFx.Exceptions;
 using CliFx.Infrastructure;
 using CliFx.Utils;
 
