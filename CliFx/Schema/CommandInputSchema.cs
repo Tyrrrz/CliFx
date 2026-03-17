@@ -55,7 +55,7 @@ public abstract class CommandInputSchema(
 
         var errors = Validators
             .Select(validator => validator.Validate(value))
-            .OfType<BindingValidationError>()
+            .WhereNotNull()
             .ToArray();
 
         if (errors.Any())
