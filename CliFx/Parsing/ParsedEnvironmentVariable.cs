@@ -10,4 +10,6 @@ internal class ParsedEnvironmentVariable(string name, string value)
     public string Value { get; } = value;
 
     public IReadOnlyList<string> SplitValues() => Value.Split(Path.PathSeparator);
+
+    public override string ToString() => Name + '=' + Value;
 }

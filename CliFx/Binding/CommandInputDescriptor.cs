@@ -37,10 +37,6 @@ public abstract class CommandInputDescriptor(
     /// Validators used to validate the converted value before setting it to the target property.
     /// </summary>
     public IReadOnlyList<IInputValidator> Validators { get; } = validators;
-
-    /// <inheritdoc />
-    [ExcludeFromCodeCoverage]
-    public override string ToString() => this.GetFormattedIdentifier();
 }
 
 /// <inheritdoc cref="CommandInputDescriptor" />

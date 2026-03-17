@@ -11,4 +11,6 @@ internal class ParsedDirective(string name)
 
     public bool IsPreviewDirective =>
         string.Equals(Name, "preview", StringComparison.OrdinalIgnoreCase);
+
+    public override string ToString() => '[' + Name + ']';
 }

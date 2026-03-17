@@ -8,7 +8,7 @@ internal class ParsedOption(string identifier, IReadOnlyList<string> values)
 
     public IReadOnlyList<string> Values { get; } = values;
 
-    public string GetFormattedIdentifier() =>
+    public override string ToString() =>
         Identifier switch
         {
             { Length: >= 2 } => "--" + Identifier,

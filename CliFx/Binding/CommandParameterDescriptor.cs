@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text;
 using CliFx.Activation;
 
 namespace CliFx.Binding;
@@ -21,6 +22,22 @@ public class CommandParameterDescriptor(
 
     /// <inheritdoc cref="CommandParameterAttribute.Name" />
     public string Name { get; } = name;
+
+    /// <inheritdoc cref="ToString()" />
+    public string ToString(bool includeKind)
+    {
+        var buffer = new StringBuilder();
+
+        if (includeKind)
+            buffer.Append("Parameter ");
+
+        buffer.Append(Converter.IsSequence ? $"<{Name}...>" : $"<{Name}>");
+
+        return buffer.ToString();
+    }
+
+    /// <inheritdoc />
+    public override string ToString() => ToString(true);
 }
 
 /// <inheritdoc cref="CommandParameterDescriptor" />

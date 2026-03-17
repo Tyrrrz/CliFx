@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using CliFx.Activation;
 
 namespace CliFx.Binding;
@@ -40,6 +41,27 @@ public class CommandOptionDescriptor(
     internal bool MatchesEnvironmentVariable(string environmentVariableName) =>
         !string.IsNullOrWhiteSpace(EnvironmentVariable)
         && string.Equals(EnvironmentVariable, environmentVariableName, StringComparison.Ordinal);
+
+    /// <inheritdoc cref="ToString()" />
+    public string ToString(bool includeKind)
+    {
+        var buffer = new StringBuilder();
+
+        if (includeKind)
+            buffer.Append("Option ");
+
+        if (!string.IsNullOrWhiteSpace(Name) && ShortName is not null)
+            buffer.Append($"-{ShortName}|--{Name}");
+        else if (!string.IsNullOrWhiteSpace(Name))
+            buffer.Append($"--{Name}");
+        else if (ShortName is not null)
+            buffer.Append($"-{ShortName}");
+
+        return buffer.ToString();
+    }
+
+    /// <inheritdoc />
+    public override string ToString() => ToString(true);
 }
 
 /// <inheritdoc cref="CommandOptionDescriptor" />

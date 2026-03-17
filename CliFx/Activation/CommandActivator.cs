@@ -26,7 +26,7 @@ internal class CommandActivator(CommandDescriptor command, ICommand instance)
         {
             throw CliFxException.UserError(
                 $"""
-                {input.GetKind()} {input.GetFormattedIdentifier()} has been provided with an invalid value.
+                {input} has been provided with an invalid value.
                 Error(s):
                 {string.Join(Environment.NewLine, errors.Select(e => "- " + e.Message))}
                 """
@@ -41,7 +41,7 @@ internal class CommandActivator(CommandDescriptor command, ICommand instance)
         {
             throw CliFxException.UserError(
                 $"""
-                {input.GetKind()} {input.GetFormattedIdentifier()} cannot be set from the provided argument(s):
+                {input} cannot be set from the provided argument(s):
                 {string.Join(" ", rawValues.Select(v => '<' + v + '>'))}
                 Error: {ex.Message}
                 """,
@@ -97,9 +97,7 @@ internal class CommandActivator(CommandDescriptor command, ICommand instance)
                 throw CliFxException.UserError(
                     $"""
                     Unrecognized parameter(s):
-                    {string.Join(" ", remainingPositionalArguments.Select(p =>
-                        p.GetFormattedIdentifier()
-                    ))}
+                    {string.Join(" ", remainingPositionalArguments)}
                     """
                 );
             }
@@ -108,12 +106,12 @@ internal class CommandActivator(CommandDescriptor command, ICommand instance)
             {
                 throw CliFxException.UserError(
                     $"""
-                     Missing required parameter(s):
-                     {string.Join(
-                         " ",
-                         remainingRequiredParameters.Select(p => p.GetFormattedIdentifier())
-                     )}
-                     """
+                    Missing required parameter(s):
+                    {string.Join(
+                        ", ",
+                        remainingRequiredParameters.Select(p => p.ToString(false))
+                    )}
+                    """
                 );
             }
         }
@@ -175,7 +173,7 @@ internal class CommandActivator(CommandDescriptor command, ICommand instance)
                     Unrecognized option(s):
                     {string.Join(
                         ", ",
-                        remainingParsedOptions.Select(o => o.GetFormattedIdentifier())
+                        remainingParsedOptions
                     )}
                     """
                 );
@@ -188,7 +186,7 @@ internal class CommandActivator(CommandDescriptor command, ICommand instance)
                      Missing required option(s):
                      {string.Join(
                          ", ",
-                         remainingRequiredOptions.Select(o => o.GetFormattedIdentifier())
+                         remainingRequiredOptions.Select(o => o.ToString(false))
                      )}
                      """
                 );

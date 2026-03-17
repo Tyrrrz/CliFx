@@ -4,5 +4,5 @@ internal class ParsedPositionalArgument(string value)
 {
     public string Value { get; } = value;
 
-    public string GetFormattedIdentifier() => $"<{Value}>";
+    public override string ToString() => $"<{Value}>";
 }
