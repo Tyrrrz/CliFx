@@ -8,7 +8,7 @@ namespace CliFx.Binding;
 /// <summary>
 /// Describes the structure of a command and drives its activation from parsed command-line input.
 /// </summary>
-public partial class CommandDescriptor(
+public class CommandDescriptor(
     [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
         Type type,
     string? name,
@@ -45,48 +45,6 @@ public partial class CommandDescriptor(
         !string.IsNullOrWhiteSpace(Name)
             ? string.Equals(name, Name, StringComparison.OrdinalIgnoreCase)
             : string.IsNullOrWhiteSpace(name);
-}
-
-public partial class CommandDescriptor : IEquatable<CommandDescriptor>
-{
-    /// <inheritdoc />
-    public bool Equals(CommandDescriptor? other)
-    {
-        if (other is null)
-            return false;
-        if (ReferenceEquals(this, other))
-            return true;
-
-        return Type == other.Type;
-    }
-
-    /// <inheritdoc />
-    public override bool Equals(object? obj)
-    {
-        if (obj is null)
-            return false;
-        if (ReferenceEquals(this, obj))
-            return true;
-        if (obj.GetType() != GetType())
-            return false;
-
-        return Equals((CommandDescriptor)obj);
-    }
-
-    /// <inheritdoc />
-    public override int GetHashCode() => Type.GetHashCode();
-
-    /// <summary>
-    /// Equality operator.
-    /// </summary>
-    public static bool operator ==(CommandDescriptor? left, CommandDescriptor? right) =>
-        Equals(left, right);
-
-    /// <summary>
-    /// Equality operator.
-    /// </summary>
-    public static bool operator !=(CommandDescriptor? left, CommandDescriptor? right) =>
-        !Equals(left, right);
 }
 
 /// <inheritdoc cref="CommandDescriptor" />
