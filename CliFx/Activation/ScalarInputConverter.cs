@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using CliFx.Exceptions;
-using CliFx.Utils.Extensions;
 
 namespace CliFx.Activation;
 
@@ -25,7 +24,7 @@ public abstract class ScalarInputConverter<T> : InputConverter<T>
             : throw CliFxException.UserError(
                 $"""
                 Expected a single argument, but provided with multiple:
-                {rawValues.Select(v => '<' + v + '>').JoinToString(" ")}
+                {string.Join(" ", rawValues.Select(v => '<' + v + '>'))}
                 """
             );
 }

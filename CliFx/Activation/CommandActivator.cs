@@ -29,7 +29,7 @@ internal class CommandActivator(CommandDescriptor command, ICommand instance)
                 $"""
                 {input.GetKind()} {input.GetFormattedIdentifier()} has been provided with an invalid value.
                 Error(s):
-                {errors.Select(e => "- " + e.Message).JoinToString(Environment.NewLine)}
+                {string.Join(Environment.NewLine, errors.Select(e => "- " + e.Message))}
                 """
             );
         }
@@ -43,7 +43,7 @@ internal class CommandActivator(CommandDescriptor command, ICommand instance)
             throw CliFxException.UserError(
                 $"""
                 {input.GetKind()} {input.GetFormattedIdentifier()} cannot be set from the provided argument(s):
-                {rawValues.Select(v => '<' + v + '>').JoinToString(" ")}
+                {string.Join(" ", rawValues.Select(v => '<' + v + '>'))}
                 Error: {ex.Message}
                 """,
                 ex
@@ -98,9 +98,9 @@ internal class CommandActivator(CommandDescriptor command, ICommand instance)
                 throw CliFxException.UserError(
                     $"""
                     Unrecognized parameter(s):
-                    {remainingPositionalArguments.Select(p =>
+                    {string.Join(" ", remainingPositionalArguments.Select(p =>
                         p.GetFormattedIdentifier()
-                    ).JoinToString(" ")}
+                    ))}
                     """
                 );
             }
@@ -110,9 +110,10 @@ internal class CommandActivator(CommandDescriptor command, ICommand instance)
                 throw CliFxException.UserError(
                     $"""
                      Missing required parameter(s):
-                     {remainingRequiredParameters
-                         .Select(p => p.GetFormattedIdentifier())
-                         .JoinToString(" ")}
+                     {string.Join(
+                         " ",
+                         remainingRequiredParameters.Select(p => p.GetFormattedIdentifier())
+                     )}
                      """
                 );
             }
@@ -173,8 +174,9 @@ internal class CommandActivator(CommandDescriptor command, ICommand instance)
                 throw CliFxException.UserError(
                     $"""
                     Unrecognized option(s):
-                    {remainingParsedOptions.Select(o => o.GetFormattedIdentifier()).JoinToString(
-                        ", "
+                    {string.Join(
+                        ", ",
+                        remainingParsedOptions.Select(o => o.GetFormattedIdentifier())
                     )}
                     """
                 );
@@ -185,9 +187,10 @@ internal class CommandActivator(CommandDescriptor command, ICommand instance)
                 throw CliFxException.UserError(
                     $"""
                      Missing required option(s):
-                     {remainingRequiredOptions
-                         .Select(o => o.GetFormattedIdentifier())
-                         .JoinToString(", ")}
+                     {string.Join(
+                         ", ",
+                         remainingRequiredOptions.Select(o => o.GetFormattedIdentifier())
+                     )}
                      """
                 );
             }
