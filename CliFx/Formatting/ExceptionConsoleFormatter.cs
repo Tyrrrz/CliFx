@@ -117,17 +117,3 @@ internal class ExceptionConsoleFormatter(ConsoleWriter consoleWriter)
         }
     }
 }
-
-internal static class ExceptionConsoleFormatterExtensions
-{
-    extension(ConsoleWriter consoleWriter)
-    {
-        public void WriteException(Exception exception) =>
-            new ExceptionConsoleFormatter(consoleWriter).WriteException(exception);
-    }
-
-    extension(IConsole console)
-    {
-        public void WriteException(Exception exception) => console.Error.WriteException(exception);
-    }
-}

@@ -6,13 +6,6 @@ using CliFx.Utils.Extensions;
 
 namespace CliFx.Utils;
 
-internal class StackFrameParameter(string type, string? name)
-{
-    public string Type { get; } = type;
-
-    public string? Name { get; } = name;
-}
-
 internal partial class StackFrame(
     string parentType,
     string methodName,

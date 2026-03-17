@@ -141,12 +141,3 @@ internal class NoPreambleEncoding(Encoding underlyingEncoding)
     [ExcludeFromCodeCoverage]
     public override object Clone() => new NoPreambleEncoding((Encoding)base.Clone());
 }
-
-internal static class NoPreambleEncodingExtensions
-{
-    extension(Encoding encoding)
-    {
-        public Encoding WithoutPreamble() =>
-            encoding.GetPreamble().Length > 0 ? new NoPreambleEncoding(encoding) : encoding;
-    }
-}

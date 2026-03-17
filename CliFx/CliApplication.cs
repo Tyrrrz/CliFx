@@ -92,9 +92,10 @@ public class CliApplication(
 
         // Initialize an instance of the command type
         var commandInstance =
-            commandDescriptor == FallbackDefaultCommand.Descriptor
-                ? new FallbackDefaultCommand() // bypass the activator
-                : typeActivator.CreateInstance<ICommand>(commandDescriptor.Type);
+            commandDescriptor != FallbackDefaultCommand.Descriptor
+                ? typeActivator.CreateInstance(commandDescriptor)
+                // Bypass the activator
+                : new FallbackDefaultCommand();
 
         // Assemble the help context
         var helpContext = new HelpContext(
@@ -107,16 +108,18 @@ public class CliApplication(
             )
         );
 
+        // Assemble the command activator
+        var commandActivator = new CommandActivator(commandDescriptor, commandInstance);
+
         // Perform a limited command activation to check if the help or version options were specified by the user
         if (commandInstance is ICommandWithHelpOption or ICommandWithVersionOption)
         {
-            new CommandActivator(commandDescriptor, commandInstance).ActivateHelpAndVersionOptions(
-                commandLine
-            );
+            commandActivator.ActivateHelpAndVersionOptions(commandLine);
 
             // Help text
             if (
                 commandInstance is ICommandWithHelpOption { IsHelpRequested: true }
+                // Can also be requested on the fallback command by not supplying any arguments
                 || commandDescriptor == FallbackDefaultCommand.Descriptor
                     && !commandLine.HasArguments
             )
@@ -140,7 +143,7 @@ public class CliApplication(
         try
         {
             // Activate the command inputs from the command line
-            new CommandActivator(commandDescriptor, commandInstance).Activate(commandLine);
+            commandActivator.Activate(commandLine);
 
             // Execute the command
             await commandInstance.ExecuteAsync(console);

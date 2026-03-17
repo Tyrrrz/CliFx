@@ -78,17 +78,3 @@ internal class CommandInputConsoleFormatter(ConsoleWriter consoleWriter)
         WriteEnvironmentVariables(commandLine);
     }
 }
-
-internal static class CommandInputConsoleFormatterExtensions
-{
-    public static void WriteCommandInput(
-        this ConsoleWriter consoleWriter,
-        ParsedCommandLine commandLine
-    ) => new CommandInputConsoleFormatter(consoleWriter).WriteCommandInput(commandLine);
-
-    extension(IConsole console)
-    {
-        public void WriteCommandInput(ParsedCommandLine commandLine) =>
-            console.Output.WriteCommandInput(commandLine);
-    }
-}
