@@ -5,7 +5,7 @@ using CliFx.Activation;
 namespace CliFx.Binding;
 
 /// <summary>
-/// Describes an input (parameter or option) of a command.
+/// Describes a binding between a CLR property and an input (parameter or option) of a command.
 /// </summary>
 public abstract class CommandInputDescriptor(
     PropertyDescriptor property,
