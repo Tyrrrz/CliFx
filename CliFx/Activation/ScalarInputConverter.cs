@@ -9,7 +9,7 @@ namespace CliFx.Activation;
 public abstract class ScalarInputConverter<T> : InputConverter<T>
 {
     /// <inheritdoc />
-    public override bool IsSequence => false;
+    public override bool SupportsSequence => false;
 
     /// <summary>
     /// Converts the input value from the provided singular command-line argument.

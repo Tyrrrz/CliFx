@@ -13,13 +13,13 @@ namespace CliFx.Activation;
 public interface IInputConverter
 {
     /// <summary>
-    /// Whether this converter is meant to be used with sequence-based (multi-value) command inputs.
+    /// Whether this converter can be used with sequence-based (multi-value) command inputs.
     /// </summary>
     /// <remarks>
     /// If this property is <c>false</c>, then <see cref="Convert" /> must throw when provided
     /// with more than one value.
     /// </remarks>
-    bool IsSequence { get; }
+    bool SupportsSequence { get; }
 
     /// <summary>
     /// Converts the input value from the provided raw command-line arguments.

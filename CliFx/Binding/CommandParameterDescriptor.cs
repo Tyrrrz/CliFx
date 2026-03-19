@@ -31,7 +31,10 @@ public class CommandParameterDescriptor(
         if (includeKind)
             buffer.Append("Parameter ");
 
-        buffer.Append(Converter.IsSequence ? $"<{Name}...>" : $"<{Name}>");
+        if (!Converter.SupportsSequence)
+            buffer.Append('<').Append(Name).Append('>');
+        else
+            buffer.Append('<').Append(Name).Append("...>");
 
         return buffer.ToString();
     }

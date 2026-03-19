@@ -6,7 +6,7 @@ namespace CliFx.Activation;
 public abstract class InputConverter<T> : IInputConverter
 {
     /// <inheritdoc />
-    public abstract bool IsSequence { get; }
+    public abstract bool SupportsSequence { get; }
 
     /// <inheritdoc cref="IInputConverter.Convert" />
     public abstract T Convert(IReadOnlyList<string> rawValues);

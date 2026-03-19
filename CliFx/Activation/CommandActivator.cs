@@ -70,7 +70,7 @@ internal class CommandActivator(
             if (position >= commandLine.PositionalArguments.Count)
                 break;
 
-            if (!parameter.Converter.IsSequence)
+            if (!parameter.Converter.SupportsSequence)
             {
                 var positionalArgument = commandLine.PositionalArguments[position];
                 ActivateInput(parameter, instance, [positionalArgument.Value]);
@@ -154,7 +154,7 @@ internal class CommandActivator(
                 )
             )
             {
-                var rawValues = !option.Converter.IsSequence
+                var rawValues = !option.Converter.SupportsSequence
                     ? [environmentVariableValue]
                     : environmentVariableValue.Split(Path.PathSeparator);
 

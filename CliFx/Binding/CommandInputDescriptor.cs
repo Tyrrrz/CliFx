@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using CliFx.Activation;
 
 namespace CliFx.Binding;
