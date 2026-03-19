@@ -34,15 +34,5 @@ internal static class TypeExtensions
                 // IEnumerable<object> and nothing else, then we'll just return that.
                 .MaxBy(t => t != typeof(object));
         }
-
-        [RequiresUnreferencedCode(
-            "Uses Type.GetMethod() which may not be available after trimming."
-        )]
-        public bool IsToStringOverriden()
-        {
-            var toStringMethod = type.GetMethod(nameof(ToString), Type.EmptyTypes);
-            return toStringMethod?.GetBaseDefinition()?.DeclaringType
-                != toStringMethod?.DeclaringType;
-        }
     }
 }

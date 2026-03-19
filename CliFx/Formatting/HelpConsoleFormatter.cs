@@ -315,56 +315,47 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
         }
     }
 
-    [RequiresUnreferencedCode("Displays default values using runtime type reflection.")]
     private void WriteDefaultValue(CommandInputDescriptor schema)
     {
         var defaultValue = context.CommandDefaultValues.GetValueOrDefault(schema);
-        if (defaultValue is not null)
+        if (defaultValue is null)
+            return;
+
+        // Normalize to an array to process both single and sequence default values uniformly
+        var defaultValues =
+            defaultValue is not string && defaultValue is IEnumerable defaultValueAsEnumerable
+                ? defaultValueAsEnumerable.Cast<object>().ToArray()
+                : [defaultValue];
+
+        // Only strings, chars, bools, and types that implement IFormattable have
+        // meaningful ToString() representations.
+        if (!defaultValues.All(v => v is string or char or bool or IFormattable))
+            return;
+
+        var isFirst = true;
+
+        foreach (var element in defaultValues)
         {
-            // Non-Scalar
-            if (defaultValue is not string && defaultValue is IEnumerable defaultValues)
+            if (element is not IFormattable and not IConvertible)
+                continue;
+
+            if (isFirst)
             {
-                var elementType =
-                    defaultValues.GetType().TryGetEnumerableUnderlyingType() ?? typeof(object);
-
-                if (elementType.IsToStringOverriden())
-                {
-                    Write(ConsoleColor.White, "Default: ");
-
-                    var isFirst = true;
-
-                    foreach (var element in defaultValues)
-                    {
-                        if (isFirst)
-                        {
-                            isFirst = false;
-                        }
-                        else
-                        {
-                            Write(", ");
-                        }
-
-                        Write('"');
-                        Write(element.ToString(CultureInfo.InvariantCulture));
-                        Write('"');
-                    }
-
-                    Write('.');
-                }
+                Write(ConsoleColor.White, "Default: ");
+                isFirst = false;
             }
             else
             {
-                if (defaultValue.GetType().IsToStringOverriden())
-                {
-                    Write(ConsoleColor.White, "Default: ");
-
-                    Write('"');
-                    Write(defaultValue.ToString(CultureInfo.InvariantCulture));
-                    Write('"');
-                    Write('.');
-                }
+                Write(", ");
             }
+
+            Write('"');
+            Write(element.ToString(CultureInfo.InvariantCulture));
+            Write('"');
         }
+
+        if (!isFirst)
+            Write('.');
     }
 
     private void WriteCommandChildren()
