@@ -4,7 +4,7 @@ using CliFx.Parsing;
 
 namespace CliFx.Formatting;
 
-internal class ParseCommandLineConsoleFormatter(
+internal class ParsedCommandLineConsoleFormatter(
     ConsoleWriter consoleWriter,
     ParsedCommandLine commandLine
 ) : ConsoleFormatter(consoleWriter)
