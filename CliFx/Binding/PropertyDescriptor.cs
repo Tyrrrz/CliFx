@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using CliFx.Utils.Extensions;
 
 namespace CliFx.Binding;
 
@@ -35,30 +33,20 @@ public class PropertyDescriptor(
     /// </summary>
     public void SetValue(object instance, object? value) => setValue(instance, value);
 
-    [RequiresUnreferencedCode(
-        "Uses Type.GetInterfaces() which may not be available after trimming."
-    )]
-    private static Type GetEffectiveEnumType(Type type)
-    {
-        var enumerableUnderlyingType = type.TryGetEnumerableUnderlyingType();
-        if (enumerableUnderlyingType is not null)
-            return GetEffectiveEnumType(enumerableUnderlyingType);
-
-        var nullableUnderlyingType = type.TryGetNullableUnderlyingType();
-        if (nullableUnderlyingType is not null)
-            return GetEffectiveEnumType(nullableUnderlyingType);
-
-        return type;
-    }
-
-    [RequiresUnreferencedCode(
-        "Uses reflection to discover valid enum values. Not compatible with trimming."
-    )]
     internal IReadOnlyList<object?>? TryGetValidValues()
     {
-        var effectiveType = GetEffectiveEnumType(Type);
-        if (effectiveType.IsEnum)
-            return Enum.GetNames(effectiveType);
+        if (Type.IsEnum)
+        {
+            return Enum.GetNames(Type);
+        }
+
+        if (
+            Nullable.GetUnderlyingType(Type) is Type nullableUnderlyingType
+            && nullableUnderlyingType.IsEnum
+        )
+        {
+            return Enum.GetNames(nullableUnderlyingType);
+        }
 
         return null;
     }

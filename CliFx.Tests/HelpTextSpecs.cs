@@ -600,59 +600,6 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     }
 
     [Fact]
-    public async Task I_can_request_the_help_text_to_see_the_list_of_valid_values_for_all_parameters_and_options_bound_to_non_scalar_enum_properties()
-    {
-        // Arrange
-        var commandDescriptor = DynamicCommandBuilder.Compile(
-            // lang=csharp
-            """
-            public enum CustomEnum { One, Two, Three }
-
-            [Command]
-            public partial class Command : ICommand
-            {
-                [CommandParameter(0)]
-                public required IReadOnlyList<CustomEnum> Foo { get; set; }
-
-                [CommandOption("bar")]
-                public required IReadOnlyList<CustomEnum> Bar { get; set; }
-
-                public ValueTask ExecuteAsync(IConsole console) => default;
-            }
-            """
-        );
-
-        var application = new CliApplicationBuilder()
-            .AddCommand(commandDescriptor)
-            .UseConsole(FakeConsole)
-            .Build();
-
-        // Act
-        var exitCode = await application.RunAsync(["--help"], new Dictionary<string, string>());
-
-        // Assert
-        exitCode.Should().Be(0);
-
-        var stdOut = FakeConsole.ReadOutputString();
-        stdOut
-            .Should()
-            .ContainAllInOrder(
-                "PARAMETERS",
-                "foo",
-                "Choices:",
-                "One",
-                "Two",
-                "Three",
-                "OPTIONS",
-                "--bar",
-                "Choices:",
-                "One",
-                "Two",
-                "Three"
-            );
-    }
-
-    [Fact]
     public async Task I_can_request_the_help_text_to_see_the_list_of_valid_values_for_all_parameters_and_options_bound_to_nullable_enum_properties()
     {
         // Arrange
@@ -668,7 +615,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
                 public CustomEnum? Foo { get; set; }
 
                 [CommandOption("bar")]
-                public IReadOnlyList<CustomEnum?>? Bar { get; set; }
+                public CustomEnum? Bar { get; set; }
 
                 public ValueTask ExecuteAsync(IConsole console) => default;
             }

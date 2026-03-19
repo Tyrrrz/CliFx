@@ -143,7 +143,6 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
         WriteLine();
     }
 
-    [RequiresUnreferencedCode("Displays default values using runtime type reflection.")]
     private void WriteCommandParameters()
     {
         if (!context.CommandDescriptor.Parameters.Any())
@@ -216,7 +215,6 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
         }
     }
 
-    [RequiresUnreferencedCode("Displays default values using runtime type reflection.")]
     private void WriteCommandOptions()
     {
         if (!IsEmpty)
@@ -444,7 +442,6 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
         WriteLine();
     }
 
-    [RequiresUnreferencedCode("Displays default values using runtime type reflection.")]
     public void WriteHelpText()
     {
         WriteApplicationInfo();

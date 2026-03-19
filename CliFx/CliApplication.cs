@@ -48,11 +48,6 @@ public class CliApplication(
             await Task.Delay(100);
     }
 
-    // WriteHelpText uses TryGetValidValues() which relies on reflection for enum valid values display.
-    // This is suppressed here because the public RunAsync is the user-facing entry point and marking it
-    // with [RequiresUnreferencedCode] would be too disruptive. For full AOT compatibility, the source
-    // generator should emit valid enum values statically (see PropertyDescriptor.TryGetValidValues).
-#pragma warning disable IL2026
     private async ValueTask<int> RunAsync(
         ApplicationDescriptor applicationDescriptor,
         ParsedCommandLine commandLine,
@@ -167,7 +162,6 @@ public class CliApplication(
             return ex.ExitCode;
         }
     }
-#pragma warning restore IL2026
 
     /// <summary>
     /// Runs the application with the specified command-line arguments and environment variables.
