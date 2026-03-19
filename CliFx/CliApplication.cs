@@ -55,7 +55,8 @@ public class CliApplication(
 #pragma warning disable IL2026
     private async ValueTask<int> RunAsync(
         ApplicationDescriptor applicationDescriptor,
-        ParsedCommandLine commandLine
+        ParsedCommandLine commandLine,
+        IReadOnlyDictionary<string, string> environmentVariables
     )
     {
         console.ResetColor();
@@ -69,7 +70,7 @@ public class CliApplication(
         // Handle the preview directive
         if (Configuration.IsPreviewModeAllowed && commandLine.IsPreviewDirectiveSpecified)
         {
-            console.WriteCommandInput(commandLine);
+            console.WriteCommandLine(commandLine);
             return 0;
         }
 
@@ -108,7 +109,11 @@ public class CliApplication(
         );
 
         // Assemble the command activator
-        var commandActivator = new CommandActivator(commandDescriptor, commandInstance);
+        var commandActivator = new CommandActivator(
+            commandDescriptor,
+            commandInstance,
+            environmentVariables
+        );
 
         // Perform a limited command activation to check if the help or version options were specified by the user
         if (commandInstance is ICommandWithHelpOption or ICommandWithVersionOption)
@@ -183,11 +188,10 @@ public class CliApplication(
 
             var commandLine = ParsedCommandLine.Parse(
                 commandLineArguments,
-                environmentVariables,
                 applicationDescriptor.GetCommandNames()
             );
 
-            return await RunAsync(applicationDescriptor, commandLine);
+            return await RunAsync(applicationDescriptor, commandLine, environmentVariables);
         }
         // To prevent the app from showing the annoying troubleshooting dialog on Windows,
         // we handle all exceptions ourselves and print them to the console.

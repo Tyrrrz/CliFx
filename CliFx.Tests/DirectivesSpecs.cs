@@ -73,19 +73,6 @@ public class DirectivesSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
         var stdOut = FakeConsole.ReadOutputString();
         stdOut
             .Should()
-            .ContainAllInOrder(
-                "cmd",
-                "<param>",
-                "[-a]",
-                "[-b]",
-                "[-c]",
-                "[--option \"foo\"]",
-                "ENV_QOP",
-                "=",
-                "\"hello\"",
-                "ENV_KIL",
-                "=",
-                "\"world\""
-            );
+            .ContainAllInOrder("cmd", "<param>", "[-a]", "[-b]", "[-c]", "[--option \"foo\"]");
     }
 }

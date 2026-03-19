@@ -4,14 +4,13 @@ using CliFx.Parsing;
 
 namespace CliFx.Formatting;
 
-internal class CommandInputConsoleFormatter(ConsoleWriter consoleWriter)
-    : ConsoleFormatter(consoleWriter)
+internal class ParseCommandLineConsoleFormatter(
+    ConsoleWriter consoleWriter,
+    ParsedCommandLine commandLine
+) : ConsoleFormatter(consoleWriter)
 {
-    private void WriteCommandLineArguments(ParsedCommandLine commandLine)
+    public void Write()
     {
-        Write("Command-line:");
-        WriteLine();
-
         WriteHorizontalMargin();
 
         // Command name
@@ -50,31 +49,5 @@ internal class CommandInputConsoleFormatter(ConsoleWriter consoleWriter)
         }
 
         WriteLine();
-    }
-
-    private void WriteEnvironmentVariables(ParsedCommandLine commandLine)
-    {
-        Write("Environment:");
-        WriteLine();
-
-        foreach (var parsedEnvironmentVariable in commandLine.EnvironmentVariables)
-        {
-            WriteHorizontalMargin();
-
-            Write(ConsoleColor.White, parsedEnvironmentVariable.Name);
-            Write('=');
-            Write('"');
-            Write(parsedEnvironmentVariable.Value);
-            Write('"');
-
-            WriteLine();
-        }
-    }
-
-    public void WriteCommandInput(ParsedCommandLine commandLine)
-    {
-        WriteCommandLineArguments(commandLine);
-        WriteLine();
-        WriteEnvironmentVariables(commandLine);
     }
 }

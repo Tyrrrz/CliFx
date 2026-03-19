@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using CliFx.Binding;
 using CliFx.Parsing;
@@ -7,7 +8,11 @@ using CliFx.Utils.Extensions;
 
 namespace CliFx.Activation;
 
-internal class CommandActivator(CommandDescriptor command, ICommand instance)
+internal class CommandActivator(
+    CommandDescriptor command,
+    ICommand instance,
+    IReadOnlyDictionary<string, string> environmentVariables
+)
 {
     private static void ActivateInput(
         CommandInputDescriptor input,
@@ -132,10 +137,6 @@ internal class CommandActivator(CommandDescriptor command, ICommand instance)
                 .Options.Where(o => option.MatchesIdentifier(o.Identifier))
                 .ToArray();
 
-            var parsedEnvironmentVariable = commandLine.EnvironmentVariables.FirstOrDefault(e =>
-                option.MatchesEnvironmentVariable(e.Name)
-            );
-
             if (parsedOptions.Any())
             {
                 var rawValues = parsedOptions.SelectMany(o => o.Values).ToArray();
@@ -145,11 +146,17 @@ internal class CommandActivator(CommandDescriptor command, ICommand instance)
                 if (rawValues.Any())
                     remainingRequiredOptions.Remove(option);
             }
-            else if (parsedEnvironmentVariable is not null)
+            else if (
+                !string.IsNullOrWhiteSpace(option.EnvironmentVariable)
+                && environmentVariables.TryGetValue(
+                    option.EnvironmentVariable,
+                    out var environmentVariableValue
+                )
+            )
             {
                 var rawValues = !option.Converter.IsSequence
-                    ? [parsedEnvironmentVariable.Value]
-                    : parsedEnvironmentVariable.SplitValues();
+                    ? [environmentVariableValue]
+                    : environmentVariableValue.Split(Path.PathSeparator);
 
                 ActivateInput(option, instance, rawValues);
 

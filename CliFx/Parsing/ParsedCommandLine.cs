@@ -9,8 +9,7 @@ internal partial class ParsedCommandLine(
     string? commandName,
     IReadOnlyList<ParsedDirective> directives,
     IReadOnlyList<ParsedPositionalArgument> positionalArguments,
-    IReadOnlyList<ParsedOption> options,
-    IReadOnlyList<ParsedEnvironmentVariable> environmentVariables
+    IReadOnlyList<ParsedOption> options
 )
 {
     public string? CommandName { get; } = commandName;
@@ -21,9 +20,6 @@ internal partial class ParsedCommandLine(
         positionalArguments;
 
     public IReadOnlyList<ParsedOption> Options { get; } = options;
-
-    public IReadOnlyList<ParsedEnvironmentVariable> EnvironmentVariables { get; } =
-        environmentVariables;
 
     public bool HasArguments =>
         !string.IsNullOrWhiteSpace(CommandName)
@@ -188,7 +184,6 @@ internal partial class ParsedCommandLine
 
     public static ParsedCommandLine Parse(
         IReadOnlyList<string> commandLineArguments,
-        IReadOnlyDictionary<string, string> environmentVariables,
         IReadOnlyList<string> availableCommandNames
     )
     {
@@ -206,16 +201,11 @@ internal partial class ParsedCommandLine
 
         var parsedOptions = ParseOptions(commandLineArguments, ref index);
 
-        var parsedEnvironmentVariables = environmentVariables
-            .Select(kvp => new ParsedEnvironmentVariable(kvp.Key, kvp.Value))
-            .ToArray();
-
         return new ParsedCommandLine(
             parsedCommandName,
             parsedDirectives,
             parsedPositionalArguments,
-            parsedOptions,
-            parsedEnvironmentVariables
+            parsedOptions
         );
     }
 }
