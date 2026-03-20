@@ -8,8 +8,8 @@ namespace CliFx;
 /// </summary>
 public class ApplicationConfiguration(
     IReadOnlyList<CommandDescriptor> commandDescriptors,
-    bool isDebugModeAllowed,
-    bool isPreviewModeAllowed
+    string? debugModeEnvironmentVariable,
+    string? previewModeEnvironmentVariable
 )
 {
     /// <summary>
@@ -18,12 +18,12 @@ public class ApplicationConfiguration(
     public IReadOnlyList<CommandDescriptor> CommandDescriptors { get; } = commandDescriptors;
 
     /// <summary>
-    /// Whether debug mode is allowed in the application.
+    /// Environment variable name that enables the debug mode.
     /// </summary>
-    public bool IsDebugModeAllowed { get; } = isDebugModeAllowed;
+    public string? DebugModeEnvironmentVariable { get; } = debugModeEnvironmentVariable;
 
     /// <summary>
-    /// Whether preview mode is allowed in the application.
+    /// Environment variable name that enables the preview mode.
     /// </summary>
-    public bool IsPreviewModeAllowed { get; } = isPreviewModeAllowed;
+    public string? PreviewModeEnvironmentVariable { get; } = previewModeEnvironmentVariable;
 }

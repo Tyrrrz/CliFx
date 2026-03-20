@@ -14,7 +14,7 @@ namespace CliFx.Tests;
 public class DirectivesSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
 {
     [Fact(Timeout = 15000)]
-    public async Task I_can_use_the_debug_directive_to_make_the_application_wait_for_the_debugger_to_attach()
+    public async Task I_can_use_an_environment_variable_to_make_the_application_wait_for_the_debugger_to_attach()
     {
         // Arrange
         using var cts = new CancellationTokenSource();
@@ -27,7 +27,9 @@ public class DirectivesSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
                 cts.Cancel();
         }
 
-        var command = Cli.Wrap(Dummy.Program.FilePath).WithArguments("[debug]") | HandleStdOut;
+        var command =
+            Cli.Wrap(Dummy.Program.FilePath)
+                .WithEnvironmentVariables(e => e.Set("CLIFX_DEBUG", "1")) | HandleStdOut;
 
         // Act & assert
         try
@@ -41,7 +43,7 @@ public class DirectivesSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
     }
 
     [Fact]
-    public async Task I_can_use_the_preview_directive_to_make_the_application_print_the_parsed_command_input()
+    public async Task I_can_use_an_environment_variable_to_make_the_application_print_the_parsed_command_input()
     {
         // Arrange
         var commandDescriptor = DynamicCommandBuilder.Compile(
@@ -58,18 +60,18 @@ public class DirectivesSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
         var application = new CliApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
-            .AllowPreviewMode()
+            .AllowPreviewMode("CLIFX_PREVIEW")
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            ["[preview]", "cmd", "param", "-abc", "--option", "foo"],
-            new Dictionary<string, string> { ["ENV_QOP"] = "hello", ["ENV_KIL"] = "world" }
+        await application.RunAsync(
+            // Above command doesn't support these inputs, so the exit code
+            // will be non-zero, but it's not relevant for this test.
+            ["cmd", "param", "-abc", "--option", "foo"],
+            new Dictionary<string, string> { ["CLIFX_PREVIEW"] = "true" }
         );
 
         // Assert
-        exitCode.Should().Be(0);
-
         var stdOut = FakeConsole.ReadOutputString();
         stdOut
             .Should()

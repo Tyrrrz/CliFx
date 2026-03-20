@@ -56,17 +56,26 @@ public class CliApplication(
     {
         console.ResetColor();
 
-        // Handle the debug directive
-        if (Configuration.IsDebugModeAllowed && commandLine.IsDebugDirectiveSpecified)
+        // Handle debug mode
+        if (
+            !string.IsNullOrWhiteSpace(Configuration.DebugModeEnvironmentVariable)
+            && bool.ParseOrDefault(
+                environmentVariables.GetValueOrDefault(Configuration.DebugModeEnvironmentVariable)
+            )
+        )
         {
             await PromptDebuggerAsync();
         }
 
-        // Handle the preview directive
-        if (Configuration.IsPreviewModeAllowed && commandLine.IsPreviewDirectiveSpecified)
+        // Handle preview mode
+        if (
+            !string.IsNullOrWhiteSpace(Configuration.PreviewModeEnvironmentVariable)
+            && bool.ParseOrDefault(
+                environmentVariables.GetValueOrDefault(Configuration.PreviewModeEnvironmentVariable)
+            )
+        )
         {
             console.WriteCommandLine(commandLine);
-            return 0;
         }
 
         // Try to get the command schema that matches the input

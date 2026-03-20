@@ -15,8 +15,8 @@ public partial class CliApplicationBuilder
 {
     private readonly HashSet<CommandDescriptor> _commandDescriptors = [];
 
-    private bool _isDebugModeAllowed = true;
-    private bool _isPreviewModeAllowed = true;
+    private string? _debugModeEnvironmentVariable;
+    private string? _previewModeEnvironmentVariable;
     private string? _title;
     private string? _executableName;
     private string? _version;
@@ -45,20 +45,22 @@ public partial class CliApplicationBuilder
     }
 
     /// <summary>
-    /// Specifies whether debug mode (enabled with the [debug] directive) is allowed in the application.
+    /// Enables the debug mode, activated when the specified environment variable is set to <c>true</c>.
+    /// When active, the application waits for a debugger to attach before executing the command.
     /// </summary>
-    public CliApplicationBuilder AllowDebugMode(bool isAllowed = true)
+    public CliApplicationBuilder AllowDebugMode(string? environmentVariableName)
     {
-        _isDebugModeAllowed = isAllowed;
+        _debugModeEnvironmentVariable = environmentVariableName;
         return this;
     }
 
     /// <summary>
-    /// Specifies whether preview mode (enabled with the [preview] directive) is allowed in the application.
+    /// Enables the preview mode, activated when the specified environment variable is set to <c>true</c>.
+    /// When active, the application prints the parsed command line before executing the command.
     /// </summary>
-    public CliApplicationBuilder AllowPreviewMode(bool isAllowed = true)
+    public CliApplicationBuilder AllowPreviewMode(string? environmentVariableName)
     {
-        _isPreviewModeAllowed = isAllowed;
+        _previewModeEnvironmentVariable = environmentVariableName;
         return this;
     }
 
@@ -161,8 +163,8 @@ public partial class CliApplicationBuilder
 
         var configuration = new ApplicationConfiguration(
             [.. _commandDescriptors],
-            _isDebugModeAllowed,
-            _isPreviewModeAllowed
+            _debugModeEnvironmentVariable,
+            _previewModeEnvironmentVariable
         );
 
         return new CliApplication(

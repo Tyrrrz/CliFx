@@ -7,14 +7,11 @@ namespace CliFx.Parsing;
 
 internal partial class ParsedCommandLine(
     string? commandName,
-    IReadOnlyList<ParsedDirective> directives,
     IReadOnlyList<ParsedPositionalArgument> positionalArguments,
     IReadOnlyList<ParsedOption> options
 )
 {
     public string? CommandName { get; } = commandName;
-
-    public IReadOnlyList<ParsedDirective> Directives { get; } = directives;
 
     public IReadOnlyList<ParsedPositionalArgument> PositionalArguments { get; } =
         positionalArguments;
@@ -22,41 +19,11 @@ internal partial class ParsedCommandLine(
     public IReadOnlyList<ParsedOption> Options { get; } = options;
 
     public bool HasArguments =>
-        !string.IsNullOrWhiteSpace(CommandName)
-        || Directives.Any()
-        || PositionalArguments.Any()
-        || Options.Any();
-
-    public bool IsDebugDirectiveSpecified => Directives.Any(d => d.IsDebugDirective);
-
-    public bool IsPreviewDirectiveSpecified => Directives.Any(d => d.IsPreviewDirective);
+        !string.IsNullOrWhiteSpace(CommandName) || PositionalArguments.Any() || Options.Any();
 }
 
 internal partial class ParsedCommandLine
 {
-    private static IReadOnlyList<ParsedDirective> ParseDirectives(
-        IReadOnlyList<string> commandLineArguments,
-        ref int index
-    )
-    {
-        var result = new List<ParsedDirective>();
-
-        // Consume all consecutive directive arguments
-        for (; index < commandLineArguments.Count; index++)
-        {
-            var argument = commandLineArguments[index];
-
-            // Break on the first non-directive argument
-            if (!argument.StartsWith('[') || !argument.EndsWith(']'))
-                break;
-
-            var directiveName = argument.Substring(1, argument.Length - 2);
-            result.Add(new ParsedDirective(directiveName));
-        }
-
-        return result;
-    }
-
     private static string? ParseCommandName(
         IReadOnlyList<string> commandLineArguments,
         ISet<string> commandNames,
@@ -189,8 +156,6 @@ internal partial class ParsedCommandLine
     {
         var index = 0;
 
-        var parsedDirectives = ParseDirectives(commandLineArguments, ref index);
-
         var parsedCommandName = ParseCommandName(
             commandLineArguments,
             availableCommandNames.ToHashSet(StringComparer.OrdinalIgnoreCase),
@@ -201,11 +166,6 @@ internal partial class ParsedCommandLine
 
         var parsedOptions = ParseOptions(commandLineArguments, ref index);
 
-        return new ParsedCommandLine(
-            parsedCommandName,
-            parsedDirectives,
-            parsedPositionalArguments,
-            parsedOptions
-        );
+        return new ParsedCommandLine(parsedCommandName, parsedPositionalArguments, parsedOptions);
     }
 }
