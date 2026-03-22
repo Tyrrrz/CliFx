@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using CliFx.Generators.SemanticModel;
+using CliFx.Generators.Binding;
 using CliFx.Generators.Utils.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -12,16 +12,16 @@ namespace CliFx.Generators;
 /// Source generator that generates strongly-typed command schema registration code for CliFx commands.
 /// </summary>
 [Generator]
-public class CommandSchemaGenerator : IIncrementalGenerator
+public class CommandDescriptorGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        var cliFxRefs = context.CompilationProvider.Select(
-            static (compilation, _) => new CliFxReferences(compilation)
+        var knownSymbols = context.CompilationProvider.Select(
+            static (compilation, _) => new KnownSymbols(compilation)
         );
 
         var commandNodes = context.SyntaxProvider.ForAttributeWithMetadataName(
-            CliFxReferences.CommandAttributeMetadataName,
+            KnownSymbols.CommandAttributeMetadataName,
             static (node, _) => node is ClassDeclarationSyntax,
             static (ctx, _) =>
                 (
@@ -30,13 +30,13 @@ public class CommandSchemaGenerator : IIncrementalGenerator
                 )
         );
 
-        var commandNodesWithRefs = commandNodes.Combine(cliFxRefs);
+        var commandNodesWithKnownSymbols = commandNodes.Combine(knownSymbols);
 
         // Emit diagnostics for [Command] classes that are not partial or don't implement ICommand
-        var diagnostics = commandNodesWithRefs.SelectMany(
+        var diagnostics = commandNodesWithKnownSymbols.SelectMany(
             static (pair, _) =>
             {
-                var (item, refs) = pair;
+                var (item, knownSymbols) = pair;
 
                 // Abstract classes are intentionally skipped — no diagnostic needed
                 if (item.Symbol.IsAbstract)
@@ -54,7 +54,7 @@ public class CommandSchemaGenerator : IIncrementalGenerator
 
                 if (
                     !item.Symbol.AllInterfaces.Any(i =>
-                        SymbolEqualityComparer.Default.Equals(i, refs.ICommand.Symbol)
+                        SymbolEqualityComparer.Default.Equals(i, knownSymbols.ICommand.Symbol)
                     )
                 )
                     return
@@ -75,32 +75,35 @@ public class CommandSchemaGenerator : IIncrementalGenerator
         );
 
         // Only process classes that are partial, implement ICommand, and are not abstract
-        var commandDeclarations = commandNodesWithRefs
+        var commandSymbols = commandNodesWithKnownSymbols
             .Select(
                 static (pair, _) =>
                 {
-                    var (item, refs) = pair;
+                    var (item, knownSymbols) = pair;
                     if (
                         !item.ClassDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword)
                         || item.Symbol.IsAbstract
                         || !item.Symbol.AllInterfaces.Any(i =>
-                            SymbolEqualityComparer.Default.Equals(i, refs.ICommand.Symbol)
+                            SymbolEqualityComparer.Default.Equals(i, knownSymbols.ICommand.Symbol)
                         )
                     )
                         return null;
 
-                    return new CommandDescriptorBuilder(refs).TryBuild(item.Symbol);
+                    return new CommandSymbolBuilder(knownSymbols).TryBuild(item.Symbol);
                 }
             )
             .WhereNotNull();
 
-        // Build one CommandSchemaContext per command in the pipeline, then flush each
+        // Build one CommandDescriptorContext per command in the pipeline, then flush each
         // individually.  Using per-item RegisterSourceOutput (instead of .Collect()) means
         // Roslyn only regenerates the file for the command that actually changed.
-        var commandContexts = commandDeclarations
-            .Combine(cliFxRefs)
-            .Select(static (pair, _) => CommandSchemaContext.Create(pair.Left, pair.Right));
+        var descriptorContexts = commandSymbols
+            .Combine(knownSymbols)
+            .Select(static (pair, _) => CommandDescriptorContext.Create(pair.Left, pair.Right));
 
-        context.RegisterSourceOutput(commandContexts, static (ctx, genCtx) => genCtx.FlushTo(ctx));
+        context.RegisterSourceOutput(
+            descriptorContexts,
+            static (ctx, descriptorCtx) => descriptorCtx.FlushTo(ctx)
+        );
     }
 }

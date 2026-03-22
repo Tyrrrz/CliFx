@@ -1,17 +1,14 @@
 using CliFx.Generators.Utils.Extensions;
 using Microsoft.CodeAnalysis;
 
-namespace CliFx.Generators.SemanticModel;
+namespace CliFx.Generators.Binding;
 
-internal record TypeDescriptor(ITypeSymbol Symbol)
+internal record TypeSymbol(ITypeSymbol Symbol)
 {
-    public Accessibility ActualAccessibility => Symbol.GetActualAccessibility();
+    public Accessibility ActualAccessibility { get; } = Symbol.GetActualAccessibility();
 
     public string Name { get; } =
         Symbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
-
-    public string GlobalFullyQualifiedName { get; } =
-        Symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
 
     public string FullyQualifiedName { get; } =
         Symbol.ToDisplayString(
@@ -19,6 +16,9 @@ internal record TypeDescriptor(ITypeSymbol Symbol)
                 SymbolDisplayGlobalNamespaceStyle.OmittedAsContaining
             )
         );
+
+    public string GlobalFullyQualifiedName { get; } =
+        Symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
 
     // No generic parameters
     public string GlobalBaseFullyQualifiedName { get; } =

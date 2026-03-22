@@ -1,8 +1,9 @@
 using System.Text;
+using CliFx.Generators.Binding;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 
-namespace CliFx.Generators.SemanticModel;
+namespace CliFx.Generators;
 
 /// <summary>
 /// Carries all contextual data for a single command's descriptor generation pass:
@@ -12,18 +13,18 @@ namespace CliFx.Generators.SemanticModel;
 /// Roslyn incremental pipeline and flushed into a <see cref="SourceProductionContext"/>
 /// at the end of the pipeline.
 /// </summary>
-internal sealed class CommandSchemaContext(
-    CliFxReferences refs,
-    CommandDescriptor descriptor,
+internal sealed class CommandDescriptorContext(
+    KnownSymbols knownSymbols,
+    CommandSymbol command,
     string hintName,
     string source
 )
 {
     /// <summary>All well-known CliFx types resolved from the current compilation.</summary>
-    public CliFxReferences Refs { get; } = refs;
+    public KnownSymbols KnownSymbols { get; } = knownSymbols;
 
-    /// <summary>The semantic descriptor built from the <c>[Command]</c> class symbol.</summary>
-    public CommandDescriptor Descriptor { get; } = descriptor;
+    /// <summary>The command symbol built from the <c>[Command]</c> class symbol.</summary>
+    public CommandSymbol Command { get; } = command;
 
     /// <summary>The hint name under which the generated source will be registered.</summary>
     public string HintName { get; } = hintName;
@@ -33,14 +34,14 @@ internal sealed class CommandSchemaContext(
 
     /// <summary>
     /// Generates the source text for <paramref name="descriptor"/> via
-    /// <see cref="CommandSchemaEmitter"/> and returns a fully populated context
+    /// <see cref="CommandDescriptorEmitter"/> and returns a fully populated context
     /// ready to be flushed into a <see cref="SourceProductionContext"/>.
     /// </summary>
-    public static CommandSchemaContext Create(CommandDescriptor descriptor, CliFxReferences refs)
+    public static CommandDescriptorContext Create(CommandSymbol command, KnownSymbols knownSymbols)
     {
-        var source = new CommandSchemaEmitter(refs).GenerateSource(descriptor);
-        var hintName = $"{descriptor.Type.FullyQualifiedName.Replace('.', '_')}_Descriptor.g.cs";
-        return new CommandSchemaContext(refs, descriptor, hintName, source);
+        var source = new CommandDescriptorEmitter(knownSymbols).GenerateSource(command);
+        var hintName = $"{command.Type.FullyQualifiedName.Replace('.', '_')}_Descriptor.g.cs";
+        return new CommandDescriptorContext(knownSymbols, command, hintName, source);
     }
 
     /// <summary>
@@ -49,7 +50,7 @@ internal sealed class CommandSchemaContext(
     /// </summary>
     public void FlushTo(SourceProductionContext ctx)
     {
-        foreach (var diagnostic in Descriptor.Diagnostics)
+        foreach (var diagnostic in Command.Diagnostics)
             ctx.ReportDiagnostic(diagnostic);
 
         ctx.AddSource(HintName, SourceText.From(Source, Encoding.UTF8));

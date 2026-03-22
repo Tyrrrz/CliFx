@@ -4,24 +4,24 @@ using System.Linq;
 using CliFx.Generators.Utils.Extensions;
 using Microsoft.CodeAnalysis;
 
-namespace CliFx.Generators.SemanticModel;
+namespace CliFx.Generators.Binding;
 
-internal sealed class CommandDescriptorBuilder(CliFxReferences refs)
+internal sealed class CommandSymbolBuilder(KnownSymbols knownSymbols)
 {
     // Used to check converter inferrability during descriptor building.
-    private readonly CommandSchemaEmitter _emitter = new(refs);
+    private readonly CommandDescriptorEmitter _emitter = new(knownSymbols);
 
     /// <summary>
-    /// Attempts to build a <see cref="CommandDescriptor"/> from <paramref name="type"/>.
+    /// Attempts to build a <see cref="CommandSymbol"/> from <paramref name="type"/>.
     /// Returns <see langword="null"/> if the type does not satisfy the requirements for
     /// schema generation (not annotated with <c>[Command]</c>, abstract, etc.).
     /// </summary>
-    internal CommandDescriptor? TryBuild(INamedTypeSymbol type)
+    internal CommandSymbol? TryBuild(INamedTypeSymbol type)
     {
         // Must implement ICommand
         if (
             !type.AllInterfaces.Any(i =>
-                SymbolEqualityComparer.Default.Equals(i, refs.ICommand.Symbol)
+                SymbolEqualityComparer.Default.Equals(i, knownSymbols.ICommand.Symbol)
             )
         )
             return null;
@@ -31,7 +31,7 @@ internal sealed class CommandDescriptorBuilder(CliFxReferences refs)
             .FirstOrDefault(a =>
                 SymbolEqualityComparer.Default.Equals(
                     a.AttributeClass,
-                    refs.CommandAttribute.Symbol
+                    knownSymbols.CommandAttribute.Symbol
                 )
             );
 
@@ -54,14 +54,14 @@ internal sealed class CommandDescriptorBuilder(CliFxReferences refs)
             commandAttribute.NamedArguments.FirstOrDefault(a => a.Key == "Description").Value.Value
             as string;
 
-        var parameterDescriptors = new List<CommandParameterDescriptor>();
-        var optionDescriptors = new List<CommandOptionDescriptor>();
+        var parameterDescriptors = new List<CommandParameterSymbol>();
+        var optionDescriptors = new List<CommandOptionSymbol>();
         var diagnostics = new List<Diagnostic>();
 
         foreach (
             var property in type.GetProperties()
                 .Where(p => !p.IsStatic)
-                .Select(p => new PropertyDescriptor(p))
+                .Select(p => new PropertySymbol(p))
         )
         {
             var parameterAttribute = property
@@ -69,7 +69,7 @@ internal sealed class CommandDescriptorBuilder(CliFxReferences refs)
                 .FirstOrDefault(a =>
                     SymbolEqualityComparer.Default.Equals(
                         a.AttributeClass,
-                        refs.CommandParameterAttribute.Symbol
+                        knownSymbols.CommandParameterAttribute.Symbol
                     )
                 );
 
@@ -86,7 +86,7 @@ internal sealed class CommandDescriptorBuilder(CliFxReferences refs)
                 .FirstOrDefault(a =>
                     SymbolEqualityComparer.Default.Equals(
                         a.AttributeClass,
-                        refs.CommandOptionAttribute.Symbol
+                        knownSymbols.CommandOptionAttribute.Symbol
                     )
                 );
 
@@ -189,18 +189,17 @@ internal sealed class CommandDescriptorBuilder(CliFxReferences refs)
             }
         }
 
-        return new CommandDescriptor(
-            new TypeDescriptor(type),
+        return new CommandSymbol(
+            new TypeSymbol(type),
             commandName,
             commandDescription,
-            parameterDescriptors,
-            optionDescriptors,
+            [.. parameterDescriptors, .. optionDescriptors],
             diagnostics
         );
     }
 
-    private CommandParameterDescriptor? BuildParameter(
-        PropertyDescriptor property,
+    private CommandParameterSymbol? BuildParameter(
+        PropertySymbol property,
         AttributeData attribute,
         List<Diagnostic> diagnostics
     )
@@ -230,7 +229,7 @@ internal sealed class CommandDescriptorBuilder(CliFxReferences refs)
             as ITypeSymbol
         )
             is { } converterSym
-            ? new TypeDescriptor(converterSym)
+            ? new TypeSymbol(converterSym)
             : null;
 
         // Emit an error and drop the property if no converter can be inferred.
@@ -247,10 +246,11 @@ internal sealed class CommandDescriptorBuilder(CliFxReferences refs)
             return null;
         }
 
-        return new CommandParameterDescriptor(
+        return new CommandParameterSymbol(
             property,
             order,
             name,
+            property.IsRequired,
             attribute.NamedArguments.FirstOrDefault(a => a.Key == "Description").Value.Value
                 as string,
             converterType,
@@ -260,13 +260,13 @@ internal sealed class CommandDescriptorBuilder(CliFxReferences refs)
                 .Select(v => v.Value as ITypeSymbol)
                 .WhereNotNull()
                 .ToArray()
-                .Select(s => new TypeDescriptor(s))
+                .Select(s => new TypeSymbol(s))
                 .ToArray()
         );
     }
 
-    private CommandOptionDescriptor? BuildOption(
-        PropertyDescriptor property,
+    private CommandOptionSymbol? BuildOption(
+        PropertySymbol property,
         AttributeData attribute,
         List<Diagnostic> diagnostics
     )
@@ -322,7 +322,7 @@ internal sealed class CommandDescriptorBuilder(CliFxReferences refs)
             as ITypeSymbol
         )
             is { } converterSym
-            ? new TypeDescriptor(converterSym)
+            ? new TypeSymbol(converterSym)
             : null;
 
         // Emit an error and drop the property if no converter can be inferred.
@@ -339,12 +339,13 @@ internal sealed class CommandDescriptorBuilder(CliFxReferences refs)
             return null;
         }
 
-        return new CommandOptionDescriptor(
+        return new CommandOptionSymbol(
             property,
             name,
             shortName,
             attribute.NamedArguments.FirstOrDefault(a => a.Key == "EnvironmentVariable").Value.Value
                 as string,
+            property.IsRequired,
             attribute.NamedArguments.FirstOrDefault(a => a.Key == "Description").Value.Value
                 as string,
             converterType,
@@ -353,7 +354,7 @@ internal sealed class CommandDescriptorBuilder(CliFxReferences refs)
                 .SelectMany(a => a.Value.Values)
                 .Select(v => v.Value)
                 .OfType<ITypeSymbol>()
-                .Select(s => new TypeDescriptor(s))
+                .Select(s => new TypeSymbol(s))
                 .ToArray()
         );
     }
