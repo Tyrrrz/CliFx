@@ -95,18 +95,16 @@ public class AddCommandsFromThisAssemblyGenerator : IIncrementalGenerator
                 static (pair, _) =>
                 {
                     var (item, knownSymbols) = pair;
-                    if (
-                        !item.ClassDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword)
-                        || item.Symbol.IsAbstract
-                        || !item.Symbol.AllInterfaces.Any(i =>
-                            SymbolEqualityComparer.Default.Equals(i, knownSymbols.ICommand.Symbol)
-                        )
-                    )
+                    if (!item.ClassDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword))
                     {
                         return null;
                     }
 
-                    return new CommandSymbolBuilder(knownSymbols).TryBuild(item.Symbol);
+                    return CommandSymbol.TryResolve(
+                        item.Symbol,
+                        knownSymbols,
+                        out var commandDiagnostics
+                    );
                 }
             )
             .WhereNotNull();

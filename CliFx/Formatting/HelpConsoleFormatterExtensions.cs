@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using CliFx.Infrastructure;
 
 namespace CliFx.Formatting;

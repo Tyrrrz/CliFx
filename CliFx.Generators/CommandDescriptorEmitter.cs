@@ -7,9 +7,9 @@ using Microsoft.CodeAnalysis;
 
 namespace CliFx.Generators;
 
-internal sealed class CommandDescriptorEmitter(KnownSymbols knownSymbols)
+internal class CommandDescriptorEmitter(KnownSymbols knownSymbols)
 {
-    internal string GenerateSource(CommandSymbol command)
+    internal string GenerateSource(CommandSymbol command, out IReadOnlyList<Diagnostic> diagnostics)
     {
         var namespaceName =
             command.Type.Symbol.ContainingNamespace is not null
@@ -92,7 +92,24 @@ internal sealed class CommandDescriptorEmitter(KnownSymbols knownSymbols)
             """
         );
 
+        var diagnosticsList = new List<Diagnostic>();
+
         foreach (var param in command.Parameters.OrderBy(p => p.Order))
+        {
+            var converterExpr = TryBuildConverterExpr(param.ConverterType, param.Property.Symbol);
+            if (converterExpr is null)
+            {
+                diagnosticsList.Add(
+                    Diagnostic.Create(
+                        DiagnosticDescriptors.ConverterNotInferrable,
+                        param.Property.Symbol.Locations.FirstOrDefault() ?? Location.None,
+                        param.Property.Name,
+                        param.Property.Type.FullyQualifiedName
+                    )
+                );
+                continue;
+            }
+
             sb.Append(
                 // lang=csharp
                 $$"""
@@ -105,10 +122,7 @@ internal sealed class CommandDescriptorEmitter(KnownSymbols knownSymbols)
                                 {{EncodeString(param.Name)}},
                                 {{(param.IsRequired ? "true" : "false")}},
                                 {{EncodeString(param.Description)}},
-                                {{TryBuildConverterExpr(
-                    param.ConverterType,
-                    param.Property.Symbol
-                )}},
+                                {{converterExpr}},
                                 {{BuildValidatorsExpr(
                     param.ValidatorTypes,
                     param.Property.Type.FullyQualifiedName
@@ -116,8 +130,24 @@ internal sealed class CommandDescriptorEmitter(KnownSymbols knownSymbols)
 
                 """
             );
+        }
 
         foreach (var option in command.Options)
+        {
+            var converterExpr = TryBuildConverterExpr(option.ConverterType, option.Property.Symbol);
+            if (converterExpr is null)
+            {
+                diagnosticsList.Add(
+                    Diagnostic.Create(
+                        DiagnosticDescriptors.ConverterNotInferrable,
+                        option.Property.Symbol.Locations.FirstOrDefault() ?? Location.None,
+                        option.Property.Name,
+                        option.Property.Type.FullyQualifiedName
+                    )
+                );
+                continue;
+            }
+
             sb.Append(
                 // lang=csharp
                 $$"""
@@ -131,10 +161,7 @@ internal sealed class CommandDescriptorEmitter(KnownSymbols knownSymbols)
                                 {{EncodeString(option.EnvironmentVariable)}},
                                 {{(option.IsRequired ? "true" : "false")}},
                                 {{EncodeString(option.Description)}},
-                                {{TryBuildConverterExpr(
-                    option.ConverterType,
-                    option.Property.Symbol
-                )}},
+                                {{converterExpr}},
                                 {{BuildValidatorsExpr(
                     option.ValidatorTypes,
                     option.Property.Type.FullyQualifiedName
@@ -142,6 +169,7 @@ internal sealed class CommandDescriptorEmitter(KnownSymbols knownSymbols)
 
                 """
             );
+        }
 
         sb.Append(
             // lang=csharp
@@ -195,6 +223,7 @@ internal sealed class CommandDescriptorEmitter(KnownSymbols knownSymbols)
             sb.AppendLine("}");
         }
 
+        diagnostics = diagnosticsList;
         return sb.ToString();
     }
 
@@ -202,8 +231,6 @@ internal sealed class CommandDescriptorEmitter(KnownSymbols knownSymbols)
     // Converter expression builder
     // -------------------------------------------------------------------------
 
-    // Internal so CommandSymbolBuilder can use it as a null-check to detect
-    // properties whose type has no inferrable converter before committing to the descriptor.
     // Returns null if no converter can be inferred (caller must report a diagnostic and skip emission).
     internal string? TryBuildConverterExpr(TypeSymbol? userConverterType, IPropertySymbol property)
     {

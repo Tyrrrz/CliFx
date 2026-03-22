@@ -18,7 +18,7 @@ internal static class DiagnosticDescriptors
         new(
             $"{nameof(CliFx)}_{nameof(OptionNameInvalid)}",
             "Command option name is invalid",
-            "Option name '{0}' on property '{1}' is invalid. Option names must be at least 2 characters long, must not start with a dash, and must not contain whitespace.",
+            "Option name '{0}' on property '{1}' is invalid. Option names must be at least 2 characters long, must start with a letter, and must not contain whitespace.",
             "CliFx",
             DiagnosticSeverity.Warning,
             true
