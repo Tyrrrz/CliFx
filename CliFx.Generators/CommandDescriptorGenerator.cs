@@ -32,17 +32,18 @@ public class CommandDescriptorGenerator : IIncrementalGenerator
 
         var commandNodesWithKnownSymbols = commandNodes.Combine(knownSymbols);
 
-        // Emit diagnostics for [Command] classes that are not partial or don't implement ICommand
+        // Collect and report diagnostics
         var diagnostics = commandNodesWithKnownSymbols.SelectMany(
             static (pair, _) =>
             {
                 var (item, knownSymbols) = pair;
 
-                // Abstract classes are intentionally skipped — no diagnostic needed
                 if (item.Symbol.IsAbstract)
                     return [];
 
+                // Must be partial to allow source generation to add members
                 if (!item.ClassDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword))
+                {
                     return
                     [
                         Diagnostic.Create(
@@ -51,12 +52,15 @@ public class CommandDescriptorGenerator : IIncrementalGenerator
                             item.Symbol.Name
                         ),
                     ];
+                }
 
+                // Must implement ICommand
                 if (
                     !item.Symbol.AllInterfaces.Any(i =>
                         SymbolEqualityComparer.Default.Equals(i, knownSymbols.ICommand.Symbol)
                     )
                 )
+                {
                     return
                     [
                         Diagnostic.Create(
@@ -65,10 +69,12 @@ public class CommandDescriptorGenerator : IIncrementalGenerator
                             item.Symbol.Name
                         ),
                     ];
+                }
 
                 return Array.Empty<Diagnostic>();
             }
         );
+
         context.RegisterSourceOutput(
             diagnostics,
             static (ctx, diagnostic) => ctx.ReportDiagnostic(diagnostic)

@@ -10,10 +10,8 @@ internal partial class KnownSymbols(Compilation compilation)
         Resolve(compilation, "CliFx.CliApplicationBuilder");
 
     public TypeSymbol ICommand { get; } = Resolve(compilation, "CliFx.ICommand");
-
     public TypeSymbol ICommandWithHelpOption { get; } =
         Resolve(compilation, "CliFx.ICommandWithHelpOption");
-
     public TypeSymbol ICommandWithVersionOption { get; } =
         Resolve(compilation, "CliFx.ICommandWithVersionOption");
 
