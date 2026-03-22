@@ -65,10 +65,10 @@ internal partial class KnownSymbols(Compilation compilation)
         Resolve(compilation, "CliFx.Activation.ConvertibleScalarInputConverter`1");
     public TypeSymbol DelegateScalarInputConverter { get; } =
         Resolve(compilation, "CliFx.Activation.DelegateScalarInputConverter`1");
+    public TypeSymbol DelegateSequenceInputConverter { get; } =
+        Resolve(compilation, "CliFx.Activation.DelegateSequenceInputConverter`1");
     public TypeSymbol ArraySequenceInputConverter { get; } =
         Resolve(compilation, "CliFx.Activation.ArraySequenceInputConverter`1");
-    public TypeSymbol ArrayInitializableSequenceInputConverter { get; } =
-        Resolve(compilation, "CliFx.Activation.ArrayInitializableSequenceInputConverter`2");
 }
 
 internal partial class KnownSymbols

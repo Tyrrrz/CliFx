@@ -371,7 +371,7 @@ internal sealed class CommandDescriptorEmitter(KnownSymbols knownSymbols)
             )
         )
         {
-            return $"new {knownSymbols.ArrayInitializableSequenceInputConverter.GlobalBaseFullyQualifiedName}<{elementTypeFqn}, {collectionTypeFqn}>({elementConverterArg}, arr => new {collectionTypeFqn}(arr))";
+            return $"new {knownSymbols.DelegateSequenceInputConverter.GlobalBaseFullyQualifiedName}<{collectionTypeFqn}>(rawValues => new {collectionTypeFqn}(new {knownSymbols.ArraySequenceInputConverter.GlobalBaseFullyQualifiedName}<{elementTypeFqn}>({elementConverterArg}).Convert(rawValues)))";
         }
 
         return null;
