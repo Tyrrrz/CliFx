@@ -19,7 +19,7 @@ public interface IInputConverter
     /// If this property is <c>false</c>, then <see cref="Convert" /> must throw when provided
     /// with more than one value.
     /// </remarks>
-    bool SupportsSequence { get; }
+    bool CanConvertSequence { get; }
 
     /// <summary>
     /// Converts the input value from the provided raw command-line arguments.

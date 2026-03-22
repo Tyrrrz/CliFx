@@ -6,5 +6,5 @@ namespace CliFx.Activation;
 public abstract class SequenceInputConverter<T> : InputConverter<T>
 {
     /// <inheritdoc />
-    public override bool SupportsSequence => true;
+    public override bool CanConvertSequence => true;
 }

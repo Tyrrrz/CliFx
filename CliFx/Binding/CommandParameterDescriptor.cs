@@ -31,7 +31,7 @@ public class CommandParameterDescriptor(
         if (includeKind)
             buffer.Append("Parameter ");
 
-        if (!Converter.SupportsSequence)
+        if (!Converter.CanConvertSequence)
             buffer.Append('<').Append(Name).Append('>');
         else
             buffer.Append('<').Append(Name).Append("...>");

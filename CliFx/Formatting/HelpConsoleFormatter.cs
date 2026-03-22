@@ -70,7 +70,7 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
             {
                 Write(
                     ConsoleColor.DarkCyan,
-                    !parameter.Converter.SupportsSequence
+                    !parameter.Converter.CanConvertSequence
                         ? $"<{parameter.Name}>"
                         : $"<{parameter.Name}...>"
                 );
@@ -90,7 +90,7 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
 
                 Write(
                     ConsoleColor.White,
-                    !option.Converter.SupportsSequence ? "<value>" : "<values...>"
+                    !option.Converter.CanConvertSequence ? "<value>" : "<values...>"
                 );
                 Write(' ');
             }
