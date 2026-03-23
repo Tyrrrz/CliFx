@@ -57,42 +57,34 @@ internal static class RoslynExtensions
             }
         }
 
-        public IEnumerable<ITypeSymbol> GetSelfAndContainingTypes() =>
-            type.GetContainingTypes().Prepend(type);
-
         public IEnumerable<ITypeSymbol> GetBaseTypes()
         {
             var baseType = type.BaseType;
             while (baseType is not null)
             {
                 yield return baseType;
-                baseType = baseType.ContainingType;
+                baseType = baseType.BaseType;
             }
         }
 
-        public IEnumerable<IPropertySymbol> GetProperties(bool includeInherited = true)
+        public IEnumerable<ISymbol> GetMembers(bool includeInherited = true)
         {
-            var propertyNames = new HashSet<string>();
+            var memberNames = new HashSet<string>(StringComparer.Ordinal);
 
             foreach (
                 var currentType in includeInherited ? type.GetBaseTypes().Prepend(type) : [type]
             )
             {
-                foreach (var property in currentType.GetMembers().OfType<IPropertySymbol>())
+                foreach (var member in currentType.GetMembers())
                 {
-                    if (propertyNames.Add(property.Name))
-                        yield return property;
+                    if (memberNames.Add(member.Name))
+                        yield return member;
                 }
             }
         }
 
-        public ITypeSymbol? TryGetEnumerableUnderlyingType() =>
-            type
-                .AllInterfaces.FirstOrDefault(i =>
-                    i.ConstructedFrom.SpecialType
-                    == SpecialType.System_Collections_Generic_IEnumerable_T
-                )
-                ?.TypeArguments[0];
+        public IEnumerable<IPropertySymbol> GetProperties(bool includeInherited = true) =>
+            type.GetMembers(includeInherited).OfType<IPropertySymbol>();
 
         public Accessibility GetActualAccessibility()
         {
@@ -106,14 +98,26 @@ internal static class RoslynExtensions
 
             return accessibility;
         }
+
+        public ITypeSymbol? TryGetEnumerableUnderlyingType() =>
+            type
+                .AllInterfaces.FirstOrDefault(i =>
+                    i.ConstructedFrom.SpecialType
+                    == SpecialType.System_Collections_Generic_IEnumerable_T
+                )
+                ?.TypeArguments[0];
     }
 
     extension(IPropertySymbol property)
     {
-        public bool IsRequired() =>
+        public IEnumerable<PropertyDeclarationSyntax> GetDeclarations() =>
             property
                 .DeclaringSyntaxReferences.Select(r => r.GetSyntax())
-                .OfType<PropertyDeclarationSyntax>()
+                .OfType<PropertyDeclarationSyntax>();
+
+        public bool IsRequired() =>
+            property
+                .GetDeclarations()
                 .SelectMany(p => p.Modifiers)
                 .Any(m => m.IsKind(SyntaxKind.RequiredKeyword));
     }
