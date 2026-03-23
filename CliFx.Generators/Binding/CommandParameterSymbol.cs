@@ -31,8 +31,8 @@ internal record CommandParameterSymbol(
         {
             diagnosticsList.Add(
                 Diagnostic.Create(
-                    DiagnosticDescriptors.ParameterMustHaveName,
-                    property.Locations.FirstOrDefault() ?? Location.None,
+                    DiagnosticDescriptors.CommandParameterMustHaveName,
+                    property.Locations.FirstOrDefault(),
                     property.Name
                 )
             );

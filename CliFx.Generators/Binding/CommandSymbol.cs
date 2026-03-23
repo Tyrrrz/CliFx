@@ -115,49 +115,6 @@ internal record CommandSymbol(
             }
         }
 
-        // Options must have unique names and short names
-        for (var i = 0; i < options.Count; i++)
-        {
-            for (var j = i + 1; j < options.Count; j++)
-            {
-                var first = options[i];
-                var second = options[j];
-
-                if (
-                    !string.IsNullOrWhiteSpace(first.Name)
-                    && string.Equals(first.Name, second.Name, StringComparison.OrdinalIgnoreCase)
-                )
-                {
-                    diagnosticsList.Add(
-                        Diagnostic.Create(
-                            DiagnosticDescriptors.OptionsMustHaveUniqueNames,
-                            second.Property.Locations.FirstOrDefault() ?? Location.None,
-                            second.Property.Name,
-                            type.Name,
-                            "name",
-                            second.Name,
-                            first.Property.Name
-                        )
-                    );
-                }
-
-                if (first.ShortName is not null && first.ShortName == second.ShortName)
-                {
-                    diagnosticsList.Add(
-                        Diagnostic.Create(
-                            DiagnosticDescriptors.OptionsMustHaveUniqueNames,
-                            second.Property.Locations.FirstOrDefault() ?? Location.None,
-                            second.Property.Name,
-                            type.Name,
-                            "short name",
-                            second.ShortName.ToString(),
-                            first.Property.Name
-                        )
-                    );
-                }
-            }
-        }
-
         // Parameters must have unique order values
         for (var i = 0; i < parameters.Count; i++)
         {
@@ -170,12 +127,11 @@ internal record CommandSymbol(
                 {
                     diagnosticsList.Add(
                         Diagnostic.Create(
-                            DiagnosticDescriptors.ParametersMustHaveUniqueOrder,
-                            second.Property.Locations.FirstOrDefault() ?? Location.None,
+                            DiagnosticDescriptors.CommandParametersMustHaveUniqueOrder,
+                            first.Property.Locations.FirstOrDefault(),
+                            first.Property.Name,
                             second.Property.Name,
-                            type.Name,
-                            second.Order,
-                            first.Property.Name
+                            first.Order
                         )
                     );
                 }
@@ -194,12 +150,50 @@ internal record CommandSymbol(
                 {
                     diagnosticsList.Add(
                         Diagnostic.Create(
-                            DiagnosticDescriptors.ParametersMustHaveUniqueNames,
-                            second.Property.Locations.FirstOrDefault() ?? Location.None,
+                            DiagnosticDescriptors.CommandParametersMustHaveUniqueNames,
+                            first.Property.Locations.FirstOrDefault(),
+                            first.Property.Name,
                             second.Property.Name,
-                            type.Name,
-                            second.Name,
-                            first.Property.Name
+                            first.Name
+                        )
+                    );
+                }
+            }
+        }
+
+        // Options must have unique names and short names
+        for (var i = 0; i < options.Count; i++)
+        {
+            for (var j = i + 1; j < options.Count; j++)
+            {
+                var first = options[i];
+                var second = options[j];
+
+                if (
+                    !string.IsNullOrWhiteSpace(first.Name)
+                    && string.Equals(first.Name, second.Name, StringComparison.OrdinalIgnoreCase)
+                )
+                {
+                    diagnosticsList.Add(
+                        Diagnostic.Create(
+                            DiagnosticDescriptors.CommandOptionsMustHaveUniqueNames,
+                            first.Property.Locations.FirstOrDefault(),
+                            first.Property.Name,
+                            second.Property.Name,
+                            first.Name
+                        )
+                    );
+                }
+
+                if (first.ShortName is not null && first.ShortName == second.ShortName)
+                {
+                    diagnosticsList.Add(
+                        Diagnostic.Create(
+                            DiagnosticDescriptors.CommandOptionsMustHaveUniqueShortNames,
+                            first.Property.Locations.FirstOrDefault(),
+                            first.Property.Name,
+                            second.Property.Name,
+                            first.ShortName
                         )
                     );
                 }

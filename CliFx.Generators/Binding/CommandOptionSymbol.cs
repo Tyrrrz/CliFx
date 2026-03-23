@@ -43,8 +43,8 @@ internal record CommandOptionSymbol(
         {
             diagnosticsList.Add(
                 Diagnostic.Create(
-                    DiagnosticDescriptors.OptionMustHaveNameOrShortName,
-                    property.Locations.FirstOrDefault() ?? Location.None,
+                    DiagnosticDescriptors.CommandOptionMustHaveNameOrShortName,
+                    property.Locations.FirstOrDefault(),
                     property.Name
                 )
             );
@@ -58,10 +58,10 @@ internal record CommandOptionSymbol(
         {
             diagnosticsList.Add(
                 Diagnostic.Create(
-                    DiagnosticDescriptors.OptionNameInvalid,
-                    property.Locations.FirstOrDefault() ?? Location.None,
-                    name,
-                    property.Name
+                    DiagnosticDescriptors.CommandOptionNameInvalid,
+                    property.Locations.FirstOrDefault(),
+                    property.Name,
+                    name
                 )
             );
         }

@@ -100,8 +100,8 @@ public partial class Generator
             {
                 diagnosticsList.Add(
                     Diagnostic.Create(
-                        DiagnosticDescriptors.ConverterNotInferrable,
-                        param.Property.Locations.FirstOrDefault() ?? Location.None,
+                        DiagnosticDescriptors.CommandInputConverterNotInferrable,
+                        param.Property.Locations.FirstOrDefault(),
                         param.Property.Name,
                         TypeIdentifier.From(param.Property.Type).FullyQualifiedName
                     )
@@ -136,8 +136,8 @@ public partial class Generator
             {
                 diagnosticsList.Add(
                     Diagnostic.Create(
-                        DiagnosticDescriptors.ConverterNotInferrable,
-                        option.Property.Locations.FirstOrDefault() ?? Location.None,
+                        DiagnosticDescriptors.CommandInputConverterNotInferrable,
+                        option.Property.Locations.FirstOrDefault(),
                         option.Property.Name,
                         TypeIdentifier.From(option.Property.Type).FullyQualifiedName
                     )
