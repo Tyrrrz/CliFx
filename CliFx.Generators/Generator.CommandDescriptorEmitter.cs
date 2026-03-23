@@ -60,7 +60,7 @@ public partial class Generator
         sb.Append(
             """
 
-                /// <summary>Whether the user requested help (via the -h|--help option).</summary>
+                /// <inheritdoc />
                 public bool IsHelpRequested { get; set; }
 
             """
@@ -71,7 +71,7 @@ public partial class Generator
             sb.Append(
                 """
 
-                    /// <summary>Whether the user requested version information (via the --version option).</summary>
+                    /// <inheritdoc />
                     public bool IsVersionRequested { get; set; }
 
                 """
