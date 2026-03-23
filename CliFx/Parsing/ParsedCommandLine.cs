@@ -43,7 +43,7 @@ internal partial class ParsedCommandLine
 
             potentialCommandNameComponents.Add(argument);
 
-            var potentialCommandName = string.Join(" ", potentialCommandNameComponents);
+            var potentialCommandName = string.Join(' ', potentialCommandNameComponents);
             if (commandNames.Contains(potentialCommandName))
             {
                 // Record the position but continue the loop in case we find

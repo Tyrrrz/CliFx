@@ -23,7 +23,7 @@ public abstract class ScalarInputConverter<T> : InputConverter<T>
             : throw CliFxException.UserError(
                 $"""
                 Expected a single argument, but provided with multiple:
-                {string.Join(" ", rawValues.Select(v => '<' + v + '>'))}
+                {string.Join(' ', rawValues.Select(v => '<' + v + '>'))}
                 """
             );
 }

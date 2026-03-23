@@ -47,7 +47,7 @@ internal class CommandActivator(
             throw CliFxException.UserError(
                 $"""
                 {input} cannot be set from the provided argument(s):
-                {string.Join(" ", rawValues.Select(v => '<' + v + '>'))}
+                {string.Join(' ', rawValues.Select(v => '<' + v + '>'))}
                 Error: {ex.Message}
                 """,
                 ex
@@ -102,7 +102,7 @@ internal class CommandActivator(
                 throw CliFxException.UserError(
                     $"""
                     Unrecognized parameter(s):
-                    {string.Join(" ", remainingPositionalArguments)}
+                    {string.Join(' ', remainingPositionalArguments)}
                     """
                 );
             }
