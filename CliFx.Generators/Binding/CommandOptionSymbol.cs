@@ -5,18 +5,18 @@ using Microsoft.CodeAnalysis;
 namespace CliFx.Generators.Binding;
 
 internal record CommandOptionSymbol(
-    PropertySymbol Property,
+    IPropertySymbol Property,
     string? Name,
     char? ShortName,
     string? EnvironmentVariable,
     bool IsRequired,
     string? Description,
-    TypeSymbol? ConverterType,
-    IReadOnlyList<TypeSymbol> ValidatorTypes
+    TypeIdentifier? ConverterType,
+    IReadOnlyList<TypeIdentifier> ValidatorTypes
 ) : CommandInputSymbol(Property, IsRequired, Description, ConverterType, ValidatorTypes)
 {
     internal static CommandOptionSymbol? TryResolve(
-        PropertySymbol property,
+        IPropertySymbol property,
         AttributeData attribute,
         out IReadOnlyList<Diagnostic> diagnostics
     )
@@ -44,7 +44,7 @@ internal record CommandOptionSymbol(
             diagnosticsList.Add(
                 Diagnostic.Create(
                     DiagnosticDescriptors.OptionMustHaveNameOrShortName,
-                    property.Symbol.Locations.FirstOrDefault() ?? Location.None,
+                    property.Locations.FirstOrDefault() ?? Location.None,
                     property.Name
                 )
             );
@@ -59,19 +59,12 @@ internal record CommandOptionSymbol(
             diagnosticsList.Add(
                 Diagnostic.Create(
                     DiagnosticDescriptors.OptionNameInvalid,
-                    property.Symbol.Locations.FirstOrDefault() ?? Location.None,
+                    property.Locations.FirstOrDefault() ?? Location.None,
                     name,
                     property.Name
                 )
             );
         }
-
-        var converterType = attribute
-            .NamedArguments.FirstOrDefault(a => a.Key == "Converter")
-            .Value.Value
-            is ITypeSymbol converterTypeSymbol
-            ? new TypeSymbol(converterTypeSymbol)
-            : null;
 
         diagnostics = diagnosticsList;
 
@@ -84,13 +77,16 @@ internal record CommandOptionSymbol(
             property.IsRequired,
             attribute.NamedArguments.FirstOrDefault(a => a.Key == "Description").Value.Value
                 as string,
-            converterType,
+            attribute.NamedArguments.FirstOrDefault(a => a.Key == "Converter").Value.Value
+                is ITypeSymbol converterTypeSymbol
+                ? TypeIdentifier.From(converterTypeSymbol)
+                : null,
             attribute
                 .NamedArguments.Where(a => a.Key == "Validators")
                 .SelectMany(a => a.Value.Values)
                 .Select(v => v.Value)
                 .OfType<ITypeSymbol>()
-                .Select(s => new TypeSymbol(s))
+                .Select(s => TypeIdentifier.From(s))
                 .ToArray()
         );
     }

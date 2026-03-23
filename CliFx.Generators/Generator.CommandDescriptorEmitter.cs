@@ -7,19 +7,18 @@ using Microsoft.CodeAnalysis;
 
 namespace CliFx.Generators;
 
-internal class CommandDescriptorEmitter(KnownSymbols knownSymbols)
+public partial class Generator
 {
-    internal string GenerateSource(CommandSymbol command, out IReadOnlyList<Diagnostic> diagnostics)
+    private static string EmitCommandDescriptor(
+        CommandSymbol command,
+        out IReadOnlyList<Diagnostic> diagnostics
+    )
     {
-        var namespaceName =
-            command.Type.Symbol.ContainingNamespace is not null
-            && !command.Type.Symbol.ContainingNamespace.IsGlobalNamespace
-                ? command.Type.Symbol.ContainingNamespace.ToDisplayString()
-                : null;
+        var namespaceName = command.Type.Namespace;
 
-        var interfaces = new List<string>(2) { knownSymbols.ICommandWithHelpOption.ToString() };
+        var interfaces = new List<string>(2) { KnownSymbols.ICommandWithHelpOption.ToString() };
         if (command.IsDefault)
-            interfaces.Add(knownSymbols.ICommandWithVersionOption.ToString());
+            interfaces.Add(KnownSymbols.ICommandWithVersionOption.ToString());
 
         var interfaceList =
             interfaces.Count > 0 ? " : " + string.Join(", ", interfaces) : string.Empty;
@@ -83,11 +82,11 @@ internal class CommandDescriptorEmitter(KnownSymbols knownSymbols)
             $$"""
 
                 /// <summary>Generated command descriptor for <see cref="{{command.Type.Name}}"/>.</summary>
-                public static {{knownSymbols.CommandDescriptor}} Descriptor { get; } =
-                    new {{knownSymbols.CommandDescriptor}}<{{command.Type.FullyQualifiedName}}>(
+                public static {{KnownSymbols.CommandDescriptor}} Descriptor { get; } =
+                    new {{KnownSymbols.CommandDescriptor}}<{{command.Type.FullyQualifiedName}}>(
                         {{EncodeString(command.Name)}},
                         {{EncodeString(command.Description)}},
-                        new {{knownSymbols.CommandInputDescriptor}}[]
+                        new {{KnownSymbols.CommandInputDescriptor}}[]
                         {
             """
         );
@@ -96,15 +95,15 @@ internal class CommandDescriptorEmitter(KnownSymbols knownSymbols)
 
         foreach (var param in command.Parameters.OrderBy(p => p.Order))
         {
-            var converterExpr = TryBuildConverterExpr(param.ConverterType, param.Property.Symbol);
+            var converterExpr = TryBuildConverterExpr(param.ConverterType, param.Property);
             if (converterExpr is null)
             {
                 diagnosticsList.Add(
                     Diagnostic.Create(
                         DiagnosticDescriptors.ConverterNotInferrable,
-                        param.Property.Symbol.Locations.FirstOrDefault() ?? Location.None,
+                        param.Property.Locations.FirstOrDefault() ?? Location.None,
                         param.Property.Name,
-                        param.Property.Type.FullyQualifiedName
+                        TypeIdentifier.From(param.Property.Type).FullyQualifiedName
                     )
                 );
                 continue;
@@ -113,8 +112,8 @@ internal class CommandDescriptorEmitter(KnownSymbols knownSymbols)
             sb.Append(
                 // lang=csharp
                 $$"""
-                            new {{knownSymbols.CommandParameterDescriptor}}<{{command.Type.FullyQualifiedName}}, {{param.Property.Type.FullyQualifiedName}}>(
-                                new {{knownSymbols.PropertyDescriptor}}<{{command.Type.FullyQualifiedName}}, {{param.Property.Type.FullyQualifiedName}}>(
+                            new {{KnownSymbols.CommandParameterDescriptor}}<{{command.Type.FullyQualifiedName}}, {{TypeIdentifier.From(param.Property.Type).FullyQualifiedName}}>(
+                                new {{KnownSymbols.PropertyDescriptor}}<{{command.Type.FullyQualifiedName}}, {{TypeIdentifier.From(param.Property.Type).FullyQualifiedName}}>(
                                     "{{param.Property.Name}}",
                                     c => c.{{param.Property.Name}},
                                     (c, v) => c.{{param.Property.Name}} = v),
@@ -125,24 +124,22 @@ internal class CommandDescriptorEmitter(KnownSymbols knownSymbols)
                                 {{converterExpr}},
                                 {{BuildValidatorsExpr(
                     param.ValidatorTypes,
-                    param.Property.Type.FullyQualifiedName
-                )}}),
-
+                    TypeIdentifier.From(param.Property.Type).FullyQualifiedName)}}),
                 """
             );
         }
 
         foreach (var option in command.Options)
         {
-            var converterExpr = TryBuildConverterExpr(option.ConverterType, option.Property.Symbol);
+            var converterExpr = TryBuildConverterExpr(option.ConverterType, option.Property);
             if (converterExpr is null)
             {
                 diagnosticsList.Add(
                     Diagnostic.Create(
                         DiagnosticDescriptors.ConverterNotInferrable,
-                        option.Property.Symbol.Locations.FirstOrDefault() ?? Location.None,
+                        option.Property.Locations.FirstOrDefault() ?? Location.None,
                         option.Property.Name,
-                        option.Property.Type.FullyQualifiedName
+                        TypeIdentifier.From(option.Property.Type).FullyQualifiedName
                     )
                 );
                 continue;
@@ -151,8 +148,8 @@ internal class CommandDescriptorEmitter(KnownSymbols knownSymbols)
             sb.Append(
                 // lang=csharp
                 $$"""
-                            new {{knownSymbols.CommandOptionDescriptor}}<{{command.Type.FullyQualifiedName}}, {{option.Property.Type.FullyQualifiedName}}>(
-                                new {{knownSymbols.PropertyDescriptor}}<{{command.Type.FullyQualifiedName}}, {{option.Property.Type.FullyQualifiedName}}>(
+                            new {{KnownSymbols.CommandOptionDescriptor}}<{{command.Type.FullyQualifiedName}}, {{TypeIdentifier.From(option.Property.Type).FullyQualifiedName}}>(
+                                new {{KnownSymbols.PropertyDescriptor}}<{{command.Type.FullyQualifiedName}}, {{TypeIdentifier.From(option.Property.Type).FullyQualifiedName}}>(
                                     "{{option.Property.Name}}",
                                     c => c.{{option.Property.Name}},
                                     (c, v) => c.{{option.Property.Name}} = v),
@@ -164,7 +161,7 @@ internal class CommandDescriptorEmitter(KnownSymbols knownSymbols)
                                 {{converterExpr}},
                                 {{BuildValidatorsExpr(
                     option.ValidatorTypes,
-                    option.Property.Type.FullyQualifiedName
+                    TypeIdentifier.From(option.Property.Type).FullyQualifiedName
                 )}}),
 
                 """
@@ -174,8 +171,8 @@ internal class CommandDescriptorEmitter(KnownSymbols knownSymbols)
         sb.Append(
             // lang=csharp
             $$"""
-                        new {{knownSymbols.CommandOptionDescriptor}}<{{command.Type.FullyQualifiedName}}, bool>(
-                            new {{knownSymbols.PropertyDescriptor}}<{{command.Type.FullyQualifiedName}}, bool>(
+                        new {{KnownSymbols.CommandOptionDescriptor}}<{{command.Type.FullyQualifiedName}}, bool>(
+                            new {{KnownSymbols.PropertyDescriptor}}<{{command.Type.FullyQualifiedName}}, bool>(
                                 "IsHelpRequested",
                                 c => c.IsHelpRequested,
                                 (c, v) => c.IsHelpRequested = v),
@@ -184,8 +181,8 @@ internal class CommandDescriptorEmitter(KnownSymbols knownSymbols)
                             null,
                             false,
                             "Shows help text.",
-                            new {{knownSymbols.BoolScalarInputConverter}}(),
-                            global::System.Array.Empty<{{knownSymbols.InputValidator.GlobalBaseFullyQualifiedName}}<bool>>()),
+                            new {{KnownSymbols.BoolScalarInputConverter}}(),
+                            global::System.Array.Empty<{{KnownSymbols.InputValidator.GlobalFullyQualifiedName}}<bool>>()),
 
             """
         );
@@ -194,8 +191,8 @@ internal class CommandDescriptorEmitter(KnownSymbols knownSymbols)
             sb.Append(
                 // lang=csharp
                 $$"""
-                            new {{knownSymbols.CommandOptionDescriptor}}<{{command.Type.FullyQualifiedName}}, bool>(
-                                new {{knownSymbols.PropertyDescriptor}}<{{command.Type.FullyQualifiedName}}, bool>(
+                            new {{KnownSymbols.CommandOptionDescriptor}}<{{command.Type.FullyQualifiedName}}, bool>(
+                                new {{KnownSymbols.PropertyDescriptor}}<{{command.Type.FullyQualifiedName}}, bool>(
                                     "IsVersionRequested",
                                     c => c.IsVersionRequested,
                                     (c, v) => c.IsVersionRequested = v),
@@ -204,8 +201,8 @@ internal class CommandDescriptorEmitter(KnownSymbols knownSymbols)
                                 null,
                                 false,
                                 "Shows version information.",
-                                new {{knownSymbols.BoolScalarInputConverter}}(),
-                                global::System.Array.Empty<{{knownSymbols.InputValidator.GlobalBaseFullyQualifiedName}}<bool>>()),
+                                new {{KnownSymbols.BoolScalarInputConverter}}(),
+                                global::System.Array.Empty<{{KnownSymbols.InputValidator.GlobalFullyQualifiedName}}<bool>>()),
 
                 """
             );
@@ -227,63 +224,50 @@ internal class CommandDescriptorEmitter(KnownSymbols knownSymbols)
         return sb.ToString();
     }
 
-    // -------------------------------------------------------------------------
-    // Converter expression builder
-    // -------------------------------------------------------------------------
-
-    // Returns null if no converter can be inferred (caller must report a diagnostic and skip emission).
-    internal string? TryBuildConverterExpr(TypeSymbol? userConverterType, IPropertySymbol property)
+    private static string? TryBuildConverterExpr(
+        TypeIdentifier? userConverterType,
+        IPropertySymbol property
+    )
     {
-        // User-supplied converter takes precedence and is used as-is.
         if (userConverterType is not null)
             return $"new {userConverterType.GlobalFullyQualifiedName}()";
 
         var type = property.Type;
 
-        // Sequence types: build a default sequence converter (wrapping a scalar element converter).
         if (
             type.SpecialType != SpecialType.System_String
             && type.TryGetEnumerableUnderlyingType() is { } elementType
         )
             return TryBuildDefaultSequenceConverterExpr(elementType, type);
 
-        // Scalar types: build a default scalar converter (or null for unknown types).
         return TryBuildDefaultScalarConverterExpr(type);
     }
 
-    private string? TryBuildDefaultScalarConverterExpr(ITypeSymbol type)
+    private static string? TryBuildDefaultScalarConverterExpr(ITypeSymbol type)
     {
         var typeFqn = type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
 
-        // string
         if (type.SpecialType == SpecialType.System_String)
-            return $"new {knownSymbols.StringScalarInputConverter}()";
+            return $"new {KnownSymbols.StringScalarInputConverter}()";
 
-        // object
         if (type.SpecialType == SpecialType.System_Object)
-            return $"new {knownSymbols.ObjectScalarInputConverter}()";
+            return $"new {KnownSymbols.ObjectScalarInputConverter}()";
 
-        // bool
         if (type.SpecialType == SpecialType.System_Boolean)
-            return $"new {knownSymbols.BoolScalarInputConverter}()";
+            return $"new {KnownSymbols.BoolScalarInputConverter}()";
 
-        // DateTimeOffset
         if (type is INamedTypeSymbol { ContainingNamespace.Name: "System", Name: "DateTimeOffset" })
-            return $"new {knownSymbols.DateTimeOffsetScalarInputConverter}()";
+            return $"new {KnownSymbols.DateTimeOffsetScalarInputConverter}()";
 
-        // DateTime
         if (type is INamedTypeSymbol { ContainingNamespace.Name: "System", Name: "DateTime" })
-            return $"new {knownSymbols.DateTimeScalarInputConverter}()";
+            return $"new {KnownSymbols.DateTimeScalarInputConverter}()";
 
-        // TimeSpan
         if (type is INamedTypeSymbol { ContainingNamespace.Name: "System", Name: "TimeSpan" })
-            return $"new {knownSymbols.TimeSpanScalarInputConverter}()";
+            return $"new {KnownSymbols.TimeSpanScalarInputConverter}()";
 
-        // Enum
         if (type.TypeKind == TypeKind.Enum)
-            return $"new {knownSymbols.EnumScalarInputConverter.GlobalBaseFullyQualifiedName}<{typeFqn}>()";
+            return $"new {KnownSymbols.EnumScalarInputConverter.GlobalFullyQualifiedName}<{typeFqn}>()";
 
-        // Nullable<T>
         if (
             type is INamedTypeSymbol { IsValueType: true } named
             && named.ConstructedFrom.SpecialType == SpecialType.System_Nullable_T
@@ -294,10 +278,9 @@ internal class CommandDescriptorEmitter(KnownSymbols knownSymbols)
             var innerConverterExpr = TryBuildDefaultScalarConverterExpr(innerType);
             if (innerConverterExpr is null)
                 return null;
-            return $"new {knownSymbols.NullableScalarInputConverter.GlobalBaseFullyQualifiedName}<{innerFqn}>({innerConverterExpr})";
+            return $"new {KnownSymbols.NullableScalarInputConverter.GlobalFullyQualifiedName}<{innerFqn}>({innerConverterExpr})";
         }
 
-        // String-parseable with IFormatProvider: static T Parse(string, IFormatProvider)
         var parseMethodWithFormatProvider = type.GetMembers("Parse")
             .OfType<IMethodSymbol>()
             .FirstOrDefault(m =>
@@ -311,9 +294,8 @@ internal class CommandDescriptorEmitter(KnownSymbols knownSymbols)
             );
 
         if (parseMethodWithFormatProvider is not null)
-            return $"new {knownSymbols.DelegateScalarInputConverter.GlobalBaseFullyQualifiedName}<{typeFqn}>(s => {typeFqn}.Parse(s!, global::System.Globalization.CultureInfo.InvariantCulture))";
+            return $"new {KnownSymbols.DelegateScalarInputConverter.GlobalFullyQualifiedName}<{typeFqn}>(s => {typeFqn}.Parse(s!, global::System.Globalization.CultureInfo.InvariantCulture))";
 
-        // String-parseable: static T Parse(string)
         var parseMethod = type.GetMembers("Parse")
             .OfType<IMethodSymbol>()
             .FirstOrDefault(m =>
@@ -325,9 +307,8 @@ internal class CommandDescriptorEmitter(KnownSymbols knownSymbols)
             );
 
         if (parseMethod is not null)
-            return $"new {knownSymbols.DelegateScalarInputConverter.GlobalBaseFullyQualifiedName}<{typeFqn}>(s => {typeFqn}.Parse(s!))";
+            return $"new {KnownSymbols.DelegateScalarInputConverter.GlobalFullyQualifiedName}<{typeFqn}>(s => {typeFqn}.Parse(s!))";
 
-        // String-constructable: ctor(string)
         if (
             type is INamedTypeSymbol namedConstructable
             && namedConstructable.Constructors.Any(c =>
@@ -337,23 +318,22 @@ internal class CommandDescriptorEmitter(KnownSymbols knownSymbols)
             )
         )
         {
-            return $"new {knownSymbols.DelegateScalarInputConverter.GlobalBaseFullyQualifiedName}<{typeFqn}>(s => new {typeFqn}(s!))";
+            return $"new {KnownSymbols.DelegateScalarInputConverter.GlobalFullyQualifiedName}<{typeFqn}>(s => new {typeFqn}(s!))";
         }
 
-        // IConvertible
         if (
             type.AllInterfaces.Any(i =>
                 i.ContainingNamespace?.Name == "System" && i.Name == "IConvertible"
             )
         )
         {
-            return $"new {knownSymbols.ConvertibleScalarInputConverter.GlobalBaseFullyQualifiedName}<{typeFqn}>()";
+            return $"new {KnownSymbols.ConvertibleScalarInputConverter.GlobalFullyQualifiedName}<{typeFqn}>()";
         }
 
         return null;
     }
 
-    private string? TryBuildDefaultSequenceConverterExpr(
+    private static string? TryBuildDefaultSequenceConverterExpr(
         ITypeSymbol elementType,
         ITypeSymbol collectionType
     )
@@ -366,15 +346,12 @@ internal class CommandDescriptorEmitter(KnownSymbols knownSymbols)
         if (elementConverterArg is null)
             return null;
 
-        // T[]
         if (collectionType is IArrayTypeSymbol)
-            return $"new {knownSymbols.ArraySequenceInputConverter.GlobalBaseFullyQualifiedName}<{elementTypeFqn}>({elementConverterArg})";
+            return $"new {KnownSymbols.ArraySequenceInputConverter.GlobalFullyQualifiedName}<{elementTypeFqn}>({elementConverterArg})";
 
-        // Interface (IReadOnlyList<T>, IEnumerable<T>, etc.)
         if (collectionType.TypeKind == TypeKind.Interface)
-            return $"new {knownSymbols.ArraySequenceInputConverter.GlobalBaseFullyQualifiedName}<{elementTypeFqn}, {collectionTypeFqn}>({elementConverterArg})";
+            return $"new {KnownSymbols.ArraySequenceInputConverter.GlobalFullyQualifiedName}<{elementTypeFqn}, {collectionTypeFqn}>({elementConverterArg})";
 
-        // Concrete type with IEnumerable<T> or T[] constructor (e.g., List<T>)
         if (
             collectionType is INamedTypeSymbol namedCollection
             && namedCollection.Constructors.Any(c =>
@@ -398,23 +375,19 @@ internal class CommandDescriptorEmitter(KnownSymbols knownSymbols)
             )
         )
         {
-            return $"new {knownSymbols.DelegateSequenceInputConverter.GlobalBaseFullyQualifiedName}<{collectionTypeFqn}>(rawValues => new {collectionTypeFqn}(new {knownSymbols.ArraySequenceInputConverter.GlobalBaseFullyQualifiedName}<{elementTypeFqn}>({elementConverterArg}).Convert(rawValues)))";
+            return $"new {KnownSymbols.DelegateSequenceInputConverter.GlobalFullyQualifiedName}<{collectionTypeFqn}>(rawValues => new {collectionTypeFqn}(new {KnownSymbols.ArraySequenceInputConverter.GlobalFullyQualifiedName}<{elementTypeFqn}>({elementConverterArg}).Convert(rawValues)))";
         }
 
         return null;
     }
 
-    // -------------------------------------------------------------------------
-    // Helpers
-    // -------------------------------------------------------------------------
-
-    private string BuildValidatorsExpr(
-        IReadOnlyList<TypeSymbol> validatorTypes,
+    private static string BuildValidatorsExpr(
+        IReadOnlyList<TypeIdentifier> validatorTypes,
         string propertyTypeFqn
     )
     {
         var validatorBaseType =
-            $"{knownSymbols.InputValidator.GlobalBaseFullyQualifiedName}<{propertyTypeFqn}>";
+            $"{KnownSymbols.InputValidator.GlobalFullyQualifiedName}<{propertyTypeFqn}>";
 
         if (validatorTypes.Count == 0)
             return $"global::System.Array.Empty<{validatorBaseType}>()";
@@ -426,7 +399,6 @@ internal class CommandDescriptorEmitter(KnownSymbols knownSymbols)
         return $"new {validatorBaseType}[] {{ {items} }}";
     }
 
-    // Truly stateless — no refs needed.
     private static string EncodeString(string? value) =>
         value is null ? "null" : $"\"{value.Replace("\\", @"\\").Replace("\"", "\\\"")}\"";
 }

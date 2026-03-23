@@ -9,23 +9,44 @@ namespace CliFx.Generators.Utils.Extensions;
 
 internal static class RoslynExtensions
 {
-    public static IncrementalValuesProvider<T> WhereNotNull<T>(
-        this IncrementalValuesProvider<T?> source
-    )
-        where T : class => source.Where(d => d is not null).Select((d, _) => d!);
-
-    extension(ISymbol symbol)
+    extension<T>(IncrementalValuesProvider<T?> source)
+        where T : class
     {
-        public bool DisplayNameMatches(string name) =>
-            string.Equals(
-                symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat),
-                name,
-                StringComparison.Ordinal
-            );
+        public IncrementalValuesProvider<T> WhereNotNull() =>
+            source.Where(d => d is not null).Select((d, _) => d);
+    }
+
+    extension(TypeDeclarationSyntax declaration)
+    {
+        public IEnumerable<TypeDeclarationSyntax> GetContainingDeclarations()
+        {
+            var current = declaration.Parent;
+            while (current is not null)
+            {
+                if (current is TypeDeclarationSyntax containingDeclaration)
+                    yield return containingDeclaration;
+
+                current = current.Parent;
+            }
+        }
+
+        public IEnumerable<TypeDeclarationSyntax> GetSelfAndContainingDeclarations() =>
+            declaration.GetContainingDeclarations().Prepend(declaration);
+
+        public bool IsFullyPartial() =>
+            declaration
+                .GetSelfAndContainingDeclarations()
+                .OfType<TypeDeclarationSyntax>()
+                .All(t => t.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword)));
     }
 
     extension(ITypeSymbol type)
     {
+        public IEnumerable<TypeDeclarationSyntax> GetDeclarations() =>
+            type
+                .DeclaringSyntaxReferences.Select(r => r.GetSyntax())
+                .OfType<TypeDeclarationSyntax>();
+
         public IEnumerable<ITypeSymbol> GetContainingTypes()
         {
             var containingType = type.ContainingType;
@@ -35,6 +56,9 @@ internal static class RoslynExtensions
                 containingType = containingType.ContainingType;
             }
         }
+
+        public IEnumerable<ITypeSymbol> GetSelfAndContainingTypes() =>
+            type.GetContainingTypes().Prepend(type);
 
         public IEnumerable<ITypeSymbol> GetBaseTypes()
         {

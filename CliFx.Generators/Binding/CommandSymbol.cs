@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using CliFx.Generators.Utils.Extensions;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CliFx.Generators.Binding;
 
 internal record CommandSymbol(
-    TypeSymbol Type,
+    ResolvedTypeIdentifier Type,
     string? Name,
     string? Description,
     IReadOnlyList<CommandInputSymbol> Inputs
@@ -25,100 +23,61 @@ internal record CommandSymbol(
 
     internal static CommandSymbol? TryResolve(
         INamedTypeSymbol type,
-        KnownSymbols knownSymbols,
         out IReadOnlyList<Diagnostic> diagnostics
     )
     {
         var diagnosticsList = new List<Diagnostic>();
+        var classDeclarations = type.GetDeclarations().ToArray();
 
-        var classDeclaration = type
-            .DeclaringSyntaxReferences.Select(r => r.GetSyntax())
-            .OfType<ClassDeclarationSyntax>()
-            .FirstOrDefault();
+        // Must have the [Command] attribute
+        var commandAttribute = type.GetAttributes()
+            .FirstOrDefault(a => KnownSymbols.CommandAttribute.IsMatchedBy(a.AttributeClass));
 
-        // Must be partial to allow source generation to add members.
-        if (
-            classDeclaration is not null
-            && !classDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword)
-        )
+        if (commandAttribute is null)
         {
-            diagnosticsList.Add(
-                Diagnostic.Create(
-                    DiagnosticDescriptors.CommandMustBePartial,
-                    classDeclaration.Identifier.GetLocation(),
-                    type.Name
-                )
-            );
+            // Shouldn't happen when called by the generator since it filters types by attribute,
+            // so not worth the effort to produce a diagnostic.
+            diagnostics = diagnosticsList;
+            return null;
+        }
+
+        // Must be partial by itself, along with all containing types
+        foreach (var declaration in classDeclarations)
+        {
+            if (!declaration.IsFullyPartial())
+            {
+                diagnosticsList.Add(
+                    Diagnostic.Create(
+                        DiagnosticDescriptors.CommandMustBePartial,
+                        declaration.Identifier.GetLocation(),
+                        type.Name
+                    )
+                );
+            }
         }
 
         // Must implement ICommand
-        if (
-            !type.AllInterfaces.Any(i =>
-                SymbolEqualityComparer.Default.Equals(i, knownSymbols.ICommand.Symbol)
-            )
-        )
+        if (!type.AllInterfaces.Any(KnownSymbols.ICommand.IsMatchedBy))
         {
             diagnosticsList.Add(
                 Diagnostic.Create(
                     DiagnosticDescriptors.CommandMustImplementICommand,
-                    classDeclaration?.Identifier.GetLocation()
-                        ?? type.Locations.FirstOrDefault()
-                        ?? Location.None,
+                    classDeclarations.FirstOrDefault()?.Identifier.GetLocation()
+                        ?? type.Locations.FirstOrDefault(),
                     type.Name
                 )
             );
         }
 
-        // Must have the [Command] attribute
-        var commandAttribute = type.GetAttributes()
-            .FirstOrDefault(a =>
-                SymbolEqualityComparer.Default.Equals(
-                    a.AttributeClass,
-                    knownSymbols.CommandAttribute.Symbol
-                )
-            );
-
-        if (commandAttribute is null)
-        {
-            diagnostics = [];
-            return null;
-        }
-
-        // Must be a concrete class
-        if (type.IsAbstract)
-        {
-            diagnostics = [];
-            return null;
-        }
-
-        var commandName =
-            commandAttribute.NamedArguments.FirstOrDefault(a => a.Key == "Name").Value.Value
-                as string
-            ?? commandAttribute
-                .ConstructorArguments.Where(a => a.Type?.SpecialType == SpecialType.System_String)
-                .Select(a => a.Value as string)
-                .FirstOrDefault();
-
-        var commandDescription =
-            commandAttribute.NamedArguments.FirstOrDefault(a => a.Key == "Description").Value.Value
-            as string;
-
         var parameters = new List<CommandParameterSymbol>();
         var options = new List<CommandOptionSymbol>();
 
-        foreach (
-            var property in type.GetProperties()
-                .Where(p => !p.IsStatic)
-                .Select(p => new PropertySymbol(p))
-        )
+        foreach (var property in type.GetProperties().Where(p => !p.IsStatic))
         {
             var parameterAttribute = property
-                .Symbol.GetAttributes()
+                .GetAttributes()
                 .FirstOrDefault(a =>
-                    SymbolEqualityComparer.Default.Equals(
-                        a.AttributeClass,
-                        knownSymbols.CommandParameterAttribute.Symbol
-                    )
+                    KnownSymbols.CommandParameterAttribute.IsMatchedBy(a.AttributeClass)
                 );
 
             if (parameterAttribute is not null)
@@ -133,17 +92,12 @@ internal record CommandSymbol(
 
                 if (descriptor is not null)
                     parameters.Add(descriptor);
-
-                continue;
             }
 
             var optionAttribute = property
-                .Symbol.GetAttributes()
+                .GetAttributes()
                 .FirstOrDefault(a =>
-                    SymbolEqualityComparer.Default.Equals(
-                        a.AttributeClass,
-                        knownSymbols.CommandOptionAttribute.Symbol
-                    )
+                    KnownSymbols.CommandOptionAttribute.IsMatchedBy(a.AttributeClass)
                 );
 
             if (optionAttribute is not null)
@@ -177,7 +131,7 @@ internal record CommandSymbol(
                     diagnosticsList.Add(
                         Diagnostic.Create(
                             DiagnosticDescriptors.OptionsMustHaveUniqueNames,
-                            second.Property.Symbol.Locations.FirstOrDefault() ?? Location.None,
+                            second.Property.Locations.FirstOrDefault() ?? Location.None,
                             second.Property.Name,
                             type.Name,
                             "name",
@@ -192,7 +146,7 @@ internal record CommandSymbol(
                     diagnosticsList.Add(
                         Diagnostic.Create(
                             DiagnosticDescriptors.OptionsMustHaveUniqueNames,
-                            second.Property.Symbol.Locations.FirstOrDefault() ?? Location.None,
+                            second.Property.Locations.FirstOrDefault() ?? Location.None,
                             second.Property.Name,
                             type.Name,
                             "short name",
@@ -217,7 +171,7 @@ internal record CommandSymbol(
                     diagnosticsList.Add(
                         Diagnostic.Create(
                             DiagnosticDescriptors.ParametersMustHaveUniqueOrder,
-                            second.Property.Symbol.Locations.FirstOrDefault() ?? Location.None,
+                            second.Property.Locations.FirstOrDefault() ?? Location.None,
                             second.Property.Name,
                             type.Name,
                             second.Order,
@@ -241,7 +195,7 @@ internal record CommandSymbol(
                     diagnosticsList.Add(
                         Diagnostic.Create(
                             DiagnosticDescriptors.ParametersMustHaveUniqueNames,
-                            second.Property.Symbol.Locations.FirstOrDefault() ?? Location.None,
+                            second.Property.Locations.FirstOrDefault() ?? Location.None,
                             second.Property.Name,
                             type.Name,
                             second.Name,
@@ -255,9 +209,17 @@ internal record CommandSymbol(
         diagnostics = diagnosticsList;
 
         return new CommandSymbol(
-            new TypeSymbol(type),
-            commandName,
-            commandDescription,
+            ResolvedTypeIdentifier.From(type),
+            commandAttribute?.NamedArguments.FirstOrDefault(a => a.Key == "Name").Value.Value
+                as string
+                ?? commandAttribute
+                    ?.ConstructorArguments.Where(a =>
+                        a.Type?.SpecialType == SpecialType.System_String
+                    )
+                    .Select(a => a.Value as string)
+                    .FirstOrDefault(),
+            commandAttribute?.NamedArguments.FirstOrDefault(a => a.Key == "Description").Value.Value
+                as string,
             [.. parameters, .. options]
         );
     }
