@@ -9,38 +9,85 @@ using CliFx.Utils.Extensions;
 namespace CliFx;
 
 /// <summary>
-/// Builder for <see cref="CliApplication" />.
+/// Builder that simplifies the creation of a <see cref="CommandLineApplication" /> instance.
 /// </summary>
-public partial class CliApplicationBuilder
+public partial class CommandLineApplicationBuilder
 {
-    private readonly HashSet<CommandDescriptor> _commandDescriptors = [];
+    private readonly HashSet<CommandDescriptor> _commands = [];
 
-    private string? _debugModeEnvironmentVariable;
-    private string? _previewModeEnvironmentVariable;
     private string? _title;
     private string? _executableName;
     private string? _version;
     private string? _description;
+
+    private string? _debugModeEnvironmentVariable;
+    private string? _previewModeEnvironmentVariable;
+
     private IConsole? _console;
     private ITypeActivator? _typeActivator;
 
     /// <summary>
-    /// Adds a command to the application.
+    /// Registers a command with the application.
     /// </summary>
-    public CliApplicationBuilder AddCommand(CommandDescriptor commandDescriptor)
+    public CommandLineApplicationBuilder AddCommand(CommandDescriptor command)
     {
-        _commandDescriptors.Add(commandDescriptor);
+        _commands.Add(command);
         return this;
     }
 
     /// <summary>
-    /// Adds multiple commands to the application.
+    /// Registers multiple commands with the application.
     /// </summary>
-    public CliApplicationBuilder AddCommands(IEnumerable<CommandDescriptor> commandDescriptors)
+    public CommandLineApplicationBuilder AddCommands(IEnumerable<CommandDescriptor> commands)
     {
-        foreach (var commandDescriptor in commandDescriptors)
-            AddCommand(commandDescriptor);
+        foreach (var command in commands)
+            AddCommand(command);
 
+        return this;
+    }
+
+    /// <summary>
+    /// Sets the application title, which is displayed in the help text.
+    /// </summary>
+    /// <remarks>
+    /// By default, application title is inferred from the assembly name.
+    /// </remarks>
+    public CommandLineApplicationBuilder SetTitle(string title)
+    {
+        _title = title;
+        return this;
+    }
+
+    /// <summary>
+    /// Sets the application executable name, which is displayed in the help text.
+    /// </summary>
+    /// <remarks>
+    /// By default, application executable name is inferred from the assembly file name.
+    /// </remarks>
+    public CommandLineApplicationBuilder SetExecutableName(string executableName)
+    {
+        _executableName = executableName;
+        return this;
+    }
+
+    /// <summary>
+    /// Sets the application version, which is displayed in the help text or when the version information is requested.
+    /// </summary>
+    /// <remarks>
+    /// By default, application version is inferred from the assembly version.
+    /// </remarks>
+    public CommandLineApplicationBuilder SetVersion(string version)
+    {
+        _version = version;
+        return this;
+    }
+
+    /// <summary>
+    /// Sets the application description, which is displayed in the help text.
+    /// </summary>
+    public CommandLineApplicationBuilder SetDescription(string? description)
+    {
+        _description = description;
         return this;
     }
 
@@ -48,7 +95,7 @@ public partial class CliApplicationBuilder
     /// Enables the debug mode, activated when the specified environment variable is set to <c>true</c>.
     /// When active, the application waits for a debugger to attach before executing the command.
     /// </summary>
-    public CliApplicationBuilder AllowDebugMode(string? environmentVariableName)
+    public CommandLineApplicationBuilder AllowDebugMode(string? environmentVariableName)
     {
         _debugModeEnvironmentVariable = environmentVariableName;
         return this;
@@ -58,61 +105,16 @@ public partial class CliApplicationBuilder
     /// Enables the preview mode, activated when the specified environment variable is set to <c>true</c>.
     /// When active, the application prints the parsed command line before executing the command.
     /// </summary>
-    public CliApplicationBuilder AllowPreviewMode(string? environmentVariableName)
+    public CommandLineApplicationBuilder AllowPreviewMode(string? environmentVariableName)
     {
         _previewModeEnvironmentVariable = environmentVariableName;
         return this;
     }
 
     /// <summary>
-    /// Sets the application title, which is shown in the help text.
-    /// </summary>
-    /// <remarks>
-    /// By default, application title is inferred from the assembly name.
-    /// </remarks>
-    public CliApplicationBuilder SetTitle(string title)
-    {
-        _title = title;
-        return this;
-    }
-
-    /// <summary>
-    /// Sets the application executable name, which is shown in the help text.
-    /// </summary>
-    /// <remarks>
-    /// By default, application executable name is inferred from the assembly file name.
-    /// </remarks>
-    public CliApplicationBuilder SetExecutableName(string executableName)
-    {
-        _executableName = executableName;
-        return this;
-    }
-
-    /// <summary>
-    /// Sets the application version, which is shown in the help text or when the user specifies the version option.
-    /// </summary>
-    /// <remarks>
-    /// By default, application version is inferred from the assembly version.
-    /// </remarks>
-    public CliApplicationBuilder SetVersion(string version)
-    {
-        _version = version;
-        return this;
-    }
-
-    /// <summary>
-    /// Sets the application description, which is shown in the help text.
-    /// </summary>
-    public CliApplicationBuilder SetDescription(string? description)
-    {
-        _description = description;
-        return this;
-    }
-
-    /// <summary>
     /// Configures the application to use the specified implementation of <see cref="IConsole" />.
     /// </summary>
-    public CliApplicationBuilder UseConsole(IConsole console)
+    public CommandLineApplicationBuilder UseConsole(IConsole console)
     {
         _console = console;
         return this;
@@ -121,7 +123,7 @@ public partial class CliApplicationBuilder
     /// <summary>
     /// Configures the application to use the specified implementation of <see cref="ITypeActivator" />.
     /// </summary>
-    public CliApplicationBuilder UseTypeActivator(ITypeActivator typeActivator)
+    public CommandLineApplicationBuilder UseTypeActivator(ITypeActivator typeActivator)
     {
         _typeActivator = typeActivator;
         return this;
@@ -130,44 +132,44 @@ public partial class CliApplicationBuilder
     /// <summary>
     /// Configures the application to use the specified delegate for activating types.
     /// </summary>
-    public CliApplicationBuilder UseTypeActivator(Func<Type, object> createInstance) =>
+    public CommandLineApplicationBuilder UseTypeActivator(Func<Type, object> createInstance) =>
         UseTypeActivator(new DelegateTypeActivator(createInstance));
 
     /// <summary>
     /// Configures the application to use the specified service provider for activating types.
     /// </summary>
-    public CliApplicationBuilder UseTypeActivator(IServiceProvider serviceProvider) =>
+    public CommandLineApplicationBuilder UseTypeActivator(IServiceProvider serviceProvider) =>
         // Null returns are handled by DelegateTypeActivator
         UseTypeActivator(serviceProvider.GetService!);
 
     /// <summary>
     /// Configures the application to use the specified service provider for activating types.
-    /// This method takes a delegate that receives the list of all added command descriptors, so that you can
+    /// This method takes a delegate that receives the list of all added commands, so that you can
     /// easily register their types with the service provider.
     /// </summary>
-    public CliApplicationBuilder UseTypeActivator(
+    public CommandLineApplicationBuilder UseTypeActivator(
         Func<IReadOnlyList<CommandDescriptor>, IServiceProvider> getServiceProvider
-    ) => UseTypeActivator(getServiceProvider([.. _commandDescriptors]));
+    ) => UseTypeActivator(getServiceProvider([.. _commands]));
 
     /// <summary>
-    /// Creates a configured instance of <see cref="CliApplication" />.
+    /// Creates a configured instance of <see cref="CommandLineApplication" />.
     /// </summary>
-    public CliApplication Build()
+    public CommandLineApplication Build()
     {
-        var metadata = new ApplicationMetadata(
+        var metadata = new CommandLineApplicationMetadata(
             _title ?? GetDefaultTitle(),
             _executableName ?? GetDefaultExecutableName(),
             _version ?? GetDefaultVersionText(),
             _description
         );
 
-        var configuration = new ApplicationConfiguration(
-            [.. _commandDescriptors],
+        var configuration = new CommandLineApplicationConfiguration(
+            [.. _commands],
             _debugModeEnvironmentVariable,
             _previewModeEnvironmentVariable
         );
 
-        return new CliApplication(
+        return new CommandLineApplication(
             metadata,
             configuration,
             _console ?? new SystemConsole(),
@@ -176,7 +178,7 @@ public partial class CliApplicationBuilder
     }
 }
 
-public partial class CliApplicationBuilder
+public partial class CommandLineApplicationBuilder
 {
     private static string GetDefaultTitle()
     {

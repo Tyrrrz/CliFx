@@ -25,7 +25,7 @@ public partial class Benchmarks
 
     [Benchmark(Description = "CliFx", Baseline = true)]
     public async ValueTask<int> ExecuteWithCliFx() =>
-        await new CliApplicationBuilder()
+        await new CommandLineApplicationBuilder()
             .AddCommand(CliFxCommand.Descriptor)
             .Build()
             .RunAsync(Arguments, new Dictionary<string, string>());

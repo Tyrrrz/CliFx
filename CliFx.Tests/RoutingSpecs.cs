@@ -48,7 +48,7 @@ public class RoutingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommands(commandDescriptors)
             .UseConsole(FakeConsole)
             .Build();
@@ -102,7 +102,7 @@ public class RoutingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommands(commandDescriptors)
             .UseConsole(FakeConsole)
             .Build();
@@ -156,7 +156,7 @@ public class RoutingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommands(commandDescriptors)
             .UseConsole(FakeConsole)
             .Build();

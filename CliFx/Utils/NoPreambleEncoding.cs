@@ -8,7 +8,7 @@ namespace CliFx.Utils;
 // Also see:
 // https://source.dot.net/#System.Console/ConsoleEncoding.cs,5eedd083a4a4f4a2
 // Majority of overrides are just proxy calls to avoid potentially more expensive base behavior.
-// The important part is the GetPreamble() method that has been overriden to return an empty array.
+// The important part is the GetPreamble() method that has been overridden to return an empty array.
 internal class NoPreambleEncoding(Encoding underlyingEncoding)
     : Encoding(
         underlyingEncoding.CodePage,
@@ -16,6 +16,9 @@ internal class NoPreambleEncoding(Encoding underlyingEncoding)
         underlyingEncoding.DecoderFallback
     )
 {
+    // This is the only part that's changed
+    public override byte[] GetPreamble() => [];
+
     [ExcludeFromCodeCoverage]
     public override string EncodingName => underlyingEncoding.EncodingName;
 
@@ -48,9 +51,6 @@ internal class NoPreambleEncoding(Encoding underlyingEncoding)
 
     [ExcludeFromCodeCoverage]
     public override bool IsMailNewsSave => underlyingEncoding.IsMailNewsSave;
-
-    // This is the only part that changes
-    public override byte[] GetPreamble() => [];
 
     [ExcludeFromCodeCoverage]
     public override int GetByteCount(char[] chars, int index, int count) =>

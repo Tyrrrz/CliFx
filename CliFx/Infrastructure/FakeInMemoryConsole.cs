@@ -5,7 +5,7 @@ namespace CliFx.Infrastructure;
 /// <summary>
 /// Implementation of <see cref="IConsole" /> that uses fake standard input, output, and error streams
 /// backed by in-memory stores.
-/// Use this implementation in tests to verify how a command interacts with the console.
+/// Use this implementation in tests to verify console interactions in an isolated environment.
 /// </summary>
 public class FakeInMemoryConsole : FakeConsole
 {
@@ -47,7 +47,7 @@ public class FakeInMemoryConsole : FakeConsole
     }
 
     /// <summary>
-    /// Writes data to the input stream.
+    /// Writes text to the input stream.
     /// </summary>
     public void WriteInput(string data) => WriteInput(Input.CurrentEncoding.GetBytes(data));
 
@@ -64,7 +64,7 @@ public class FakeInMemoryConsole : FakeConsole
     }
 
     /// <summary>
-    /// Reads the data written to the output stream.
+    /// Reads the text written to the output stream.
     /// </summary>
     public string ReadOutputString() => Output.Encoding.GetString(ReadOutputBytes());
 
@@ -81,7 +81,7 @@ public class FakeInMemoryConsole : FakeConsole
     }
 
     /// <summary>
-    /// Reads the data written to the error stream.
+    /// Reads the text written to the error stream.
     /// </summary>
     public string ReadErrorString() => Error.Encoding.GetString(ReadErrorBytes());
 

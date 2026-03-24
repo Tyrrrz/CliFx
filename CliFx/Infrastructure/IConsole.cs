@@ -95,9 +95,12 @@ public interface IConsole
     /// the associated token, allowing the command to exit early on its own terms.
     /// </para>
     /// <para>
-    /// Note that the cancellation token is only respected the first time the user sends an
-    /// interrupt signal. If the user sends an interrupt signal again, the application will
-    /// immediately terminate, bypassing the cancellation token.
+    /// The cancellation token is only respected the first time the user sends an interrupt signal.
+    /// If the user sends an interrupt signal again, the cancellation token will be ignored and the
+    /// application will immediately terminate.
+    /// </para>
+    /// <para>
+    /// Note that the above semantics are not enforced by <see cref="FakeConsole" /> and <see cref="FakeInMemoryConsole" />.
     /// </para>
     /// </remarks>
     CancellationToken RegisterCancellationHandler();

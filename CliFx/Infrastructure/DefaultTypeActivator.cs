@@ -4,8 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace CliFx.Infrastructure;
 
 /// <summary>
-/// Implementation of <see cref="ITypeActivator" /> that instantiates an object
-/// by using its parameterless constructor.
+/// Implementation of <see cref="ITypeActivator" /> that instantiates a type by using its parameterless constructor.
 /// </summary>
 public class DefaultTypeActivator : ITypeActivator
 {

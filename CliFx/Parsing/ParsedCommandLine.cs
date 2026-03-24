@@ -17,9 +17,6 @@ internal partial class ParsedCommandLine(
         positionalArguments;
 
     public IReadOnlyList<ParsedOption> Options { get; } = options;
-
-    public bool HasArguments =>
-        !string.IsNullOrWhiteSpace(CommandName) || PositionalArguments.Any() || Options.Any();
 }
 
 internal partial class ParsedCommandLine

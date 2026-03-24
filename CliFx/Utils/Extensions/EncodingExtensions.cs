@@ -1,8 +1,8 @@
 using System.Text;
 
-namespace CliFx.Utils;
+namespace CliFx.Utils.Extensions;
 
-internal static class NoPreambleEncodingExtensions
+internal static class EncodingExtensions
 {
     extension(Encoding encoding)
     {

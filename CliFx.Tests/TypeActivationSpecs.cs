@@ -31,7 +31,7 @@ public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .UseTypeActivator(new DefaultTypeActivator())
@@ -64,7 +64,7 @@ public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .UseTypeActivator(new DefaultTypeActivator())
@@ -103,7 +103,7 @@ public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .UseTypeActivator(type => Activator.CreateInstance(type, "Hello world")!)
@@ -142,7 +142,7 @@ public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .UseTypeActivator(commandSchemas =>
@@ -190,7 +190,7 @@ public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .UseTypeActivator((Type _) => null!)

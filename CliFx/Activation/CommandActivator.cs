@@ -203,6 +203,9 @@ internal class CommandActivator(
 
     public void ActivateHelpAndVersionOptions(ParsedCommandLine commandLine)
     {
+        if (instance is not ICommandWithHelpOption and not ICommandWithVersionOption)
+            return;
+
         var options = new List<CommandOptionDescriptor>(2);
 
         if (instance is ICommandWithHelpOption)

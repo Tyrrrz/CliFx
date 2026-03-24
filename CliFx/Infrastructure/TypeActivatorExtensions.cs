@@ -15,7 +15,7 @@ internal static class TypeActivatorExtensions
                 Type type
         )
         {
-            if (!typeof(T).IsAssignableFrom(type))
+            if (!type.IsAssignableTo(typeof(T)))
             {
                 throw CliFxException.InternalError(
                     $"Type '{type.FullName}' is not assignable to '{typeof(T).FullName}'."

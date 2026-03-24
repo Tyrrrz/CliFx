@@ -1,4 +1,4 @@
-namespace CliFx.Utils;
+namespace CliFx.Utils.StackTraces;
 
 internal class StackFrameParameter(string type, string? name)
 {

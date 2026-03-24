@@ -3,7 +3,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using CliFx.Utils;
+using CliFx.Utils.Extensions;
 
 namespace CliFx.Infrastructure;
 

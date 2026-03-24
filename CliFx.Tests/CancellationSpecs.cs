@@ -84,7 +84,7 @@ public class CancellationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOut
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();

@@ -26,7 +26,7 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
@@ -62,7 +62,7 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
@@ -105,7 +105,7 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
@@ -139,7 +139,7 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
@@ -173,7 +173,7 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .SetDescription("This will be in help text")

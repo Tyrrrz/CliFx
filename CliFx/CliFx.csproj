@@ -36,7 +36,7 @@
     />
   </ItemGroup>
 
-  <!-- Embed the source generator inside the package -->
+  <!-- Embed the source generators inside the package -->
   <ItemGroup>
     <ProjectReference
       Include="..\CliFx.Generators\CliFx.Generators.csproj"

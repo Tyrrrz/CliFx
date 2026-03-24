@@ -4,26 +4,26 @@ using CliFx.Binding;
 namespace CliFx;
 
 /// <summary>
-/// Configuration of an application.
+/// Configuration of a command-line application.
 /// </summary>
-public class ApplicationConfiguration(
-    IReadOnlyList<CommandDescriptor> commandDescriptors,
+public class CommandLineApplicationConfiguration(
+    IReadOnlyList<CommandDescriptor> commands,
     string? debugModeEnvironmentVariable,
     string? previewModeEnvironmentVariable
 )
 {
     /// <summary>
-    /// Command descriptors registered in the application.
+    /// Commands registered in the application.
     /// </summary>
-    public IReadOnlyList<CommandDescriptor> CommandDescriptors { get; } = commandDescriptors;
+    public IReadOnlyList<CommandDescriptor> Commands { get; } = commands;
 
     /// <summary>
-    /// Environment variable name that enables the debug mode.
+    /// Environment variable that enables the debug mode.
     /// </summary>
     public string? DebugModeEnvironmentVariable { get; } = debugModeEnvironmentVariable;
 
     /// <summary>
-    /// Environment variable name that enables the preview mode.
+    /// Environment variable that enables the preview mode.
     /// </summary>
     public string? PreviewModeEnvironmentVariable { get; } = previewModeEnvironmentVariable;
 }

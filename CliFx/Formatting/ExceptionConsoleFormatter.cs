@@ -2,7 +2,7 @@
 using System.IO;
 using System.Linq;
 using CliFx.Infrastructure;
-using CliFx.Utils;
+using CliFx.Utils.StackTraces;
 
 namespace CliFx.Formatting;
 

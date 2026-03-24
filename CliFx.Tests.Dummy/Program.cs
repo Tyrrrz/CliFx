@@ -24,7 +24,7 @@ public static class Program
             "false"
         );
 
-        return await new CliApplicationBuilder()
+        return await new CommandLineApplicationBuilder()
             .AddCommandsFromThisAssembly()
             .AllowDebugMode("CLIFX_DEBUG")
             .AllowPreviewMode("CLIFX_PREVIEW")

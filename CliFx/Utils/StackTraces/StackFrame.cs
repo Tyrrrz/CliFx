@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using CliFx.Utils.Extensions;
 
-namespace CliFx.Utils;
+namespace CliFx.Utils.StackTraces;
 
 internal partial class StackFrame(
     string parentType,

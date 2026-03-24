@@ -13,7 +13,7 @@ public class ApplicationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutp
     public async Task I_can_create_an_application_with_the_default_configuration()
     {
         // Act
-        var app = new CliApplicationBuilder()
+        var app = new CommandLineApplicationBuilder()
             .AddCommand(NoOpCommand.Descriptor)
             .UseConsole(FakeConsole)
             .Build();

@@ -32,7 +32,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
@@ -69,7 +69,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
@@ -111,7 +111,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
@@ -156,7 +156,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
@@ -201,7 +201,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
@@ -243,7 +243,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
@@ -285,7 +285,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
@@ -327,7 +327,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
@@ -369,7 +369,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
@@ -411,7 +411,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
@@ -456,7 +456,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
@@ -518,7 +518,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
@@ -555,7 +555,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
@@ -591,7 +591,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
@@ -624,7 +624,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
@@ -657,7 +657,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
@@ -690,7 +690,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
@@ -726,7 +726,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();

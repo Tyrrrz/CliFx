@@ -81,7 +81,7 @@ public class ConsoleSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
@@ -132,7 +132,7 @@ public class ConsoleSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
@@ -174,7 +174,7 @@ public class ConsoleSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();

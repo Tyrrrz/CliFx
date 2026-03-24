@@ -14,7 +14,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_can_request_the_help_text_by_running_the_application_without_arguments_if_the_default_command_is_not_defined()
     {
         // Arrange
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .UseConsole(FakeConsole)
             .SetDescription("This will be in help text")
             .Build();
@@ -23,7 +23,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         var exitCode = await application.RunAsync([], new Dictionary<string, string>());
 
         // Assert
-        exitCode.Should().Be(0);
+        exitCode.Should().Be(1);
 
         var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().Contain("This will be in help text");
@@ -44,7 +44,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .SetDescription("This will be in help text")
@@ -81,7 +81,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommands(commandDescriptors)
             .UseConsole(FakeConsole)
             .SetDescription("This will be in help text")
@@ -124,7 +124,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommands(commandDescriptors)
             .UseConsole(FakeConsole)
             .Build();
@@ -169,7 +169,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommands(commandDescriptors)
             .UseConsole(FakeConsole)
             .Build();
@@ -191,7 +191,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_can_request_the_help_text_by_running_the_application_with_invalid_arguments()
     {
         // Arrange
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(NoOpCommand.Descriptor)
             .UseConsole(FakeConsole)
             .SetDescription("This will be in help text")
@@ -217,7 +217,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_can_request_the_help_text_to_see_the_application_title_description_and_version()
     {
         // Arrange
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .UseConsole(FakeConsole)
             .SetTitle("App title")
             .SetDescription("App description")
@@ -249,7 +249,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
@@ -285,7 +285,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommands(commandDescriptors)
             .UseConsole(FakeConsole)
             .Build();
@@ -324,7 +324,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
@@ -370,7 +370,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
@@ -409,7 +409,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
@@ -447,7 +447,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
@@ -486,7 +486,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
@@ -525,7 +525,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
@@ -569,7 +569,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
@@ -622,7 +622,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
@@ -675,7 +675,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
@@ -741,7 +741,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
@@ -819,7 +819,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommands(commandDescriptors)
             .UseConsole(FakeConsole)
             .Build();
@@ -890,7 +890,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommands(commandDescriptors)
             .UseConsole(FakeConsole)
             .Build();
@@ -920,7 +920,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_can_request_the_version_text_by_running_the_application_with_the_implicit_version_option()
     {
         // Arrange
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(NoOpCommand.Descriptor)
             .SetVersion("v6.9")
             .UseConsole(FakeConsole)

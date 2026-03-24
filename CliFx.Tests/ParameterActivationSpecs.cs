@@ -37,7 +37,7 @@ public class ParameterActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
@@ -88,7 +88,7 @@ public class ParameterActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
@@ -129,7 +129,7 @@ public class ParameterActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
@@ -165,7 +165,7 @@ public class ParameterActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
@@ -207,7 +207,7 @@ public class ParameterActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();
@@ -243,7 +243,7 @@ public class ParameterActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(
             """
         );
 
-        var application = new CliApplicationBuilder()
+        var application = new CommandLineApplicationBuilder()
             .AddCommand(commandDescriptor)
             .UseConsole(FakeConsole)
             .Build();

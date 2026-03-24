@@ -15,41 +15,15 @@ namespace CliFx;
 /// <summary>
 /// Command-line application facade.
 /// </summary>
-public class CliApplication(
-    ApplicationMetadata metadata,
-    ApplicationConfiguration configuration,
+public class CommandLineApplication(
+    CommandLineApplicationMetadata metadata,
+    CommandLineApplicationConfiguration configuration,
     IConsole console,
     ITypeActivator typeActivator
 )
 {
-    /// <summary>
-    /// Application metadata.
-    /// </summary>
-    public ApplicationMetadata Metadata { get; } = metadata;
-
-    /// <summary>
-    /// Application configuration.
-    /// </summary>
-    public ApplicationConfiguration Configuration { get; } = configuration;
-
-    private async ValueTask PromptDebuggerAsync()
-    {
-        using (console.WithForegroundColor(ConsoleColor.Green))
-        {
-            console.WriteLine(
-                $"Attach the debugger to process with ID {Environment.ProcessId} to continue."
-            );
-        }
-
-        // Try to also launch the debugger ourselves (only works with Visual Studio)
-        Debugger.Launch();
-
-        while (!Debugger.IsAttached)
-            await Task.Delay(100);
-    }
-
     private async ValueTask<int> RunAsync(
-        ApplicationDescriptor applicationDescriptor,
+        CommandRootDescriptor root,
         ParsedCommandLine commandLine,
         IReadOnlyDictionary<string, string> environmentVariables
     )
@@ -58,90 +32,86 @@ public class CliApplication(
 
         // Handle debug mode
         if (
-            !string.IsNullOrWhiteSpace(Configuration.DebugModeEnvironmentVariable)
+            !string.IsNullOrWhiteSpace(configuration.DebugModeEnvironmentVariable)
             && bool.ParseOrDefault(
-                environmentVariables.GetValueOrDefault(Configuration.DebugModeEnvironmentVariable)
+                environmentVariables.GetValueOrDefault(configuration.DebugModeEnvironmentVariable)
             )
         )
         {
-            await PromptDebuggerAsync();
+            using (console.WithForegroundColor(ConsoleColor.Green))
+            {
+                console.WriteLine(
+                    $"Attach the debugger to process with ID {Environment.ProcessId} to continue."
+                );
+            }
+
+            // Try to also launch the debugger ourselves (only works with Visual Studio)
+            Debugger.Launch();
+
+            // Wait for the debugger to attach
+            await Debugger.WaitUntilAttachedAsync();
         }
 
         // Handle preview mode
         if (
-            !string.IsNullOrWhiteSpace(Configuration.PreviewModeEnvironmentVariable)
+            !string.IsNullOrWhiteSpace(configuration.PreviewModeEnvironmentVariable)
             && bool.ParseOrDefault(
-                environmentVariables.GetValueOrDefault(Configuration.PreviewModeEnvironmentVariable)
+                environmentVariables.GetValueOrDefault(configuration.PreviewModeEnvironmentVariable)
             )
         )
         {
             console.WriteCommandLine(commandLine);
         }
 
-        // Try to get the command schema that matches the input
-        var commandDescriptor =
+        // Try to find the command that matches the input
+        var command =
             (
                 !string.IsNullOrWhiteSpace(commandLine.CommandName)
                     // If the command name is specified, try to find the command by name.
                     // This should always succeed, because the input parsing relies on
                     // the list of available command names.
-                    ? applicationDescriptor.TryFindCommand(commandLine.CommandName)
+                    ? root.TryFindCommand(commandLine.CommandName)
                     // Otherwise, try to find the default command
-                    : applicationDescriptor.TryFindDefaultCommand()
+                    : root.TryFindDefaultCommand()
             )
             ??
-            // If a valid command was not found, use the fallback default command.
-            // This is only used as a stub to show the help text.
+            // If a valid command was not found, use the fallback default command
             FallbackDefaultCommand.Descriptor;
 
-        // Initialize an instance of the command type
-        var commandInstance =
-            commandDescriptor != FallbackDefaultCommand.Descriptor
-                ? typeActivator.CreateInstance(commandDescriptor)
+        // Initialize an instance of the command
+        var instance =
+            command != FallbackDefaultCommand.Descriptor
+                ? typeActivator.CreateInstance(command)
                 // Bypass the activator
                 : new FallbackDefaultCommand();
 
         // Assemble the help context
         var helpContext = new HelpContext(
-            Metadata,
-            applicationDescriptor,
-            commandDescriptor,
-            commandDescriptor.Inputs.ToDictionary(
-                inputDescriptor => inputDescriptor,
-                inputDescriptor => inputDescriptor.Property.GetValue(commandInstance)
-            )
+            metadata,
+            root,
+            command,
+            command.Inputs.ToDictionary(i => i, i => i.Property.GetValue(instance))
         );
 
         // Assemble the command activator
-        var commandActivator = new CommandActivator(
-            commandDescriptor,
-            commandInstance,
-            environmentVariables
-        );
+        var commandActivator = new CommandActivator(command, instance, environmentVariables);
 
-        // Perform a limited command activation to check if the help or version options were specified by the user
-        if (commandInstance is ICommandWithHelpOption or ICommandWithVersionOption)
+        // Perform a limited command activation only for the conventional help and version options,
+        // so that they can be handled even if the rest of the command-line input is invalid.
+        commandActivator.ActivateHelpAndVersionOptions(commandLine);
+
+        // Handle help option
+        if (instance is ICommandWithHelpOption { IsHelpRequested: true })
         {
-            commandActivator.ActivateHelpAndVersionOptions(commandLine);
+            console.WriteHelpText(helpContext);
+            return 0;
+        }
 
-            // Help text
-            if (
-                commandInstance is ICommandWithHelpOption { IsHelpRequested: true }
-                // Can also be requested on the fallback command by not supplying any arguments
-                || commandDescriptor == FallbackDefaultCommand.Descriptor
-                    && !commandLine.HasArguments
-            )
-            {
-                console.WriteHelpText(helpContext);
-                return 0;
-            }
-
-            // Version text
-            if (commandInstance is ICommandWithVersionOption { IsVersionRequested: true })
-            {
-                console.WriteLine(Metadata.Version);
-                return 0;
-            }
+        // Handle version option
+        if (instance is ICommandWithVersionOption { IsVersionRequested: true })
+        {
+            console.WriteLine(metadata.Version);
+            return 0;
         }
 
         // Starting from this point, we may produce exceptions that are meant for the
@@ -154,7 +124,7 @@ public class CliApplication(
             commandActivator.Activate(commandLine);
 
             // Execute the command
-            await commandInstance.ExecuteAsync(console);
+            await instance.ExecuteAsync(console);
 
             return 0;
         }
@@ -178,7 +148,8 @@ public class CliApplication(
     /// </summary>
     /// <remarks>
     /// When running WITHOUT the debugger attached (i.e. in production), this method swallows
-    /// all exceptions and reports them to the console.
+    /// all inner exceptions and reports them to the console, instead of allowing them to propagate
+    /// to the caller and potentially crash the application.
     /// </remarks>
     public async ValueTask<int> RunAsync(
         IReadOnlyList<string> commandLineArguments,
@@ -187,14 +158,10 @@ public class CliApplication(
     {
         try
         {
-            var applicationDescriptor = new ApplicationDescriptor(Configuration.CommandDescriptors);
+            var root = new CommandRootDescriptor(configuration.Commands);
+            var commandLine = ParsedCommandLine.Parse(commandLineArguments, root.GetCommandNames());
 
-            var commandLine = ParsedCommandLine.Parse(
-                commandLineArguments,
-                applicationDescriptor.GetCommandNames()
-            );
-
-            return await RunAsync(applicationDescriptor, commandLine, environmentVariables);
+            return await RunAsync(root, commandLine, environmentVariables);
         }
         // To prevent the app from showing the annoying troubleshooting dialog on Windows,
         // we handle all exceptions ourselves and print them to the console.
@@ -210,12 +177,14 @@ public class CliApplication(
     }
 
     /// <summary>
-    /// Runs the application with the specified command-line arguments.
+    /// Runs the application with the specified command-line arguments, while the environment variables
+    /// are resolved automatically from <see cref="Environment" />.
     /// Returns the exit code which indicates whether the application completed successfully.
     /// </summary>
     /// <remarks>
     /// When running WITHOUT the debugger attached (i.e. in production), this method swallows
-    /// all exceptions and reports them to the console.
+    /// all inner exceptions and reports them to the console, instead of allowing them to propagate
+    /// to the caller and potentially crash the application.
     /// </remarks>
     public async ValueTask<int> RunAsync(IReadOnlyList<string> commandLineArguments) =>
         await RunAsync(
@@ -227,12 +196,13 @@ public class CliApplication(
 
     /// <summary>
     /// Runs the application.
-    /// Command-line arguments and environment variables are resolved automatically.
+    /// Command-line arguments and environment variables are resolved automatically from <see cref="Environment" />.
     /// Returns the exit code which indicates whether the application completed successfully.
     /// </summary>
     /// <remarks>
     /// When running WITHOUT the debugger attached (i.e. in production), this method swallows
-    /// all exceptions and reports them to the console.
+    /// all inner exceptions and reports them to the console, instead of allowing them to propagate
+    /// to the caller and potentially crash the application.
     /// </remarks>
     public async ValueTask<int> RunAsync() =>
         await RunAsync(

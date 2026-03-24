@@ -4,8 +4,8 @@ namespace CliFx.Generators;
 
 internal static class KnownSymbols
 {
-    public static TypeIdentifier CliApplicationBuilder { get; } =
-        new("CliFx.CliApplicationBuilder");
+    public static TypeIdentifier CommandLineApplicationBuilder { get; } =
+        new("CliFx.CommandLineApplicationBuilder");
 
     public static TypeIdentifier ICommand { get; } = new("CliFx.ICommand");
     public static TypeIdentifier ICommandWithHelpOption { get; } =

@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using CliFx.Binding;
 using CliFx.Infrastructure;
 
@@ -11,8 +10,6 @@ namespace CliFx;
 [Command]
 internal partial class FallbackDefaultCommand : ICommand
 {
-    // Never actually executed. CliFx intercepts this specific command implementation
-    // and always shows help text, even when it wasn't explicitly requested.
-    [ExcludeFromCodeCoverage]
-    public ValueTask ExecuteAsync(IConsole console) => default;
+    public ValueTask ExecuteAsync(IConsole console) =>
+        throw new CommandException("Use one of the other available commands.", 1, true);
 }

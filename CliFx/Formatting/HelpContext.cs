@@ -4,8 +4,8 @@ using CliFx.Binding;
 namespace CliFx.Formatting;
 
 internal record HelpContext(
-    ApplicationMetadata ApplicationMetadata,
-    ApplicationDescriptor ApplicationDescriptor,
+    CommandLineApplicationMetadata ApplicationMetadata,
+    CommandRootDescriptor ApplicationDescriptor,
     CommandDescriptor CommandDescriptor,
     IReadOnlyDictionary<CommandInputDescriptor, object?> CommandDefaultValues
 );

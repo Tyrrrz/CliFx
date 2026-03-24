@@ -5,7 +5,7 @@ using CliFx.Utils.Extensions;
 
 namespace CliFx.Binding;
 
-internal class ApplicationDescriptor(IReadOnlyList<CommandDescriptor> commands)
+internal class CommandRootDescriptor(IReadOnlyList<CommandDescriptor> commands)
 {
     public IReadOnlyList<CommandDescriptor> Commands { get; } = commands;
 

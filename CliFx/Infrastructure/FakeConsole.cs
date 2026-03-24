@@ -7,7 +7,7 @@ namespace CliFx.Infrastructure;
 
 /// <summary>
 /// Implementation of <see cref="IConsole" /> that uses the provided fake standard input, output, and error streams.
-/// Use this implementation in tests to verify how a command interacts with the console.
+/// Use this implementation in tests to verify console interactions in an isolated environment.
 /// </summary>
 public class FakeConsole : IConsole, IDisposable
 {

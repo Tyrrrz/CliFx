@@ -2,7 +2,7 @@
 using CliFx.Demo.Domain;
 using Microsoft.Extensions.DependencyInjection;
 
-return await new CliApplicationBuilder()
+return await new CommandLineApplicationBuilder()
     .SetDescription("Demo application showcasing CliFx features.")
     .AddCommandsFromThisAssembly()
     .UseTypeActivator(commandSchemas =>

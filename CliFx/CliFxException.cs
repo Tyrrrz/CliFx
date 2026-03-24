@@ -12,8 +12,6 @@ public partial class CliFxException(
     Exception? innerException = null
 ) : Exception(message, innerException)
 {
-    internal const int DefaultExitCode = 1;
-
     // When an exception is created without a message, the base Exception class
     // provides a default message that is not very useful.
     // This property is used to identify whether this instance was created with
@@ -33,6 +31,8 @@ public partial class CliFxException(
 
 public partial class CliFxException
 {
+    internal const int DefaultExitCode = 1;
+
     // Internal errors don't show help because they're meant for the developer and
     // not the end-user of the application.
     internal static CliFxException InternalError(
