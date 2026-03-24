@@ -58,7 +58,7 @@ internal record CommandOptionSymbol(
         {
             diagnosticsList.Add(
                 Diagnostic.Create(
-                    DiagnosticDescriptors.CommandOptionNameInvalid,
+                    DiagnosticDescriptors.CommandOptionNameMustBeValid,
                     property.Locations.FirstOrDefault(),
                     property.Name,
                     name

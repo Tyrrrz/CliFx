@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using CliFx.Generators;
 using CliFx.Tests.Utils;
 using CliFx.Tests.Utils.Extensions;
 using FluentAssertions;
@@ -220,6 +221,40 @@ public class ParameterActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(
 
         var stdOut = FakeConsole.ReadOutputString();
         stdOut.Should().ConsistOfLines("Foo = abc", "Bar = xyz");
+    }
+
+    [Fact]
+    public void I_get_an_error_if_a_non_required_parameter_is_not_last_in_order()
+    {
+        // Arrange
+        _ = DynamicCommandBuilder.CreateCompilation(
+            // lang=csharp
+            """
+            [Command]
+            public partial class Command : ICommand
+            {
+                [CommandParameter(0)]
+                public string? Foo { get; set; }
+
+                [CommandParameter(1)]
+                public required string Bar { get; set; }
+
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """,
+            out var diagnostics
+        );
+
+        // Assert
+        diagnostics
+            .Should()
+            .ContainSingle(d =>
+                d.Id == DiagnosticDescriptors.CommandParameterMustHaveHighestOrderIfNotRequired.Id
+            )
+            .Which.GetMessage()
+            .Should()
+            .Contain("Foo")
+            .And.Contain("Bar");
     }
 
     [Fact]

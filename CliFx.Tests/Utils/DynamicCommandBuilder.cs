@@ -15,7 +15,10 @@ namespace CliFx.Tests.Utils;
 
 internal static class DynamicCommandBuilder
 {
-    public static IReadOnlyList<CommandDescriptor> CompileMany(string sourceCode)
+    public static Compilation CreateCompilation(
+        string sourceCode,
+        out IReadOnlyList<Diagnostic> diagnostics
+    )
     {
         // Get default system namespaces
         var defaultSystemNamespaces = new[]
@@ -50,7 +53,7 @@ internal static class DynamicCommandBuilder
         );
 
         // Compile the code to IL
-        var compilation = CSharpCompilation.Create(
+        var initialCompilation = CSharpCompilation.Create(
             "CliFxTests_DynamicAssembly_" + Guid.NewGuid(),
             [syntaxTree],
             Net100
@@ -66,7 +69,7 @@ internal static class DynamicCommandBuilder
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
         );
 
-        // Run the source generator to produce Schema properties on [Command] classes
+        // Run the source generator
         CSharpGeneratorDriver
             .Create(
                 [new Generator().AsSourceGenerator()],
@@ -75,14 +78,21 @@ internal static class DynamicCommandBuilder
                 )
             )
             .RunGeneratorsAndUpdateCompilation(
-                compilation,
+                initialCompilation,
                 out var updatedCompilation,
                 out var generatorDiagnostics
             );
 
-        var compilationErrors = updatedCompilation
-            .GetDiagnostics()
-            .Concat(generatorDiagnostics)
+        diagnostics = updatedCompilation.GetDiagnostics().Concat(generatorDiagnostics).ToArray();
+
+        return updatedCompilation;
+    }
+
+    public static IReadOnlyList<CommandDescriptor> CompileMany(string sourceCode)
+    {
+        var compilation = CreateCompilation(sourceCode, out var diagnostics);
+
+        var compilationErrors = diagnostics
             .Where(d => d.Severity >= DiagnosticSeverity.Error)
             .ToArray();
 
@@ -98,7 +108,7 @@ internal static class DynamicCommandBuilder
 
         // Emit the code to an in-memory buffer
         using var buffer = new MemoryStream();
-        var emit = updatedCompilation.Emit(buffer);
+        var emit = compilation.Emit(buffer);
 
         var emitErrors = emit
             .Diagnostics.Where(d => d.Severity >= DiagnosticSeverity.Error)

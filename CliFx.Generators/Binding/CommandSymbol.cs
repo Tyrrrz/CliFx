@@ -127,7 +127,7 @@ internal record CommandSymbol(
                 {
                     diagnosticsList.Add(
                         Diagnostic.Create(
-                            DiagnosticDescriptors.CommandParametersMustHaveUniqueOrder,
+                            DiagnosticDescriptors.CommandParameterMustHaveUniqueOrder,
                             first.Property.Locations.FirstOrDefault(),
                             first.Property.Name,
                             second.Property.Name,
@@ -150,7 +150,7 @@ internal record CommandSymbol(
                 {
                     diagnosticsList.Add(
                         Diagnostic.Create(
-                            DiagnosticDescriptors.CommandParametersMustHaveUniqueNames,
+                            DiagnosticDescriptors.CommandParameterMustHaveUniqueName,
                             first.Property.Locations.FirstOrDefault(),
                             first.Property.Name,
                             second.Property.Name,
@@ -158,6 +158,30 @@ internal record CommandSymbol(
                         )
                     );
                 }
+            }
+        }
+
+        // Non-required parameters must have the highest order (and be alone)
+        var parametersByOrder = parameters.OrderBy(p => p.Order).ToArray();
+        for (var i = 0; i < parametersByOrder.Length; i++)
+        {
+            var parameter = parametersByOrder[i];
+
+            if (parameter.IsRequired)
+                continue;
+
+            if (i < parametersByOrder.Length - 1)
+            {
+                var nextParameter = parametersByOrder[i + 1];
+
+                diagnosticsList.Add(
+                    Diagnostic.Create(
+                        DiagnosticDescriptors.CommandParameterMustHaveHighestOrderIfNotRequired,
+                        parameter.Property.Locations.FirstOrDefault(),
+                        parameter.Property.Name,
+                        nextParameter.Property.Name
+                    )
+                );
             }
         }
 
@@ -176,7 +200,7 @@ internal record CommandSymbol(
                 {
                     diagnosticsList.Add(
                         Diagnostic.Create(
-                            DiagnosticDescriptors.CommandOptionsMustHaveUniqueNames,
+                            DiagnosticDescriptors.CommandOptionMustHaveUniqueName,
                             first.Property.Locations.FirstOrDefault(),
                             first.Property.Name,
                             second.Property.Name,
@@ -189,7 +213,7 @@ internal record CommandSymbol(
                 {
                     diagnosticsList.Add(
                         Diagnostic.Create(
-                            DiagnosticDescriptors.CommandOptionsMustHaveUniqueShortNames,
+                            DiagnosticDescriptors.CommandOptionMustHaveUniqueShortName,
                             first.Property.Locations.FirstOrDefault(),
                             first.Property.Name,
                             second.Property.Name,
