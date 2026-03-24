@@ -13,7 +13,7 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace CliFx.Tests.Utils;
 
-internal static class DynamicCommandBuilder
+internal static class CommandCompiler
 {
     public static Compilation CreateCompilation(
         string sourceCode,
@@ -61,9 +61,7 @@ internal static class DynamicCommandBuilder
                     MetadataReference.CreateFromFile(typeof(ICommand).Assembly.Location)
                 )
                 .Append(
-                    MetadataReference.CreateFromFile(
-                        typeof(DynamicCommandBuilder).Assembly.Location
-                    )
+                    MetadataReference.CreateFromFile(typeof(CommandCompiler).Assembly.Location)
                 ),
             // DLL to avoid having to define the Main() method
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
@@ -127,7 +125,7 @@ internal static class DynamicCommandBuilder
         // Load the generated assembly
         var generatedAssembly = Assembly.Load(buffer.ToArray());
 
-        // Return schemas for all defined commands via the source-generated Schema property
+        // Return types for all defined commands
         var commandTypes = generatedAssembly
             .GetTypes()
             .Where(t => t.IsAssignableTo(typeof(ICommand)) && !t.IsAbstract)

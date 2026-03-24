@@ -18,29 +18,29 @@ internal class CommandRootDescriptor(IReadOnlyList<CommandDescriptor> commands)
         Commands.FirstOrDefault(c => c.MatchesName(commandName));
 
     private IReadOnlyList<CommandDescriptor> GetDescendantCommands(
-        IReadOnlyList<CommandDescriptor> potentialParentCommandDescriptors,
+        IReadOnlyList<CommandDescriptor> potentialParentCommands,
         string? parentCommandName
     )
     {
         var result = new List<CommandDescriptor>();
 
-        foreach (var potentialParentCommandDescriptor in potentialParentCommandDescriptors)
+        foreach (var potentialParentCommand in potentialParentCommands)
         {
-            if (string.IsNullOrWhiteSpace(potentialParentCommandDescriptor.Name))
+            if (string.IsNullOrWhiteSpace(potentialParentCommand.Name))
                 continue;
 
-            if (potentialParentCommandDescriptor.MatchesName(parentCommandName))
+            if (potentialParentCommand.MatchesName(parentCommandName))
                 continue;
 
             var isDescendant =
                 string.IsNullOrWhiteSpace(parentCommandName)
-                || potentialParentCommandDescriptor.Name.StartsWith(
+                || potentialParentCommand.Name.StartsWith(
                     parentCommandName + ' ',
                     StringComparison.OrdinalIgnoreCase
                 );
 
             if (isDescendant)
-                result.Add(potentialParentCommandDescriptor);
+                result.Add(potentialParentCommand);
         }
 
         return result;

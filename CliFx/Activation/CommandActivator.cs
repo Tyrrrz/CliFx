@@ -210,7 +210,7 @@ internal class CommandActivator(
 
         if (instance is ICommandWithHelpOption)
         {
-            var optionDescriptor = command.Options.FirstOrDefault(o =>
+            var option = command.Options.FirstOrDefault(o =>
                 string.Equals(
                     o.Property.Name,
                     nameof(ICommandWithHelpOption.IsHelpRequested),
@@ -218,13 +218,13 @@ internal class CommandActivator(
                 )
             );
 
-            if (optionDescriptor is not null)
-                options.Add(optionDescriptor);
+            if (option is not null)
+                options.Add(option);
         }
 
         if (instance is ICommandWithVersionOption)
         {
-            var optionDescriptor = command.Options.FirstOrDefault(o =>
+            var option = command.Options.FirstOrDefault(o =>
                 string.Equals(
                     o.Property.Name,
                     nameof(ICommandWithVersionOption.IsVersionRequested),
@@ -232,8 +232,8 @@ internal class CommandActivator(
                 )
             );
 
-            if (optionDescriptor is not null)
-                options.Add(optionDescriptor);
+            if (option is not null)
+                options.Add(option);
         }
 
         if (!options.Any())

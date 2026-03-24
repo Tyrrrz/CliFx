@@ -55,7 +55,7 @@ public class CancellationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOut
     public async Task I_can_configure_the_command_to_listen_to_the_interrupt_signal_when_running_in_isolation()
     {
         // Arrange
-        var commandDescriptor = DynamicCommandBuilder.Compile(
+        var command = CommandCompiler.Compile(
             // lang=csharp
             """
             [Command]
@@ -85,7 +85,7 @@ public class CancellationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOut
         );
 
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(commandDescriptor)
+            .AddCommand(command)
             .UseConsole(FakeConsole)
             .Build();
 

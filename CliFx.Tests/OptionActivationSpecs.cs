@@ -14,7 +14,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
     public async Task I_can_activate_an_option_to_a_property_and_get_the_value_from_the_corresponding_argument_by_name()
     {
         // Arrange
-        var commandDescriptor = DynamicCommandBuilder.Compile(
+        var command = CommandCompiler.Compile(
             // lang=csharp
             """
             [Command]
@@ -33,7 +33,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
         );
 
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(commandDescriptor)
+            .AddCommand(command)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -51,7 +51,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
     public async Task I_can_activate_an_option_to_a_property_and_get_the_value_from_the_corresponding_argument_by_short_name()
     {
         // Arrange
-        var commandDescriptor = DynamicCommandBuilder.Compile(
+        var command = CommandCompiler.Compile(
             // lang=csharp
             """
             [Command]
@@ -70,7 +70,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
         );
 
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(commandDescriptor)
+            .AddCommand(command)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -88,7 +88,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
     public async Task I_can_activate_an_option_to_a_property_and_get_the_value_from_the_corresponding_argument_set_by_name()
     {
         // Arrange
-        var commandDescriptor = DynamicCommandBuilder.Compile(
+        var command = CommandCompiler.Compile(
             // lang=csharp
             """
             [Command]
@@ -112,7 +112,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
         );
 
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(commandDescriptor)
+            .AddCommand(command)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -133,7 +133,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
     public async Task I_can_activate_an_option_to_a_property_and_get_the_value_from_the_corresponding_argument_set_by_short_name()
     {
         // Arrange
-        var commandDescriptor = DynamicCommandBuilder.Compile(
+        var command = CommandCompiler.Compile(
             // lang=csharp
             """
             [Command]
@@ -157,7 +157,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
         );
 
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(commandDescriptor)
+            .AddCommand(command)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -178,7 +178,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
     public async Task I_can_activate_an_option_to_a_property_and_get_the_value_from_the_corresponding_argument_stack_by_short_name()
     {
         // Arrange
-        var commandDescriptor = DynamicCommandBuilder.Compile(
+        var command = CommandCompiler.Compile(
             // lang=csharp
             """
             [Command]
@@ -202,7 +202,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
         );
 
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(commandDescriptor)
+            .AddCommand(command)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -223,7 +223,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
     public async Task I_can_activate_an_option_to_a_non_scalar_property_and_get_the_values_from_the_corresponding_arguments_by_name()
     {
         // Arrange
-        var commandDescriptor = DynamicCommandBuilder.Compile(
+        var command = CommandCompiler.Compile(
             // lang=csharp
             """
             [Command]
@@ -244,7 +244,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
         );
 
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(commandDescriptor)
+            .AddCommand(command)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -265,7 +265,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
     public async Task I_can_activate_an_option_to_a_non_scalar_property_and_get_the_values_from_the_corresponding_arguments_by_short_name()
     {
         // Arrange
-        var commandDescriptor = DynamicCommandBuilder.Compile(
+        var command = CommandCompiler.Compile(
             // lang=csharp
             """
             [Command]
@@ -286,7 +286,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
         );
 
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(commandDescriptor)
+            .AddCommand(command)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -307,7 +307,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
     public async Task I_can_activate_an_option_to_a_non_scalar_property_and_get_the_values_from_the_corresponding_argument_sets_by_name()
     {
         // Arrange
-        var commandDescriptor = DynamicCommandBuilder.Compile(
+        var command = CommandCompiler.Compile(
             // lang=csharp
             """
             [Command]
@@ -328,7 +328,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
         );
 
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(commandDescriptor)
+            .AddCommand(command)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -349,7 +349,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
     public async Task I_can_activate_an_option_to_a_non_scalar_property_and_get_the_values_from_the_corresponding_argument_sets_by_short_name()
     {
         // Arrange
-        var commandDescriptor = DynamicCommandBuilder.Compile(
+        var command = CommandCompiler.Compile(
             // lang=csharp
             """
             [Command]
@@ -370,7 +370,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
         );
 
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(commandDescriptor)
+            .AddCommand(command)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -391,7 +391,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
     public async Task I_can_activate_an_option_to_a_non_scalar_property_and_get_the_values_from_the_corresponding_argument_sets_by_name_or_short_name()
     {
         // Arrange
-        var commandDescriptor = DynamicCommandBuilder.Compile(
+        var command = CommandCompiler.Compile(
             // lang=csharp
             """
             [Command]
@@ -412,7 +412,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
         );
 
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(commandDescriptor)
+            .AddCommand(command)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -433,7 +433,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
     public async Task I_can_activate_an_option_to_a_property_and_get_no_value_if_the_user_does_not_provide_the_corresponding_argument()
     {
         // Arrange
-        var commandDescriptor = DynamicCommandBuilder.Compile(
+        var command = CommandCompiler.Compile(
             // lang=csharp
             """
             [Command]
@@ -457,7 +457,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
         );
 
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(commandDescriptor)
+            .AddCommand(command)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -478,7 +478,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
     public async Task I_can_activate_an_option_to_a_property_through_multiple_inheritance()
     {
         // Arrange
-        var commandDescriptor = DynamicCommandBuilder.Compile(
+        var command = CommandCompiler.Compile(
             // lang=csharp
             """
             public interface IHasFoo : ICommand
@@ -519,7 +519,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
         );
 
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(commandDescriptor)
+            .AddCommand(command)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -537,7 +537,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
     public async Task I_can_activate_an_option_to_a_property_and_get_the_correct_value_if_the_user_provides_an_argument_containing_a_negative_number()
     {
         // Arrange
-        var commandDescriptor = DynamicCommandBuilder.Compile(
+        var command = CommandCompiler.Compile(
             // lang=csharp
             """
             [Command]
@@ -556,7 +556,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
         );
 
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(commandDescriptor)
+            .AddCommand(command)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -577,7 +577,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
     public async Task I_can_try_to_bind_a_required_option_to_a_property_and_get_an_error_if_the_user_does_not_provide_the_corresponding_argument()
     {
         // Arrange
-        var commandDescriptor = DynamicCommandBuilder.Compile(
+        var command = CommandCompiler.Compile(
             // lang=csharp
             """
             [Command]
@@ -592,7 +592,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
         );
 
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(commandDescriptor)
+            .AddCommand(command)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -610,7 +610,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
     public async Task I_can_try_to_bind_a_required_option_to_a_property_and_get_an_error_if_the_user_provides_an_empty_argument()
     {
         // Arrange
-        var commandDescriptor = DynamicCommandBuilder.Compile(
+        var command = CommandCompiler.Compile(
             // lang=csharp
             """
             [Command]
@@ -625,7 +625,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
         );
 
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(commandDescriptor)
+            .AddCommand(command)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -643,7 +643,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
     public async Task I_can_try_to_bind_an_option_to_a_non_scalar_property_and_get_an_error_if_the_user_does_not_provide_at_least_one_corresponding_argument()
     {
         // Arrange
-        var commandDescriptor = DynamicCommandBuilder.Compile(
+        var command = CommandCompiler.Compile(
             // lang=csharp
             """
             [Command]
@@ -658,7 +658,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
         );
 
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(commandDescriptor)
+            .AddCommand(command)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -676,7 +676,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
     public async Task I_can_try_to_bind_options_and_get_an_error_if_the_user_provides_unrecognized_arguments()
     {
         // Arrange
-        var commandDescriptor = DynamicCommandBuilder.Compile(
+        var command = CommandCompiler.Compile(
             // lang=csharp
             """
             [Command]
@@ -691,7 +691,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
         );
 
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(commandDescriptor)
+            .AddCommand(command)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -712,7 +712,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
     public async Task I_can_try_to_bind_an_option_to_a_scalar_property_and_get_an_error_if_the_user_provides_too_many_arguments()
     {
         // Arrange
-        var commandDescriptor = DynamicCommandBuilder.Compile(
+        var command = CommandCompiler.Compile(
             // lang=csharp
             """
             [Command]
@@ -727,7 +727,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
         );
 
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(commandDescriptor)
+            .AddCommand(command)
             .UseConsole(FakeConsole)
             .Build();
 
