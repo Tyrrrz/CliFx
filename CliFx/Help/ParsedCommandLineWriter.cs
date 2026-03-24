@@ -2,12 +2,10 @@
 using CliFx.Infrastructure;
 using CliFx.Parsing;
 
-namespace CliFx.Formatting;
+namespace CliFx.Help;
 
-internal class ParsedCommandLineConsoleFormatter(
-    ConsoleWriter consoleWriter,
-    ParsedCommandLine commandLine
-) : ConsoleFormatter(consoleWriter)
+internal class ParsedCommandLineWriter(ParsedCommandLine commandLine, ConsoleWriter consoleWriter)
+    : FormattedConsoleWriter(consoleWriter)
 {
     public void Write()
     {

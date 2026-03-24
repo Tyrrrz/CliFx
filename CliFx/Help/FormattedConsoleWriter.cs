@@ -1,9 +1,9 @@
 ﻿using System;
 using CliFx.Infrastructure;
 
-namespace CliFx.Formatting;
+namespace CliFx.Help;
 
-internal class ConsoleFormatter(ConsoleWriter consoleWriter)
+internal class FormattedConsoleWriter(ConsoleWriter consoleWriter)
 {
     private int _column;
     private int _row;

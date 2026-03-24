@@ -4,10 +4,9 @@ using System.Linq;
 using CliFx.Infrastructure;
 using CliFx.Utils.StackTraces;
 
-namespace CliFx.Formatting;
+namespace CliFx.Help;
 
-internal class ExceptionConsoleFormatter(ConsoleWriter consoleWriter)
-    : ConsoleFormatter(consoleWriter)
+internal class ExceptionWriter(ConsoleWriter consoleWriter) : FormattedConsoleWriter(consoleWriter)
 {
     private void WriteStackFrame(StackFrame stackFrame, int indentLevel)
     {
@@ -68,9 +67,9 @@ internal class ExceptionConsoleFormatter(ConsoleWriter consoleWriter)
         WriteLine();
     }
 
-    private void WriteException(Exception exception, int indentLevel)
+    private void WriteException(Exception exception, int depth)
     {
-        WriteHorizontalMargin(4 * indentLevel);
+        WriteHorizontalMargin(4 * depth);
 
         // Fully qualified exception type
         var exceptionType = exception.GetType();
@@ -85,7 +84,7 @@ internal class ExceptionConsoleFormatter(ConsoleWriter consoleWriter)
         // Recurse into inner exceptions
         if (exception.InnerException is not null)
         {
-            WriteException(exception.InnerException, indentLevel + 1);
+            WriteException(exception.InnerException, depth + 1);
         }
 
         // Non-thrown exceptions (e.g. inner exceptions) have no stacktrace
@@ -93,7 +92,7 @@ internal class ExceptionConsoleFormatter(ConsoleWriter consoleWriter)
         {
             // Parse and pretty-print the stacktrace
             foreach (var stackFrame in StackFrame.ParseTrace(exception.StackTrace))
-                WriteStackFrame(stackFrame, indentLevel);
+                WriteStackFrame(stackFrame, depth);
         }
     }
 

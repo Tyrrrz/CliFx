@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CliFx.Activation;
 using CliFx.Binding;
-using CliFx.Formatting;
+using CliFx.Help;
 using CliFx.Infrastructure;
 using CliFx.Parsing;
 using CliFx.Utils.Extensions;
@@ -103,7 +103,7 @@ public class CommandLineApplication(
         // Handle help option
         if (instance is ICommandWithHelpOption { IsHelpRequested: true })
         {
-            console.WriteHelpText(helpContext);
+            console.WriteHelp(helpContext);
             return 0;
         }
 
@@ -135,7 +135,7 @@ public class CommandLineApplication(
             if (ex.ShowHelp)
             {
                 console.WriteLine();
-                console.WriteHelpText(helpContext);
+                console.WriteHelp(helpContext);
             }
 
             return ex.ExitCode;

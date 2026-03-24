@@ -419,7 +419,7 @@ COMMANDS
   cmd1              Subcommands: cmd1 sub.
   cmd2
 
-You can run `dotnet myapp.dll [command] --help` to show help on a specific command.
+You can run `dotnet myapp.dll [command] --help` to show help for a specific command.
 ```
 
 To see the list of commands nested under a specific command, the user can refine their help request by specifying the corresponding command name before the help option:
@@ -437,7 +437,7 @@ OPTIONS
 COMMANDS
   sub
 
-You can run `dotnet myapp.dll cmd1 [command] --help` to show help on a specific command.
+You can run `dotnet myapp.dll cmd1 [command] --help` to show help for a specific command.
 ```
 
 > [!NOTE]

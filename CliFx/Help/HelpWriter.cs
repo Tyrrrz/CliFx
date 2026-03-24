@@ -7,10 +7,10 @@ using CliFx.Binding;
 using CliFx.Infrastructure;
 using CliFx.Utils.Extensions;
 
-namespace CliFx.Formatting;
+namespace CliFx.Help;
 
-internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext context)
-    : ConsoleFormatter(consoleWriter)
+internal class HelpWriter(HelpContext context, ConsoleWriter consoleWriter)
+    : FormattedConsoleWriter(consoleWriter)
 {
     private void WriteHeader(string text)
     {
@@ -20,33 +20,13 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
 
     private void WriteCommandInvocation()
     {
-        Write(context.ApplicationMetadata.ExecutableName);
+        Write(context.Metadata.ExecutableName);
 
         // Command name
-        if (!string.IsNullOrWhiteSpace(context.CommandDescriptor.Name))
+        if (!string.IsNullOrWhiteSpace(context.Command.Name))
         {
             Write(' ');
-            Write(ConsoleColor.Cyan, context.CommandDescriptor.Name);
-        }
-    }
-
-    private void WriteApplicationInfo()
-    {
-        if (!IsEmpty)
-            WriteVerticalMargin();
-
-        // Title and version
-        Write(ConsoleColor.White, context.ApplicationMetadata.Title);
-        Write(' ');
-        Write(ConsoleColor.Yellow, context.ApplicationMetadata.Version);
-        WriteLine();
-
-        // Description
-        if (!string.IsNullOrWhiteSpace(context.ApplicationMetadata.Description))
-        {
-            WriteHorizontalMargin();
-            Write(context.ApplicationMetadata.Description);
-            WriteLine();
+            Write(ConsoleColor.Cyan, context.Command.Name);
         }
     }
 
@@ -57,7 +37,7 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
 
         WriteHeader("Usage");
 
-        // Current command usage
+        // Current command
         {
             WriteHorizontalMargin();
 
@@ -65,7 +45,7 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
             Write(' ');
 
             // Parameters
-            foreach (var parameter in context.CommandDescriptor.Parameters.OrderBy(p => p.Order))
+            foreach (var parameter in context.Command.Parameters.OrderBy(p => p.Order))
             {
                 Write(
                     ConsoleColor.DarkCyan,
@@ -77,7 +57,7 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
             }
 
             // Required options
-            foreach (var option in context.CommandDescriptor.Options.Where(o => o.IsRequired))
+            foreach (var option in context.Command.Options.Where(o => o.IsRequired))
             {
                 Write(
                     ConsoleColor.Yellow,
@@ -95,7 +75,7 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
             }
 
             // Placeholder for non-required options
-            if (context.CommandDescriptor.Options.Any(o => !o.IsRequired))
+            if (context.Command.Options.Any(o => !o.IsRequired))
             {
                 Write(ConsoleColor.Yellow, "[options]");
             }
@@ -103,12 +83,8 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
             WriteLine();
         }
 
-        // Child command usage
-        var childCommandDescriptors = context.ApplicationDescriptor.GetChildCommands(
-            context.CommandDescriptor.Name
-        );
-
-        if (childCommandDescriptors.Any())
+        // Child commands
+        if (context.Root.GetChildCommands(context.Command.Name).Any())
         {
             WriteHorizontalMargin();
 
@@ -128,7 +104,7 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
 
     private void WriteCommandDescription()
     {
-        if (string.IsNullOrWhiteSpace(context.CommandDescriptor.Description))
+        if (string.IsNullOrWhiteSpace(context.Command.Description))
             return;
 
         if (!IsEmpty)
@@ -138,13 +114,56 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
 
         WriteHorizontalMargin();
 
-        Write(context.CommandDescriptor.Description);
+        Write(context.Command.Description);
         WriteLine();
+    }
+
+    private void WriteCommandInputDefaultValue(CommandInputDescriptor input)
+    {
+        var defaultValue = context.CommandDefaultValues.GetValueOrDefault(input);
+        if (defaultValue is null)
+            return;
+
+        // Normalize to an array to process both scalar and sequence default values uniformly
+        var defaultValues =
+            defaultValue is not string && defaultValue is IEnumerable defaultValueAsEnumerable
+                ? defaultValueAsEnumerable.Cast<object>().ToArray()
+                : [defaultValue];
+
+        // Only strings, chars, bools, and types that implement IFormattable have
+        // meaningful ToString() representations.
+        if (!defaultValues.All(v => v is string or char or bool or IFormattable))
+            return;
+
+        var isFirst = true;
+
+        foreach (var value in defaultValues)
+        {
+            if (value is not IFormattable and not IConvertible)
+                continue;
+
+            if (isFirst)
+            {
+                Write(ConsoleColor.White, "Default: ");
+                isFirst = false;
+            }
+            else
+            {
+                Write(", ");
+            }
+
+            Write('"');
+            Write(value.ToString(CultureInfo.InvariantCulture));
+            Write('"');
+        }
+
+        if (!isFirst)
+            Write('.');
     }
 
     private void WriteCommandParameters()
     {
-        if (!context.CommandDescriptor.Parameters.Any())
+        if (!context.Command.Parameters.Any())
             return;
 
         if (!IsEmpty)
@@ -152,9 +171,9 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
 
         WriteHeader("Parameters");
 
-        foreach (var parameterSchema in context.CommandDescriptor.Parameters.OrderBy(p => p.Order))
+        foreach (var parameter in context.Command.Parameters.OrderBy(p => p.Order))
         {
-            if (parameterSchema.IsRequired)
+            if (parameter.IsRequired)
             {
                 Write(ConsoleColor.Red, "* ");
             }
@@ -163,19 +182,19 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
                 WriteHorizontalMargin();
             }
 
-            Write(ConsoleColor.DarkCyan, $"{parameterSchema.Name}");
+            Write(ConsoleColor.DarkCyan, $"{parameter.Name}");
 
             WriteColumnMargin();
 
             // Description
-            if (!string.IsNullOrWhiteSpace(parameterSchema.Description))
+            if (!string.IsNullOrWhiteSpace(parameter.Description))
             {
-                Write(parameterSchema.Description);
+                Write(parameter.Description);
                 Write(' ');
             }
 
             // Valid values
-            var validValues = parameterSchema.Property.TryGetValidValues() ?? [];
+            var validValues = parameter.Property.TryGetValidValues() ?? [];
             if (validValues.Any())
             {
                 Write(ConsoleColor.White, "Choices: ");
@@ -205,9 +224,9 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
             }
 
             // Default value
-            if (!parameterSchema.IsRequired)
+            if (!parameter.IsRequired)
             {
-                WriteDefaultValue(parameterSchema);
+                WriteCommandInputDefaultValue(parameter);
             }
 
             WriteLine();
@@ -221,13 +240,9 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
 
         WriteHeader("Options");
 
-        foreach (
-            var optionSchema in context.CommandDescriptor.Options.OrderByDescending(o =>
-                o.IsRequired
-            )
-        )
+        foreach (var option in context.Command.Options.OrderByDescending(o => o.IsRequired))
         {
-            if (optionSchema.IsRequired)
+            if (option.IsRequired)
             {
                 Write(ConsoleColor.Red, "* ");
             }
@@ -237,34 +252,34 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
             }
 
             // Short name
-            if (optionSchema.ShortName is not null)
+            if (option.ShortName is not null)
             {
-                Write(ConsoleColor.Yellow, $"-{optionSchema.ShortName}");
+                Write(ConsoleColor.Yellow, $"-{option.ShortName}");
             }
 
             // Separator
-            if (!string.IsNullOrWhiteSpace(optionSchema.Name) && optionSchema.ShortName is not null)
+            if (!string.IsNullOrWhiteSpace(option.Name) && option.ShortName is not null)
             {
                 Write('|');
             }
 
             // Name
-            if (!string.IsNullOrWhiteSpace(optionSchema.Name))
+            if (!string.IsNullOrWhiteSpace(option.Name))
             {
-                Write(ConsoleColor.Yellow, $"--{optionSchema.Name}");
+                Write(ConsoleColor.Yellow, $"--{option.Name}");
             }
 
             WriteColumnMargin();
 
             // Description
-            if (!string.IsNullOrWhiteSpace(optionSchema.Description))
+            if (!string.IsNullOrWhiteSpace(option.Description))
             {
-                Write(optionSchema.Description);
+                Write(option.Description);
                 Write(' ');
             }
 
             // Valid values
-            var validValues = optionSchema.Property.TryGetValidValues() ?? [];
+            var validValues = option.Property.TryGetValidValues() ?? [];
             if (validValues.Any())
             {
                 Write(ConsoleColor.White, "Choices: ");
@@ -294,75 +309,32 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
             }
 
             // Environment variable
-            if (!string.IsNullOrWhiteSpace(optionSchema.EnvironmentVariable))
+            if (!string.IsNullOrWhiteSpace(option.EnvironmentVariable))
             {
                 Write(ConsoleColor.White, "Environment variable: ");
-                Write(optionSchema.EnvironmentVariable);
+                Write(option.EnvironmentVariable);
                 Write('.');
                 Write(' ');
             }
 
             // Default value
-            if (!optionSchema.IsRequired)
+            if (!option.IsRequired)
             {
-                WriteDefaultValue(optionSchema);
+                WriteCommandInputDefaultValue(option);
             }
 
             WriteLine();
         }
     }
 
-    private void WriteDefaultValue(CommandInputDescriptor schema)
-    {
-        var defaultValue = context.CommandDefaultValues.GetValueOrDefault(schema);
-        if (defaultValue is null)
-            return;
-
-        // Normalize to an array to process both single and sequence default values uniformly
-        var defaultValues =
-            defaultValue is not string && defaultValue is IEnumerable defaultValueAsEnumerable
-                ? defaultValueAsEnumerable.Cast<object>().ToArray()
-                : [defaultValue];
-
-        // Only strings, chars, bools, and types that implement IFormattable have
-        // meaningful ToString() representations.
-        if (!defaultValues.All(v => v is string or char or bool or IFormattable))
-            return;
-
-        var isFirst = true;
-
-        foreach (var element in defaultValues)
-        {
-            if (element is not IFormattable and not IConvertible)
-                continue;
-
-            if (isFirst)
-            {
-                Write(ConsoleColor.White, "Default: ");
-                isFirst = false;
-            }
-            else
-            {
-                Write(", ");
-            }
-
-            Write('"');
-            Write(element.ToString(CultureInfo.InvariantCulture));
-            Write('"');
-        }
-
-        if (!isFirst)
-            Write('.');
-    }
-
     private void WriteCommandChildren()
     {
-        var childCommandDescriptors = context
-            .ApplicationDescriptor.GetChildCommands(context.CommandDescriptor.Name)
+        var childCommands = context
+            .Root.GetChildCommands(context.Command.Name)
             .OrderBy(a => a.Name, StringComparer.Ordinal)
             .ToArray();
 
-        if (!childCommandDescriptors.Any())
+        if (!childCommands.Any())
             return;
 
         if (!IsEmpty)
@@ -370,39 +342,37 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
 
         WriteHeader("Commands");
 
-        foreach (var childCommandDescriptor in childCommandDescriptors)
+        foreach (var childCommand in childCommands)
         {
             // Name
             WriteHorizontalMargin();
             Write(
                 ConsoleColor.Cyan,
-                // Relative to current command
-                childCommandDescriptor
-                    .Name?.Substring(context.CommandDescriptor.Name?.Length ?? 0)
-                    .Trim()
+                // Trim the name so it's relative to the current command
+                childCommand.Name?.Substring(context.Command.Name?.Length ?? 0).Trim()
             );
 
             WriteColumnMargin();
 
             // Description
-            if (!string.IsNullOrWhiteSpace(childCommandDescriptor.Description))
+            if (!string.IsNullOrWhiteSpace(childCommand.Description))
             {
-                Write(childCommandDescriptor.Description);
+                Write(childCommand.Description);
                 Write(' ');
             }
 
-            // Child commands of child command
-            var grandChildCommandDescriptors = context
-                .ApplicationDescriptor.GetChildCommands(childCommandDescriptor.Name)
+            // Grand-child commands
+            var grandChildCommands = context
+                .Root.GetChildCommands(childCommand.Name)
                 .OrderBy(c => c.Name, StringComparer.Ordinal)
                 .ToArray();
 
-            if (grandChildCommandDescriptors.Any())
+            if (grandChildCommands.Any())
             {
                 Write(ConsoleColor.White, "Subcommands: ");
 
                 var isFirst = true;
-                foreach (var grandChildCommandDescriptor in grandChildCommandDescriptors)
+                foreach (var grandChildCommand in grandChildCommands)
                 {
                     if (isFirst)
                     {
@@ -415,10 +385,8 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
 
                     Write(
                         ConsoleColor.Cyan,
-                        // Relative to current command (not the parent)
-                        grandChildCommandDescriptor
-                            .Name?.Substring(context.CommandDescriptor.Name?.Length ?? 0)
-                            .Trim()
+                        // Trim the name so it's relative to the current command
+                        grandChildCommand.Name?.Substring(context.Command.Name?.Length ?? 0).Trim()
                     );
                 }
 
@@ -436,14 +404,27 @@ internal class HelpConsoleFormatter(ConsoleWriter consoleWriter, HelpContext con
         Write(ConsoleColor.Cyan, "[command]");
         Write(' ');
         Write(ConsoleColor.White, "--help");
-        Write("` to show help on a specific command.");
+        Write("` to show help for a specific command.");
 
         WriteLine();
     }
 
     public void WriteHelpText()
     {
-        WriteApplicationInfo();
+        // Application info
+        Write(ConsoleColor.White, context.Metadata.Title);
+        Write(' ');
+        Write(ConsoleColor.Yellow, context.Metadata.Version);
+        WriteLine();
+
+        if (!string.IsNullOrWhiteSpace(context.Metadata.Description))
+        {
+            WriteHorizontalMargin();
+            Write(context.Metadata.Description);
+            WriteLine();
+        }
+
+        // Command info
         WriteCommandUsage();
         WriteCommandDescription();
         WriteCommandParameters();
