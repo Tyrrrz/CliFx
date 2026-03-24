@@ -11,8 +11,8 @@ internal record CommandParameterSymbol(
     string Name,
     bool IsRequired,
     string? Description,
-    TypeIdentifier? ConverterType,
-    IReadOnlyList<TypeIdentifier> ValidatorTypes
+    ResolvedTypeIdentifier? ConverterType,
+    IReadOnlyList<ResolvedTypeIdentifier> ValidatorTypes
 ) : CommandInputSymbol(Property, IsRequired, Description, ConverterType, ValidatorTypes)
 {
     internal static CommandParameterSymbol? TryResolve(
@@ -50,16 +50,15 @@ internal record CommandParameterSymbol(
             property.IsRequired,
             attribute.NamedArguments.FirstOrDefault(a => a.Key == "Description").Value.Value
                 as string,
-            attribute.NamedArguments.FirstOrDefault(a => a.Key == "Converter").Value.Value
-                is ITypeSymbol converterTypeSymbol
-                ? TypeIdentifier.From(converterTypeSymbol)
+            attribute.NamedArguments.FirstOrDefault(a => a.Key == "Converter").Value.Value is INamedTypeSymbol converterTypeSymbol
+                ? ResolvedTypeIdentifier.From(converterTypeSymbol)
                 : null,
             attribute
                 .NamedArguments.Where(a => a.Key == "Validators")
                 .SelectMany(a => a.Value.Values)
-                .Select(v => v.Value as ITypeSymbol)
+                .Select(v => v.Value as INamedTypeSymbol)
                 .WhereNotNull()
-                .Select(s => TypeIdentifier.From(s))
+                .Select(ResolvedTypeIdentifier.From)
                 .ToArray()
         );
     }

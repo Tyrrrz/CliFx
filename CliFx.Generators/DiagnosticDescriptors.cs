@@ -68,6 +68,16 @@ public static class DiagnosticDescriptors
             true
         );
 
+    public static DiagnosticDescriptor CommandParameterMustHaveHighestOrderIfSequenceBased { get; } =
+        new(
+            $"{nameof(CliFx)}_{nameof(CommandParameterMustHaveHighestOrderIfSequenceBased)}",
+            "Sequence-based command parameter must be the last parameter in order",
+            "Sequence-based parameter bound to property '{0}' is followed by the parameter bound to property '{1}'. A sequence-based parameter must be the last parameter in order. By extension, only one parameter in a command can be sequence-based.",
+            "CliFx",
+            DiagnosticSeverity.Error,
+            true
+        );
+
     public static DiagnosticDescriptor CommandParameterMustHaveUniqueName { get; } =
         new(
             $"{nameof(CliFx)}_{nameof(CommandParameterMustHaveUniqueName)}",

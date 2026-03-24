@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using CliFx.Generators.Utils.Extensions;
 using Microsoft.CodeAnalysis;
 
 namespace CliFx.Generators.Binding;
@@ -11,8 +12,8 @@ internal record CommandOptionSymbol(
     string? EnvironmentVariable,
     bool IsRequired,
     string? Description,
-    TypeIdentifier? ConverterType,
-    IReadOnlyList<TypeIdentifier> ValidatorTypes
+    ResolvedTypeIdentifier? ConverterType,
+    IReadOnlyList<ResolvedTypeIdentifier> ValidatorTypes
 ) : CommandInputSymbol(Property, IsRequired, Description, ConverterType, ValidatorTypes)
 {
     internal static CommandOptionSymbol? TryResolve(
@@ -77,16 +78,15 @@ internal record CommandOptionSymbol(
             property.IsRequired,
             attribute.NamedArguments.FirstOrDefault(a => a.Key == "Description").Value.Value
                 as string,
-            attribute.NamedArguments.FirstOrDefault(a => a.Key == "Converter").Value.Value
-                is ITypeSymbol converterTypeSymbol
-                ? TypeIdentifier.From(converterTypeSymbol)
+            attribute.NamedArguments.FirstOrDefault(a => a.Key == "Converter").Value.Value is INamedTypeSymbol converterTypeSymbol
+                ? ResolvedTypeIdentifier.From(converterTypeSymbol)
                 : null,
             attribute
                 .NamedArguments.Where(a => a.Key == "Validators")
                 .SelectMany(a => a.Value.Values)
-                .Select(v => v.Value)
-                .OfType<ITypeSymbol>()
-                .Select(s => TypeIdentifier.From(s))
+                .Select(v => v.Value as INamedTypeSymbol)
+                .WhereNotNull()
+                .Select(ResolvedTypeIdentifier.From)
                 .ToArray()
         );
     }

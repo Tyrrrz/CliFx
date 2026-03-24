@@ -185,6 +185,29 @@ internal record CommandSymbol(
             }
         }
 
+        // Sequence-based parameters must have the highest order (and be alone)
+        for (var i = 0; i < parametersByOrder.Length; i++)
+        {
+            var parameter = parametersByOrder[i];
+
+            if (!parameter.IsSequenceBased)
+                continue;
+
+            if (i < parametersByOrder.Length - 1)
+            {
+                var nextParameter = parametersByOrder[i + 1];
+
+                diagnosticsList.Add(
+                    Diagnostic.Create(
+                        DiagnosticDescriptors.CommandParameterMustHaveHighestOrderIfSequenceBased,
+                        parameter.Property.Locations.FirstOrDefault(),
+                        parameter.Property.Name,
+                        nextParameter.Property.Name
+                    )
+                );
+            }
+        }
+
         // Options must have unique names and short names
         for (var i = 0; i < options.Count; i++)
         {

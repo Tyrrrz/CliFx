@@ -38,8 +38,8 @@ internal static class KnownSymbols
 
     public static TypeIdentifier InputConverter { get; } =
         Create("CliFx.Activation.InputConverter");
-    public static TypeIdentifier InputValidator { get; } =
-        Create("CliFx.Activation.InputValidator");
+    public static TypeIdentifier SequenceInputConverter { get; } =
+        Create("CliFx.Activation.SequenceInputConverter");
     public static TypeIdentifier StringScalarInputConverter { get; } =
         Create("CliFx.Activation.StringScalarInputConverter");
     public static TypeIdentifier ObjectScalarInputConverter { get; } =
@@ -64,4 +64,6 @@ internal static class KnownSymbols
         Create("CliFx.Activation.DelegateSequenceInputConverter");
     public static TypeIdentifier ArraySequenceInputConverter { get; } =
         Create("CliFx.Activation.ArraySequenceInputConverter");
+    public static TypeIdentifier InputValidator { get; } =
+        Create("CliFx.Activation.InputValidator");
 }

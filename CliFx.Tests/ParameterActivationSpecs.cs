@@ -258,6 +258,115 @@ public class ParameterActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(
     }
 
     [Fact]
+    public void I_get_an_error_if_a_sequence_based_parameter_is_not_last_in_order()
+    {
+        // Arrange
+        _ = CommandCompiler.CreateCompilation(
+            // lang=csharp
+            """
+            [Command]
+            public partial class Command : ICommand
+            {
+                [CommandParameter(0)]
+                public required IReadOnlyList<string> Foo { get; set; }
+
+                [CommandParameter(1)]
+                public required string Bar { get; set; }
+
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """,
+            out var diagnostics
+        );
+
+        // Assert
+        diagnostics
+            .Should()
+            .ContainSingle(d =>
+                d.Id == DiagnosticDescriptors.CommandParameterMustHaveHighestOrderIfSequenceBased.Id
+            )
+            .Which.GetMessage()
+            .Should()
+            .Contain("Foo")
+            .And.Contain("Bar");
+    }
+
+    [Fact]
+    public void I_do_not_get_a_sequence_order_error_if_a_collection_parameter_uses_a_scalar_converter()
+    {
+        // Arrange
+        _ = CommandCompiler.CreateCompilation(
+            // lang=csharp
+            """
+            public sealed class ScalarCollectionConverter : ScalarInputConverter<IReadOnlyList<string>>
+            {
+                public override IReadOnlyList<string> Convert(string? rawValue) =>
+                    rawValue is null ? [] : rawValue.Split(',');
+            }
+
+            [Command]
+            public partial class Command : ICommand
+            {
+                [CommandParameter(0, Converter = typeof(ScalarCollectionConverter))]
+                public required IReadOnlyList<string> Foo { get; set; }
+
+                [CommandParameter(1)]
+                public required string Bar { get; set; }
+
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """,
+            out var diagnostics
+        );
+
+        // Assert
+        diagnostics
+            .Should()
+            .NotContain(d =>
+                d.Id == DiagnosticDescriptors.CommandParameterMustHaveHighestOrderIfSequenceBased.Id
+            );
+    }
+
+    [Fact]
+    public void I_get_a_sequence_order_error_if_a_non_enumerable_parameter_uses_a_sequence_converter()
+    {
+        // Arrange
+        _ = CommandCompiler.CreateCompilation(
+            // lang=csharp
+            """
+            public sealed class StringSequenceConverter : SequenceInputConverter<string>
+            {
+                public override string Convert(IReadOnlyList<string> rawValues) => string.Join(",", rawValues);
+            }
+
+            [Command]
+            public partial class Command : ICommand
+            {
+                [CommandParameter(0, Converter = typeof(StringSequenceConverter))]
+                public required string Foo { get; set; }
+
+                [CommandParameter(1)]
+                public required string Bar { get; set; }
+
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """,
+            out var diagnostics
+        );
+
+        // Assert
+        diagnostics
+            .Should()
+            .ContainSingle(d =>
+                d.Id == DiagnosticDescriptors.CommandParameterMustHaveHighestOrderIfSequenceBased.Id
+            )
+            .Which.GetMessage()
+            .Should()
+            .Contain("Foo")
+            .And.Contain("Bar");
+    }
+
+    [Fact]
     public async Task I_can_try_to_bind_parameters_and_get_an_error_if_the_user_provides_too_many_arguments()
     {
         // Arrange
