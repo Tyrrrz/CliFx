@@ -3,21 +3,13 @@ using Microsoft.CodeAnalysis;
 
 namespace CliFx.Generators.Binding;
 
-internal partial class TypeIdentifier(string fullyQualifiedName)
+internal partial record class TypeIdentifier(
+    string? Namespace,
+    string FullyQualifiedName,
+    string Name
+)
 {
-    public string? Namespace { get; } =
-        fullyQualifiedName.LastIndexOf('.') is int pos && pos > 0
-            ? fullyQualifiedName[..pos]
-            : null;
-
-    public string Name { get; } =
-        fullyQualifiedName.LastIndexOf('.') is int pos && pos > 0
-            ? fullyQualifiedName[(pos + 1)..]
-            : fullyQualifiedName;
-
-    public string FullyQualifiedName { get; } = fullyQualifiedName;
-
-    public string GlobalFullyQualifiedName { get; } = "global::" + fullyQualifiedName;
+    public string GlobalFullyQualifiedName { get; } = "global::" + FullyQualifiedName;
 
     public bool IsMatchedBy(INamedTypeSymbol symbol) =>
         string.Equals(
@@ -29,7 +21,7 @@ internal partial class TypeIdentifier(string fullyQualifiedName)
     public override string ToString() => GlobalFullyQualifiedName;
 }
 
-internal partial class TypeIdentifier
+internal partial record class TypeIdentifier
 {
     internal static readonly SymbolDisplayFormat FullyQualifiedFormatWithoutGlobalPrefix =
         SymbolDisplayFormat.FullyQualifiedFormat.WithGlobalNamespaceStyle(
@@ -37,5 +29,11 @@ internal partial class TypeIdentifier
         );
 
     public static TypeIdentifier From(ITypeSymbol symbol) =>
-        new(symbol.ToDisplayString(FullyQualifiedFormatWithoutGlobalPrefix));
+        new(
+            symbol.ContainingNamespace is { IsGlobalNamespace: false } ns
+                ? ns.ToDisplayString(FullyQualifiedFormatWithoutGlobalPrefix)
+                : null,
+            symbol.ToDisplayString(FullyQualifiedFormatWithoutGlobalPrefix),
+            symbol.Name
+        );
 }

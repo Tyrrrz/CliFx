@@ -2,11 +2,25 @@ using Microsoft.CodeAnalysis;
 
 namespace CliFx.Generators.Binding;
 
-internal class ResolvedTypeIdentifier(string fullyQualifiedName, INamedTypeSymbol symbol)
-    : TypeIdentifier(fullyQualifiedName)
+internal sealed record class ResolvedTypeIdentifier(
+    INamedTypeSymbol Symbol,
+    string? Namespace,
+    string FullyQualifiedName,
+    string Name
+) : TypeIdentifier(Namespace, FullyQualifiedName, Name)
 {
-    public INamedTypeSymbol Symbol { get; } = symbol;
+    // Prevent the compiler from overriding this with record semantics
+    public override string ToString() => base.ToString();
 
-    public static ResolvedTypeIdentifier From(INamedTypeSymbol symbol) =>
-        new(symbol.ToDisplayString(FullyQualifiedFormatWithoutGlobalPrefix), symbol);
+    public static ResolvedTypeIdentifier From(INamedTypeSymbol symbol)
+    {
+        return new(
+            symbol,
+            symbol.ContainingNamespace is { IsGlobalNamespace: false } ns
+                ? ns.ToDisplayString(FullyQualifiedFormatWithoutGlobalPrefix)
+                : null,
+            symbol.ToDisplayString(FullyQualifiedFormatWithoutGlobalPrefix),
+            symbol.Name
+        );
+    }
 }

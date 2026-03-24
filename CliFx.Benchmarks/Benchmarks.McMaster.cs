@@ -27,5 +27,8 @@ public partial class Benchmarks
     }
 
     [Benchmark(Description = "McMaster.Extensions.CommandLineUtils")]
-    public int ExecuteWithMcMaster() => CommandLineApplication.Execute<McMasterCommand>(Arguments);
+    public int ExecuteWithMcMaster() =>
+        McMaster.Extensions.CommandLineUtils.CommandLineApplication.Execute<McMasterCommand>(
+            Arguments
+        );
 }
