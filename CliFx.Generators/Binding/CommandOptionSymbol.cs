@@ -23,6 +23,7 @@ internal record CommandOptionSymbol(
     )
     {
         var diagnosticsList = new List<Diagnostic>();
+        diagnostics = diagnosticsList;
 
         var name =
             attribute
@@ -67,8 +68,6 @@ internal record CommandOptionSymbol(
             );
         }
 
-        diagnostics = diagnosticsList;
-
         return new CommandOptionSymbol(
             property,
             name,
@@ -78,7 +77,8 @@ internal record CommandOptionSymbol(
             property.IsRequired,
             attribute.NamedArguments.FirstOrDefault(a => a.Key == "Description").Value.Value
                 as string,
-            attribute.NamedArguments.FirstOrDefault(a => a.Key == "Converter").Value.Value is INamedTypeSymbol converterTypeSymbol
+            attribute.NamedArguments.FirstOrDefault(a => a.Key == "Converter").Value.Value
+                is INamedTypeSymbol converterTypeSymbol
                 ? ResolvedTypeIdentifier.From(converterTypeSymbol)
                 : null,
             attribute

@@ -22,6 +22,7 @@ internal record CommandParameterSymbol(
     )
     {
         var diagnosticsList = new List<Diagnostic>();
+        diagnostics = diagnosticsList;
 
         var name =
             attribute.NamedArguments.FirstOrDefault(a => a.Key == "Name").Value.Value as string;
@@ -38,8 +39,6 @@ internal record CommandParameterSymbol(
             );
         }
 
-        diagnostics = diagnosticsList;
-
         return new CommandParameterSymbol(
             property,
             attribute
@@ -50,7 +49,8 @@ internal record CommandParameterSymbol(
             property.IsRequired,
             attribute.NamedArguments.FirstOrDefault(a => a.Key == "Description").Value.Value
                 as string,
-            attribute.NamedArguments.FirstOrDefault(a => a.Key == "Converter").Value.Value is INamedTypeSymbol converterTypeSymbol
+            attribute.NamedArguments.FirstOrDefault(a => a.Key == "Converter").Value.Value
+                is INamedTypeSymbol converterTypeSymbol
                 ? ResolvedTypeIdentifier.From(converterTypeSymbol)
                 : null,
             attribute

@@ -27,6 +27,8 @@ internal record CommandSymbol(
     )
     {
         var diagnosticsList = new List<Diagnostic>();
+        diagnostics = diagnosticsList;
+
         var classDeclarations = type.GetDeclarations().ToArray();
 
         // Must have the [Command] attribute
@@ -246,8 +248,6 @@ internal record CommandSymbol(
                 }
             }
         }
-
-        diagnostics = diagnosticsList;
 
         return new CommandSymbol(
             ResolvedTypeIdentifier.From(type),

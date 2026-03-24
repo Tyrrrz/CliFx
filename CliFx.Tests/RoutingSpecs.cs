@@ -13,7 +13,7 @@ public class RoutingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_can_configure_a_command_to_be_executed_by_default_when_the_user_does_not_specify_a_command_name()
     {
         // Arrange
-        var command = CommandCompiler.CompileMany(
+        var commands = CommandCompiler.CompileMany(
             // lang=csharp
             """
             [Command]
@@ -49,7 +49,7 @@ public class RoutingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         );
 
         var application = new CommandLineApplicationBuilder()
-            .AddCommands(command)
+            .AddCommands(commands)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -67,7 +67,7 @@ public class RoutingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_can_configure_a_command_to_be_executed_when_the_user_specifies_its_name()
     {
         // Arrange
-        var command = CommandCompiler.CompileMany(
+        var commands = CommandCompiler.CompileMany(
             // lang=csharp
             """
             [Command]
@@ -103,7 +103,7 @@ public class RoutingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         );
 
         var application = new CommandLineApplicationBuilder()
-            .AddCommands(command)
+            .AddCommands(commands)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -121,7 +121,7 @@ public class RoutingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_can_configure_a_nested_command_to_be_executed_when_the_user_specifies_its_name()
     {
         // Arrange
-        var command = CommandCompiler.CompileMany(
+        var commands = CommandCompiler.CompileMany(
             // lang=csharp
             """
             [Command]
@@ -157,7 +157,7 @@ public class RoutingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         );
 
         var application = new CommandLineApplicationBuilder()
-            .AddCommands(command)
+            .AddCommands(commands)
             .UseConsole(FakeConsole)
             .Build();
 

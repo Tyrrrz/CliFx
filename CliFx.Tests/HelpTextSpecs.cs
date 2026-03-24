@@ -64,7 +64,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_can_request_the_help_text_by_running_the_application_with_the_implicit_help_option_even_if_the_default_command_is_not_defined()
     {
         // Arrange
-        var command = CommandCompiler.CompileMany(
+        var commands = CommandCompiler.CompileMany(
             // lang=csharp
             """
             [Command("cmd")]
@@ -82,7 +82,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         );
 
         var application = new CommandLineApplicationBuilder()
-            .AddCommands(command)
+            .AddCommands(commands)
             .UseConsole(FakeConsole)
             .SetDescription("This will be in help text")
             .Build();
@@ -101,7 +101,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_can_request_the_help_text_for_a_specific_command_by_running_the_application_and_specifying_its_name_with_the_implicit_help_option()
     {
         // Arrange
-        var command = CommandCompiler.CompileMany(
+        var commands = CommandCompiler.CompileMany(
             // lang=csharp
             """
             [Command]
@@ -125,7 +125,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         );
 
         var application = new CommandLineApplicationBuilder()
-            .AddCommands(command)
+            .AddCommands(commands)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -146,7 +146,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_can_request_the_help_text_for_a_specific_nested_command_by_running_the_application_and_specifying_its_name_with_the_implicit_help_option()
     {
         // Arrange
-        var command = CommandCompiler.CompileMany(
+        var commands = CommandCompiler.CompileMany(
             // lang=csharp
             """
             [Command]
@@ -170,7 +170,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         );
 
         var application = new CommandLineApplicationBuilder()
-            .AddCommands(command)
+            .AddCommands(commands)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -268,7 +268,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_can_request_the_help_text_to_see_the_usage_format_for_a_named_command()
     {
         // Arrange
-        var command = CommandCompiler.CompileMany(
+        var commands = CommandCompiler.CompileMany(
             // lang=csharp
             """
             [Command]
@@ -286,7 +286,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         );
 
         var application = new CommandLineApplicationBuilder()
-            .AddCommands(command)
+            .AddCommands(commands)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -790,7 +790,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_can_request_the_help_text_to_see_the_list_of_all_immediate_child_commands()
     {
         // Arrange
-        var command = CommandCompiler.CompileMany(
+        var commands = CommandCompiler.CompileMany(
             // lang=csharp
             """
             [Command("cmd1", Description = "Description of one command.")]
@@ -820,7 +820,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         );
 
         var application = new CommandLineApplicationBuilder()
-            .AddCommands(command)
+            .AddCommands(commands)
             .UseConsole(FakeConsole)
             .Build();
 
@@ -840,13 +840,13 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
                 "Description of one command.",
                 "cmd2",
                 "Description of another command.",
-                // `cmd2 child` will appear as an immediate command because it does not
+                // "cmd2 child" will appear as an immediate command because it does not
                 // have a more specific parent.
                 "cmd3 child",
                 "Description of an orphaned command."
             );
 
-        // `cmd2 child` will still appear in the list of `cmd2` subcommands,
+        // "cmd2 child" will still appear in the list of "cmd2" subcommands,
         // but its description will not be visible.
         stdOut.Should().NotContain("Description of another command's child command.");
     }
@@ -855,7 +855,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_can_request_the_help_text_to_see_the_list_of_all_immediate_grand_child_commands()
     {
         // Arrange
-        var command = CommandCompiler.CompileMany(
+        var commands = CommandCompiler.CompileMany(
             // lang=csharp
             """
             [Command("cmd1")]
@@ -891,7 +891,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         );
 
         var application = new CommandLineApplicationBuilder()
-            .AddCommands(command)
+            .AddCommands(commands)
             .UseConsole(FakeConsole)
             .Build();
 

@@ -398,13 +398,13 @@ internal class HelpWriter(HelpContext context, ConsoleWriter consoleWriter)
 
         // Child command help tip
         WriteVerticalMargin();
-        Write("You can run `");
+        Write("You can run \"");
         WriteCommandInvocation();
         Write(' ');
         Write(ConsoleColor.Cyan, "[command]");
         Write(' ');
         Write(ConsoleColor.White, "--help");
-        Write("` to show help for a specific command.");
+        Write("\" to show help for a specific command.");
 
         WriteLine();
     }
