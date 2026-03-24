@@ -84,7 +84,7 @@ public static class DiagnosticDescriptors
             "Command parameter must have a unique name",
             "Name of the parameter bound to property '{0}' is the same as the name of the parameter bound to property '{1}': '{2}'. Each parameter must have a unique name (comparison IS NOT case-sensitive).",
             "CliFx",
-            DiagnosticSeverity.Warning,
+            DiagnosticSeverity.Error,
             true
         );
 
@@ -96,7 +96,7 @@ public static class DiagnosticDescriptors
             "Command option must have a name or short name",
             "Option bound to property '{0}' must have either a name or a short name specified.",
             "CliFx",
-            DiagnosticSeverity.Warning,
+            DiagnosticSeverity.Error,
             true
         );
 
@@ -106,7 +106,7 @@ public static class DiagnosticDescriptors
             "Command option name must be valid",
             "Name of the option bound to property '{0}' is invalid: '{1}'. Option names must be at least 2 characters long, must start with a letter, and must not contain whitespace.",
             "CliFx",
-            DiagnosticSeverity.Warning,
+            DiagnosticSeverity.Error,
             true
         );
 
@@ -116,7 +116,7 @@ public static class DiagnosticDescriptors
             "Command option must have a unique name",
             "Name of the option bound to property '{0}' is the same as the name of the option bound to property '{1}': '{2}'. Each option must have a unique name (comparison IS NOT case-sensitive).",
             "CliFx",
-            DiagnosticSeverity.Warning,
+            DiagnosticSeverity.Error,
             true
         );
 
@@ -125,6 +125,26 @@ public static class DiagnosticDescriptors
             $"{nameof(CliFx)}_{nameof(CommandOptionMustHaveUniqueShortName)}",
             "Command option must have a unique short name",
             "Short name of the option bound to property '{0}' is the same as the short name of the option bound to property '{1}': '{2}'. Each option must have a unique short name (comparison IS case-sensitive).",
+            "CliFx",
+            DiagnosticSeverity.Error,
+            true
+        );
+
+    public static DiagnosticDescriptor CommandOptionShadowsBuiltInHelpOption { get; } =
+        new(
+            $"{nameof(CliFx)}_{nameof(CommandOptionShadowsBuiltInHelpOption)}",
+            "Command option shadows the conventional help option",
+            "Option bound to property '{0}' shadows the conventional help option via '{1}'. Consider choosing a different identifier for your option.",
+            "CliFx",
+            DiagnosticSeverity.Warning,
+            true
+        );
+
+    public static DiagnosticDescriptor CommandOptionShadowsBuiltInVersionOption { get; } =
+        new(
+            $"{nameof(CliFx)}_{nameof(CommandOptionShadowsBuiltInVersionOption)}",
+            "Command option shadows the conventional version option",
+            "Option bound to property '{0}' shadows the conventional version option via '{1}'. Consider choosing a different identifier for your option.",
             "CliFx",
             DiagnosticSeverity.Warning,
             true

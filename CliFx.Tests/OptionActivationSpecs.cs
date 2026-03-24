@@ -1,5 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using CliFx.Binding;
+using CliFx.Generators;
 using CliFx.Tests.Utils;
 using CliFx.Tests.Utils.Extensions;
 using FluentAssertions;
@@ -742,5 +745,222 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
 
         var stdErr = FakeConsole.ReadErrorString();
         stdErr.Should().Contain("Expected a single argument, but provided with multiple");
+    }
+
+    [Fact]
+    public void I_get_a_warning_if_a_user_option_partially_shadows_the_built_in_help_option()
+    {
+        // Arrange
+        _ = CommandCompiler.CreateCompilation(
+            // lang=csharp
+            """
+            [Command]
+            public partial class Command : ICommand
+            {
+                [CommandOption('h')]
+                public bool CustomHelp { get; set; }
+
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """,
+            out var diagnostics
+        );
+
+        // Assert
+        diagnostics
+            .Should()
+            .ContainSingle(d =>
+                d.Id == DiagnosticDescriptors.CommandOptionShadowsBuiltInHelpOption.Id
+            )
+            .Which.GetMessage()
+            .Should()
+            .Contain("CustomHelp")
+            .And.Contain("conventional help option")
+            .And.Contain("via '-h'")
+            .And.Contain("Consider choosing a different identifier");
+    }
+
+    [Fact]
+    public void I_get_a_warning_if_a_user_option_completely_shadows_the_built_in_help_option()
+    {
+        // Arrange
+        _ = CommandCompiler.CreateCompilation(
+            // lang=csharp
+            """
+            [Command]
+            public partial class Command : ICommand
+            {
+                [CommandOption("help", 'h')]
+                public bool CustomHelp { get; set; }
+
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """,
+            out var diagnostics
+        );
+
+        // Assert
+        diagnostics
+            .Should()
+            .ContainSingle(d =>
+                d.Id == DiagnosticDescriptors.CommandOptionShadowsBuiltInHelpOption.Id
+            )
+            .Which.GetMessage()
+            .Should()
+            .Contain("CustomHelp")
+            .And.Contain("conventional help option")
+            .And.Contain("via '-h'")
+            .And.Contain("Consider choosing a different identifier");
+    }
+
+    [Fact]
+    public void I_get_a_warning_if_a_user_option_partially_shadows_the_built_in_version_option()
+    {
+        // Arrange
+        _ = CommandCompiler.CreateCompilation(
+            // lang=csharp
+            """
+            [Command]
+            public partial class Command : ICommand
+            {
+                [CommandOption("version")]
+                public bool CustomVersion { get; set; }
+
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """,
+            out var diagnostics
+        );
+
+        // Assert
+        diagnostics
+            .Should()
+            .ContainSingle(d =>
+                d.Id == DiagnosticDescriptors.CommandOptionShadowsBuiltInVersionOption.Id
+            )
+            .Which.GetMessage()
+            .Should()
+            .Contain("CustomVersion")
+            .And.Contain("conventional version option")
+            .And.Contain("via '--version'")
+            .And.Contain("Consider choosing a different identifier");
+    }
+
+    [Fact]
+    public void I_get_a_warning_if_a_user_option_completely_shadows_the_built_in_version_option()
+    {
+        // Arrange
+        _ = CommandCompiler.CreateCompilation(
+            // lang=csharp
+            """
+            [Command]
+            public partial class Command : ICommand
+            {
+                [CommandOption("version", 'v')]
+                public bool CustomVersion { get; set; }
+
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """,
+            out var diagnostics
+        );
+
+        // Assert
+        diagnostics
+            .Should()
+            .ContainSingle(d =>
+                d.Id == DiagnosticDescriptors.CommandOptionShadowsBuiltInVersionOption.Id
+            )
+            .Which.GetMessage()
+            .Should()
+            .Contain("CustomVersion")
+            .And.Contain("conventional version option")
+            .And.Contain("via '--version'")
+            .And.Contain("Consider choosing a different identifier");
+    }
+
+    [Fact]
+    public void I_do_not_get_a_warning_if_a_user_option_uses_the_short_name_v()
+    {
+        // Arrange
+        _ = CommandCompiler.CreateCompilation(
+            // lang=csharp
+            """
+            [Command]
+            public partial class Command : ICommand
+            {
+                [CommandOption('v')]
+                public bool CustomVersionShort { get; set; }
+
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """,
+            out var diagnostics
+        );
+
+        // Assert
+        diagnostics
+            .Should()
+            .NotContain(d =>
+                d.Id == DiagnosticDescriptors.CommandOptionShadowsBuiltInVersionOption.Id
+            );
+    }
+
+    [Fact]
+    public void I_do_not_auto_generate_the_conventional_help_option_when_it_is_partially_shadowed()
+    {
+        // Arrange
+        var command = CommandCompiler.Compile(
+            // lang=csharp
+            """
+            [Command]
+            public partial class Command : ICommand
+            {
+                [CommandOption('h')]
+                public bool CustomHelp { get; set; }
+
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
+
+        // Assert
+        command
+            .Inputs.OfType<CommandOptionDescriptor>()
+            .Should()
+            .NotContain(o =>
+                string.Equals(o.Property.Name, "IsHelpRequested", System.StringComparison.Ordinal)
+            );
+    }
+
+    [Fact]
+    public void I_do_not_auto_generate_the_conventional_version_option_when_it_is_partially_shadowed()
+    {
+        // Arrange
+        var command = CommandCompiler.Compile(
+            // lang=csharp
+            """
+            [Command]
+            public partial class Command : ICommand
+            {
+                [CommandOption("version")]
+                public bool CustomVersion { get; set; }
+
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
+
+        // Assert
+        command
+            .Inputs.OfType<CommandOptionDescriptor>()
+            .Should()
+            .NotContain(o =>
+                string.Equals(
+                    o.Property.Name,
+                    "IsVersionRequested",
+                    System.StringComparison.Ordinal
+                )
+            );
     }
 }

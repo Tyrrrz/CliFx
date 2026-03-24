@@ -6,9 +6,12 @@ namespace CliFx.Binding;
 /// Binds a property to an option input of a command.
 /// </summary>
 [AttributeUsage(AttributeTargets.Property)]
-public sealed class CommandOptionAttribute : CommandInputAttribute
+public class CommandOptionAttribute : CommandInputAttribute
 {
-    private CommandOptionAttribute(string? name, char? shortName)
+    /// <summary>
+    /// Initializes an instance of <see cref="CommandOptionAttribute" />.
+    /// </summary>
+    protected CommandOptionAttribute(string? name, char? shortName)
     {
         Name = name;
         ShortName = shortName;

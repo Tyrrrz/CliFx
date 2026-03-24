@@ -298,7 +298,7 @@ public class ParameterActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(
         _ = CommandCompiler.CreateCompilation(
             // lang=csharp
             """
-            public sealed class ScalarCollectionConverter : ScalarInputConverter<IReadOnlyList<string>>
+            public class ScalarCollectionConverter : ScalarInputConverter<IReadOnlyList<string>>
             {
                 public override IReadOnlyList<string> Convert(string? rawValue) =>
                     rawValue is null ? [] : rawValue.Split(',');
@@ -334,7 +334,7 @@ public class ParameterActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(
         _ = CommandCompiler.CreateCompilation(
             // lang=csharp
             """
-            public sealed class StringSequenceConverter : SequenceInputConverter<string>
+            public class StringSequenceConverter : SequenceInputConverter<string>
             {
                 public override string Convert(IReadOnlyList<string> rawValues) => string.Join(",", rawValues);
             }

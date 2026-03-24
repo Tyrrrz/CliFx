@@ -6,7 +6,7 @@ namespace CliFx.Binding;
 /// Binds a type to a command.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-public sealed class CommandAttribute(string? name) : Attribute
+public class CommandAttribute(string? name) : Attribute
 {
     /// <summary>
     /// Initializes an instance of <see cref="CommandAttribute" />.

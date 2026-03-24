@@ -6,7 +6,7 @@ namespace CliFx.Binding;
 /// Binds a property to a parameter input of a command.
 /// </summary>
 [AttributeUsage(AttributeTargets.Property)]
-public sealed class CommandParameterAttribute(int order) : CommandInputAttribute
+public class CommandParameterAttribute(int order) : CommandInputAttribute
 {
     /// <summary>
     /// Relative parameter order.

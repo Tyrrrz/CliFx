@@ -168,44 +168,94 @@ public partial class Generator
             );
         }
 
-        sb.Append(
-            // lang=csharp
-            $$"""
-                        new {{KnownSymbols.CommandOptionDescriptor}}<{{command.Type.FullyQualifiedName}}, bool>(
-                            new {{KnownSymbols.PropertyDescriptor}}<{{command.Type.FullyQualifiedName}}, bool>(
-                                "IsHelpRequested",
-                                c => c.IsHelpRequested,
-                                (c, v) => c.IsHelpRequested = v),
-                            "help",
-                            'h',
-                            null,
-                            false,
-                            "Shows help text.",
-                            new {{KnownSymbols.BoolScalarInputConverter}}(),
-                            global::System.Array.Empty<{{KnownSymbols.InputValidator.GlobalFullyQualifiedName}}<bool>>()),
-
-            """
+        var helpOptionByShortName = command.Options.FirstOrDefault(o => o.ShortName == 'h');
+        var helpOptionByName = command.Options.FirstOrDefault(o =>
+            string.Equals(o.Name, "help", System.StringComparison.OrdinalIgnoreCase)
         );
 
-        if (command.IsDefault)
+        var includeBuiltInHelpShortName = helpOptionByShortName is null;
+        var includeBuiltInHelpName = helpOptionByName is null;
+        var shouldEmitBuiltInHelpOption = includeBuiltInHelpShortName && includeBuiltInHelpName;
+
+        if (helpOptionByShortName is not null || helpOptionByName is not null)
+        {
+            var option = helpOptionByShortName ?? helpOptionByName;
+            var shadowedIdentifier = helpOptionByShortName is not null ? "-h" : "--help";
+
+            diagnosticsList.Add(
+                Diagnostic.Create(
+                    DiagnosticDescriptors.CommandOptionShadowsBuiltInHelpOption,
+                    option?.Property.Locations.FirstOrDefault(),
+                    option?.Property.Name,
+                    shadowedIdentifier
+                )
+            );
+        }
+
+        if (shouldEmitBuiltInHelpOption)
+        {
             sb.Append(
                 // lang=csharp
                 $$"""
                             new {{KnownSymbols.CommandOptionDescriptor}}<{{command.Type.FullyQualifiedName}}, bool>(
                                 new {{KnownSymbols.PropertyDescriptor}}<{{command.Type.FullyQualifiedName}}, bool>(
-                                    "IsVersionRequested",
-                                    c => c.IsVersionRequested,
-                                    (c, v) => c.IsVersionRequested = v),
-                                "version",
-                                null,
+                                    "IsHelpRequested",
+                                    c => c.IsHelpRequested,
+                                    (c, v) => c.IsHelpRequested = v),
+                                {{(includeBuiltInHelpName ? "\"help\"" : "null")}},
+                                {{(includeBuiltInHelpShortName ? "'h'" : "null")}},
                                 null,
                                 false,
-                                "Shows version information.",
+                                "Shows help text.",
                                 new {{KnownSymbols.BoolScalarInputConverter}}(),
                                 global::System.Array.Empty<{{KnownSymbols.InputValidator.GlobalFullyQualifiedName}}<bool>>()),
 
                 """
             );
+        }
+
+        if (command.IsDefault)
+        {
+            var versionOptionByName = command.Options.FirstOrDefault(o =>
+                string.Equals(o.Name, "version", System.StringComparison.OrdinalIgnoreCase)
+            );
+
+            var shouldEmitBuiltInVersionOption = versionOptionByName is null;
+
+            if (versionOptionByName is not null)
+            {
+                diagnosticsList.Add(
+                    Diagnostic.Create(
+                        DiagnosticDescriptors.CommandOptionShadowsBuiltInVersionOption,
+                        versionOptionByName.Property.Locations.FirstOrDefault(),
+                        versionOptionByName.Property.Name,
+                        "--version"
+                    )
+                );
+            }
+
+            if (shouldEmitBuiltInVersionOption)
+            {
+                sb.Append(
+                    // lang=csharp
+                    $$"""
+                                new {{KnownSymbols.CommandOptionDescriptor}}<{{command.Type.FullyQualifiedName}}, bool>(
+                                    new {{KnownSymbols.PropertyDescriptor}}<{{command.Type.FullyQualifiedName}}, bool>(
+                                        "IsVersionRequested",
+                                        c => c.IsVersionRequested,
+                                        (c, v) => c.IsVersionRequested = v),
+                                    "version",
+                                    null,
+                                    null,
+                                    false,
+                                    "Shows version information.",
+                                    new {{KnownSymbols.BoolScalarInputConverter}}(),
+                                    global::System.Array.Empty<{{KnownSymbols.InputValidator.GlobalFullyQualifiedName}}<bool>>()),
+
+                    """
+                );
+            }
+        }
 
         sb.Append(
             """
