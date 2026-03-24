@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CliFx.Activation;
 
@@ -18,7 +19,8 @@ public class ArraySequenceInputConverter<TElement, TSequence>(
         for (var i = 0; i < rawValues.Count; i++)
             result[i] = elementConverter.Convert(rawValues[i]);
 
-        return (TSequence)(object)result;
+        // Validity of this call is ensured by the instantiator of this converter
+        return (TSequence)result.AsEnumerable();
     }
 }
 

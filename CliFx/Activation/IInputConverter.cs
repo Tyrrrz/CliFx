@@ -7,8 +7,8 @@ namespace CliFx.Activation;
 /// </summary>
 /// <remarks>
 /// To implement your own converter, inherit from <see cref="ScalarInputConverter{T}" /> for
-/// scalar (single-value) types and from <see cref="SequenceInputConverter{T}" /> for
-/// sequence-based (multi-value) types.
+/// scalar (single-value) inputs and from <see cref="SequenceInputConverter{T}" /> for
+/// sequence-based (multi-value) inputs.
 /// </remarks>
 public interface IInputConverter
 {

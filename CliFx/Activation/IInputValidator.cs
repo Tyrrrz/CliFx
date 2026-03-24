@@ -4,7 +4,7 @@ namespace CliFx.Activation;
 /// Defines validation logic for activated command inputs.
 /// </summary>
 /// <remarks>
-/// To implement your own validator, inherit from <see cref="InputValidator{T}" /> instead.
+/// To implement your own validator, inherit from <see cref="InputValidator{T}" />.
 /// </remarks>
 public interface IInputValidator
 {

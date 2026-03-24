@@ -6,7 +6,7 @@ using System.Linq;
 namespace CliFx.Binding;
 
 /// <summary>
-/// Describes a binding between a class and a command.
+/// Describes a binding between a CLR type and a command.
 /// </summary>
 public class CommandDescriptor(
     [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]

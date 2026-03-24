@@ -3,7 +3,7 @@
 namespace CliFx.Binding;
 
 /// <summary>
-/// Binds a class to a command.
+/// Binds a type to a command.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class, Inherited = false)]
 public sealed class CommandAttribute(string? name) : Attribute
