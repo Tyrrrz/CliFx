@@ -11,7 +11,12 @@ public partial class Benchmarks
             [Option("str", ['s'])] string? strOption,
             [Option("int", ['i'])] int intOption,
             [Option("bool", ['b'])] bool boolOption
-        ) { }
+        )
+        {
+            _ = strOption;
+            _ = intOption;
+            _ = boolOption;
+        }
     }
 
     [Benchmark(Description = "Cocona")]

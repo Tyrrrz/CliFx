@@ -20,7 +20,14 @@ public partial class Benchmarks
         [CommandOption("bool", 'b')]
         public bool BoolOption { get; set; }
 
-        public ValueTask ExecuteAsync(IConsole console) => default;
+        public ValueTask ExecuteAsync(IConsole console)
+        {
+            _ = StrOption;
+            _ = IntOption;
+            _ = BoolOption;
+
+            return default;
+        }
     }
 
     [Benchmark(Description = "CliFx", Baseline = true)]

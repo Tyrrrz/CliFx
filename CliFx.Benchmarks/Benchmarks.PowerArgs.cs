@@ -16,7 +16,12 @@ public partial class Benchmarks
         [ArgShortcut("--bool"), ArgShortcut("-b")]
         public bool BoolOption { get; set; }
 
-        public void Main() { }
+        public void Main()
+        {
+            _ = StrOption;
+            _ = IntOption;
+            _ = BoolOption;
+        }
     }
 
     [Benchmark(Description = "PowerArgs")]

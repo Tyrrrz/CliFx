@@ -16,7 +16,14 @@ public partial class Benchmarks
         [Option("--bool|-b")]
         public bool BoolOption { get; set; }
 
-        public int OnExecute() => 0;
+        public int OnExecute()
+        {
+            _ = StrOption;
+            _ = IntOption;
+            _ = BoolOption;
+
+            return 0;
+        }
     }
 
     [Benchmark(Description = "McMaster.Extensions.CommandLineUtils")]
