@@ -11,5 +11,5 @@ namespace CliFx;
 internal partial class FallbackDefaultCommand : ICommand
 {
     public ValueTask ExecuteAsync(IConsole console) =>
-        throw new CommandException("Use one of the other available commands.", 1, true);
+        throw new CommandException("Use one of the available named commands.", 1, true);
 }
