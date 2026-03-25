@@ -176,7 +176,7 @@ public class EnvironmentSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutp
 
         var command =
             Cli.Wrap(Dummy.Program.FilePath)
-                .WithEnvironmentVariables(e => e.Set("CLIFX_DEBUG", "1")) | HandleStdOut;
+                .WithEnvironmentVariables(e => e.Set("CLIFX_DEBUG", "true")) | HandleStdOut;
 
         // Act & assert
         try
