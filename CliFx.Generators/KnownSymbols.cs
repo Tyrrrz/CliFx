@@ -5,8 +5,12 @@ namespace CliFx.Generators;
 internal static class KnownSymbols
 {
     private static TypeIdentifier Create(string fullyQualifiedName) =>
-        fullyQualifiedName.LastIndexOf('.') is int pos && pos > 0
-            ? new(fullyQualifiedName[..pos], fullyQualifiedName, fullyQualifiedName[(pos + 1)..])
+        fullyQualifiedName.LastIndexOf('.') is var index and >= 0
+            ? new(
+                fullyQualifiedName[..index],
+                fullyQualifiedName,
+                fullyQualifiedName[(index + 1)..]
+            )
             : new(null, fullyQualifiedName, fullyQualifiedName);
 
     public static TypeIdentifier CommandLineApplicationBuilder { get; } =

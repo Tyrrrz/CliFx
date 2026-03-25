@@ -15,7 +15,7 @@ internal static class AssertionExtensions
                 .Should()
                 .Equal(lines);
 
-        public AndConstraint<StringAssertions> ContainAllInOrder(IEnumerable<string> values)
+        public AndConstraint<StringAssertions> ContainAllInOrder(params IEnumerable<string> values)
         {
             var lastIndex = 0;
 
@@ -35,8 +35,5 @@ internal static class AssertionExtensions
 
             return new AndConstraint<StringAssertions>(assertions);
         }
-
-        public AndConstraint<StringAssertions> ContainAllInOrder(params string[] values) =>
-            assertions.ContainAllInOrder((IEnumerable<string>)values);
     }
 }
