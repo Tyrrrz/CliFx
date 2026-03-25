@@ -26,3 +26,14 @@ public interface IInputConverter
     /// </summary>
     object? Convert(IReadOnlyList<string> rawValues);
 }
+
+/// <inheritdoc />
+/// <remarks>
+/// Generic version used by source-generated code for static type references and AOT compatibility.
+/// </remarks>
+// This interface is a bit messy but is required for covariance, which helps keep the source generators simpler
+public interface IInputConverter<out T> : IInputConverter
+{
+    /// <inheritdoc cref="IInputConverter.Convert" />
+    new T Convert(IReadOnlyList<string> rawValues);
+}

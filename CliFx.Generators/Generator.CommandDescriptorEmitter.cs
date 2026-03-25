@@ -297,27 +297,23 @@ public partial class Generator
     {
         var typeFqn = type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
 
+        // Object
+        if (type.SpecialType == SpecialType.System_Object)
+            return $"new {KnownSymbols.StringScalarInputConverter}()";
+
+        // String
         if (type.SpecialType == SpecialType.System_String)
             return $"new {KnownSymbols.StringScalarInputConverter}()";
 
-        if (type.SpecialType == SpecialType.System_Object)
-            return $"new {KnownSymbols.ObjectScalarInputConverter}()";
-
+        // Bool
         if (type.SpecialType == SpecialType.System_Boolean)
             return $"new {KnownSymbols.BoolScalarInputConverter}()";
 
-        if (type is INamedTypeSymbol { ContainingNamespace.Name: "System", Name: "DateTimeOffset" })
-            return $"new {KnownSymbols.DateTimeOffsetScalarInputConverter}()";
-
-        if (type is INamedTypeSymbol { ContainingNamespace.Name: "System", Name: "DateTime" })
-            return $"new {KnownSymbols.DateTimeScalarInputConverter}()";
-
-        if (type is INamedTypeSymbol { ContainingNamespace.Name: "System", Name: "TimeSpan" })
-            return $"new {KnownSymbols.TimeSpanScalarInputConverter}()";
-
+        // Enum
         if (type.TypeKind == TypeKind.Enum)
             return $"new {KnownSymbols.EnumScalarInputConverter.GlobalFullyQualifiedName}<{typeFqn}>()";
 
+        // Nullable<T>
         if (
             type is INamedTypeSymbol { IsValueType: true } named
             && named.ConstructedFrom.SpecialType == SpecialType.System_Nullable_T
@@ -331,6 +327,7 @@ public partial class Generator
             return $"new {KnownSymbols.NullableScalarInputConverter.GlobalFullyQualifiedName}<{innerFqn}>({innerConverterExpr})";
         }
 
+        // Has static Parse(string, IFormatProvider)
         var parseMethodWithFormatProvider = type.GetMembers("Parse")
             .OfType<IMethodSymbol>()
             .FirstOrDefault(m =>
@@ -346,6 +343,7 @@ public partial class Generator
         if (parseMethodWithFormatProvider is not null)
             return $"new {KnownSymbols.DelegateScalarInputConverter.GlobalFullyQualifiedName}<{typeFqn}>(s => {typeFqn}.Parse(s!, global::System.Globalization.CultureInfo.InvariantCulture))";
 
+        // Has static Parse(string)
         var parseMethod = type.GetMembers("Parse")
             .OfType<IMethodSymbol>()
             .FirstOrDefault(m =>
@@ -359,6 +357,7 @@ public partial class Generator
         if (parseMethod is not null)
             return $"new {KnownSymbols.DelegateScalarInputConverter.GlobalFullyQualifiedName}<{typeFqn}>(s => {typeFqn}.Parse(s!))";
 
+        // Has ctor(string)
         if (
             type is INamedTypeSymbol namedConstructable
             && namedConstructable.Constructors.Any(c =>
@@ -371,6 +370,7 @@ public partial class Generator
             return $"new {KnownSymbols.DelegateScalarInputConverter.GlobalFullyQualifiedName}<{typeFqn}>(s => new {typeFqn}(s!))";
         }
 
+        // Implements IConvertible
         if (
             type.AllInterfaces.Any(i =>
                 i.ContainingNamespace?.Name == "System" && i.Name == "IConvertible"
@@ -396,12 +396,28 @@ public partial class Generator
         if (elementConverterArg is null)
             return null;
 
-        if (collectionType is IArrayTypeSymbol)
+        // T[] or IEnumerable<T> or ICollection<T> or IList<T> or IReadOnlyCollection<T> or IReadOnlyList<T>
+        if (
+            collectionType is IArrayTypeSymbol
+            || (
+                collectionType
+                    is INamedTypeSymbol
+                    {
+                        TypeKind: TypeKind.Interface,
+                        TypeArguments: [var interfaceElementType],
+                    } namedInterface
+                && SymbolEqualityComparer.Default.Equals(interfaceElementType, elementType)
+                && namedInterface.ConstructedFrom.SpecialType
+                    is SpecialType.System_Collections_Generic_IEnumerable_T
+                        or SpecialType.System_Collections_Generic_ICollection_T
+                        or SpecialType.System_Collections_Generic_IList_T
+                        or SpecialType.System_Collections_Generic_IReadOnlyCollection_T
+                        or SpecialType.System_Collections_Generic_IReadOnlyList_T
+            )
+        )
             return $"new {KnownSymbols.ArraySequenceInputConverter.GlobalFullyQualifiedName}<{elementTypeFqn}>({elementConverterArg})";
 
-        if (collectionType.TypeKind == TypeKind.Interface)
-            return $"new {KnownSymbols.ArraySequenceInputConverter.GlobalFullyQualifiedName}<{elementTypeFqn}, {collectionTypeFqn}>({elementConverterArg})";
-
+        // Has ctor(string[])
         if (
             collectionType is INamedTypeSymbol namedCollection
             && namedCollection.Constructors.Any(c =>
@@ -425,7 +441,7 @@ public partial class Generator
             )
         )
         {
-            return $"new {KnownSymbols.DelegateSequenceInputConverter.GlobalFullyQualifiedName}<{collectionTypeFqn}>(rawValues => new {collectionTypeFqn}(new {KnownSymbols.ArraySequenceInputConverter.GlobalFullyQualifiedName}<{elementTypeFqn}>({elementConverterArg}).Convert(rawValues)))";
+            return $"new {KnownSymbols.DelegateSequenceInputConverter.GlobalFullyQualifiedName}<{elementTypeFqn}[], {collectionTypeFqn}>(new {KnownSymbols.ArraySequenceInputConverter.GlobalFullyQualifiedName}<{elementTypeFqn}>({elementConverterArg}), values => new {collectionTypeFqn}(values))";
         }
 
         return null;

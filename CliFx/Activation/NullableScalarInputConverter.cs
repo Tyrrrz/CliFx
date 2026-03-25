@@ -9,5 +9,5 @@ public class NullableScalarInputConverter<T>(ScalarInputConverter<T> innerConver
 {
     /// <inheritdoc />
     public override T? Convert(string? rawValue) =>
-        !string.IsNullOrWhiteSpace(rawValue) ? innerConverter.Convert(rawValue) : null;
+        !string.IsNullOrEmpty(rawValue) ? innerConverter.Convert(rawValue) : null;
 }

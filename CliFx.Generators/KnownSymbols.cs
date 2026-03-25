@@ -46,16 +46,8 @@ internal static class KnownSymbols
         Create("CliFx.Activation.SequenceInputConverter");
     public static TypeIdentifier StringScalarInputConverter { get; } =
         Create("CliFx.Activation.StringScalarInputConverter");
-    public static TypeIdentifier ObjectScalarInputConverter { get; } =
-        Create("CliFx.Activation.ObjectScalarInputConverter");
     public static TypeIdentifier BoolScalarInputConverter { get; } =
         Create("CliFx.Activation.BoolScalarInputConverter");
-    public static TypeIdentifier DateTimeOffsetScalarInputConverter { get; } =
-        Create("CliFx.Activation.DateTimeOffsetScalarInputConverter");
-    public static TypeIdentifier DateTimeScalarInputConverter { get; } =
-        Create("CliFx.Activation.DateTimeScalarInputConverter");
-    public static TypeIdentifier TimeSpanScalarInputConverter { get; } =
-        Create("CliFx.Activation.TimeSpanScalarInputConverter");
     public static TypeIdentifier EnumScalarInputConverter { get; } =
         Create("CliFx.Activation.EnumScalarInputConverter");
     public static TypeIdentifier NullableScalarInputConverter { get; } =

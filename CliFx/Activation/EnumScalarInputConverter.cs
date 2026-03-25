@@ -9,5 +9,5 @@ public class EnumScalarInputConverter<T> : ScalarInputConverter<T>
     where T : struct, Enum
 {
     /// <inheritdoc />
-    public override T Convert(string? rawValue) => (T)Enum.Parse(typeof(T), rawValue!, true);
+    public override T Convert(string? rawValue) => Enum.Parse<T>(rawValue!, true);
 }

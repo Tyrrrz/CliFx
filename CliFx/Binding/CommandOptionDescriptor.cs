@@ -75,8 +75,8 @@ public class CommandOptionDescriptor<TCommand, TProperty>(
     string? environmentVariable,
     bool isRequired,
     string? description,
-    InputConverter<TProperty> converter,
-    IReadOnlyList<InputValidator<TProperty>> validators
+    IInputConverter<TProperty> converter,
+    IReadOnlyList<IInputValidator<TProperty>> validators
 )
     : CommandOptionDescriptor(
         property,

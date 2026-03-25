@@ -3,7 +3,7 @@ using System.Collections.Generic;
 namespace CliFx.Activation;
 
 /// <inheritdoc />
-public abstract class InputConverter<T> : IInputConverter
+public abstract class InputConverter<T> : IInputConverter<T>
 {
     /// <inheritdoc />
     public abstract bool CanConvertSequence { get; }

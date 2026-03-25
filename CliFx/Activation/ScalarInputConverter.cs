@@ -19,7 +19,7 @@ public abstract class ScalarInputConverter<T> : InputConverter<T>
     /// <inheritdoc />
     public sealed override T Convert(IReadOnlyList<string> rawValues) =>
         rawValues.Count <= 1
-            ? Convert(rawValues.FirstOrDefault())
+            ? Convert(rawValues.SingleOrDefault())
             : throw CliFxException.UserError(
                 $"""
                 Expected a single argument, but provided with multiple:

@@ -53,8 +53,8 @@ public class CommandParameterDescriptor<TCommand, TProperty>(
     string name,
     bool isRequired,
     string? description,
-    InputConverter<TProperty> converter,
-    IReadOnlyList<InputValidator<TProperty>> validators
+    IInputConverter<TProperty> converter,
+    IReadOnlyList<IInputValidator<TProperty>> validators
 )
     : CommandParameterDescriptor(
         property,

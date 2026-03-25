@@ -46,7 +46,7 @@ public abstract class CommandInputDescriptor<TCommand, TProperty>(
     PropertyDescriptor<TCommand, TProperty> property,
     bool isRequired,
     string? description,
-    InputConverter<TProperty> converter,
-    IReadOnlyList<InputValidator<TProperty>> validators
+    IInputConverter<TProperty> converter,
+    IReadOnlyList<IInputValidator<TProperty>> validators
 ) : CommandInputDescriptor(property, isRequired, description, converter, validators)
     where TCommand : ICommand;

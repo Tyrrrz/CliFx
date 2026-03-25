@@ -656,6 +656,48 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
     }
 
     [Fact]
+    public async Task I_can_bind_a_parameter_or_an_option_to_an_array_backed_collection_interface_property()
+    {
+        // Arrange
+        var command = CommandCompiler.Compile(
+            // lang=csharp
+            """
+            [Command]
+            public partial class Command : ICommand
+            {
+                [CommandOption('f')]
+                public ICollection<string>? Foo { get; set; }
+
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    foreach (var i in Foo)
+                        console.WriteLine(i);
+
+                    return default;
+                }
+            }
+            """
+        );
+
+        var application = new CommandLineApplicationBuilder()
+            .AddCommand(command)
+            .UseConsole(FakeConsole)
+            .Build();
+
+        // Act
+        var exitCode = await application.RunAsync(
+            ["-f", "one", "two", "three"],
+            new Dictionary<string, string>()
+        );
+
+        // Assert
+        exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
+        stdOut.Should().ConsistOfLines("one", "two", "three");
+    }
+
+    [Fact]
     public async Task I_can_bind_a_parameter_or_an_option_to_a_string_list_property()
     {
         // Arrange
@@ -786,6 +828,29 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
                 {
                     [CommandOption('f')]
                     public CustomType? Foo { get; set; }
+
+                    public ValueTask ExecuteAsync(IConsole console) => default;
+                }
+                """
+            );
+
+        // Assert
+        act.Should().Throw<InvalidOperationException>().WithMessage("*ConverterNotInferrable*");
+    }
+
+    [Fact]
+    public void I_can_try_to_bind_a_parameter_or_an_option_to_a_non_scalar_property_and_get_an_error_if_it_is_of_an_unsupported_interface_type()
+    {
+        // Act
+        var act = () =>
+            CommandCompiler.Compile(
+                // lang=csharp
+                """
+                [Command]
+                public partial class Command : ICommand
+                {
+                    [CommandOption('f')]
+                    public ISet<string>? Foo { get; set; }
 
                     public ValueTask ExecuteAsync(IConsole console) => default;
                 }
