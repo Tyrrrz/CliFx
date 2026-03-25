@@ -118,13 +118,10 @@ internal record CommandSymbol(
         }
 
         // Parameters must have unique order values
-        for (var i = 0; i < parameters.Count; i++)
+        foreach (var (i, first) in parameters.Index())
         {
-            for (var j = i + 1; j < parameters.Count; j++)
+            foreach (var second in parameters.Skip(i + 1))
             {
-                var first = parameters[i];
-                var second = parameters[j];
-
                 if (first.Order == second.Order)
                 {
                     diagnosticsList.Add(
@@ -141,13 +138,10 @@ internal record CommandSymbol(
         }
 
         // Parameters must have unique names
-        for (var i = 0; i < parameters.Count; i++)
+        foreach (var (i, first) in parameters.Index())
         {
-            for (var j = i + 1; j < parameters.Count; j++)
+            foreach (var second in parameters.Skip(i + 1))
             {
-                var first = parameters[i];
-                var second = parameters[j];
-
                 if (string.Equals(first.Name, second.Name, StringComparison.OrdinalIgnoreCase))
                 {
                     diagnosticsList.Add(
@@ -165,10 +159,8 @@ internal record CommandSymbol(
 
         // Non-required parameters must have the highest order (and be alone)
         var parametersByOrder = parameters.OrderBy(p => p.Order).ToArray();
-        for (var i = 0; i < parametersByOrder.Length; i++)
+        foreach (var (i, parameter) in parametersByOrder.Index())
         {
-            var parameter = parametersByOrder[i];
-
             if (parameter.IsRequired)
                 continue;
 
@@ -188,10 +180,8 @@ internal record CommandSymbol(
         }
 
         // Sequence-based parameters must have the highest order (and be alone)
-        for (var i = 0; i < parametersByOrder.Length; i++)
+        foreach (var (i, parameter) in parametersByOrder.Index())
         {
-            var parameter = parametersByOrder[i];
-
             if (!parameter.IsSequenceBased)
                 continue;
 
@@ -211,13 +201,10 @@ internal record CommandSymbol(
         }
 
         // Options must have unique names and short names
-        for (var i = 0; i < options.Count; i++)
+        foreach (var (i, first) in options.Index())
         {
-            for (var j = i + 1; j < options.Count; j++)
+            foreach (var second in options.Skip(i + 1))
             {
-                var first = options[i];
-                var second = options[j];
-
                 if (
                     !string.IsNullOrWhiteSpace(first.Name)
                     && string.Equals(first.Name, second.Name, StringComparison.OrdinalIgnoreCase)

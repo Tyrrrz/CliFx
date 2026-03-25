@@ -16,8 +16,8 @@ public class ArraySequenceInputConverter<TElement, TSequence>(
     public override TSequence Convert(IReadOnlyList<string> rawValues)
     {
         var result = new TElement[rawValues.Count];
-        for (var i = 0; i < rawValues.Count; i++)
-            result[i] = elementConverter.Convert(rawValues[i]);
+        foreach (var (i, rawValue) in rawValues.Index())
+            result[i] = elementConverter.Convert(rawValue);
 
         // Validity of this call is ensured by the instantiator of this converter
         return (TSequence)result.AsEnumerable();

@@ -34,10 +34,8 @@ internal partial class ParsedCommandLine
 
         // Append arguments to a buffer until we find the longest sequence that represents
         // a valid command name.
-        for (var i = index; i < commandLineArguments.Count; i++)
+        foreach (var (i, argument) in commandLineArguments.Index().Skip(index))
         {
-            var argument = commandLineArguments[i];
-
             potentialCommandNameComponents.Add(argument);
 
             var potentialCommandName = string.Join(' ', potentialCommandNameComponents);
