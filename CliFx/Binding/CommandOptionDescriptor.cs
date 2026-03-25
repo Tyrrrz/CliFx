@@ -38,10 +38,6 @@ public class CommandOptionDescriptor(
     internal bool MatchesIdentifier(string identifier) =>
         MatchesName(identifier) || identifier.Length == 1 && MatchesShortName(identifier[0]);
 
-    internal bool MatchesEnvironmentVariable(string environmentVariableName) =>
-        !string.IsNullOrWhiteSpace(EnvironmentVariable)
-        && string.Equals(EnvironmentVariable, environmentVariableName, StringComparison.Ordinal);
-
     /// <inheritdoc cref="ToString()" />
     public string ToString(bool includeKind)
     {

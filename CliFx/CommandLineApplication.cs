@@ -94,11 +94,11 @@ public class CommandLineApplication(
         );
 
         // Assemble the command activator
-        var commandActivator = new CommandActivator(command, instance, environmentVariables);
+        var activator = new CommandActivator(command, instance, environmentVariables);
 
         // Perform a limited command activation only for the conventional help and version options,
         // so that they can be handled even if the rest of the command-line input is invalid.
-        commandActivator.ActivateHelpAndVersionOptions(commandLine);
+        activator.ActivateHelpAndVersionOptions(commandLine);
 
         // Handle help option
         if (instance is ICommandWithHelpOption { IsHelpRequested: true })
@@ -121,7 +121,7 @@ public class CommandLineApplication(
         try
         {
             // Activate the command inputs from the command line
-            commandActivator.Activate(commandLine);
+            activator.Activate(commandLine);
 
             // Execute the command
             await instance.ExecuteAsync(console);

@@ -107,18 +107,4 @@ internal static class RoslynExtensions
                 )
                 ?.TypeArguments[0];
     }
-
-    extension(IPropertySymbol property)
-    {
-        public IEnumerable<PropertyDeclarationSyntax> GetDeclarations() =>
-            property
-                .DeclaringSyntaxReferences.Select(r => r.GetSyntax())
-                .OfType<PropertyDeclarationSyntax>();
-
-        public bool IsRequired() =>
-            property
-                .GetDeclarations()
-                .SelectMany(p => p.Modifiers)
-                .Any(m => m.IsKind(SyntaxKind.RequiredKeyword));
-    }
 }

@@ -5,7 +5,6 @@ using System.Globalization;
 using System.Linq;
 using CliFx.Binding;
 using CliFx.Infrastructure;
-using CliFx.Utils.Extensions;
 
 namespace CliFx.Help;
 
@@ -154,8 +153,11 @@ internal class HelpWriter(HelpContext context, ConsoleWriter consoleWriter)
                 value switch
                 {
                     // Lowercase bools look better
-                    bool b => b.ToString().ToLowerInvariant(),
-                    IFormattable f => f.ToString(null, CultureInfo.InvariantCulture),
+                    bool boolValue => boolValue.ToString().ToLowerInvariant(),
+                    IFormattable formattable => formattable.ToString(
+                        null,
+                        CultureInfo.InvariantCulture
+                    ),
                     _ => value.ToString(),
                 }
             );
