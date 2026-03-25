@@ -8,10 +8,13 @@ public partial record Isbn(
     int Registrant,
     int Publication,
     int CheckDigit
-)
+) : IFormattable
 {
-    public override string ToString() =>
+    // Implement IFormattable so CliFx can render ISBN values in the help text, such as when listing input defaults
+    public string ToString(string? format, IFormatProvider? formatProvider) =>
         $"{EanPrefix:000}-{RegistrationGroup:00}-{Registrant:00000}-{Publication:00}-{CheckDigit:0}";
+
+    public override string ToString() => ToString(null, null);
 }
 
 public partial record Isbn

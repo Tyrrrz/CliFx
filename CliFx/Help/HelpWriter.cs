@@ -139,9 +139,6 @@ internal class HelpWriter(HelpContext context, ConsoleWriter consoleWriter)
 
         foreach (var value in defaultValues)
         {
-            if (value is not IFormattable and not IConvertible)
-                continue;
-
             if (isFirst)
             {
                 Write(ConsoleColor.White, "Default: ");
@@ -153,7 +150,15 @@ internal class HelpWriter(HelpContext context, ConsoleWriter consoleWriter)
             }
 
             Write('"');
-            Write(value.ToString(CultureInfo.InvariantCulture));
+            Write(
+                value switch
+                {
+                    // Lowercase bools look better
+                    bool b => b.ToString().ToLowerInvariant(),
+                    IFormattable f => f.ToString(null, CultureInfo.InvariantCulture),
+                    _ => value.ToString(),
+                }
+            );
             Write('"');
         }
 

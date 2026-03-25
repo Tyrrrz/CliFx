@@ -771,7 +771,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
                 "three",
                 "--qwe",
                 "Default:",
-                "True",
+                "true",
                 "--qop",
                 "Default:",
                 "1337",
