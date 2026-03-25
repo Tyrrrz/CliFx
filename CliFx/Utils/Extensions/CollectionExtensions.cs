@@ -10,10 +10,10 @@ internal static class CollectionExtensions
     {
         public IEnumerable<T> WhereNotNull()
         {
-            foreach (var i in source)
+            foreach (var item in source)
             {
-                if (i is not null)
-                    yield return i;
+                if (item is not null)
+                    yield return item;
             }
         }
     }
@@ -22,10 +22,10 @@ internal static class CollectionExtensions
     {
         public IEnumerable<string> WhereNotNullOrWhiteSpace()
         {
-            foreach (var i in source)
+            foreach (var item in source)
             {
-                if (!string.IsNullOrWhiteSpace(i))
-                    yield return i;
+                if (!string.IsNullOrWhiteSpace(item))
+                    yield return item;
             }
         }
     }
