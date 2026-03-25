@@ -13,7 +13,7 @@ internal partial record class TypeIdentifier(
 
     public bool IsMatchedBy(INamedTypeSymbol symbol) =>
         string.Equals(
-            symbol.ToDisplayString(FullyQualifiedFormatWithoutGlobalPrefix),
+            symbol.ToDisplayString(FullyQualifiedFormatWithoutGlobalPrefixOrGenerics),
             FullyQualifiedName,
             StringComparison.Ordinal
         );
@@ -26,6 +26,11 @@ internal partial record class TypeIdentifier
     internal static readonly SymbolDisplayFormat FullyQualifiedFormatWithoutGlobalPrefix =
         SymbolDisplayFormat.FullyQualifiedFormat.WithGlobalNamespaceStyle(
             SymbolDisplayGlobalNamespaceStyle.OmittedAsContaining
+        );
+
+    private static readonly SymbolDisplayFormat FullyQualifiedFormatWithoutGlobalPrefixOrGenerics =
+        FullyQualifiedFormatWithoutGlobalPrefix.WithGenericsOptions(
+            SymbolDisplayGenericsOptions.None
         );
 
     public static TypeIdentifier From(ITypeSymbol symbol) =>

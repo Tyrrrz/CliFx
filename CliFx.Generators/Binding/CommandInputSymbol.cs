@@ -18,15 +18,9 @@ internal abstract record CommandInputSymbol(
     public bool IsConverterSequenceBased =>
         ConverterType is not null
         && ConverterType
-            .Symbol.GetBaseTypes()
-            .Prepend(ConverterType.Symbol)
+            .Symbol.GetSelfAndBaseTypes()
             .OfType<INamedTypeSymbol>()
-            .Any(t =>
-                t.OriginalDefinition.Name == "SequenceInputConverter"
-                && t.OriginalDefinition.ContainingNamespace.ToDisplayString(
-                    TypeIdentifier.FullyQualifiedFormatWithoutGlobalPrefix
-                ) == "CliFx.Activation"
-            );
+            .Any(t => KnownSymbols.SequenceInputConverter.IsMatchedBy(t));
 
     // An input is considered sequence-based if it has a sequence-based converter, or if it
     // doesn't have a converter but its type is an enumerable (except string).

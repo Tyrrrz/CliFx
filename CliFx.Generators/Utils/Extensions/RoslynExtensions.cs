@@ -67,13 +67,13 @@ internal static class RoslynExtensions
             }
         }
 
+        public IEnumerable<ITypeSymbol> GetSelfAndBaseTypes() => type.GetBaseTypes().Prepend(type);
+
         public IEnumerable<ISymbol> GetMembers(bool includeInherited = true)
         {
             var memberNames = new HashSet<string>(StringComparer.Ordinal);
 
-            foreach (
-                var currentType in includeInherited ? type.GetBaseTypes().Prepend(type) : [type]
-            )
+            foreach (var currentType in includeInherited ? type.GetSelfAndBaseTypes() : [type])
             {
                 foreach (var member in currentType.GetMembers())
                 {
