@@ -9,6 +9,16 @@ namespace CliFx.Generators.Utils.Extensions;
 
 internal static class RoslynExtensions
 {
+    private static readonly SymbolDisplayFormat FullyQualifiedFormatWithoutGlobalPrefix =
+        SymbolDisplayFormat.FullyQualifiedFormat.WithGlobalNamespaceStyle(
+            SymbolDisplayGlobalNamespaceStyle.OmittedAsContaining
+        );
+
+    private static readonly SymbolDisplayFormat FullyQualifiedFormatWithoutGlobalPrefixOrGenerics =
+        FullyQualifiedFormatWithoutGlobalPrefix.WithGenericsOptions(
+            SymbolDisplayGenericsOptions.None
+        );
+
     extension<T>(IncrementalValuesProvider<T?> source)
         where T : class
     {
@@ -42,6 +52,21 @@ internal static class RoslynExtensions
 
     extension(ITypeSymbol type)
     {
+        public string GetGloballyQualifiedName() =>
+            type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+
+        public string? TryGetNamespaceName() =>
+            type.ContainingNamespace is { IsGlobalNamespace: false } ns
+                ? ns.ToDisplayString(FullyQualifiedFormatWithoutGlobalPrefix)
+                : null;
+
+        public bool IsMatchedBy(string fullyQualifiedName) =>
+            string.Equals(
+                type.ToDisplayString(FullyQualifiedFormatWithoutGlobalPrefixOrGenerics),
+                fullyQualifiedName,
+                StringComparison.Ordinal
+            );
+
         public IEnumerable<TypeDeclarationSyntax> GetDeclarations() =>
             type
                 .DeclaringSyntaxReferences.Select(r => r.GetSyntax())

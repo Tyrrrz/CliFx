@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis;
 namespace CliFx.Generators.Binding;
 
 internal record CommandSymbol(
-    ResolvedTypeIdentifier Type,
+    INamedTypeSymbol Type,
     string? Name,
     string? Description,
     IReadOnlyList<CommandInputSymbol> Inputs
@@ -33,7 +33,9 @@ internal record CommandSymbol(
 
         // Must have the [Command] attribute
         var commandAttribute = type.GetAttributes()
-            .FirstOrDefault(a => KnownSymbols.CommandAttribute.IsMatchedBy(a.AttributeClass));
+            .FirstOrDefault(a =>
+                a.AttributeClass?.IsMatchedBy(KnownTypes.CommandAttribute) == true
+            );
 
         if (commandAttribute is null)
         {
@@ -59,7 +61,7 @@ internal record CommandSymbol(
         }
 
         // Must implement ICommand
-        if (!type.AllInterfaces.Any(KnownSymbols.ICommand.IsMatchedBy))
+        if (!type.AllInterfaces.Any(i => i.IsMatchedBy(KnownTypes.ICommand)))
         {
             diagnosticsList.Add(
                 Diagnostic.Create(
@@ -79,7 +81,7 @@ internal record CommandSymbol(
             var parameterAttribute = property
                 .GetAttributes()
                 .FirstOrDefault(a =>
-                    KnownSymbols.CommandParameterAttribute.IsMatchedBy(a.AttributeClass)
+                    a.AttributeClass?.IsMatchedBy(KnownTypes.CommandParameterAttribute) == true
                 );
 
             if (parameterAttribute is not null)
@@ -99,7 +101,7 @@ internal record CommandSymbol(
             var optionAttribute = property
                 .GetAttributes()
                 .FirstOrDefault(a =>
-                    KnownSymbols.CommandOptionAttribute.IsMatchedBy(a.AttributeClass)
+                    a.AttributeClass?.IsMatchedBy(KnownTypes.CommandOptionAttribute) == true
                 );
 
             if (optionAttribute is not null)
@@ -237,7 +239,7 @@ internal record CommandSymbol(
         }
 
         return new CommandSymbol(
-            ResolvedTypeIdentifier.From(type),
+            type,
             commandAttribute?.NamedArguments.FirstOrDefault(a => a.Key == "Name").Value.Value
                 as string
                 ?? commandAttribute

@@ -5,12 +5,12 @@ using Microsoft.CodeAnalysis;
 
 namespace CliFx.Generators.Binding;
 
-internal abstract record CommandInputSymbol(
+internal abstract partial record CommandInputSymbol(
     IPropertySymbol Property,
     bool IsRequired,
     string? Description,
-    ResolvedTypeIdentifier? ConverterType,
-    IReadOnlyList<ResolvedTypeIdentifier> ValidatorTypes
+    INamedTypeSymbol? ConverterType,
+    IReadOnlyList<INamedTypeSymbol> ValidatorTypes
 )
 {
     // Technically, we should be checking if IInputConverter.CanConvertSequence is true,
@@ -18,9 +18,9 @@ internal abstract record CommandInputSymbol(
     public bool IsConverterSequenceBased =>
         ConverterType is not null
         && ConverterType
-            .Symbol.GetSelfAndBaseTypes()
+            .GetSelfAndBaseTypes()
             .OfType<INamedTypeSymbol>()
-            .Any(t => KnownSymbols.SequenceInputConverter.IsMatchedBy(t));
+            .Any(t => t.IsMatchedBy(KnownTypes.SequenceInputConverter));
 
     // An input is considered sequence-based if it has a sequence-based converter, or if it
     // doesn't have a converter but its type is an enumerable (except string).
@@ -29,4 +29,19 @@ internal abstract record CommandInputSymbol(
             ? IsConverterSequenceBased
             : Property.Type.SpecialType != SpecialType.System_String
                 && Property.Type.TryGetEnumerableUnderlyingType() is not null;
+}
+
+internal partial record CommandInputSymbol
+{
+    protected static INamedTypeSymbol? TryResolveConverterType(AttributeData attribute) =>
+        attribute.NamedArguments.FirstOrDefault(a => a.Key == "Converter").Value.Value
+        as INamedTypeSymbol;
+
+    protected static INamedTypeSymbol[] ResolveValidatorTypes(AttributeData attribute) =>
+        attribute
+            .NamedArguments.Where(a => a.Key == "Validators")
+            .SelectMany(a => a.Value.Values)
+            .Select(v => v.Value as INamedTypeSymbol)
+            .WhereNotNull()
+            .ToArray();
 }

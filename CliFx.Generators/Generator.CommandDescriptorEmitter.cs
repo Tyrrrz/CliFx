@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using CliFx.Generators.Binding;
+using CliFx.Generators.Utils;
 using CliFx.Generators.Utils.Extensions;
 using Microsoft.CodeAnalysis;
 
@@ -14,11 +15,13 @@ public partial class Generator
         out IReadOnlyList<Diagnostic> diagnostics
     )
     {
-        var namespaceName = command.Type.Namespace;
+        var namespaceName = command.Type.TryGetNamespaceName();
+        var commandTypeName = command.Type.Name;
+        var commandTypeFqn = command.Type.GetGloballyQualifiedName();
 
-        var interfaces = new List<string>(2) { KnownSymbols.ICommandWithHelpOption.ToString() };
+        var interfaces = new List<string>(2) { "global::" + KnownTypes.ICommandWithHelpOption };
         if (command.IsDefault)
-            interfaces.Add(KnownSymbols.ICommandWithVersionOption.ToString());
+            interfaces.Add("global::" + KnownTypes.ICommandWithVersionOption);
 
         var interfaceList =
             interfaces.Count > 0 ? " : " + string.Join(", ", interfaces) : string.Empty;
@@ -42,7 +45,7 @@ public partial class Generator
             );
         }
 
-        foreach (var containingType in command.Type.Symbol.GetContainingTypes().Reverse())
+        foreach (var containingType in command.Type.GetContainingTypes().Reverse())
         {
             sb.AppendLine(
                 $"partial class {containingType.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)}"
@@ -52,7 +55,7 @@ public partial class Generator
 
         sb.Append(
             $$"""
-            partial class {{command.Type.Name}}{{interfaceList}}
+            partial class {{commandTypeName}}{{interfaceList}}
             {
             """
         );
@@ -81,12 +84,12 @@ public partial class Generator
         sb.Append(
             $$"""
 
-                /// <summary>Generated command descriptor for <see cref="{{command.Type.Name}}"/>.</summary>
-                public static {{KnownSymbols.CommandDescriptor}} Descriptor { get; } =
-                    new {{KnownSymbols.CommandDescriptor}}<{{command.Type.FullyQualifiedName}}>(
-                        {{EncodeString(command.Name)}},
-                        {{EncodeString(command.Description)}},
-                        new {{KnownSymbols.CommandInputDescriptor}}[]
+                /// <summary>Generated command descriptor for <see cref="{{commandTypeName}}"/>.</summary>
+                public static global::{{KnownTypes.CommandDescriptor}} Descriptor { get; } =
+                    new global::{{KnownTypes.CommandDescriptor}}<{{commandTypeFqn}}>(
+                        {{CSharp.Encode(command.Name)}},
+                        {{CSharp.Encode(command.Description)}},
+                        new global::{{KnownTypes.CommandInputDescriptor}}[]
                         {
             """
         );
@@ -103,28 +106,28 @@ public partial class Generator
                         DiagnosticDescriptors.CommandInputConverterNotInferrable,
                         param.Property.Locations.FirstOrDefault(),
                         param.Property.Name,
-                        TypeIdentifier.From(param.Property.Type).FullyQualifiedName
+                        param.Property.Type.GetGloballyQualifiedName()
                     )
                 );
                 continue;
             }
 
+            var propTypeFqn = param.Property.Type.GetGloballyQualifiedName();
+
             sb.Append(
                 // lang=csharp
                 $$"""
-                            new {{KnownSymbols.CommandParameterDescriptor}}<{{command.Type.FullyQualifiedName}}, {{TypeIdentifier.From(param.Property.Type).FullyQualifiedName}}>(
-                                new {{KnownSymbols.PropertyDescriptor}}<{{command.Type.FullyQualifiedName}}, {{TypeIdentifier.From(param.Property.Type).FullyQualifiedName}}>(
+                            new global::{{KnownTypes.CommandParameterDescriptor}}<{{commandTypeFqn}}, {{propTypeFqn}}>(
+                                new global::{{KnownTypes.PropertyDescriptor}}<{{commandTypeFqn}}, {{propTypeFqn}}>(
                                     "{{param.Property.Name}}",
                                     c => c.{{param.Property.Name}},
                                     (c, v) => c.{{param.Property.Name}} = v),
                                 {{param.Order}},
-                                {{EncodeString(param.Name)}},
+                                {{CSharp.Encode(param.Name)}},
                                 {{(param.IsRequired ? "true" : "false")}},
-                                {{EncodeString(param.Description)}},
+                                {{CSharp.Encode(param.Description)}},
                                 {{converterExpr}},
-                                {{BuildValidatorsExpr(
-                    param.ValidatorTypes,
-                    TypeIdentifier.From(param.Property.Type).FullyQualifiedName)}}),
+                                {{BuildValidatorsExpr(param.ValidatorTypes, propTypeFqn)}}),
                 """
             );
         }
@@ -139,34 +142,63 @@ public partial class Generator
                         DiagnosticDescriptors.CommandInputConverterNotInferrable,
                         option.Property.Locations.FirstOrDefault(),
                         option.Property.Name,
-                        TypeIdentifier.From(option.Property.Type).FullyQualifiedName
+                        option.Property.Type.GetGloballyQualifiedName()
                     )
                 );
                 continue;
             }
 
+            var propTypeFqn = option.Property.Type.GetGloballyQualifiedName();
+
             sb.Append(
                 // lang=csharp
                 $$"""
-                            new {{KnownSymbols.CommandOptionDescriptor}}<{{command.Type.FullyQualifiedName}}, {{TypeIdentifier.From(option.Property.Type).FullyQualifiedName}}>(
-                                new {{KnownSymbols.PropertyDescriptor}}<{{command.Type.FullyQualifiedName}}, {{TypeIdentifier.From(option.Property.Type).FullyQualifiedName}}>(
+                            new global::{{KnownTypes.CommandOptionDescriptor}}<{{commandTypeFqn}}, {{propTypeFqn}}>(
+                                new global::{{KnownTypes.PropertyDescriptor}}<{{commandTypeFqn}}, {{propTypeFqn}}>(
                                     "{{option.Property.Name}}",
                                     c => c.{{option.Property.Name}},
                                     (c, v) => c.{{option.Property.Name}} = v),
-                                {{EncodeString(option.Name)}},
+                                {{CSharp.Encode(option.Name)}},
                                 {{(option.ShortName.HasValue ? $"'{option.ShortName}'" : "null")}},
-                                {{EncodeString(option.EnvironmentVariable)}},
+                                {{CSharp.Encode(option.EnvironmentVariable)}},
                                 {{(option.IsRequired ? "true" : "false")}},
-                                {{EncodeString(option.Description)}},
+                                {{CSharp.Encode(option.Description)}},
                                 {{converterExpr}},
-                                {{BuildValidatorsExpr(
-                    option.ValidatorTypes,
-                    TypeIdentifier.From(option.Property.Type).FullyQualifiedName
-                )}}),
+                                {{BuildValidatorsExpr(option.ValidatorTypes, propTypeFqn)}}),
 
                 """
             );
         }
+
+        EmitBuiltInHelpOption(sb, command, diagnosticsList);
+
+        if (command.IsDefault)
+            EmitBuiltInVersionOption(sb, command, diagnosticsList);
+
+        sb.Append(
+            """
+                        });
+                }
+            """
+        );
+
+        foreach (var _ in command.Type.GetContainingTypes())
+        {
+            sb.AppendLine();
+            sb.AppendLine("}");
+        }
+
+        diagnostics = diagnosticsList;
+        return sb.ToString();
+    }
+
+    private static void EmitBuiltInHelpOption(
+        StringBuilder sb,
+        CommandSymbol command,
+        List<Diagnostic> diagnostics
+    )
+    {
+        var commandTypeFqn = command.Type.GetGloballyQualifiedName();
 
         var helpOptionByShortName = command.Options.FirstOrDefault(o => o.ShortName == 'h');
         var helpOptionByName = command.Options.FirstOrDefault(o =>
@@ -182,7 +214,7 @@ public partial class Generator
             var option = helpOptionByShortName ?? helpOptionByName;
             var shadowedIdentifier = helpOptionByShortName is not null ? "-h" : "--help";
 
-            diagnosticsList.Add(
+            diagnostics.Add(
                 Diagnostic.Create(
                     DiagnosticDescriptors.CommandOptionShadowsBuiltInHelpOption,
                     option?.Property.Locations.FirstOrDefault(),
@@ -197,8 +229,8 @@ public partial class Generator
             sb.Append(
                 // lang=csharp
                 $$"""
-                            new {{KnownSymbols.CommandOptionDescriptor}}<{{command.Type.FullyQualifiedName}}, bool>(
-                                new {{KnownSymbols.PropertyDescriptor}}<{{command.Type.FullyQualifiedName}}, bool>(
+                            new global::{{KnownTypes.CommandOptionDescriptor}}<{{commandTypeFqn}}, bool>(
+                                new global::{{KnownTypes.PropertyDescriptor}}<{{commandTypeFqn}}, bool>(
                                     "IsHelpRequested",
                                     c => c.IsHelpRequested,
                                     (c, v) => c.IsHelpRequested = v),
@@ -207,80 +239,70 @@ public partial class Generator
                                 null,
                                 false,
                                 "Shows help text.",
-                                new {{KnownSymbols.BoolScalarInputConverter}}(),
-                                global::System.Array.Empty<{{KnownSymbols.InputValidator.GlobalFullyQualifiedName}}<bool>>()),
+                                new global::{{KnownTypes.BoolScalarInputConverter}}(),
+                                global::System.Array.Empty<global::{{KnownTypes.InputValidator}}<bool>>()),
 
                 """
             );
         }
+    }
 
-        if (command.IsDefault)
-        {
-            var versionOptionByName = command.Options.FirstOrDefault(o =>
-                string.Equals(o.Name, "version", System.StringComparison.OrdinalIgnoreCase)
-            );
+    private static void EmitBuiltInVersionOption(
+        StringBuilder sb,
+        CommandSymbol command,
+        List<Diagnostic> diagnostics
+    )
+    {
+        var commandTypeFqn = command.Type.GetGloballyQualifiedName();
 
-            var shouldEmitBuiltInVersionOption = versionOptionByName is null;
-
-            if (versionOptionByName is not null)
-            {
-                diagnosticsList.Add(
-                    Diagnostic.Create(
-                        DiagnosticDescriptors.CommandOptionShadowsBuiltInVersionOption,
-                        versionOptionByName.Property.Locations.FirstOrDefault(),
-                        versionOptionByName.Property.Name,
-                        "--version"
-                    )
-                );
-            }
-
-            if (shouldEmitBuiltInVersionOption)
-            {
-                sb.Append(
-                    // lang=csharp
-                    $$"""
-                                new {{KnownSymbols.CommandOptionDescriptor}}<{{command.Type.FullyQualifiedName}}, bool>(
-                                    new {{KnownSymbols.PropertyDescriptor}}<{{command.Type.FullyQualifiedName}}, bool>(
-                                        "IsVersionRequested",
-                                        c => c.IsVersionRequested,
-                                        (c, v) => c.IsVersionRequested = v),
-                                    "version",
-                                    null,
-                                    null,
-                                    false,
-                                    "Shows version information.",
-                                    new {{KnownSymbols.BoolScalarInputConverter}}(),
-                                    global::System.Array.Empty<{{KnownSymbols.InputValidator.GlobalFullyQualifiedName}}<bool>>()),
-
-                    """
-                );
-            }
-        }
-
-        sb.Append(
-            """
-                        });
-                }
-            """
+        var versionOptionByName = command.Options.FirstOrDefault(o =>
+            string.Equals(o.Name, "version", System.StringComparison.OrdinalIgnoreCase)
         );
 
-        foreach (var _ in command.Type.Symbol.GetContainingTypes())
+        var shouldEmitBuiltInVersionOption = versionOptionByName is null;
+
+        if (versionOptionByName is not null)
         {
-            sb.AppendLine();
-            sb.AppendLine("}");
+            diagnostics.Add(
+                Diagnostic.Create(
+                    DiagnosticDescriptors.CommandOptionShadowsBuiltInVersionOption,
+                    versionOptionByName.Property.Locations.FirstOrDefault(),
+                    versionOptionByName.Property.Name,
+                    "--version"
+                )
+            );
         }
 
-        diagnostics = diagnosticsList;
-        return sb.ToString();
+        if (shouldEmitBuiltInVersionOption)
+        {
+            sb.Append(
+                // lang=csharp
+                $$"""
+                            new global::{{KnownTypes.CommandOptionDescriptor}}<{{commandTypeFqn}}, bool>(
+                                new global::{{KnownTypes.PropertyDescriptor}}<{{commandTypeFqn}}, bool>(
+                                    "IsVersionRequested",
+                                    c => c.IsVersionRequested,
+                                    (c, v) => c.IsVersionRequested = v),
+                                "version",
+                                null,
+                                null,
+                                false,
+                                "Shows version information.",
+                                new global::{{KnownTypes.BoolScalarInputConverter}}(),
+                                global::System.Array.Empty<global::{{KnownTypes.InputValidator}}<bool>>()),
+
+                """
+            );
+        }
     }
 
     private static string? TryBuildConverterExpr(
-        TypeIdentifier? userConverterType,
+        INamedTypeSymbol? userConverterType,
         IPropertySymbol property
     )
     {
         if (userConverterType is not null)
-            return $"new {userConverterType.GlobalFullyQualifiedName}()";
+            return $"new {userConverterType.GetGloballyQualifiedName()}()";
 
         var type = property.Type;
 
@@ -299,19 +321,19 @@ public partial class Generator
 
         // Object
         if (type.SpecialType == SpecialType.System_Object)
-            return $"new {KnownSymbols.StringScalarInputConverter}()";
+            return $"new global::{KnownTypes.StringScalarInputConverter}()";
 
         // String
         if (type.SpecialType == SpecialType.System_String)
-            return $"new {KnownSymbols.StringScalarInputConverter}()";
+            return $"new global::{KnownTypes.StringScalarInputConverter}()";
 
         // Bool
         if (type.SpecialType == SpecialType.System_Boolean)
-            return $"new {KnownSymbols.BoolScalarInputConverter}()";
+            return $"new global::{KnownTypes.BoolScalarInputConverter}()";
 
         // Enum
         if (type.TypeKind == TypeKind.Enum)
-            return $"new {KnownSymbols.EnumScalarInputConverter.GlobalFullyQualifiedName}<{typeFqn}>()";
+            return $"new global::{KnownTypes.EnumScalarInputConverter}<{typeFqn}>()";
 
         // Nullable<T>
         if (
@@ -324,7 +346,7 @@ public partial class Generator
             var innerConverterExpr = TryBuildDefaultScalarConverterExpr(innerType);
             if (innerConverterExpr is null)
                 return null;
-            return $"new {KnownSymbols.NullableScalarInputConverter.GlobalFullyQualifiedName}<{innerFqn}>({innerConverterExpr})";
+            return $"new global::{KnownTypes.NullableScalarInputConverter}<{innerFqn}>({innerConverterExpr})";
         }
 
         // Has static Parse(string, IFormatProvider)
@@ -341,7 +363,7 @@ public partial class Generator
             );
 
         if (parseMethodWithFormatProvider is not null)
-            return $"new {KnownSymbols.DelegateScalarInputConverter.GlobalFullyQualifiedName}<{typeFqn}>(s => {typeFqn}.Parse(s!, global::System.Globalization.CultureInfo.InvariantCulture))";
+            return $"new global::{KnownTypes.DelegateScalarInputConverter}<{typeFqn}>(s => {typeFqn}.Parse(s!, global::System.Globalization.CultureInfo.InvariantCulture))";
 
         // Has static Parse(string)
         var parseMethod = type.GetMembers("Parse")
@@ -355,7 +377,7 @@ public partial class Generator
             );
 
         if (parseMethod is not null)
-            return $"new {KnownSymbols.DelegateScalarInputConverter.GlobalFullyQualifiedName}<{typeFqn}>(s => {typeFqn}.Parse(s!))";
+            return $"new global::{KnownTypes.DelegateScalarInputConverter}<{typeFqn}>(s => {typeFqn}.Parse(s!))";
 
         // Has ctor(string)
         if (
@@ -367,7 +389,7 @@ public partial class Generator
             )
         )
         {
-            return $"new {KnownSymbols.DelegateScalarInputConverter.GlobalFullyQualifiedName}<{typeFqn}>(s => new {typeFqn}(s!))";
+            return $"new global::{KnownTypes.DelegateScalarInputConverter}<{typeFqn}>(s => new {typeFqn}(s!))";
         }
 
         // Implements IConvertible
@@ -377,7 +399,7 @@ public partial class Generator
             )
         )
         {
-            return $"new {KnownSymbols.ConvertibleScalarInputConverter.GlobalFullyQualifiedName}<{typeFqn}>()";
+            return $"new global::{KnownTypes.ConvertibleScalarInputConverter}<{typeFqn}>()";
         }
 
         return null;
@@ -415,7 +437,7 @@ public partial class Generator
                         or SpecialType.System_Collections_Generic_IReadOnlyList_T
             )
         )
-            return $"new {KnownSymbols.ArraySequenceInputConverter.GlobalFullyQualifiedName}<{elementTypeFqn}>({elementConverterArg})";
+            return $"new global::{KnownTypes.ArraySequenceInputConverter}<{elementTypeFqn}>({elementConverterArg})";
 
         // Has ctor(string[])
         if (
@@ -441,30 +463,26 @@ public partial class Generator
             )
         )
         {
-            return $"new {KnownSymbols.DelegateSequenceInputConverter.GlobalFullyQualifiedName}<{elementTypeFqn}[], {collectionTypeFqn}>(new {KnownSymbols.ArraySequenceInputConverter.GlobalFullyQualifiedName}<{elementTypeFqn}>({elementConverterArg}), values => new {collectionTypeFqn}(values))";
+            return $"new global::{KnownTypes.DelegateSequenceInputConverter}<{elementTypeFqn}[], {collectionTypeFqn}>(new global::{KnownTypes.ArraySequenceInputConverter}<{elementTypeFqn}>({elementConverterArg}), values => new {collectionTypeFqn}(values))";
         }
 
         return null;
     }
 
     private static string BuildValidatorsExpr(
-        IReadOnlyList<TypeIdentifier> validatorTypes,
+        IReadOnlyList<INamedTypeSymbol> validatorTypes,
         string propertyTypeFqn
     )
     {
-        var validatorBaseType =
-            $"{KnownSymbols.InputValidator.GlobalFullyQualifiedName}<{propertyTypeFqn}>";
+        var validatorBaseType = $"global::{KnownTypes.InputValidator}<{propertyTypeFqn}>";
 
         if (validatorTypes.Count == 0)
             return $"global::System.Array.Empty<{validatorBaseType}>()";
 
         var items = string.Join(
             ", ",
-            validatorTypes.Select(v => $"new {v.GlobalFullyQualifiedName}()")
+            validatorTypes.Select(v => $"new {v.GetGloballyQualifiedName()}()")
         );
         return $"new {validatorBaseType}[] {{ {items} }}";
     }
-
-    private static string EncodeString(string? value) =>
-        value is null ? "null" : $"\"{value.Replace("\\", @"\\").Replace("\"", "\\\"")}\"";
 }

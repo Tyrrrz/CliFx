@@ -16,7 +16,7 @@ public partial class Generator : IIncrementalGenerator
     {
         var commands = context
             .SyntaxProvider.ForAttributeWithMetadataName(
-                KnownSymbols.CommandAttribute.FullyQualifiedName,
+                KnownTypes.CommandAttribute,
                 static (node, cancellationToken) => node is ClassDeclarationSyntax,
                 static (ctx, cancellationToken) =>
                 {
@@ -50,7 +50,9 @@ public partial class Generator : IIncrementalGenerator
                     }
 
                     var hintName =
-                        item.Command.Type.FullyQualifiedName.Replace('.', '_') + "_Descriptor.g.cs";
+                        item.Command.Type.GetGloballyQualifiedName()
+                            .Replace("global::", "")
+                            .Replace('.', '_') + "_Descriptor.g.cs";
 
                     var source = EmitCommandDescriptor(item.Command, out var emitterDiagnostics);
 
@@ -84,7 +86,7 @@ public partial class Generator : IIncrementalGenerator
                 // Only generate for commands that are at least internal, since private ones won't be accessible from the extension method
                 .Where(
                     static (command) =>
-                        command.Type.Symbol.GetActualAccessibility() >= Accessibility.Internal
+                        command.Type.GetActualAccessibility() >= Accessibility.Internal
                 )
                 .Collect(),
             static (ctx, commands) =>
