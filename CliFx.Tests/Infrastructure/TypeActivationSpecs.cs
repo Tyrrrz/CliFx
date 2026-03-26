@@ -13,7 +13,7 @@ namespace CliFx.Tests.Infrastructure;
 public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
 {
     [Fact]
-    public async Task I_can_configure_the_application_to_use_the_default_type_activator_to_initialize_types_through_parameterless_constructors()
+    public async Task I_can_use_the_default_type_activator_to_initialize_types_through_parameterless_constructors()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -48,7 +48,7 @@ public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
     }
 
     [Fact]
-    public async Task I_can_try_to_configure_the_application_to_use_the_default_type_activator_and_get_an_error_if_the_requested_type_does_not_have_a_parameterless_constructor()
+    public async Task I_can_try_to_use_the_default_type_activator_and_get_an_error_if_the_requested_type_does_not_have_a_parameterless_constructor()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -81,7 +81,7 @@ public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
     }
 
     [Fact]
-    public async Task I_can_configure_the_application_to_use_a_custom_type_activator_to_initialize_types_using_a_delegate()
+    public async Task I_can_use_a_custom_type_activator_to_initialize_types_using_a_delegate()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -120,7 +120,7 @@ public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
     }
 
     [Fact]
-    public async Task I_can_configure_the_application_to_use_a_custom_type_activator_to_initialize_types_using_a_service_provider()
+    public async Task I_can_use_a_custom_type_activator_to_initialize_types_using_a_service_provider()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -172,7 +172,7 @@ public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
     }
 
     [Fact]
-    public async Task I_can_try_to_configure_the_application_to_use_a_custom_type_activator_and_get_an_error_if_the_requested_type_cannot_be_initialized()
+    public async Task I_can_try_to_use_a_custom_type_activator_and_get_an_error_if_the_requested_type_cannot_be_initialized()
     {
         // Arrange
         var command = CommandCompiler.Compile(

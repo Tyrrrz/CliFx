@@ -525,52 +525,6 @@ public class InputActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(test
     }
 
     [Fact]
-    public async Task I_can_pass_a_value_to_an_input_with_a_custom_converter()
-    {
-        // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            public class CustomConverter : ScalarInputConverter<int>
-            {
-                public override int Convert(string rawValue) =>
-                    rawValue.Length;
-            }
-
-            [Command]
-            public partial class Command : ICommand
-            {
-                [CommandOption('f', Converter = typeof(CustomConverter))]
-                public int Foo { get; set; }
-
-                public ValueTask ExecuteAsync(IConsole console)
-                {
-                    console.WriteLine(Foo);
-                    return default;
-                }
-            }
-            """
-        );
-
-        var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
-            .UseConsole(FakeConsole)
-            .Build();
-
-        // Act
-        var exitCode = await application.RunAsync(
-            ["-f", "hello world"],
-            new Dictionary<string, string>()
-        );
-
-        // Assert
-        exitCode.Should().Be(0);
-
-        var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Trim().Should().Be("11");
-    }
-
-    [Fact]
     public async Task I_can_pass_values_to_an_input_bound_to_a_string_array_property()
     {
         // Arrange
@@ -823,6 +777,52 @@ public class InputActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(test
     }
 
     [Fact]
+    public async Task I_can_pass_a_value_to_an_input_bound_to_a_property_with_a_custom_converter()
+    {
+        // Arrange
+        var command = CommandCompiler.Compile(
+            // lang=csharp
+            """
+            public class CustomConverter : ScalarInputConverter<int>
+            {
+                public override int Convert(string rawValue) =>
+                    rawValue.Length;
+            }
+
+            [Command]
+            public partial class Command : ICommand
+            {
+                [CommandOption('f', Converter = typeof(CustomConverter))]
+                public int Foo { get; set; }
+
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.WriteLine(Foo);
+                    return default;
+                }
+            }
+            """
+        );
+
+        var application = new CommandLineApplicationBuilder()
+            .AddCommand(command)
+            .UseConsole(FakeConsole)
+            .Build();
+
+        // Act
+        var exitCode = await application.RunAsync(
+            ["-f", "hello world"],
+            new Dictionary<string, string>()
+        );
+
+        // Assert
+        exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
+        stdOut.Trim().Should().Be("11");
+    }
+
+    [Fact]
     public async Task I_can_try_to_pass_an_invalid_value_to_an_input_and_get_an_error()
     {
         // Arrange
@@ -859,7 +859,7 @@ public class InputActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(test
     }
 
     [Fact]
-    public async Task I_can_try_to_pass_a_value_to_an_input_and_get_an_error_if_validation_fails()
+    public async Task I_can_try_to_pass_a_value_to_an_input_bound_to_a_property_with_a_custom_validator_and_get_an_error_if_validation_fails()
     {
         // Arrange
         var command = CommandCompiler.Compile(

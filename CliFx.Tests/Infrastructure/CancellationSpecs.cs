@@ -15,7 +15,7 @@ namespace CliFx.Tests.Infrastructure;
 public class CancellationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
 {
     [Fact(Timeout = 15000)]
-    public async Task I_can_configure_a_command_to_listen_to_the_interrupt_signal()
+    public async Task I_can_listen_to_the_interrupt_signal()
     {
         // Arrange
         using var cts = new CancellationTokenSource();
@@ -54,7 +54,7 @@ public class CancellationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOut
     }
 
     [Fact]
-    public async Task I_can_configure_a_command_to_listen_to_the_interrupt_signal_when_running_in_isolation()
+    public async Task I_can_listen_to_the_interrupt_signal_when_running_against_a_fake_console()
     {
         // Arrange
         var command = CommandCompiler.Compile(

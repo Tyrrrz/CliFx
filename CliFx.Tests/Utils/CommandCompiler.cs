@@ -93,11 +93,12 @@ internal static class CommandCompiler
     {
         var compilation = CreateCompilation(sourceCode, out var diagnostics);
 
-        var minSeverity = treatWarningsAsErrors
-            ? DiagnosticSeverity.Warning
-            : DiagnosticSeverity.Error;
-
-        var compilationErrors = diagnostics.Where(d => d.Severity >= minSeverity).ToArray();
+        var compilationErrors = diagnostics
+            .Where(d =>
+                d.Severity
+                >= (treatWarningsAsErrors ? DiagnosticSeverity.Warning : DiagnosticSeverity.Error)
+            )
+            .ToArray();
 
         if (compilationErrors.Any())
         {

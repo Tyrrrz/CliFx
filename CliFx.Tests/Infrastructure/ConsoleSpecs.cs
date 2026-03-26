@@ -17,7 +17,7 @@ namespace CliFx.Tests.Infrastructure;
 public class ConsoleSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
 {
     [Fact(Timeout = 15000)]
-    public async Task I_can_run_the_application_with_the_default_console_implementation_to_interact_with_the_system_console()
+    public async Task I_can_use_the_default_console_to_interact_with_the_system_console()
     {
         // Can't verify our own console output, so using an external process for this test
 
@@ -34,7 +34,7 @@ public class ConsoleSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     }
 
     [Fact]
-    public void I_can_run_the_application_on_a_system_with_a_custom_console_encoding_and_not_get_corrupted_output()
+    public void I_can_use_a_custom_console_encoding_and_not_get_corrupted_output()
     {
         // Arrange
         using var buffer = new MemoryStream();
@@ -53,7 +53,7 @@ public class ConsoleSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     }
 
     [Fact]
-    public async Task I_can_run_the_application_with_the_fake_console_implementation_to_isolate_console_interactions()
+    public async Task I_can_use_the_fake_console_to_isolate_console_interactions()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -111,7 +111,7 @@ public class ConsoleSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     }
 
     [Fact]
-    public async Task I_can_run_the_application_with_the_fake_console_implementation_and_simulate_stream_interactions()
+    public async Task I_can_use_the_fake_console_to_simulate_stream_interactions()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -153,7 +153,7 @@ public class ConsoleSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     }
 
     [Fact]
-    public async Task I_can_run_the_application_with_the_fake_console_implementation_and_simulate_key_presses()
+    public async Task I_can_use_the_fake_console_to_simulate_key_presses()
     {
         // Arrange
         var command = CommandCompiler.Compile(

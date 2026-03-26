@@ -816,7 +816,7 @@ public class OptionActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
     }
 
     [Fact(Timeout = 15000)]
-    public async Task I_can_resolve_environment_variables_automatically()
+    public async Task I_can_pass_environment_variables()
     {
         // Ensures that the environment variables are properly obtained from
         // System.Environment when they are not provided explicitly to CommandLineApplication.
