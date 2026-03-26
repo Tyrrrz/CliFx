@@ -1,5 +1,4 @@
 <Project>
-
   <PropertyGroup>
     <Version>0.0.0-dev</Version>
     <Company>Tyrrrz</Company>
@@ -21,5 +20,4 @@
     <EnableTrimAnalyzer>false</EnableTrimAnalyzer>
     <EnableAotAnalyzer>false</EnableAotAnalyzer>
   </PropertyGroup>
-
 </Project>
