@@ -158,7 +158,7 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
     }
 
     [Fact]
-    public async Task I_can_throw_an_exception_in_a_command_to_report_an_error_and_print_the_help_text()
+    public async Task I_can_throw_an_exception_in_a_command_to_report_an_error_and_show_help()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -176,7 +176,7 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
         var application = new CommandLineApplicationBuilder()
             .AddCommand(command)
             .UseConsole(FakeConsole)
-            .SetDescription("This will be in help text")
+            .SetDescription("This will be in the help text")
             .Build();
 
         // Act
@@ -186,7 +186,7 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
         exitCode.Should().Be(69);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().Contain("This will be in help text");
+        stdOut.Should().Contain("This will be in the help text");
 
         var stdErr = FakeConsole.ReadErrorString();
         stdErr.Trim().Should().Be("Something went wrong");

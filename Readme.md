@@ -225,21 +225,21 @@ Besides that, they also differ in the following ways:
     public string? OptionalParameter { get; init; }
     ```
 
-- Parameters are primarily used for scalar (non-enumerable) properties, while options can be used for both scalar and non-scalar properties.
-  - You can bind an option to a property of a non-scalar type, such as `IReadOnlyList<T>`:
+- Parameters are primarily used for scalar (non-enumerable) properties, while options can be used for both scalar and sequence-based properties.
+  - You can bind an option to a property of a sequence-based type, such as `IReadOnlyList<T>`:
 
     ```csharp
-    // Any option can be non-scalar
+    // Any option can be sequence-based
     [CommandOption("foo")]
-    public required IReadOnlyList<string> NonScalarOption { get; init; }
+    public required IReadOnlyList<string> SequenceBasedOption { get; init; }
     ```
 
-  - You can bind a parameter to a non-scalar property, but only if it's the last parameter in the command:
+  - You can bind a parameter to a sequence-based property, but only if it's the last parameter in the command:
 
     ```csharp
-    // Only the last parameter can be non-scalar
+    // Only the last parameter can be sequence-based
     [CommandParameter(0)]
-    public required IReadOnlyList<string> NonScalarParameter { get; init; }
+    public required IReadOnlyList<string> SequenceBasedParameter { get; init; }
     ```
 
 - Options can rely on an environment variable for fallback, while parameters cannot:
@@ -247,7 +247,7 @@ Besides that, they also differ in the following ways:
   ```csharp
   // If the value is not provided directly, it will be read
   // from the environment variable instead.
-  // This works for both scalar and non-scalar properties.
+  // This works for both scalar and sequence-based properties.
   [CommandOption("foo", EnvironmentVariable = "ENV_FOO")]
   public required string OptionWithFallback { get; init; }
   ```
@@ -274,7 +274,7 @@ Parameters and options can be bound to properties with the following underlying 
   - Types that are assignable from arrays (`IReadOnlyList<T>`, `ICollection<T>`, etc.)
   - Types with a constructor accepting an array (`List<T>`, `HashSet<T>`, etc.)
 
-#### Non-scalar parameters and options
+#### Sequence-based parameters and options
 
 Here's an example of a command with an array-backed parameter:
 

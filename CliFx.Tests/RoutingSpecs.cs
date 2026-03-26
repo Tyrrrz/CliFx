@@ -10,7 +10,7 @@ namespace CliFx.Tests;
 public class RoutingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
 {
     [Fact]
-    public async Task I_can_configure_a_command_to_be_executed_by_default_when_the_user_does_not_specify_a_command_name()
+    public async Task I_can_execute_the_default_command()
     {
         // Arrange
         var commands = CommandCompiler.CompileMany(
@@ -64,7 +64,7 @@ public class RoutingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     }
 
     [Fact]
-    public async Task I_can_configure_a_command_to_be_executed_when_the_user_specifies_its_name()
+    public async Task I_can_execute_a_named_command()
     {
         // Arrange
         var commands = CommandCompiler.CompileMany(
@@ -118,7 +118,7 @@ public class RoutingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     }
 
     [Fact]
-    public async Task I_can_configure_a_nested_command_to_be_executed_when_the_user_specifies_its_name()
+    public async Task I_can_execute_a_nested_named_command()
     {
         // Arrange
         var commands = CommandCompiler.CompileMany(

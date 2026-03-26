@@ -15,7 +15,7 @@ namespace CliFx.Tests.Utils;
 
 internal static class CommandCompiler
 {
-    public static Compilation CreateCompilation(
+    private static Compilation CreateCompilation(
         string sourceCode,
         out IReadOnlyList<Diagnostic> diagnostics
     )
@@ -86,13 +86,18 @@ internal static class CommandCompiler
         return updatedCompilation;
     }
 
-    public static IReadOnlyList<CommandDescriptor> CompileMany(string sourceCode)
+    public static IReadOnlyList<CommandDescriptor> CompileMany(
+        string sourceCode,
+        bool treatWarningsAsErrors = false
+    )
     {
         var compilation = CreateCompilation(sourceCode, out var diagnostics);
 
-        var compilationErrors = diagnostics
-            .Where(d => d.Severity >= DiagnosticSeverity.Error)
-            .ToArray();
+        var minSeverity = treatWarningsAsErrors
+            ? DiagnosticSeverity.Warning
+            : DiagnosticSeverity.Error;
+
+        var compilationErrors = diagnostics.Where(d => d.Severity >= minSeverity).ToArray();
 
         if (compilationErrors.Any())
         {
@@ -148,9 +153,9 @@ internal static class CommandCompiler
             .ToArray();
     }
 
-    public static CommandDescriptor Compile(string sourceCode)
+    public static CommandDescriptor Compile(string sourceCode, bool treatWarningsAsErrors = false)
     {
-        var commandDescriptors = CompileMany(sourceCode);
+        var commandDescriptors = CompileMany(sourceCode, treatWarningsAsErrors);
         if (commandDescriptors.Count > 1)
         {
             throw new InvalidOperationException(

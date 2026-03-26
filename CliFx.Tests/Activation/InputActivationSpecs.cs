@@ -1,4 +1,3 @@
-﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using CliFx.Tests.Utils;
@@ -7,12 +6,12 @@ using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace CliFx.Tests;
+namespace CliFx.Tests.Activation;
 
-public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
+public class InputActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
 {
     [Fact]
-    public async Task I_can_bind_a_parameter_or_an_option_to_a_string_property()
+    public async Task I_can_pass_a_value_to_an_input_bound_to_a_string_property()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -49,7 +48,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
     }
 
     [Fact]
-    public async Task I_can_bind_a_parameter_or_an_option_to_an_object_property()
+    public async Task I_can_pass_a_value_to_an_input_bound_to_an_object_property()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -86,7 +85,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
     }
 
     [Fact]
-    public async Task I_can_bind_a_parameter_or_an_option_to_a_boolean_property()
+    public async Task I_can_pass_a_value_to_an_input_bound_to_a_boolean_property()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -135,7 +134,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
     }
 
     [Fact]
-    public async Task I_can_bind_a_parameter_or_an_option_to_an_integer_property()
+    public async Task I_can_pass_a_value_to_an_input_bound_to_an_integer_property()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -172,7 +171,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
     }
 
     [Fact]
-    public async Task I_can_bind_a_parameter_or_an_option_to_a_double_property()
+    public async Task I_can_pass_a_value_to_an_input_bound_to_a_double_property()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -212,7 +211,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
     }
 
     [Fact]
-    public async Task I_can_bind_a_parameter_or_an_option_to_a_DateTimeOffset_property()
+    public async Task I_can_pass_a_value_to_an_input_bound_to_a_DateTimeOffset_property()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -252,7 +251,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
     }
 
     [Fact]
-    public async Task I_can_bind_a_parameter_or_an_option_to_a_TimeSpan_property()
+    public async Task I_can_pass_a_value_to_an_input_bound_to_a_TimeSpan_property()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -292,7 +291,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
     }
 
     [Fact]
-    public async Task I_can_bind_a_parameter_or_an_option_to_an_enum_property()
+    public async Task I_can_pass_a_value_to_an_input_bound_to_an_enum_property()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -331,7 +330,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
     }
 
     [Fact]
-    public async Task I_can_bind_a_parameter_or_an_option_to_a_nullable_integer_property()
+    public async Task I_can_pass_a_value_to_an_input_bound_to_a_nullable_integer_property()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -373,7 +372,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
     }
 
     [Fact]
-    public async Task I_can_bind_a_parameter_or_an_option_to_a_nullable_enum_property()
+    public async Task I_can_pass_a_value_to_an_input_bound_to_a_nullable_enum_property()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -417,51 +416,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
     }
 
     [Fact]
-    public async Task I_can_bind_a_parameter_or_an_option_to_a_string_constructable_object_property()
-    {
-        // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            public class CustomType
-            {
-                public string Value { get; }
-
-                public CustomType(string value) => Value = value;
-            }
-
-            [Command]
-            public partial class Command : ICommand
-            {
-                [CommandOption('f')]
-                public CustomType? Foo { get; set; }
-
-                public ValueTask ExecuteAsync(IConsole console)
-                {
-                    console.WriteLine(Foo.Value);
-                    return default;
-                }
-            }
-            """
-        );
-
-        var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
-            .UseConsole(FakeConsole)
-            .Build();
-
-        // Act
-        var exitCode = await application.RunAsync(["-f", "xyz"], new Dictionary<string, string>());
-
-        // Assert
-        exitCode.Should().Be(0);
-
-        var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Trim().Should().Be("xyz");
-    }
-
-    [Fact]
-    public async Task I_can_bind_a_parameter_or_an_option_to_a_string_parsable_object_property()
+    public async Task I_can_pass_a_value_to_an_input_bound_to_a_string_parsable_property()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -526,7 +481,51 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
     }
 
     [Fact]
-    public async Task I_can_bind_a_parameter_or_an_option_to_a_property_with_a_custom_converter()
+    public async Task I_can_pass_a_value_to_an_input_bound_to_a_string_constructible_property()
+    {
+        // Arrange
+        var command = CommandCompiler.Compile(
+            // lang=csharp
+            """
+            public class CustomType
+            {
+                public string Value { get; }
+
+                public CustomType(string value) => Value = value;
+            }
+
+            [Command]
+            public partial class Command : ICommand
+            {
+                [CommandOption('f')]
+                public CustomType? Foo { get; set; }
+
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.WriteLine(Foo.Value);
+                    return default;
+                }
+            }
+            """
+        );
+
+        var application = new CommandLineApplicationBuilder()
+            .AddCommand(command)
+            .UseConsole(FakeConsole)
+            .Build();
+
+        // Act
+        var exitCode = await application.RunAsync(["-f", "xyz"], new Dictionary<string, string>());
+
+        // Assert
+        exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
+        stdOut.Trim().Should().Be("xyz");
+    }
+
+    [Fact]
+    public async Task I_can_pass_a_value_to_an_input_with_a_custom_converter()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -572,7 +571,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
     }
 
     [Fact]
-    public async Task I_can_bind_a_parameter_or_an_option_to_a_string_array_property()
+    public async Task I_can_pass_values_to_an_input_bound_to_a_string_array_property()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -614,7 +613,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
     }
 
     [Fact]
-    public async Task I_can_bind_a_parameter_or_an_option_to_a_read_only_list_of_strings_property()
+    public async Task I_can_pass_values_to_an_input_bound_to_a_read_only_list_of_strings_property()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -656,7 +655,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
     }
 
     [Fact]
-    public async Task I_can_bind_a_parameter_or_an_option_to_an_array_backed_collection_interface_property()
+    public async Task I_can_pass_values_to_an_input_bound_to_a_collection_of_strings_property()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -698,7 +697,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
     }
 
     [Fact]
-    public async Task I_can_bind_a_parameter_or_an_option_to_a_string_list_property()
+    public async Task I_can_pass_values_to_an_input_bound_to_a_string_list_property()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -740,7 +739,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
     }
 
     [Fact]
-    public async Task I_can_bind_a_parameter_or_an_option_to_an_integer_array_property()
+    public async Task I_can_pass_values_to_an_input_bound_to_an_integer_array_property()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -782,87 +781,49 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
     }
 
     [Fact]
-    public void I_can_try_to_bind_a_parameter_or_an_option_to_a_property_and_get_an_error_if_it_is_of_an_unsupported_type()
+    public async Task I_can_pass_values_to_an_input_bound_to_a_read_only_list_of_integers_property()
     {
+        // Arrange
+        var command = CommandCompiler.Compile(
+            // lang=csharp
+            """
+            [Command]
+            public partial class Command : ICommand
+            {
+                [CommandOption('f')]
+                public IReadOnlyList<int>? Foo { get; set; }
+
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    foreach (var i in Foo)
+                        console.WriteLine(i);
+
+                    return default;
+                }
+            }
+            """
+        );
+
+        var application = new CommandLineApplicationBuilder()
+            .AddCommand(command)
+            .UseConsole(FakeConsole)
+            .Build();
+
         // Act
-        var act = () =>
-            CommandCompiler.Compile(
-                // lang=csharp
-                """
-                public class CustomType
-                {
-                }
-
-                [Command]
-                public partial class Command : ICommand
-                {
-                    [CommandOption('f')]
-                    public CustomType? Foo { get; set; }
-
-                    public ValueTask ExecuteAsync(IConsole console) => default;
-                }
-                """
-            );
+        var exitCode = await application.RunAsync(
+            ["-f", "1", "13", "27"],
+            new Dictionary<string, string>()
+        );
 
         // Assert
-        act.Should().Throw<InvalidOperationException>().WithMessage("*ConverterNotInferrable*");
+        exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
+        stdOut.Should().ConsistOfLines("1", "13", "27");
     }
 
     [Fact]
-    public void I_can_try_to_bind_a_parameter_or_an_option_to_a_non_scalar_property_and_get_an_error_if_it_is_of_an_unsupported_type()
-    {
-        // Act
-        var act = () =>
-            CommandCompiler.Compile(
-                // lang=csharp
-                """
-                public class CustomType : IEnumerable<object>
-                {
-                    public IEnumerator<object> GetEnumerator() => Enumerable.Empty<object>().GetEnumerator();
-
-                    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-                }
-
-                [Command]
-                public partial class Command : ICommand
-                {
-                    [CommandOption('f')]
-                    public CustomType? Foo { get; set; }
-
-                    public ValueTask ExecuteAsync(IConsole console) => default;
-                }
-                """
-            );
-
-        // Assert
-        act.Should().Throw<InvalidOperationException>().WithMessage("*ConverterNotInferrable*");
-    }
-
-    [Fact]
-    public void I_can_try_to_bind_a_parameter_or_an_option_to_a_non_scalar_property_and_get_an_error_if_it_is_of_an_unsupported_interface_type()
-    {
-        // Act
-        var act = () =>
-            CommandCompiler.Compile(
-                // lang=csharp
-                """
-                [Command]
-                public partial class Command : ICommand
-                {
-                    [CommandOption('f')]
-                    public ISet<string>? Foo { get; set; }
-
-                    public ValueTask ExecuteAsync(IConsole console) => default;
-                }
-                """
-            );
-
-        // Assert
-        act.Should().Throw<InvalidOperationException>().WithMessage("*ConverterNotInferrable*");
-    }
-
-    [Fact]
-    public async Task I_can_try_to_bind_a_parameter_or_an_option_to_a_property_and_get_an_error_if_the_user_provides_an_invalid_value()
+    public async Task I_can_try_to_pass_an_invalid_value_to_an_input_and_get_an_error()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -898,7 +859,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
     }
 
     [Fact]
-    public async Task I_can_try_to_bind_a_parameter_or_an_option_to_a_property_and_get_an_error_if_a_custom_validator_fails()
+    public async Task I_can_try_to_pass_a_value_to_an_input_and_get_an_error_if_validation_fails()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -941,7 +902,7 @@ public class ConversionSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutpu
     }
 
     [Fact]
-    public async Task I_can_try_to_bind_a_parameter_or_an_option_to_a_string_parsable_property_and_get_an_error_if_the_parsing_fails()
+    public async Task I_can_try_to_pass_a_value_to_an_input_bound_to_a_string_parsable_property_and_get_an_error_if_parsing_fails()
     {
         // Arrange
         var command = CommandCompiler.Compile(

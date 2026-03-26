@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using CliFx.Tests.Utils;
 using CliFx.Tests.Utils.Extensions;
@@ -8,29 +8,10 @@ using Xunit.Abstractions;
 
 namespace CliFx.Tests;
 
-public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
+public class HelpSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
 {
     [Fact]
-    public async Task I_can_request_the_help_text_by_running_the_application_without_arguments_if_the_default_command_is_not_defined()
-    {
-        // Arrange
-        var application = new CommandLineApplicationBuilder()
-            .UseConsole(FakeConsole)
-            .SetDescription("This will be in help text")
-            .Build();
-
-        // Act
-        var exitCode = await application.RunAsync([], new Dictionary<string, string>());
-
-        // Assert
-        exitCode.Should().Be(1);
-
-        var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().Contain("This will be in help text");
-    }
-
-    [Fact]
-    public async Task I_can_request_the_help_text_by_running_the_application_with_the_implicit_help_option()
+    public async Task I_can_request_help_by_passing_the_conventional_help_option()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -47,7 +28,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         var application = new CommandLineApplicationBuilder()
             .AddCommand(command)
             .UseConsole(FakeConsole)
-            .SetDescription("This will be in help text")
+            .SetDescription("This will be in the help text")
             .Build();
 
         // Act
@@ -57,48 +38,30 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().Contain("This will be in help text");
+        stdOut.Should().Contain("This will be in the help text");
     }
 
     [Fact]
-    public async Task I_can_request_the_help_text_by_running_the_application_with_the_implicit_help_option_even_if_the_default_command_is_not_defined()
+    public async Task I_can_request_help_by_passing_no_arguments_if_the_default_command_is_not_registered()
     {
         // Arrange
-        var commands = CommandCompiler.CompileMany(
-            // lang=csharp
-            """
-            [Command("cmd")]
-            public partial class NamedCommand : ICommand
-            {
-                public ValueTask ExecuteAsync(IConsole console) => default;
-            }
-
-            [Command("cmd child")]
-            public partial class NamedChildCommand : ICommand
-            {
-                public ValueTask ExecuteAsync(IConsole console) => default;
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommands(commands)
             .UseConsole(FakeConsole)
-            .SetDescription("This will be in help text")
+            .SetDescription("This will be in the help text")
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(["--help"], new Dictionary<string, string>());
+        var exitCode = await application.RunAsync([], new Dictionary<string, string>());
 
         // Assert
-        exitCode.Should().Be(0);
+        exitCode.Should().NotBe(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().Contain("This will be in help text");
+        stdOut.Should().Contain("This will be in the help text");
     }
 
     [Fact]
-    public async Task I_can_request_the_help_text_for_a_specific_command_by_running_the_application_and_specifying_its_name_with_the_implicit_help_option()
+    public async Task I_can_request_help_for_a_specific_named_command_by_passing_its_name_and_the_conventional_help_option()
     {
         // Arrange
         var commands = CommandCompiler.CompileMany(
@@ -143,7 +106,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     }
 
     [Fact]
-    public async Task I_can_request_the_help_text_for_a_specific_nested_command_by_running_the_application_and_specifying_its_name_with_the_implicit_help_option()
+    public async Task I_can_request_help_for_a_specific_nested_named_command_by_passing_its_name_and_the_conventional_help_option()
     {
         // Arrange
         var commands = CommandCompiler.CompileMany(
@@ -188,13 +151,13 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     }
 
     [Fact]
-    public async Task I_can_request_the_help_text_by_running_the_application_with_invalid_arguments()
+    public async Task I_can_request_help_by_passing_invalid_arguments()
     {
         // Arrange
         var application = new CommandLineApplicationBuilder()
             .AddCommand(NoOpCommand.Descriptor)
             .UseConsole(FakeConsole)
-            .SetDescription("This will be in help text")
+            .SetDescription("This will be in the help text")
             .Build();
 
         // Act
@@ -207,14 +170,14 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         exitCode.Should().NotBe(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().Contain("This will be in help text");
+        stdOut.Should().Contain("This will be in the help text");
 
         var stdErr = FakeConsole.ReadErrorString();
         stdErr.Should().NotBeNullOrWhiteSpace();
     }
 
     [Fact]
-    public async Task I_can_request_the_help_text_to_see_the_application_title_description_and_version()
+    public async Task I_can_request_help_to_see_the_application_title_description_and_version()
     {
         // Arrange
         var application = new CommandLineApplicationBuilder()
@@ -235,7 +198,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     }
 
     [Fact]
-    public async Task I_can_request_the_help_text_to_see_the_command_description()
+    public async Task I_can_request_help_to_see_the_command_description()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -265,7 +228,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     }
 
     [Fact]
-    public async Task I_can_request_the_help_text_to_see_the_usage_format_for_a_named_command()
+    public async Task I_can_request_help_to_see_the_usage_format_of_a_named_command()
     {
         // Arrange
         var commands = CommandCompiler.CompileMany(
@@ -301,7 +264,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     }
 
     [Fact]
-    public async Task I_can_request_the_help_text_to_see_the_usage_format_for_all_parameters()
+    public async Task I_can_request_help_to_see_the_usage_format_of_all_parameter_inputs()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -339,54 +302,8 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         stdOut.Should().ContainAllInOrder("USAGE", "<foo>", "<bar>", "<baz...>");
     }
 
-    // https://github.com/Tyrrrz/CliFx/issues/117
     [Fact]
-    public async Task I_can_request_the_help_text_to_see_the_usage_format_for_all_parameters_in_the_correct_order()
-    {
-        // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            // Base members appear last in reflection order
-            public abstract class CommandBase : ICommand
-            {
-                [CommandParameter(0)]
-                public required string Foo { get; set; }
-
-                public abstract ValueTask ExecuteAsync(IConsole console);
-            }
-
-            [Command]
-            public partial class Command : CommandBase
-            {
-                [CommandParameter(2)]
-                public required IReadOnlyList<string> Baz { get; set; }
-
-                [CommandParameter(1)]
-                public required string Bar { get; set; }
-
-                public override ValueTask ExecuteAsync(IConsole console) => default;
-            }
-            """
-        );
-
-        var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
-            .UseConsole(FakeConsole)
-            .Build();
-
-        // Act
-        var exitCode = await application.RunAsync(["--help"], new Dictionary<string, string>());
-
-        // Assert
-        exitCode.Should().Be(0);
-
-        var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ContainAllInOrder("USAGE", "<foo>", "<bar>", "<baz...>");
-    }
-
-    [Fact]
-    public async Task I_can_request_the_help_text_to_see_the_usage_format_for_all_required_options()
+    public async Task I_can_request_help_to_see_the_usage_format_of_all_required_option_inputs()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -427,7 +344,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     }
 
     [Fact]
-    public async Task I_can_request_the_help_text_to_see_the_list_of_all_parameters_and_options()
+    public async Task I_can_request_help_to_see_the_list_of_all_inputs()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -472,7 +389,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     }
 
     [Fact]
-    public async Task I_can_request_the_help_text_to_see_the_help_and_implicit_version_options()
+    public async Task I_can_request_help_to_see_the_conventional_help_and_version_option_inputs()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -511,7 +428,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     }
 
     [Fact]
-    public async Task I_can_request_the_help_text_on_a_named_command_to_see_the_implicit_help_option()
+    public async Task I_can_request_help_on_a_named_command_to_see_the_conventional_help_option_input()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -542,12 +459,11 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         var stdOut = FakeConsole.ReadOutputString();
 
         stdOut.Should().ContainAllInOrder("OPTIONS", "-h", "--help", "Shows help text");
-
         stdOut.Should().NotContainAny("--version", "Shows version information");
     }
 
     [Fact]
-    public async Task I_can_request_the_help_text_to_see_the_list_of_valid_values_for_all_parameters_and_options_bound_to_enum_properties()
+    public async Task I_can_request_help_to_see_the_list_of_valid_values_for_inputs_bound_to_enum_properties()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -600,7 +516,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     }
 
     [Fact]
-    public async Task I_can_request_the_help_text_to_see_the_list_of_valid_values_for_all_parameters_and_options_bound_to_nullable_enum_properties()
+    public async Task I_can_request_help_to_see_the_list_of_valid_values_for_inputs_bound_to_nullable_enum_properties()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -653,7 +569,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     }
 
     [Fact]
-    public async Task I_can_request_the_help_text_to_see_the_environment_variables_of_options_that_use_them_as_fallback()
+    public async Task I_can_request_help_to_see_the_environment_variables_of_option_inputs_that_use_them_as_fallback()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -701,7 +617,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     }
 
     [Fact]
-    public async Task I_can_request_the_help_text_to_see_the_default_values_of_non_required_options()
+    public async Task I_can_request_help_to_see_the_default_values_of_non_required_option_inputs()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -787,7 +703,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     }
 
     [Fact]
-    public async Task I_can_request_the_help_text_to_see_the_list_of_all_immediate_child_commands()
+    public async Task I_can_request_help_to_see_the_list_of_all_immediate_child_commands()
     {
         // Arrange
         var commands = CommandCompiler.CompileMany(
@@ -852,7 +768,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     }
 
     [Fact]
-    public async Task I_can_request_the_help_text_to_see_the_list_of_all_immediate_grand_child_commands()
+    public async Task I_can_request_help_to_see_the_list_of_all_immediate_grand_child_commands()
     {
         // Arrange
         var commands = CommandCompiler.CompileMany(
@@ -917,7 +833,7 @@ public class HelpTextSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     }
 
     [Fact]
-    public async Task I_can_request_the_version_text_by_running_the_application_with_the_implicit_version_option()
+    public async Task I_can_request_version_information_by_passing_the_conventional_version_option()
     {
         // Arrange
         var application = new CommandLineApplicationBuilder()

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
@@ -10,12 +10,12 @@ using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace CliFx.Tests;
+namespace CliFx.Tests.Infrastructure;
 
 public class CancellationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
 {
     [Fact(Timeout = 15000)]
-    public async Task I_can_configure_the_command_to_listen_to_the_interrupt_signal()
+    public async Task I_can_configure_a_command_to_listen_to_the_interrupt_signal()
     {
         // Arrange
         using var cts = new CancellationTokenSource();
@@ -31,28 +31,30 @@ public class CancellationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOut
 
         var stdOutBuffer = new StringBuilder();
 
-        var pipeTarget = PipeTarget.Merge(
-            PipeTarget.ToDelegate(HandleStdOut),
-            PipeTarget.ToStringBuilder(stdOutBuffer)
-        );
+        var command =
+            Cli.Wrap(Dummy.Program.FilePath).WithArguments("cancel-test")
+            | PipeTarget.Merge(
+                PipeTarget.ToDelegate(HandleStdOut),
+                PipeTarget.ToStringBuilder(stdOutBuffer)
+            );
 
-        var command = Cli.Wrap(Dummy.Program.FilePath).WithArguments("cancel-test") | pipeTarget;
-
-        // Act & assert
-        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
+        // Act
+        var act = async () =>
             await command.ExecuteAsync(
                 // Forceful cancellation (not required because we have a timeout)
                 CancellationToken.None,
                 // Graceful cancellation
                 cts.Token
-            )
-        );
+            );
+
+        // Assert
+        await act.Should().ThrowAsync<OperationCanceledException>();
 
         stdOutBuffer.ToString().Trim().Should().ConsistOfLines("Started.", "Cancelled.");
     }
 
     [Fact]
-    public async Task I_can_configure_the_command_to_listen_to_the_interrupt_signal_when_running_in_isolation()
+    public async Task I_can_configure_a_command_to_listen_to_the_interrupt_signal_when_running_in_isolation()
     {
         // Arrange
         var command = CommandCompiler.Compile(
