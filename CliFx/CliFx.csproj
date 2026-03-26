@@ -36,12 +36,22 @@
     />
   </ItemGroup>
 
-  <!-- Embed the source generators inside the package -->
+  <!-- Reference the source generators for build -->
   <ItemGroup>
     <ProjectReference
       Include="..\CliFx.Generators\CliFx.Generators.csproj"
       ReferenceOutputAssembly="false"
       OutputItemType="analyzer"
+    />
+  </ItemGroup>
+
+  <!-- Pack the source generators into the NuGet package -->
+  <ItemGroup>
+    <None
+      Include="..\CliFx.Generators\bin\$(Configuration)\netstandard2.0\CliFx.Generators.dll"
+      Pack="true"
+      PackagePath="analyzers/dotnet/cs"
+      Visible="false"
     />
   </ItemGroup>
 </Project>
