@@ -27,6 +27,16 @@ public partial class Generator
                 /// <summary>
                 /// Registers all non-private source-generated commands from the same assembly as the caller.
                 /// </summary>
+                /// <remarks>
+                /// <list type="bullet">
+                {{string.Join(
+                    Environment.NewLine,
+                    commands.Select(c =>
+                        $"/// <item><see cref=\"{c.Type.GetGloballyQualifiedName()}\" /></item>"
+                    )
+                )}}
+                /// </list>
+                /// </remarks>
                 internal static global::{{KnownTypes.CommandLineApplicationBuilder}} AddCommandsFromThisAssembly(
                     this global::{{KnownTypes.CommandLineApplicationBuilder}} builder
                 )
