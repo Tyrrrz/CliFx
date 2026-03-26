@@ -1,6 +1,6 @@
 # CliFx
 
-[![Status](https://img.shields.io/badge/status-maintenance-ffd700.svg)](https://github.com/Tyrrrz/.github/blob/prime/docs/project-status.md)
+[![Status](https://img.shields.io/badge/status-active-47c219.svg)](https://github.com/Tyrrrz/.github/blob/prime/docs/project-status.md)
 [![Made in Ukraine](https://img.shields.io/badge/made_in-ukraine-ffd700.svg?labelColor=0057b7)](https://tyrrrz.me/ukraine)
 [![Build](https://img.shields.io/github/actions/workflow/status/Tyrrrz/CliFx/main.yml?branch=prime)](https://github.com/Tyrrrz/CliFx/actions)
 [![Coverage](https://img.shields.io/codecov/c/github/Tyrrrz/CliFx/prime)](https://codecov.io/gh/Tyrrrz/CliFx)
