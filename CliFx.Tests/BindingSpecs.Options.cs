@@ -180,7 +180,7 @@ public partial class BindingSpecs
         }
 
         [Fact]
-        public void I_can_try_to_implement_the_help_option_without_a_binding_and_get_an_error()
+        public void I_can_try_to_implement_the_help_option_without_an_input_binding_and_get_an_error()
         {
             // Act
             var act = () =>
@@ -204,7 +204,7 @@ public partial class BindingSpecs
         }
 
         [Fact]
-        public void I_can_try_to_implement_the_version_option_without_a_binding_and_get_an_error()
+        public void I_can_try_to_implement_the_version_option_without_an_input_binding_and_get_an_error()
         {
             // Act
             var act = () =>
