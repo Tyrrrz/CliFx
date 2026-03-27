@@ -15,43 +15,41 @@ public partial class BindingSpecs(ITestOutputHelper testOutput) : SpecsBase(test
     public async Task I_can_bind_inputs_to_properties_defined_in_parent_types()
     {
         // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            public abstract class GrandParentCommand : ICommand
-            {
-                [CommandParameter(0)]
-                public string? Foo { get; set; }
-
-                public abstract ValueTask ExecuteAsync(IConsole console);
-            }
-
-            public abstract class ParentCommand : GrandParentCommand
-            {
-                [CommandOption("bar")]
-                public string? Bar { get; set; }
-            }
-
-            [Command]
-            public partial class Command : ParentCommand
-            {
-                [CommandOption("baz")]
-                public string? Baz { get; set; }
-
-                public override ValueTask ExecuteAsync(IConsole console)
-                {
-                    console.WriteLine("Foo = " + Foo);
-                    console.WriteLine("Bar = " + Bar);
-                    console.WriteLine("Baz = " + Baz);
-
-                    return default;
-                }
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
+            .AddCommand(
+                // lang=csharp
+                """
+                public abstract class GrandParentCommand : ICommand
+                {
+                    [CommandParameter(0)]
+                    public string? Foo { get; set; }
+
+                    public abstract ValueTask ExecuteAsync(IConsole console);
+                }
+
+                public abstract class ParentCommand : GrandParentCommand
+                {
+                    [CommandOption("bar")]
+                    public string? Bar { get; set; }
+                }
+
+                [Command]
+                public partial class Command : ParentCommand
+                {
+                    [CommandOption("baz")]
+                    public string? Baz { get; set; }
+
+                    public override ValueTask ExecuteAsync(IConsole console)
+                    {
+                        console.WriteLine("Foo = " + Foo);
+                        console.WriteLine("Bar = " + Bar);
+                        console.WriteLine("Baz = " + Baz);
+
+                        return default;
+                    }
+                }
+                """
+            )
             .UseConsole(FakeConsole)
             .Build();
 

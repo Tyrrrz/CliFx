@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using CliFx.Tests.Utils;
 using CliFx.Tests.Utils.Extensions;
 using FluentAssertions;
 using Xunit;
@@ -14,26 +13,24 @@ public partial class ActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(t
     public async Task I_can_pass_a_value_to_an_input_bound_to_a_string_property()
     {
         // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            [Command]
-            public partial class Command : ICommand
-            {
-                [CommandOption('f')]
-                public string? Foo { get; set; }
-
-                public ValueTask ExecuteAsync(IConsole console)
-                {
-                    console.WriteLine(Foo);
-                    return default;
-                }
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
+            .AddCommand(
+                // lang=csharp
+                """
+                [Command]
+                public partial class Command : ICommand
+                {
+                    [CommandOption('f')]
+                    public string? Foo { get; set; }
+
+                    public ValueTask ExecuteAsync(IConsole console)
+                    {
+                        console.WriteLine(Foo);
+                        return default;
+                    }
+                }
+                """
+            )
             .UseConsole(FakeConsole)
             .Build();
 
@@ -51,26 +48,24 @@ public partial class ActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(t
     public async Task I_can_pass_a_value_to_an_input_bound_to_an_object_property()
     {
         // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            [Command]
-            public partial class Command : ICommand
-            {
-                [CommandOption('f')]
-                public object? Foo { get; set; }
-
-                public ValueTask ExecuteAsync(IConsole console)
-                {
-                    console.WriteLine(Foo);
-                    return default;
-                }
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
+            .AddCommand(
+                // lang=csharp
+                """
+                [Command]
+                public partial class Command : ICommand
+                {
+                    [CommandOption('f')]
+                    public object? Foo { get; set; }
+
+                    public ValueTask ExecuteAsync(IConsole console)
+                    {
+                        console.WriteLine(Foo);
+                        return default;
+                    }
+                }
+                """
+            )
             .UseConsole(FakeConsole)
             .Build();
 
@@ -88,35 +83,33 @@ public partial class ActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(t
     public async Task I_can_pass_a_value_to_an_input_bound_to_a_boolean_property()
     {
         // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            [Command]
-            public partial class Command : ICommand
-            {
-                [CommandOption('f')]
-                public bool Foo { get; set; }
-
-                [CommandOption('b')]
-                public bool Bar { get; set; }
-
-                [CommandOption('c')]
-                public bool Baz { get; set; }
-
-                public ValueTask ExecuteAsync(IConsole console)
-                {
-                    console.WriteLine("Foo = " + Foo);
-                    console.WriteLine("Bar = " + Bar);
-                    console.WriteLine("Baz = " + Baz);
-
-                    return default;
-                }
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
+            .AddCommand(
+                // lang=csharp
+                """
+                [Command]
+                public partial class Command : ICommand
+                {
+                    [CommandOption('f')]
+                    public bool Foo { get; set; }
+
+                    [CommandOption('b')]
+                    public bool Bar { get; set; }
+
+                    [CommandOption('c')]
+                    public bool Baz { get; set; }
+
+                    public ValueTask ExecuteAsync(IConsole console)
+                    {
+                        console.WriteLine("Foo = " + Foo);
+                        console.WriteLine("Bar = " + Bar);
+                        console.WriteLine("Baz = " + Baz);
+
+                        return default;
+                    }
+                }
+                """
+            )
             .UseConsole(FakeConsole)
             .Build();
 
@@ -137,26 +130,24 @@ public partial class ActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(t
     public async Task I_can_pass_a_value_to_an_input_bound_to_an_integer_property()
     {
         // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            [Command]
-            public partial class Command : ICommand
-            {
-                [CommandOption('f')]
-                public int Foo { get; set; }
-
-                public ValueTask ExecuteAsync(IConsole console)
-                {
-                    console.WriteLine(Foo);
-                    return default;
-                }
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
+            .AddCommand(
+                // lang=csharp
+                """
+                [Command]
+                public partial class Command : ICommand
+                {
+                    [CommandOption('f')]
+                    public int Foo { get; set; }
+
+                    public ValueTask ExecuteAsync(IConsole console)
+                    {
+                        console.WriteLine(Foo);
+                        return default;
+                    }
+                }
+                """
+            )
             .UseConsole(FakeConsole)
             .Build();
 
@@ -174,26 +165,24 @@ public partial class ActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(t
     public async Task I_can_pass_a_value_to_an_input_bound_to_a_double_property()
     {
         // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            [Command]
-            public partial class Command : ICommand
-            {
-                [CommandOption('f')]
-                public double Foo { get; set; }
-
-                public ValueTask ExecuteAsync(IConsole console)
-                {
-                    console.WriteLine(Foo.ToString(CultureInfo.InvariantCulture));
-                    return default;
-                }
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
+            .AddCommand(
+                // lang=csharp
+                """
+                [Command]
+                public partial class Command : ICommand
+                {
+                    [CommandOption('f')]
+                    public double Foo { get; set; }
+
+                    public ValueTask ExecuteAsync(IConsole console)
+                    {
+                        console.WriteLine(Foo.ToString(CultureInfo.InvariantCulture));
+                        return default;
+                    }
+                }
+                """
+            )
             .UseConsole(FakeConsole)
             .Build();
 
@@ -214,26 +203,24 @@ public partial class ActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(t
     public async Task I_can_pass_a_value_to_an_input_bound_to_a_DateTimeOffset_property()
     {
         // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            [Command]
-            public partial class Command : ICommand
-            {
-                [CommandOption('f')]
-                public DateTimeOffset Foo { get; set; }
-
-                public ValueTask ExecuteAsync(IConsole console)
-                {
-                    console.WriteLine(Foo.ToString("u", CultureInfo.InvariantCulture));
-                    return default;
-                }
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
+            .AddCommand(
+                // lang=csharp
+                """
+                [Command]
+                public partial class Command : ICommand
+                {
+                    [CommandOption('f')]
+                    public DateTimeOffset Foo { get; set; }
+
+                    public ValueTask ExecuteAsync(IConsole console)
+                    {
+                        console.WriteLine(Foo.ToString("u", CultureInfo.InvariantCulture));
+                        return default;
+                    }
+                }
+                """
+            )
             .UseConsole(FakeConsole)
             .Build();
 
@@ -254,26 +241,24 @@ public partial class ActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(t
     public async Task I_can_pass_a_value_to_an_input_bound_to_a_TimeSpan_property()
     {
         // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            [Command]
-            public partial class Command : ICommand
-            {
-                [CommandOption('f')]
-                public TimeSpan Foo { get; set; }
-
-                public ValueTask ExecuteAsync(IConsole console)
-                {
-                    console.WriteLine(Foo.ToString(null, CultureInfo.InvariantCulture));
-                    return default;
-                }
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
+            .AddCommand(
+                // lang=csharp
+                """
+                [Command]
+                public partial class Command : ICommand
+                {
+                    [CommandOption('f')]
+                    public TimeSpan Foo { get; set; }
+
+                    public ValueTask ExecuteAsync(IConsole console)
+                    {
+                        console.WriteLine(Foo.ToString(null, CultureInfo.InvariantCulture));
+                        return default;
+                    }
+                }
+                """
+            )
             .UseConsole(FakeConsole)
             .Build();
 
@@ -294,28 +279,26 @@ public partial class ActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(t
     public async Task I_can_pass_a_value_to_an_input_bound_to_an_enum_property()
     {
         // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            public enum CustomEnum { One = 1, Two = 2, Three = 3 }
-
-            [Command]
-            public partial class Command : ICommand
-            {
-                [CommandOption('f')]
-                public CustomEnum Foo { get; set; }
-
-                public ValueTask ExecuteAsync(IConsole console)
-                {
-                    console.WriteLine((int) Foo);
-                    return default;
-                }
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
+            .AddCommand(
+                // lang=csharp
+                """
+                public enum CustomEnum { One = 1, Two = 2, Three = 3 }
+
+                [Command]
+                public partial class Command : ICommand
+                {
+                    [CommandOption('f')]
+                    public CustomEnum Foo { get; set; }
+
+                    public ValueTask ExecuteAsync(IConsole console)
+                    {
+                        console.WriteLine((int) Foo);
+                        return default;
+                    }
+                }
+                """
+            )
             .UseConsole(FakeConsole)
             .Build();
 
@@ -333,31 +316,29 @@ public partial class ActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(t
     public async Task I_can_pass_a_value_to_an_input_bound_to_a_nullable_integer_property()
     {
         // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            [Command]
-            public partial class Command : ICommand
-            {
-                [CommandOption('f')]
-                public int? Foo { get; set; }
-
-                [CommandOption('b')]
-                public int? Bar { get; set; }
-
-                public ValueTask ExecuteAsync(IConsole console)
-                {
-                    console.WriteLine("Foo = " + Foo);
-                    console.WriteLine("Bar = " + Bar);
-
-                    return default;
-                }
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
+            .AddCommand(
+                // lang=csharp
+                """
+                [Command]
+                public partial class Command : ICommand
+                {
+                    [CommandOption('f')]
+                    public int? Foo { get; set; }
+
+                    [CommandOption('b')]
+                    public int? Bar { get; set; }
+
+                    public ValueTask ExecuteAsync(IConsole console)
+                    {
+                        console.WriteLine("Foo = " + Foo);
+                        console.WriteLine("Bar = " + Bar);
+
+                        return default;
+                    }
+                }
+                """
+            )
             .UseConsole(FakeConsole)
             .Build();
 
@@ -375,33 +356,31 @@ public partial class ActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(t
     public async Task I_can_pass_a_value_to_an_input_bound_to_a_nullable_enum_property()
     {
         // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            public enum CustomEnum { One = 1, Two = 2, Three = 3 }
-
-            [Command]
-            public partial class Command : ICommand
-            {
-                [CommandOption('f')]
-                public CustomEnum? Foo { get; set; }
-
-                [CommandOption('b')]
-                public CustomEnum? Bar { get; set; }
-
-                public ValueTask ExecuteAsync(IConsole console)
-                {
-                    console.WriteLine("Foo = " + (int?) Foo);
-                    console.WriteLine("Bar = " + (int?) Bar);
-
-                    return default;
-                }
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
+            .AddCommand(
+                // lang=csharp
+                """
+                public enum CustomEnum { One = 1, Two = 2, Three = 3 }
+
+                [Command]
+                public partial class Command : ICommand
+                {
+                    [CommandOption('f')]
+                    public CustomEnum? Foo { get; set; }
+
+                    [CommandOption('b')]
+                    public CustomEnum? Bar { get; set; }
+
+                    public ValueTask ExecuteAsync(IConsole console)
+                    {
+                        console.WriteLine("Foo = " + (int?) Foo);
+                        console.WriteLine("Bar = " + (int?) Bar);
+
+                        return default;
+                    }
+                }
+                """
+            )
             .UseConsole(FakeConsole)
             .Build();
 
@@ -419,51 +398,49 @@ public partial class ActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(t
     public async Task I_can_pass_a_value_to_an_input_bound_to_a_string_parsable_property()
     {
         // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            public class CustomTypeA
-            {
-                public string Value { get; }
-
-                private CustomTypeA(string value) => Value = value;
-
-                public static CustomTypeA Parse(string value) =>
-                    new CustomTypeA(value);
-            }
-
-            public class CustomTypeB
-            {
-                public string Value { get; }
-
-                private CustomTypeB(string value) => Value = value;
-
-                public static CustomTypeB Parse(string value, IFormatProvider formatProvider) =>
-                    new CustomTypeB(value);
-            }
-
-            [Command]
-            public partial class Command : ICommand
-            {
-                [CommandOption('f')]
-                public CustomTypeA? Foo { get; set; }
-
-                [CommandOption('b')]
-                public CustomTypeB? Bar { get; set; }
-
-                public ValueTask ExecuteAsync(IConsole console)
-                {
-                    console.WriteLine("Foo = " + Foo.Value);
-                    console.WriteLine("Bar = " + Bar.Value);
-
-                    return default;
-                }
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
+            .AddCommand(
+                // lang=csharp
+                """
+                public class CustomTypeA
+                {
+                    public string Value { get; }
+
+                    private CustomTypeA(string value) => Value = value;
+
+                    public static CustomTypeA Parse(string value) =>
+                        new CustomTypeA(value);
+                }
+
+                public class CustomTypeB
+                {
+                    public string Value { get; }
+
+                    private CustomTypeB(string value) => Value = value;
+
+                    public static CustomTypeB Parse(string value, IFormatProvider formatProvider) =>
+                        new CustomTypeB(value);
+                }
+
+                [Command]
+                public partial class Command : ICommand
+                {
+                    [CommandOption('f')]
+                    public CustomTypeA? Foo { get; set; }
+
+                    [CommandOption('b')]
+                    public CustomTypeB? Bar { get; set; }
+
+                    public ValueTask ExecuteAsync(IConsole console)
+                    {
+                        console.WriteLine("Foo = " + Foo.Value);
+                        console.WriteLine("Bar = " + Bar.Value);
+
+                        return default;
+                    }
+                }
+                """
+            )
             .UseConsole(FakeConsole)
             .Build();
 
@@ -484,33 +461,31 @@ public partial class ActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(t
     public async Task I_can_pass_a_value_to_an_input_bound_to_a_string_constructible_property()
     {
         // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            public class CustomType
-            {
-                public string Value { get; }
-
-                public CustomType(string value) => Value = value;
-            }
-
-            [Command]
-            public partial class Command : ICommand
-            {
-                [CommandOption('f')]
-                public CustomType? Foo { get; set; }
-
-                public ValueTask ExecuteAsync(IConsole console)
-                {
-                    console.WriteLine(Foo.Value);
-                    return default;
-                }
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
+            .AddCommand(
+                // lang=csharp
+                """
+                public class CustomType
+                {
+                    public string Value { get; }
+
+                    public CustomType(string value) => Value = value;
+                }
+
+                [Command]
+                public partial class Command : ICommand
+                {
+                    [CommandOption('f')]
+                    public CustomType? Foo { get; set; }
+
+                    public ValueTask ExecuteAsync(IConsole console)
+                    {
+                        console.WriteLine(Foo.Value);
+                        return default;
+                    }
+                }
+                """
+            )
             .UseConsole(FakeConsole)
             .Build();
 
@@ -528,28 +503,26 @@ public partial class ActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(t
     public async Task I_can_pass_values_to_an_input_bound_to_a_string_array_property()
     {
         // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            [Command]
-            public partial class Command : ICommand
-            {
-                [CommandOption('f')]
-                public string[]? Foo { get; set; }
-
-                public ValueTask ExecuteAsync(IConsole console)
-                {
-                    foreach (var i in Foo)
-                        console.WriteLine(i);
-
-                    return default;
-                }
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
+            .AddCommand(
+                // lang=csharp
+                """
+                [Command]
+                public partial class Command : ICommand
+                {
+                    [CommandOption('f')]
+                    public string[]? Foo { get; set; }
+
+                    public ValueTask ExecuteAsync(IConsole console)
+                    {
+                        foreach (var i in Foo)
+                            console.WriteLine(i);
+
+                        return default;
+                    }
+                }
+                """
+            )
             .UseConsole(FakeConsole)
             .Build();
 
@@ -570,28 +543,26 @@ public partial class ActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(t
     public async Task I_can_pass_values_to_an_input_bound_to_a_read_only_list_of_strings_property()
     {
         // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            [Command]
-            public partial class Command : ICommand
-            {
-                [CommandOption('f')]
-                public IReadOnlyList<string>? Foo { get; set; }
-
-                public ValueTask ExecuteAsync(IConsole console)
-                {
-                    foreach (var i in Foo)
-                        console.WriteLine(i);
-
-                    return default;
-                }
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
+            .AddCommand(
+                // lang=csharp
+                """
+                [Command]
+                public partial class Command : ICommand
+                {
+                    [CommandOption('f')]
+                    public IReadOnlyList<string>? Foo { get; set; }
+
+                    public ValueTask ExecuteAsync(IConsole console)
+                    {
+                        foreach (var i in Foo)
+                            console.WriteLine(i);
+
+                        return default;
+                    }
+                }
+                """
+            )
             .UseConsole(FakeConsole)
             .Build();
 
@@ -612,28 +583,26 @@ public partial class ActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(t
     public async Task I_can_pass_values_to_an_input_bound_to_a_collection_of_strings_property()
     {
         // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            [Command]
-            public partial class Command : ICommand
-            {
-                [CommandOption('f')]
-                public ICollection<string>? Foo { get; set; }
-
-                public ValueTask ExecuteAsync(IConsole console)
-                {
-                    foreach (var i in Foo)
-                        console.WriteLine(i);
-
-                    return default;
-                }
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
+            .AddCommand(
+                // lang=csharp
+                """
+                [Command]
+                public partial class Command : ICommand
+                {
+                    [CommandOption('f')]
+                    public ICollection<string>? Foo { get; set; }
+
+                    public ValueTask ExecuteAsync(IConsole console)
+                    {
+                        foreach (var i in Foo)
+                            console.WriteLine(i);
+
+                        return default;
+                    }
+                }
+                """
+            )
             .UseConsole(FakeConsole)
             .Build();
 
@@ -654,28 +623,26 @@ public partial class ActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(t
     public async Task I_can_pass_values_to_an_input_bound_to_a_string_list_property()
     {
         // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            [Command]
-            public partial class Command : ICommand
-            {
-                [CommandOption('f')]
-                public List<string>? Foo { get; set; }
-
-                public ValueTask ExecuteAsync(IConsole console)
-                {
-                    foreach (var i in Foo)
-                        console.WriteLine(i);
-
-                    return default;
-                }
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
+            .AddCommand(
+                // lang=csharp
+                """
+                [Command]
+                public partial class Command : ICommand
+                {
+                    [CommandOption('f')]
+                    public List<string>? Foo { get; set; }
+
+                    public ValueTask ExecuteAsync(IConsole console)
+                    {
+                        foreach (var i in Foo)
+                            console.WriteLine(i);
+
+                        return default;
+                    }
+                }
+                """
+            )
             .UseConsole(FakeConsole)
             .Build();
 
@@ -696,28 +663,26 @@ public partial class ActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(t
     public async Task I_can_pass_values_to_an_input_bound_to_an_integer_array_property()
     {
         // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            [Command]
-            public partial class Command : ICommand
-            {
-                [CommandOption('f')]
-                public int[]? Foo { get; set; }
-
-                public ValueTask ExecuteAsync(IConsole console)
-                {
-                    foreach (var i in Foo)
-                        console.WriteLine(i);
-
-                    return default;
-                }
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
+            .AddCommand(
+                // lang=csharp
+                """
+                [Command]
+                public partial class Command : ICommand
+                {
+                    [CommandOption('f')]
+                    public int[]? Foo { get; set; }
+
+                    public ValueTask ExecuteAsync(IConsole console)
+                    {
+                        foreach (var i in Foo)
+                            console.WriteLine(i);
+
+                        return default;
+                    }
+                }
+                """
+            )
             .UseConsole(FakeConsole)
             .Build();
 
@@ -738,28 +703,26 @@ public partial class ActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(t
     public async Task I_can_pass_values_to_an_input_bound_to_a_read_only_list_of_integers_property()
     {
         // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            [Command]
-            public partial class Command : ICommand
-            {
-                [CommandOption('f')]
-                public IReadOnlyList<int>? Foo { get; set; }
-
-                public ValueTask ExecuteAsync(IConsole console)
-                {
-                    foreach (var i in Foo)
-                        console.WriteLine(i);
-
-                    return default;
-                }
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
+            .AddCommand(
+                // lang=csharp
+                """
+                [Command]
+                public partial class Command : ICommand
+                {
+                    [CommandOption('f')]
+                    public IReadOnlyList<int>? Foo { get; set; }
+
+                    public ValueTask ExecuteAsync(IConsole console)
+                    {
+                        foreach (var i in Foo)
+                            console.WriteLine(i);
+
+                        return default;
+                    }
+                }
+                """
+            )
             .UseConsole(FakeConsole)
             .Build();
 
@@ -780,32 +743,30 @@ public partial class ActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(t
     public async Task I_can_pass_a_value_to_an_input_bound_to_a_property_with_a_custom_converter()
     {
         // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            public class CustomConverter : ScalarInputConverter<int>
-            {
-                public override int Convert(string rawValue) =>
-                    rawValue.Length;
-            }
-
-            [Command]
-            public partial class Command : ICommand
-            {
-                [CommandOption('f', Converter = typeof(CustomConverter))]
-                public int Foo { get; set; }
-
-                public ValueTask ExecuteAsync(IConsole console)
-                {
-                    console.WriteLine(Foo);
-                    return default;
-                }
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
+            .AddCommand(
+                // lang=csharp
+                """
+                public class CustomConverter : ScalarInputConverter<int>
+                {
+                    public override int Convert(string rawValue) =>
+                        rawValue.Length;
+                }
+
+                [Command]
+                public partial class Command : ICommand
+                {
+                    [CommandOption('f', Converter = typeof(CustomConverter))]
+                    public int Foo { get; set; }
+
+                    public ValueTask ExecuteAsync(IConsole console)
+                    {
+                        console.WriteLine(Foo);
+                        return default;
+                    }
+                }
+                """
+            )
             .UseConsole(FakeConsole)
             .Build();
 
@@ -826,22 +787,20 @@ public partial class ActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(t
     public async Task I_can_try_to_pass_an_invalid_value_to_an_input_and_get_an_error()
     {
         // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            [Command]
-            public partial class Command : ICommand
-            {
-                [CommandOption('f')]
-                public int Foo { get; set; }
-
-                public ValueTask ExecuteAsync(IConsole console) => default;
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
+            .AddCommand(
+                // lang=csharp
+                """
+                [Command]
+                public partial class Command : ICommand
+                {
+                    [CommandOption('f')]
+                    public int Foo { get; set; }
+
+                    public ValueTask ExecuteAsync(IConsole console) => default;
+                }
+                """
+            )
             .UseConsole(FakeConsole)
             .Build();
 
@@ -862,32 +821,30 @@ public partial class ActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(t
     public async Task I_can_try_to_pass_a_value_to_an_input_bound_to_a_property_with_a_custom_validator_and_get_an_error_if_validation_fails()
     {
         // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            public class ValidatorA : InputValidator<int>
-            {
-                public override InputValidationError Validate(int value) => Ok();
-            }
-
-            public class ValidatorB : InputValidator<int>
-            {
-                public override InputValidationError Validate(int value) => Error("Hello world");
-            }
-
-            [Command]
-            public partial class Command : ICommand
-            {
-                [CommandOption('f', Validators = [typeof(ValidatorA), typeof(ValidatorB)])]
-                public int Foo { get; set; }
-
-                public ValueTask ExecuteAsync(IConsole console) => default;
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
+            .AddCommand(
+                // lang=csharp
+                """
+                public class ValidatorA : InputValidator<int>
+                {
+                    public override InputValidationError Validate(int value) => Ok();
+                }
+
+                public class ValidatorB : InputValidator<int>
+                {
+                    public override InputValidationError Validate(int value) => Error("Hello world");
+                }
+
+                [Command]
+                public partial class Command : ICommand
+                {
+                    [CommandOption('f', Validators = [typeof(ValidatorA), typeof(ValidatorB)])]
+                    public int Foo { get; set; }
+
+                    public ValueTask ExecuteAsync(IConsole console) => default;
+                }
+                """
+            )
             .UseConsole(FakeConsole)
             .Build();
 
@@ -905,31 +862,29 @@ public partial class ActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(t
     public async Task I_can_try_to_pass_a_value_to_an_input_bound_to_a_string_parsable_property_and_get_an_error_if_parsing_fails()
     {
         // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            public class CustomType
-            {
-                public string Value { get; }
-
-                private CustomType(string value) => Value = value;
-
-                public static CustomType Parse(string value) => throw new Exception("Hello world");
-            }
-
-            [Command]
-            public partial class Command : ICommand
-            {
-                [CommandOption('f')]
-                public CustomType? Foo { get; set; }
-
-                public ValueTask ExecuteAsync(IConsole console) => default;
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
+            .AddCommand(
+                // lang=csharp
+                """
+                public class CustomType
+                {
+                    public string Value { get; }
+
+                    private CustomType(string value) => Value = value;
+
+                    public static CustomType Parse(string value) => throw new Exception("Hello world");
+                }
+
+                [Command]
+                public partial class Command : ICommand
+                {
+                    [CommandOption('f')]
+                    public CustomType? Foo { get; set; }
+
+                    public ValueTask ExecuteAsync(IConsole console) => default;
+                }
+                """
+            )
             .UseConsole(FakeConsole)
             .Build();
 

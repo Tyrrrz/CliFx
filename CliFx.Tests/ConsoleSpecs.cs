@@ -4,7 +4,6 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using CliFx.Infrastructure;
-using CliFx.Tests.Utils;
 using CliFx.Tests.Utils.Extensions;
 using CliWrap;
 using CliWrap.Buffered;
@@ -56,33 +55,31 @@ public class ConsoleSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_can_use_the_fake_console_to_isolate_console_interactions()
     {
         // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            [Command]
-            public partial class Command : ICommand
-            {
-                public ValueTask ExecuteAsync(IConsole console)
-                {
-                    console.ResetColor();
-                    console.ForegroundColor = ConsoleColor.DarkMagenta;
-                    console.BackgroundColor = ConsoleColor.DarkMagenta;
-                    console.WindowWidth = 100;
-                    console.WindowHeight = 25;
-                    console.CursorLeft = 42;
-                    console.CursorTop = 24;
-
-                    console.Output.WriteLine("Hello ");
-                    console.Error.WriteLine("world!");
-
-                    return default;
-                }
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
+            .AddCommand(
+                // lang=csharp
+                """
+                [Command]
+                public partial class Command : ICommand
+                {
+                    public ValueTask ExecuteAsync(IConsole console)
+                    {
+                        console.ResetColor();
+                        console.ForegroundColor = ConsoleColor.DarkMagenta;
+                        console.BackgroundColor = ConsoleColor.DarkMagenta;
+                        console.WindowWidth = 100;
+                        console.WindowHeight = 25;
+                        console.CursorLeft = 42;
+                        console.CursorTop = 24;
+
+                        console.Output.WriteLine("Hello ");
+                        console.Error.WriteLine("world!");
+
+                        return default;
+                    }
+                }
+                """
+            )
             .UseConsole(FakeConsole)
             .Build();
 
@@ -114,26 +111,24 @@ public class ConsoleSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_can_use_the_fake_console_to_simulate_stream_interactions()
     {
         // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            [Command]
-            public partial class Command : ICommand
-            {
-                public ValueTask ExecuteAsync(IConsole console)
-                {
-                    var input = console.Input.ReadToEnd();
-                    console.Output.WriteLine(input);
-                    console.Error.WriteLine(input);
-
-                    return default;
-                }
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
+            .AddCommand(
+                // lang=csharp
+                """
+                [Command]
+                public partial class Command : ICommand
+                {
+                    public ValueTask ExecuteAsync(IConsole console)
+                    {
+                        var input = console.Input.ReadToEnd();
+                        console.Output.WriteLine(input);
+                        console.Error.WriteLine(input);
+
+                        return default;
+                    }
+                }
+                """
+            )
             .UseConsole(FakeConsole)
             .Build();
 
@@ -156,26 +151,24 @@ public class ConsoleSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_can_use_the_fake_console_to_simulate_key_presses()
     {
         // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            [Command]
-            public partial class Command : ICommand
-            {
-                public ValueTask ExecuteAsync(IConsole console)
-                {
-                    console.WriteLine(console.ReadKey().Key);
-                    console.WriteLine(console.ReadKey().Key);
-                    console.WriteLine(console.ReadKey().Key);
-
-                    return default;
-                }
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
+            .AddCommand(
+                // lang=csharp
+                """
+                [Command]
+                public partial class Command : ICommand
+                {
+                    public ValueTask ExecuteAsync(IConsole console)
+                    {
+                        console.WriteLine(console.ReadKey().Key);
+                        console.WriteLine(console.ReadKey().Key);
+                        console.WriteLine(console.ReadKey().Key);
+
+                        return default;
+                    }
+                }
+                """
+            )
             .UseConsole(FakeConsole)
             .Build();
 
