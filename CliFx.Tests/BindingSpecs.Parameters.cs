@@ -1,4 +1,3 @@
-using System;
 using CliFx.Generators;
 using CliFx.Tests.Utils;
 using FluentAssertions;

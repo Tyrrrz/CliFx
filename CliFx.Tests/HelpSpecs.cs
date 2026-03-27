@@ -389,6 +389,64 @@ public class HelpSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     }
 
     [Fact]
+    public async Task I_can_request_help_to_see_the_list_of_all_inputs_including_inherited_ones()
+    {
+        // Arrange
+        var command = CommandCompiler.Compile(
+            // lang=csharp
+            """
+            public abstract class GrandParentCommand : ICommand
+            {
+                [CommandParameter(0, Name = "foo", Description = "Description of foo.")]
+                public string? Foo { get; set; }
+
+                public abstract ValueTask ExecuteAsync(IConsole console);
+            }
+
+            public abstract class ParentCommand : GrandParentCommand
+            {
+                [CommandOption("bar", Description = "Description of bar.")]
+                public string? Bar { get; set; }
+            }
+
+            [Command]
+            public partial class Command : ParentCommand
+            {
+                [CommandOption("baz", Description = "Description of baz.")]
+                public string? Baz { get; set; }
+
+                public override ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
+
+        var application = new CommandLineApplicationBuilder()
+            .AddCommand(command)
+            .UseConsole(FakeConsole)
+            .Build();
+
+        // Act
+        var exitCode = await application.RunAsync(["--help"], new Dictionary<string, string>());
+
+        // Assert
+        exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
+        stdOut
+            .Should()
+            .ContainAllInOrder(
+                "PARAMETERS",
+                "foo",
+                "Description of foo.",
+                "OPTIONS",
+                "--baz",
+                "Description of baz.",
+                "--bar",
+                "Description of bar."
+            );
+    }
+
+    [Fact]
     public async Task I_can_request_help_to_see_the_conventional_help_and_version_options()
     {
         // Arrange
