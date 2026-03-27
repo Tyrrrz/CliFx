@@ -178,5 +178,67 @@ public partial class BindingSpecs
                     $"*{DiagnosticDescriptors.CommandOptionShadowsBuiltInVersionOption.Id}*"
                 );
         }
+
+        [Fact]
+        public void I_can_bind_an_option_to_a_sequence_property_with_an_element_converter()
+        {
+            // Act
+            var act = () =>
+                CommandCompiler.Compile(
+                    // lang=csharp
+                    """
+                    public class IntConverter : ScalarInputConverter<int>
+                    {
+                        public override int Convert(string? rawValue) =>
+                            int.Parse(rawValue!, CultureInfo.InvariantCulture);
+                    }
+
+                    [Command]
+                    public partial class Command : ICommand
+                    {
+                        [CommandOption('f', Converter = typeof(IntConverter), IsElementConverter = true)]
+                        public IReadOnlyList<int>? Foo { get; set; }
+
+                        public ValueTask ExecuteAsync(IConsole console) => default;
+                    }
+                    """
+                );
+
+            // Assert
+            act.Should().NotThrow();
+        }
+
+        [Fact]
+        public void I_can_try_to_bind_an_option_with_element_converter_that_is_sequence_based_and_get_an_error()
+        {
+            // Act
+            var act = () =>
+                CommandCompiler.Compile(
+                    // lang=csharp
+                    """
+                    public class IntSequenceConverter : SequenceInputConverter<int[]>
+                    {
+                        public override int[] Convert(IReadOnlyList<string> rawValues) =>
+                            rawValues.Select(v => int.Parse(v, CultureInfo.InvariantCulture)).ToArray();
+                    }
+
+                    [Command]
+                    public partial class Command : ICommand
+                    {
+                        [CommandOption('f', Converter = typeof(IntSequenceConverter), IsElementConverter = true)]
+                        public int[]? Foo { get; set; }
+
+                        public ValueTask ExecuteAsync(IConsole console) => default;
+                    }
+                    """
+                );
+
+            // Assert
+            act.Should()
+                .Throw()
+                .WithMessage(
+                    $"*{DiagnosticDescriptors.CommandInputElementConverterMustNotBeSequenceBased.Id}*"
+                );
+        }
     }
 }

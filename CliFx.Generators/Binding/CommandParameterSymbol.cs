@@ -11,8 +11,17 @@ internal record CommandParameterSymbol(
     bool IsRequired,
     string? Description,
     INamedTypeSymbol? ConverterType,
+    bool IsElementConverter,
     IReadOnlyList<INamedTypeSymbol> ValidatorTypes
-) : CommandInputSymbol(Property, IsRequired, Description, ConverterType, ValidatorTypes)
+)
+    : CommandInputSymbol(
+        Property,
+        IsRequired,
+        Description,
+        ConverterType,
+        IsElementConverter,
+        ValidatorTypes
+    )
 {
     internal static CommandParameterSymbol? TryResolve(
         IPropertySymbol property,
@@ -49,6 +58,7 @@ internal record CommandParameterSymbol(
             attribute.NamedArguments.FirstOrDefault(a => a.Key == "Description").Value.Value
                 as string,
             TryResolveConverterType(attribute),
+            ResolveIsElementConverter(attribute),
             ResolveValidatorTypes(attribute)
         );
     }

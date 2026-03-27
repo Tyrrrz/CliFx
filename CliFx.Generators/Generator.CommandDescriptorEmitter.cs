@@ -98,7 +98,11 @@ public partial class Generator
 
         foreach (var param in command.Parameters.OrderBy(p => p.Order))
         {
-            var converterExpr = TryBuildConverterExpr(param.ConverterType, param.Property);
+            var converterExpr = TryBuildConverterExpr(
+                param.ConverterType,
+                param.Property,
+                param.IsElementConverter
+            );
             if (converterExpr is null)
             {
                 diagnosticsList.Add(
@@ -134,7 +138,11 @@ public partial class Generator
 
         foreach (var option in command.Options)
         {
-            var converterExpr = TryBuildConverterExpr(option.ConverterType, option.Property);
+            var converterExpr = TryBuildConverterExpr(
+                option.ConverterType,
+                option.Property,
+                option.IsElementConverter
+            );
             if (converterExpr is null)
             {
                 diagnosticsList.Add(
@@ -298,21 +306,46 @@ public partial class Generator
 
     private static string? TryBuildConverterExpr(
         INamedTypeSymbol? userConverterType,
-        IPropertySymbol property
+        IPropertySymbol property,
+        bool isElementConverter
     )
     {
         if (userConverterType is not null)
-            return $"new {userConverterType.GetGloballyQualifiedName()}()";
+        {
+            var userConverterExpr = $"new {userConverterType.GetGloballyQualifiedName()}()";
 
-        var type = property.Type;
+            if (isElementConverter)
+            {
+                // The user provided a scalar element converter that needs to be wrapped
+                // in an appropriate sequence converter
+                var type = property.Type;
+                if (
+                    type.SpecialType != SpecialType.System_String
+                    && type.TryGetEnumerableUnderlyingType() is { } elementType
+                )
+                {
+                    return TryBuildSequenceConverterExpr(elementType, type, userConverterExpr);
+                }
+            }
+
+            return userConverterExpr;
+        }
+
+        var propType = property.Type;
 
         if (
-            type.SpecialType != SpecialType.System_String
-            && type.TryGetEnumerableUnderlyingType() is { } elementType
+            propType.SpecialType != SpecialType.System_String
+            && propType.TryGetEnumerableUnderlyingType() is { } seqElementType
         )
-            return TryBuildDefaultSequenceConverterExpr(elementType, type);
+        {
+            var elementConverterExpr = TryBuildDefaultScalarConverterExpr(seqElementType);
+            if (elementConverterExpr is null)
+                return null;
 
-        return TryBuildDefaultScalarConverterExpr(type);
+            return TryBuildSequenceConverterExpr(seqElementType, propType, elementConverterExpr);
+        }
+
+        return TryBuildDefaultScalarConverterExpr(propType);
     }
 
     private static string? TryBuildDefaultScalarConverterExpr(ITypeSymbol type)
@@ -405,18 +438,16 @@ public partial class Generator
         return null;
     }
 
-    private static string? TryBuildDefaultSequenceConverterExpr(
+    private static string? TryBuildSequenceConverterExpr(
         ITypeSymbol elementType,
-        ITypeSymbol collectionType
+        ITypeSymbol collectionType,
+        string elementConverterExpr
     )
     {
         var collectionTypeFqn = collectionType.ToDisplayString(
             SymbolDisplayFormat.FullyQualifiedFormat
         );
         var elementTypeFqn = elementType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-        var elementConverterArg = TryBuildDefaultScalarConverterExpr(elementType);
-        if (elementConverterArg is null)
-            return null;
 
         // T[] or IEnumerable<T> or ICollection<T> or IList<T> or IReadOnlyCollection<T> or IReadOnlyList<T>
         if (
@@ -437,7 +468,7 @@ public partial class Generator
                         or SpecialType.System_Collections_Generic_IReadOnlyList_T
             )
         )
-            return $"new global::{KnownTypes.ArraySequenceInputConverter}<{elementTypeFqn}>({elementConverterArg})";
+            return $"new global::{KnownTypes.ArraySequenceInputConverter}<{elementTypeFqn}>({elementConverterExpr})";
 
         // Has ctor(string[])
         if (
@@ -463,7 +494,7 @@ public partial class Generator
             )
         )
         {
-            return $"new global::{KnownTypes.DelegateSequenceInputConverter}<{elementTypeFqn}[], {collectionTypeFqn}>(new global::{KnownTypes.ArraySequenceInputConverter}<{elementTypeFqn}>({elementConverterArg}), values => new {collectionTypeFqn}(values))";
+            return $"new global::{KnownTypes.DelegateSequenceInputConverter}<{elementTypeFqn}[], {collectionTypeFqn}>(new global::{KnownTypes.ArraySequenceInputConverter}<{elementTypeFqn}>({elementConverterExpr}), values => new {collectionTypeFqn}(values))";
         }
 
         return null;

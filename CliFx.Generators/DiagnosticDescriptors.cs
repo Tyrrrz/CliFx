@@ -38,6 +38,16 @@ public static class DiagnosticDescriptors
             true
         );
 
+    public static DiagnosticDescriptor CommandInputElementConverterMustNotBeSequenceBased { get; } =
+        new(
+            $"{nameof(CliFx)}_{nameof(CommandInputElementConverterMustNotBeSequenceBased)}",
+            "Element converter must not be a sequence converter",
+            "Input bound to property '{0}' specifies 'IsElementConverter = true' but the provided converter derives from SequenceInputConverter<T>. When using 'IsElementConverter', the converter must be a scalar converter (derive from ScalarInputConverter<T>).",
+            "CliFx",
+            DiagnosticSeverity.Error,
+            true
+        );
+
     // Parameter
 
     public static DiagnosticDescriptor CommandParameterMustHaveUniqueOrder { get; } =

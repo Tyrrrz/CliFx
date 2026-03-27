@@ -823,6 +823,109 @@ public partial class ActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(t
     }
 
     [Fact]
+    public async Task I_can_pass_multiple_values_to_a_sequence_option_using_an_element_converter()
+    {
+        // Arrange
+        var command = CommandCompiler.Compile(
+            // lang=csharp
+            """
+            public class DoubleConverter : ScalarInputConverter<int>
+            {
+                public override int Convert(string? rawValue) =>
+                    int.Parse(rawValue!, CultureInfo.InvariantCulture) * 2;
+            }
+
+            [Command]
+            public partial class Command : ICommand
+            {
+                [CommandOption('f', Converter = typeof(DoubleConverter), IsElementConverter = true)]
+                public IReadOnlyList<int>? Foo { get; set; }
+
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    if (Foo is not null)
+                    {
+                        foreach (var item in Foo)
+                            console.WriteLine(item);
+                    }
+
+                    return default;
+                }
+            }
+            """
+        );
+
+        var application = new CommandLineApplicationBuilder()
+            .AddCommand(command)
+            .UseConsole(FakeConsole)
+            .Build();
+
+        // Act
+        var exitCode = await application.RunAsync(
+            ["-f", "3", "-f", "5", "-f", "7"],
+            new Dictionary<string, string>()
+        );
+
+        // Assert
+        exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
+        stdOut.Should().ConsistOfLines("6", "10", "14");
+    }
+
+    [Fact]
+    public async Task I_can_pass_multiple_values_to_a_sequence_parameter_using_an_element_converter()
+    {
+        // Arrange
+        var command = CommandCompiler.Compile(
+            // lang=csharp
+            """
+            public class DoubleConverter : ScalarInputConverter<int>
+            {
+                public override int Convert(string? rawValue) =>
+                    int.Parse(rawValue!, CultureInfo.InvariantCulture) * 2;
+            }
+
+            [Command]
+            public partial class Command : ICommand
+            {
+                [CommandParameter(0)]
+                public required string Name { get; set; }
+
+                [CommandParameter(1, Converter = typeof(DoubleConverter), IsElementConverter = true)]
+                public required IReadOnlyList<int> Values { get; set; }
+
+                public ValueTask ExecuteAsync(IConsole console)
+                {
+                    console.WriteLine("Name = " + Name);
+                    foreach (var item in Values)
+                        console.WriteLine("Value = " + item);
+
+                    return default;
+                }
+            }
+            """
+        );
+
+        var application = new CommandLineApplicationBuilder()
+            .AddCommand(command)
+            .UseConsole(FakeConsole)
+            .Build();
+
+        // Act
+        var exitCode = await application.RunAsync(
+            ["hello", "3", "5"],
+            new Dictionary<string, string>()
+        );
+
+        // Assert
+        exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
+        stdOut.Should().ConsistOfLines("Name = hello", "Value = 6", "Value = 10");
+    }
+
+    [Fact]
     public async Task I_can_try_to_pass_an_invalid_value_to_an_input_and_get_an_error()
     {
         // Arrange

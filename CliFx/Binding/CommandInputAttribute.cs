@@ -33,6 +33,23 @@ public abstract class CommandInputAttribute : Attribute
     public Type? Converter { get; set; }
 
     /// <summary>
+    /// Whether the specified <see cref="Converter" /> is an element converter that should be
+    /// automatically wrapped in an appropriate sequence converter.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// When set to <c>true</c>, the provided converter must be a scalar converter
+    /// (derived from <see cref="ScalarInputConverter{T}" />) that converts individual elements
+    /// of the sequence. CliFx will automatically wrap it in a sequence converter that applies
+    /// the element converter to each argument.
+    /// </para>
+    /// <para>
+    /// This property cannot be used with a sequence converter.
+    /// </para>
+    /// </remarks>
+    public bool IsElementConverter { get; set; }
+
+    /// <summary>
     /// Custom validator(s) used for verifying the value of this input after activation.
     /// </summary>
     /// <remarks>

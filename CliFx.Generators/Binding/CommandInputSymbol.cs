@@ -10,6 +10,7 @@ internal abstract partial record CommandInputSymbol(
     bool IsRequired,
     string? Description,
     INamedTypeSymbol? ConverterType,
+    bool IsElementConverter,
     IReadOnlyList<INamedTypeSymbol> ValidatorTypes
 )
 {
@@ -22,11 +23,12 @@ internal abstract partial record CommandInputSymbol(
             .OfType<INamedTypeSymbol>()
             .Any(t => t.IsMatchedBy(KnownTypes.SequenceInputConverter));
 
-    // An input is considered sequence-based if it has a sequence-based converter, or if it
-    // doesn't have a converter but its type is an enumerable (except string).
+    // An input is considered sequence-based if it has a sequence-based converter, if the
+    // converter is an element converter (will be wrapped), or if it doesn't have a converter
+    // but its type is an enumerable (except string).
     public bool IsSequenceBased =>
         ConverterType is not null
-            ? IsConverterSequenceBased
+            ? IsConverterSequenceBased || IsElementConverter
             : Property.Type.SpecialType != SpecialType.System_String
                 && Property.Type.TryGetEnumerableUnderlyingType() is not null;
 }
@@ -36,6 +38,10 @@ internal partial record CommandInputSymbol
     protected static INamedTypeSymbol? TryResolveConverterType(AttributeData attribute) =>
         attribute.NamedArguments.FirstOrDefault(a => a.Key == "Converter").Value.Value
         as INamedTypeSymbol;
+
+    protected static bool ResolveIsElementConverter(AttributeData attribute) =>
+        attribute.NamedArguments.FirstOrDefault(a => a.Key == "IsElementConverter").Value.Value
+            is true;
 
     protected static INamedTypeSymbol[] ResolveValidatorTypes(AttributeData attribute) =>
         attribute

@@ -119,6 +119,21 @@ internal record CommandSymbol(
             }
         }
 
+        // Element converter must not be sequence-based
+        foreach (var input in parameters.Cast<CommandInputSymbol>().Concat(options))
+        {
+            if (input.IsElementConverter && input.IsConverterSequenceBased)
+            {
+                diagnosticsList.Add(
+                    Diagnostic.Create(
+                        DiagnosticDescriptors.CommandInputElementConverterMustNotBeSequenceBased,
+                        input.Property.Locations.FirstOrDefault(),
+                        input.Property.Name
+                    )
+                );
+            }
+        }
+
         // Parameters must have unique order values
         foreach (var (i, first) in parameters.Index())
         {
