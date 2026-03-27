@@ -117,15 +117,15 @@ public partial class Generator
                     string.Equals(p.Name, "IsHelpRequested", System.StringComparison.Ordinal)
                 );
 
-            var hasBindingAttribute =
+            var hasOptionBinding =
                 isHelpRequestedProperty
                     ?.GetAttributes()
                     .Any(a =>
                         a.AttributeClass?.GetSelfAndBaseTypes()
-                            .Any(t => t.IsMatchedBy(KnownTypes.CommandInputAttribute)) == true
+                            .Any(t => t.IsMatchedBy(KnownTypes.CommandOptionAttribute)) == true
                     ) == true;
 
-            if (!hasBindingAttribute)
+            if (!hasOptionBinding)
             {
                 diagnosticsList.Add(
                     Diagnostic.Create(
@@ -146,15 +146,15 @@ public partial class Generator
                     string.Equals(p.Name, "IsVersionRequested", System.StringComparison.Ordinal)
                 );
 
-            var hasBindingAttribute =
+            var hasOptionBinding =
                 isVersionRequestedProperty
                     ?.GetAttributes()
                     .Any(a =>
                         a.AttributeClass?.GetSelfAndBaseTypes()
-                            .Any(t => t.IsMatchedBy(KnownTypes.CommandInputAttribute)) == true
+                            .Any(t => t.IsMatchedBy(KnownTypes.CommandOptionAttribute)) == true
                     ) == true;
 
-            if (!hasBindingAttribute)
+            if (!hasOptionBinding)
             {
                 diagnosticsList.Add(
                     Diagnostic.Create(
