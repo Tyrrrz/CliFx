@@ -13,43 +13,43 @@ public class RoutingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_can_execute_the_default_command()
     {
         // Arrange
-        var commands = CommandCompiler.CompileMany(
-            // lang=csharp
-            """
-            [Command]
-            public partial class DefaultCommand : ICommand
-            {
-                public ValueTask ExecuteAsync(IConsole console)
-                {
-                    console.WriteLine("default");
-                    return default;
-                }
-            }
-
-            [Command("cmd")]
-            public partial class NamedCommand : ICommand
-            {
-                public ValueTask ExecuteAsync(IConsole console)
-                {
-                    console.WriteLine("cmd");
-                    return default;
-                }
-            }
-
-            [Command("cmd child")]
-            public partial class NamedChildCommand : ICommand
-            {
-                public ValueTask ExecuteAsync(IConsole console)
-                {
-                    console.WriteLine("cmd child");
-                    return default;
-                }
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommands(commands)
+            .AddCommands(
+                CommandCompiler.Compile(
+                    // lang=csharp
+                    """
+                    [Command]
+                    public partial class DefaultCommand : ICommand
+                    {
+                        public ValueTask ExecuteAsync(IConsole console)
+                        {
+                            console.WriteLine("default");
+                            return default;
+                        }
+                    }
+
+                    [Command("cmd")]
+                    public partial class NamedCommand : ICommand
+                    {
+                        public ValueTask ExecuteAsync(IConsole console)
+                        {
+                            console.WriteLine("cmd");
+                            return default;
+                        }
+                    }
+
+                    [Command("cmd child")]
+                    public partial class NamedChildCommand : ICommand
+                    {
+                        public ValueTask ExecuteAsync(IConsole console)
+                        {
+                            console.WriteLine("cmd child");
+                            return default;
+                        }
+                    }
+                    """
+                )
+            )
             .UseConsole(FakeConsole)
             .Build();
 
@@ -67,43 +67,43 @@ public class RoutingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_can_execute_a_named_command()
     {
         // Arrange
-        var commands = CommandCompiler.CompileMany(
-            // lang=csharp
-            """
-            [Command]
-            public partial class DefaultCommand : ICommand
-            {
-                public ValueTask ExecuteAsync(IConsole console)
-                {
-                    console.WriteLine("default");
-                    return default;
-                }
-            }
-
-            [Command("cmd")]
-            public partial class NamedCommand : ICommand
-            {
-                public ValueTask ExecuteAsync(IConsole console)
-                {
-                    console.WriteLine("cmd");
-                    return default;
-                }
-            }
-
-            [Command("cmd child")]
-            public partial class NamedChildCommand : ICommand
-            {
-                public ValueTask ExecuteAsync(IConsole console)
-                {
-                    console.WriteLine("cmd child");
-                    return default;
-                }
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommands(commands)
+            .AddCommands(
+                CommandCompiler.Compile(
+                    // lang=csharp
+                    """
+                    [Command]
+                    public partial class DefaultCommand : ICommand
+                    {
+                        public ValueTask ExecuteAsync(IConsole console)
+                        {
+                            console.WriteLine("default");
+                            return default;
+                        }
+                    }
+
+                    [Command("cmd")]
+                    public partial class NamedCommand : ICommand
+                    {
+                        public ValueTask ExecuteAsync(IConsole console)
+                        {
+                            console.WriteLine("cmd");
+                            return default;
+                        }
+                    }
+
+                    [Command("cmd child")]
+                    public partial class NamedChildCommand : ICommand
+                    {
+                        public ValueTask ExecuteAsync(IConsole console)
+                        {
+                            console.WriteLine("cmd child");
+                            return default;
+                        }
+                    }
+                    """
+                )
+            )
             .UseConsole(FakeConsole)
             .Build();
 
@@ -121,43 +121,43 @@ public class RoutingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_can_execute_a_nested_named_command()
     {
         // Arrange
-        var commands = CommandCompiler.CompileMany(
-            // lang=csharp
-            """
-            [Command]
-            public partial class DefaultCommand : ICommand
-            {
-                public ValueTask ExecuteAsync(IConsole console)
-                {
-                    console.WriteLine("default");
-                    return default;
-                }
-            }
-
-            [Command("cmd")]
-            public partial class NamedCommand : ICommand
-            {
-                public ValueTask ExecuteAsync(IConsole console)
-                {
-                    console.WriteLine("cmd");
-                    return default;
-                }
-            }
-
-            [Command("cmd child")]
-            public partial class NamedChildCommand : ICommand
-            {
-                public ValueTask ExecuteAsync(IConsole console)
-                {
-                    console.WriteLine("cmd child");
-                    return default;
-                }
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommands(commands)
+            .AddCommands(
+                CommandCompiler.Compile(
+                    // lang=csharp
+                    """
+                    [Command]
+                    public partial class DefaultCommand : ICommand
+                    {
+                        public ValueTask ExecuteAsync(IConsole console)
+                        {
+                            console.WriteLine("default");
+                            return default;
+                        }
+                    }
+
+                    [Command("cmd")]
+                    public partial class NamedCommand : ICommand
+                    {
+                        public ValueTask ExecuteAsync(IConsole console)
+                        {
+                            console.WriteLine("cmd");
+                            return default;
+                        }
+                    }
+
+                    [Command("cmd child")]
+                    public partial class NamedChildCommand : ICommand
+                    {
+                        public ValueTask ExecuteAsync(IConsole console)
+                        {
+                            console.WriteLine("cmd child");
+                            return default;
+                        }
+                    }
+                    """
+                )
+            )
             .UseConsole(FakeConsole)
             .Build();
 

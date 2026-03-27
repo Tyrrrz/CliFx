@@ -19,26 +19,26 @@ public partial class ActivationSpecs
         public async Task I_can_pass_a_value_to_an_option_identified_by_name()
         {
             // Arrange
-            var command = CommandCompiler.Compile(
-                // lang=csharp
-                """
-                [Command]
-                public partial class Command : ICommand
-                {
-                    [CommandOption("foo")]
-                    public bool Foo { get; set; }
-
-                    public ValueTask ExecuteAsync(IConsole console)
-                    {
-                        console.WriteLine(Foo);
-                        return default;
-                    }
-                }
-                """
-            );
-
             var application = new CommandLineApplicationBuilder()
-                .AddCommand(command)
+                .AddCommands(
+                    CommandCompiler.Compile(
+                        // lang=csharp
+                        """
+                        [Command]
+                        public partial class Command : ICommand
+                        {
+                            [CommandOption("foo")]
+                            public bool Foo { get; set; }
+
+                            public ValueTask ExecuteAsync(IConsole console)
+                            {
+                                console.WriteLine(Foo);
+                                return default;
+                            }
+                        }
+                        """
+                    )
+                )
                 .UseConsole(FakeConsole)
                 .Build();
 
@@ -56,26 +56,26 @@ public partial class ActivationSpecs
         public async Task I_can_pass_a_value_to_an_option_identified_by_short_name()
         {
             // Arrange
-            var command = CommandCompiler.Compile(
-                // lang=csharp
-                """
-                [Command]
-                public partial class Command : ICommand
-                {
-                    [CommandOption('f')]
-                    public bool Foo { get; set; }
-
-                    public ValueTask ExecuteAsync(IConsole console)
-                    {
-                        console.WriteLine(Foo);
-                        return default;
-                    }
-                }
-                """
-            );
-
             var application = new CommandLineApplicationBuilder()
-                .AddCommand(command)
+                .AddCommands(
+                    CommandCompiler.Compile(
+                        // lang=csharp
+                        """
+                        [Command]
+                        public partial class Command : ICommand
+                        {
+                            [CommandOption('f')]
+                            public bool Foo { get; set; }
+
+                            public ValueTask ExecuteAsync(IConsole console)
+                            {
+                                console.WriteLine(Foo);
+                                return default;
+                            }
+                        }
+                        """
+                    )
+                )
                 .UseConsole(FakeConsole)
                 .Build();
 
@@ -93,31 +93,31 @@ public partial class ActivationSpecs
         public async Task I_can_pass_values_to_multiple_options_identified_by_names()
         {
             // Arrange
-            var command = CommandCompiler.Compile(
-                // lang=csharp
-                """
-                [Command]
-                public partial class Command : ICommand
-                {
-                    [CommandOption("foo")]
-                    public string? Foo { get; set; }
-
-                    [CommandOption("bar")]
-                    public string? Bar { get; set; }
-
-                    public ValueTask ExecuteAsync(IConsole console)
-                    {
-                        console.WriteLine("Foo = " + Foo);
-                        console.WriteLine("Bar = " + Bar);
-
-                        return default;
-                    }
-                }
-                """
-            );
-
             var application = new CommandLineApplicationBuilder()
-                .AddCommand(command)
+                .AddCommands(
+                    CommandCompiler.Compile(
+                        // lang=csharp
+                        """
+                        [Command]
+                        public partial class Command : ICommand
+                        {
+                            [CommandOption("foo")]
+                            public string? Foo { get; set; }
+
+                            [CommandOption("bar")]
+                            public string? Bar { get; set; }
+
+                            public ValueTask ExecuteAsync(IConsole console)
+                            {
+                                console.WriteLine("Foo = " + Foo);
+                                console.WriteLine("Bar = " + Bar);
+
+                                return default;
+                            }
+                        }
+                        """
+                    )
+                )
                 .UseConsole(FakeConsole)
                 .Build();
 
@@ -138,31 +138,31 @@ public partial class ActivationSpecs
         public async Task I_can_pass_values_to_multiple_options_identified_by_short_names()
         {
             // Arrange
-            var command = CommandCompiler.Compile(
-                // lang=csharp
-                """
-                [Command]
-                public partial class Command : ICommand
-                {
-                    [CommandOption('f')]
-                    public string? Foo { get; set; }
-
-                    [CommandOption('b')]
-                    public string? Bar { get; set; }
-
-                    public ValueTask ExecuteAsync(IConsole console)
-                    {
-                        console.WriteLine("Foo = " + Foo);
-                        console.WriteLine("Bar = " + Bar);
-
-                        return default;
-                    }
-                }
-                """
-            );
-
             var application = new CommandLineApplicationBuilder()
-                .AddCommand(command)
+                .AddCommands(
+                    CommandCompiler.Compile(
+                        // lang=csharp
+                        """
+                        [Command]
+                        public partial class Command : ICommand
+                        {
+                            [CommandOption('f')]
+                            public string? Foo { get; set; }
+
+                            [CommandOption('b')]
+                            public string? Bar { get; set; }
+
+                            public ValueTask ExecuteAsync(IConsole console)
+                            {
+                                console.WriteLine("Foo = " + Foo);
+                                console.WriteLine("Bar = " + Bar);
+
+                                return default;
+                            }
+                        }
+                        """
+                    )
+                )
                 .UseConsole(FakeConsole)
                 .Build();
 
@@ -183,31 +183,31 @@ public partial class ActivationSpecs
         public async Task I_can_pass_values_to_multiple_options_identified_by_stacked_short_names()
         {
             // Arrange
-            var command = CommandCompiler.Compile(
-                // lang=csharp
-                """
-                [Command]
-                public partial class Command : ICommand
-                {
-                    [CommandOption('f')]
-                    public string? Foo { get; set; }
-
-                    [CommandOption('b')]
-                    public string? Bar { get; set; }
-
-                    public ValueTask ExecuteAsync(IConsole console)
-                    {
-                        console.WriteLine("Foo = " + Foo);
-                        console.WriteLine("Bar = " + Bar);
-
-                        return default;
-                    }
-                }
-                """
-            );
-
             var application = new CommandLineApplicationBuilder()
-                .AddCommand(command)
+                .AddCommands(
+                    CommandCompiler.Compile(
+                        // lang=csharp
+                        """
+                        [Command]
+                        public partial class Command : ICommand
+                        {
+                            [CommandOption('f')]
+                            public string? Foo { get; set; }
+
+                            [CommandOption('b')]
+                            public string? Bar { get; set; }
+
+                            public ValueTask ExecuteAsync(IConsole console)
+                            {
+                                console.WriteLine("Foo = " + Foo);
+                                console.WriteLine("Bar = " + Bar);
+
+                                return default;
+                            }
+                        }
+                        """
+                    )
+                )
                 .UseConsole(FakeConsole)
                 .Build();
 
@@ -228,28 +228,28 @@ public partial class ActivationSpecs
         public async Task I_can_pass_multiple_values_to_a_sequence_based_option_identified_by_name()
         {
             // Arrange
-            var command = CommandCompiler.Compile(
-                // lang=csharp
-                """
-                [Command]
-                public partial class Command : ICommand
-                {
-                    [CommandOption("Foo")]
-                    public IReadOnlyList<string>? Foo { get; set; }
-
-                    public ValueTask ExecuteAsync(IConsole console)
-                    {
-                        foreach (var i in Foo)
-                            console.WriteLine(i);
-
-                        return default;
-                    }
-                }
-                """
-            );
-
             var application = new CommandLineApplicationBuilder()
-                .AddCommand(command)
+                .AddCommands(
+                    CommandCompiler.Compile(
+                        // lang=csharp
+                        """
+                        [Command]
+                        public partial class Command : ICommand
+                        {
+                            [CommandOption("Foo")]
+                            public IReadOnlyList<string>? Foo { get; set; }
+
+                            public ValueTask ExecuteAsync(IConsole console)
+                            {
+                                foreach (var i in Foo)
+                                    console.WriteLine(i);
+
+                                return default;
+                            }
+                        }
+                        """
+                    )
+                )
                 .UseConsole(FakeConsole)
                 .Build();
 
@@ -270,28 +270,28 @@ public partial class ActivationSpecs
         public async Task I_can_pass_multiple_values_to_a_sequence_based_option_identified_by_short_name()
         {
             // Arrange
-            var command = CommandCompiler.Compile(
-                // lang=csharp
-                """
-                [Command]
-                public partial class Command : ICommand
-                {
-                    [CommandOption('f')]
-                    public IReadOnlyList<string>? Foo { get; set; }
-
-                    public ValueTask ExecuteAsync(IConsole console)
-                    {
-                        foreach (var i in Foo)
-                            console.WriteLine(i);
-
-                        return default;
-                    }
-                }
-                """
-            );
-
             var application = new CommandLineApplicationBuilder()
-                .AddCommand(command)
+                .AddCommands(
+                    CommandCompiler.Compile(
+                        // lang=csharp
+                        """
+                        [Command]
+                        public partial class Command : ICommand
+                        {
+                            [CommandOption('f')]
+                            public IReadOnlyList<string>? Foo { get; set; }
+
+                            public ValueTask ExecuteAsync(IConsole console)
+                            {
+                                foreach (var i in Foo)
+                                    console.WriteLine(i);
+
+                                return default;
+                            }
+                        }
+                        """
+                    )
+                )
                 .UseConsole(FakeConsole)
                 .Build();
 
@@ -312,28 +312,28 @@ public partial class ActivationSpecs
         public async Task I_can_pass_multiple_values_to_a_sequence_based_option_identified_by_name_repeatedly()
         {
             // Arrange
-            var command = CommandCompiler.Compile(
-                // lang=csharp
-                """
-                [Command]
-                public partial class Command : ICommand
-                {
-                    [CommandOption("foo")]
-                    public IReadOnlyList<string>? Foo { get; set; }
-
-                    public ValueTask ExecuteAsync(IConsole console)
-                    {
-                        foreach (var i in Foo)
-                            console.WriteLine(i);
-
-                        return default;
-                    }
-                }
-                """
-            );
-
             var application = new CommandLineApplicationBuilder()
-                .AddCommand(command)
+                .AddCommands(
+                    CommandCompiler.Compile(
+                        // lang=csharp
+                        """
+                        [Command]
+                        public partial class Command : ICommand
+                        {
+                            [CommandOption("foo")]
+                            public IReadOnlyList<string>? Foo { get; set; }
+
+                            public ValueTask ExecuteAsync(IConsole console)
+                            {
+                                foreach (var i in Foo)
+                                    console.WriteLine(i);
+
+                                return default;
+                            }
+                        }
+                        """
+                    )
+                )
                 .UseConsole(FakeConsole)
                 .Build();
 
@@ -354,28 +354,28 @@ public partial class ActivationSpecs
         public async Task I_can_pass_multiple_values_to_a_sequence_based_option_identified_by_short_name_repeatedly()
         {
             // Arrange
-            var command = CommandCompiler.Compile(
-                // lang=csharp
-                """
-                [Command]
-                public partial class Command : ICommand
-                {
-                    [CommandOption('f')]
-                    public IReadOnlyList<string>? Foo { get; set; }
-
-                    public ValueTask ExecuteAsync(IConsole console)
-                    {
-                        foreach (var i in Foo)
-                            console.WriteLine(i);
-
-                        return default;
-                    }
-                }
-                """
-            );
-
             var application = new CommandLineApplicationBuilder()
-                .AddCommand(command)
+                .AddCommands(
+                    CommandCompiler.Compile(
+                        // lang=csharp
+                        """
+                        [Command]
+                        public partial class Command : ICommand
+                        {
+                            [CommandOption('f')]
+                            public IReadOnlyList<string>? Foo { get; set; }
+
+                            public ValueTask ExecuteAsync(IConsole console)
+                            {
+                                foreach (var i in Foo)
+                                    console.WriteLine(i);
+
+                                return default;
+                            }
+                        }
+                        """
+                    )
+                )
                 .UseConsole(FakeConsole)
                 .Build();
 
@@ -396,28 +396,28 @@ public partial class ActivationSpecs
         public async Task I_can_pass_multiple_values_to_a_sequence_based_option_identified_by_name_and_short_name_repeatedly()
         {
             // Arrange
-            var command = CommandCompiler.Compile(
-                // lang=csharp
-                """
-                [Command]
-                public partial class Command : ICommand
-                {
-                    [CommandOption("foo", 'f')]
-                    public IReadOnlyList<string>? Foo { get; set; }
-
-                    public ValueTask ExecuteAsync(IConsole console)
-                    {
-                        foreach (var i in Foo)
-                            console.WriteLine(i);
-
-                        return default;
-                    }
-                }
-                """
-            );
-
             var application = new CommandLineApplicationBuilder()
-                .AddCommand(command)
+                .AddCommands(
+                    CommandCompiler.Compile(
+                        // lang=csharp
+                        """
+                        [Command]
+                        public partial class Command : ICommand
+                        {
+                            [CommandOption("foo", 'f')]
+                            public IReadOnlyList<string>? Foo { get; set; }
+
+                            public ValueTask ExecuteAsync(IConsole console)
+                            {
+                                foreach (var i in Foo)
+                                    console.WriteLine(i);
+
+                                return default;
+                            }
+                        }
+                        """
+                    )
+                )
                 .UseConsole(FakeConsole)
                 .Build();
 
@@ -438,26 +438,26 @@ public partial class ActivationSpecs
         public async Task I_can_pass_a_negative_number_as_a_value_to_an_option()
         {
             // Arrange
-            var command = CommandCompiler.Compile(
-                // lang=csharp
-                """
-                [Command]
-                public partial class Command : ICommand
-                {
-                    [CommandOption("foo")]
-                    public string? Foo { get; set; }
-
-                    public ValueTask ExecuteAsync(IConsole console)
-                    {
-                        console.WriteLine(Foo);
-                        return default;
-                    }
-                }
-                """
-            );
-
             var application = new CommandLineApplicationBuilder()
-                .AddCommand(command)
+                .AddCommands(
+                    CommandCompiler.Compile(
+                        // lang=csharp
+                        """
+                        [Command]
+                        public partial class Command : ICommand
+                        {
+                            [CommandOption("foo")]
+                            public string? Foo { get; set; }
+
+                            public ValueTask ExecuteAsync(IConsole console)
+                            {
+                                console.WriteLine(Foo);
+                                return default;
+                            }
+                        }
+                        """
+                    )
+                )
                 .UseConsole(FakeConsole)
                 .Build();
 
@@ -478,31 +478,31 @@ public partial class ActivationSpecs
         public async Task I_can_pass_nothing_to_an_option_to_keep_its_default_value()
         {
             // Arrange
-            var command = CommandCompiler.Compile(
-                // lang=csharp
-                """
-                [Command]
-                public partial class Command : ICommand
-                {
-                    [CommandOption("foo")]
-                    public string? Foo { get; set; }
-
-                    [CommandOption("bar")]
-                    public string? Bar { get; set; } = "hello";
-
-                    public ValueTask ExecuteAsync(IConsole console)
-                    {
-                        console.WriteLine("Foo = " + Foo);
-                        console.WriteLine("Bar = " + Bar);
-
-                        return default;
-                    }
-                }
-                """
-            );
-
             var application = new CommandLineApplicationBuilder()
-                .AddCommand(command)
+                .AddCommands(
+                    CommandCompiler.Compile(
+                        // lang=csharp
+                        """
+                        [Command]
+                        public partial class Command : ICommand
+                        {
+                            [CommandOption("foo")]
+                            public string? Foo { get; set; }
+
+                            [CommandOption("bar")]
+                            public string? Bar { get; set; } = "hello";
+
+                            public ValueTask ExecuteAsync(IConsole console)
+                            {
+                                console.WriteLine("Foo = " + Foo);
+                                console.WriteLine("Bar = " + Bar);
+
+                                return default;
+                            }
+                        }
+                        """
+                    )
+                )
                 .UseConsole(FakeConsole)
                 .Build();
 
@@ -523,31 +523,31 @@ public partial class ActivationSpecs
         public async Task I_can_pass_nothing_to_an_option_to_resolve_its_value_from_an_environment_variable()
         {
             // Arrange
-            var command = CommandCompiler.Compile(
-                // lang=csharp
-                """
-                [Command]
-                public partial class Command : ICommand
-                {
-                    [CommandOption("foo", EnvironmentVariable = "ENV_FOO")]
-                    public string? Foo { get; set; }
-
-                    [CommandOption("bar", EnvironmentVariable = "ENV_BAR")]
-                    public string? Bar { get; set; }
-
-                    public ValueTask ExecuteAsync(IConsole console)
-                    {
-                        console.WriteLine(Foo);
-                        console.WriteLine(Bar);
-
-                        return default;
-                    }
-                }
-                """
-            );
-
             var application = new CommandLineApplicationBuilder()
-                .AddCommand(command)
+                .AddCommands(
+                    CommandCompiler.Compile(
+                        // lang=csharp
+                        """
+                        [Command]
+                        public partial class Command : ICommand
+                        {
+                            [CommandOption("foo", EnvironmentVariable = "ENV_FOO")]
+                            public string? Foo { get; set; }
+
+                            [CommandOption("bar", EnvironmentVariable = "ENV_BAR")]
+                            public string? Bar { get; set; }
+
+                            public ValueTask ExecuteAsync(IConsole console)
+                            {
+                                console.WriteLine(Foo);
+                                console.WriteLine(Bar);
+
+                                return default;
+                            }
+                        }
+                        """
+                    )
+                )
                 .UseConsole(FakeConsole)
                 .Build();
 
@@ -568,28 +568,28 @@ public partial class ActivationSpecs
         public async Task I_can_pass_nothing_to_a_sequence_based_option_to_resolve_its_value_from_an_environment_variable()
         {
             // Arrange
-            var command = CommandCompiler.Compile(
-                // lang=csharp
-                """
-                [Command]
-                public partial class Command : ICommand
-                {
-                    [CommandOption("foo", EnvironmentVariable = "ENV_FOO")]
-                    public IReadOnlyList<string>? Foo { get; set; }
-
-                    public ValueTask ExecuteAsync(IConsole console)
-                    {
-                        foreach (var i in Foo)
-                            console.WriteLine(i);
-
-                        return default;
-                    }
-                }
-                """
-            );
-
             var application = new CommandLineApplicationBuilder()
-                .AddCommand(command)
+                .AddCommands(
+                    CommandCompiler.Compile(
+                        // lang=csharp
+                        """
+                        [Command]
+                        public partial class Command : ICommand
+                        {
+                            [CommandOption("foo", EnvironmentVariable = "ENV_FOO")]
+                            public IReadOnlyList<string>? Foo { get; set; }
+
+                            public ValueTask ExecuteAsync(IConsole console)
+                            {
+                                foreach (var i in Foo)
+                                    console.WriteLine(i);
+
+                                return default;
+                            }
+                        }
+                        """
+                    )
+                )
                 .UseConsole(FakeConsole)
                 .Build();
 
@@ -610,26 +610,26 @@ public partial class ActivationSpecs
         public async Task I_can_pass_nothing_to_a_scalar_option_to_resolve_its_value_from_an_environment_variable_and_ignore_path_separators()
         {
             // Arrange
-            var command = CommandCompiler.Compile(
-                // lang=csharp
-                """
-                [Command]
-                public partial class Command : ICommand
-                {
-                    [CommandOption("foo", EnvironmentVariable = "ENV_FOO")]
-                    public string? Foo { get; set; }
-
-                    public ValueTask ExecuteAsync(IConsole console)
-                    {
-                        console.WriteLine(Foo);
-                        return default;
-                    }
-                }
-                """
-            );
-
             var application = new CommandLineApplicationBuilder()
-                .AddCommand(command)
+                .AddCommands(
+                    CommandCompiler.Compile(
+                        // lang=csharp
+                        """
+                        [Command]
+                        public partial class Command : ICommand
+                        {
+                            [CommandOption("foo", EnvironmentVariable = "ENV_FOO")]
+                            public string? Foo { get; set; }
+
+                            public ValueTask ExecuteAsync(IConsole console)
+                            {
+                                console.WriteLine(Foo);
+                                return default;
+                            }
+                        }
+                        """
+                    )
+                )
                 .UseConsole(FakeConsole)
                 .Build();
 
@@ -650,22 +650,22 @@ public partial class ActivationSpecs
         public async Task I_can_try_to_pass_nothing_to_a_required_option_and_get_an_error()
         {
             // Arrange
-            var command = CommandCompiler.Compile(
-                // lang=csharp
-                """
-                [Command]
-                public partial class Command : ICommand
-                {
-                    [CommandOption("foo")]
-                    public required string Foo { get; set; }
-
-                    public ValueTask ExecuteAsync(IConsole console) => default;
-                }
-                """
-            );
-
             var application = new CommandLineApplicationBuilder()
-                .AddCommand(command)
+                .AddCommands(
+                    CommandCompiler.Compile(
+                        // lang=csharp
+                        """
+                        [Command]
+                        public partial class Command : ICommand
+                        {
+                            [CommandOption("foo")]
+                            public required string Foo { get; set; }
+
+                            public ValueTask ExecuteAsync(IConsole console) => default;
+                        }
+                        """
+                    )
+                )
                 .UseConsole(FakeConsole)
                 .Build();
 
@@ -683,22 +683,22 @@ public partial class ActivationSpecs
         public async Task I_can_try_to_pass_an_empty_value_to_a_required_option_and_get_an_error()
         {
             // Arrange
-            var command = CommandCompiler.Compile(
-                // lang=csharp
-                """
-                [Command]
-                public partial class Command : ICommand
-                {
-                    [CommandOption("foo")]
-                    public required string Foo { get; set; }
-
-                    public ValueTask ExecuteAsync(IConsole console) => default;
-                }
-                """
-            );
-
             var application = new CommandLineApplicationBuilder()
-                .AddCommand(command)
+                .AddCommands(
+                    CommandCompiler.Compile(
+                        // lang=csharp
+                        """
+                        [Command]
+                        public partial class Command : ICommand
+                        {
+                            [CommandOption("foo")]
+                            public required string Foo { get; set; }
+
+                            public ValueTask ExecuteAsync(IConsole console) => default;
+                        }
+                        """
+                    )
+                )
                 .UseConsole(FakeConsole)
                 .Build();
 
@@ -716,22 +716,22 @@ public partial class ActivationSpecs
         public async Task I_can_try_to_pass_nothing_to_a_required_sequence_based_option_and_get_an_error()
         {
             // Arrange
-            var command = CommandCompiler.Compile(
-                // lang=csharp
-                """
-                [Command]
-                public partial class Command : ICommand
-                {
-                    [CommandOption("foo")]
-                    public required IReadOnlyList<string> Foo { get; set; }
-
-                    public ValueTask ExecuteAsync(IConsole console) => default;
-                }
-                """
-            );
-
             var application = new CommandLineApplicationBuilder()
-                .AddCommand(command)
+                .AddCommands(
+                    CommandCompiler.Compile(
+                        // lang=csharp
+                        """
+                        [Command]
+                        public partial class Command : ICommand
+                        {
+                            [CommandOption("foo")]
+                            public required IReadOnlyList<string> Foo { get; set; }
+
+                            public ValueTask ExecuteAsync(IConsole console) => default;
+                        }
+                        """
+                    )
+                )
                 .UseConsole(FakeConsole)
                 .Build();
 
@@ -749,22 +749,22 @@ public partial class ActivationSpecs
         public async Task I_can_try_to_pass_values_to_unrecognized_options_and_get_an_error()
         {
             // Arrange
-            var command = CommandCompiler.Compile(
-                // lang=csharp
-                """
-                [Command]
-                public partial class Command : ICommand
-                {
-                    [CommandOption("foo")]
-                    public string? Foo { get; set; }
-
-                    public ValueTask ExecuteAsync(IConsole console) => default;
-                }
-                """
-            );
-
             var application = new CommandLineApplicationBuilder()
-                .AddCommand(command)
+                .AddCommands(
+                    CommandCompiler.Compile(
+                        // lang=csharp
+                        """
+                        [Command]
+                        public partial class Command : ICommand
+                        {
+                            [CommandOption("foo")]
+                            public string? Foo { get; set; }
+
+                            public ValueTask ExecuteAsync(IConsole console) => default;
+                        }
+                        """
+                    )
+                )
                 .UseConsole(FakeConsole)
                 .Build();
 
@@ -785,22 +785,22 @@ public partial class ActivationSpecs
         public async Task I_can_try_to_pass_too_many_values_to_a_scalar_option_and_get_an_error()
         {
             // Arrange
-            var command = CommandCompiler.Compile(
-                // lang=csharp
-                """
-                [Command]
-                public partial class Command : ICommand
-                {
-                    [CommandOption("foo")]
-                    public string? Foo { get; set; }
-
-                    public ValueTask ExecuteAsync(IConsole console) => default;
-                }
-                """
-            );
-
             var application = new CommandLineApplicationBuilder()
-                .AddCommand(command)
+                .AddCommands(
+                    CommandCompiler.Compile(
+                        // lang=csharp
+                        """
+                        [Command]
+                        public partial class Command : ICommand
+                        {
+                            [CommandOption("foo")]
+                            public string? Foo { get; set; }
+
+                            public ValueTask ExecuteAsync(IConsole console) => default;
+                        }
+                        """
+                    )
+                )
                 .UseConsole(FakeConsole)
                 .Build();
 

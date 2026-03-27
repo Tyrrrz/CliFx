@@ -82,19 +82,19 @@ public class ApplicationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutp
     public async Task I_can_use_an_environment_variable_to_make_the_application_print_the_parsed_command_input()
     {
         // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            [Command("cmd")]
-            public partial class Command : ICommand
-            {
-                public ValueTask ExecuteAsync(IConsole console) => default;
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
+            .AddCommands(
+                CommandCompiler.Compile(
+                    // lang=csharp
+                    """
+                    [Command("cmd")]
+                    public partial class Command : ICommand
+                    {
+                        public ValueTask ExecuteAsync(IConsole console) => default;
+                    }
+                    """
+                )
+            )
             .UseConsole(FakeConsole)
             .AllowPreviewMode("CLIFX_PREVIEW")
             .Build();
