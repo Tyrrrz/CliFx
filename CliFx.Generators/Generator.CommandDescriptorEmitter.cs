@@ -19,8 +19,17 @@ public partial class Generator
         var commandTypeName = command.Type.Name;
         var commandTypeFqn = command.Type.GetGloballyQualifiedName();
 
-        var interfaces = new List<string>(2) { "global::" + KnownTypes.ICommandWithHelpOption };
-        if (command.IsDefault)
+        var userImplementsHelpOption = command.Type.AllInterfaces.Any(i =>
+            i.IsMatchedBy(KnownTypes.ICommandWithHelpOption)
+        );
+        var userImplementsVersionOption = command.Type.AllInterfaces.Any(i =>
+            i.IsMatchedBy(KnownTypes.ICommandWithVersionOption)
+        );
+
+        var interfaces = new List<string>(2);
+        if (!userImplementsHelpOption)
+            interfaces.Add("global::" + KnownTypes.ICommandWithHelpOption);
+        if (command.IsDefault && !userImplementsVersionOption)
             interfaces.Add("global::" + KnownTypes.ICommandWithVersionOption);
 
         var interfaceList =
@@ -60,16 +69,19 @@ public partial class Generator
             """
         );
 
-        sb.Append(
-            """
+        if (!userImplementsHelpOption)
+        {
+            sb.Append(
+                """
 
-                /// <inheritdoc />
-                public bool IsHelpRequested { get; set; }
+                    /// <inheritdoc />
+                    public bool IsHelpRequested { get; set; }
 
-            """
-        );
+                """
+            );
+        }
 
-        if (command.IsDefault)
+        if (command.IsDefault && !userImplementsVersionOption)
         {
             sb.Append(
                 """
@@ -170,9 +182,10 @@ public partial class Generator
             );
         }
 
-        EmitBuiltInHelpOption(sb, command, diagnosticsList);
+        if (!userImplementsHelpOption)
+            EmitBuiltInHelpOption(sb, command, diagnosticsList);
 
-        if (command.IsDefault)
+        if (command.IsDefault && !userImplementsVersionOption)
             EmitBuiltInVersionOption(sb, command, diagnosticsList);
 
         sb.Append(

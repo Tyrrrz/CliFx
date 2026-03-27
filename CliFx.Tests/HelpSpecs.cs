@@ -909,4 +909,71 @@ public class HelpSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         var stdOut = FakeConsole.ReadOutputString();
         stdOut.Trim().Should().Be("v6.9");
     }
+
+    [Fact]
+    public async Task I_can_set_up_a_custom_help_option()
+    {
+        // Arrange
+        var command = CommandCompiler.Compile(
+            // lang=csharp
+            """
+            [Command]
+            public partial class Command : ICommand, ICommandWithHelpOption
+            {
+                [CommandOption("help", 'h', Description = "Custom help text.")]
+                public bool IsHelpRequested { get; set; }
+
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
+
+        var application = new CommandLineApplicationBuilder()
+            .AddCommand(command)
+            .UseConsole(FakeConsole)
+            .Build();
+
+        // Act
+        var exitCode = await application.RunAsync(["--help"], new Dictionary<string, string>());
+
+        // Assert
+        exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
+        stdOut.Should().ContainAllInOrder("OPTIONS", "-h", "--help", "Custom help text.");
+    }
+
+    [Fact]
+    public async Task I_can_set_up_a_custom_version_option()
+    {
+        // Arrange
+        var command = CommandCompiler.Compile(
+            // lang=csharp
+            """
+            [Command]
+            public partial class Command : ICommand, ICommandWithVersionOption
+            {
+                [CommandOption("version", Description = "Custom version text.")]
+                public bool IsVersionRequested { get; set; }
+
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
+
+        var application = new CommandLineApplicationBuilder()
+            .AddCommand(command)
+            .SetVersion("v1.0")
+            .UseConsole(FakeConsole)
+            .Build();
+
+        // Act
+        var exitCode = await application.RunAsync(["--version"], new Dictionary<string, string>());
+
+        // Assert
+        exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
+        stdOut.Trim().Should().Be("v1.0");
+    }
 }
