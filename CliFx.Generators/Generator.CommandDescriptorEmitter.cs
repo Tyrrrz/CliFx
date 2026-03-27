@@ -318,34 +318,38 @@ public partial class Generator
             {
                 // The user provided a scalar element converter that needs to be wrapped
                 // in an appropriate sequence converter
-                var type = property.Type;
+                var collectionType = property.Type;
                 if (
-                    type.SpecialType != SpecialType.System_String
-                    && type.TryGetEnumerableUnderlyingType() is { } elementType
+                    collectionType.SpecialType != SpecialType.System_String
+                    && collectionType.TryGetEnumerableUnderlyingType() is { } underlyingType
                 )
                 {
-                    return TryBuildSequenceConverterExpr(elementType, type, userConverterExpr);
+                    return TryBuildSequenceConverterExpr(
+                        underlyingType,
+                        collectionType,
+                        userConverterExpr
+                    );
                 }
             }
 
             return userConverterExpr;
         }
 
-        var propType = property.Type;
+        var type = property.Type;
 
         if (
-            propType.SpecialType != SpecialType.System_String
-            && propType.TryGetEnumerableUnderlyingType() is { } seqElementType
+            type.SpecialType != SpecialType.System_String
+            && type.TryGetEnumerableUnderlyingType() is { } elementType
         )
         {
-            var elementConverterExpr = TryBuildDefaultScalarConverterExpr(seqElementType);
+            var elementConverterExpr = TryBuildDefaultScalarConverterExpr(elementType);
             if (elementConverterExpr is null)
                 return null;
 
-            return TryBuildSequenceConverterExpr(seqElementType, propType, elementConverterExpr);
+            return TryBuildSequenceConverterExpr(elementType, type, elementConverterExpr);
         }
 
-        return TryBuildDefaultScalarConverterExpr(propType);
+        return TryBuildDefaultScalarConverterExpr(type);
     }
 
     private static string? TryBuildDefaultScalarConverterExpr(ITypeSymbol type)
