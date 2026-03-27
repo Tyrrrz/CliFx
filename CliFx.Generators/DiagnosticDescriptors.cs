@@ -142,6 +142,26 @@ public static class DiagnosticDescriptors
             true
         );
 
+    public static DiagnosticDescriptor CommandHelpOptionPropertyMustBeBound { get; } =
+        new(
+            $"{nameof(CliFx)}_{nameof(CommandHelpOptionPropertyMustBeBound)}",
+            "Help option property must have a binding attribute",
+            "Property '{0}' is declared by a manual implementation of 'ICommandWithHelpOption' but does not have a binding attribute. Add a binding attribute to the property so that it can receive input from the command line.",
+            "CliFx",
+            DiagnosticSeverity.Error,
+            true
+        );
+
+    public static DiagnosticDescriptor CommandVersionOptionPropertyMustBeBound { get; } =
+        new(
+            $"{nameof(CliFx)}_{nameof(CommandVersionOptionPropertyMustBeBound)}",
+            "Version option property must have a binding attribute",
+            "Property '{0}' is declared by a manual implementation of 'ICommandWithVersionOption' but does not have a binding attribute. Add a binding attribute to the property so that it can receive input from the command line.",
+            "CliFx",
+            DiagnosticSeverity.Error,
+            true
+        );
+
     public static DiagnosticDescriptor CommandOptionShadowsBuiltInHelpOption { get; } =
         new(
             $"{nameof(CliFx)}_{nameof(CommandOptionShadowsBuiltInHelpOption)}",

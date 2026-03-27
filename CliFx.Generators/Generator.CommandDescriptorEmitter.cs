@@ -108,6 +108,65 @@ public partial class Generator
 
         var diagnosticsList = new List<Diagnostic>();
 
+        // Validate that manually implemented help/version interface properties have binding attributes
+        if (userImplementsHelpOption)
+        {
+            var isHelpRequestedProperty = command
+                .Type.GetProperties()
+                .FirstOrDefault(p =>
+                    string.Equals(p.Name, "IsHelpRequested", System.StringComparison.Ordinal)
+                );
+
+            var hasBindingAttribute =
+                isHelpRequestedProperty
+                    ?.GetAttributes()
+                    .Any(a =>
+                        a.AttributeClass?.GetSelfAndBaseTypes()
+                            .Any(t => t.IsMatchedBy(KnownTypes.CommandInputAttribute)) == true
+                    ) == true;
+
+            if (!hasBindingAttribute)
+            {
+                diagnosticsList.Add(
+                    Diagnostic.Create(
+                        DiagnosticDescriptors.CommandHelpOptionPropertyMustBeBound,
+                        isHelpRequestedProperty?.Locations.FirstOrDefault()
+                            ?? command.Type.Locations.FirstOrDefault(),
+                        "IsHelpRequested"
+                    )
+                );
+            }
+        }
+
+        if (userImplementsVersionOption)
+        {
+            var isVersionRequestedProperty = command
+                .Type.GetProperties()
+                .FirstOrDefault(p =>
+                    string.Equals(p.Name, "IsVersionRequested", System.StringComparison.Ordinal)
+                );
+
+            var hasBindingAttribute =
+                isVersionRequestedProperty
+                    ?.GetAttributes()
+                    .Any(a =>
+                        a.AttributeClass?.GetSelfAndBaseTypes()
+                            .Any(t => t.IsMatchedBy(KnownTypes.CommandInputAttribute)) == true
+                    ) == true;
+
+            if (!hasBindingAttribute)
+            {
+                diagnosticsList.Add(
+                    Diagnostic.Create(
+                        DiagnosticDescriptors.CommandVersionOptionPropertyMustBeBound,
+                        isVersionRequestedProperty?.Locations.FirstOrDefault()
+                            ?? command.Type.Locations.FirstOrDefault(),
+                        "IsVersionRequested"
+                    )
+                );
+            }
+        }
+
         foreach (var param in command.Parameters.OrderBy(p => p.Order))
         {
             var converterExpr = TryBuildConverterExpr(param.ConverterType, param.Property);

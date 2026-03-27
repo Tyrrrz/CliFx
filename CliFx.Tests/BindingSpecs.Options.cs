@@ -178,5 +178,55 @@ public partial class BindingSpecs
                     $"*{DiagnosticDescriptors.CommandOptionShadowsBuiltInVersionOption.Id}*"
                 );
         }
+
+        [Fact]
+        public void I_can_try_to_implement_the_help_option_interface_without_a_binding_attribute_and_get_an_error()
+        {
+            // Act
+            var act = () =>
+                CommandCompiler.Compile(
+                    // lang=csharp
+                    """
+                    [Command]
+                    public partial class Command : ICommand, ICommandWithHelpOption
+                    {
+                        public bool IsHelpRequested { get; set; }
+
+                        public ValueTask ExecuteAsync(IConsole console) => default;
+                    }
+                    """
+                );
+
+            // Assert
+            act.Should()
+                .Throw()
+                .WithMessage($"*{DiagnosticDescriptors.CommandHelpOptionPropertyMustBeBound.Id}*");
+        }
+
+        [Fact]
+        public void I_can_try_to_implement_the_version_option_interface_without_a_binding_attribute_and_get_an_error()
+        {
+            // Act
+            var act = () =>
+                CommandCompiler.Compile(
+                    // lang=csharp
+                    """
+                    [Command]
+                    public partial class Command : ICommand, ICommandWithVersionOption
+                    {
+                        public bool IsVersionRequested { get; set; }
+
+                        public ValueTask ExecuteAsync(IConsole console) => default;
+                    }
+                    """
+                );
+
+            // Assert
+            act.Should()
+                .Throw()
+                .WithMessage(
+                    $"*{DiagnosticDescriptors.CommandVersionOptionPropertyMustBeBound.Id}*"
+                );
+        }
     }
 }
