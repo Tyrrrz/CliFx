@@ -20,23 +20,19 @@ public class CancellationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOut
         // Arrange
         using var cts = new CancellationTokenSource();
 
-        // We need to send the cancellation request right after the process has registered
-        // a handler for the interrupt signal, otherwise the default handler will trigger
-        // and just kill the process.
-        void HandleStdOut(string line)
-        {
-            if (string.Equals(line, "Started.", StringComparison.OrdinalIgnoreCase))
-                cts.CancelAfter(TimeSpan.FromSeconds(0.2));
-        }
-
         var stdOutBuffer = new StringBuilder();
 
         var command =
             Cli.Wrap(Dummy.Program.FilePath).WithArguments("cancel-test")
-            | PipeTarget.Merge(
-                PipeTarget.ToDelegate(HandleStdOut),
-                PipeTarget.ToStringBuilder(stdOutBuffer)
-            );
+            | PipeTarget.ToStringBuilder(stdOutBuffer);
+
+        // Schedule graceful cancellation before starting execution.
+        // We use a fixed delay instead of triggering on "Started." from stdout, because
+        // on some platforms (e.g. Windows) the stdout pipe may be buffered and the output
+        // may only become available after the process exits, which is too late.
+        // The delay must be long enough for the process to start up and register its
+        // interrupt handler, but short enough that the 3-second Task.Delay hasn't elapsed.
+        cts.CancelAfter(TimeSpan.FromSeconds(1));
 
         // Act
         var act = async () =>
