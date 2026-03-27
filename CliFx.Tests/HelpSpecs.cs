@@ -45,22 +45,22 @@ public class HelpSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_can_request_help_by_passing_the_manually_bound_help_option()
     {
         // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            [Command]
-            public partial class Command : ICommand, ICommandWithHelpOption
-            {
-                [CommandOption("help", 'h', Description = "Custom help text.")]
-                public bool IsHelpRequested { get; set; }
-
-                public ValueTask ExecuteAsync(IConsole console) => default;
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
+            .AddCommands(
+                CommandCompiler.Compile(
+                    // lang=csharp
+                    """
+                    [Command]
+                    public partial class Command : ICommand, ICommandWithHelpOption
+                    {
+                        [CommandOption("help", 'h', Description = "Custom help text.")]
+                        public bool IsHelpRequested { get; set; }
+
+                        public ValueTask ExecuteAsync(IConsole console) => default;
+                    }
+                    """
+                )
+            )
             .UseConsole(FakeConsole)
             .Build();
 
@@ -947,22 +947,22 @@ public class HelpSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     public async Task I_can_request_version_information_by_passing_the_manually_bound_version_option()
     {
         // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            [Command]
-            public partial class Command : ICommand, ICommandWithVersionOption
-            {
-                [CommandOption("version", Description = "Custom version text.")]
-                public bool IsVersionRequested { get; set; }
-
-                public ValueTask ExecuteAsync(IConsole console) => default;
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
+            .AddCommands(
+                CommandCompiler.Compile(
+                    // lang=csharp
+                    """
+                    [Command]
+                    public partial class Command : ICommand, ICommandWithVersionOption
+                    {
+                        [CommandOption("version", Description = "Custom version text.")]
+                        public bool IsVersionRequested { get; set; }
+
+                        public ValueTask ExecuteAsync(IConsole console) => default;
+                    }
+                    """
+                )
+            )
             .SetVersion("v1.0")
             .UseConsole(FakeConsole)
             .Build();
