@@ -67,19 +67,21 @@ public partial class BindingSpecs
         public void I_can_bind_an_option_that_shadows_the_built_in_help_option_and_the_help_option_is_not_auto_generated()
         {
             // Arrange
-            var command = CommandCompiler.Compile(
-                // lang=csharp
-                """
-                [Command]
-                public partial class Command : ICommand
-                {
-                    [CommandOption("help")]
-                    public bool CustomHelp { get; set; }
+            var command = CommandCompiler
+                .Compile(
+                    // lang=csharp
+                    """
+                    [Command]
+                    public partial class Command : ICommand
+                    {
+                        [CommandOption("help")]
+                        public bool CustomHelp { get; set; }
 
-                    public ValueTask ExecuteAsync(IConsole console) => default;
-                }
-                """
-            );
+                        public ValueTask ExecuteAsync(IConsole console) => default;
+                    }
+                    """
+                )
+                .Single();
 
             // Assert
             command
@@ -98,19 +100,21 @@ public partial class BindingSpecs
         public void I_can_bind_an_option_that_shadows_the_built_in_version_option_and_the_version_option_is_not_auto_generated()
         {
             // Arrange
-            var command = CommandCompiler.Compile(
-                // lang=csharp
-                """
-                [Command]
-                public partial class Command : ICommand
-                {
-                    [CommandOption("version")]
-                    public bool CustomVersion { get; set; }
+            var command = CommandCompiler
+                .Compile(
+                    // lang=csharp
+                    """
+                    [Command]
+                    public partial class Command : ICommand
+                    {
+                        [CommandOption("version")]
+                        public bool CustomVersion { get; set; }
 
-                    public ValueTask ExecuteAsync(IConsole console) => default;
-                }
-                """
-            );
+                        public ValueTask ExecuteAsync(IConsole console) => default;
+                    }
+                    """
+                )
+                .Single();
 
             // Assert
             command

@@ -12,13 +12,21 @@ public class DelegateScalarInputConverter<T>(Func<string?, T> convert) : ScalarI
 }
 
 /// <summary>
-/// Converter for activating command inputs using another scalar converter and a transform delegate.
+/// Utilities for creating <see cref="DelegateScalarInputConverter{T}" />.
 /// </summary>
-public class DelegateScalarInputConverter<TInner, T>(
-    ScalarInputConverter<TInner> innerConverter,
-    Func<TInner, T> transform
-) : ScalarInputConverter<T>
+public static class DelegateScalarInputConverter
 {
-    /// <inheritdoc />
-    public override T Convert(string? rawValue) => transform(innerConverter.Convert(rawValue));
+    /// <summary>
+    /// Creates a delegate-based scalar converter.
+    /// </summary>
+    public static DelegateScalarInputConverter<T> Create<T>(Func<string?, T> convert) =>
+        new(convert);
+
+    /// <summary>
+    /// Creates a delegate-based scalar converter.
+    /// </summary>
+    public static DelegateScalarInputConverter<T> Create<T, TInner>(
+        ScalarInputConverter<TInner> innerConverter,
+        Func<TInner, T> transform
+    ) => Create(v => transform(innerConverter.Convert(v)));
 }

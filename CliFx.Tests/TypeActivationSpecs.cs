@@ -16,23 +16,23 @@ public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
     public async Task I_can_use_the_default_type_activator_to_initialize_types_through_parameterless_constructors()
     {
         // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            [Command]
-            public partial class Command : ICommand
-            {
-                public ValueTask ExecuteAsync(IConsole console)
-                {
-                    console.WriteLine("foo");
-                    return default;
-                }
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
+            .AddCommands(
+                CommandCompiler.Compile(
+                    // lang=csharp
+                    """
+                    [Command]
+                    public partial class Command : ICommand
+                    {
+                        public ValueTask ExecuteAsync(IConsole console)
+                        {
+                            console.WriteLine("foo");
+                            return default;
+                        }
+                    }
+                    """
+                )
+            )
             .UseConsole(FakeConsole)
             .UseTypeActivator(new DefaultTypeActivator())
             .Build();
@@ -51,21 +51,21 @@ public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
     public async Task I_can_try_to_use_the_default_type_activator_and_get_an_error_if_the_requested_type_does_not_have_a_parameterless_constructor()
     {
         // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            [Command]
-            public partial class Command : ICommand
-            {
-                public Command(string foo) {}
-
-                public ValueTask ExecuteAsync(IConsole console) => default;
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
+            .AddCommands(
+                CommandCompiler.Compile(
+                    // lang=csharp
+                    """
+                    [Command]
+                    public partial class Command : ICommand
+                    {
+                        public Command(string foo) {}
+
+                        public ValueTask ExecuteAsync(IConsole console) => default;
+                    }
+                    """
+                )
+            )
             .UseConsole(FakeConsole)
             .UseTypeActivator(new DefaultTypeActivator())
             .Build();
@@ -84,27 +84,27 @@ public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
     public async Task I_can_use_a_custom_type_activator_to_initialize_types_using_a_delegate()
     {
         // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            [Command]
-            public partial class Command : ICommand
-            {
-                private readonly string _foo;
-
-                public Command(string foo) => _foo = foo;
-
-                public ValueTask ExecuteAsync(IConsole console)
-                {
-                    console.WriteLine(_foo);
-                    return default;
-                }
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
+            .AddCommands(
+                CommandCompiler.Compile(
+                    // lang=csharp
+                    """
+                    [Command]
+                    public partial class Command : ICommand
+                    {
+                        private readonly string _foo;
+
+                        public Command(string foo) => _foo = foo;
+
+                        public ValueTask ExecuteAsync(IConsole console)
+                        {
+                            console.WriteLine(_foo);
+                            return default;
+                        }
+                    }
+                    """
+                )
+            )
             .UseConsole(FakeConsole)
             .UseTypeActivator(type => Activator.CreateInstance(type, "Hello world")!)
             .Build();
@@ -123,27 +123,27 @@ public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
     public async Task I_can_use_a_custom_type_activator_to_initialize_types_using_a_service_provider()
     {
         // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            [Command]
-            public partial class Command : ICommand
-            {
-                private readonly string _foo;
-
-                public Command(string foo) => _foo = foo;
-
-                public ValueTask ExecuteAsync(IConsole console)
-                {
-                    console.WriteLine(_foo);
-                    return default;
-                }
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
+            .AddCommands(
+                CommandCompiler.Compile(
+                    // lang=csharp
+                    """
+                    [Command]
+                    public partial class Command : ICommand
+                    {
+                        private readonly string _foo;
+
+                        public Command(string foo) => _foo = foo;
+
+                        public ValueTask ExecuteAsync(IConsole console)
+                        {
+                            console.WriteLine(_foo);
+                            return default;
+                        }
+                    }
+                    """
+                )
+            )
             .UseConsole(FakeConsole)
             .UseTypeActivator(commands =>
             {
@@ -175,23 +175,23 @@ public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
     public async Task I_can_try_to_use_a_custom_type_activator_and_get_an_error_if_the_requested_type_cannot_be_initialized()
     {
         // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            [Command]
-            public partial class Command : ICommand
-            {
-                public ValueTask ExecuteAsync(IConsole console)
-                {
-                    console.WriteLine("foo");
-                    return default;
-                }
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
+            .AddCommands(
+                CommandCompiler.Compile(
+                    // lang=csharp
+                    """
+                    [Command]
+                    public partial class Command : ICommand
+                    {
+                        public ValueTask ExecuteAsync(IConsole console)
+                        {
+                            console.WriteLine("foo");
+                            return default;
+                        }
+                    }
+                    """
+                )
+            )
             .UseConsole(FakeConsole)
             .UseTypeActivator((Type _) => null!)
             .Build();

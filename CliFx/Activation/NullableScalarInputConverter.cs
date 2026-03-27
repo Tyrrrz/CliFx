@@ -11,3 +11,15 @@ public class NullableScalarInputConverter<T>(ScalarInputConverter<T> innerConver
     public override T? Convert(string? rawValue) =>
         !string.IsNullOrEmpty(rawValue) ? innerConverter.Convert(rawValue) : null;
 }
+
+/// <summary>
+/// Utilities for creating <see cref="NullableScalarInputConverter{T}" />.
+/// </summary>
+public static class NullableScalarInputConverter
+{
+    /// <summary>
+    /// Creates a nullable scalar converter.
+    /// </summary>
+    public static NullableScalarInputConverter<T> Create<T>(ScalarInputConverter<T> innerConverter)
+        where T : struct => new(innerConverter);
+}

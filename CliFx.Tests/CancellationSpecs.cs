@@ -57,37 +57,37 @@ public class CancellationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOut
     public async Task I_can_listen_to_the_interrupt_signal_when_running_against_a_fake_console()
     {
         // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            [Command]
-            public partial class Command : ICommand
-            {
-                public async ValueTask ExecuteAsync(IConsole console)
-                {
-                    try
-                    {
-                        console.WriteLine("Started.");
-
-                        await Task.Delay(
-                            TimeSpan.FromSeconds(3),
-                            console.RegisterCancellationHandler()
-                        );
-
-                        console.WriteLine("Completed.");
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        console.WriteLine("Cancelled.");
-                        throw;
-                    }
-                }
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
+            .AddCommands(
+                CommandCompiler.Compile(
+                    // lang=csharp
+                    """
+                    [Command]
+                    public partial class Command : ICommand
+                    {
+                        public async ValueTask ExecuteAsync(IConsole console)
+                        {
+                            try
+                            {
+                                console.WriteLine("Started.");
+
+                                await Task.Delay(
+                                    TimeSpan.FromSeconds(3),
+                                    console.RegisterCancellationHandler()
+                                );
+
+                                console.WriteLine("Completed.");
+                            }
+                            catch (OperationCanceledException)
+                            {
+                                console.WriteLine("Cancelled.");
+                                throw;
+                            }
+                        }
+                    }
+                    """
+                )
+            )
             .UseConsole(FakeConsole)
             .Build();
 

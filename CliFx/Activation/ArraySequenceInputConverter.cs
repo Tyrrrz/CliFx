@@ -19,3 +19,16 @@ public class ArraySequenceInputConverter<T>(ScalarInputConverter<T> elementConve
         return result;
     }
 }
+
+/// <summary>
+/// Utilities for creating <see cref="ArraySequenceInputConverter{T}" />.
+/// </summary>
+public static class ArraySequenceInputConverter
+{
+    /// <summary>
+    /// Creates an array-based sequence converter.
+    /// </summary>
+    public static ArraySequenceInputConverter<T> Create<T>(
+        ScalarInputConverter<T> elementConverter
+    ) => new(elementConverter);
+}
