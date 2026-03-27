@@ -42,6 +42,39 @@ public class HelpSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     }
 
     [Fact]
+    public async Task I_can_request_help_by_passing_the_manually_bound_help_option()
+    {
+        // Arrange
+        var command = CommandCompiler.Compile(
+            // lang=csharp
+            """
+            [Command]
+            public partial class Command : ICommand, ICommandWithHelpOption
+            {
+                [CommandOption("help", 'h', Description = "Custom help text.")]
+                public bool IsHelpRequested { get; set; }
+
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """
+        );
+
+        var application = new CommandLineApplicationBuilder()
+            .AddCommand(command)
+            .UseConsole(FakeConsole)
+            .Build();
+
+        // Act
+        var exitCode = await application.RunAsync(["--help"], new Dictionary<string, string>());
+
+        // Assert
+        exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
+        stdOut.Should().ContainAllInOrder("OPTIONS", "-h", "--help", "Custom help text.");
+    }
+
+    [Fact]
     public async Task I_can_request_help_by_passing_no_arguments_if_the_default_command_is_not_registered()
     {
         // Arrange
@@ -942,38 +975,5 @@ public class HelpSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
 
         var stdOut = FakeConsole.ReadOutputString();
         stdOut.Trim().Should().Be("v1.0");
-    }
-
-    [Fact]
-    public async Task I_can_request_help_by_passing_the_manually_bound_help_option()
-    {
-        // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            [Command]
-            public partial class Command : ICommand, ICommandWithHelpOption
-            {
-                [CommandOption("help", 'h', Description = "Custom help text.")]
-                public bool IsHelpRequested { get; set; }
-
-                public ValueTask ExecuteAsync(IConsole console) => default;
-            }
-            """
-        );
-
-        var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
-            .UseConsole(FakeConsole)
-            .Build();
-
-        // Act
-        var exitCode = await application.RunAsync(["--help"], new Dictionary<string, string>());
-
-        // Assert
-        exitCode.Should().Be(0);
-
-        var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ContainAllInOrder("OPTIONS", "-h", "--help", "Custom help text.");
     }
 }
