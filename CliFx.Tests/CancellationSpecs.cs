@@ -10,7 +10,7 @@ using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace CliFx.Tests.Infrastructure;
+namespace CliFx.Tests;
 
 public class CancellationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
 {

@@ -264,7 +264,7 @@ public class HelpSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     }
 
     [Fact]
-    public async Task I_can_request_help_to_see_the_usage_format_of_all_parameter_inputs()
+    public async Task I_can_request_help_to_see_the_usage_format_of_all_parameters()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -303,7 +303,7 @@ public class HelpSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     }
 
     [Fact]
-    public async Task I_can_request_help_to_see_the_usage_format_of_all_required_option_inputs()
+    public async Task I_can_request_help_to_see_the_usage_format_of_all_required_options()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -389,7 +389,7 @@ public class HelpSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     }
 
     [Fact]
-    public async Task I_can_request_help_to_see_the_conventional_help_and_version_option_inputs()
+    public async Task I_can_request_help_to_see_the_conventional_help_and_version_options()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -428,7 +428,7 @@ public class HelpSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     }
 
     [Fact]
-    public async Task I_can_request_help_on_a_named_command_to_see_the_conventional_help_option_input()
+    public async Task I_can_request_help_on_a_named_command_to_see_the_conventional_help_option()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -569,7 +569,7 @@ public class HelpSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     }
 
     [Fact]
-    public async Task I_can_request_help_to_see_the_environment_variables_of_option_inputs_that_use_them_as_fallback()
+    public async Task I_can_request_help_to_see_the_environment_variables_of_options_that_use_them_as_fallback()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -617,7 +617,7 @@ public class HelpSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     }
 
     [Fact]
-    public async Task I_can_request_help_to_see_the_default_values_of_non_required_option_inputs()
+    public async Task I_can_request_help_to_see_the_default_values_of_non_required_options()
     {
         // Arrange
         var command = CommandCompiler.Compile(

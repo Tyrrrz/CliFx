@@ -12,7 +12,7 @@ using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace CliFx.Tests.Infrastructure;
+namespace CliFx.Tests;
 
 public class ConsoleSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
 {

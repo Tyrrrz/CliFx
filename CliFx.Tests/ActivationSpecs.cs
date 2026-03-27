@@ -6,9 +6,9 @@ using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace CliFx.Tests.Activation;
+namespace CliFx.Tests;
 
-public class InputActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
+public partial class ActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
 {
     [Fact]
     public async Task I_can_pass_a_value_to_an_input_bound_to_a_string_property()

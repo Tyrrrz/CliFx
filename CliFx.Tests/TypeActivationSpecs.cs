@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace CliFx.Tests.Infrastructure;
+namespace CliFx.Tests;
 
 public class TypeActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
 {

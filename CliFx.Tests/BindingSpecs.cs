@@ -5,9 +5,9 @@ using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace CliFx.Tests.Binding;
+namespace CliFx.Tests;
 
-public class InputBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
+public partial class BindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
 {
     [Fact]
     public void I_can_try_to_bind_an_input_to_a_property_of_an_unsupported_type_and_get_an_error()
