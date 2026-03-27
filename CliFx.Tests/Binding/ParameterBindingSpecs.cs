@@ -35,7 +35,7 @@ public class ParameterBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
         act.Should()
             .Throw()
             .WithMessage(
-                $"*{nameof(DiagnosticDescriptors.CommandParameterMustHaveHighestOrderIfNotRequired)}*"
+                $"*{DiagnosticDescriptors.CommandParameterMustHaveHighestOrderIfNotRequired.Id}*"
             );
     }
 
@@ -65,7 +65,7 @@ public class ParameterBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
         act.Should()
             .Throw()
             .WithMessage(
-                $"*{nameof(DiagnosticDescriptors.CommandParameterMustHaveHighestOrderIfSequenceBased)}*"
+                $"*{DiagnosticDescriptors.CommandParameterMustHaveHighestOrderIfSequenceBased.Id}*"
             );
     }
 
@@ -132,7 +132,7 @@ public class ParameterBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(tes
         act.Should()
             .Throw()
             .WithMessage(
-                $"*{nameof(DiagnosticDescriptors.CommandParameterMustHaveHighestOrderIfSequenceBased)}*"
+                $"*{DiagnosticDescriptors.CommandParameterMustHaveHighestOrderIfSequenceBased.Id}*"
             );
     }
 }

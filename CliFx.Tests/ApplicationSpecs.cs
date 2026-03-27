@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using CliFx.Infrastructure;
 using CliFx.Tests.Utils;
 using CliFx.Tests.Utils.Extensions;
 using CliWrap;
@@ -34,10 +35,12 @@ public class ApplicationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutp
             .SetVersion("1.0.0")
             .SetDescription("This is my app.")
             .SetExecutableName("myapp")
+            .AddCommand(NoOpCommand.Descriptor)
             .AddCommands([NoOpCommand.Descriptor])
             .AllowDebugMode("CLIFX_DEBUG")
             .AllowPreviewMode("CLIFX_PREVIEW")
             .UseConsole(FakeConsole)
+            .UseTypeActivator(new DefaultTypeActivator())
             .Build();
 
         var exitCode = await app.RunAsync([], new Dictionary<string, string>());

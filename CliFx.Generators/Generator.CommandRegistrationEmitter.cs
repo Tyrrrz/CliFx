@@ -11,6 +11,8 @@ public partial class Generator
 {
     private static string EmitCommandRegistrations(ImmutableArray<CommandSymbol> commands)
     {
+        var orderedCommands = commands.OrderBy(c => c.Name, StringComparer.Ordinal).ToArray();
+
         return
         // lang=csharp
         $$"""
@@ -20,19 +22,19 @@ public partial class Generator
             namespace {{KnownTypes.CommandLineApplicationBuilderNamespace}};
 
             /// <summary>
-            /// Provides an extension method for registering all source-generated commands from the same assembly as the caller.
+            /// Provides an extension method for registering all accessible source-generated commands from the same assembly as the caller.
             /// </summary>
             internal static class CommandRegistrations
             {
                 /// <summary>
-                /// Registers all non-private source-generated commands from the same assembly as the caller.
+                /// Registers all accessible source-generated commands from the same assembly as the caller.
                 /// </summary>
                 /// <remarks>
                 /// <list type="bullet">
                 {{string.Join(
                     Environment.NewLine,
-                    commands.Select(c =>
-                        $"/// <item><see cref=\"{c.Type.GetGloballyQualifiedName()}\" /></item>"
+                    orderedCommands.Select(c =>
+                        $"/// <item><see cref=\"{c.Type.GetGloballyQualifiedName()}\" /> ({(c.IsDefault ? "default" : '"' + c.Name + '"')})</item>"
                     )
                 )}}
                 /// </list>
@@ -43,7 +45,7 @@ public partial class Generator
                 {
                     {{string.Join(
                         Environment.NewLine,
-                        commands.Select(c =>
+                        orderedCommands.Select(c =>
                             // lang=csharp
                             $"builder.AddCommand({c.Type.GetGloballyQualifiedName()}.Descriptor);"
                         )

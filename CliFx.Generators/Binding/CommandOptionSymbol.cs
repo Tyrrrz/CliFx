@@ -59,10 +59,23 @@ internal record CommandOptionSymbol(
         {
             diagnosticsList.Add(
                 Diagnostic.Create(
-                    DiagnosticDescriptors.CommandOptionNameMustBeValid,
+                    DiagnosticDescriptors.CommandOptionMustHaveValidName,
                     property.Locations.FirstOrDefault(),
                     property.Name,
                     name
+                )
+            );
+        }
+
+        // Option short name must be a letter
+        if (shortName is not null && !char.IsLetter(shortName.Value))
+        {
+            diagnosticsList.Add(
+                Diagnostic.Create(
+                    DiagnosticDescriptors.CommandOptionMustHaveValidShortName,
+                    property.Locations.FirstOrDefault(),
+                    property.Name,
+                    shortName
                 )
             );
         }

@@ -35,7 +35,7 @@ public class InputBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOut
         // Assert
         act.Should()
             .Throw()
-            .WithMessage($"*{nameof(DiagnosticDescriptors.CommandInputConverterNotInferrable)}*");
+            .WithMessage($"*{DiagnosticDescriptors.CommandInputConverterNotInferrable.Id}*");
     }
 
     [Fact]
@@ -67,7 +67,7 @@ public class InputBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOut
         // Assert
         act.Should()
             .Throw()
-            .WithMessage($"*{nameof(DiagnosticDescriptors.CommandInputConverterNotInferrable)}*");
+            .WithMessage($"*{DiagnosticDescriptors.CommandInputConverterNotInferrable.Id}*");
     }
 
     [Fact]
@@ -92,6 +92,6 @@ public class InputBindingSpecs(ITestOutputHelper testOutput) : SpecsBase(testOut
         // Assert
         act.Should()
             .Throw()
-            .WithMessage($"*{nameof(DiagnosticDescriptors.CommandInputConverterNotInferrable)}*");
+            .WithMessage($"*{DiagnosticDescriptors.CommandInputConverterNotInferrable.Id}*");
     }
 }
