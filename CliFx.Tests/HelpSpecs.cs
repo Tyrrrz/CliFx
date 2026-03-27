@@ -911,7 +911,7 @@ public class HelpSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     }
 
     [Fact]
-    public async Task I_can_request_help_if_the_conventional_help_option_is_bound_manually()
+    public async Task I_can_request_help_by_passing_the_manually_bound_help_option()
     {
         // Arrange
         var command = CommandCompiler.Compile(
@@ -944,7 +944,7 @@ public class HelpSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     }
 
     [Fact]
-    public async Task I_can_request_version_if_the_conventional_version_option_is_bound_manually()
+    public async Task I_can_request_version_information_if_the_conventional_version_option_is_bound_manually()
     {
         // Arrange
         var command = CommandCompiler.Compile(
