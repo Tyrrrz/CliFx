@@ -146,7 +146,7 @@ public static class DiagnosticDescriptors
         new(
             $"{nameof(CliFx)}_{nameof(CommandHelpOptionPropertyMustBeBound)}",
             "Help option property must have an input binding",
-            "Property '{0}' is declared by a manual implementation of 'ICommandWithHelpOption' but does not have an input binding. Add a parameter or option attribute to the property so that it can be set from the command line.",
+            "Property '{0}' is declared by a manual implementation of 'ICommandWithHelpOption' but does not have an input binding. Add a [CommandOption] attribute to the property so that it can be set from the command line.",
             "CliFx",
             DiagnosticSeverity.Error,
             true
@@ -156,7 +156,7 @@ public static class DiagnosticDescriptors
         new(
             $"{nameof(CliFx)}_{nameof(CommandVersionOptionPropertyMustBeBound)}",
             "Version option property must have an input binding",
-            "Property '{0}' is declared by a manual implementation of 'ICommandWithVersionOption' but does not have an input binding. Add a parameter or option attribute to the property so that it can be set from the command line.",
+            "Property '{0}' is declared by a manual implementation of 'ICommandWithVersionOption' but does not have an input binding. Add a [CommandOption] attribute to the property so that it can be set from the command line.",
             "CliFx",
             DiagnosticSeverity.Error,
             true
