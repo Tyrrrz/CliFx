@@ -134,6 +134,28 @@ internal record CommandSymbol(
             }
         }
 
+        // Element converter requires a sequence-based property
+        foreach (var input in parameters.Cast<CommandInputSymbol>().Concat(options))
+        {
+            if (
+                input.IsElementConverter
+                && (
+                    input.Property.Type.SpecialType == SpecialType.System_String
+                    || input.Property.Type.TryGetEnumerableUnderlyingType() is null
+                )
+            )
+            {
+                diagnosticsList.Add(
+                    Diagnostic.Create(
+                        DiagnosticDescriptors.CommandInputElementConverterRequiresSequenceProperty,
+                        input.Property.Locations.FirstOrDefault(),
+                        input.Property.Name,
+                        input.Property.Type.GetGloballyQualifiedName()
+                    )
+                );
+            }
+        }
+
         // Parameters must have unique order values
         foreach (var (i, first) in parameters.Index())
         {

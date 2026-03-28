@@ -236,5 +236,38 @@ public partial class BindingSpecs
                     $"*{DiagnosticDescriptors.CommandParameterMustHaveHighestOrderIfSequenceBased.Id}*"
                 );
         }
+
+        [Fact]
+        public void I_can_try_to_bind_a_parameter_with_element_converter_on_a_non_sequence_property_and_get_an_error()
+        {
+            // Act
+            var act = () =>
+                CommandCompiler.Compile(
+                    // lang=csharp
+                    """
+                    public class IntConverter : ScalarInputConverter<int>
+                    {
+                        public override int Convert(string? rawValue) =>
+                            int.Parse(rawValue!, CultureInfo.InvariantCulture);
+                    }
+
+                    [Command]
+                    public partial class Command : ICommand
+                    {
+                        [CommandParameter(0, Converter = typeof(IntConverter), IsElementConverter = true)]
+                        public required int Foo { get; set; }
+
+                        public ValueTask ExecuteAsync(IConsole console) => default;
+                    }
+                    """
+                );
+
+            // Assert
+            act.Should()
+                .Throw()
+                .WithMessage(
+                    $"*{DiagnosticDescriptors.CommandInputElementConverterRequiresSequenceProperty.Id}*"
+                );
+        }
     }
 }

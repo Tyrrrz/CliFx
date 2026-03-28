@@ -48,6 +48,16 @@ public static class DiagnosticDescriptors
             true
         );
 
+    public static DiagnosticDescriptor CommandInputElementConverterRequiresSequenceProperty { get; } =
+        new(
+            $"{nameof(CliFx)}_{nameof(CommandInputElementConverterRequiresSequenceProperty)}",
+            "Element converter requires a sequence-based property",
+            "Input bound to property '{0}' specifies 'IsElementConverter = true' but the property type '{1}' is not a sequence. 'IsElementConverter' can only be used with sequence-based properties (e.g., arrays, lists, or other enumerable types).",
+            "CliFx",
+            DiagnosticSeverity.Error,
+            true
+        );
+
     // Parameter
 
     public static DiagnosticDescriptor CommandParameterMustHaveUniqueOrder { get; } =
