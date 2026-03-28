@@ -14,14 +14,22 @@ public class DelegateSequenceInputConverter<T>(Func<IReadOnlyList<string>, T> co
 }
 
 /// <summary>
-/// Sequence converter for activating command inputs using another sequence converter and a transform delegate.
+/// Utilities for creating <see cref="DelegateSequenceInputConverter{T}" />.
 /// </summary>
-public class DelegateSequenceInputConverter<TInner, T>(
-    SequenceInputConverter<TInner> innerConverter,
-    Func<TInner, T> transform
-) : SequenceInputConverter<T>
+public static class DelegateSequenceInputConverter
 {
-    /// <inheritdoc />
-    public override T Convert(IReadOnlyList<string> rawValues) =>
-        transform(innerConverter.Convert(rawValues));
+    /// <summary>
+    /// Creates a delegate-based sequence converter.
+    /// </summary>
+    public static DelegateSequenceInputConverter<T> Create<T>(
+        Func<IReadOnlyList<string>, T> convert
+    ) => new(convert);
+
+    /// <summary>
+    /// Creates a delegate-based sequence converter.
+    /// </summary>
+    public static DelegateSequenceInputConverter<T> Create<T, TInner>(
+        SequenceInputConverter<TInner> innerConverter,
+        Func<TInner, T> transform
+    ) => Create(vs => transform(innerConverter.Convert(vs)));
 }

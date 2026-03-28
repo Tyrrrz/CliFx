@@ -378,12 +378,11 @@ public partial class Generator
             && named.ConstructedFrom.SpecialType == SpecialType.System_Nullable_T
         )
         {
-            var innerType = named.TypeArguments[0];
-            var innerFqn = innerType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-            var innerConverterExpr = TryBuildDefaultScalarConverterExpr(innerType);
+            var innerConverterExpr = TryBuildDefaultScalarConverterExpr(named.TypeArguments[0]);
             if (innerConverterExpr is null)
                 return null;
-            return $"new global::{KnownTypes.NullableScalarInputConverter}<{innerFqn}>({innerConverterExpr})";
+
+            return $"global::{KnownTypes.NullableScalarInputConverter}.Create({innerConverterExpr})";
         }
 
         // Has static Parse(string, IFormatProvider)
@@ -400,7 +399,7 @@ public partial class Generator
             );
 
         if (parseMethodWithFormatProvider is not null)
-            return $"new global::{KnownTypes.DelegateScalarInputConverter}<{typeFqn}>(s => {typeFqn}.Parse(s!, global::System.Globalization.CultureInfo.InvariantCulture))";
+            return $"global::{KnownTypes.DelegateScalarInputConverter}.Create(v => {typeFqn}.Parse(v!, global::System.Globalization.CultureInfo.InvariantCulture))";
 
         // Has static Parse(string)
         var parseMethod = type.GetMembers("Parse")
@@ -414,7 +413,7 @@ public partial class Generator
             );
 
         if (parseMethod is not null)
-            return $"new global::{KnownTypes.DelegateScalarInputConverter}<{typeFqn}>(s => {typeFqn}.Parse(s!))";
+            return $"global::{KnownTypes.DelegateScalarInputConverter}.Create(v => {typeFqn}.Parse(v!))";
 
         // Has ctor(string)
         if (
@@ -426,7 +425,7 @@ public partial class Generator
             )
         )
         {
-            return $"new global::{KnownTypes.DelegateScalarInputConverter}<{typeFqn}>(s => new {typeFqn}(s!))";
+            return $"global::{KnownTypes.DelegateScalarInputConverter}.Create(v => new {typeFqn}(v!))";
         }
 
         // Implements IConvertible
@@ -451,7 +450,6 @@ public partial class Generator
         var collectionTypeFqn = collectionType.ToDisplayString(
             SymbolDisplayFormat.FullyQualifiedFormat
         );
-        var elementTypeFqn = elementType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
 
         // T[] or IEnumerable<T> or ICollection<T> or IList<T> or IReadOnlyCollection<T> or IReadOnlyList<T>
         if (
@@ -472,7 +470,7 @@ public partial class Generator
                         or SpecialType.System_Collections_Generic_IReadOnlyList_T
             )
         )
-            return $"new global::{KnownTypes.ArraySequenceInputConverter}<{elementTypeFqn}>({elementConverterExpr})";
+            return $"global::{KnownTypes.ArraySequenceInputConverter}.Create({elementConverterExpr})";
 
         // Has ctor(string[])
         if (
@@ -498,7 +496,13 @@ public partial class Generator
             )
         )
         {
-            return $"new global::{KnownTypes.DelegateSequenceInputConverter}<{elementTypeFqn}[], {collectionTypeFqn}>(new global::{KnownTypes.ArraySequenceInputConverter}<{elementTypeFqn}>({elementConverterExpr}), values => new {collectionTypeFqn}(values))";
+            // lang=csharp
+            return $"""
+                global::{KnownTypes.DelegateSequenceInputConverter}.Create(
+                    global::{KnownTypes.ArraySequenceInputConverter}.Create({elementConverterExpr}),
+                    vs => new {collectionTypeFqn}(vs)
+                )
+                """;
         }
 
         return null;

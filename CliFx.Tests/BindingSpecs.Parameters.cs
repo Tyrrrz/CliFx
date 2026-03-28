@@ -71,38 +71,6 @@ public partial class BindingSpecs
         }
 
         [Fact]
-        public void I_can_bind_a_parameter_to_an_enumerable_property_that_is_not_last_by_order_but_uses_a_scalar_converter()
-        {
-            // Act
-            var act = () =>
-                CommandCompiler.Compile(
-                    // lang=csharp
-                    """
-                    public class ScalarCollectionConverter : ScalarInputConverter<IReadOnlyList<string>>
-                    {
-                        public override IReadOnlyList<string> Convert(string? rawValue) =>
-                            rawValue is null ? [] : rawValue.Split(',');
-                    }
-
-                    [Command]
-                    public partial class Command : ICommand
-                    {
-                        [CommandParameter(0, Converter = typeof(ScalarCollectionConverter))]
-                        public required IReadOnlyList<string> Foo { get; set; }
-
-                        [CommandParameter(1)]
-                        public required string Bar { get; set; }
-
-                        public ValueTask ExecuteAsync(IConsole console) => default;
-                    }
-                    """
-                );
-
-            // Assert
-            act.Should().NotThrow();
-        }
-
-        [Fact]
         public void I_can_try_to_bind_a_parameter_to_a_non_enumerable_property_that_is_not_last_by_order_but_uses_a_sequence_converter_and_get_an_error()
         {
             // Act

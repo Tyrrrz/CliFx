@@ -86,7 +86,7 @@ internal static class CommandCompiler
         return updatedCompilation;
     }
 
-    public static IReadOnlyList<CommandDescriptor> CompileMany(
+    public static IReadOnlyList<CommandDescriptor> Compile(
         string sourceCode,
         bool treatWarningsAsErrors = false
     )
@@ -152,18 +152,5 @@ internal static class CommandCompiler
             )
             .WhereNotNull()
             .ToArray();
-    }
-
-    public static CommandDescriptor Compile(string sourceCode, bool treatWarningsAsErrors = false)
-    {
-        var commandDescriptors = CompileMany(sourceCode, treatWarningsAsErrors);
-        if (commandDescriptors.Count > 1)
-        {
-            throw new InvalidOperationException(
-                "There are more than one command definitions in the provided source code."
-            );
-        }
-
-        return commandDescriptors.Single();
     }
 }

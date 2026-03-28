@@ -14,20 +14,20 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
     public async Task I_can_throw_an_exception_in_a_command_to_report_an_error_with_a_stacktrace()
     {
         // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            [Command]
-            public partial class Command : ICommand
-            {
-                public ValueTask ExecuteAsync(IConsole console) =>
-                    throw new Exception("Something went wrong");
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
+            .AddCommands(
+                CommandCompiler.Compile(
+                    // lang=csharp
+                    """
+                    [Command]
+                    public partial class Command : ICommand
+                    {
+                        public ValueTask ExecuteAsync(IConsole console) =>
+                            throw new Exception("Something went wrong");
+                    }
+                    """
+                )
+            )
             .UseConsole(FakeConsole)
             .Build();
 
@@ -50,20 +50,20 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
     public async Task I_can_throw_an_exception_with_an_inner_exception_in_a_command_to_report_an_error_with_a_stacktrace()
     {
         // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            [Command]
-            public partial class Command : ICommand
-            {
-                public ValueTask ExecuteAsync(IConsole console) =>
-                    throw new Exception("Something went wrong", new Exception("Another exception"));
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
+            .AddCommands(
+                CommandCompiler.Compile(
+                    // lang=csharp
+                    """
+                    [Command]
+                    public partial class Command : ICommand
+                    {
+                        public ValueTask ExecuteAsync(IConsole console) =>
+                            throw new Exception("Something went wrong", new Exception("Another exception"));
+                    }
+                    """
+                )
+            )
             .UseConsole(FakeConsole)
             .Build();
 
@@ -93,20 +93,20 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
     public async Task I_can_throw_an_exception_in_a_command_to_report_an_error_and_exit_with_the_specified_code()
     {
         // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            [Command]
-            public partial class Command : ICommand
-            {
-                public ValueTask ExecuteAsync(IConsole console) =>
-                    throw new CommandException("Something went wrong", 69);
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
+            .AddCommands(
+                CommandCompiler.Compile(
+                    // lang=csharp
+                    """
+                    [Command]
+                    public partial class Command : ICommand
+                    {
+                        public ValueTask ExecuteAsync(IConsole console) =>
+                            throw new CommandException("Something went wrong", 69);
+                    }
+                    """
+                )
+            )
             .UseConsole(FakeConsole)
             .Build();
 
@@ -127,20 +127,20 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
     public async Task I_can_throw_an_exception_without_a_message_in_a_command_to_report_an_error_with_a_stacktrace()
     {
         // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            [Command]
-            public partial class Command : ICommand
-            {
-                public ValueTask ExecuteAsync(IConsole console) =>
-                    throw new CommandException("", 69);
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
+            .AddCommands(
+                CommandCompiler.Compile(
+                    // lang=csharp
+                    """
+                    [Command]
+                    public partial class Command : ICommand
+                    {
+                        public ValueTask ExecuteAsync(IConsole console) =>
+                            throw new CommandException("", 69);
+                    }
+                    """
+                )
+            )
             .UseConsole(FakeConsole)
             .Build();
 
@@ -161,20 +161,20 @@ public class ErrorReportingSpecs(ITestOutputHelper testOutput) : SpecsBase(testO
     public async Task I_can_throw_an_exception_in_a_command_to_report_an_error_and_show_help()
     {
         // Arrange
-        var command = CommandCompiler.Compile(
-            // lang=csharp
-            """
-            [Command]
-            public partial class Command : ICommand
-            {
-                public ValueTask ExecuteAsync(IConsole console) =>
-                    throw new CommandException("Something went wrong", 69, true);
-            }
-            """
-        );
-
         var application = new CommandLineApplicationBuilder()
-            .AddCommand(command)
+            .AddCommands(
+                CommandCompiler.Compile(
+                    // lang=csharp
+                    """
+                    [Command]
+                    public partial class Command : ICommand
+                    {
+                        public ValueTask ExecuteAsync(IConsole console) =>
+                            throw new CommandException("Something went wrong", 69, true);
+                    }
+                    """
+                )
+            )
             .UseConsole(FakeConsole)
             .SetDescription("This will be in the help text")
             .Build();
