@@ -27,11 +27,9 @@ public class CancellationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOut
             | PipeTarget.ToStringBuilder(stdOutBuffer);
 
         // Schedule graceful cancellation before starting execution.
-        // We use a fixed delay instead of triggering on "Started." from stdout, because
-        // on some platforms (e.g. Windows) the stdout pipe may be buffered and the output
-        // may only become available after the process exits, which is too late.
-        // The delay must be long enough for the process to start up and register its
-        // interrupt handler, but short enough that the 3-second Task.Delay hasn't elapsed.
+        // We use a fixed delay instead of waiting for stdout/stderr
+        // triggers because the output may be buffered.
+        // https://github.com/Tyrrrz/CliFx/pull/180
         cts.CancelAfter(TimeSpan.FromSeconds(1));
 
         // Act
@@ -46,7 +44,7 @@ public class CancellationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOut
         // Assert
         await act.Should().ThrowAsync<OperationCanceledException>();
 
-        stdOutBuffer.ToString().Trim().Should().ConsistOfLines("Started.", "Cancelled.");
+        stdOutBuffer.ToString().Trim().Should().ConsistOfLines("Cancelled.");
     }
 
     [Fact]
