@@ -20,23 +20,17 @@ public class CancellationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOut
         // Arrange
         using var cts = new CancellationTokenSource();
 
-        // We need to send the cancellation request right after the process has registered
-        // a handler for the interrupt signal, otherwise the default handler will trigger
-        // and just kill the process.
-        void HandleStdOut(string line)
-        {
-            if (string.Equals(line, "Started.", StringComparison.OrdinalIgnoreCase))
-                cts.CancelAfter(TimeSpan.FromSeconds(0.2));
-        }
-
         var stdOutBuffer = new StringBuilder();
 
         var command =
             Cli.Wrap(Dummy.Program.FilePath).WithArguments("cancel-test")
-            | PipeTarget.Merge(
-                PipeTarget.ToDelegate(HandleStdOut),
-                PipeTarget.ToStringBuilder(stdOutBuffer)
-            );
+            | PipeTarget.ToStringBuilder(stdOutBuffer);
+
+        // Schedule graceful cancellation before starting execution.
+        // We use a fixed delay instead of waiting for stdout/stderr
+        // triggers because the output may be buffered.
+        // https://github.com/Tyrrrz/CliFx/pull/180
+        cts.CancelAfter(TimeSpan.FromSeconds(1));
 
         // Act
         var act = async () =>
@@ -50,7 +44,7 @@ public class CancellationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOut
         // Assert
         await act.Should().ThrowAsync<OperationCanceledException>();
 
-        stdOutBuffer.ToString().Trim().Should().ConsistOfLines("Started.", "Cancelled.");
+        stdOutBuffer.ToString().Trim().Should().ConsistOfLines("Cancelled.");
     }
 
     [Fact]
