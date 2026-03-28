@@ -11,7 +11,6 @@ internal static class KnownTypes
     public const string ICommandWithVersionOption = "CliFx.ICommandWithVersionOption";
 
     public const string CommandAttribute = "CliFx.Binding.CommandAttribute";
-    public const string CommandInputAttribute = "CliFx.Binding.CommandInputAttribute";
     public const string CommandParameterAttribute = "CliFx.Binding.CommandParameterAttribute";
     public const string CommandOptionAttribute = "CliFx.Binding.CommandOptionAttribute";
 
