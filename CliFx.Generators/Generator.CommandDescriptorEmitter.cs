@@ -19,8 +19,17 @@ public partial class Generator
         var commandTypeName = command.Type.Name;
         var commandTypeFqn = command.Type.GetGloballyQualifiedName();
 
-        var interfaces = new List<string>(2) { "global::" + KnownTypes.ICommandWithHelpOption };
-        if (command.IsDefault)
+        var userImplementsHelpOption = command.Type.AllInterfaces.Any(i =>
+            i.IsMatchedBy(KnownTypes.ICommandWithHelpOption)
+        );
+        var userImplementsVersionOption = command.Type.AllInterfaces.Any(i =>
+            i.IsMatchedBy(KnownTypes.ICommandWithVersionOption)
+        );
+
+        var interfaces = new List<string>(2);
+        if (!userImplementsHelpOption)
+            interfaces.Add("global::" + KnownTypes.ICommandWithHelpOption);
+        if (command.IsDefault && !userImplementsVersionOption)
             interfaces.Add("global::" + KnownTypes.ICommandWithVersionOption);
 
         var interfaceList =
@@ -60,16 +69,19 @@ public partial class Generator
             """
         );
 
-        sb.Append(
-            """
+        if (!userImplementsHelpOption)
+        {
+            sb.Append(
+                """
 
-                /// <inheritdoc />
-                public bool IsHelpRequested { get; set; }
+                    /// <inheritdoc />
+                    public bool IsHelpRequested { get; set; }
 
-            """
-        );
+                """
+            );
+        }
 
-        if (command.IsDefault)
+        if (command.IsDefault && !userImplementsVersionOption)
         {
             sb.Append(
                 """
@@ -95,6 +107,65 @@ public partial class Generator
         );
 
         var diagnosticsList = new List<Diagnostic>();
+
+        // Validate that manually implemented help/version interface properties have binding attributes
+        if (userImplementsHelpOption)
+        {
+            var isHelpRequestedProperty = command
+                .Type.GetProperties()
+                .FirstOrDefault(p =>
+                    string.Equals(p.Name, "IsHelpRequested", System.StringComparison.Ordinal)
+                );
+
+            var hasOptionBinding =
+                isHelpRequestedProperty
+                    ?.GetAttributes()
+                    .Any(a =>
+                        a.AttributeClass?.GetSelfAndBaseTypes()
+                            .Any(t => t.IsMatchedBy(KnownTypes.CommandOptionAttribute)) == true
+                    ) == true;
+
+            if (!hasOptionBinding)
+            {
+                diagnosticsList.Add(
+                    Diagnostic.Create(
+                        DiagnosticDescriptors.CommandHelpOptionPropertyMustBeBound,
+                        isHelpRequestedProperty?.Locations.FirstOrDefault()
+                            ?? command.Type.Locations.FirstOrDefault(),
+                        "IsHelpRequested"
+                    )
+                );
+            }
+        }
+
+        if (userImplementsVersionOption)
+        {
+            var isVersionRequestedProperty = command
+                .Type.GetProperties()
+                .FirstOrDefault(p =>
+                    string.Equals(p.Name, "IsVersionRequested", System.StringComparison.Ordinal)
+                );
+
+            var hasOptionBinding =
+                isVersionRequestedProperty
+                    ?.GetAttributes()
+                    .Any(a =>
+                        a.AttributeClass?.GetSelfAndBaseTypes()
+                            .Any(t => t.IsMatchedBy(KnownTypes.CommandOptionAttribute)) == true
+                    ) == true;
+
+            if (!hasOptionBinding)
+            {
+                diagnosticsList.Add(
+                    Diagnostic.Create(
+                        DiagnosticDescriptors.CommandVersionOptionPropertyMustBeBound,
+                        isVersionRequestedProperty?.Locations.FirstOrDefault()
+                            ?? command.Type.Locations.FirstOrDefault(),
+                        "IsVersionRequested"
+                    )
+                );
+            }
+        }
 
         foreach (var param in command.Parameters.OrderBy(p => p.Order))
         {
@@ -170,9 +241,10 @@ public partial class Generator
             );
         }
 
-        EmitBuiltInHelpOption(sb, command, diagnosticsList);
+        if (!userImplementsHelpOption)
+            EmitBuiltInHelpOption(sb, command, diagnosticsList);
 
-        if (command.IsDefault)
+        if (command.IsDefault && !userImplementsVersionOption)
             EmitBuiltInVersionOption(sb, command, diagnosticsList);
 
         sb.Append(
