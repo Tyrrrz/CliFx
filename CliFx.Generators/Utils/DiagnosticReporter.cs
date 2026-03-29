@@ -4,12 +4,12 @@ using Microsoft.CodeAnalysis;
 
 namespace CliFx.Generators.Utils;
 
-internal class DiagnosticReporter(Action<Diagnostic> reportDiagnostic)
+internal class DiagnosticReporter(Action<Diagnostic> report)
 {
     internal DiagnosticReporter(IList<Diagnostic> diagnostics)
         : this(diagnostics.Add) { }
 
-    public void Report(Diagnostic diagnostic) => reportDiagnostic(diagnostic);
+    public void Report(Diagnostic diagnostic) => report(diagnostic);
 
     public void Report(
         DiagnosticDescriptor descriptor,

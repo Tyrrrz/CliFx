@@ -146,7 +146,7 @@ public partial class Generator
         if (elementConverterFragment is null)
             return null;
 
-        // Array-initializable
+        // Assignable from T[]
         if (
             // T[]
             collectionType is IArrayTypeSymbol
