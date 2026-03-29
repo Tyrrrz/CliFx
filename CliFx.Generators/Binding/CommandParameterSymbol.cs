@@ -22,16 +22,9 @@ internal record CommandParameterSymbol(
         DiagnosticReporter diagnostics
     )
     {
-        var attribute = property
-            .GetAttributes()
-            .FirstOrDefault(a =>
-                a.AttributeClass?.IsMatchedBy("CliFx.Binding.CommandParameterAttribute") == true
-            );
-
+        var attribute = property.TryGetAttribute("CliFx.Binding.CommandParameterAttribute");
         if (attribute is null)
-        {
             return null;
-        }
 
         var order = attribute
             .ConstructorArguments.Where(a => a.Type?.SpecialType == SpecialType.System_Int32)

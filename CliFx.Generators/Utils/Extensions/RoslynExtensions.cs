@@ -67,6 +67,13 @@ internal static class RoslynExtensions
             symbol.ContainingNamespace is { IsGlobalNamespace: false } ns
                 ? ns.ToDisplayString(FullyQualifiedFormatWithoutGlobalPrefix)
                 : null;
+
+        public AttributeData? TryGetAttribute(string fullyQualifiedAttributeName) =>
+            symbol
+                .GetAttributes()
+                .FirstOrDefault(a =>
+                    a.AttributeClass?.IsMatchedBy(fullyQualifiedAttributeName) == true
+                );
     }
 
     extension(ITypeSymbol type)
@@ -119,22 +126,24 @@ internal static class RoslynExtensions
             foreach (var currentType in includeInherited ? type.GetSelfAndBaseTypes() : [type])
             {
                 foreach (var member in currentType.GetMembers())
-                {
                     yield return member;
-                }
             }
         }
 
         public IEnumerable<IPropertySymbol> GetProperties(bool includeInherited = true) =>
-            type.GetMembers(includeInherited)
-                .OfType<IPropertySymbol>()
-                .DistinctBy(p => p.Name, StringComparer.Ordinal);
+            type.GetMembers(includeInherited).OfType<IPropertySymbol>();
 
         public IEnumerable<IMethodSymbol> GetMethods(bool includeInherited = true) =>
             type.GetMembers(includeInherited).OfType<IMethodSymbol>();
 
         public Accessibility GetActualAccessibility() =>
             type.GetSelfAndContainingTypes().Min(t => t.DeclaredAccessibility);
+
+        public ITypeSymbol? TryGetNullableUnderlyingType() =>
+            type is INamedTypeSymbol { IsValueType: true } named
+            && named.ConstructedFrom.SpecialType == SpecialType.System_Nullable_T
+                ? named.TypeArguments[0]
+                : null;
 
         public ITypeSymbol? TryGetEnumerableUnderlyingType() =>
             type
@@ -143,11 +152,5 @@ internal static class RoslynExtensions
                     == SpecialType.System_Collections_Generic_IEnumerable_T
                 )
                 ?.TypeArguments[0];
-
-        public ITypeSymbol? TryGetNullableUnderlyingType() =>
-            type is INamedTypeSymbol { IsValueType: true } named
-            && named.ConstructedFrom.SpecialType == SpecialType.System_Nullable_T
-                ? named.TypeArguments[0]
-                : null;
     }
 }

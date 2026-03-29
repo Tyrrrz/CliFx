@@ -343,12 +343,8 @@ public partial class Generator
                 );
 
             var hasOptionBinding =
-                isHelpRequestedProperty
-                    ?.GetAttributes()
-                    .Any(a =>
-                        a.AttributeClass?.GetSelfAndBaseTypes()
-                            .Any(t => t.IsMatchedBy("CliFx.Binding.CommandOptionAttribute")) == true
-                    ) == true;
+                isHelpRequestedProperty?.TryGetAttribute("CliFx.Binding.CommandOptionAttribute")
+                is not null;
 
             if (!hasOptionBinding)
             {
@@ -418,12 +414,8 @@ public partial class Generator
                 );
 
             var hasOptionBinding =
-                isVersionRequestedProperty
-                    ?.GetAttributes()
-                    .Any(a =>
-                        a.AttributeClass?.GetSelfAndBaseTypes()
-                            .Any(t => t.IsMatchedBy("CliFx.Binding.CommandOptionAttribute")) == true
-                    ) == true;
+                isVersionRequestedProperty?.TryGetAttribute("CliFx.Binding.CommandOptionAttribute")
+                is not null;
 
             if (!hasOptionBinding)
             {

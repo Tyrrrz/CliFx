@@ -23,16 +23,9 @@ internal record CommandOptionSymbol(
         DiagnosticReporter diagnostics
     )
     {
-        var attribute = property
-            .GetAttributes()
-            .FirstOrDefault(a =>
-                a.AttributeClass?.IsMatchedBy("CliFx.Binding.CommandOptionAttribute") == true
-            );
-
+        var attribute = property.TryGetAttribute("CliFx.Binding.CommandOptionAttribute");
         if (attribute is null)
-        {
             return null;
-        }
 
         var name =
             attribute

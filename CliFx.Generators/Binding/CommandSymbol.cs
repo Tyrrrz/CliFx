@@ -24,15 +24,9 @@ internal record CommandSymbol(
 
     internal static CommandSymbol? TryResolve(INamedTypeSymbol type, DiagnosticReporter diagnostics)
     {
-        var classDeclarations = type.GetDeclarations().ToArray();
-
         // Must have the [Command] attribute
-        var commandAttribute = type.GetAttributes()
-            .FirstOrDefault(a =>
-                a.AttributeClass?.IsMatchedBy("CliFx.Binding.CommandAttribute") == true
-            );
-
-        if (commandAttribute is null)
+        var attribute = type.TryGetAttribute("CliFx.Binding.CommandAttribute");
+        if (attribute is null)
         {
             // Shouldn't happen when called by the generator since it filters types by attribute,
             // so not worth the effort to produce a diagnostic.
@@ -40,7 +34,7 @@ internal record CommandSymbol(
         }
 
         // Must be partial by itself, along with all containing types
-        foreach (var declaration in classDeclarations)
+        foreach (var declaration in type.GetDeclarations().ToArray())
         {
             if (!declaration.IsFullyPartial())
             {
@@ -57,22 +51,20 @@ internal record CommandSymbol(
         {
             diagnostics.Report(
                 DiagnosticDescriptors.CommandMustImplementICommand,
-                classDeclarations.FirstOrDefault()?.Identifier.GetLocation()
-                    ?? type.Locations.FirstOrDefault(),
+                type.Locations.FirstOrDefault(),
                 type.Name
             );
         }
 
         var name =
-            commandAttribute?.NamedArguments.FirstOrDefault(a => a.Key == "Name").Value.Value
-                as string
-            ?? commandAttribute
+            attribute?.NamedArguments.FirstOrDefault(a => a.Key == "Name").Value.Value as string
+            ?? attribute
                 ?.ConstructorArguments.Where(a => a.Type?.SpecialType == SpecialType.System_String)
                 .Select(a => a.Value as string)
                 .FirstOrDefault();
 
         var description =
-            commandAttribute?.NamedArguments.FirstOrDefault(a => a.Key == "Description").Value.Value
+            attribute?.NamedArguments.FirstOrDefault(a => a.Key == "Description").Value.Value
             as string;
 
         var properties = type.GetProperties().ToArray();
