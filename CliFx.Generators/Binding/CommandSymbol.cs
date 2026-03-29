@@ -34,7 +34,7 @@ internal record CommandSymbol(
         // Must have the [Command] attribute
         var commandAttribute = type.GetAttributes()
             .FirstOrDefault(a =>
-                a.AttributeClass?.IsMatchedBy(KnownTypes.CommandAttribute) == true
+                a.AttributeClass?.IsMatchedBy("CliFx.Binding.CommandAttribute") == true
             );
 
         if (commandAttribute is null)
@@ -61,7 +61,7 @@ internal record CommandSymbol(
         }
 
         // Must implement ICommand
-        if (!type.AllInterfaces.Any(i => i.IsMatchedBy(KnownTypes.ICommand)))
+        if (!type.AllInterfaces.Any(i => i.IsMatchedBy("CliFx.ICommand")))
         {
             diagnosticsList.Add(
                 Diagnostic.Create(
@@ -81,7 +81,7 @@ internal record CommandSymbol(
             var parameterAttribute = property
                 .GetAttributes()
                 .FirstOrDefault(a =>
-                    a.AttributeClass?.IsMatchedBy(KnownTypes.CommandParameterAttribute) == true
+                    a.AttributeClass?.IsMatchedBy("CliFx.Binding.CommandParameterAttribute") == true
                 );
 
             if (parameterAttribute is not null)
@@ -101,7 +101,7 @@ internal record CommandSymbol(
             var optionAttribute = property
                 .GetAttributes()
                 .FirstOrDefault(a =>
-                    a.AttributeClass?.IsMatchedBy(KnownTypes.CommandOptionAttribute) == true
+                    a.AttributeClass?.IsMatchedBy("CliFx.Binding.CommandOptionAttribute") == true
                 );
 
             if (optionAttribute is not null)

@@ -16,7 +16,7 @@ public partial class Generator : IIncrementalGenerator
     {
         var commands = context
             .SyntaxProvider.ForAttributeWithMetadataName(
-                KnownTypes.CommandAttribute,
+                "CliFx.Binding.CommandAttribute",
                 static (node, cancellationToken) => node is ClassDeclarationSyntax,
                 static (ctx, cancellationToken) =>
                 {

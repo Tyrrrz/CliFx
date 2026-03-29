@@ -20,17 +20,17 @@ public partial class Generator
         var commandTypeFqn = command.Type.GetGloballyQualifiedName();
 
         var userImplementsHelpOption = command.Type.AllInterfaces.Any(i =>
-            i.IsMatchedBy(KnownTypes.ICommandWithHelpOption)
+            i.IsMatchedBy("CliFx.ICommandWithHelpOption")
         );
         var userImplementsVersionOption = command.Type.AllInterfaces.Any(i =>
-            i.IsMatchedBy(KnownTypes.ICommandWithVersionOption)
+            i.IsMatchedBy("CliFx.ICommandWithVersionOption")
         );
 
         var interfaces = new List<string>(2);
         if (!userImplementsHelpOption)
-            interfaces.Add("global::" + KnownTypes.ICommandWithHelpOption);
+            interfaces.Add("global::CliFx.ICommandWithHelpOption");
         if (command.IsDefault && !userImplementsVersionOption)
-            interfaces.Add("global::" + KnownTypes.ICommandWithVersionOption);
+            interfaces.Add("global::CliFx.ICommandWithVersionOption");
 
         var interfaceList =
             interfaces.Count > 0 ? " : " + string.Join(", ", interfaces) : string.Empty;
@@ -97,11 +97,11 @@ public partial class Generator
             $$"""
 
                 /// <summary>Generated command descriptor for <see cref="{{commandTypeName}}"/>.</summary>
-                public static global::{{KnownTypes.CommandDescriptor}} Descriptor { get; } =
-                    new global::{{KnownTypes.CommandDescriptor}}<{{commandTypeFqn}}>(
+                public static global::CliFx.Binding.CommandDescriptor Descriptor { get; } =
+                    new global::CliFx.Binding.CommandDescriptor<{{commandTypeFqn}}>(
                         {{CSharp.Encode(command.Name)}},
                         {{CSharp.Encode(command.Description)}},
-                        new global::{{KnownTypes.CommandInputDescriptor}}[]
+                        new global::CliFx.Binding.CommandInputDescriptor[]
                         {
             """
         );
@@ -122,7 +122,7 @@ public partial class Generator
                     ?.GetAttributes()
                     .Any(a =>
                         a.AttributeClass?.GetSelfAndBaseTypes()
-                            .Any(t => t.IsMatchedBy(KnownTypes.CommandOptionAttribute)) == true
+                            .Any(t => t.IsMatchedBy("CliFx.Binding.CommandOptionAttribute")) == true
                     ) == true;
 
             if (!hasOptionBinding)
@@ -151,7 +151,7 @@ public partial class Generator
                     ?.GetAttributes()
                     .Any(a =>
                         a.AttributeClass?.GetSelfAndBaseTypes()
-                            .Any(t => t.IsMatchedBy(KnownTypes.CommandOptionAttribute)) == true
+                            .Any(t => t.IsMatchedBy("CliFx.Binding.CommandOptionAttribute")) == true
                     ) == true;
 
             if (!hasOptionBinding)
@@ -188,8 +188,8 @@ public partial class Generator
             sb.Append(
                 // lang=csharp
                 $$"""
-                            new global::{{KnownTypes.CommandParameterDescriptor}}<{{commandTypeFqn}}, {{propTypeFqn}}>(
-                                new global::{{KnownTypes.PropertyDescriptor}}<{{commandTypeFqn}}, {{propTypeFqn}}>(
+                            new global::CliFx.Binding.CommandParameterDescriptor<{{commandTypeFqn}}, {{propTypeFqn}}>(
+                                new global::CliFx.Binding.PropertyDescriptor<{{commandTypeFqn}}, {{propTypeFqn}}>(
                                     "{{param.Property.Name}}",
                                     c => c.{{param.Property.Name}},
                                     (c, v) => c.{{param.Property.Name}} = v),
@@ -224,8 +224,8 @@ public partial class Generator
             sb.Append(
                 // lang=csharp
                 $$"""
-                            new global::{{KnownTypes.CommandOptionDescriptor}}<{{commandTypeFqn}}, {{propTypeFqn}}>(
-                                new global::{{KnownTypes.PropertyDescriptor}}<{{commandTypeFqn}}, {{propTypeFqn}}>(
+                            new global::CliFx.Binding.CommandOptionDescriptor<{{commandTypeFqn}}, {{propTypeFqn}}>(
+                                new global::CliFx.Binding.PropertyDescriptor<{{commandTypeFqn}}, {{propTypeFqn}}>(
                                     "{{option.Property.Name}}",
                                     c => c.{{option.Property.Name}},
                                     (c, v) => c.{{option.Property.Name}} = v),
@@ -301,8 +301,8 @@ public partial class Generator
             sb.Append(
                 // lang=csharp
                 $$"""
-                            new global::{{KnownTypes.CommandOptionDescriptor}}<{{commandTypeFqn}}, bool>(
-                                new global::{{KnownTypes.PropertyDescriptor}}<{{commandTypeFqn}}, bool>(
+                            new global::CliFx.Binding.CommandOptionDescriptor<{{commandTypeFqn}}, bool>(
+                                new global::CliFx.Binding.PropertyDescriptor<{{commandTypeFqn}}, bool>(
                                     "IsHelpRequested",
                                     c => c.IsHelpRequested,
                                     (c, v) => c.IsHelpRequested = v),
@@ -311,8 +311,8 @@ public partial class Generator
                                 null,
                                 false,
                                 "Shows help text.",
-                                new global::{{KnownTypes.BoolScalarInputConverter}}(),
-                                global::System.Array.Empty<global::{{KnownTypes.InputValidator}}<bool>>()),
+                                new global::CliFx.Activation.BoolScalarInputConverter(),
+                                global::System.Array.Empty<global::CliFx.Activation.InputValidator<bool>>()),
 
                 """
             );
@@ -350,8 +350,8 @@ public partial class Generator
             sb.Append(
                 // lang=csharp
                 $$"""
-                            new global::{{KnownTypes.CommandOptionDescriptor}}<{{commandTypeFqn}}, bool>(
-                                new global::{{KnownTypes.PropertyDescriptor}}<{{commandTypeFqn}}, bool>(
+                            new global::CliFx.Binding.CommandOptionDescriptor<{{commandTypeFqn}}, bool>(
+                                new global::CliFx.Binding.PropertyDescriptor<{{commandTypeFqn}}, bool>(
                                     "IsVersionRequested",
                                     c => c.IsVersionRequested,
                                     (c, v) => c.IsVersionRequested = v),
@@ -360,8 +360,8 @@ public partial class Generator
                                 null,
                                 false,
                                 "Shows version information.",
-                                new global::{{KnownTypes.BoolScalarInputConverter}}(),
-                                global::System.Array.Empty<global::{{KnownTypes.InputValidator}}<bool>>()),
+                                new global::CliFx.Activation.BoolScalarInputConverter(),
+                                global::System.Array.Empty<global::CliFx.Activation.InputValidator<bool>>()),
 
                 """
             );
@@ -393,19 +393,19 @@ public partial class Generator
 
         // Object
         if (type.SpecialType == SpecialType.System_Object)
-            return $"new global::{KnownTypes.StringScalarInputConverter}()";
+            return "new global::CliFx.Activation.StringScalarInputConverter()";
 
         // String
         if (type.SpecialType == SpecialType.System_String)
-            return $"new global::{KnownTypes.StringScalarInputConverter}()";
+            return "new global::CliFx.Activation.StringScalarInputConverter()";
 
         // Bool
         if (type.SpecialType == SpecialType.System_Boolean)
-            return $"new global::{KnownTypes.BoolScalarInputConverter}()";
+            return "new global::CliFx.Activation.BoolScalarInputConverter()";
 
         // Enum
         if (type.TypeKind == TypeKind.Enum)
-            return $"new global::{KnownTypes.EnumScalarInputConverter}<{typeFqn}>()";
+            return $"new global::CliFx.Activation.EnumScalarInputConverter<{typeFqn}>()";
 
         // Nullable<T>
         if (
@@ -417,7 +417,7 @@ public partial class Generator
             if (innerConverterExpr is null)
                 return null;
 
-            return $"global::{KnownTypes.NullableScalarInputConverter}.Create({innerConverterExpr})";
+            return $"global::CliFx.Activation.NullableScalarInputConverter.Create({innerConverterExpr})";
         }
 
         // Has static Parse(string, IFormatProvider)
@@ -434,7 +434,7 @@ public partial class Generator
             );
 
         if (parseMethodWithFormatProvider is not null)
-            return $"global::{KnownTypes.DelegateScalarInputConverter}.Create(v => {typeFqn}.Parse(v!, global::System.Globalization.CultureInfo.InvariantCulture))";
+            return $"global::CliFx.Activation.DelegateScalarInputConverter.Create(v => {typeFqn}.Parse(v!, global::System.Globalization.CultureInfo.InvariantCulture))";
 
         // Has static Parse(string)
         var parseMethod = type.GetMembers("Parse")
@@ -448,7 +448,7 @@ public partial class Generator
             );
 
         if (parseMethod is not null)
-            return $"global::{KnownTypes.DelegateScalarInputConverter}.Create(v => {typeFqn}.Parse(v!))";
+            return $"global::CliFx.Activation.DelegateScalarInputConverter.Create(v => {typeFqn}.Parse(v!))";
 
         // Has ctor(string)
         if (
@@ -460,7 +460,7 @@ public partial class Generator
             )
         )
         {
-            return $"global::{KnownTypes.DelegateScalarInputConverter}.Create(v => new {typeFqn}(v!))";
+            return $"global::CliFx.Activation.DelegateScalarInputConverter.Create(v => new {typeFqn}(v!))";
         }
 
         // Implements IConvertible
@@ -470,7 +470,7 @@ public partial class Generator
             )
         )
         {
-            return $"new global::{KnownTypes.ConvertibleScalarInputConverter}<{typeFqn}>()";
+            return $"new global::CliFx.Activation.ConvertibleScalarInputConverter<{typeFqn}>()";
         }
 
         return null;
@@ -508,7 +508,7 @@ public partial class Generator
                         or SpecialType.System_Collections_Generic_IReadOnlyList_T
             )
         )
-            return $"global::{KnownTypes.ArraySequenceInputConverter}.Create({elementConverterArg})";
+            return $"global::CliFx.Activation.ArraySequenceInputConverter.Create({elementConverterArg})";
 
         // Has ctor(string[])
         if (
@@ -536,8 +536,8 @@ public partial class Generator
         {
             // lang=csharp
             return $"""
-                global::{KnownTypes.DelegateSequenceInputConverter}.Create(
-                    global::{KnownTypes.ArraySequenceInputConverter}.Create({elementConverterArg}),
+                global::CliFx.Activation.DelegateSequenceInputConverter.Create(
+                    global::CliFx.Activation.ArraySequenceInputConverter.Create({elementConverterArg}),
                     vs => new {collectionTypeFqn}(vs)
                 )
                 """;
@@ -551,7 +551,7 @@ public partial class Generator
         string propertyTypeFqn
     )
     {
-        var validatorBaseType = $"global::{KnownTypes.InputValidator}<{propertyTypeFqn}>";
+        var validatorBaseType = $"global::CliFx.Activation.InputValidator<{propertyTypeFqn}>";
 
         if (validatorTypes.Count == 0)
             return $"global::System.Array.Empty<{validatorBaseType}>()";

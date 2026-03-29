@@ -20,7 +20,7 @@ internal abstract partial record CommandInputSymbol(
         && ConverterType
             .GetSelfAndBaseTypes()
             .OfType<INamedTypeSymbol>()
-            .Any(t => t.IsMatchedBy(KnownTypes.SequenceInputConverter));
+            .Any(t => t.IsMatchedBy("CliFx.Activation.SequenceInputConverter"));
 
     // An input is considered sequence-based if it has a sequence-based converter, or if it
     // doesn't have a converter but its type is an enumerable (except string).
