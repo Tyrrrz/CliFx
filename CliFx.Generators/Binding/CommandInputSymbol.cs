@@ -14,21 +14,18 @@ internal abstract partial record CommandInputSymbol(
 )
 {
     // Technically, we should be checking if IInputConverter.CanConvertSequence is true,
-    // but we can't do that during compile time, so this is the best we can do.
+    // but we can't do that during compile time, so this is as close as we can get.
     public bool IsConverterSequenceBased =>
         ConverterType is not null
-        && ConverterType
-            .GetSelfAndBaseTypes()
-            .OfType<INamedTypeSymbol>()
-            .Any(t => t.IsMatchedBy("CliFx.Activation.SequenceInputConverter"));
+        && ConverterType.Inherits("CliFx.Activation.SequenceInputConverter");
 
     // An input is considered sequence-based if it has a sequence-based converter, or if it
-    // doesn't have a converter but its type is an enumerable (except string).
+    // doesn't have a converter but its type implements IEnumerable (except string).
     public bool IsSequenceBased =>
         ConverterType is not null
             ? IsConverterSequenceBased
             : Property.Type.SpecialType != SpecialType.System_String
-                && Property.Type.TryGetEnumerableUnderlyingType() is not null;
+                && Property.Type.Implements("System.Collections.IEnumerable");
 }
 
 internal partial record CommandInputSymbol

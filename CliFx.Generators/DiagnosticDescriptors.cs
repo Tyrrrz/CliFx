@@ -162,21 +162,21 @@ public static class DiagnosticDescriptors
             true
         );
 
-    public static DiagnosticDescriptor CommandOptionShadowsBuiltInHelpOption { get; } =
+    public static DiagnosticDescriptor CommandOptionShadowsConventionalHelpOption { get; } =
         new(
-            $"{nameof(CliFx)}_{nameof(CommandOptionShadowsBuiltInHelpOption)}",
+            $"{nameof(CliFx)}_{nameof(CommandOptionShadowsConventionalHelpOption)}",
             "Option shadows the conventional help option",
-            "Option bound to property '{0}' shadows the conventional help option via '{1}'. Consider choosing a different identifier for your option.",
+            "Option bound to property '{0}' shadows the conventional help option by {1}. Consider choosing a different identifier for your option.",
             "CliFx",
             DiagnosticSeverity.Warning,
             true
         );
 
-    public static DiagnosticDescriptor CommandOptionShadowsBuiltInVersionOption { get; } =
+    public static DiagnosticDescriptor CommandOptionShadowsConventionalVersionOption { get; } =
         new(
-            $"{nameof(CliFx)}_{nameof(CommandOptionShadowsBuiltInVersionOption)}",
+            $"{nameof(CliFx)}_{nameof(CommandOptionShadowsConventionalVersionOption)}",
             "Option shadows the conventional version option",
-            "Option bound to property '{0}' shadows the conventional version option via '{1}'. Consider choosing a different identifier for your option.",
+            "Option bound to property '{0}' shadows the conventional version option by {1}. Consider choosing a different identifier for your option.",
             "CliFx",
             DiagnosticSeverity.Warning,
             true

@@ -1,5 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using CliFx.Generators.Utils;
+using CliFx.Generators.Utils.Extensions;
 using Microsoft.CodeAnalysis;
 
 namespace CliFx.Generators.Binding;
@@ -17,12 +20,19 @@ internal record CommandOptionSymbol(
 {
     internal static CommandOptionSymbol? TryResolve(
         IPropertySymbol property,
-        AttributeData attribute,
-        out IReadOnlyList<Diagnostic> diagnostics
+        DiagnosticReporter diagnostics
     )
     {
-        var diagnosticsList = new List<Diagnostic>();
-        diagnostics = diagnosticsList;
+        var attribute = property
+            .GetAttributes()
+            .FirstOrDefault(a =>
+                a.AttributeClass?.IsMatchedBy("CliFx.Binding.CommandOptionAttribute") == true
+            );
+
+        if (attribute is null)
+        {
+            return null;
+        }
 
         var name =
             attribute
@@ -42,12 +52,10 @@ internal record CommandOptionSymbol(
         // Option must have either a name or short name, or both
         if (string.IsNullOrWhiteSpace(name) && shortName is null)
         {
-            diagnosticsList.Add(
-                Diagnostic.Create(
-                    DiagnosticDescriptors.CommandOptionMustHaveNameOrShortName,
-                    property.Locations.FirstOrDefault(),
-                    property.Name
-                )
+            diagnostics.Report(
+                DiagnosticDescriptors.CommandOptionMustHaveNameOrShortName,
+                property.Locations.FirstOrDefault(),
+                property.Name
             );
         }
 
@@ -57,40 +65,84 @@ internal record CommandOptionSymbol(
             && (name.Length < 2 || !char.IsLetter(name[0]) || name.Any(char.IsWhiteSpace))
         )
         {
-            diagnosticsList.Add(
-                Diagnostic.Create(
-                    DiagnosticDescriptors.CommandOptionMustHaveValidName,
-                    property.Locations.FirstOrDefault(),
-                    property.Name,
-                    name
-                )
+            diagnostics.Report(
+                DiagnosticDescriptors.CommandOptionMustHaveValidName,
+                property.Locations.FirstOrDefault(),
+                property.Name,
+                name
             );
         }
 
         // Option short name must be a letter
         if (shortName is not null && !char.IsLetter(shortName.Value))
         {
-            diagnosticsList.Add(
-                Diagnostic.Create(
-                    DiagnosticDescriptors.CommandOptionMustHaveValidShortName,
-                    property.Locations.FirstOrDefault(),
-                    property.Name,
-                    shortName
-                )
+            diagnostics.Report(
+                DiagnosticDescriptors.CommandOptionMustHaveValidShortName,
+                property.Locations.FirstOrDefault(),
+                property.Name,
+                shortName
             );
         }
+
+        var environmentVariable =
+            attribute.NamedArguments.FirstOrDefault(a => a.Key == "EnvironmentVariable").Value.Value
+            as string;
+
+        var description =
+            attribute.NamedArguments.FirstOrDefault(a => a.Key == "Description").Value.Value
+            as string;
 
         return new CommandOptionSymbol(
             property,
             name,
             shortName,
-            attribute.NamedArguments.FirstOrDefault(a => a.Key == "EnvironmentVariable").Value.Value
-                as string,
+            environmentVariable,
             property.IsRequired,
-            attribute.NamedArguments.FirstOrDefault(a => a.Key == "Description").Value.Value
-                as string,
+            description,
             TryResolveConverterType(attribute),
             ResolveValidatorTypes(attribute)
         );
+    }
+
+    internal static IReadOnlyList<CommandOptionSymbol> Resolve(
+        IReadOnlyList<IPropertySymbol> properties,
+        DiagnosticReporter diagnostics
+    )
+    {
+        var options = properties.Select(p => TryResolve(p, diagnostics)).WhereNotNull().ToArray();
+
+        // Options must have unique names and short names
+        foreach (var (i, first) in options.Index())
+        {
+            foreach (var second in options.Skip(i + 1))
+            {
+                if (
+                    !string.IsNullOrWhiteSpace(first.Name)
+                    && string.Equals(first.Name, second.Name, StringComparison.OrdinalIgnoreCase)
+                )
+                {
+                    diagnostics.Report(
+                        DiagnosticDescriptors.CommandOptionMustHaveUniqueName,
+                        first.Property.Locations.FirstOrDefault(),
+                        first.Property.Name,
+                        second.Property.Name,
+                        first.Name
+                    );
+                }
+
+                if (first.ShortName is not null && first.ShortName == second.ShortName)
+                {
+                    diagnostics.Report(
+                        DiagnosticDescriptors.CommandOptionMustHaveUniqueShortName,
+                        first.Property.Locations.FirstOrDefault(),
+                        first.Property.Name,
+                        second.Property.Name,
+                        first.ShortName
+                    );
+                }
+            }
+        }
+
+        return options;
     }
 }

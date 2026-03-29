@@ -1,7 +1,9 @@
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using CliFx.Generators.Binding;
+using CliFx.Generators.Utils;
 using CliFx.Generators.Utils.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -29,9 +31,14 @@ public partial class Generator : IIncrementalGenerator
             .Select(
                 static (item, cancellationToken) =>
                 {
-                    var command = CommandSymbol.TryResolve(item.Symbol, out var commandDiagnostics);
+                    var diagnostics = new List<Diagnostic>();
 
-                    return (Command: command, Diagnostics: commandDiagnostics);
+                    var command = CommandSymbol.TryResolve(
+                        item.Symbol,
+                        new DiagnosticReporter(diagnostics)
+                    );
+
+                    return (Command: command, Diagnostics: diagnostics.ToImmutableArray());
                 }
             );
 
@@ -54,7 +61,12 @@ public partial class Generator : IIncrementalGenerator
                             .Replace("global::", "")
                             .Replace('.', '_') + "_Descriptor.g.cs";
 
-                    var source = EmitCommandDescriptor(item.Command, out var emitterDiagnostics);
+                    var emitterDiagnostics = new List<Diagnostic>();
+
+                    var source = EmitCommandDescriptor(
+                        item.Command,
+                        new DiagnosticReporter(emitterDiagnostics)
+                    );
 
                     return (
                         HintName: hintName,
@@ -66,7 +78,9 @@ public partial class Generator : IIncrementalGenerator
             static (ctx, item) =>
             {
                 foreach (var diagnostic in item.Diagnostics)
+                {
                     ctx.ReportDiagnostic(diagnostic);
+                }
 
                 if (
                     !string.IsNullOrWhiteSpace(item.HintName)
@@ -83,7 +97,7 @@ public partial class Generator : IIncrementalGenerator
             commands
                 .Select(static (item, cancellationToken) => item.Command)
                 .WhereNotNull()
-                // Only generate for commands that are at least internal, since private ones won't be accessible from the extension method
+                // Only generate for commands that will be accessible by the generated code
                 .Where(
                     static (command) =>
                         command.Type.GetActualAccessibility() >= Accessibility.Internal

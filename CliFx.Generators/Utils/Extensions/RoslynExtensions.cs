@@ -9,8 +9,16 @@ namespace CliFx.Generators.Utils.Extensions;
 
 internal static class RoslynExtensions
 {
+    private static readonly SymbolDisplayFormat FullyQualifiedFormat =
+        SymbolDisplayFormat.FullyQualifiedFormat.AddMemberOptions(
+            SymbolDisplayMemberOptions.IncludeContainingType
+        );
+
+    private static readonly SymbolDisplayFormat FullyQualifiedFormatWithGlobalPrefix =
+        FullyQualifiedFormat.WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Included);
+
     private static readonly SymbolDisplayFormat FullyQualifiedFormatWithoutGlobalPrefix =
-        SymbolDisplayFormat.FullyQualifiedFormat.WithGlobalNamespaceStyle(
+        FullyQualifiedFormat.WithGlobalNamespaceStyle(
             SymbolDisplayGlobalNamespaceStyle.OmittedAsContaining
         );
 
@@ -50,22 +58,31 @@ internal static class RoslynExtensions
                 .All(t => t.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword)));
     }
 
-    extension(ITypeSymbol type)
+    extension(ISymbol symbol)
     {
         public string GetGloballyQualifiedName() =>
-            type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+            symbol.ToDisplayString(FullyQualifiedFormatWithGlobalPrefix);
 
         public string? TryGetNamespaceName() =>
-            type.ContainingNamespace is { IsGlobalNamespace: false } ns
+            symbol.ContainingNamespace is { IsGlobalNamespace: false } ns
                 ? ns.ToDisplayString(FullyQualifiedFormatWithoutGlobalPrefix)
                 : null;
+    }
 
+    extension(ITypeSymbol type)
+    {
         public bool IsMatchedBy(string fullyQualifiedName) =>
             string.Equals(
                 type.ToDisplayString(FullyQualifiedFormatWithoutGlobalPrefixOrGenerics),
                 fullyQualifiedName,
                 StringComparison.Ordinal
             );
+
+        public bool Implements(string interfaceFullyQualifiedName) =>
+            type.AllInterfaces.Any(i => i.IsMatchedBy(interfaceFullyQualifiedName));
+
+        public bool Inherits(string baseTypeFullyQualifiedName) =>
+            type.GetBaseTypes().Any(t => t.IsMatchedBy(baseTypeFullyQualifiedName));
 
         public IEnumerable<TypeDeclarationSyntax> GetDeclarations() =>
             type
@@ -82,6 +99,9 @@ internal static class RoslynExtensions
             }
         }
 
+        public IEnumerable<ITypeSymbol> GetSelfAndContainingTypes() =>
+            type.GetContainingTypes().Prepend(type);
+
         public IEnumerable<ITypeSymbol> GetBaseTypes()
         {
             var baseType = type.BaseType;
@@ -96,33 +116,25 @@ internal static class RoslynExtensions
 
         public IEnumerable<ISymbol> GetMembers(bool includeInherited = true)
         {
-            var memberNames = new HashSet<string>(StringComparer.Ordinal);
-
             foreach (var currentType in includeInherited ? type.GetSelfAndBaseTypes() : [type])
             {
                 foreach (var member in currentType.GetMembers())
                 {
-                    if (memberNames.Add(member.Name))
-                        yield return member;
+                    yield return member;
                 }
             }
         }
 
         public IEnumerable<IPropertySymbol> GetProperties(bool includeInherited = true) =>
-            type.GetMembers(includeInherited).OfType<IPropertySymbol>();
+            type.GetMembers(includeInherited)
+                .OfType<IPropertySymbol>()
+                .DistinctBy(p => p.Name, StringComparer.Ordinal);
 
-        public Accessibility GetActualAccessibility()
-        {
-            var accessibility = type.DeclaredAccessibility;
+        public IEnumerable<IMethodSymbol> GetMethods(bool includeInherited = true) =>
+            type.GetMembers(includeInherited).OfType<IMethodSymbol>();
 
-            foreach (var currentType in type.GetContainingTypes())
-            {
-                if (currentType.DeclaredAccessibility < accessibility)
-                    accessibility = currentType.DeclaredAccessibility;
-            }
-
-            return accessibility;
-        }
+        public Accessibility GetActualAccessibility() =>
+            type.GetSelfAndContainingTypes().Min(t => t.DeclaredAccessibility);
 
         public ITypeSymbol? TryGetEnumerableUnderlyingType() =>
             type
@@ -131,5 +143,11 @@ internal static class RoslynExtensions
                     == SpecialType.System_Collections_Generic_IEnumerable_T
                 )
                 ?.TypeArguments[0];
+
+        public ITypeSymbol? TryGetNullableUnderlyingType() =>
+            type is INamedTypeSymbol { IsValueType: true } named
+            && named.ConstructedFrom.SpecialType == SpecialType.System_Nullable_T
+                ? named.TypeArguments[0]
+                : null;
     }
 }

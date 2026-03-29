@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CliFx.Generators.Utils;
 using CliFx.Generators.Utils.Extensions;
 using Microsoft.CodeAnalysis;
 
@@ -13,14 +14,6 @@ internal record CommandSymbol(
     IReadOnlyList<CommandInputSymbol> Inputs
 )
 {
-    // Implemented by user, not generated code
-    public bool ImplementsHelpOptionInterface =>
-        Type.AllInterfaces.Any(i => i.IsMatchedBy("CliFx.ICommandWithHelpOption"));
-
-    // Implemented by user, not generated code
-    public bool ImplementsVersionOptionInterface =>
-        Type.AllInterfaces.Any(i => i.IsMatchedBy("CliFx.ICommandWithVersionOption"));
-
     public bool IsDefault => string.IsNullOrWhiteSpace(Name);
 
     public IReadOnlyList<CommandParameterSymbol> Parameters { get; } =
@@ -29,14 +22,8 @@ internal record CommandSymbol(
     public IReadOnlyList<CommandOptionSymbol> Options { get; } =
         Inputs.OfType<CommandOptionSymbol>().ToArray();
 
-    internal static CommandSymbol? TryResolve(
-        INamedTypeSymbol type,
-        out IReadOnlyList<Diagnostic> diagnostics
-    )
+    internal static CommandSymbol? TryResolve(INamedTypeSymbol type, DiagnosticReporter diagnostics)
     {
-        var diagnosticsList = new List<Diagnostic>();
-        diagnostics = diagnosticsList;
-
         var classDeclarations = type.GetDeclarations().ToArray();
 
         // Must have the [Command] attribute
@@ -49,7 +36,6 @@ internal record CommandSymbol(
         {
             // Shouldn't happen when called by the generator since it filters types by attribute,
             // so not worth the effort to produce a diagnostic.
-            diagnostics = diagnosticsList;
             return null;
         }
 
@@ -58,207 +44,41 @@ internal record CommandSymbol(
         {
             if (!declaration.IsFullyPartial())
             {
-                diagnosticsList.Add(
-                    Diagnostic.Create(
-                        DiagnosticDescriptors.CommandMustBePartial,
-                        declaration.Identifier.GetLocation(),
-                        type.Name
-                    )
+                diagnostics.Report(
+                    DiagnosticDescriptors.CommandMustBePartial,
+                    declaration.Identifier.GetLocation(),
+                    type.Name
                 );
             }
         }
 
         // Must implement ICommand
-        if (!type.AllInterfaces.Any(i => i.IsMatchedBy("CliFx.ICommand")))
+        if (!type.Implements("CliFx.ICommand"))
         {
-            diagnosticsList.Add(
-                Diagnostic.Create(
-                    DiagnosticDescriptors.CommandMustImplementICommand,
-                    classDeclarations.FirstOrDefault()?.Identifier.GetLocation()
-                        ?? type.Locations.FirstOrDefault(),
-                    type.Name
-                )
+            diagnostics.Report(
+                DiagnosticDescriptors.CommandMustImplementICommand,
+                classDeclarations.FirstOrDefault()?.Identifier.GetLocation()
+                    ?? type.Locations.FirstOrDefault(),
+                type.Name
             );
         }
 
-        var parameters = new List<CommandParameterSymbol>();
-        var options = new List<CommandOptionSymbol>();
-
-        foreach (var property in type.GetProperties().Where(p => !p.IsStatic))
-        {
-            var parameterAttribute = property
-                .GetAttributes()
-                .FirstOrDefault(a =>
-                    a.AttributeClass?.IsMatchedBy("CliFx.Binding.CommandParameterAttribute") == true
-                );
-
-            if (parameterAttribute is not null)
-            {
-                var descriptor = CommandParameterSymbol.TryResolve(
-                    property,
-                    parameterAttribute,
-                    out var parameterDiagnostics
-                );
-
-                diagnosticsList.AddRange(parameterDiagnostics);
-
-                if (descriptor is not null)
-                    parameters.Add(descriptor);
-            }
-
-            var optionAttribute = property
-                .GetAttributes()
-                .FirstOrDefault(a =>
-                    a.AttributeClass?.IsMatchedBy("CliFx.Binding.CommandOptionAttribute") == true
-                );
-
-            if (optionAttribute is not null)
-            {
-                var descriptor = CommandOptionSymbol.TryResolve(
-                    property,
-                    optionAttribute,
-                    out var optionDiagnostics
-                );
-
-                diagnosticsList.AddRange(optionDiagnostics);
-
-                if (descriptor is not null)
-                    options.Add(descriptor);
-            }
-        }
-
-        // Parameters must have unique order values
-        foreach (var (i, first) in parameters.Index())
-        {
-            foreach (var second in parameters.Skip(i + 1))
-            {
-                if (first.Order == second.Order)
-                {
-                    diagnosticsList.Add(
-                        Diagnostic.Create(
-                            DiagnosticDescriptors.CommandParameterMustHaveUniqueOrder,
-                            first.Property.Locations.FirstOrDefault(),
-                            first.Property.Name,
-                            second.Property.Name,
-                            first.Order
-                        )
-                    );
-                }
-            }
-        }
-
-        // Parameters must have unique names
-        foreach (var (i, first) in parameters.Index())
-        {
-            foreach (var second in parameters.Skip(i + 1))
-            {
-                if (string.Equals(first.Name, second.Name, StringComparison.OrdinalIgnoreCase))
-                {
-                    diagnosticsList.Add(
-                        Diagnostic.Create(
-                            DiagnosticDescriptors.CommandParameterMustHaveUniqueName,
-                            first.Property.Locations.FirstOrDefault(),
-                            first.Property.Name,
-                            second.Property.Name,
-                            first.Name
-                        )
-                    );
-                }
-            }
-        }
-
-        // Non-required parameters must have the highest order (and be alone)
-        var parametersByOrder = parameters.OrderBy(p => p.Order).ToArray();
-        foreach (var (i, parameter) in parametersByOrder.Index())
-        {
-            if (parameter.IsRequired)
-                continue;
-
-            if (i < parametersByOrder.Length - 1)
-            {
-                var nextParameter = parametersByOrder[i + 1];
-
-                diagnosticsList.Add(
-                    Diagnostic.Create(
-                        DiagnosticDescriptors.CommandParameterMustHaveHighestOrderIfNotRequired,
-                        parameter.Property.Locations.FirstOrDefault(),
-                        parameter.Property.Name,
-                        nextParameter.Property.Name
-                    )
-                );
-            }
-        }
-
-        // Sequence-based parameters must have the highest order (and be alone)
-        foreach (var (i, parameter) in parametersByOrder.Index())
-        {
-            if (!parameter.IsSequenceBased)
-                continue;
-
-            if (i < parametersByOrder.Length - 1)
-            {
-                var nextParameter = parametersByOrder[i + 1];
-
-                diagnosticsList.Add(
-                    Diagnostic.Create(
-                        DiagnosticDescriptors.CommandParameterMustHaveHighestOrderIfSequenceBased,
-                        parameter.Property.Locations.FirstOrDefault(),
-                        parameter.Property.Name,
-                        nextParameter.Property.Name
-                    )
-                );
-            }
-        }
-
-        // Options must have unique names and short names
-        foreach (var (i, first) in options.Index())
-        {
-            foreach (var second in options.Skip(i + 1))
-            {
-                if (
-                    !string.IsNullOrWhiteSpace(first.Name)
-                    && string.Equals(first.Name, second.Name, StringComparison.OrdinalIgnoreCase)
-                )
-                {
-                    diagnosticsList.Add(
-                        Diagnostic.Create(
-                            DiagnosticDescriptors.CommandOptionMustHaveUniqueName,
-                            first.Property.Locations.FirstOrDefault(),
-                            first.Property.Name,
-                            second.Property.Name,
-                            first.Name
-                        )
-                    );
-                }
-
-                if (first.ShortName is not null && first.ShortName == second.ShortName)
-                {
-                    diagnosticsList.Add(
-                        Diagnostic.Create(
-                            DiagnosticDescriptors.CommandOptionMustHaveUniqueShortName,
-                            first.Property.Locations.FirstOrDefault(),
-                            first.Property.Name,
-                            second.Property.Name,
-                            first.ShortName
-                        )
-                    );
-                }
-            }
-        }
-
-        return new CommandSymbol(
-            type,
+        var name =
             commandAttribute?.NamedArguments.FirstOrDefault(a => a.Key == "Name").Value.Value
                 as string
-                ?? commandAttribute
-                    ?.ConstructorArguments.Where(a =>
-                        a.Type?.SpecialType == SpecialType.System_String
-                    )
-                    .Select(a => a.Value as string)
-                    .FirstOrDefault(),
+            ?? commandAttribute
+                ?.ConstructorArguments.Where(a => a.Type?.SpecialType == SpecialType.System_String)
+                .Select(a => a.Value as string)
+                .FirstOrDefault();
+
+        var description =
             commandAttribute?.NamedArguments.FirstOrDefault(a => a.Key == "Description").Value.Value
-                as string,
-            [.. parameters, .. options]
-        );
+            as string;
+
+        var properties = type.GetProperties().ToArray();
+        var parameters = CommandParameterSymbol.Resolve(properties, diagnostics);
+        var options = CommandOptionSymbol.Resolve(properties, diagnostics);
+
+        return new CommandSymbol(type, name, description, [.. parameters, .. options]);
     }
 }

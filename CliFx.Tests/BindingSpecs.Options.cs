@@ -152,7 +152,9 @@ public partial class BindingSpecs
             // Assert
             act.Should()
                 .Throw()
-                .WithMessage($"*{DiagnosticDescriptors.CommandOptionShadowsBuiltInHelpOption.Id}*");
+                .WithMessage(
+                    $"*{DiagnosticDescriptors.CommandOptionShadowsConventionalHelpOption.Id}*"
+                );
         }
 
         [Fact]
@@ -179,7 +181,7 @@ public partial class BindingSpecs
             act.Should()
                 .Throw()
                 .WithMessage(
-                    $"*{DiagnosticDescriptors.CommandOptionShadowsBuiltInVersionOption.Id}*"
+                    $"*{DiagnosticDescriptors.CommandOptionShadowsConventionalVersionOption.Id}*"
                 );
         }
 
