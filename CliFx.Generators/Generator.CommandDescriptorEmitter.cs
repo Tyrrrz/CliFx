@@ -19,17 +19,10 @@ public partial class Generator
         var commandTypeName = command.Type.Name;
         var commandTypeFqn = command.Type.GetGloballyQualifiedName();
 
-        var userImplementsHelpOption = command.Type.AllInterfaces.Any(i =>
-            i.IsMatchedBy("CliFx.ICommandWithHelpOption")
-        );
-        var userImplementsVersionOption = command.Type.AllInterfaces.Any(i =>
-            i.IsMatchedBy("CliFx.ICommandWithVersionOption")
-        );
-
         var interfaces = new List<string>(2);
-        if (!userImplementsHelpOption)
+        if (!command.ImplementsHelpOptionInterface)
             interfaces.Add("global::CliFx.ICommandWithHelpOption");
-        if (command.IsDefault && !userImplementsVersionOption)
+        if (command.IsDefault && !command.ImplementsVersionOptionInterface)
             interfaces.Add("global::CliFx.ICommandWithVersionOption");
 
         var interfaceList =
@@ -69,7 +62,7 @@ public partial class Generator
             """
         );
 
-        if (!userImplementsHelpOption)
+        if (!command.ImplementsHelpOptionInterface)
         {
             sb.Append(
                 """
@@ -81,7 +74,7 @@ public partial class Generator
             );
         }
 
-        if (command.IsDefault && !userImplementsVersionOption)
+        if (command.IsDefault && !command.ImplementsVersionOptionInterface)
         {
             sb.Append(
                 """
@@ -109,7 +102,7 @@ public partial class Generator
         var diagnosticsList = new List<Diagnostic>();
 
         // Validate that manually implemented help/version interface properties have binding attributes
-        if (userImplementsHelpOption)
+        if (command.ImplementsHelpOptionInterface)
         {
             var isHelpRequestedProperty = command
                 .Type.GetProperties()
@@ -138,7 +131,7 @@ public partial class Generator
             }
         }
 
-        if (userImplementsVersionOption)
+        if (command.ImplementsVersionOptionInterface)
         {
             var isVersionRequestedProperty = command
                 .Type.GetProperties()
@@ -241,10 +234,10 @@ public partial class Generator
             );
         }
 
-        if (!userImplementsHelpOption)
+        if (!command.ImplementsHelpOptionInterface)
             EmitBuiltInHelpOption(sb, command, diagnosticsList);
 
-        if (command.IsDefault && !userImplementsVersionOption)
+        if (command.IsDefault && !command.ImplementsVersionOptionInterface)
             EmitBuiltInVersionOption(sb, command, diagnosticsList);
 
         sb.Append(

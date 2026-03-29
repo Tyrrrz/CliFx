@@ -13,6 +13,14 @@ internal record CommandSymbol(
     IReadOnlyList<CommandInputSymbol> Inputs
 )
 {
+    // Implemented by user, not generated code
+    public bool ImplementsHelpOptionInterface =>
+        Type.AllInterfaces.Any(i => i.IsMatchedBy("CliFx.ICommandWithHelpOption"));
+
+    // Implemented by user, not generated code
+    public bool ImplementsVersionOptionInterface =>
+        Type.AllInterfaces.Any(i => i.IsMatchedBy("CliFx.ICommandWithVersionOption"));
+
     public bool IsDefault => string.IsNullOrWhiteSpace(Name);
 
     public IReadOnlyList<CommandParameterSymbol> Parameters { get; } =
