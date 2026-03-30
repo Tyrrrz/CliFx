@@ -18,7 +18,7 @@ public class CommandAttribute(string? name) : Attribute
     /// Command name.
     /// </summary>
     /// <remarks>
-    /// Command can have no name, in which case it's treated as the application's default command.
+    /// Command can have no name, in which case it's treated as the application's default (i.e. root) command.
     /// Only one default command is allowed to be registered in an application.
     /// All commands registered in an application must have unique names (comparison IS NOT case-sensitive).
     /// </remarks>
