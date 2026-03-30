@@ -59,8 +59,8 @@ To learn more about the war and how you can help, [click here](https://tyrrrz.me
 
 ### Quick overview
 
-To turn your program into a command-line interface, modify the `Main()` method so that it delegates the execution to an instance of `CliApplication`.
-You can use `CliApplicationBuilder` to simplify the process of creating and configuring an application:
+To turn your program into a command-line interface, modify the `Main()` method so that it delegates the execution to an instance of `CommandLineApplication`.
+You can use `CommandLineApplicationBuilder` to simplify the process of creating and configuring an application:
 
 ```csharp
 using CliFx;
@@ -68,7 +68,7 @@ using CliFx;
 public static class Program
 {
     public static async Task<int> Main() =>
-        await new CliApplicationBuilder()
+        await new CommandLineApplicationBuilder()
             .AddCommandsFromThisAssembly()
             .Build()
             .RunAsync();
@@ -76,11 +76,11 @@ public static class Program
 ```
 
 > [!WARNING]
-> Ensure that your `Main()` method returns the integer exit code provided by `CliApplication.RunAsync()`, as shown in the above example.
+> Ensure that your `Main()` method returns the integer exit code provided by `CommandLineApplication.RunAsync()`, as shown in the above example.
 > Exit code is used to communicate execution result to the parent process, so it's important that your program propagates it.
 
 > [!NOTE]
-> When calling `CliApplication.RunAsync()`, **CliFx** resolves command-line arguments and environment variables from `Environment.GetCommandLineArgs()` and `Environment.GetEnvironmentVariables()` respectively.
+> When calling `CommandLineApplication.RunAsync()`, **CliFx** resolves command-line arguments and environment variables from `Environment.GetCommandLineArgs()` and `Environment.GetEnvironmentVariables()` respectively.
 > You can also provide them manually using one of the alternative overloads.
 
 The code above uses `AddCommandsFromThisAssembly()` to detect command types defined within the current project and register them on the application.
@@ -90,10 +90,10 @@ To define a command, create a class that implements the `ICommand` interface and
 
 ```csharp
 using CliFx;
-using CliFx.Attributes;
+using CliFx.Binding;
 
 [Command(Description = "Calculates the logarithm of a value.")]
-public class LogCommand : ICommand
+public partial class LogCommand : ICommand
 {
     // Order: 0
     [CommandParameter(0, Description = "Value whose logarithm is to be found.")]
@@ -198,7 +198,7 @@ Similarly, unseparated arguments in the form of `myapp -ofile` will be treated a
 These rules also make the order of arguments important — command-line string is expected to follow this pattern:
 
 ```console
-$ myapp [...directives] [command] [...parameters] [...options]
+$ myapp [command] [...parameters] [...options]
 ```
 
 ### Parameters and options
@@ -280,7 +280,7 @@ Here's an example of a command with an array-backed parameter:
 
 ```csharp
 [Command]
-public class FileSizeCalculatorCommand : ICommand
+public partial class FileSizeCalculatorCommand : ICommand
 {
     // FileInfo is string-initializable and IReadOnlyList<T> can be assigned from an array,
     // so the value of this property can be mapped from a sequence of arguments.
@@ -305,11 +305,11 @@ Total file size: 186368 bytes
 
 #### Custom conversion
 
-To create a custom converter for a parameter or an option, define a class that inherits from `BindingConverter<T>` and specify it in the attribute:
+To create a custom converter for a parameter or an option, define a class that inherits from `ScalarInputConverter<T>` and specify it in the attribute:
 
 ```csharp
 // Maps 2D vectors from AxB notation
-public class VectorConverter : BindingConverter<Vector2>
+public class VectorConverter : ScalarInputConverter<Vector2>
 {
     public override Vector2 Convert(string? rawValue)
     {
@@ -325,7 +325,7 @@ public class VectorConverter : BindingConverter<Vector2>
 }
 
 [Command]
-public class SurfaceCalculatorCommand : ICommand
+public partial class SurfaceCalculatorCommand : ICommand
 {
     // Custom converter is used to map raw argument values
     [CommandParameter(0, Converter = typeof(VectorConverter))]
@@ -370,28 +370,28 @@ Commands that have common name segments are considered to be hierarchically rela
 ```csharp
 // Default command, i.e. command without a name
 [Command]
-public class DefaultCommand : ICommand
+public partial class DefaultCommand : ICommand
 {
     // ...
 }
 
 // Child of default command
 [Command("cmd1")]
-public class FirstCommand : ICommand
+public partial class FirstCommand : ICommand
 {
     // ...
 }
 
 // Child of default command
 [Command("cmd2")]
-public class SecondCommand : ICommand
+public partial class SecondCommand : ICommand
 {
     // ...
 }
 
 // Child of FirstCommand
 [Command("cmd1 sub")]
-public class SubCommand : ICommand
+public partial class SubCommand : ICommand
 {
     // ...
 }
@@ -451,7 +451,7 @@ This special exception type can be used to print an error message to the console
 
 ```csharp
 [Command]
-public class DivideCommand : ICommand
+public partial class DivideCommand : ICommand
 {
     [CommandOption("dividend")]
     public required double Dividend { get; init; }
@@ -499,7 +499,7 @@ Once this method is called, the program will no longer terminate on an interrupt
 
 ```csharp
 [Command]
-public class CancellableCommand : ICommand
+public partial class CancellableCommand : ICommand
 {
     private async ValueTask DoSomethingAsync(CancellationToken cancellation)
     {
@@ -537,7 +537,7 @@ To do that, pass a custom `ITypeActivator` or a factory delegate to the `UseType
 public static class Program
 {
     public static async Task<int> Main() =>
-        await new CliApplicationBuilder()
+        await new CommandLineApplicationBuilder()
             .AddCommandsFromThisAssembly()
             .UseTypeActivator(type =>
             {
@@ -556,9 +556,9 @@ For example, this is how to configure your application to use [`Microsoft.Extens
 public static class Program
 {
     public static async Task<int> Main() =>
-        await new CliApplicationBuilder()
+        await new CommandLineApplicationBuilder()
             .AddCommandsFromThisAssembly()
-            .UseTypeActivator(commandTypes =>
+            .UseTypeActivator(commands =>
             {
                 var services = new ServiceCollection();
 
@@ -566,8 +566,8 @@ public static class Program
                 services.AddSingleton<MyService>();
 
                 // Register commands
-                foreach (var commandType in commandTypes)
-                    services.AddTransient(commandType);
+                foreach (var command in commands)
+                    services.AddTransient(command.Type);
 
                 return services.BuildServiceProvider();
             })
@@ -589,7 +589,7 @@ For example, imagine you have the following command:
 
 ```csharp
 [Command]
-public class ConcatCommand : ICommand
+public partial class ConcatCommand : ICommand
 {
     [CommandOption("left")]
     public string Left { get; init; } = "Hello";
@@ -643,8 +643,8 @@ public async Task ConcatCommand_executes_successfully()
     // Arrange
     using var console = new FakeInMemoryConsole();
 
-    var app = new CliApplicationBuilder()
-        .AddCommand<ConcatCommand>()
+    var app = new CommandLineApplicationBuilder()
+        .AddCommand(ConcatCommand.Descriptor)
         .UseConsole(console)
         .Build();
 
@@ -668,38 +668,43 @@ public async Task ConcatCommand_executes_successfully()
 ### Debug and preview mode
 
 When troubleshooting issues, you may find it useful to run your app in debug or preview mode.
-To do that, pass the corresponding directive before any other command-line arguments.
-
-In order to run the application in debug mode, use the `[debug]` directive.
-This will cause the program to launch in a suspended state, waiting for the debugger to attach to the current process:
-
-```console
-$ dotnet myapp.dll [debug] cmd -o
-
-Attach debugger to PID 3148 to continue.
-```
-
-To run the application in preview mode, use the `[preview]` directive.
-This will short-circuit the execution and instead print the consumed command-line arguments as they were parsed, along with resolved environment variables:
-
-```console
-$ dotnet myapp.dll [preview] cmd arg1 arg2 -o foo --option bar1 bar2
-
-Command-line:
-  cmd <arg1> <arg2> [-o foo] [--option bar1 bar2]
-
-Environment:
-  FOO="123"
-  BAR="xyz"
-```
-
-You can also disallow these directives, e.g. when running in production, by calling `AllowDebugMode(...)` and `AllowPreviewMode(...)` methods on `CliApplicationBuilder`:
+These modes are activated through environment variables, which you can configure using `AllowDebugMode(...)` and `AllowPreviewMode(...)` methods on `CommandLineApplicationBuilder`:
 
 ```csharp
-var app = new CliApplicationBuilder()
+var app = new CommandLineApplicationBuilder()
     .AddCommandsFromThisAssembly()
-    .AllowDebugMode(true) // allow debug mode
-    .AllowPreviewMode(false) // disallow preview mode
+    // Enable debug mode via the CLIFX_DEBUG environment variable
+    .AllowDebugMode("CLIFX_DEBUG")
+    // Enable preview mode via the CLIFX_PREVIEW environment variable
+    .AllowPreviewMode("CLIFX_PREVIEW")
+    .Build();
+```
+
+When the debug mode environment variable is set to `true`, the application will launch in a suspended state, waiting for the debugger to attach to the current process:
+
+```console
+$ MYAPP_DEBUG=true dotnet myapp.dll cmd -o
+
+Attach the debugger to process with ID 3148 to continue.
+```
+
+When the preview mode environment variable is set to `true`, the application will print the consumed command-line arguments as they were parsed:
+
+```console
+$ MYAPP_PREVIEW=true dotnet myapp.dll cmd arg1 arg2 -o foo --option bar1 bar2
+
+cmd <arg1> <arg2> [-o foo] [--option bar1 bar2]
+```
+
+To disable these modes (e.g. for production), simply pass `null` as the environment variable name:
+
+```csharp
+var app = new CommandLineApplicationBuilder()
+    .AddCommandsFromThisAssembly()
+    // Disable debug mode
+    .AllowDebugMode(null)
+    // Disable preview mode
+    .AllowPreviewMode(null)
     .Build();
 ```
 
