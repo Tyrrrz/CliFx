@@ -205,7 +205,7 @@ public partial class CommandLineApplicationBuilder
             );
         }
 
-        return Path.GetFileNameWithoutExtension(processFilePath);
+        return Path.GetFileName(processFilePath);
     }
 
     private static string GetDefaultVersionText()
