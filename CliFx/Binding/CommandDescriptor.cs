@@ -45,6 +45,9 @@ public class CommandDescriptor(
         !string.IsNullOrWhiteSpace(Name)
             ? string.Equals(name, Name, StringComparison.OrdinalIgnoreCase)
             : string.IsNullOrWhiteSpace(name);
+
+    /// <inheritdoc />
+    public override string ToString() => !string.IsNullOrWhiteSpace(Name) ? Name : "<default>";
 }
 
 /// <inheritdoc cref="CommandDescriptor" />

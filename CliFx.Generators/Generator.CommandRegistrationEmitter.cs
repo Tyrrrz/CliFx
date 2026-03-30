@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using CliFx.Generators.Binding;
+using CliFx.Generators.Utils;
 using CliFx.Generators.Utils.Extensions;
 using Microsoft.CodeAnalysis;
 
@@ -30,16 +31,16 @@ public partial class Generator
                     /// </summary>
                     /// <remarks>
                     /// <list type="bullet">
-                            {{string.Join(
-                                Environment.NewLine,
-                                orderedCommands.Select(c =>
-                                    $"""
-                                    /// <item>
-                                    /// <see cref="{c.Type.GetGloballyQualifiedName()}" /> ({(c.IsDefault ? "default" : '"' + c.Name + '"')})
-                                    /// </item>
-                                    """
-                                )
-                            )}}
+                        {{string.Join(
+                            Environment.NewLine,
+                            orderedCommands.Select(c =>
+                                $"""
+                                /// <item>
+                                /// <see cref="{Xml.Escape(c.Type.GetGloballyQualifiedName())}" /> ({Xml.Escape(c.ToString())})
+                                /// </item>
+                                """
+                            )
+                        ).NullIfWhiteSpace() ?? "///"}}
                     /// </list>
                     /// </remarks>
                     internal static global::CliFx.CommandLineApplicationBuilder AddCommandsFromThisAssembly(

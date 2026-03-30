@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using CliFx.Generators.Utils;
@@ -7,7 +6,7 @@ using Microsoft.CodeAnalysis;
 
 namespace CliFx.Generators.Binding;
 
-internal record CommandSymbol(
+internal partial record CommandSymbol(
     INamedTypeSymbol Type,
     string? Name,
     string? Description,
@@ -22,6 +21,11 @@ internal record CommandSymbol(
     public IReadOnlyList<CommandOptionSymbol> Options { get; } =
         Inputs.OfType<CommandOptionSymbol>().ToArray();
 
+    public override string ToString() => !string.IsNullOrWhiteSpace(Name) ? Name : "<default>";
+}
+
+internal partial record CommandSymbol
+{
     internal static CommandSymbol? TryResolve(INamedTypeSymbol type, DiagnosticReporter diagnostics)
     {
         // Must have the [Command] attribute

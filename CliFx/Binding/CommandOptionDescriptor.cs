@@ -38,8 +38,7 @@ public class CommandOptionDescriptor(
     internal bool MatchesIdentifier(string identifier) =>
         MatchesName(identifier) || identifier.Length == 1 && MatchesShortName(identifier[0]);
 
-    /// <inheritdoc cref="ToString()" />
-    public string ToString(bool includeKind)
+    internal string ToString(bool includeKind, bool includeValue)
     {
         var buffer = new StringBuilder();
 
@@ -53,11 +52,23 @@ public class CommandOptionDescriptor(
         else if (ShortName is not null)
             buffer.Append($"-{ShortName}");
 
+        if (includeValue)
+        {
+            buffer.Append(' ');
+
+            if (!IsRequired)
+                buffer.Append('<').Append("value").Append("?>");
+            else if (Converter.CanConvertSequence)
+                buffer.Append('<').Append("value").Append("...>");
+            else
+                buffer.Append('<').Append("value").Append('>');
+        }
+
         return buffer.ToString();
     }
 
     /// <inheritdoc />
-    public override string ToString() => ToString(true);
+    public override string ToString() => ToString(true, true);
 }
 
 /// <inheritdoc cref="CommandOptionDescriptor" />

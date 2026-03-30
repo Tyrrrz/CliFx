@@ -516,8 +516,23 @@ public partial class Generator
         partial class {{command.Type.Name}}
         {
             /// <summary>
-            /// Generated command descriptor for <see cref="{{command.Type.GetGloballyQualifiedName()}}" /> ({{(command.IsDefault ? "default" : '"' + command.Name + '"')}}).
+            /// Generated command descriptor for <see cref="{{Xml.Escape(command.Type.GetGloballyQualifiedName())}}" /> ({{Xml.Escape(command.ToString())}}).
             /// </summary>
+            /// <remarks>
+            /// <list type="bullet">
+                {{string.Join(
+                    Environment.NewLine,
+                    command.Inputs.Select(i =>
+                        // lang=xml
+                        $"""
+                        /// <item>
+                        /// <see cref="{Xml.Escape(i.Property.GetGloballyQualifiedName())}" /> ({Xml.Escape(i.ToString())})
+                        /// </item>
+                        """
+                    )
+                ).NullIfWhiteSpace() ?? "///"}}
+            /// </list>
+            /// </remarks>
             public static global::CliFx.Binding.CommandDescriptor Descriptor { get; } =
                 new global::CliFx.Binding.CommandDescriptor<{{command.Type.GetGloballyQualifiedName()}}>(
                     {{CSharp.Encode(command.Name)}},

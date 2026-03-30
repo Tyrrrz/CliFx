@@ -193,7 +193,7 @@ internal class CommandActivator(
                      Missing required option(s):
                      {string.Join(
                          ", ",
-                         remainingRequiredOptions.Select(o => o.ToString(false))
+                         remainingRequiredOptions.Select(o => o.ToString(false, false))
                      )}
                      """
                 );

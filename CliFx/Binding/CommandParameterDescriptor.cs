@@ -23,18 +23,19 @@ public class CommandParameterDescriptor(
     /// <inheritdoc cref="CommandParameterAttribute.Name" />
     public string Name { get; } = name;
 
-    /// <inheritdoc cref="ToString()" />
-    public string ToString(bool includeKind)
+    internal string ToString(bool includeKind)
     {
         var buffer = new StringBuilder();
 
         if (includeKind)
             buffer.Append("Parameter ");
 
-        if (!Converter.CanConvertSequence)
-            buffer.Append('<').Append(Name).Append('>');
-        else
+        if (!IsRequired)
+            buffer.Append('<').Append(Name).Append("?>");
+        else if (Converter.CanConvertSequence)
             buffer.Append('<').Append(Name).Append("...>");
+        else
+            buffer.Append('<').Append(Name).Append('>');
 
         return buffer.ToString();
     }

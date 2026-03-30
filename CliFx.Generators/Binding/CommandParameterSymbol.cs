@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using CliFx.Generators.Utils;
 using CliFx.Generators.Utils.Extensions;
 using Microsoft.CodeAnalysis;
 
 namespace CliFx.Generators.Binding;
 
-internal record CommandParameterSymbol(
+internal partial record CommandParameterSymbol(
     IPropertySymbol Property,
     int Order,
     string Name,
@@ -16,6 +17,28 @@ internal record CommandParameterSymbol(
     INamedTypeSymbol? ConverterType,
     IReadOnlyList<INamedTypeSymbol> ValidatorTypes
 ) : CommandInputSymbol(Property, IsRequired, Description, ConverterType, ValidatorTypes)
+{
+    internal string ToString(bool includeKind)
+    {
+        var buffer = new StringBuilder();
+
+        if (includeKind)
+            buffer.Append("Parameter ");
+
+        if (!IsRequired)
+            buffer.Append('<').Append(Name).Append("?>");
+        else if (IsSequenceBased)
+            buffer.Append('<').Append(Name).Append("...>");
+        else
+            buffer.Append('<').Append(Name).Append('>');
+
+        return buffer.ToString();
+    }
+
+    public override string ToString() => ToString(true);
+}
+
+internal partial record CommandParameterSymbol
 {
     internal static CommandParameterSymbol? TryResolve(
         IPropertySymbol property,

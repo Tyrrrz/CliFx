@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using CliFx.Generators.Utils;
 using CliFx.Generators.Utils.Extensions;
 using Microsoft.CodeAnalysis;
 
 namespace CliFx.Generators.Binding;
 
-internal record CommandOptionSymbol(
+internal partial record CommandOptionSymbol(
     IPropertySymbol Property,
     string? Name,
     char? ShortName,
@@ -17,6 +18,40 @@ internal record CommandOptionSymbol(
     INamedTypeSymbol? ConverterType,
     IReadOnlyList<INamedTypeSymbol> ValidatorTypes
 ) : CommandInputSymbol(Property, IsRequired, Description, ConverterType, ValidatorTypes)
+{
+    internal string ToString(bool includeKind, bool includeValue)
+    {
+        var buffer = new StringBuilder();
+
+        if (includeKind)
+            buffer.Append("Option ");
+
+        if (!string.IsNullOrWhiteSpace(Name) && ShortName is not null)
+            buffer.Append($"-{ShortName}|--{Name}");
+        else if (!string.IsNullOrWhiteSpace(Name))
+            buffer.Append($"--{Name}");
+        else if (ShortName is not null)
+            buffer.Append($"-{ShortName}");
+
+        if (includeValue)
+        {
+            buffer.Append(' ');
+
+            if (!IsRequired)
+                buffer.Append('<').Append("value").Append("?>");
+            else if (IsSequenceBased)
+                buffer.Append('<').Append("value").Append("...>");
+            else
+                buffer.Append('<').Append("value").Append('>');
+        }
+
+        return buffer.ToString();
+    }
+
+    public override string ToString() => ToString(true, true);
+}
+
+internal partial record CommandOptionSymbol
 {
     internal static CommandOptionSymbol? TryResolve(
         IPropertySymbol property,
