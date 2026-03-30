@@ -9,9 +9,14 @@ public class LibraryProvider
     private static string StorageFilePath { get; } =
         Path.Combine(Directory.GetCurrentDirectory(), "Library.json");
 
+    private static readonly JsonSerializerOptions _serializerOptions = new()
+    {
+        TypeInfoResolver = Library.JsonContext.Default,
+    };
+
     private void StoreLibrary(Library library)
     {
-        var data = JsonSerializer.Serialize(library);
+        var data = JsonSerializer.Serialize(library, _serializerOptions);
         File.WriteAllText(StorageFilePath, data);
     }
 
@@ -22,7 +27,7 @@ public class LibraryProvider
 
         var data = File.ReadAllText(StorageFilePath);
 
-        return JsonSerializer.Deserialize<Library>(data) ?? Library.Empty;
+        return JsonSerializer.Deserialize<Library>(data, _serializerOptions) ?? Library.Empty;
     }
 
     public Book? TryGetBook(string title) =>

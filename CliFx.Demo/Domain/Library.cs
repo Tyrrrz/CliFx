@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace CliFx.Demo.Domain;
 
@@ -24,4 +25,7 @@ public partial record Library(IReadOnlyList<Book> Books)
 public partial record Library
 {
     public static Library Empty { get; } = new([]);
+
+    [JsonSerializable(typeof(Library))]
+    internal partial class JsonContext : JsonSerializerContext;
 }
