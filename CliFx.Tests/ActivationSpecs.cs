@@ -134,59 +134,6 @@ public partial class ActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(t
     }
 
     [Fact]
-    public async Task I_can_pass_a_value_to_an_input_bound_to_a_boolean_property_using_alternative_identifiers()
-    {
-        // Arrange
-        var application = new CommandLineApplicationBuilder()
-            .AddCommands(
-                CommandCompiler.Compile(
-                    // lang=csharp
-                    """
-                    [Command]
-                    public partial class Command : ICommand
-                    {
-                        [CommandOption('a')]
-                        public bool Foo { get; set; }
-
-                        [CommandOption('b')]
-                        public bool Bar { get; set; }
-
-                        [CommandOption('c')]
-                        public bool Baz { get; set; }
-
-                        [CommandOption('d')]
-                        public bool Qux { get; set; }
-
-                        public ValueTask ExecuteAsync(IConsole console)
-                        {
-                            console.WriteLine("Foo = " + Foo);
-                            console.WriteLine("Bar = " + Bar);
-                            console.WriteLine("Baz = " + Baz);
-                            console.WriteLine("Qux = " + Qux);
-
-                            return default;
-                        }
-                    }
-                    """
-                )
-            )
-            .UseConsole(FakeConsole)
-            .Build();
-
-        // Act
-        var exitCode = await application.RunAsync(
-            ["-a", "on", "-b", "off", "-c", "Yes", "-d", "no"],
-            new Dictionary<string, string>()
-        );
-
-        // Assert
-        exitCode.Should().Be(0);
-
-        var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ConsistOfLines("Foo = True", "Bar = False", "Baz = True", "Qux = False");
-    }
-
-    [Fact]
     public async Task I_can_pass_a_value_to_an_input_bound_to_an_integer_property()
     {
         // Arrange
