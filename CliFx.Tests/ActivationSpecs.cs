@@ -134,7 +134,7 @@ public partial class ActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(t
     }
 
     [Fact]
-    public async Task I_can_pass_an_on_off_yes_no_value_to_an_input_bound_to_a_boolean_property()
+    public async Task I_can_pass_a_value_to_an_input_bound_to_a_boolean_property_using_alternative_identifiers()
     {
         // Arrange
         var application = new CommandLineApplicationBuilder()
@@ -360,9 +360,13 @@ public partial class ActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(t
                         [CommandOption('f')]
                         public CustomEnum Foo { get; set; }
 
+                        [CommandOption('b')]
+                        public CustomEnum Bar { get; set; }
+
                         public ValueTask ExecuteAsync(IConsole console)
                         {
-                            console.WriteLine((int) Foo);
+                            console.WriteLine("Foo = " + (int) Foo);
+                            console.WriteLine("Bar = " + (int) Bar);
                             return default;
                         }
                     }
@@ -373,52 +377,16 @@ public partial class ActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(t
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(["-f", "two"], new Dictionary<string, string>());
+        var exitCode = await application.RunAsync(
+            ["-f", "two", "-b", "2"],
+            new Dictionary<string, string>()
+        );
 
         // Assert
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Trim().Should().Be("2");
-    }
-
-    [Fact]
-    public async Task I_can_pass_a_numeric_value_to_an_input_bound_to_an_enum_property()
-    {
-        // Arrange
-        var application = new CommandLineApplicationBuilder()
-            .AddCommands(
-                CommandCompiler.Compile(
-                    // lang=csharp
-                    """
-                    public enum CustomEnum { One = 1, Two = 2, Three = 3 }
-
-                    [Command]
-                    public partial class Command : ICommand
-                    {
-                        [CommandOption('f')]
-                        public CustomEnum Foo { get; set; }
-
-                        public ValueTask ExecuteAsync(IConsole console)
-                        {
-                            console.WriteLine((int) Foo);
-                            return default;
-                        }
-                    }
-                    """
-                )
-            )
-            .UseConsole(FakeConsole)
-            .Build();
-
-        // Act
-        var exitCode = await application.RunAsync(["-f", "2"], new Dictionary<string, string>());
-
-        // Assert
-        exitCode.Should().Be(0);
-
-        var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Trim().Should().Be("2");
+        stdOut.Should().ConsistOfLines("Foo = 2", "Bar = 2");
     }
 
     [Fact]
