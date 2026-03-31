@@ -146,23 +146,23 @@ public partial class ActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(t
                     public partial class Command : ICommand
                     {
                         [CommandOption('a')]
-                        public bool A { get; set; }
+                        public bool Foo { get; set; }
 
                         [CommandOption('b')]
-                        public bool B { get; set; }
+                        public bool Bar { get; set; }
 
                         [CommandOption('c')]
-                        public bool C { get; set; }
+                        public bool Baz { get; set; }
 
                         [CommandOption('d')]
-                        public bool D { get; set; }
+                        public bool Qux { get; set; }
 
                         public ValueTask ExecuteAsync(IConsole console)
                         {
-                            console.WriteLine("A = " + A);
-                            console.WriteLine("B = " + B);
-                            console.WriteLine("C = " + C);
-                            console.WriteLine("D = " + D);
+                            console.WriteLine("Foo = " + Foo);
+                            console.WriteLine("Bar = " + Bar);
+                            console.WriteLine("Baz = " + Baz);
+                            console.WriteLine("Qux = " + Qux);
 
                             return default;
                         }
@@ -183,7 +183,7 @@ public partial class ActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(t
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ConsistOfLines("A = True", "B = False", "C = True", "D = False");
+        stdOut.Should().ConsistOfLines("Foo = True", "Bar = False", "Baz = True", "Qux = False");
     }
 
     [Fact]

@@ -20,13 +20,17 @@ public class BoolScalarInputConverter(
             string.Equals(rawValue, "on", StringComparison.OrdinalIgnoreCase)
             || string.Equals(rawValue, "yes", StringComparison.OrdinalIgnoreCase)
         )
+        {
             return true;
+        }
 
         if (
             string.Equals(rawValue, "off", StringComparison.OrdinalIgnoreCase)
             || string.Equals(rawValue, "no", StringComparison.OrdinalIgnoreCase)
         )
+        {
             return false;
+        }
 
         return bool.Parse(rawValue);
     }
