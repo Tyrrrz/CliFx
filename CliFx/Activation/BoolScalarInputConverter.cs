@@ -1,3 +1,5 @@
+using System;
+
 namespace CliFx.Activation;
 
 /// <summary>
@@ -9,6 +11,27 @@ public class BoolScalarInputConverter(
 ) : ScalarInputConverter<bool>
 {
     /// <inheritdoc />
-    public override bool Convert(string? rawValue) =>
-        !string.IsNullOrWhiteSpace(rawValue) ? bool.Parse(rawValue) : valueWhenEmpty;
+    public override bool Convert(string? rawValue)
+    {
+        if (string.IsNullOrWhiteSpace(rawValue))
+            return valueWhenEmpty;
+
+        if (
+            string.Equals(rawValue, "on", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(rawValue, "yes", StringComparison.OrdinalIgnoreCase)
+        )
+        {
+            return true;
+        }
+
+        if (
+            string.Equals(rawValue, "off", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(rawValue, "no", StringComparison.OrdinalIgnoreCase)
+        )
+        {
+            return false;
+        }
+
+        return bool.Parse(rawValue);
+    }
 }
