@@ -19,13 +19,17 @@ public class EnumScalarInputConverter<T> : ScalarInputConverter<T>
             rawValue is not null
             && long.TryParse(rawValue, CultureInfo.InvariantCulture, out var longValue)
         )
+        {
             return (T)Enum.ToObject(typeof(T), longValue);
+        }
 
         if (
             rawValue is not null
             && ulong.TryParse(rawValue, CultureInfo.InvariantCulture, out var ulongValue)
         )
+        {
             return (T)Enum.ToObject(typeof(T), ulongValue);
+        }
 
         return Enum.Parse<T>(rawValue!, true);
     }
