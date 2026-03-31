@@ -175,7 +175,7 @@ public partial class ActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(t
 
         // Act
         var exitCode = await application.RunAsync(
-            ["-a", "on", "-b", "off", "-c", "yes", "-d", "no"],
+            ["-a", "on", "-b", "off", "-c", "Yes", "-d", "no"],
             new Dictionary<string, string>()
         );
 
