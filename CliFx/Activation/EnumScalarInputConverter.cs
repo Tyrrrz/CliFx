@@ -16,22 +16,14 @@ public class EnumScalarInputConverter<T> : ScalarInputConverter<T>
         // Try long first (covers all signed and most unsigned underlying types),
         // then fall back to ulong for unsigned values beyond long.MaxValue.
         if (
-            long.TryParse(
-                rawValue,
-                NumberStyles.Integer,
-                CultureInfo.InvariantCulture,
-                out var longValue
-            )
+            rawValue is not null
+            && long.TryParse(rawValue, CultureInfo.InvariantCulture, out var longValue)
         )
             return (T)Enum.ToObject(typeof(T), longValue);
 
         if (
-            ulong.TryParse(
-                rawValue,
-                NumberStyles.Integer,
-                CultureInfo.InvariantCulture,
-                out var ulongValue
-            )
+            rawValue is not null
+            && ulong.TryParse(rawValue, CultureInfo.InvariantCulture, out var ulongValue)
         )
             return (T)Enum.ToObject(typeof(T), ulongValue);
 
