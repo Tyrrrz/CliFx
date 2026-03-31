@@ -20,7 +20,7 @@
 </p>
 
 **CliFx** is an opinionated framework for building command-line applications.
-It provides a model to express command interactions directly through classes and properties, skipping all the infrastructural concerns like argument parsing, routing, error handling, and help generation.
+It provides a model to express command interactions through a relationship of classes and properties, skipping all the low-level infrastructural concerns like argument parsing, routing, error handling, and help generation.
 
 ## Terms of use<sup>[[?]](https://github.com/Tyrrrz/.github/blob/prime/docs/why-so-political.md)</sup>
 
@@ -59,38 +59,8 @@ To learn more about the war and how you can help, [click here](https://tyrrrz.me
 
 ### Quick overview
 
-To turn your program into a command-line interface, modify the `Main()` method so that it delegates its execution to an instance of `CommandLineApplication`.
-You can use `CommandLineApplicationBuilder` to create and configure an application in a series of fluent instructions:
-
-```csharp
-using CliFx;
-
-public static class Program
-{
-    public static async Task<int> Main() =>
-        await new CommandLineApplicationBuilder()
-            // Registers all accessible command types from the current assembly
-            .AddCommandsFromThisAssembly()
-            // Creates the application instance
-            .Build()
-            // Runs the application, resolving command-line arguments and
-            // environment variables automatically.
-            .RunAsync();
-}
-```
-
-> [!IMPORTANT]
-> Ensure that your `Main()` method returns the integer exit code provided by `CommandLineApplication.RunAsync()`, as shown in the example above.
-> Exit code is used to communicate execution result to the parent process, so it's important that your program properly propagates it.
-
-> [!NOTE]
-> When calling `CommandLineApplication.RunAsync()`, **CliFx** resolves command-line arguments and environment variables from `Environment.GetCommandLineArgs()` and `Environment.GetEnvironmentVariables()` respectively.
-> You can also provide them explicitly using one of the alternative overloads.
-
-In **CliFx**, all application functionality is encapsulated within commands, which are logically independent entry points that the user can choose to execute.
-The above example uses `AddCommandsFromThisAssembly()` to detect all command types defined in the current assembly and register them with the application.
-
-To define a command, you need to declare a `partial` class, annotate it with the `[Command]` attribute, and implement the `ICommand` interface:
+In **CliFx**, all application functionality is encapsulated within commands — they represent different independent entry points that the user can execute.
+To define a command, declare a `partial` type, annotate it with the `[Command]` attribute, and implement the `ICommand` interface:
 
 ```csharp
 using CliFx;
@@ -124,16 +94,59 @@ public partial class LogCommand : ICommand
 ```
 
 > [!IMPORTANT]
-> The command type (along with all its containing types, if applicable) must be declared as `partial` so that **CliFx** can extend it with necessary metadata and behavior.
+> The command type must be declared as `partial` so that **CliFx** can extend it with necessary metadata and behavior.
+> If the type is nested within other types, all of them must be also marked as `partial`.
 
-In order to implement `ICommand`, the class needs to define an `ExecuteAsync(...)` method, which is what gets called when the user chooses to execute the command.
-As the only parameter, this method takes an instance of `IConsole` — an abstraction used in place of `System.Console` to write text, read binary data, or otherwise interact with the console in a decoupled fashion.
+In order to satisfy `ICommand`'s contract, the type needs to define an `ExecuteAsync(...)` method which contains the command's execution logic.
+As the only parameter, this method takes an instance of `IConsole` — a decoupled abstraction used in place of `System.Console` to write text, read binary data, or otherwise interact with the console.
 
-In most cases, your command will also need some inputs to work with.
-This is achieved by defining properties on the command class and annotating them with the `[CommandParameter]` and `[CommandOption]` attributes, which specify how the values of these properties are mapped from the command-line arguments.
+Beyond that, your command will probably also need to be able to receive some input from the user.
+This is achieved by defining properties and attaching the `[CommandParameter]` and `[CommandOption]` attributes to bind them as either parameters or options.
 
-The command in the above example serves as a simple logarithm calculator which has two input bindings: a positional parameter for the logarithm value (bound to `Value`) and a named option for the logarithm base (bound to `Base`).
-In order to execute this command, at minimum, the user needs to provide an argument for the value:
+The command in the above example serves as a simple logarithm calculator that has two inputs: a positional parameter for the logarithm value (bound to `Value`) and a named option for the logarithm base (bound to `Base`).
+Its command-line signature looks like this:
+
+```console
+$ ./myapp <value> [--base <base>]
+```
+
+To expose your command as an entry point and turn the program into a command-line interface, modify the `Main()` method so that it delegates its execution to an instance of `CommandLineApplication`.
+Use the `CommandLineApplicationBuilder` helper to create and configure an application in a series of fluent instructions:
+
+```csharp
+using CliFx;
+
+public static class Program
+{
+    // This Main() method will be generated automatically if you don't implement one yourself
+    public static async Task<int> Main() =>
+        await new CommandLineApplicationBuilder()
+            // Registers all accessible commands from the current assembly
+            .AddCommandsFromThisAssembly()
+            // Creates the application instance
+            .Build()
+            // Runs the application, resolving command-line arguments and
+            // environment variables automatically.
+            .RunAsync();
+}
+```
+
+> [!TIP]
+> If your program does not have a `Main()` method, **CliFx** will generate one for you automatically.
+> You only need to implement your own if you wish to customize the configuration of the application.
+
+> [!IMPORTANT]
+> Ensure that your `Main()` method returns the integer exit code provided by `CommandLineApplication.RunAsync()`, as shown in the example.
+> Exit code is used to communicate execution result to the parent process, so it's important that your program properly propagates it.
+
+> [!NOTE]
+> When calling `CommandLineApplication.RunAsync()`, **CliFx** resolves command-line arguments and environment variables from `Environment.GetCommandLineArgs()` and `Environment.GetEnvironmentVariables()` respectively.
+> You can also provide them explicitly using one of the other available overloads.
+
+In order to make the command available for execution, it needs to be registered with the application.
+The above example relies on `AddCommandsFromThisAssembly()` for that, which automatically detects and registers all accessible commands from the current assembly.
+
+Now, the user can execute `LogCommand` by running the application and passing an argument to the `value` parameter:
 
 ```console
 $ ./myapp 10000
@@ -141,7 +154,7 @@ $ ./myapp 10000
 4
 ```
 
-They can also pass the `-b|--base` option to override the default logarithm base of `10`:
+They can also use the `-b|--base` option to override the default logarithm base of `10`:
 
 ```console
 $ ./myapp 729 -b 3
@@ -158,7 +171,8 @@ Missing required parameter(s):
 <value>
 ```
 
-**CliFx** also automatically provides the conventional `-h|--help` option, which shows a help screen with all available options and parameters, their descriptions, and usage examples:
+**CliFx** also automatically binds the conventional `-h|--help` option.
+It can be used to request a help screen that lists all available options and parameters, their descriptions, and usage examples:
 
 ```console
 $ ./myapp --help
@@ -180,8 +194,8 @@ OPTIONS
   --version         Shows version information. Default: "false".
 ```
 
-Because the command in the above example doesn't have a name, it's treated as the default (i.e. root) command.
-More complex applications typically have multiple commands, each with its own name and functionality, allowing the user to choose between different workflows.
+Because `LogCommand` doesn't have a name, it's treated as the default (i.e. root) command, which is executed when the user doesn't specify any command name in the arguments.
+More complex applications typically employ several commands, each with its own name and functionality, allowing the user to choose between different workflows.
 
 To define a named command, simply specify its name in the `[Command]` attribute:
 
@@ -208,25 +222,20 @@ public partial class SumCommand : ICommand
 }
 ```
 
-With this setup, the user can run the application in one of the following ways:
-
-To execute the `log` command (bound to `LogCommand`):
+The setup above binds the original logarithm command as `log` and also introduces a new `sum` command that calculates the sum of all input values.
+This allows the user to run the application in one of the two following ways:
 
 ```console
 $ ./myapp log 100 -b 10
 
 4
-```
 
-To execute the `sum` command (bound to `SumCommand`):
-
-```console
 $ ./myapp sum 1 2 3
 
 6
 ```
 
-The root-level help text will also list each available command:
+Also, if the user now requests root-level help, they will see both commands included in the output:
 
 ```console
 $ ./myapp --help
@@ -253,14 +262,15 @@ You can run `myapp [command] --help` to show help for a specific command.
 **CliFx** supports two types of input bindings: **parameters** and **options**.
 Parameters are bound from the command-line arguments based on the order they appear in, while options are bound by their name.
 
-These two kinds of bindings are configured through the `[CommandParameter]` and `[CommandOption]` attributes respectively, which can be applied to any property on the command class.
-Despite both fulfilling the same purpose of mapping command-line inputs to properties, parameters and options have different semantics and usage patterns.
+These two kinds of bindings are configured through the `[CommandParameter]` and `[CommandOption]` attributes respectively, which can be applied to any property on the command type.
+Despite both fulfilling the same purpose of mapping command-line inputs to properties, parameters and options have somewhat different semantics and usage patterns.
 
 #### Parameters
 
-Below is an example of a parameter binding:
+Below is an example of a simple parameter binding:
 
 ```csharp
+// Order: 0
 [CommandParameter(0)]
 public required double Param { get; set; }
 
@@ -268,11 +278,8 @@ public required double Param { get; set; }
 // $ ./myapp <param>
 ```
 
-> [!IMPORTANT]
-> Order values must be unique among the parameters of the same command.
-
-Here, from the attribute, we can see that this parameter is bound with the order of `0`.
-This value specifies the parameter's position relative to the other parameters in the command, which determines the order in which they are activated from the command line.
+Here, as evident from the attribute, this parameter is bound with the order of `0`.
+This value specifies the parameter's position relative to the other parameters in the command, which determines the sequence in which they are activated from the command line.
 
 For example, given the following bindings, parameters will receive their inputs in the order of: `First` -> `Second` -> `Third`:
 
@@ -290,14 +297,17 @@ public required string Third { get; set; }
 // $ ./myapp <first> <second> <third>
 ```
 
+> [!IMPORTANT]
+> Order values must be unique among the parameters of the same command.
+
 > [!NOTE]
 > Order values do not have to be sequential.
 > They are not used as absolute indices, but rather as relative indicators of the parameters' positions, so they can be spaced out as needed.
 
 Because parameters are bound positionally, every subsequent parameter relies on the previous one to be set in order to itself receive a value.
-This means that they are primarily used for mandatory inputs that the user is always expected to provide to execute the command, hence why the underlying properties in the above examples are all marked as `required`.
+This makes them primarily suited for handling mandatory inputs, hence why the underlying properties in the above examples are all marked as `required`.
 
-If you need to bind a parameter without requiring it to be set, you can do so by dropping the `required` modifier from the property, however this can only be done for the last parameter in the command:
+If you do need to bind a non-required parameter, you can do so by dropping the `required` modifier from the property — however this can only be done for the last parameter in the command:
 
 ```csharp
 [CommandParameter(0)]
@@ -315,10 +325,8 @@ public string? Third { get; set; }
 // $ ./myapp <first> <second> <third?>
 ```
 
-If a parameter is optional, you can either set a default value on the property, or marks its type as nullable.
-
-For the same reasons, parameters generally cannot be used for inputs that can take more than one value, since it's not always clear how many arguments should be consumed for a given parameter.
-Again, the only exception to that rule is when it's the last parameter in the command:
+Due to the same positional nature, parameters generally cannot be used for inputs that take more than one value, as it's not always clear how many arguments should be consumed for a given parameter.
+The only exception to that rule is, again, when the parameter is the last one in the command:
 
 ```csharp
 [CommandParameter(0)]
@@ -336,9 +344,8 @@ public required IReadOnlyList<string> Third { get; set; }
 // $ ./myapp <first> <second> <third...>
 ```
 
-As a natural consequence of these limitations, **parameters are best used to express fixed scalar inputs, whose presence is essential for the command to execute successfully**.
-
-Besides that, when binding properties to parameters, you can also specify a custom name and description to show in the help text:
+Besides that, when binding properties to parameters, you can also specify a custom name and description.
+These don't have any functional implications on how arguments are parsed, but are used to identify the parameter in the help text:
 
 ```csharp
 [CommandParameter(0,
@@ -353,15 +360,14 @@ public required double Value { get; set; }
 // $ ./myapp <logval>
 ```
 
-As a general guideline, consider using parameter bindings if the input you're expressing:
+As a general guideline, consider using parameter bindings if the input you're expressing satisfies the following criteria:
 
-- Is essential for the command to execute successfully and doesn't have an obvious default value.
-- Is a scalar that doesn't take multiple values.
-- Is the only input in the command.
+- It's essential for the command to execute successfully and doesn't have an obvious default value
+- It's a scalar that doesn't take multiple values
 
 #### Options
 
-Below is an example of an option binding:
+Below is an example of a simple option binding:
 
 ```csharp
 [CommandOption("opt", 'o')]
@@ -372,15 +378,8 @@ public double Option { get; set; }
 // $ ./myapp -o <value?>
 ```
 
-> [!IMPORTANT]
-> Option names and short names must be unique among the options of the same command.
-> The comparison is case-insensitive for names and case-sensitive for short names.
-
-> [!NOTE]
-> An option binding doesn't have to specify both a name and a short name, but at least one of them needs to be set.
-
-Here, from the attribute, we can see that this option is specified with the name of `opt` and a short name of `o`.
-The user can pass the option by specifying either of these identifiers, and the framework will set the provided value to the corresponding property.
+Here, as evident from the attribute, this option is bound with the name of `opt` and a short name of `o`.
+The user can pass the option by specifying either of these identifiers, and **CliFx** will set the provided value to the corresponding property.
 
 If an option is essential to the execution of the command, the underlying property can also be marked as `required`.
 This will make it so that the user has to provide a value for this option on every execution of the command, otherwise the application will exit with an error:
@@ -403,6 +402,13 @@ public required string Baz { get; set; }
 // Usage:
 // $ ./myapp --foo <value> --bar <value?> --baz <value>
 ```
+
+> [!IMPORTANT]
+> Option names and short names must be unique among the options of the same command.
+> The comparison is case-insensitive for names and case-sensitive for short names.
+
+> [!NOTE]
+> An option binding doesn't have to specify both a name and a short name, but at least one of them needs to be set.
 
 In the same vein, options can be freely used for inputs that can take multiple values:
 
@@ -439,32 +445,37 @@ Taking all of the above into account, the general guideline is that **options ar
 
 #### Conversion
 
-In order to handle conversion between raw command-line arguments (strings) and the underlying property types, **CliFxx** employs the `IInputConverter<T>` interface, set by the `Converter` property on the binding attributes.
+In order to handle conversion between raw command-line arguments (strings) and the underlying property types, **CliFx** employs the `IInputConverter<T>` interface, set by the `Converter` property on the binding attributes.
 If the converter is not explicitly specified, the framework will try to generate one automatically.
 
-Below are types supported by the default conversion logic:
+Below are the types supported by the default conversion logic:
 
 - `string`
+  - No conversion required
 - `bool`
-  - `true` if passed `true`, `1`, `yes` or `on` (case-insensitive) or no value at all
-  - `false` if passed `false`, `0`, `no` or `off` (case-insensitive)
+  - Converted by calling `bool.Parse(...)`
+  - Converted as `true` if passed nothing (e.g. `--switch`)
 - `enum`
-  - If passed a numeric string, the enum member is selected by its value
-  - If passed a non-numeric string, the enum member is selected by its name (case-insensitive)
-- Any type that defines a `static T Parse(string, IFormatProvider?)` method
-  - Covers a wide range of built-in .NET types, such as `int`, `double`, `DateTime`, `Guid`, etc.
-  - Also supports user-defined types that implement their own conversion logic through a `Parse(...)` method
+  - Converted by calling `Enum.ToObject(...)` if passed a numeric string
+  - Converted by calling `Enum.Parse(...)` if passed a non-numeric string
+- Any type that implements a `static T Parse(string, IFormatProvider?)` method
   - The `IFormatProvider?` parameter is optional
-- Any type that defines a constructor accepting a single `string` parameter
+  - Converted by calling `T.Parse(...)`
+  - Covers a wide range of built-in .NET types, such as `int`, `double`, `DateTime`, `Guid`, etc.
+  - Also supports user-defined types that implement the corresponding method
+- Any type that implements a `.ctor(string)` constructor
+  - Converted by calling `.ctor(...)`
   - Covers types that don't have a `Parse(...)` method but can still be initialized from a string, such as `FileInfo`, `DirectoryInfo`, etc.
-  - Also supports user-defined types that implement their own conversion logic through the constructor
-- `Nullable<T>` of above value types
-  - If passed a non-empty string, the underlying conversion logic is applied
-  - If passed nothing or an empty string, the property is set to `null`
-- Arrays of above types
-  - This includes interfaces assignable from arrays, such as `IEnumerable<T>`, `IReadOnlyList<T>`, `IReadOnlyCollection<T>`, etc.
-- Any type that defines a constructor accepting an array of one of the above types
-  - This includes collection types like `List<T>`, `HashSet<T>`, etc.
+  - Also supports user-defined types that implement the corresponding constructor
+- `Nullable<T>` of the above value types
+  - Converted by invoking the underlying conversion logic for `T`
+  - Converted as `null` if passed nothing
+- `T[]` of the above types
+  - Converted by invoking the underlying conversion logic for `T` for each passed argument
+  - Also works for interfaces assignable from arrays, such as `IEnumerable<T>`, `IReadOnlyList<T>`, `IReadOnlyCollection<T>`, etc.
+- Any type that implements a `.ctor(T[])` constructor
+  - Converted by calling `.ctor(...)` with the array of converted values
+  - Covers collection types like `List<T>`, `HashSet<T>`, etc.
 
 For example, here is an example command that showcases some of these built-in conversions:
 
@@ -579,6 +590,9 @@ public class PositiveNumberValidator : InputValidator<double>
 }
 ```
 
+> [!IMPORTANT]
+> Custom validator types must have a public parameter-less constructor, which is used by the framework to instantiate them at run time.
+
 Then, include this validator in the `Validators` property of the binding attribute:
 
 ```csharp
@@ -658,6 +672,63 @@ These rules also make the order of arguments important — command-line string i
 ```console
 $ ./myapp [command] [...parameters] [...options]
 ```
+
+### Command instantiation
+
+Because **CliFx** takes responsibility for the application's entire lifecycle, it needs to be capable of instantiating commands at run time.
+To facilitate that, it uses an interface called `ITypeActivator` that determines how to create a new instance of a given type.
+
+The default implementation of `ITypeActivator` only supports types that have public parameter-less constructors, which is sufficient for most common scenarios.
+However, in some cases you may want to define a custom initializer, for example when integrating with an external dependency container.
+
+To do that, pass a custom `ITypeActivator` or a factory delegate to the `UseTypeActivator(...)` method when building the application:
+
+```csharp
+public static class Program
+{
+    public static async Task<int> Main() =>
+        await new CommandLineApplicationBuilder()
+            .AddCommandsFromThisAssembly()
+            .UseTypeActivator(type =>
+            {
+                var instance = MyTypeFactory.Create(type);
+                return instance;
+            })
+            .Build()
+            .RunAsync();
+}
+```
+
+This method also supports `IServiceProvider` through various overloads, which allows you to directly integrate dependency containers that implement this interface.
+For example, this is how to configure your application to use [`Microsoft.Extensions.DependencyInjection`](https://nuget.org/packages/Microsoft.Extensions.DependencyInjection) as the type activator in **CliFx**:
+
+```csharp
+public static class Program
+{
+    public static async Task<int> Main() =>
+        await new CommandLineApplicationBuilder()
+            .AddCommandsFromThisAssembly()
+            .UseTypeActivator(commands =>
+            {
+                var services = new ServiceCollection();
+
+                // Register services
+                services.AddSingleton<MyService>();
+
+                // Register commands
+                foreach (var command in commands)
+                    services.AddTransient(command.Type);
+
+                return services.BuildServiceProvider();
+            })
+            .Build()
+            .RunAsync();
+}
+```
+
+> [!NOTE]
+> If you want to use certain advanced features provided by `Microsoft.Extensions.DependencyInjection`, you may need to do a bit of extra work to configure the container properly.
+> For example, to leverage support for keyed services, you need to [manually register an implementation of `IKeyedServiceProvider`](https://github.com/Tyrrrz/CliFx/issues/148).
 
 ### Command routing
 
@@ -822,63 +893,6 @@ public partial class CancellableCommand : ICommand
 > [!WARNING]
 > Cancellation handler is only respected when the user sends the interrupt signal for the first time.
 > If the user decides to issue the signal again, the application will be forcefully terminated without triggering the cancellation token.
-
-### Type activation
-
-Because **CliFx** takes responsibility for the application's entire lifecycle, it needs to be capable of instantiating various user-defined types at run-time.
-To facilitate that, it uses an interface called `ITypeActivator` that determines how to create a new instance of a given type.
-
-The default implementation of `ITypeActivator` only supports types that have public parameterless constructors, which is sufficient for the majority of scenarios.
-However, in some cases you may also want to define a custom initializer, for example when integrating with an external dependency container.
-
-To do that, pass a custom `ITypeActivator` or a factory delegate to the `UseTypeActivator(...)` method when building the application:
-
-```csharp
-public static class Program
-{
-    public static async Task<int> Main() =>
-        await new CommandLineApplicationBuilder()
-            .AddCommandsFromThisAssembly()
-            .UseTypeActivator(type =>
-            {
-                var instance = MyTypeFactory.Create(type);
-                return instance;
-            })
-            .Build()
-            .RunAsync();
-}
-```
-
-This method also supports `IServiceProvider` through various overloads, which allows you to directly integrate dependency containers that implement this interface.
-For example, this is how to configure your application to use [`Microsoft.Extensions.DependencyInjection`](https://nuget.org/packages/Microsoft.Extensions.DependencyInjection) as the type activator in **CliFx**:
-
-```csharp
-public static class Program
-{
-    public static async Task<int> Main() =>
-        await new CommandLineApplicationBuilder()
-            .AddCommandsFromThisAssembly()
-            .UseTypeActivator(commands =>
-            {
-                var services = new ServiceCollection();
-
-                // Register services
-                services.AddSingleton<MyService>();
-
-                // Register commands
-                foreach (var command in commands)
-                    services.AddTransient(command.Type);
-
-                return services.BuildServiceProvider();
-            })
-            .Build()
-            .RunAsync();
-}
-```
-
-> [!NOTE]
-> If you want to use certain advanced features provided by `Microsoft.Extensions.DependencyInjection`, you may need to do a bit of extra work to configure the container properly.
-> For example, to leverage support for keyed services, you need to [manually register an implementation of `IKeyedServiceProvider`](https://github.com/Tyrrrz/CliFx/issues/148).
 
 ### Testing
 
