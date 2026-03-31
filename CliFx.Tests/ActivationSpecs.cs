@@ -367,6 +367,7 @@ public partial class ActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(t
                         {
                             console.WriteLine("Foo = " + (int) Foo);
                             console.WriteLine("Bar = " + (int) Bar);
+
                             return default;
                         }
                     }
