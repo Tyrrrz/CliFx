@@ -462,7 +462,7 @@ Below are types supported by the default conversion logic:
   - If passed a non-empty string, the underlying conversion logic is applied
   - If passed nothing or an empty string, the property is set to `null`
 - Arrays of above types
-  - This includes types assignable from arrays, such as `IEnumerable<T>`, `IReadOnlyList<T>`, `IReadOnlyCollection<T>`, etc.
+  - This includes interfaces assignable from arrays, such as `IEnumerable<T>`, `IReadOnlyList<T>`, `IReadOnlyCollection<T>`, etc.
 - Any type that defines a constructor accepting an array of one of the above types
   - This includes collection types like `List<T>`, `HashSet<T>`, etc.
 
@@ -533,21 +533,18 @@ public partial class SurfaceCalculatorCommand : ICommand
 {
     [CommandParameter(0,
         Description = "First point of the triangle, in the format AxB (e.g. 10x20).",
-        // Custom converter is used to map raw argument values
         Converter = typeof(VectorConverter)
     )]
     public required Vector2 PointA { get; init; }
 
     [CommandParameter(1,
         Description = "Second point of the triangle, in the format AxB (e.g. 10x20).",
-        // Custom converter is used to map raw argument values
         Converter = typeof(VectorConverter)
     )]
     public required Vector2 PointB { get; init; }
 
     [CommandParameter(2,
         Description = "Third point of the triangle, in the format AxB (e.g. 10x20).",
-        // Custom converter is used to map raw argument values
         Converter = typeof(VectorConverter)
     )]
     public required Vector2 PointC { get; init; }
@@ -574,12 +571,10 @@ using CliFx.Activation;
 
 public class PositiveNumberValidator : InputValidator<double>
 {
-    public InputValidationError? Validate(double value)
+    public override IEnumerable<InputValidationError> Validate(double value)
     {
         if (value <= 0)
-            return Error("Value must be positive.");
-
-        return Ok();
+            yield return Error("Value must be positive.");
     }
 }
 ```

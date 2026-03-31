@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace CliFx.Activation;
 
 /// <summary>
@@ -10,9 +12,9 @@ public interface IInputValidator
 {
     /// <summary>
     /// Validates the input value.
-    /// Returns <c>null</c> if the validation is successful, or an error in case of failure.
+    /// Returns validation errors, if any.
     /// </summary>
-    InputValidationError? Validate(object? value);
+    IEnumerable<InputValidationError> Validate(object? value);
 }
 
 /// <inheritdoc />
@@ -23,5 +25,5 @@ public interface IInputValidator
 public interface IInputValidator<T> : IInputValidator
 {
     /// <inheritdoc cref="IInputValidator.Validate" />
-    InputValidationError? Validate(T value);
+    IEnumerable<InputValidationError> Validate(T value);
 }

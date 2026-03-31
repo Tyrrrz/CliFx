@@ -1,22 +1,19 @@
+using System.Collections.Generic;
+
 namespace CliFx.Activation;
 
 /// <inheritdoc />
 public abstract class InputValidator<T> : IInputValidator<T>
 {
     /// <summary>
-    /// Returns a successful validation result.
-    /// </summary>
-    protected InputValidationError? Ok() => null;
-
-    /// <summary>
-    /// Returns a non-successful validation result.
+    /// Returns a validation error.
     /// </summary>
     protected InputValidationError Error(string message) => new(message);
 
     /// <inheritdoc cref="IInputValidator.Validate" />
-    public abstract InputValidationError? Validate(T value);
+    public abstract IEnumerable<InputValidationError> Validate(T value);
 
-    InputValidationError? IInputValidator.Validate(object? value)
+    IEnumerable<InputValidationError> IInputValidator.Validate(object? value)
     {
         // Value is of the expected type
         if (value is T valueAsT)

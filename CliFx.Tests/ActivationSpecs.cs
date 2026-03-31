@@ -930,12 +930,18 @@ public partial class ActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(t
                     """
                     public class ValidatorA : InputValidator<int>
                     {
-                        public override InputValidationError Validate(int value) => Ok();
+                        public override IEnumerable<InputValidationError> Validate(int value)
+                        {
+                            yield break;
+                        }
                     }
 
                     public class ValidatorB : InputValidator<int>
                     {
-                        public override InputValidationError Validate(int value) => Error("Hello world");
+                        public override IEnumerable<InputValidationError> Validate(int value)
+                        {
+                            yield return Error("Hello world");
+                        }
                     }
 
                     [Command]

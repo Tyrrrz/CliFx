@@ -22,18 +22,15 @@ internal class CommandActivator(
     {
         var value = input.Converter.Convert(rawValues);
 
-        var errors = input
-            .Validators.Select(validator => validator.Validate(value))
-            .WhereNotNull()
-            .ToArray();
+        var validationErrors = input.Validators.SelectMany(v => v.Validate(value)).ToArray();
 
-        if (errors.Any())
+        if (validationErrors.Any())
         {
             throw CliFxException.UserError(
                 $"""
                 {input} has been provided with an invalid value.
                 Error(s):
-                {string.Join(Environment.NewLine, errors.Select(e => "- " + e.Message))}
+                {string.Join(Environment.NewLine, validationErrors.Select(e => "- " + e.Message))}
                 """
             );
         }
