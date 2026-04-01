@@ -7,21 +7,21 @@
     <PackageVersion Include="Basic.Reference.Assemblies.Net100" Version="1.8.4" />
     <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
     <PackageVersion Include="clipr" Version="1.6.1" />
-    <PackageVersion Include="CliWrap" Version="3.10.0" />
+    <PackageVersion Include="CliWrap" Version="3.10.1" />
     <PackageVersion Include="Cocona" Version="2.2.0" />
     <PackageVersion Include="CommandLineParser" Version="2.9.1" />
-    <PackageVersion Include="coverlet.collector" Version="8.0.0" />
+    <PackageVersion Include="coverlet.collector" Version="8.0.1" />
     <PackageVersion Include="CSharpier.MsBuild" Version="1.2.6" />
-    <PackageVersion Include="FluentAssertions" Version="8.8.0" />
-    <PackageVersion Include="GitHubActionsTestLogger" Version="3.0.1" />
+    <PackageVersion Include="FluentAssertions" Version="8.9.0" />
+    <PackageVersion Include="GitHubActionsTestLogger" Version="3.0.3" />
     <PackageVersion Include="McMaster.Extensions.CommandLineUtils" Version="5.0.1" />
     <PackageVersion Include="Microsoft.CodeAnalysis" Version="4.11.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.3" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.5" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.3.0" />
     <PackageVersion Include="PolyShim" Version="2.7.0" />
     <PackageVersion Include="PowerArgs" Version="4.0.3" />
-    <PackageVersion Include="System.CommandLine" Version="2.0.3" />
+    <PackageVersion Include="System.CommandLine" Version="2.0.5" />
     <PackageVersion Include="System.Threading.Tasks.Extensions" Version="4.6.3" />
     <PackageVersion Include="xunit" Version="2.9.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
