@@ -113,7 +113,10 @@ public partial class Generator : IIncrementalGenerator
             }
         );
 
-        // Detect whether the compilation already contains an entry point
+        // Detect whether the compilation already contains an entry point.
+        // Any method named 'Main' is treated conservatively as an entry point, even if its
+        // signature doesn't match exactly. This avoids accidentally generating a duplicate
+        // entry point in ambiguous cases.
         var hasMainMethod = context
             .SyntaxProvider.CreateSyntaxProvider(
                 static (node, _) =>
