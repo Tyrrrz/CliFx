@@ -9,9 +9,6 @@ public class ProgramEntryPointGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        // Use the Roslyn compilation API to check whether an entry point already exists.
-        // GetEntryPoint() returns null when no valid entry point is found in the compilation,
-        // which covers both explicit Main methods and top-level statement programs.
         var needsEntryPoint = context.CompilationProvider.Select(
             static (compilation, cancellationToken) =>
                 (
@@ -20,7 +17,6 @@ public class ProgramEntryPointGenerator : IIncrementalGenerator
                 ) && compilation.GetEntryPoint(cancellationToken) is null
         );
 
-        // Generate a Program entry point for executable projects that don't already have one
         context.RegisterSourceOutput(
             needsEntryPoint,
             static (ctx, needsEntryPoint) =>
