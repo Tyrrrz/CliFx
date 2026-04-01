@@ -1,8 +1,8 @@
 namespace CliFx.Generators;
 
-public partial class Generator
+internal static class ProgramEntryPointEmitter
 {
-    private static string EmitProgramEntryPoint()
+    internal static string Emit()
     {
         // lang=csharp
         return """

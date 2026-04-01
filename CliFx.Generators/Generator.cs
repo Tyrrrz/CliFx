@@ -12,7 +12,7 @@ using Microsoft.CodeAnalysis.Text;
 namespace CliFx.Generators;
 
 [Generator]
-public partial class Generator : IIncrementalGenerator
+public class Generator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -63,7 +63,7 @@ public partial class Generator : IIncrementalGenerator
 
                     var emitterDiagnostics = new List<Diagnostic>();
 
-                    var source = EmitCommandDescriptor(
+                    var source = CommandDescriptorEmitter.Emit(
                         item.Command,
                         new DiagnosticReporter(emitterDiagnostics)
                     );
@@ -93,75 +93,22 @@ public partial class Generator : IIncrementalGenerator
         );
 
         // Generate the AddCommandsFromThisAssembly() extension method
-        var accessibleCommands = commands
-            .Select(static (item, cancellationToken) => item.Command)
-            .WhereNotNull()
-            // Only generate for commands that will be accessible by the generated code
-            .Where(
-                static (command) => command.Type.GetActualAccessibility() >= Accessibility.Internal
-            )
-            .Collect();
-
         context.RegisterSourceOutput(
-            accessibleCommands,
+            commands
+                .Select(static (item, cancellationToken) => item.Command)
+                .WhereNotNull()
+                // Only generate for commands that will be accessible by the generated code
+                .Where(
+                    static (command) =>
+                        command.Type.GetActualAccessibility() >= Accessibility.Internal
+                )
+                .Collect(),
             static (ctx, commands) =>
             {
                 ctx.AddSource(
                     "CommandRegistrations.g.cs",
-                    SourceText.From(EmitCommandRegistrations(commands), Encoding.UTF8)
+                    SourceText.From(CommandRegistrationEmitter.Emit(commands), Encoding.UTF8)
                 );
-            }
-        );
-
-        // Detect whether the compilation already contains an entry point.
-        // Any method named 'Main' is treated conservatively as an entry point, even if its
-        // signature doesn't match exactly. This avoids accidentally generating a duplicate
-        // entry point in ambiguous cases.
-        var hasMainMethod = context
-            .SyntaxProvider.CreateSyntaxProvider(
-                static (node, _) =>
-                    node is MethodDeclarationSyntax method && method.Identifier.Text == "Main",
-                static (ctx, _) => true
-            )
-            .Collect()
-            .Select(static (items, _) => items.Length > 0);
-
-        var hasGlobalStatements = context
-            .SyntaxProvider.CreateSyntaxProvider(
-                static (node, _) => node is GlobalStatementSyntax,
-                static (ctx, _) => true
-            )
-            .Collect()
-            .Select(static (items, _) => items.Length > 0);
-
-        // Detect whether the compilation targets an executable output kind
-        var isConsoleApplication = context.CompilationProvider.Select(
-            static (compilation, _) =>
-                compilation.Options.OutputKind == OutputKind.ConsoleApplication
-                || compilation.Options.OutputKind == OutputKind.WindowsApplication
-        );
-
-        // Generate a Program entry point only for executable projects with commands but no entry point
-        context.RegisterSourceOutput(
-            accessibleCommands
-                .Combine(hasMainMethod)
-                .Combine(hasGlobalStatements)
-                .Combine(isConsoleApplication),
-            static (ctx, pair) =>
-            {
-                var (((commands, hasMainMethod), hasGlobalStatements), isConsoleApplication) = pair;
-                if (
-                    isConsoleApplication
-                    && commands.Length > 0
-                    && !hasMainMethod
-                    && !hasGlobalStatements
-                )
-                {
-                    ctx.AddSource(
-                        "Program.g.cs",
-                        SourceText.From(EmitProgramEntryPoint(), Encoding.UTF8)
-                    );
-                }
             }
         );
     }
