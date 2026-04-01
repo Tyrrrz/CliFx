@@ -90,8 +90,8 @@ internal static class CommandCompiler
 
     public static IReadOnlyList<CommandDescriptor> Compile(
         string sourceCode,
-        bool treatWarningsAsErrors = false,
-        OutputKind outputKind = OutputKind.DynamicallyLinkedLibrary
+        OutputKind outputKind = OutputKind.DynamicallyLinkedLibrary,
+        bool treatWarningsAsErrors = false
     )
     {
         var compilation = CreateCompilation(sourceCode, outputKind, out var diagnostics);
