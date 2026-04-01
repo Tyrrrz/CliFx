@@ -53,7 +53,7 @@ public class ApplicationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutp
     [Fact]
     public void I_can_create_an_application_without_a_configuration()
     {
-        // Arrange & Act
+        // Act
         var commands = CommandCompiler.Compile(
             // lang=csharp
             """
