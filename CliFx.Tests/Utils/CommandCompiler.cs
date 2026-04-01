@@ -70,7 +70,7 @@ internal static class CommandCompiler
         // Run the source generator
         CSharpGeneratorDriver
             .Create(
-                [new Generator().AsSourceGenerator()],
+                [new CommandDescriptorGenerator().AsSourceGenerator()],
                 parseOptions: CSharpParseOptions.Default.WithLanguageVersion(
                     LanguageVersion.Preview
                 )

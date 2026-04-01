@@ -25,13 +25,13 @@ public class ProgramEntryPointGenerator : IIncrementalGenerator
             needsEntryPoint,
             static (ctx, needsEntryPoint) =>
             {
-                if (needsEntryPoint)
-                {
-                    ctx.AddSource(
-                        "Program.g.cs",
-                        SourceText.From(ProgramEntryPointEmitter.Emit(), Encoding.UTF8)
-                    );
-                }
+                if (!needsEntryPoint)
+                    return;
+
+                ctx.AddSource(
+                    "Program.g.cs",
+                    SourceText.From(ProgramEntryPoint.Emit(), Encoding.UTF8)
+                );
             }
         );
     }

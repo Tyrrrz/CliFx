@@ -12,7 +12,7 @@ using Microsoft.CodeAnalysis.Text;
 namespace CliFx.Generators;
 
 [Generator]
-public class Generator : IIncrementalGenerator
+public class CommandDescriptorGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
