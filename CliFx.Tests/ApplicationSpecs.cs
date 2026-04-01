@@ -7,6 +7,7 @@ using CliFx.Tests.Utils;
 using CliFx.Tests.Utils.Extensions;
 using CliWrap;
 using FluentAssertions;
+using Microsoft.CodeAnalysis;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -47,6 +48,26 @@ public class ApplicationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutp
 
         // Assert
         exitCode.Should().Be(0);
+    }
+
+    [Fact]
+    public void I_can_create_an_application_without_a_configuration()
+    {
+        // Act
+        var commands = CommandCompiler.Compile(
+            // lang=csharp
+            """
+            [Command]
+            public partial class DefaultCommand : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole console) => default;
+            }
+            """,
+            OutputKind.ConsoleApplication
+        );
+
+        // Assert
+        commands[0].Type.Assembly.EntryPoint.Should().NotBeNull();
     }
 
     [Fact(Timeout = 15000)]

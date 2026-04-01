@@ -12,7 +12,7 @@ using Microsoft.CodeAnalysis.Text;
 namespace CliFx.Generators;
 
 [Generator]
-public partial class Generator : IIncrementalGenerator
+public class CommandDescriptorGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -63,7 +63,7 @@ public partial class Generator : IIncrementalGenerator
 
                     var emitterDiagnostics = new List<Diagnostic>();
 
-                    var source = EmitCommandDescriptor(
+                    var source = CommandDescriptor.Emit(
                         item.Command,
                         new DiagnosticReporter(emitterDiagnostics)
                     );
@@ -107,7 +107,7 @@ public partial class Generator : IIncrementalGenerator
             {
                 ctx.AddSource(
                     "CommandRegistrations.g.cs",
-                    SourceText.From(EmitCommandRegistrations(commands), Encoding.UTF8)
+                    SourceText.From(CommandRegistration.Emit(commands), Encoding.UTF8)
                 );
             }
         );

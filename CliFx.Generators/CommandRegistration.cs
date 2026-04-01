@@ -8,9 +8,9 @@ using Microsoft.CodeAnalysis;
 
 namespace CliFx.Generators;
 
-public partial class Generator
+internal static class CommandRegistration
 {
-    private static string EmitCommandRegistrations(IReadOnlyList<CommandSymbol> commands)
+    internal static string Emit(IReadOnlyList<CommandSymbol> commands)
     {
         var orderedCommands = commands.OrderBy(c => c.Name, StringComparer.Ordinal).ToArray();
 

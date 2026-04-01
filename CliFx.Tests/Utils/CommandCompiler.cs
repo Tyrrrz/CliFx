@@ -17,6 +17,7 @@ internal static class CommandCompiler
 {
     private static Compilation CreateCompilation(
         string sourceCode,
+        OutputKind outputKind,
         out IReadOnlyList<Diagnostic> diagnostics
     )
     {
@@ -63,14 +64,15 @@ internal static class CommandCompiler
                 .Append(
                     MetadataReference.CreateFromFile(typeof(CommandCompiler).Assembly.Location)
                 ),
-            // DLL to avoid having to define the Main() method
-            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+            new CSharpCompilationOptions(outputKind)
         );
 
-        // Run the source generator
         CSharpGeneratorDriver
             .Create(
-                [new Generator().AsSourceGenerator()],
+                [
+                    new CommandDescriptorGenerator().AsSourceGenerator(),
+                    new ProgramEntryPointGenerator().AsSourceGenerator(),
+                ],
                 parseOptions: CSharpParseOptions.Default.WithLanguageVersion(
                     LanguageVersion.Preview
                 )
@@ -88,10 +90,11 @@ internal static class CommandCompiler
 
     public static IReadOnlyList<CommandDescriptor> Compile(
         string sourceCode,
+        OutputKind outputKind = OutputKind.DynamicallyLinkedLibrary,
         bool treatWarningsAsErrors = false
     )
     {
-        var compilation = CreateCompilation(sourceCode, out var diagnostics);
+        var compilation = CreateCompilation(sourceCode, outputKind, out var diagnostics);
 
         var compilationErrors = diagnostics
             .Where(d =>
