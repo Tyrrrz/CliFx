@@ -93,22 +93,72 @@ public partial class Generator : IIncrementalGenerator
         );
 
         // Generate the AddCommandsFromThisAssembly() extension method
+        var accessibleCommands = commands
+            .Select(static (item, cancellationToken) => item.Command)
+            .WhereNotNull()
+            // Only generate for commands that will be accessible by the generated code
+            .Where(
+                static (command) => command.Type.GetActualAccessibility() >= Accessibility.Internal
+            )
+            .Collect();
+
         context.RegisterSourceOutput(
-            commands
-                .Select(static (item, cancellationToken) => item.Command)
-                .WhereNotNull()
-                // Only generate for commands that will be accessible by the generated code
-                .Where(
-                    static (command) =>
-                        command.Type.GetActualAccessibility() >= Accessibility.Internal
-                )
-                .Collect(),
+            accessibleCommands,
             static (ctx, commands) =>
             {
                 ctx.AddSource(
                     "CommandRegistrations.g.cs",
                     SourceText.From(EmitCommandRegistrations(commands), Encoding.UTF8)
                 );
+            }
+        );
+
+        // Detect whether the compilation already contains an entry point
+        var hasMainMethod = context
+            .SyntaxProvider.CreateSyntaxProvider(
+                static (node, _) =>
+                    node is MethodDeclarationSyntax method && method.Identifier.Text == "Main",
+                static (ctx, _) => true
+            )
+            .Collect()
+            .Select(static (items, _) => items.Length > 0);
+
+        var hasGlobalStatements = context
+            .SyntaxProvider.CreateSyntaxProvider(
+                static (node, _) => node is GlobalStatementSyntax,
+                static (ctx, _) => true
+            )
+            .Collect()
+            .Select(static (items, _) => items.Length > 0);
+
+        // Detect whether the compilation targets an executable output kind
+        var isConsoleApplication = context.CompilationProvider.Select(
+            static (compilation, _) =>
+                compilation.Options.OutputKind == OutputKind.ConsoleApplication
+                || compilation.Options.OutputKind == OutputKind.WindowsApplication
+        );
+
+        // Generate a Program entry point only for executable projects with commands but no entry point
+        context.RegisterSourceOutput(
+            accessibleCommands
+                .Combine(hasMainMethod)
+                .Combine(hasGlobalStatements)
+                .Combine(isConsoleApplication),
+            static (ctx, pair) =>
+            {
+                var (((commands, hasMainMethod), hasGlobalStatements), isConsoleApplication) = pair;
+                if (
+                    isConsoleApplication
+                    && commands.Length > 0
+                    && !hasMainMethod
+                    && !hasGlobalStatements
+                )
+                {
+                    ctx.AddSource(
+                        "Program.g.cs",
+                        SourceText.From(EmitProgramEntryPoint(), Encoding.UTF8)
+                    );
+                }
             }
         );
     }
