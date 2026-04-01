@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CliFx.Generators.Binding;
 using CliFx.Generators.Utils;
 using CliFx.Generators.Utils.Extensions;
 using Microsoft.CodeAnalysis;
 
-namespace CliFx.Generators.Binding;
+namespace CliFx.Generators;
 
 internal static class CommandRegistration
 {
