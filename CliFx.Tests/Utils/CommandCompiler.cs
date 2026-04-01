@@ -17,6 +17,7 @@ internal static class CommandCompiler
 {
     private static Compilation CreateCompilation(
         string sourceCode,
+        OutputKind outputKind,
         out IReadOnlyList<Diagnostic> diagnostics
     )
     {
@@ -63,14 +64,24 @@ internal static class CommandCompiler
                 .Append(
                     MetadataReference.CreateFromFile(typeof(CommandCompiler).Assembly.Location)
                 ),
-            // DLL to avoid having to define the Main() method
-            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+            new CSharpCompilationOptions(outputKind)
         );
 
-        // Run the source generator
+        // Always run the command descriptor generator; also run the entry point generator for
+        // executable output kinds so that it can supply the Main() method when none is defined.
+        var generators = new List<ISourceGenerator>
+        {
+            new CommandDescriptorGenerator().AsSourceGenerator(),
+        };
+
+        if (outputKind is OutputKind.ConsoleApplication or OutputKind.WindowsApplication)
+        {
+            generators.Add(new ProgramEntryPointGenerator().AsSourceGenerator());
+        }
+
         CSharpGeneratorDriver
             .Create(
-                [new CommandDescriptorGenerator().AsSourceGenerator()],
+                generators,
                 parseOptions: CSharpParseOptions.Default.WithLanguageVersion(
                     LanguageVersion.Preview
                 )
@@ -88,10 +99,11 @@ internal static class CommandCompiler
 
     public static IReadOnlyList<CommandDescriptor> Compile(
         string sourceCode,
-        bool treatWarningsAsErrors = false
+        bool treatWarningsAsErrors = false,
+        OutputKind outputKind = OutputKind.DynamicallyLinkedLibrary
     )
     {
-        var compilation = CreateCompilation(sourceCode, out var diagnostics);
+        var compilation = CreateCompilation(sourceCode, outputKind, out var diagnostics);
 
         var compilationErrors = diagnostics
             .Where(d =>
