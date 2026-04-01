@@ -67,21 +67,12 @@ internal static class CommandCompiler
             new CSharpCompilationOptions(outputKind)
         );
 
-        // Always run the command descriptor generator; also run the entry point generator for
-        // executable output kinds so that it can supply the Main() method when none is defined.
-        var generators = new List<ISourceGenerator>
-        {
-            new CommandDescriptorGenerator().AsSourceGenerator(),
-        };
-
-        if (outputKind is OutputKind.ConsoleApplication or OutputKind.WindowsApplication)
-        {
-            generators.Add(new ProgramEntryPointGenerator().AsSourceGenerator());
-        }
-
         CSharpGeneratorDriver
             .Create(
-                generators,
+                [
+                    new CommandDescriptorGenerator().AsSourceGenerator(),
+                    new ProgramEntryPointGenerator().AsSourceGenerator(),
+                ],
                 parseOptions: CSharpParseOptions.Default.WithLanguageVersion(
                     LanguageVersion.Preview
                 )
