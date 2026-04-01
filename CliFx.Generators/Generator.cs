@@ -63,7 +63,7 @@ public class Generator : IIncrementalGenerator
 
                     var emitterDiagnostics = new List<Diagnostic>();
 
-                    var source = CommandDescriptorEmitter.Emit(
+                    var source = CommandDescriptor.Emit(
                         item.Command,
                         new DiagnosticReporter(emitterDiagnostics)
                     );
@@ -107,7 +107,7 @@ public class Generator : IIncrementalGenerator
             {
                 ctx.AddSource(
                     "CommandRegistrations.g.cs",
-                    SourceText.From(CommandRegistrationEmitter.Emit(commands), Encoding.UTF8)
+                    SourceText.From(CommandRegistration.Emit(commands), Encoding.UTF8)
                 );
             }
         );

@@ -1,14 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using CliFx.Generators.Binding;
 using CliFx.Generators.Utils;
 using CliFx.Generators.Utils.Extensions;
 using Microsoft.CodeAnalysis;
 
-namespace CliFx.Generators;
+namespace CliFx.Generators.Binding;
 
-internal static class CommandDescriptorEmitter
+internal static class CommandDescriptor
 {
     private static string EmitValidators(
         IReadOnlyList<INamedTypeSymbol> validatorTypes,
@@ -394,7 +393,7 @@ internal static class CommandDescriptorEmitter
                 false,
                 {{CSharp.Encode("Shows help text.")}},
                 new global::CliFx.Activation.BoolScalarInputConverter(),
-                global::System.Array.Empty<global::CliFx.Activation.InputValidator<bool>>()
+                global::System.Array.Empty<global::CliFx.Activation.IInputValidator<bool>>()
             )
             """;
     }
@@ -465,7 +464,7 @@ internal static class CommandDescriptorEmitter
                 false,
                 {{CSharp.Encode("Shows version information.")}},
                 new global::CliFx.Activation.BoolScalarInputConverter(),
-                global::System.Array.Empty<global::CliFx.Activation.InputValidator<bool>>()
+                global::System.Array.Empty<global::CliFx.Activation.IInputValidator<bool>>()
             )
             """;
     }
