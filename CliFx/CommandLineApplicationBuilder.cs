@@ -24,7 +24,7 @@ public partial class CommandLineApplicationBuilder
     private string? _previewModeEnvironmentVariable;
 
     private IConsole? _console;
-    private ITypeActivator? _typeActivator;
+    private ITypeInstantiator? _typeInstantiator;
 
     /// <summary>
     /// Registers a command with the application.
@@ -133,35 +133,35 @@ public partial class CommandLineApplicationBuilder
     }
 
     /// <summary>
-    /// Configures the application to use the specified implementation of <see cref="ITypeActivator" />.
+    /// Configures the application to use the specified implementation of <see cref="ITypeInstantiator" />.
     /// </summary>
-    public CommandLineApplicationBuilder UseTypeActivator(ITypeActivator typeActivator)
+    public CommandLineApplicationBuilder UseTypeInstantiator(ITypeInstantiator typeInstantiator)
     {
-        _typeActivator = typeActivator;
+        _typeInstantiator = typeInstantiator;
         return this;
     }
 
     /// <summary>
     /// Configures the application to use the specified delegate for activating types.
     /// </summary>
-    public CommandLineApplicationBuilder UseTypeActivator(Func<Type, object> createInstance) =>
-        UseTypeActivator(new DelegateTypeActivator(createInstance));
+    public CommandLineApplicationBuilder UseTypeInstantiator(Func<Type, object> createInstance) =>
+        UseTypeInstantiator(new DelegateTypeInstantiator(createInstance));
 
     /// <summary>
     /// Configures the application to use the specified service provider for activating types.
     /// </summary>
-    public CommandLineApplicationBuilder UseTypeActivator(IServiceProvider serviceProvider) =>
-        // Null returns are handled by DelegateTypeActivator
-        UseTypeActivator(serviceProvider.GetService!);
+    public CommandLineApplicationBuilder UseTypeInstantiator(IServiceProvider serviceProvider) =>
+        // Null returns are handled by DelegateTypeInstantiator
+        UseTypeInstantiator(serviceProvider.GetService!);
 
     /// <summary>
     /// Configures the application to use the specified service provider for activating types.
     /// This method takes a delegate that receives the list of all added commands, so that you can
     /// easily register their types with the service provider.
     /// </summary>
-    public CommandLineApplicationBuilder UseTypeActivator(
+    public CommandLineApplicationBuilder UseTypeInstantiator(
         Func<IReadOnlyList<CommandDescriptor>, IServiceProvider> getServiceProvider
-    ) => UseTypeActivator(getServiceProvider([.. _commands]));
+    ) => UseTypeInstantiator(getServiceProvider([.. _commands]));
 
     /// <summary>
     /// Creates a configured instance of <see cref="CommandLineApplication" />.
@@ -185,7 +185,7 @@ public partial class CommandLineApplicationBuilder
             metadata,
             configuration,
             _console ?? new SystemConsole(),
-            _typeActivator ?? new DefaultTypeActivator()
+            _typeInstantiator ?? new DefaultTypeInstantiator()
         );
     }
 }

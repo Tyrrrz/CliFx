@@ -4,9 +4,9 @@ using CliFx.Binding;
 
 namespace CliFx.Infrastructure;
 
-internal static class TypeActivatorExtensions
+internal static class TypeInstantiatorExtensions
 {
-    extension(ITypeActivator activator)
+    extension(ITypeInstantiator instantiator)
     {
         public T CreateInstance<T>(
             [DynamicallyAccessedMembers(
@@ -22,10 +22,10 @@ internal static class TypeActivatorExtensions
                 );
             }
 
-            return (T)activator.CreateInstance(type);
+            return (T)instantiator.CreateInstance(type);
         }
 
         public ICommand CreateInstance(CommandDescriptor command) =>
-            activator.CreateInstance<ICommand>(command.Type);
+            instantiator.CreateInstance<ICommand>(command.Type);
     }
 }

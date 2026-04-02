@@ -41,7 +41,7 @@ public class ApplicationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutp
             .AllowDebugMode()
             .AllowPreviewMode()
             .UseConsole(FakeConsole)
-            .UseTypeActivator(new DefaultTypeActivator())
+            .UseTypeInstantiator(new DefaultTypeInstantiator())
             .Build();
 
         var exitCode = await app.RunAsync([], new Dictionary<string, string>());

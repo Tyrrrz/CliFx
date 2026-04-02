@@ -19,7 +19,7 @@ public class CommandLineApplication(
     CommandLineApplicationMetadata metadata,
     CommandLineApplicationConfiguration configuration,
     IConsole console,
-    ITypeActivator typeActivator
+    ITypeInstantiator typeInstantiator
 )
 {
     private async ValueTask<int> RunAsync(
@@ -81,8 +81,8 @@ public class CommandLineApplication(
         // Initialize an instance of the command
         var instance =
             command != FallbackDefaultCommand.Descriptor
-                ? typeActivator.CreateInstance(command)
-                // Bypass the activator
+                ? typeInstantiator.CreateInstance(command)
+                // Bypass the instantiator
                 : new FallbackDefaultCommand();
 
         // Assemble the help context

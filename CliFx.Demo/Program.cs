@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 return await new CommandLineApplicationBuilder()
     .SetDescription("Demo application showcasing CliFx features.")
     .AddCommandsFromThisAssembly()
-    .UseTypeActivator(commands =>
+    .UseTypeInstantiator(commands =>
     {
         // We use Microsoft.Extensions.DependencyInjection for injecting dependencies in commands
         var services = new ServiceCollection();

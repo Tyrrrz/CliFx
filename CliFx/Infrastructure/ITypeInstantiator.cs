@@ -6,7 +6,7 @@ namespace CliFx.Infrastructure;
 /// <summary>
 /// Abstraction for a service that can instantiate objects at run time.
 /// </summary>
-public interface ITypeActivator
+public interface ITypeInstantiator
 {
     /// <summary>
     /// Creates an instance of the specified type.

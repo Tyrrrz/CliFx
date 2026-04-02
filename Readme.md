@@ -676,12 +676,12 @@ $ ./myapp [command] [...parameters] [...options]
 ### Command instantiation
 
 Because **CliFx** takes responsibility for the application's entire lifecycle, it needs to be capable of instantiating commands at run time.
-To facilitate that, it uses an interface called `ITypeActivator` that determines how to create a new instance of a given type.
+To facilitate that, it uses an interface called `ITypeInstantiator` that determines how to create a new instance of a given type.
 
-The default implementation of `ITypeActivator` only supports types that have public parameter-less constructors, which is sufficient for most common scenarios.
+The default implementation of `ITypeInstantiator` only supports types that have public parameter-less constructors, which is sufficient for most common scenarios.
 However, in some cases you may want to define a custom initializer, for example when integrating with an external dependency container.
 
-To do that, pass a custom `ITypeActivator` or a factory delegate to the `UseTypeActivator(...)` method when building the application:
+To do that, pass a custom `ITypeInstantiator` or a factory delegate to the `UseTypeInstantiator(...)` method when building the application:
 
 ```csharp
 public static class Program
@@ -689,7 +689,7 @@ public static class Program
     public static async Task<int> Main() =>
         await new CommandLineApplicationBuilder()
             .AddCommandsFromThisAssembly()
-            .UseTypeActivator(type =>
+            .UseTypeInstantiator(type =>
             {
                 var instance = MyTypeFactory.Create(type);
                 return instance;
@@ -700,7 +700,7 @@ public static class Program
 ```
 
 This method also supports `IServiceProvider` through various overloads, which allows you to directly integrate dependency containers that implement this interface.
-For example, this is how to configure your application to use [`Microsoft.Extensions.DependencyInjection`](https://nuget.org/packages/Microsoft.Extensions.DependencyInjection) as the type activator in **CliFx**:
+For example, this is how to configure your application to use [`Microsoft.Extensions.DependencyInjection`](https://nuget.org/packages/Microsoft.Extensions.DependencyInjection) as the type instantiator in **CliFx**:
 
 ```csharp
 public static class Program
@@ -708,7 +708,7 @@ public static class Program
     public static async Task<int> Main() =>
         await new CommandLineApplicationBuilder()
             .AddCommandsFromThisAssembly()
-            .UseTypeActivator(commands =>
+            .UseTypeInstantiator(commands =>
             {
                 var services = new ServiceCollection();
 

@@ -4,9 +4,9 @@ using System.Diagnostics.CodeAnalysis;
 namespace CliFx.Infrastructure;
 
 /// <summary>
-/// Implementation of <see cref="ITypeActivator" /> that instantiates a type by using its parameterless constructor.
+/// Implementation of <see cref="ITypeInstantiator" /> that instantiates a type by using its parameterless constructor.
 /// </summary>
-public class DefaultTypeActivator : ITypeActivator
+public class DefaultTypeInstantiator : ITypeInstantiator
 {
     /// <inheritdoc />
     public object CreateInstance(
@@ -30,8 +30,8 @@ public class DefaultTypeActivator : ITypeActivator
             throw CliFxException.InternalError(
                 $"""
                 Failed to create an instance of type `{type.FullName}` because an appropriate constructor is not available.
-                Default type activator is only capable of instantiating a type if it has a public parameterless constructor.
-                To fix this, either add a parameterless constructor to the type or configure a custom activator for the application.
+                Default type instantiator is only capable of instantiating a type if it has a public parameterless constructor.
+                To fix this, either add a parameterless constructor to the type or configure a custom instantiator for the application.
                 """,
                 ex
             );
