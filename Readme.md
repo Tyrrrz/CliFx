@@ -22,6 +22,8 @@
 **CliFx** is an opinionated framework for building command-line applications.
 It provides a model to express command interactions through a relationship of classes and properties, skipping all the low-level infrastructural concerns like argument parsing, routing, error handling, and help generation.
 
+**This is the readme for CliFx v3 (alpha). For v2, see [this readme](https://github.com/Tyrrrz/CliFx/blob/2.3.6/Readme.md)**.
+
 ## Terms of use<sup>[[?]](https://github.com/Tyrrrz/.github/blob/prime/docs/why-so-political.md)</sup>
 
 By using this project or its source code, for any purpose and in any shape or form, you grant your **implicit agreement** to all the following statements:
@@ -278,8 +280,11 @@ public required double Param { get; set; }
 // $ ./myapp <param>
 ```
 
-Here, as evident from the attribute, this parameter is bound with the order of `0`.
-This value specifies the parameter's position relative to the other parameters in the command, which determines the sequence in which they are activated from the command line.
+> [!IMPORTANT]
+> Order values must be unique among the parameters of the same command.
+
+As evident from the attribute, this parameter is bound with the order of `0`.
+This value specifies the parameter's position relative to the other parameters in the command, determining the order in which it is activated from the command line.
 
 For example, given the following bindings, parameters will receive their inputs in the order of: `First` -> `Second` -> `Third`:
 
@@ -296,13 +301,6 @@ public required string Third { get; set; }
 // Usage:
 // $ ./myapp <first> <second> <third>
 ```
-
-> [!IMPORTANT]
-> Order values must be unique among the parameters of the same command.
-
-> [!NOTE]
-> Order values do not have to be sequential.
-> They are not used as absolute indices, but rather as relative indicators of the parameters' positions, so they can be spaced out as needed.
 
 Because parameters are bound positionally, every subsequent parameter relies on the previous one to be set in order to itself receive a value.
 This makes them primarily suited for handling mandatory inputs, hence why the underlying properties in the above examples are all marked as `required`.
@@ -322,7 +320,7 @@ public required string Second { get; set; }
 public string? Third { get; set; }
 
 // Usage:
-// $ ./myapp <first> <second> <third?>
+// $ ./myapp <first> <second> [<third>]
 ```
 
 Due to the same positional nature, parameters generally cannot be used for inputs that take more than one value, as it's not always clear how many arguments should be consumed for a given parameter.
@@ -345,7 +343,7 @@ public required IReadOnlyList<string> Third { get; set; }
 ```
 
 Besides that, when binding properties to parameters, you can also specify a custom name and description.
-These don't have any functional implications on how arguments are parsed, but are used to identify the parameter in the help text:
+These don't have any functional implications, but are used to identify the parameter in the help text:
 
 ```csharp
 [CommandParameter(0,
@@ -360,10 +358,14 @@ public required double Value { get; set; }
 // $ ./myapp <logval>
 ```
 
-As a general guideline, consider using parameter bindings if the input you're expressing satisfies the following criteria:
+> [!IMPORTANT]
+> Parameter names must be unique among the parameters of the same command.
 
-- It's essential for the command to execute successfully and doesn't have an obvious default value
-- It's a scalar that doesn't take multiple values
+As a general guideline, prefer using parameter bindings for inputs that:
+
+- Are essential for the command to execute successfully
+- Don't have an obvious default value
+- Are scalar and don't take multiple values
 
 #### Options
 
@@ -374,15 +376,22 @@ Below is an example of a simple option binding:
 public double Option { get; set; }
 
 // Usage:
-// $ ./myapp --opt <value?>
-// $ ./myapp -o <value?>
+// $ ./myapp [--opt <value>]
+// $ ./myapp [-o <value>]
 ```
 
-Here, as evident from the attribute, this option is bound with the name of `opt` and a short name of `o`.
+> [!IMPORTANT]
+> Option names and short names must be unique among the options of the same command.
+> The comparison is case-insensitive for names and case-sensitive for short names.
+
+> [!NOTE]
+> An option binding doesn't have to specify both a name and a short name, but at least one of them needs to be set.
+
+As evident from the attribute, this option is bound with the name of `opt` and a short name of `o`.
 The user can pass the option by specifying either of these identifiers, and **CliFx** will set the provided value to the corresponding property.
 
 If an option is essential to the execution of the command, the underlying property can also be marked as `required`.
-This will make it so that the user has to provide a value for this option on every execution of the command, otherwise the application will exit with an error:
+This will make it so that the user has to provide a value for this option on every execution of the command, otherwise the application will exit with an error.
 
 Unlike the parameters, though, options can be marked as required and non-required arbitrarily, without any restrictions:
 
@@ -400,17 +409,10 @@ public string? Bar { get; set; }
 public required string Baz { get; set; }
 
 // Usage:
-// $ ./myapp --foo <value> --bar <value?> --baz <value>
+// $ ./myapp --foo <value> [--bar <value>] --baz <value>
 ```
 
-> [!IMPORTANT]
-> Option names and short names must be unique among the options of the same command.
-> The comparison is case-insensitive for names and case-sensitive for short names.
-
-> [!NOTE]
-> An option binding doesn't have to specify both a name and a short name, but at least one of them needs to be set.
-
-In the same vein, options can be freely used for inputs that can take multiple values:
+In the same vein, options can be freely used for inputs that take multiple values:
 
 ```csharp
 // This option is sequence-based (can take multiple values)
@@ -425,7 +427,7 @@ public required IReadOnlyList<string> Bar { get; set; }
 // $ ./myapp --foo <value...> --bar <value...>
 ```
 
-Finally, options can also be configured to rely on an environment variable for fallback, which is useful for required inputs that the user doesn't want to specify every time:
+Finally, options can also be configured to rely on an environment variable for fallback, which is useful for required inputs that the user may not want to specify every time:
 
 ```csharp
 // If the value is not provided from the command line, it will be read
@@ -435,20 +437,24 @@ public required string Foo { get; set; }
 
 // Usage:
 // $ ./myapp --foo <value>
-// $ ENV_FOO=value ./myapp
+// Example:
+// $ ./myapp --foo bar
+// $ ENV_FOO=bar ./myapp
 ```
 
 > [!NOTE]
-> If the user provides a value for an option while the corresponding environment variable is also set, the command-line input will take precedence.
+> If the user provides a value for an option while the fallback environment variable is also set, the command-line input will take precedence.
 
-Taking all of the above into account, the general guideline is that **options are best used to express inputs that enable alternative execution paths, have obvious and sensible defaults, or otherwise can't be easily expressed as parameters**.
+As a general guideline, prefer using option bindings for inputs that:
+
+- Enable an alternative execution path in the command
+- Have an obvious and sensible default value
+- Otherwise can't be easily expressed as parameters
 
 #### Conversion
 
-In order to handle conversion between raw command-line arguments (strings) and the underlying property types, **CliFx** employs the `IInputConverter<T>` interface, set by the `Converter` property on the binding attributes.
-If the converter is not explicitly specified, the framework will try to generate one automatically.
-
-Below are the types supported by the default conversion logic:
+In order to handle input conversion between raw command-line arguments (strings) and the underlying properties, **CliFx** employs the `IInputConverter<T>` interface.
+By default, the framework will try to automatically infer a suitable converter for each property based on its type, supporting the following scenarios:
 
 - `string`
   - No conversion required
@@ -503,12 +509,14 @@ public partial class SearchCommand : ICommand
     }
 }
 
-// Usage:
+// Usage
+// $ ./myapp search <pattern> [--recursive] [--format <value>] [--in <value...>]
+// Example:
 // $ ./myapp search "*.log" --recursive --format json --in /var/log /tmp/logs
 ```
 
-If you need to support a type that isn't covered by the default conversion logic, you can implement a custom converter yourself.
-To do that, first create a class that inherits either from `ScalarInputConverter<T>` (for scalar types) or `SequenceInputConverter<T>` (for collection types):
+If you need to support a type that isn't covered by the default conversion logic, you can also implement a custom converter yourself.
+To do that, create a class that implements `IInputConverter<T>` by deriving from either `ScalarInputConverter<T>` for scalar types or `SequenceInputConverter<T>` for sequence-based types:
 
 ```csharp
 using CliFx.Activation;
@@ -542,23 +550,26 @@ Then, specify this converter in the `Converter` property of the binding attribut
 [Command("surface", Description = "Calculates the surface area of a triangle defined by three points.")]
 public partial class SurfaceCalculatorCommand : ICommand
 {
-    [CommandParameter(0,
+    [CommandParameter(
+        0,
         Description = "First point of the triangle, in the format AxB (e.g. 10x20).",
         Converter = typeof(VectorConverter)
     )]
-    public required Vector2 PointA { get; init; }
+    public required Vector2 PointA { get; set; }
 
-    [CommandParameter(1,
+    [CommandParameter(
+        1,
         Description = "Second point of the triangle, in the format AxB (e.g. 10x20).",
         Converter = typeof(VectorConverter)
     )]
-    public required Vector2 PointB { get; init; }
+    public required Vector2 PointB { get; set; }
 
-    [CommandParameter(2,
+    [CommandParameter(
+        2,
         Description = "Third point of the triangle, in the format AxB (e.g. 10x20).",
         Converter = typeof(VectorConverter)
     )]
-    public required Vector2 PointC { get; init; }
+    public required Vector2 PointC { get; set; }
 
     public ValueTask ExecuteAsync(IConsole console)
     {
@@ -567,6 +578,8 @@ public partial class SurfaceCalculatorCommand : ICommand
 }
 
 // Usage:
+// $ ./myapp surface <pointA> <pointB> <pointC>
+// Example:
 // $ ./myapp surface 0x0 0x10 10x0
 ```
 
@@ -575,7 +588,7 @@ public partial class SurfaceCalculatorCommand : ICommand
 Besides custom converters, you can also implement custom validators to verify that your inputs meet certain criteria before the command is executed.
 Unlike converters, validators work with already converted values rather than raw command-line arguments.
 
-To implement a custom validator, create a class that inherits from `InputValidator<T>`:
+To implement a custom validator, create a class that implements `IInputValidator<T>` by deriving from `InputValidator<T>`:
 
 ```csharp
 using CliFx.Activation;
@@ -599,7 +612,8 @@ Then, include this validator in the `Validators` property of the binding attribu
 [Command("sqrt", Description = "Calculates the square root of a value.")]
 public partial class SqrtCommand : ICommand
 {
-    [CommandParameter(0,
+    [CommandParameter(
+        0,
         Description = "Value whose square root is to be found.",
         Validators = [typeof(PositiveNumberValidator)]
     )]
@@ -612,11 +626,13 @@ public partial class SqrtCommand : ICommand
 }
 
 // Usage:
+// $ ./myapp sqrt <value>
+// Example:
 // $ ./myapp sqrt 25
 ```
 
 The `Validators` property is an array, so you can specify more than one validator for the same input.
-In that case, all their errors (if any) are aggregated and shown together to the user:
+When using multiple validators, all of them will be executed sequentially and their errors will be merged and reported together:
 
 ```csharp
 [Command("passwd", Description = "Changes the user password.")]
@@ -625,7 +641,8 @@ public partial class ChangePasswordCommand : ICommand
     [CommandParameter(0, Description = "Username whose password is to be changed.")]
     public required string Username { get; set; }
 
-    [CommandParameter(1,
+    [CommandParameter(
+        1,
         Description = "New password.",
         Validators =
         [
@@ -642,6 +659,8 @@ public partial class ChangePasswordCommand : ICommand
 }
 
 // Usage:
+// $ ./myapp passwd <username> <password>
+// Example:
 // $ ./myapp passwd alice "verystr0ngpassw0rd!"
 ```
 
@@ -650,12 +669,12 @@ public partial class ChangePasswordCommand : ICommand
 **CliFx** employs a variation of the POSIX argument syntax, which is used in most modern command-line tools.
 Here are some examples of how it works:
 
-- `./myapp --foo bar` sets option `"foo"` to value `"bar"`
-- `./myapp -f bar` sets option `'f'` to value `"bar"`
-- `./myapp --switch` sets option `"switch"` without value
-- `./myapp -s` sets option `'s'` without value
-- `./myapp -abc` sets options `'a'`, `'b'` and `'c'` without value
-- `./myapp -xqf bar` sets options `'x'` and `'q'` without value, and option `'f'` to value `"bar"`
+- `./myapp --foo bar` sets the option `"foo"` to value `"bar"`
+- `./myapp -f bar` sets the option `'f'` to value `"bar"`
+- `./myapp --switch` sets the option `"switch"` without a value
+- `./myapp -s` sets the option `'s'` without a value
+- `./myapp -abc` sets the options `'a'`, `'b'` and `'c'` without values
+- `./myapp -xqf bar` sets the options `'x'` and `'q'` without values, and the option `'f'` to value `"bar"`
 - `./myapp -i file1.txt file2.txt` sets option `'i'` to a sequence of values `"file1.txt"` and `"file2.txt"`
 - `./myapp -i file1.txt -i file2.txt` sets option `'i'` to a sequence of values `"file1.txt"` and `"file2.txt"`
 - `./myapp cmd abc -o` routes to command `cmd` (assuming it's a command) with parameter `abc` and sets option `'o'` without value
@@ -733,10 +752,10 @@ public static class Program
 ### Command routing
 
 In order to facilitate a variety of different workflows, command-line applications may provide the user with more than just a single command.
-Complex applications may also nest commands underneath each other, employing a multi-level hierarchical structure.
+Complex applications may also nest commands within each other, employing a multi-level hierarchical structure.
 
 With **CliFx**, this is achieved by simply giving each command a unique name through the `[Command]` attribute.
-Commands that have common name segments are considered to be hierarchically related, which affects how they're listed in the help text.
+Commands that have common name segments are considered to be hierarchically related, affecting how they appear in the help text:
 
 ```csharp
 // Default command, i.e. command without a name
@@ -746,21 +765,21 @@ public partial class DefaultCommand : ICommand
     // ...
 }
 
-// Child of default command
+// Child of the default command
 [Command("cmd1")]
 public partial class FirstCommand : ICommand
 {
     // ...
 }
 
-// Child of default command
+// Another child of the default command
 [Command("cmd2")]
 public partial class SecondCommand : ICommand
 {
     // ...
 }
 
-// Child of FirstCommand
+// Child of cmd1 (FirstCommand)
 [Command("cmd1 sub")]
 public partial class SubCommand : ICommand
 {
@@ -769,51 +788,55 @@ public partial class SubCommand : ICommand
 ```
 
 Once configured, the user can execute a specific command by prepending its name to the passed arguments.
-For example, running `dotnet myapp.dll cmd1 arg1 -p 42` will execute `FirstCommand` in the above example.
+For example, to execute `FirstCommand` with a parameter and an option, the user can run:
+
+```console
+$ ./myapp cmd1 arg1 -p 42
+```
 
 The user can also find the list of all available top-level commands in the help text:
 
 ```console
-$ dotnet myapp.dll --help
+$ ./myapp --help
 
 MyApp v1.0
 
 USAGE
-  dotnet myapp.dll [options]
-  dotnet myapp.dll [command] [...]
+  myapp [options]
+  myapp [command] [...]
 
 OPTIONS
-  -h|--help         Shows help text.
-  --version         Shows version information.
+  -h|--help         Shows help text. Default: "false".
+  --version         Shows version information. Default: "false".
 
 COMMANDS
   cmd1              Subcommands: cmd1 sub.
   cmd2
 
-You can run `dotnet myapp.dll [command] --help` to show help for a specific command.
+You can run `myapp [command] --help` to show help for a specific command.
 ```
 
 To see the list of commands nested under a specific command, the user can refine their help request by specifying the corresponding command name before the help option:
 
 ```console
-$ dotnet myapp.dll cmd1 --help
+$ myapp cmd1 --help
 
 USAGE
-  dotnet myapp.dll cmd1 [options]
-  dotnet myapp.dll cmd1 [command] [...]
+  myapp cmd1 [options]
+  myapp cmd1 [command] [...]
 
 OPTIONS
-  -h|--help         Shows help text.
+  -h|--help         Shows help text. Default: "false".
 
 COMMANDS
   sub
 
-You can run `dotnet myapp.dll cmd1 [command] --help` to show help for a specific command.
+You can run `myapp cmd1 [command] --help` to show help for a specific command.
 ```
 
 > [!NOTE]
 > Defining the default (unnamed) command is not required.
-> If it's absent, running the application without specifying a command will just show the root-level help text.
+> If it's absent, **CliFx** will generate one for you automatically.
 
 ### Reporting errors
 
@@ -821,14 +844,14 @@ Commands in **CliFx** do not directly return exit codes, but instead communicate
 This special exception type can be used to print an error message to the console, return a specific exit code, and also optionally show help text for the current command:
 
 ```csharp
-[Command]
+[Command("div")]
 public partial class DivideCommand : ICommand
 {
     [CommandOption("dividend")]
-    public required double Dividend { get; init; }
+    public required double Dividend { get; set; }
 
     [CommandOption("divisor")]
-    public required double Divisor { get; init; }
+    public required double Divisor { get; set; }
 
     public ValueTask ExecuteAsync(IConsole console)
     {
@@ -847,7 +870,7 @@ public partial class DivideCommand : ICommand
 ```
 
 ```console
-$ dotnet myapp.dll --dividend 10 --divisor 0
+$ ./myapp div --dividend 10 --divisor 0
 
 Division by zero is not supported.
 
@@ -866,7 +889,7 @@ Console applications support the concept of interrupt signals, which can be issu
 If your command performs critical work, you can intercept these signals to handle cancellation requests in a graceful way.
 
 In order to make the command cancellation-aware, call `console.RegisterCancellationHandler()` to register the signal handler and obtain the corresponding `CancellationToken`.
-Once this method is called, the program will no longer terminate on an interrupt signal but will instead trigger the associated token, which can be used to delay the termination of a command just enough to exit in a controlled manner.
+Once this method is called, the program will no longer terminate on an interrupt signal but will instead trigger the associated token, which can be used to delay the termination of a command enough to exit in a controlled manner:
 
 ```csharp
 [Command]
@@ -902,14 +925,14 @@ While an application running in production would rely on `SystemConsole` to inte
 For example, imagine you have the following command:
 
 ```csharp
-[Command]
+[Command("concat")]
 public partial class ConcatCommand : ICommand
 {
     [CommandOption("left")]
-    public string Left { get; init; } = "Hello";
+    public string Left { get; set; } = "Hello";
 
     [CommandOption("right")]
-    public string Right { get; init; } = "world";
+    public string Right { get; set; } = "world";
 
     public ValueTask ExecuteAsync(IConsole console)
     {
@@ -964,6 +987,7 @@ public async Task ConcatCommand_executes_successfully()
 
     var args = new[]
     {
+        "concat",
         "--left", "foo",
         "--right", "bar"
     };
@@ -994,23 +1018,26 @@ var application = new CommandLineApplicationBuilder()
     .Build();
 ```
 
+> [!TIP]
+> Calling `AllowDebugMode()` and `AllowPreviewMode()` without arguments will enable these modes with the default environment variable names of `CLIFX_DEBUG` and `CLIFX_PREVIEW` respectively.
+
 When the debug mode environment variable is set to `true`, the application will launch in a suspended state, waiting for the debugger to attach to the current process:
 
 ```console
-$ MYAPP_DEBUG=true dotnet myapp.dll cmd -o
+$ CLIFX_DEBUG=true ./myapp cmd -o
 
-Attach the debugger to process with ID 3148 to continue.
+Attach the debugger to the process with ID 3148 to continue.
 ```
 
-When the preview mode environment variable is set to `true`, the application will print the consumed command-line arguments as they were parsed:
+When the preview mode environment variable is set to `true`, the application will print the consumed command-line arguments as they were parsed, before executing the command:
 
 ```console
-$ MYAPP_PREVIEW=true dotnet myapp.dll cmd arg1 arg2 -o foo --option bar1 bar2
+$ CLIFX_PREVIEW=true ./myapp cmd arg1 arg2 -o foo --option bar1 bar2
 
 cmd <arg1> <arg2> [-o foo] [--option bar1 bar2]
 ```
 
-To disallow these modes (e.g. for production), simply pass `null` as the environment variable name:
+To disallow these modes (e.g. for production), simply pass `null` for the corresponding environment variable names:
 
 ```csharp
 var application = new CommandLineApplicationBuilder()

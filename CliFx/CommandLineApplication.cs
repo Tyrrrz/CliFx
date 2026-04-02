@@ -41,7 +41,7 @@ public class CommandLineApplication(
             using (console.WithForegroundColor(ConsoleColor.Green))
             {
                 console.WriteLine(
-                    $"Attach the debugger to process with ID {Environment.ProcessId} to continue."
+                    $"Attach the debugger to the process with ID {Environment.ProcessId} to continue."
                 );
             }
 
