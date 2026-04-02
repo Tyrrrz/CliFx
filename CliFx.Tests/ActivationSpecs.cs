@@ -891,10 +891,27 @@ public partial class ActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(t
                         }
                     }
 
+                    public class ValidatorC : InputValidator<int>
+                    {
+                        public override IEnumerable<InputValidationError> Validate(int value)
+                        {
+                            yield return Error("Another error");
+                            yield return Error("Also an error");
+                        }
+                    }
+
                     [Command]
                     public partial class Command : ICommand
                     {
-                        [CommandOption('f', Validators = [typeof(ValidatorA), typeof(ValidatorB)])]
+                        [CommandOption(
+                            'f',
+                            Validators =
+                            [
+                                typeof(ValidatorA),
+                                typeof(ValidatorB),
+                                typeof(ValidatorC)
+                            ]
+                        )]
                         public int Foo { get; set; }
 
                         public ValueTask ExecuteAsync(IConsole console) => default;
@@ -913,6 +930,8 @@ public partial class ActivationSpecs(ITestOutputHelper testOutput) : SpecsBase(t
 
         var stdErr = FakeConsole.ReadErrorString();
         stdErr.Should().Contain("Hello world");
+        stdErr.Should().Contain("Another error");
+        stdErr.Should().Contain("Also an error");
     }
 
     [Fact]
