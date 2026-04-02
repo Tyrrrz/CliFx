@@ -38,8 +38,8 @@ public class ApplicationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutp
             .SetExecutableName("myapp")
             .AddCommand(NoOpCommand.Descriptor)
             .AddCommands([NoOpCommand.Descriptor])
-            .AllowDebugMode("CLIFX_DEBUG")
-            .AllowPreviewMode("CLIFX_PREVIEW")
+            .AllowDebugMode()
+            .AllowPreviewMode()
             .UseConsole(FakeConsole)
             .UseTypeActivator(new DefaultTypeActivator())
             .Build();
@@ -117,7 +117,7 @@ public class ApplicationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutp
                 )
             )
             .UseConsole(FakeConsole)
-            .AllowPreviewMode("CLIFX_PREVIEW")
+            .AllowPreviewMode()
             .Build();
 
         // Act

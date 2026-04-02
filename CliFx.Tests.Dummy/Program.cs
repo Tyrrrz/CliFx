@@ -26,8 +26,8 @@ public static class Program
 
         return await new CommandLineApplicationBuilder()
             .AddCommandsFromThisAssembly()
-            .AllowDebugMode("CLIFX_DEBUG")
-            .AllowPreviewMode("CLIFX_PREVIEW")
+            .AllowDebugMode()
+            .AllowPreviewMode()
             .Build()
             .RunAsync();
     }

@@ -102,6 +102,12 @@ public partial class CommandLineApplicationBuilder
     }
 
     /// <summary>
+    /// Enables the debug mode, activated when the <c>CLIFX_DEBUG</c> environment variable is set to <c>true</c>.
+    /// When active, the application waits for a debugger to attach before executing the command.
+    /// </summary>
+    public CommandLineApplicationBuilder AllowDebugMode() => AllowDebugMode("CLIFX_DEBUG");
+
+    /// <summary>
     /// Enables the preview mode, activated when the specified environment variable is set to <c>true</c>.
     /// When active, the application prints the parsed command line before executing the command.
     /// </summary>
@@ -110,6 +116,12 @@ public partial class CommandLineApplicationBuilder
         _previewModeEnvironmentVariable = environmentVariableName;
         return this;
     }
+
+    /// <summary>
+    /// Enables the preview mode, activated when the <c>CLIFX_PREVIEW</c> environment variable is set to <c>true</c>.
+    /// When active, the application prints the parsed command line before executing the command.
+    /// </summary>
+    public CommandLineApplicationBuilder AllowPreviewMode() => AllowPreviewMode("CLIFX_PREVIEW");
 
     /// <summary>
     /// Configures the application to use the specified implementation of <see cref="IConsole" />.
