@@ -20,9 +20,10 @@
 </p>
 
 **CliFx** is an opinionated framework for building command-line applications.
-It provides a model to express command interactions through a relationship of classes and properties, skipping all the low-level infrastructural concerns like argument parsing, routing, error handling, and help generation.
+It provides a model for expressing command interactions through classes and properties, skipping all the low-level infrastructure concerns like argument parsing, routing, error handling, and help generation.
 
-**This is the readme for CliFx v3 (alpha). For v2, see [this readme](https://github.com/Tyrrrz/CliFx/blob/2.3.6/Readme.md)**.
+> [!NOTE]
+> This is the readme for CliFx v3 (alpha). For v2, see [this readme](https://github.com/Tyrrrz/CliFx/blob/2.3.6/Readme.md).
 
 ## Terms of use<sup>[[?]](https://github.com/Tyrrrz/.github/blob/prime/docs/why-so-political.md)</sup>
 
@@ -42,7 +43,7 @@ To learn more about the war and how you can help, [click here](https://tyrrrz.me
 ## Features
 
 - Complete application framework, not just an argument parser
-- Minimum boilerplate and easy to get started
+- Minimal boilerplate and easy to get started
 - Class-first configuration via attributes
 - Comprehensive auto-generated help text
 - Support for deeply nested command hierarchies
@@ -97,12 +98,12 @@ public partial class LogCommand : ICommand
 
 > [!IMPORTANT]
 > The command type must be declared as `partial` so that **CliFx** can extend it with necessary metadata and behavior.
-> If the type is nested within other types, all of them must be also marked as `partial`.
+> If the type is nested within other types, all of them must also be marked as `partial`.
 
 In order to satisfy `ICommand`'s contract, the type needs to define an `ExecuteAsync(...)` method which contains the command's execution logic.
 As the only parameter, this method takes an instance of `IConsole` — a decoupled abstraction used in place of `System.Console` to write text, read binary data, or otherwise interact with the console.
 
-Beyond that, your command will probably also need to be able to receive some input from the user.
+Beyond that, your command will probably also need to receive some input from the user.
 This is achieved by defining properties and attaching the `[CommandParameter]` and `[CommandOption]` attributes to bind them as either parameters or options.
 
 The command in the above example serves as a simple logarithm calculator that has two inputs: a positional parameter for the logarithm value (bound to `Value`) and a named option for the logarithm base (bound to `Base`).
@@ -230,7 +231,7 @@ This allows the user to run the application in one of the two following ways:
 ```console
 $ ./myapp log 100 -b 10
 
-4
+2
 
 $ ./myapp sum 1 2 3
 
@@ -483,7 +484,7 @@ By default, the framework will try to automatically infer a suitable converter f
   - Converted by calling `.ctor(...)` with the array of converted values
   - Covers collection types like `List<T>`, `HashSet<T>`, etc.
 
-For example, here is an example command that showcases some of these built-in conversions:
+For example, here is a command that showcases some of these built-in conversions:
 
 ```csharp
 [Command("search", Description = "Searches for files matching a pattern.")]
@@ -686,7 +687,7 @@ The parser's context-free nature has several implications on how it consumes arg
 For example, `./myapp -i file1.txt file2.txt` will always be parsed as an option with multiple values, regardless of the arity of the underlying property it's bound to.
 Similarly, unseparated arguments in the form of `./myapp -ofile` will be treated as five distinct options `'o'`, `'f'`, `'i'`, `'l'`, `'e'`, instead of `'o'` being set to value `"file"`.
 
-These rules also make the order of arguments important — command-line string is expected to follow this pattern:
+These rules also make the order of arguments important — the command-line string is expected to follow this pattern:
 
 ```console
 $ ./myapp [command] [...parameters] [...options]
@@ -698,7 +699,7 @@ Because **CliFx** takes responsibility for the application's entire lifecycle, i
 To facilitate that, it uses an interface called `ITypeInstantiator` that determines how to create a new instance of a given type.
 
 The default implementation of `ITypeInstantiator` only supports types that have public parameter-less constructors, which is sufficient for most common scenarios.
-However, in some cases you may want to define a custom initializer, for example when integrating with an external dependency container.
+However, in some cases you may want to define a custom instantiator, for example when integrating with an external dependency container.
 
 To do that, pass a custom `ITypeInstantiator` or a factory delegate to the `UseTypeInstantiator(...)` method when building the application:
 
@@ -819,7 +820,7 @@ You can run `myapp [command] --help` to show help for a specific command.
 To see the list of commands nested under a specific command, the user can refine their help request by specifying the corresponding command name before the help option:
 
 ```console
-$ myapp cmd1 --help
+$ ./myapp cmd1 --help
 
 USAGE
   myapp cmd1 [options]
