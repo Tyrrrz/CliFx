@@ -71,7 +71,7 @@ public class ApplicationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutp
     }
 
     [Fact(Timeout = 15000)]
-    public async Task I_can_use_an_environment_variable_to_make_the_application_wait_for_the_debugger_to_attach()
+    public async Task I_can_use_an_environment_variable_to_make_the_application_wait_for_a_debugger_to_attach()
     {
         // Arrange
         using var cts = new CancellationTokenSource();
@@ -80,7 +80,7 @@ public class ApplicationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutp
         void HandleStdOut(string line)
         {
             // Kill the process once it writes the output we expect
-            if (line.Contains("Attach the debugger to", StringComparison.OrdinalIgnoreCase))
+            if (line.Contains("Attach a debugger to", StringComparison.OrdinalIgnoreCase))
                 cts.Cancel();
         }
 
@@ -132,6 +132,6 @@ public class ApplicationSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutp
         var stdOut = FakeConsole.ReadOutputString();
         stdOut
             .Should()
-            .ContainAllInOrder("cmd", "<param>", "[-a]", "[-b]", "[-c]", "[--option \"foo\"]");
+            .ContainAllInOrder("cmd", "|<param>|", "|-a|", "|-b|", "|-c|", "|--option <foo>|");
     }
 }

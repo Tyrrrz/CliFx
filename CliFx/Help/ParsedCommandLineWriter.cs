@@ -9,40 +9,32 @@ internal class ParsedCommandLineWriter(ParsedCommandLine commandLine, ConsoleWri
 {
     public void Write()
     {
-        WriteHorizontalMargin();
+        Write(ConsoleColor.DarkGray, "> ");
 
         // Command name
         if (!string.IsNullOrWhiteSpace(commandLine.CommandName))
         {
+            Write('|');
             Write(ConsoleColor.Cyan, commandLine.CommandName);
+            Write('|');
             Write(' ');
         }
 
         // Positional arguments
         foreach (var positionalArgument in commandLine.PositionalArguments)
         {
-            Write('<');
-            Write(ConsoleColor.White, positionalArgument.Value);
-            Write('>');
+            Write('|');
+            Write(ConsoleColor.DarkCyan, positionalArgument.ToString());
+            Write('|');
             Write(' ');
         }
 
         // Options
         foreach (var parsedOption in commandLine.Options)
         {
-            Write('[');
-
-            Write(ConsoleColor.White, parsedOption.ToString());
-
-            foreach (var value in parsedOption.Values)
-            {
-                Write(' ');
-                Write('"');
-                Write(value);
-                Write('"');
-            }
-
-            Write(']');
+            Write('|');
+            Write(ConsoleColor.Yellow, parsedOption.ToString());
+            Write('|');
             Write(' ');
         }
 

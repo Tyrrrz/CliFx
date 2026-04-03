@@ -293,7 +293,7 @@ public class HelpSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ContainAllInOrder("USAGE", "[command]", "[...]");
+        stdOut.Should().ContainAllInOrder("USAGE", "[command]", "...");
     }
 
     [Fact]

@@ -19,7 +19,8 @@ internal abstract partial record CommandInputSymbol(
         ConverterType is not null
         && ConverterType.Inherits("CliFx.Activation.SequenceInputConverter");
 
-    // An input is considered sequence-based if it has a sequence-based converter, or if it
+    // Since we operate in a context where a converter may not be specified yet,
+    // we consider an input sequence-based if it has a sequence-based converter, or if it
     // doesn't have a converter but its type implements IEnumerable (except string).
     public bool IsSequenceBased =>
         ConverterType is not null

@@ -46,12 +46,7 @@ internal class HelpWriter(HelpContext context, ConsoleWriter consoleWriter)
             // Parameters
             foreach (var parameter in context.Command.Parameters.OrderBy(p => p.Order))
             {
-                Write(
-                    ConsoleColor.DarkCyan,
-                    !parameter.Converter.CanConvertSequence
-                        ? $"<{parameter.Name}>"
-                        : $"<{parameter.Name}...>"
-                );
+                Write(ConsoleColor.DarkCyan, parameter.ToString(includeKind: false));
                 Write(' ');
             }
 
@@ -60,15 +55,11 @@ internal class HelpWriter(HelpContext context, ConsoleWriter consoleWriter)
             {
                 Write(
                     ConsoleColor.Yellow,
-                    !string.IsNullOrWhiteSpace(option.Name)
-                        ? $"--{option.Name}"
-                        : $"-{option.ShortName}"
-                );
-                Write(' ');
-
-                Write(
-                    ConsoleColor.White,
-                    !option.Converter.CanConvertSequence ? "<value>" : "<values...>"
+                    option.ToString(
+                        includeKind: false,
+                        includeBothIdentifiers: false,
+                        includeValuePlaceholder: true
+                    )
                 );
                 Write(' ');
             }
@@ -95,7 +86,7 @@ internal class HelpWriter(HelpContext context, ConsoleWriter consoleWriter)
             Write(' ');
 
             // Placeholder for other arguments
-            Write("[...]");
+            Write("...");
 
             WriteLine();
         }
@@ -148,7 +139,7 @@ internal class HelpWriter(HelpContext context, ConsoleWriter consoleWriter)
                 Write(", ");
             }
 
-            Write('"');
+            Write(ConsoleColor.DarkGray, '<');
             Write(
                 value switch
                 {
@@ -161,7 +152,7 @@ internal class HelpWriter(HelpContext context, ConsoleWriter consoleWriter)
                     _ => value.ToString(),
                 }
             );
-            Write('"');
+            Write(ConsoleColor.DarkGray, '>');
         }
 
         if (!isFirst)

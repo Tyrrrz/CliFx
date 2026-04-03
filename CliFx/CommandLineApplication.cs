@@ -41,14 +41,14 @@ public class CommandLineApplication(
             using (console.WithForegroundColor(ConsoleColor.Green))
             {
                 console.WriteLine(
-                    $"Attach the debugger to the process with ID {Environment.ProcessId} to continue."
+                    $"Attach a debugger to the process with ID {Environment.ProcessId} to continue."
                 );
             }
 
-            // Try to also launch the debugger ourselves (only works with Visual Studio)
+            // Try to also launch a debugger ourselves (only works with Visual Studio)
             Debugger.Launch();
 
-            // Wait for the debugger to attach
+            // Wait for a debugger to attach
             await Debugger.WaitUntilAttachedAsync();
         }
 
@@ -147,7 +147,7 @@ public class CommandLineApplication(
     /// Returns the exit code which indicates whether the application completed successfully.
     /// </summary>
     /// <remarks>
-    /// When running WITHOUT the debugger attached (i.e. in production), this method swallows
+    /// When running WITHOUT a debugger attached (i.e. in production), this method swallows
     /// all inner exceptions and reports them to the console, instead of allowing them to propagate
     /// to the caller and potentially crash the application.
     /// </remarks>
@@ -166,7 +166,7 @@ public class CommandLineApplication(
         // To prevent the app from showing the annoying troubleshooting dialog on Windows,
         // we handle all exceptions ourselves and print them to the console.
         // We only want to do that if the app is running in production, which we infer
-        // based on whether the debugger is attached to the process.
+        // based on whether a debugger is attached to the process.
         // When not running in production, we want the IDE to show exceptions to the
         // developer, so we don't swallow them in that case.
         catch (Exception ex) when (!Debugger.IsAttached)
@@ -182,7 +182,7 @@ public class CommandLineApplication(
     /// Returns the exit code which indicates whether the application completed successfully.
     /// </summary>
     /// <remarks>
-    /// When running WITHOUT the debugger attached (i.e. in production), this method swallows
+    /// When running WITHOUT a debugger attached (i.e. in production), this method swallows
     /// all inner exceptions and reports them to the console, instead of allowing them to propagate
     /// to the caller and potentially crash the application.
     /// </remarks>
@@ -200,7 +200,7 @@ public class CommandLineApplication(
     /// Returns the exit code which indicates whether the application completed successfully.
     /// </summary>
     /// <remarks>
-    /// When running WITHOUT the debugger attached (i.e. in production), this method swallows
+    /// When running WITHOUT a debugger attached (i.e. in production), this method swallows
     /// all inner exceptions and reports them to the console, instead of allowing them to propagate
     /// to the caller and potentially crash the application.
     /// </remarks>

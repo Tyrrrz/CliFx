@@ -31,11 +31,15 @@ public class CommandParameterDescriptor(
             buffer.Append("Parameter ");
 
         if (!IsRequired)
-            buffer.Append('<').Append(Name).Append("?>");
-        else if (Converter.CanConvertSequence)
+            buffer.Append('[');
+
+        if (IsSequenceBased)
             buffer.Append('<').Append(Name).Append("...>");
         else
             buffer.Append('<').Append(Name).Append('>');
+
+        if (!IsRequired)
+            buffer.Append(']');
 
         return buffer.ToString();
     }

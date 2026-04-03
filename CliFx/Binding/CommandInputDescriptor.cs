@@ -32,6 +32,8 @@ public abstract class CommandInputDescriptor(
     /// </summary>
     public IInputConverter Converter { get; } = converter;
 
+    internal bool IsSequenceBased => Converter.CanConvertSequence;
+
     /// <summary>
     /// Validators used to validate the converted value before setting it to the target property.
     /// </summary>

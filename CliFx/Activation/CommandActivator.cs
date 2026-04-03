@@ -30,7 +30,10 @@ internal class CommandActivator(
                 $"""
                 {input} has been provided with an invalid value.
                 Error(s):
-                {string.Join(Environment.NewLine, validationErrors.Select(e => "- " + e.Message))}
+                {string.Join(
+                    Environment.NewLine,
+                    validationErrors.Select(e => "- " + e.Message)
+                )}
                 """
             );
         }
@@ -67,7 +70,7 @@ internal class CommandActivator(
             if (position >= commandLine.PositionalArguments.Count)
                 break;
 
-            if (!parameter.Converter.CanConvertSequence)
+            if (!parameter.IsSequenceBased)
             {
                 var positionalArgument = commandLine.PositionalArguments[position];
                 ActivateInput(parameter, instance, [positionalArgument.Value]);
@@ -108,12 +111,12 @@ internal class CommandActivator(
             {
                 throw CliFxException.UserError(
                     $"""
-                    Missing required parameter(s):
-                    {string.Join(
+                Missing required parameter(s):
+                {string.Join(
                         ", ",
-                        remainingRequiredParameters.Select(p => p.ToString(false))
+                        remainingRequiredParameters.Select(p => p.ToString(includeKind: false))
                     )}
-                    """
+                """
                 );
             }
         }
@@ -151,7 +154,7 @@ internal class CommandActivator(
                 )
             )
             {
-                var rawValues = !option.Converter.CanConvertSequence
+                var rawValues = !option.IsSequenceBased
                     ? [environmentVariableValue]
                     : environmentVariableValue.Split(Path.PathSeparator);
 
@@ -174,12 +177,12 @@ internal class CommandActivator(
             {
                 throw CliFxException.UserError(
                     $"""
-                    Unrecognized option(s):
-                    {string.Join(
+                Unrecognized option(s):
+                {string.Join(
                         ", ",
                         remainingParsedOptions
                     )}
-                    """
+                """
                 );
             }
 
@@ -187,12 +190,12 @@ internal class CommandActivator(
             {
                 throw CliFxException.UserError(
                     $"""
-                     Missing required option(s):
-                     {string.Join(
+                 Missing required option(s):
+                 {string.Join(
                          ", ",
-                         remainingRequiredOptions.Select(o => o.ToString(false, false))
+                         remainingRequiredOptions.Select(o => o.ToString(includeKind: false, includeBothIdentifiers: true, includeValuePlaceholder: false))
                      )}
-                     """
+                 """
                 );
             }
         }

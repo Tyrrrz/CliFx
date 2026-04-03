@@ -191,9 +191,9 @@ PARAMETERS
 * value             Value whose logarithm is to be found.
 
 OPTIONS
-  -b|--base         Logarithm base. Default: "10".
-  -h|--help         Shows help text. Default: "false".
-  --version         Shows version information. Default: "false".
+  -b|--base         Logarithm base. Default: <10>.
+  -h|--help         Shows help text. Default: <false>.
+  --version         Shows version information. Default: <false>.
 ```
 
 Because `LogCommand` doesn't have a name, it's treated as the default (i.e. root) command, which is executed when the user doesn't specify any command name in the arguments.
@@ -246,11 +246,11 @@ MyApp v1.0
 
 USAGE
   myapp [options]
-  myapp [command] [...]
+  myapp [command] ...
 
 OPTIONS
-  -h|--help         Shows help text. Default: "false".
-  --version         Shows version information. Default: "false".
+  -h|--help         Shows help text. Default: <false>.
+  --version         Shows version information. Default: <false>.
 
 COMMANDS
   log               Calculates the logarithm of a value.
@@ -803,11 +803,11 @@ MyApp v1.0
 
 USAGE
   myapp [options]
-  myapp [command] [...]
+  myapp [command] ...
 
 OPTIONS
-  -h|--help         Shows help text. Default: "false".
-  --version         Shows version information. Default: "false".
+  -h|--help         Shows help text. Default: <false>.
+  --version         Shows version information. Default: <false>.
 
 COMMANDS
   cmd1              Subcommands: cmd1 sub.
@@ -823,10 +823,10 @@ $ myapp cmd1 --help
 
 USAGE
   myapp cmd1 [options]
-  myapp cmd1 [command] [...]
+  myapp cmd1 [command] ...
 
 OPTIONS
-  -h|--help         Shows help text. Default: "false".
+  -h|--help         Shows help text. Default: <false>.
 
 COMMANDS
   sub
@@ -1021,12 +1021,12 @@ var application = new CommandLineApplicationBuilder()
 > [!TIP]
 > Calling `AllowDebugMode()` and `AllowPreviewMode()` without arguments will enable these modes with the default environment variable names of `CLIFX_DEBUG` and `CLIFX_PREVIEW` respectively.
 
-When the debug mode environment variable is set to `true`, the application will launch in a suspended state, waiting for the debugger to attach to the current process:
+When the debug mode environment variable is set to `true`, the application will launch in a suspended state, waiting for a debugger to attach to the current process:
 
 ```console
 $ CLIFX_DEBUG=true ./myapp cmd -o
 
-Attach the debugger to the process with ID 3148 to continue.
+Attach a debugger to the process with ID 3148 to continue.
 ```
 
 When the preview mode environment variable is set to `true`, the application will print the consumed command-line arguments as they were parsed, before executing the command:

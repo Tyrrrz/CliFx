@@ -38,37 +38,57 @@ public class CommandOptionDescriptor(
     internal bool MatchesIdentifier(string identifier) =>
         MatchesName(identifier) || identifier.Length == 1 && MatchesShortName(identifier[0]);
 
-    internal string ToString(bool includeKind, bool includeValue)
+    internal string ToString(
+        bool includeKind,
+        bool includeBothIdentifiers,
+        bool includeValuePlaceholder
+    )
     {
         var buffer = new StringBuilder();
 
         if (includeKind)
             buffer.Append("Option ");
 
-        if (!string.IsNullOrWhiteSpace(Name) && ShortName is not null)
-            buffer.Append($"-{ShortName}|--{Name}");
-        else if (!string.IsNullOrWhiteSpace(Name))
-            buffer.Append($"--{Name}");
-        else if (ShortName is not null)
-            buffer.Append($"-{ShortName}");
+        if (!IsRequired)
+            buffer.Append('[');
 
-        if (includeValue)
+        if (includeBothIdentifiers)
+        {
+            if (ShortName is not null)
+                buffer.Append($"-{ShortName}");
+
+            if (ShortName is not null && !string.IsNullOrWhiteSpace(Name))
+                buffer.Append('|');
+
+            if (!string.IsNullOrWhiteSpace(Name))
+                buffer.Append($"--{Name}");
+        }
+        else
+        {
+            if (!string.IsNullOrWhiteSpace(Name))
+                buffer.Append($"--{Name}");
+            else if (ShortName is not null)
+                buffer.Append($"-{ShortName}");
+        }
+
+        if (includeValuePlaceholder)
         {
             buffer.Append(' ');
 
-            if (!IsRequired)
-                buffer.Append('<').Append("value").Append("?>");
-            else if (Converter.CanConvertSequence)
-                buffer.Append('<').Append("value").Append("...>");
+            if (IsSequenceBased)
+                buffer.Append('<').Append("values").Append("...>");
             else
                 buffer.Append('<').Append("value").Append('>');
         }
+
+        if (!IsRequired)
+            buffer.Append(']');
 
         return buffer.ToString();
     }
 
     /// <inheritdoc />
-    public override string ToString() => ToString(true, true);
+    public override string ToString() => ToString(true, true, true);
 }
 
 /// <inheritdoc cref="CommandOptionDescriptor" />
