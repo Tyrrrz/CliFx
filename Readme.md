@@ -110,41 +110,8 @@ Its command-line signature looks like this:
 $ ./myapp <value> [--base <base>]
 ```
 
-To expose your command as an entry point and turn the program into a command-line interface, modify the `Main()` method so that it delegates its execution to an instance of `CommandLineApplication`.
-Use the `CommandLineApplicationBuilder` helper to create and configure an application in a series of fluent instructions:
-
-```csharp
-using CliFx;
-
-public static class Program
-{
-    // This Main() method will be generated automatically if you don't implement one yourself
-    public static async Task<int> Main() =>
-        await new CommandLineApplicationBuilder()
-            // Registers all accessible commands from the current assembly
-            .AddCommandsFromThisAssembly()
-            // Creates the application instance
-            .Build()
-            // Runs the application, resolving command-line arguments and
-            // environment variables automatically.
-            .RunAsync();
-}
-```
-
-> [!TIP]
-> If your program does not have a `Main()` method, **CliFx** will generate one for you automatically.
-> You only need to implement your own if you wish to customize the configuration of the application.
-
-> [!IMPORTANT]
-> Ensure that your `Main()` method returns the integer exit code provided by `CommandLineApplication.RunAsync()`, as shown in the example.
-> Exit code is used to communicate execution result to the parent process, so it's important that your program properly propagates it.
-
-> [!NOTE]
-> When calling `CommandLineApplication.RunAsync()`, **CliFx** resolves command-line arguments and environment variables from `Environment.GetCommandLineArgs()` and `Environment.GetEnvironmentVariables()` respectively.
-> You can also provide them explicitly using one of the other available overloads.
-
-For the command to be available for execution, it needs to be registered with the application.
-The above example relies on `AddCommandsFromThisAssembly()` for that, which automatically detects and registers all accessible commands from the current assembly.
+Beyond that, no additional setup is required — **CliFx** uses source generators to discover commands and produce the `Main()` method automatically.
+If you wish to customize the application further, you can provide your own `Main()` method as described in the [application configuration](#application-configuration) section.
 
 Now, the user can execute `LogCommand` by running the application and passing an argument to the `value` parameter:
 
@@ -690,63 +657,6 @@ These rules also make the order of arguments important — the command-line stri
 $ ./myapp [command] [...parameters] [...options]
 ```
 
-### Command instantiation
-
-Because **CliFx** takes responsibility for the application's entire lifecycle, it needs to be capable of instantiating commands at run time.
-To facilitate that, it uses an interface called `ITypeInstantiator` that determines how to create a new instance of a given type.
-
-The default implementation of `ITypeInstantiator` only supports types that have public parameter-less constructors, which is sufficient for most common scenarios.
-However, in some cases you may want to define a custom instantiator, for example when integrating with an external dependency container.
-
-To do that, pass a custom `ITypeInstantiator` or a factory delegate to the `UseTypeInstantiator(...)` method when building the application:
-
-```csharp
-public static class Program
-{
-    public static async Task<int> Main() =>
-        await new CommandLineApplicationBuilder()
-            .AddCommandsFromThisAssembly()
-            .UseTypeInstantiator(type =>
-            {
-                var instance = MyTypeFactory.Create(type);
-                return instance;
-            })
-            .Build()
-            .RunAsync();
-}
-```
-
-This method also supports `IServiceProvider` through various overloads, which allows you to directly integrate dependency containers that implement this interface.
-For example, this is how to configure your application to use [`Microsoft.Extensions.DependencyInjection`](https://nuget.org/packages/Microsoft.Extensions.DependencyInjection) as the type instantiator in **CliFx**:
-
-```csharp
-public static class Program
-{
-    public static async Task<int> Main() =>
-        await new CommandLineApplicationBuilder()
-            .AddCommandsFromThisAssembly()
-            .UseTypeInstantiator(commands =>
-            {
-                var services = new ServiceCollection();
-
-                // Register services
-                services.AddSingleton<MyService>();
-
-                // Register commands
-                foreach (var command in commands)
-                    services.AddTransient(command.Type);
-
-                return services.BuildServiceProvider();
-            })
-            .Build()
-            .RunAsync();
-}
-```
-
-> [!NOTE]
-> If you want to use certain advanced features provided by `Microsoft.Extensions.DependencyInjection`, you may need to do a bit of extra work to configure the container properly.
-> For example, to leverage support for keyed services, you need to [manually register an implementation of `IKeyedServiceProvider`](https://github.com/Tyrrrz/CliFx/issues/148).
-
 ### Command routing
 
 Command-line applications often provide the user with more than just a single command, facilitating a variety of different workflows.
@@ -836,7 +746,7 @@ You can run `myapp cmd1 [command] --help` to show help for a specific command.
 > Defining the default (unnamed) command is not required.
 > If it's absent, **CliFx** will generate one for you automatically.
 
-### Reporting errors
+### Error reporting
 
 Commands in **CliFx** do not directly return exit codes, but instead communicate execution errors via `CommandException`.
 This special exception type can be used to print an error message to the console, return a specific exit code, and also optionally show help text for the current command:
@@ -1001,19 +911,111 @@ public async Task ConcatCommand_executes_successfully()
 }
 ```
 
-### Debug and preview mode
+### Application configuration
 
-When troubleshooting issues, you may find it useful to run your application in debug or preview mode.
-These modes are activated through environment variables, which you can configure using `AllowDebugMode(...)` and `AllowPreviewMode(...)` methods on `CommandLineApplicationBuilder`:
+As mentioned earlier, **CliFx** automatically generates a `Main()` method that builds and runs the application using all commands discovered in the current assembly.
+If you need to customize this behavior, you can provide your own `Main()` method and use the `CommandLineApplicationBuilder` helper to configure the application:
 
 ```csharp
-var application = new CommandLineApplicationBuilder()
-    .AddCommandsFromThisAssembly()
-    // Enable debug mode via the CLIFX_DEBUG environment variable
-    .AllowDebugMode("CLIFX_DEBUG")
-    // Enable preview mode via the CLIFX_PREVIEW environment variable
-    .AllowPreviewMode("CLIFX_PREVIEW")
-    .Build();
+using CliFx;
+
+public static class Program
+{
+    public static async Task<int> Main() =>
+        await new CommandLineApplicationBuilder()
+            .AddCommandsFromThisAssembly()
+            .SetTitle("My App")
+            .SetVersion("1.0.0")
+            .Build()
+            .RunAsync();
+}
+```
+
+> [!IMPORTANT]
+> Ensure that your `Main()` method returns the integer exit code provided by `CommandLineApplication.RunAsync()`, as shown in the example.
+> Exit code is used to communicate execution result to the parent process, so it's important that your program properly propagates it.
+
+By default, `CommandLineApplication.RunAsync()` resolves command-line arguments and environment variables from `Environment.GetCommandLineArgs()` and `Environment.GetEnvironmentVariables()` respectively, but you can also provide them explicitly using one of the other available overloads.
+
+Here is the full list of configuration methods available on `CommandLineApplicationBuilder`:
+
+- `AddCommand(...)` / `AddCommands(...)` — registers one or more commands with the application. Alternatively, `AddCommandsFromThisAssembly()` detects and registers all accessible commands from the current assembly.
+- `SetTitle(...)` — sets the application title displayed in the help text. Defaults to the assembly name.
+- `SetExecutableName(...)` — sets the executable name displayed in the help text. Defaults to the assembly file name.
+- `SetVersion(...)` — sets the version displayed in the help text and when version info is requested. Defaults to the assembly version.
+- `SetDescription(...)` — sets the application description displayed in the help text.
+- `UseConsole(...)` — provides a custom `IConsole` implementation, useful for [testing](#testing).
+- `UseTypeInstantiator(...)` — provides a custom type instantiator for creating command instances. See [dependency injection](#dependency-injection).
+- `AllowDebugMode(...)` / `AllowPreviewMode(...)` — enables diagnostic modes. See [debug and preview mode](#debug-and-preview-mode).
+
+#### Dependency injection
+
+Because **CliFx** takes responsibility for the application's entire lifecycle, it needs to be capable of instantiating commands at run time.
+By default, only types with public parameter-less constructors are supported, which is sufficient for most common scenarios.
+
+However, in some cases you may want to integrate with an external dependency container.
+This can be done by passing a custom `ITypeInstantiator` or a factory delegate to `UseTypeInstantiator(...)`:
+
+```csharp
+public static class Program
+{
+    public static async Task<int> Main() =>
+        await new CommandLineApplicationBuilder()
+            .AddCommandsFromThisAssembly()
+            .UseTypeInstantiator(type =>
+            {
+                var instance = MyTypeFactory.Create(type);
+                return instance;
+            })
+            .Build()
+            .RunAsync();
+}
+```
+
+This method also supports `IServiceProvider` through various overloads, which allows you to directly integrate dependency containers that implement this interface.
+For example, this is how to configure your application to use [`Microsoft.Extensions.DependencyInjection`](https://nuget.org/packages/Microsoft.Extensions.DependencyInjection) as the type instantiator in **CliFx**:
+
+```csharp
+public static class Program
+{
+    public static async Task<int> Main() =>
+        await new CommandLineApplicationBuilder()
+            .AddCommandsFromThisAssembly()
+            .UseTypeInstantiator(commands =>
+            {
+                var services = new ServiceCollection();
+
+                // Register services
+                services.AddSingleton<MyService>();
+
+                // Register commands
+                foreach (var command in commands)
+                    services.AddTransient(command.Type);
+
+                return services.BuildServiceProvider();
+            })
+            .Build()
+            .RunAsync();
+}
+```
+
+> [!NOTE]
+> If you want to use certain advanced features provided by `Microsoft.Extensions.DependencyInjection`, you may need to do a bit of extra work to configure the container properly.
+> For example, to leverage support for keyed services, you need to [manually register an implementation of `IKeyedServiceProvider`](https://github.com/Tyrrrz/CliFx/issues/148).
+
+#### Debug and preview mode
+
+When troubleshooting issues, you may find it useful to run your application in debug or preview mode.
+These modes are activated through environment variables, which you can configure using `AllowDebugMode(...)` and `AllowPreviewMode(...)`:
+
+```csharp
+public static async Task<int> Main() =>
+    await new CommandLineApplicationBuilder()
+        .AddCommandsFromThisAssembly()
+        .AllowDebugMode("CLIFX_DEBUG")
+        .AllowPreviewMode("CLIFX_PREVIEW")
+        .Build()
+        .RunAsync();
 ```
 
 > [!TIP]
@@ -1038,13 +1040,13 @@ cmd <arg1> <arg2> [-o foo] [--option bar1 bar2]
 To disallow these modes (e.g. for production), simply pass `null` for the corresponding environment variable names:
 
 ```csharp
-var application = new CommandLineApplicationBuilder()
-    .AddCommandsFromThisAssembly()
-    // Disallow debug mode
-    .AllowDebugMode(null)
-    // Disallow preview mode
-    .AllowPreviewMode(null)
-    .Build();
+public static async Task<int> Main() =>
+    await new CommandLineApplicationBuilder()
+        .AddCommandsFromThisAssembly()
+        .AllowDebugMode(null)
+        .AllowPreviewMode(null)
+        .Build()
+        .RunAsync();
 ```
 
 ## Etymology
