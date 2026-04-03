@@ -100,7 +100,7 @@ public partial class LogCommand : ICommand
 > The command type must be declared as `partial` so that **CliFx** can extend it with necessary metadata and behavior.
 > If the type is nested within other types, all of them must also be marked as `partial`.
 
-In order to satisfy `ICommand`'s contract, the type needs to define an `ExecuteAsync(...)` method which contains the command's execution logic.
+The `ICommand` interface requires the type to define an `ExecuteAsync(...)` method, which contains the command's execution logic.
 As the only parameter, this method takes an instance of `IConsole` — a decoupled abstraction used in place of `System.Console` to write text, read binary data, or otherwise interact with the console.
 
 Beyond that, your command will probably also need to receive some input from the user.
@@ -146,7 +146,7 @@ public static class Program
 > When calling `CommandLineApplication.RunAsync()`, **CliFx** resolves command-line arguments and environment variables from `Environment.GetCommandLineArgs()` and `Environment.GetEnvironmentVariables()` respectively.
 > You can also provide them explicitly using one of the other available overloads.
 
-In order to make the command available for execution, it needs to be registered with the application.
+For the command to be available for execution, it needs to be registered with the application.
 The above example relies on `AddCommandsFromThisAssembly()` for that, which automatically detects and registers all accessible commands from the current assembly.
 
 Now, the user can execute `LogCommand` by running the application and passing an argument to the `value` parameter:
@@ -454,7 +454,7 @@ As a general guideline, prefer using option bindings for inputs that:
 
 #### Conversion
 
-In order to handle input conversion between raw command-line arguments (strings) and the underlying properties, **CliFx** employs the `IInputConverter<T>` interface.
+**CliFx** employs the `IInputConverter<T>` interface to handle input conversion between raw command-line arguments (strings) and the underlying properties.
 By default, the framework will try to automatically infer a suitable converter for each property based on its type, supporting the following scenarios:
 
 - `string`
@@ -752,7 +752,7 @@ public static class Program
 
 ### Command routing
 
-In order to facilitate a variety of different workflows, command-line applications may provide the user with more than just a single command.
+Command-line applications often provide the user with more than just a single command, facilitating a variety of different workflows.
 Complex applications may also nest commands within each other, employing a multi-level hierarchical structure.
 
 With **CliFx**, this is achieved by simply giving each command a unique name through the `[Command]` attribute.
@@ -889,7 +889,7 @@ $ echo $?
 Console applications support the concept of interrupt signals, which can be issued by the user to abort the currently ongoing operation.
 If your command performs critical work, you can intercept these signals to handle cancellation requests in a graceful way.
 
-In order to make the command cancellation-aware, call `console.RegisterCancellationHandler()` to register the signal handler and obtain the corresponding `CancellationToken`.
+You can make a command cancellation-aware by calling `console.RegisterCancellationHandler()`, which registers the signal handler and returns the corresponding `CancellationToken`.
 Once this method is called, the program will no longer terminate on an interrupt signal but will instead trigger the associated token, which can be used to delay the termination of a command enough to exit in a controlled manner:
 
 ```csharp
