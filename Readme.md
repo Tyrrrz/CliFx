@@ -22,9 +22,6 @@
 **CliFx** is an opinionated framework for building command-line applications.
 It provides a model for expressing command interactions through classes and properties, skipping all the low-level infrastructure concerns like argument parsing, routing, error handling, and help generation.
 
-> [!NOTE]
-> This is the readme for CliFx v3 (alpha). For v2, see [this readme](https://github.com/Tyrrrz/CliFx/blob/2.3.6/Readme.md).
-
 ## Terms of use<sup>[[?]](https://github.com/Tyrrrz/.github/blob/prime/docs/why-so-political.md)</sup>
 
 By using this project or its source code, for any purpose and in any shape or form, you grant your **implicit agreement** to all the following statements:
