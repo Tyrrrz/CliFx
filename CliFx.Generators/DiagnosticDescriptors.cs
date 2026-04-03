@@ -26,6 +26,16 @@ public static class DiagnosticDescriptors
             true
         );
 
+    public static DiagnosticDescriptor CommandMustHaveUniqueName { get; } =
+        new(
+            $"{nameof(CliFx)}_{nameof(CommandMustHaveUniqueName)}",
+            "Command must have a unique name",
+            "Command bound to type '{0}' has the same name as the command bound to type '{1}': '{2}'. All commands registered in an application must have unique names (comparison IS NOT case-sensitive).",
+            "CliFx",
+            DiagnosticSeverity.Error,
+            true
+        );
+
     // Inputs
 
     public static DiagnosticDescriptor CommandInputConverterNotInferrable { get; } =

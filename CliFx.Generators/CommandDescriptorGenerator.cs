@@ -105,6 +105,32 @@ public class CommandDescriptorGenerator : IIncrementalGenerator
                 .Collect(),
             static (ctx, commands) =>
             {
+                // Validate that all commands have unique names
+                foreach (var (i, first) in commands.Index())
+                {
+                    foreach (var second in commands.Skip(i + 1))
+                    {
+                        if (
+                            string.Equals(
+                                first.Name,
+                                second.Name,
+                                System.StringComparison.OrdinalIgnoreCase
+                            )
+                        )
+                        {
+                            ctx.ReportDiagnostic(
+                                Diagnostic.Create(
+                                    DiagnosticDescriptors.CommandMustHaveUniqueName,
+                                    second.Type.Locations.FirstOrDefault(),
+                                    second.Type.Name,
+                                    first.Type.Name,
+                                    first.Name ?? "<default>"
+                                )
+                            );
+                        }
+                    }
+                }
+
                 ctx.AddSource(
                     "CommandRegistrations.g.cs",
                     SourceText.From(CommandRegistration.Emit(commands), Encoding.UTF8)
