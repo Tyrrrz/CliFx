@@ -74,7 +74,7 @@ internal partial record CommandParameterSymbol
         return new CommandParameterSymbol(
             property,
             order,
-            name ?? property.Name.ToLowerInvariant(),
+            name ?? property.Name.ToKebabCase(),
             property.IsRequired,
             description,
             TryResolveConverterType(attribute),

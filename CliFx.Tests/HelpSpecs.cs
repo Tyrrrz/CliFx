@@ -315,6 +315,9 @@ public class HelpSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
                         public required string Bar { get; set; }
 
                         [CommandParameter(2)]
+                        public required string MultiWordName123 { get; set; }
+
+                        [CommandParameter(3)]
                         public required IReadOnlyList<string> Baz { get; set; }
 
                         public ValueTask ExecuteAsync(IConsole console) => default;
@@ -332,7 +335,9 @@ public class HelpSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ContainAllInOrder("USAGE", "<foo>", "<bar>", "<baz...>");
+        stdOut
+            .Should()
+            .ContainAllInOrder("USAGE", "<foo>", "<bar>", "<multi-word-name123>", "<baz...>");
     }
 
     [Fact]
