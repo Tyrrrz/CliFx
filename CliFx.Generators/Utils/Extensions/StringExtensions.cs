@@ -10,9 +10,6 @@ internal static class StringExtensions
 
         public string ToKebabCase()
         {
-            if (string.IsNullOrEmpty(str))
-                return str;
-
             var buffer = new StringBuilder();
             var lastCh = default(char?);
 

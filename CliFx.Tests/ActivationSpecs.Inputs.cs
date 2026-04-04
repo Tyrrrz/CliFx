@@ -1,10 +1,7 @@
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 using CliFx.Tests.Utils;
 using CliFx.Tests.Utils.Extensions;
-using CliWrap;
-using CliWrap.Buffered;
 using FluentAssertions;
 using Xunit;
 
@@ -13,7 +10,7 @@ namespace CliFx.Tests;
 public partial class ActivationSpecs
 {
     [Fact]
-    public async Task I_can_pass_a_value_to_an_option_identified_by_name()
+    public async Task I_can_pass_a_value_to_an_input_bound_to_a_string_property()
     {
         // Arrange
         var application = new CommandLineApplicationBuilder()
@@ -24,8 +21,8 @@ public partial class ActivationSpecs
                     [Command]
                     public partial class Command : ICommand
                     {
-                        [CommandOption("foo")]
-                        public bool Foo { get; set; }
+                        [CommandOption('f')]
+                        public string? Foo { get; set; }
 
                         public ValueTask ExecuteAsync(IConsole console)
                         {
@@ -40,17 +37,17 @@ public partial class ActivationSpecs
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(["--foo"], new Dictionary<string, string>());
+        var exitCode = await application.RunAsync(["-f", "xyz"], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Trim().Should().Be("True");
+        stdOut.Trim().Should().Be("xyz");
     }
 
     [Fact]
-    public async Task I_can_pass_a_value_to_an_option_identified_by_short_name()
+    public async Task I_can_pass_a_value_to_an_input_bound_to_an_object_property()
     {
         // Arrange
         var application = new CommandLineApplicationBuilder()
@@ -62,7 +59,7 @@ public partial class ActivationSpecs
                     public partial class Command : ICommand
                     {
                         [CommandOption('f')]
-                        public bool Foo { get; set; }
+                        public object? Foo { get; set; }
 
                         public ValueTask ExecuteAsync(IConsole console)
                         {
@@ -77,62 +74,17 @@ public partial class ActivationSpecs
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(["-f"], new Dictionary<string, string>());
+        var exitCode = await application.RunAsync(["-f", "xyz"], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Trim().Should().Be("True");
+        stdOut.Trim().Should().Be("xyz");
     }
 
     [Fact]
-    public async Task I_can_pass_values_to_multiple_options_identified_by_names()
-    {
-        // Arrange
-        var application = new CommandLineApplicationBuilder()
-            .AddCommands(
-                CommandCompiler.Compile(
-                    // lang=csharp
-                    """
-                    [Command]
-                    public partial class Command : ICommand
-                    {
-                        [CommandOption("foo")]
-                        public string? Foo { get; set; }
-
-                        [CommandOption("bar")]
-                        public string? Bar { get; set; }
-
-                        public ValueTask ExecuteAsync(IConsole console)
-                        {
-                            console.WriteLine("Foo = " + Foo);
-                            console.WriteLine("Bar = " + Bar);
-
-                            return default;
-                        }
-                    }
-                    """
-                )
-            )
-            .UseConsole(FakeConsole)
-            .Build();
-
-        // Act
-        var exitCode = await application.RunAsync(
-            ["--foo", "one", "--bar", "two"],
-            new Dictionary<string, string>()
-        );
-
-        // Assert
-        exitCode.Should().Be(0);
-
-        var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ConsistOfLines("Foo = one", "Bar = two");
-    }
-
-    [Fact]
-    public async Task I_can_pass_values_to_multiple_options_identified_by_short_names()
+    public async Task I_can_pass_a_value_to_an_input_bound_to_a_boolean_property()
     {
         // Arrange
         var application = new CommandLineApplicationBuilder()
@@ -144,15 +96,19 @@ public partial class ActivationSpecs
                     public partial class Command : ICommand
                     {
                         [CommandOption('f')]
-                        public string? Foo { get; set; }
+                        public bool Foo { get; set; }
 
                         [CommandOption('b')]
-                        public string? Bar { get; set; }
+                        public bool Bar { get; set; }
+
+                        [CommandOption('c')]
+                        public bool Baz { get; set; }
 
                         public ValueTask ExecuteAsync(IConsole console)
                         {
                             console.WriteLine("Foo = " + Foo);
                             console.WriteLine("Bar = " + Bar);
+                            console.WriteLine("Baz = " + Baz);
 
                             return default;
                         }
@@ -165,7 +121,7 @@ public partial class ActivationSpecs
 
         // Act
         var exitCode = await application.RunAsync(
-            ["-f", "one", "-b", "two"],
+            ["-f", "true", "-b", "false", "-c"],
             new Dictionary<string, string>()
         );
 
@@ -173,11 +129,11 @@ public partial class ActivationSpecs
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ConsistOfLines("Foo = one", "Bar = two");
+        stdOut.Should().ConsistOfLines("Foo = True", "Bar = False", "Baz = True");
     }
 
     [Fact]
-    public async Task I_can_pass_values_to_multiple_options_identified_by_stacked_short_names()
+    public async Task I_can_pass_a_value_to_an_input_bound_to_an_integer_property()
     {
         // Arrange
         var application = new CommandLineApplicationBuilder()
@@ -189,10 +145,214 @@ public partial class ActivationSpecs
                     public partial class Command : ICommand
                     {
                         [CommandOption('f')]
-                        public string? Foo { get; set; }
+                        public int Foo { get; set; }
+
+                        public ValueTask ExecuteAsync(IConsole console)
+                        {
+                            console.WriteLine(Foo);
+                            return default;
+                        }
+                    }
+                    """
+                )
+            )
+            .UseConsole(FakeConsole)
+            .Build();
+
+        // Act
+        var exitCode = await application.RunAsync(["-f", "32"], new Dictionary<string, string>());
+
+        // Assert
+        exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
+        stdOut.Trim().Should().Be("32");
+    }
+
+    [Fact]
+    public async Task I_can_pass_a_value_to_an_input_bound_to_a_double_property()
+    {
+        // Arrange
+        var application = new CommandLineApplicationBuilder()
+            .AddCommands(
+                CommandCompiler.Compile(
+                    // lang=csharp
+                    """
+                    [Command]
+                    public partial class Command : ICommand
+                    {
+                        [CommandOption('f')]
+                        public double Foo { get; set; }
+
+                        public ValueTask ExecuteAsync(IConsole console)
+                        {
+                            console.WriteLine(Foo.ToString(CultureInfo.InvariantCulture));
+                            return default;
+                        }
+                    }
+                    """
+                )
+            )
+            .UseConsole(FakeConsole)
+            .Build();
+
+        // Act
+        var exitCode = await application.RunAsync(
+            ["-f", "32.14"],
+            new Dictionary<string, string>()
+        );
+
+        // Assert
+        exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
+        stdOut.Trim().Should().Be("32.14");
+    }
+
+    [Fact]
+    public async Task I_can_pass_a_value_to_an_input_bound_to_a_DateTimeOffset_property()
+    {
+        // Arrange
+        var application = new CommandLineApplicationBuilder()
+            .AddCommands(
+                CommandCompiler.Compile(
+                    // lang=csharp
+                    """
+                    [Command]
+                    public partial class Command : ICommand
+                    {
+                        [CommandOption('f')]
+                        public DateTimeOffset Foo { get; set; }
+
+                        public ValueTask ExecuteAsync(IConsole console)
+                        {
+                            console.WriteLine(Foo.ToString("u", CultureInfo.InvariantCulture));
+                            return default;
+                        }
+                    }
+                    """
+                )
+            )
+            .UseConsole(FakeConsole)
+            .Build();
+
+        // Act
+        var exitCode = await application.RunAsync(
+            ["-f", "1995-04-28Z"],
+            new Dictionary<string, string>()
+        );
+
+        // Assert
+        exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
+        stdOut.Trim().Should().Be("1995-04-28 00:00:00Z");
+    }
+
+    [Fact]
+    public async Task I_can_pass_a_value_to_an_input_bound_to_a_TimeSpan_property()
+    {
+        // Arrange
+        var application = new CommandLineApplicationBuilder()
+            .AddCommands(
+                CommandCompiler.Compile(
+                    // lang=csharp
+                    """
+                    [Command]
+                    public partial class Command : ICommand
+                    {
+                        [CommandOption('f')]
+                        public TimeSpan Foo { get; set; }
+
+                        public ValueTask ExecuteAsync(IConsole console)
+                        {
+                            console.WriteLine(Foo.ToString(null, CultureInfo.InvariantCulture));
+                            return default;
+                        }
+                    }
+                    """
+                )
+            )
+            .UseConsole(FakeConsole)
+            .Build();
+
+        // Act
+        var exitCode = await application.RunAsync(
+            ["-f", "12:34:56"],
+            new Dictionary<string, string>()
+        );
+
+        // Assert
+        exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
+        stdOut.Trim().Should().Be("12:34:56");
+    }
+
+    [Fact]
+    public async Task I_can_pass_a_value_to_an_input_bound_to_an_enum_property()
+    {
+        // Arrange
+        var application = new CommandLineApplicationBuilder()
+            .AddCommands(
+                CommandCompiler.Compile(
+                    // lang=csharp
+                    """
+                    public enum CustomEnum { One = 1, Two = 2, Three = 3 }
+
+                    [Command]
+                    public partial class Command : ICommand
+                    {
+                        [CommandOption('f')]
+                        public CustomEnum Foo { get; set; }
 
                         [CommandOption('b')]
-                        public string? Bar { get; set; }
+                        public CustomEnum Bar { get; set; }
+
+                        public ValueTask ExecuteAsync(IConsole console)
+                        {
+                            console.WriteLine("Foo = " + (int) Foo);
+                            console.WriteLine("Bar = " + (int) Bar);
+
+                            return default;
+                        }
+                    }
+                    """
+                )
+            )
+            .UseConsole(FakeConsole)
+            .Build();
+
+        // Act
+        var exitCode = await application.RunAsync(
+            ["-f", "two", "-b", "2"],
+            new Dictionary<string, string>()
+        );
+
+        // Assert
+        exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
+        stdOut.Should().ConsistOfLines("Foo = 2", "Bar = 2");
+    }
+
+    [Fact]
+    public async Task I_can_pass_a_value_to_an_input_bound_to_a_nullable_integer_property()
+    {
+        // Arrange
+        var application = new CommandLineApplicationBuilder()
+            .AddCommands(
+                CommandCompiler.Compile(
+                    // lang=csharp
+                    """
+                    [Command]
+                    public partial class Command : ICommand
+                    {
+                        [CommandOption('f')]
+                        public int? Foo { get; set; }
+
+                        [CommandOption('b')]
+                        public int? Bar { get; set; }
 
                         public ValueTask ExecuteAsync(IConsole console)
                         {
@@ -209,8 +369,114 @@ public partial class ActivationSpecs
             .Build();
 
         // Act
+        var exitCode = await application.RunAsync(["-b", "123"], new Dictionary<string, string>());
+
+        // Assert
+        exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
+        stdOut.Should().ConsistOfLines("Foo = ", "Bar = 123");
+    }
+
+    [Fact]
+    public async Task I_can_pass_a_value_to_an_input_bound_to_a_nullable_enum_property()
+    {
+        // Arrange
+        var application = new CommandLineApplicationBuilder()
+            .AddCommands(
+                CommandCompiler.Compile(
+                    // lang=csharp
+                    """
+                    public enum CustomEnum { One = 1, Two = 2, Three = 3 }
+
+                    [Command]
+                    public partial class Command : ICommand
+                    {
+                        [CommandOption('f')]
+                        public CustomEnum? Foo { get; set; }
+
+                        [CommandOption('b')]
+                        public CustomEnum? Bar { get; set; }
+
+                        public ValueTask ExecuteAsync(IConsole console)
+                        {
+                            console.WriteLine("Foo = " + (int?) Foo);
+                            console.WriteLine("Bar = " + (int?) Bar);
+
+                            return default;
+                        }
+                    }
+                    """
+                )
+            )
+            .UseConsole(FakeConsole)
+            .Build();
+
+        // Act
+        var exitCode = await application.RunAsync(["-b", "two"], new Dictionary<string, string>());
+
+        // Assert
+        exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
+        stdOut.Should().ConsistOfLines("Foo = ", "Bar = 2");
+    }
+
+    [Fact]
+    public async Task I_can_pass_a_value_to_an_input_bound_to_a_string_parsable_property()
+    {
+        // Arrange
+        var application = new CommandLineApplicationBuilder()
+            .AddCommands(
+                CommandCompiler.Compile(
+                    // lang=csharp
+                    """
+                    public class CustomTypeA
+                    {
+                        public string Value { get; }
+
+                        private CustomTypeA(string value) => Value = value;
+
+                        public static CustomTypeA Parse(string value) =>
+                            new CustomTypeA(value);
+                    }
+
+                    public class CustomTypeB
+                    {
+                        public string Value { get; }
+
+                        private CustomTypeB(string value) => Value = value;
+
+                        public static CustomTypeB Parse(string value, IFormatProvider formatProvider) =>
+                            new CustomTypeB(value);
+                    }
+
+                    [Command]
+                    public partial class Command : ICommand
+                    {
+                        [CommandOption('f')]
+                        public CustomTypeA? Foo { get; set; }
+
+                        [CommandOption('b')]
+                        public CustomTypeB? Bar { get; set; }
+
+                        public ValueTask ExecuteAsync(IConsole console)
+                        {
+                            console.WriteLine("Foo = " + Foo.Value);
+                            console.WriteLine("Bar = " + Bar.Value);
+
+                            return default;
+                        }
+                    }
+                    """
+                )
+            )
+            .UseConsole(FakeConsole)
+            .Build();
+
+        // Act
         var exitCode = await application.RunAsync(
-            ["-fb", "value"],
+            ["-f", "hello", "-b", "world"],
             new Dictionary<string, string>()
         );
 
@@ -218,11 +484,55 @@ public partial class ActivationSpecs
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ConsistOfLines("Foo = ", "Bar = value");
+        stdOut.Should().ConsistOfLines("Foo = hello", "Bar = world");
     }
 
     [Fact]
-    public async Task I_can_pass_multiple_values_to_a_sequence_based_option_identified_by_name()
+    public async Task I_can_pass_a_value_to_an_input_bound_to_a_string_constructible_property()
+    {
+        // Arrange
+        var application = new CommandLineApplicationBuilder()
+            .AddCommands(
+                CommandCompiler.Compile(
+                    // lang=csharp
+                    """
+                    public class CustomType
+                    {
+                        public string Value { get; }
+
+                        public CustomType(string value) => Value = value;
+                    }
+
+                    [Command]
+                    public partial class Command : ICommand
+                    {
+                        [CommandOption('f')]
+                        public CustomType? Foo { get; set; }
+
+                        public ValueTask ExecuteAsync(IConsole console)
+                        {
+                            console.WriteLine(Foo.Value);
+                            return default;
+                        }
+                    }
+                    """
+                )
+            )
+            .UseConsole(FakeConsole)
+            .Build();
+
+        // Act
+        var exitCode = await application.RunAsync(["-f", "xyz"], new Dictionary<string, string>());
+
+        // Assert
+        exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
+        stdOut.Trim().Should().Be("xyz");
+    }
+
+    [Fact]
+    public async Task I_can_pass_values_to_an_input_bound_to_a_string_array_property()
     {
         // Arrange
         var application = new CommandLineApplicationBuilder()
@@ -233,8 +543,8 @@ public partial class ActivationSpecs
                     [Command]
                     public partial class Command : ICommand
                     {
-                        [CommandOption("Foo")]
-                        public IReadOnlyList<string>? Foo { get; set; }
+                        [CommandOption('f')]
+                        public string[]? Foo { get; set; }
 
                         public ValueTask ExecuteAsync(IConsole console)
                         {
@@ -252,7 +562,7 @@ public partial class ActivationSpecs
 
         // Act
         var exitCode = await application.RunAsync(
-            ["--foo", "one", "two", "three"],
+            ["-f", "one", "two", "three"],
             new Dictionary<string, string>()
         );
 
@@ -264,7 +574,7 @@ public partial class ActivationSpecs
     }
 
     [Fact]
-    public async Task I_can_pass_multiple_values_to_a_sequence_based_option_identified_by_short_name()
+    public async Task I_can_pass_values_to_an_input_bound_to_a_read_only_list_of_strings_property()
     {
         // Arrange
         var application = new CommandLineApplicationBuilder()
@@ -306,49 +616,7 @@ public partial class ActivationSpecs
     }
 
     [Fact]
-    public async Task I_can_pass_multiple_values_to_a_sequence_based_option_identified_by_name_repeatedly()
-    {
-        // Arrange
-        var application = new CommandLineApplicationBuilder()
-            .AddCommands(
-                CommandCompiler.Compile(
-                    // lang=csharp
-                    """
-                    [Command]
-                    public partial class Command : ICommand
-                    {
-                        [CommandOption("foo")]
-                        public IReadOnlyList<string>? Foo { get; set; }
-
-                        public ValueTask ExecuteAsync(IConsole console)
-                        {
-                            foreach (var i in Foo)
-                                console.WriteLine(i);
-
-                            return default;
-                        }
-                    }
-                    """
-                )
-            )
-            .UseConsole(FakeConsole)
-            .Build();
-
-        // Act
-        var exitCode = await application.RunAsync(
-            ["--foo", "one", "--foo", "two", "--foo", "three"],
-            new Dictionary<string, string>()
-        );
-
-        // Assert
-        exitCode.Should().Be(0);
-
-        var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ConsistOfLines("one", "two", "three");
-    }
-
-    [Fact]
-    public async Task I_can_pass_multiple_values_to_a_sequence_based_option_identified_by_short_name_repeatedly()
+    public async Task I_can_pass_values_to_an_input_bound_to_a_collection_of_strings_property()
     {
         // Arrange
         var application = new CommandLineApplicationBuilder()
@@ -360,7 +628,7 @@ public partial class ActivationSpecs
                     public partial class Command : ICommand
                     {
                         [CommandOption('f')]
-                        public IReadOnlyList<string>? Foo { get; set; }
+                        public ICollection<string>? Foo { get; set; }
 
                         public ValueTask ExecuteAsync(IConsole console)
                         {
@@ -378,7 +646,7 @@ public partial class ActivationSpecs
 
         // Act
         var exitCode = await application.RunAsync(
-            ["-f", "one", "-f", "two", "-f", "three"],
+            ["-f", "one", "two", "three"],
             new Dictionary<string, string>()
         );
 
@@ -390,7 +658,7 @@ public partial class ActivationSpecs
     }
 
     [Fact]
-    public async Task I_can_pass_multiple_values_to_a_sequence_based_option_identified_by_name_and_short_name_repeatedly()
+    public async Task I_can_pass_values_to_an_input_bound_to_a_string_list_property()
     {
         // Arrange
         var application = new CommandLineApplicationBuilder()
@@ -401,8 +669,8 @@ public partial class ActivationSpecs
                     [Command]
                     public partial class Command : ICommand
                     {
-                        [CommandOption("foo", 'f')]
-                        public IReadOnlyList<string>? Foo { get; set; }
+                        [CommandOption('f')]
+                        public List<string>? Foo { get; set; }
 
                         public ValueTask ExecuteAsync(IConsole console)
                         {
@@ -420,7 +688,7 @@ public partial class ActivationSpecs
 
         // Act
         var exitCode = await application.RunAsync(
-            ["--foo", "one", "-f", "two", "--foo", "three"],
+            ["-f", "one", "two", "three"],
             new Dictionary<string, string>()
         );
 
@@ -432,7 +700,7 @@ public partial class ActivationSpecs
     }
 
     [Fact]
-    public async Task I_can_pass_a_negative_number_as_a_value_to_an_option()
+    public async Task I_can_pass_values_to_an_input_bound_to_an_integer_array_property()
     {
         // Arrange
         var application = new CommandLineApplicationBuilder()
@@ -443,138 +711,8 @@ public partial class ActivationSpecs
                     [Command]
                     public partial class Command : ICommand
                     {
-                        [CommandOption("foo")]
-                        public string? Foo { get; set; }
-
-                        public ValueTask ExecuteAsync(IConsole console)
-                        {
-                            console.WriteLine(Foo);
-                            return default;
-                        }
-                    }
-                    """
-                )
-            )
-            .UseConsole(FakeConsole)
-            .Build();
-
-        // Act
-        var exitCode = await application.RunAsync(
-            ["--foo", "-13"],
-            new Dictionary<string, string>()
-        );
-
-        // Assert
-        exitCode.Should().Be(0);
-
-        var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Trim().Should().Be("-13");
-    }
-
-    [Fact]
-    public async Task I_can_pass_nothing_to_an_option_to_keep_its_default_value()
-    {
-        // Arrange
-        var application = new CommandLineApplicationBuilder()
-            .AddCommands(
-                CommandCompiler.Compile(
-                    // lang=csharp
-                    """
-                    [Command]
-                    public partial class Command : ICommand
-                    {
-                        [CommandOption("foo")]
-                        public string? Foo { get; set; }
-
-                        [CommandOption("bar")]
-                        public string? Bar { get; set; } = "hello";
-
-                        public ValueTask ExecuteAsync(IConsole console)
-                        {
-                            console.WriteLine("Foo = " + Foo);
-                            console.WriteLine("Bar = " + Bar);
-
-                            return default;
-                        }
-                    }
-                    """
-                )
-            )
-            .UseConsole(FakeConsole)
-            .Build();
-
-        // Act
-        var exitCode = await application.RunAsync(
-            ["--foo", "one"],
-            new Dictionary<string, string>()
-        );
-
-        // Assert
-        exitCode.Should().Be(0);
-
-        var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ConsistOfLines("Foo = one", "Bar = hello");
-    }
-
-    [Fact]
-    public async Task I_can_pass_nothing_to_an_option_to_resolve_its_value_from_an_environment_variable()
-    {
-        // Arrange
-        var application = new CommandLineApplicationBuilder()
-            .AddCommands(
-                CommandCompiler.Compile(
-                    // lang=csharp
-                    """
-                    [Command]
-                    public partial class Command : ICommand
-                    {
-                        [CommandOption("foo", EnvironmentVariable = "ENV_FOO")]
-                        public string? Foo { get; set; }
-
-                        [CommandOption("bar", EnvironmentVariable = "ENV_BAR")]
-                        public string? Bar { get; set; }
-
-                        public ValueTask ExecuteAsync(IConsole console)
-                        {
-                            console.WriteLine(Foo);
-                            console.WriteLine(Bar);
-
-                            return default;
-                        }
-                    }
-                    """
-                )
-            )
-            .UseConsole(FakeConsole)
-            .Build();
-
-        // Act
-        var exitCode = await application.RunAsync(
-            ["--foo", "42"],
-            new Dictionary<string, string> { ["ENV_FOO"] = "100", ["ENV_BAR"] = "200" }
-        );
-
-        // Assert
-        exitCode.Should().Be(0);
-
-        var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Trim().Should().ConsistOfLines("42", "200");
-    }
-
-    [Fact]
-    public async Task I_can_pass_nothing_to_a_sequence_based_option_to_resolve_its_value_from_an_environment_variable()
-    {
-        // Arrange
-        var application = new CommandLineApplicationBuilder()
-            .AddCommands(
-                CommandCompiler.Compile(
-                    // lang=csharp
-                    """
-                    [Command]
-                    public partial class Command : ICommand
-                    {
-                        [CommandOption("foo", EnvironmentVariable = "ENV_FOO")]
-                        public IReadOnlyList<string>? Foo { get; set; }
+                        [CommandOption('f')]
+                        public int[]? Foo { get; set; }
 
                         public ValueTask ExecuteAsync(IConsole console)
                         {
@@ -592,19 +730,19 @@ public partial class ActivationSpecs
 
         // Act
         var exitCode = await application.RunAsync(
-            [],
-            new Dictionary<string, string> { ["ENV_FOO"] = $"bar{Path.PathSeparator}baz" }
+            ["-f", "1", "13", "27"],
+            new Dictionary<string, string>()
         );
 
         // Assert
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Should().ConsistOfLines("bar", "baz");
+        stdOut.Should().ConsistOfLines("1", "13", "27");
     }
 
     [Fact]
-    public async Task I_can_pass_nothing_to_a_scalar_option_to_resolve_its_value_from_an_environment_variable_and_ignore_path_separators()
+    public async Task I_can_pass_values_to_an_input_bound_to_a_read_only_list_of_integers_property()
     {
         // Arrange
         var application = new CommandLineApplicationBuilder()
@@ -615,8 +753,56 @@ public partial class ActivationSpecs
                     [Command]
                     public partial class Command : ICommand
                     {
-                        [CommandOption("foo", EnvironmentVariable = "ENV_FOO")]
-                        public string? Foo { get; set; }
+                        [CommandOption('f')]
+                        public IReadOnlyList<int>? Foo { get; set; }
+
+                        public ValueTask ExecuteAsync(IConsole console)
+                        {
+                            foreach (var i in Foo)
+                                console.WriteLine(i);
+
+                            return default;
+                        }
+                    }
+                    """
+                )
+            )
+            .UseConsole(FakeConsole)
+            .Build();
+
+        // Act
+        var exitCode = await application.RunAsync(
+            ["-f", "1", "13", "27"],
+            new Dictionary<string, string>()
+        );
+
+        // Assert
+        exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
+        stdOut.Should().ConsistOfLines("1", "13", "27");
+    }
+
+    [Fact]
+    public async Task I_can_pass_a_value_to_an_input_bound_to_a_property_with_a_custom_converter()
+    {
+        // Arrange
+        var application = new CommandLineApplicationBuilder()
+            .AddCommands(
+                CommandCompiler.Compile(
+                    // lang=csharp
+                    """
+                    public class CustomConverter : ScalarInputConverter<int>
+                    {
+                        public override int Convert(string rawValue) =>
+                            rawValue.Length;
+                    }
+
+                    [Command]
+                    public partial class Command : ICommand
+                    {
+                        [CommandOption('f', Converter = typeof(CustomConverter))]
+                        public int Foo { get; set; }
 
                         public ValueTask ExecuteAsync(IConsole console)
                         {
@@ -632,19 +818,19 @@ public partial class ActivationSpecs
 
         // Act
         var exitCode = await application.RunAsync(
-            [],
-            new Dictionary<string, string> { ["ENV_FOO"] = $"bar{Path.PathSeparator}baz" }
+            ["-f", "hello world"],
+            new Dictionary<string, string>()
         );
 
         // Assert
         exitCode.Should().Be(0);
 
         var stdOut = FakeConsole.ReadOutputString();
-        stdOut.Trim().Should().Be($"bar{Path.PathSeparator}baz");
+        stdOut.Trim().Should().Be("11");
     }
 
     [Fact]
-    public async Task I_can_try_to_pass_nothing_to_a_required_option_and_get_an_error()
+    public async Task I_can_try_to_pass_an_invalid_value_to_an_input_and_get_an_error()
     {
         // Arrange
         var application = new CommandLineApplicationBuilder()
@@ -655,107 +841,8 @@ public partial class ActivationSpecs
                     [Command]
                     public partial class Command : ICommand
                     {
-                        [CommandOption("foo")]
-                        public required string Foo { get; set; }
-
-                        public ValueTask ExecuteAsync(IConsole console) => default;
-                    }
-                    """
-                )
-            )
-            .UseConsole(FakeConsole)
-            .Build();
-
-        // Act
-        var exitCode = await application.RunAsync([], new Dictionary<string, string>());
-
-        // Assert
-        exitCode.Should().NotBe(0);
-
-        var stdErr = FakeConsole.ReadErrorString();
-        stdErr.Should().Contain("Missing required option(s)");
-    }
-
-    [Fact]
-    public async Task I_can_try_to_pass_an_empty_value_to_a_required_option_and_get_an_error()
-    {
-        // Arrange
-        var application = new CommandLineApplicationBuilder()
-            .AddCommands(
-                CommandCompiler.Compile(
-                    // lang=csharp
-                    """
-                    [Command]
-                    public partial class Command : ICommand
-                    {
-                        [CommandOption("foo")]
-                        public required string Foo { get; set; }
-
-                        public ValueTask ExecuteAsync(IConsole console) => default;
-                    }
-                    """
-                )
-            )
-            .UseConsole(FakeConsole)
-            .Build();
-
-        // Act
-        var exitCode = await application.RunAsync(["--foo"], new Dictionary<string, string>());
-
-        // Assert
-        exitCode.Should().NotBe(0);
-
-        var stdErr = FakeConsole.ReadErrorString();
-        stdErr.Should().Contain("Missing required option(s)");
-    }
-
-    [Fact]
-    public async Task I_can_try_to_pass_nothing_to_a_required_sequence_based_option_and_get_an_error()
-    {
-        // Arrange
-        var application = new CommandLineApplicationBuilder()
-            .AddCommands(
-                CommandCompiler.Compile(
-                    // lang=csharp
-                    """
-                    [Command]
-                    public partial class Command : ICommand
-                    {
-                        [CommandOption("foo")]
-                        public required IReadOnlyList<string> Foo { get; set; }
-
-                        public ValueTask ExecuteAsync(IConsole console) => default;
-                    }
-                    """
-                )
-            )
-            .UseConsole(FakeConsole)
-            .Build();
-
-        // Act
-        var exitCode = await application.RunAsync(["--foo"], new Dictionary<string, string>());
-
-        // Assert
-        exitCode.Should().NotBe(0);
-
-        var stdErr = FakeConsole.ReadErrorString();
-        stdErr.Should().Contain("Missing required option(s)");
-    }
-
-    [Fact]
-    public async Task I_can_try_to_pass_values_to_unrecognized_options_and_get_an_error()
-    {
-        // Arrange
-        var application = new CommandLineApplicationBuilder()
-            .AddCommands(
-                CommandCompiler.Compile(
-                    // lang=csharp
-                    """
-                    [Command]
-                    public partial class Command : ICommand
-                    {
-                        [CommandOption("foo")]
-                        public string? Foo { get; set; }
+                        [CommandOption('f')]
+                        public int Foo { get; set; }
 
                         public ValueTask ExecuteAsync(IConsole console) => default;
                     }
@@ -767,7 +854,7 @@ public partial class ActivationSpecs
 
         // Act
         var exitCode = await application.RunAsync(
-            ["--foo", "one", "--bar", "two"],
+            ["-f", "12.34"],
             new Dictionary<string, string>()
         );
 
@@ -775,11 +862,11 @@ public partial class ActivationSpecs
         exitCode.Should().NotBe(0);
 
         var stdErr = FakeConsole.ReadErrorString();
-        stdErr.Should().Contain("Unrecognized option(s)");
+        stdErr.Should().NotBeNullOrWhiteSpace();
     }
 
     [Fact]
-    public async Task I_can_try_to_pass_too_many_values_to_a_scalar_option_and_get_an_error()
+    public async Task I_can_try_to_pass_a_value_to_an_input_bound_to_a_property_with_a_custom_validator_and_get_an_error_if_validation_fails()
     {
         // Arrange
         var application = new CommandLineApplicationBuilder()
@@ -787,11 +874,44 @@ public partial class ActivationSpecs
                 CommandCompiler.Compile(
                     // lang=csharp
                     """
+                    public class ValidatorA : InputValidator<int>
+                    {
+                        public override IEnumerable<InputValidationError> Validate(int value)
+                        {
+                            yield break;
+                        }
+                    }
+
+                    public class ValidatorB : InputValidator<int>
+                    {
+                        public override IEnumerable<InputValidationError> Validate(int value)
+                        {
+                            yield return Error("Hello world");
+                        }
+                    }
+
+                    public class ValidatorC : InputValidator<int>
+                    {
+                        public override IEnumerable<InputValidationError> Validate(int value)
+                        {
+                            yield return Error("Another error");
+                            yield return Error("Also an error");
+                        }
+                    }
+
                     [Command]
                     public partial class Command : ICommand
                     {
-                        [CommandOption("foo")]
-                        public string? Foo { get; set; }
+                        [CommandOption(
+                            'f',
+                            Validators =
+                            [
+                                typeof(ValidatorA),
+                                typeof(ValidatorB),
+                                typeof(ValidatorC)
+                            ]
+                        )]
+                        public int Foo { get; set; }
 
                         public ValueTask ExecuteAsync(IConsole console) => default;
                     }
@@ -802,33 +922,56 @@ public partial class ActivationSpecs
             .Build();
 
         // Act
-        var exitCode = await application.RunAsync(
-            ["--foo", "one", "two", "three"],
-            new Dictionary<string, string>()
-        );
+        var exitCode = await application.RunAsync(["-f", "12"], new Dictionary<string, string>());
 
         // Assert
         exitCode.Should().NotBe(0);
 
         var stdErr = FakeConsole.ReadErrorString();
-        stdErr.Should().Contain("Expected a single argument, but provided with multiple");
+        stdErr.Should().Contain("Hello world");
+        stdErr.Should().Contain("Another error");
+        stdErr.Should().Contain("Also an error");
     }
 
-    [Fact(Timeout = 15000)]
-    public async Task I_can_pass_environment_variables()
+    [Fact]
+    public async Task I_can_try_to_pass_a_value_to_an_input_bound_to_a_string_parsable_property_and_get_an_error_if_parsing_fails()
     {
-        // Ensures that the environment variables are properly obtained from
-        // System.Environment when they are not provided explicitly to CommandLineApplication.
-
         // Arrange
-        var command = Cli.Wrap(Dummy.Program.FilePath)
-            .WithArguments("env-test")
-            .WithEnvironmentVariables(e => e.Set("ENV_TARGET", "Mars"));
+        var application = new CommandLineApplicationBuilder()
+            .AddCommands(
+                CommandCompiler.Compile(
+                    // lang=csharp
+                    """
+                    public class CustomType
+                    {
+                        public string Value { get; }
+
+                        private CustomType(string value) => Value = value;
+
+                        public static CustomType Parse(string value) => throw new Exception("Hello world");
+                    }
+
+                    [Command]
+                    public partial class Command : ICommand
+                    {
+                        [CommandOption('f')]
+                        public CustomType? Foo { get; set; }
+
+                        public ValueTask ExecuteAsync(IConsole console) => default;
+                    }
+                    """
+                )
+            )
+            .UseConsole(FakeConsole)
+            .Build();
 
         // Act
-        var result = await command.ExecuteBufferedAsync();
+        var exitCode = await application.RunAsync(["-f", "bar"], new Dictionary<string, string>());
 
         // Assert
-        result.StandardOutput.Trim().Should().Be("Hello Mars!");
+        exitCode.Should().NotBe(0);
+
+        var stdErr = FakeConsole.ReadErrorString();
+        stdErr.Should().Contain("Hello world");
     }
 }
