@@ -1,4 +1,4 @@
-namespace CliFx.Generators;
+namespace CliFx.Generators.Emitters;
 
 internal static class ProgramEntryPoint
 {

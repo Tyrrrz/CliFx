@@ -1,4 +1,5 @@
 using System.Text;
+using CliFx.Generators.Emitters;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 

@@ -6,7 +6,7 @@ using CliFx.Generators.Utils;
 using CliFx.Generators.Utils.Extensions;
 using Microsoft.CodeAnalysis;
 
-namespace CliFx.Generators;
+namespace CliFx.Generators.Emitters;
 
 internal static class CommandRegistration
 {
