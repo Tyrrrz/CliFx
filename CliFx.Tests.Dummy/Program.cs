@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
+
+[assembly: ExcludeFromCodeCoverage]
 
 namespace CliFx.Tests.Dummy;
 
