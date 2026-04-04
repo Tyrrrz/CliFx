@@ -14,6 +14,7 @@ public abstract class SpecsBase(ITestOutputHelper testOutput) : IDisposable
     public void Dispose()
     {
         FakeConsole.DumpToTestOutput(TestOutput);
+        FakeConsole.Clear();
         FakeConsole.Dispose();
     }
 }
