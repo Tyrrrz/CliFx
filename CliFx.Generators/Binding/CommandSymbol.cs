@@ -43,7 +43,7 @@ internal partial record CommandSymbol
             if (!declaration.IsFullyPartial())
             {
                 diagnostics.Report(
-                    DiagnosticDescriptors.CommandMustBePartial,
+                    DiagnosticDescriptors.CommandTypeMustBePartial,
                     declaration.Identifier.GetLocation(),
                     type.Name
                 );
@@ -54,7 +54,7 @@ internal partial record CommandSymbol
         if (!type.Implements("CliFx.ICommand"))
         {
             diagnostics.Report(
-                DiagnosticDescriptors.CommandMustImplementICommand,
+                DiagnosticDescriptors.CommandTypeMustImplementICommand,
                 type.Locations.FirstOrDefault(),
                 type.Name
             );

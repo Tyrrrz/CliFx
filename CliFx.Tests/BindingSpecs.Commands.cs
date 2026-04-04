@@ -24,7 +24,7 @@ public partial class BindingSpecs
             );
 
         // Assert
-        act.Should().Throw().WithMessage($"*{DiagnosticDescriptors.CommandMustBePartial.Id}*");
+        act.Should().Throw().WithMessage($"*{DiagnosticDescriptors.CommandTypeMustBePartial.Id}*");
     }
 
     [Fact]
@@ -46,7 +46,7 @@ public partial class BindingSpecs
         // Assert
         act.Should()
             .Throw()
-            .WithMessage($"*{DiagnosticDescriptors.CommandMustImplementICommand.Id}*");
+            .WithMessage($"*{DiagnosticDescriptors.CommandTypeMustImplementICommand.Id}*");
     }
 
     [Fact]

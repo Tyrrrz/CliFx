@@ -6,21 +6,21 @@ public static class DiagnosticDescriptors
 {
     // Command
 
-    public static DiagnosticDescriptor CommandMustBePartial { get; } =
+    public static DiagnosticDescriptor CommandTypeMustBePartial { get; } =
         new(
-            $"{nameof(CliFx)}_{nameof(CommandMustBePartial)}",
+            $"{nameof(CliFx)}_{nameof(CommandTypeMustBePartial)}",
             "Command class must be declared as partial",
-            "Type '{0}' is decorated with [Command] but it is not partial. Make sure that the type itself, as well as all its containing types, are declared as partial, so that the source generator can extend it.",
+            "Command bound to type '{0}' which is not partial. Make sure that the type itself, as well as all its containing types, are declared as partial, so that the source generator can extend it.",
             "CliFx",
             DiagnosticSeverity.Error,
             true
         );
 
-    public static DiagnosticDescriptor CommandMustImplementICommand { get; } =
+    public static DiagnosticDescriptor CommandTypeMustImplementICommand { get; } =
         new(
-            $"{nameof(CliFx)}_{nameof(CommandMustImplementICommand)}",
+            $"{nameof(CliFx)}_{nameof(CommandTypeMustImplementICommand)}",
             "Command class must implement ICommand",
-            "Type '{0}' is decorated with [Command] but does not implement 'ICommand'. In order to be recognized as a command, the type must also implement the 'ICommand' interface.",
+            "Command bound to type '{0}' which does not implement 'ICommand'. In order to be recognized as a command, the type must also implement the 'ICommand' interface.",
             "CliFx",
             DiagnosticSeverity.Error,
             true
