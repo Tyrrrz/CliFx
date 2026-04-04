@@ -121,19 +121,6 @@ internal static class CommandDescriptor
                 """;
         }
 
-        // Implements IConvertible
-        if (
-            type.AllInterfaces.Any(i =>
-                i.ContainingNamespace?.Name == "System" && i.Name == "IConvertible"
-            )
-        )
-        {
-            // lang=csharp
-            return $"""
-                new global::CliFx.Activation.ConvertibleScalarInputConverter<{type.GetGloballyQualifiedName()}>()
-                """;
-        }
-
         return null;
     }
 
