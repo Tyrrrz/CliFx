@@ -107,7 +107,7 @@ The command in the above example serves as a simple logarithm calculator that ha
 Its command-line signature looks like this:
 
 ```console
-$ ./myapp <value> [--base <base>]
+$ ./myapp <value> [--base <value>]
 ```
 
 Beyond that, no additional setup is required — **CliFx** uses source generators to discover commands and produce the `Main()` method automatically.
@@ -654,7 +654,7 @@ Similarly, unseparated arguments in the form of `./myapp -ofile` will be treated
 These rules also make the order of arguments important — the command-line string is expected to follow this pattern:
 
 ```console
-$ ./myapp [command] [...parameters] [...options]
+$ ./myapp [command] [parameters] [options]
 ```
 
 ### Command routing
@@ -775,6 +775,9 @@ public partial class DivideCommand : ICommand
         return default;
     }
 }
+
+// Usage:
+// $ ./myapp div --dividend <value> --divisor <value>
 ```
 
 ```console
@@ -851,6 +854,9 @@ public partial class ConcatCommand : ICommand
         return default;
     }
 }
+
+// Usage:
+// $ ./myapp concat --left <value> --right <value>
 ```
 
 To test it, you can instantiate the command in code with the required values, and then pass an instance of `FakeInMemoryConsole` to `ExecuteAsync(...)`:
