@@ -34,9 +34,13 @@ public class CommandLineApplication(
         // Handle debug mode
         if (
             !string.IsNullOrWhiteSpace(configuration.DebugModeEnvironmentVariable)
-            && bool.ParseOrNull(
-                environmentVariables.GetValueOrDefault(configuration.DebugModeEnvironmentVariable)
-            ) == true
+            && (
+                bool.ParseOrNull(
+                    environmentVariables.GetValueOrDefault(
+                        configuration.DebugModeEnvironmentVariable
+                    )
+                ) ?? false
+            )
         )
         {
             using (console.WithForegroundColor(ConsoleColor.Green))
@@ -56,9 +60,13 @@ public class CommandLineApplication(
         // Handle preview mode
         if (
             !string.IsNullOrWhiteSpace(configuration.PreviewModeEnvironmentVariable)
-            && bool.ParseOrNull(
-                environmentVariables.GetValueOrDefault(configuration.PreviewModeEnvironmentVariable)
-            ) == true
+            && (
+                bool.ParseOrNull(
+                    environmentVariables.GetValueOrDefault(
+                        configuration.PreviewModeEnvironmentVariable
+                    )
+                ) ?? false
+            )
         )
         {
             console.WriteCommandLine(commandLine);
