@@ -2,11 +2,6 @@
 
 internal static class StringExtensions
 {
-    extension(string str)
-    {
-        public string? NullIfWhiteSpace() => !string.IsNullOrWhiteSpace(str) ? str : null;
-    }
-
     extension(char c)
     {
         public string Repeat(int count) => new(c, count);

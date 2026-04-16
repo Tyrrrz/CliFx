@@ -9,6 +9,7 @@ using CliFx.Generators.Utils.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
+using PowerKit.Extensions;
 
 namespace CliFx.Generators;
 

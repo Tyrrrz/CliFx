@@ -9,6 +9,7 @@ using CliFx.Help;
 using CliFx.Infrastructure;
 using CliFx.Parsing;
 using CliFx.Utils.Extensions;
+using PowerKit.Extensions;
 
 namespace CliFx;
 
@@ -33,9 +34,9 @@ public class CommandLineApplication(
         // Handle debug mode
         if (
             !string.IsNullOrWhiteSpace(configuration.DebugModeEnvironmentVariable)
-            && bool.ParseOrDefault(
+            && bool.ParseOrNull(
                 environmentVariables.GetValueOrDefault(configuration.DebugModeEnvironmentVariable)
-            )
+            ) == true
         )
         {
             using (console.WithForegroundColor(ConsoleColor.Green))
@@ -55,9 +56,9 @@ public class CommandLineApplication(
         // Handle preview mode
         if (
             !string.IsNullOrWhiteSpace(configuration.PreviewModeEnvironmentVariable)
-            && bool.ParseOrDefault(
+            && bool.ParseOrNull(
                 environmentVariables.GetValueOrDefault(configuration.PreviewModeEnvironmentVariable)
-            )
+            ) == true
         )
         {
             console.WriteCommandLine(commandLine);

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CliFx.Generators.Utils.Extensions;
 using Microsoft.CodeAnalysis;
+using PowerKit.Extensions;
 
 namespace CliFx.Generators.Binding;
 

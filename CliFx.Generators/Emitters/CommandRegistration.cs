@@ -5,6 +5,7 @@ using CliFx.Generators.Binding;
 using CliFx.Generators.Utils;
 using CliFx.Generators.Utils.Extensions;
 using Microsoft.CodeAnalysis;
+using PowerKit.Extensions;
 
 namespace CliFx.Generators.Emitters;
 
