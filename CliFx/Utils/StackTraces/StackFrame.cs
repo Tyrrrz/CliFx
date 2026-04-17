@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using CliFx.Utils.Extensions;
+using PowerKit.Extensions;
 
 namespace CliFx.Utils.StackTraces;
 

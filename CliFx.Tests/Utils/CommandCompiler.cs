@@ -6,10 +6,10 @@ using System.Reflection;
 using Basic.Reference.Assemblies;
 using CliFx.Binding;
 using CliFx.Generators;
-using CliFx.Tests.Utils.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
+using PowerKit.Extensions;
 
 namespace CliFx.Tests.Utils;
 

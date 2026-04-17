@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CliFx.Utils.Extensions;
 
 namespace CliFx.Parsing;
 
@@ -126,7 +125,7 @@ internal partial class ParsedCommandLine
                     if (!string.IsNullOrWhiteSpace(lastOptionIdentifier))
                         result.Add(new ParsedOption(lastOptionIdentifier, lastOptionValues));
 
-                    lastOptionIdentifier = identifier.AsString();
+                    lastOptionIdentifier = identifier.ToString();
                     lastOptionValues = [];
                 }
             }

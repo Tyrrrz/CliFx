@@ -4,7 +4,7 @@ using System.IO;
 using System.Reflection;
 using CliFx.Binding;
 using CliFx.Infrastructure;
-using CliFx.Utils.Extensions;
+using PowerKit.Extensions;
 
 namespace CliFx;
 

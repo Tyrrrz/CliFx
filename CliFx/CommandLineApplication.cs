@@ -9,6 +9,7 @@ using CliFx.Help;
 using CliFx.Infrastructure;
 using CliFx.Parsing;
 using CliFx.Utils.Extensions;
+using PowerKit.Extensions;
 
 namespace CliFx;
 
@@ -33,8 +34,12 @@ public class CommandLineApplication(
         // Handle debug mode
         if (
             !string.IsNullOrWhiteSpace(configuration.DebugModeEnvironmentVariable)
-            && bool.ParseOrDefault(
-                environmentVariables.GetValueOrDefault(configuration.DebugModeEnvironmentVariable)
+            && (
+                bool.ParseOrNull(
+                    environmentVariables.GetValueOrDefault(
+                        configuration.DebugModeEnvironmentVariable
+                    )
+                ) ?? false
             )
         )
         {
@@ -55,8 +60,12 @@ public class CommandLineApplication(
         // Handle preview mode
         if (
             !string.IsNullOrWhiteSpace(configuration.PreviewModeEnvironmentVariable)
-            && bool.ParseOrDefault(
-                environmentVariables.GetValueOrDefault(configuration.PreviewModeEnvironmentVariable)
+            && (
+                bool.ParseOrNull(
+                    environmentVariables.GetValueOrDefault(
+                        configuration.PreviewModeEnvironmentVariable
+                    )
+                ) ?? false
             )
         )
         {

@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using CliFx.Binding;
 using CliFx.Parsing;
-using CliFx.Utils.Extensions;
+using PowerKit.Extensions;
 
 namespace CliFx.Activation;
 
