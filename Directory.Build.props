@@ -21,4 +21,13 @@
     <EnableTrimAnalyzer>false</EnableTrimAnalyzer>
     <EnableAotAnalyzer>false</EnableAotAnalyzer>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <Authors>$(Company)</Authors>
+    <Description>Class-first framework for building command-line interfaces</Description>
+    <PackageTags>command line executable interface framework parser arguments cli app application net core</PackageTags>
+    <PackageProjectUrl>https://github.com/Tyrrrz/CliFx</PackageProjectUrl>
+    <PackageReleaseNotes>https://github.com/Tyrrrz/CliFx/releases</PackageReleaseNotes>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
 </Project>

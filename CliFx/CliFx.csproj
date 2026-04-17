@@ -13,25 +13,19 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Authors>$(Company)</Authors>
-    <Description>Class-first framework for building command-line interfaces</Description>
-    <PackageTags>command line executable interface framework parser arguments cli app application net core</PackageTags>
-    <PackageProjectUrl>https://github.com/Tyrrrz/CliFx</PackageProjectUrl>
-    <PackageReleaseNotes>https://github.com/Tyrrrz/CliFx/releases</PackageReleaseNotes>
     <PackageIcon>favicon.png</PackageIcon>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Include="../favicon.png" Pack="true" PackagePath="" Visible="false" />
-  </ItemGroup>
 
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
     <PublicSign>false</PublicSign>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../favicon.png" Pack="true" PackagePath="" Visible="false" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="CSharpier.MsBuild" PrivateAssets="all" />
@@ -55,7 +49,7 @@
   <!-- Pack the source generators into the NuGet package -->
   <ItemGroup>
     <None
-      Include="..\CliFx.Generators\bin\$(Configuration)\netstandard2.0\CliFx.Generators.dll"
+      Include="../CliFx.Generators/bin/$(Configuration)/netstandard2.0/CliFx.Generators.dll"
       Pack="true"
       PackagePath="analyzers/dotnet/cs"
       Visible="false"

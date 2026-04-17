@@ -1,0 +1,17 @@
+<Solution>
+  <Folder Name="/Misc/">
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="global.json" />
+    <File Path="License.txt" />
+    <File Path="NuGet.config" />
+    <File Path="Readme.md" />
+  </Folder>
+
+  <Project Path="CliFx/CliFx.csproj" />
+  <Project Path="CliFx.Benchmarks/CliFx.Benchmarks.csproj" />
+  <Project Path="CliFx.Demo/CliFx.Demo.csproj" />
+  <Project Path="CliFx.Generators/CliFx.Generators.csproj" />
+  <Project Path="CliFx.Tests.Dummy/CliFx.Tests.Dummy.csproj" />
+  <Project Path="CliFx.Tests/CliFx.Tests.csproj" />
+</Solution>

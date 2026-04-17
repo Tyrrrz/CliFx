@@ -17,9 +17,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CliFx\CliFx.csproj" />
+    <ProjectReference Include="../CliFx/CliFx.csproj" />
     <ProjectReference
-      Include="..\CliFx.Generators\CliFx.Generators.csproj"
+      Include="../CliFx.Generators/CliFx.Generators.csproj"
       ReferenceOutputAssembly="false"
       OutputItemType="analyzer"
     />
