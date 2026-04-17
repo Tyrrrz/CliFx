@@ -19,7 +19,7 @@
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.5" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.3.0" />
-    <PackageVersion Include="PolyShim" Version="2.10.0" />
+    <PackageVersion Include="PolyShim" Version="2.10.1" />
     <PackageVersion Include="PowerKit" Version="0.0.0-a.6" />
     <PackageVersion Include="PowerArgs" Version="4.0.3" />
     <PackageVersion Include="System.CommandLine" Version="2.0.5" />
