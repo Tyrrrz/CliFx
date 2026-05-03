@@ -466,7 +466,7 @@ public partial class SearchCommand : ICommand
     public OutputFormat Format { get; set; } = OutputFormat.Plain;
 
     [CommandOption("in", Description = "Directories to search in.")]
-    public IReadOnlyList<DirectoryInfo> Paths { get; set; } = [];
+    public IReadOnlyList<DirectoryInfo> Directories { get; set; } = [];
 
     public ValueTask ExecuteAsync(IConsole console)
     {
@@ -800,7 +800,7 @@ Console applications support the concept of interrupt signals, which can be issu
 If your command performs critical work, you can intercept these signals to handle cancellation requests in a graceful way.
 
 You can make a command cancellation-aware by calling `console.RegisterCancellationHandler()`, which registers the signal handler and returns the corresponding `CancellationToken`.
-Once this method is called, the program will no longer terminate on an interrupt signal but will instead trigger the associated token, which can be used to delay the termination of a command enough to exit in a controlled manner:
+Once this method is called, the program will no longer terminate on an interrupt signal but will instead trigger the associated token, which can be used to delay the termination of a command to exit in a controlled manner:
 
 ```csharp
 [Command]
@@ -884,7 +884,8 @@ public async Task ConcatCommand_executes_successfully()
 }
 ```
 
-Similarly, you can also test your command at a higher level like so:
+This approach covers the execution logic of the command, as well as all its interactions with the console.
+If you also wish to test how the command gets instantiated, how it converts and validates its inputs, and how it behaves in the context of the application as a whole, then you can test it at the higher level like so:
 
 ```csharp
 // End-to-end test at the application level
