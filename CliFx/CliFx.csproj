@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard2.1;net10.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net6.0;net7.0;net10.0</TargetFrameworks>
     <IsPackable>true</IsPackable>
     <IsTrimmable
       Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net6.0'))"
@@ -28,9 +28,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Binternal" PrivateAssets="all" />
     <PackageReference Include="CSharpier.MsBuild" PrivateAssets="all" />
     <PackageReference Include="PolyShim" PrivateAssets="all" />
-    <PackageReference Include="PowerKit" PrivateAssets="all" />
+    <PackageReference Include="PowerKit" Internalize="true" PrivateAssets="all" />
     <PackageReference
       Include="System.Threading.Tasks.Extensions"
       Condition="!$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'netstandard2.1'))"
