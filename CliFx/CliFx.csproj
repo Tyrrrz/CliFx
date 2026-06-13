@@ -17,12 +17,6 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
-    <PublicSign>false</PublicSign>
-  </PropertyGroup>
-
   <ItemGroup>
     <None Include="../favicon.png" Pack="true" PackagePath="" Visible="false" />
   </ItemGroup>
@@ -32,6 +26,7 @@
     <PackageReference Include="CSharpier.MsBuild" PrivateAssets="all" />
     <PackageReference Include="PolyShim" PrivateAssets="all" />
     <PackageReference Include="PowerKit" Internalize="true" PrivateAssets="all" />
+    <PackageReference Include="Snek" PrivateAssets="all" />
     <PackageReference
       Include="System.Threading.Tasks.Extensions"
       Condition="!$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'netstandard2.1'))"
@@ -41,7 +36,7 @@
   <!-- Reference the source generators for build -->
   <ItemGroup>
     <ProjectReference
-      Include="..\CliFx.Generators\CliFx.Generators.csproj"
+      Include="../CliFx.Generators/CliFx.Generators.csproj"
       ReferenceOutputAssembly="false"
       OutputItemType="analyzer"
     />

@@ -6,7 +6,7 @@
   <ItemGroup>
     <PackageVersion Include="Basic.Reference.Assemblies.Net100" Version="1.8.8" />
     <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
-    <PackageVersion Include="Binternal" Version="1.0.0" />
+    <PackageVersion Include="Binternal" Version="1.0.1" />
     <PackageVersion Include="clipr" Version="1.6.1" />
     <PackageVersion Include="CliWrap" Version="3.10.1" />
     <PackageVersion Include="Cocona" Version="2.2.0" />
@@ -23,6 +23,7 @@
     <PackageVersion Include="PolyShim" Version="2.11.0" />
     <PackageVersion Include="PowerKit" Version="2.0.1" />
     <PackageVersion Include="PowerArgs" Version="4.0.3" />
+    <PackageVersion Include="Snek" Version="1.0.0" />
     <PackageVersion Include="System.CommandLine" Version="2.0.8" />
     <PackageVersion Include="System.Threading.Tasks.Extensions" Version="4.6.3" />
     <PackageVersion Include="xunit" Version="2.9.3" />
