@@ -20,9 +20,7 @@ public class ConsoleReader(IConsole console, Stream stream, Encoding encoding)
     public ConsoleReader(IConsole console, Stream stream)
         : this(console, stream, System.Console.InputEncoding) { }
 
-    /// <summary>
-    /// Console that owns this stream.
-    /// </summary>
+    /// <inheritdoc cref="ConsoleWriter.Console" />
     public IConsole Console { get; } = console;
 
     // The following overrides are required to establish thread-safe behavior

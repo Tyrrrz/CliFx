@@ -22,9 +22,7 @@ public static class DelegateScalarInputConverter
     public static DelegateScalarInputConverter<T> Create<T>(Func<string?, T> convert) =>
         new(convert);
 
-    /// <summary>
-    /// Creates a delegate-based scalar converter.
-    /// </summary>
+    /// <inheritdoc cref="Create{T}(Func{string?, T})" />
     public static DelegateScalarInputConverter<T> Create<T, TInner>(
         ScalarInputConverter<TInner> innerConverter,
         Func<TInner, T> transform

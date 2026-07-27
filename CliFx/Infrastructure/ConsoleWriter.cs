@@ -24,9 +24,7 @@ public class ConsoleWriter : StreamWriter
         AutoFlush = true;
     }
 
-    /// <summary>
-    /// Initializes an instance of <see cref="ConsoleWriter" />.
-    /// </summary>
+    /// <inheritdoc cref="ConsoleWriter(IConsole, Stream, Encoding)" />
     public ConsoleWriter(IConsole console, Stream stream)
         : this(console, stream, System.Console.OutputEncoding) { }
 

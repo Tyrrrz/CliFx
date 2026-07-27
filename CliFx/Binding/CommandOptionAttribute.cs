@@ -17,21 +17,15 @@ public class CommandOptionAttribute : CommandInputAttribute
         ShortName = shortName;
     }
 
-    /// <summary>
-    /// Initializes an instance of <see cref="CommandOptionAttribute" />.
-    /// </summary>
+    /// <inheritdoc cref="CommandOptionAttribute(string, char?)" />
     public CommandOptionAttribute(string name, char shortName)
         : this(name, (char?)shortName) { }
 
-    /// <summary>
-    /// Initializes an instance of <see cref="CommandOptionAttribute" />.
-    /// </summary>
+    /// <inheritdoc cref="CommandOptionAttribute(string, char?)" />
     public CommandOptionAttribute(string name)
         : this(name, null) { }
 
-    /// <summary>
-    /// Initializes an instance of <see cref="CommandOptionAttribute" />.
-    /// </summary>
+    /// <inheritdoc cref="CommandOptionAttribute(string, char?)" />
     public CommandOptionAttribute(char shortName)
         : this(null, (char?)shortName) { }
 
