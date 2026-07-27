@@ -25,9 +25,7 @@ public static class DelegateSequenceInputConverter
         Func<IReadOnlyList<string>, T> convert
     ) => new(convert);
 
-    /// <summary>
-    /// Creates a delegate-based sequence converter.
-    /// </summary>
+    /// <inheritdoc cref="Create{T}(Func{IReadOnlyList{string}, T})" />
     public static DelegateSequenceInputConverter<T> Create<T, TInner>(
         SequenceInputConverter<TInner> innerConverter,
         Func<TInner, T> transform
