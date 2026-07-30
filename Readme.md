@@ -164,7 +164,7 @@ OPTIONS
   --version         Shows version information. Default: <false>.
 ```
 
-Because `LogCommand` doesn't have a name, it's treated as the default (i.e. root) command, which is executed when the user doesn't specify any command name in the arguments.
+Because `LogCommand` doesn't have a name, it's treated as the default (i.e., root) command, which is executed when the user doesn't specify any command name in the arguments.
 More complex applications typically employ several commands, each with its own name and functionality, allowing the user to choose between different workflows.
 
 To define a named command, simply specify its name in the `[Command]` attribute:
@@ -428,7 +428,7 @@ By default, the framework will try to automatically infer a suitable converter f
   - No conversion required
 - `bool`
   - Converted by calling `bool.Parse(...)`
-  - Converted as `true` if passed nothing (e.g. `--switch`)
+  - Converted as `true` if passed nothing (e.g., `--switch`)
 - `enum`
   - Converted by calling `Enum.ToObject(...)` if passed a numeric string
   - Converted by calling `Enum.Parse(...)` if passed a non-numeric string
@@ -520,21 +520,21 @@ public partial class SurfaceCalculatorCommand : ICommand
 {
     [CommandParameter(
         0,
-        Description = "First point of the triangle, in the format AxB (e.g. 10x20).",
+        Description = "First point of the triangle, in the format AxB (e.g., 10x20).",
         Converter = typeof(VectorConverter)
     )]
     public required Vector2 PointA { get; set; }
 
     [CommandParameter(
         1,
-        Description = "Second point of the triangle, in the format AxB (e.g. 10x20).",
+        Description = "Second point of the triangle, in the format AxB (e.g., 10x20).",
         Converter = typeof(VectorConverter)
     )]
     public required Vector2 PointB { get; set; }
 
     [CommandParameter(
         2,
-        Description = "Third point of the triangle, in the format AxB (e.g. 10x20).",
+        Description = "Third point of the triangle, in the format AxB (e.g., 10x20).",
         Converter = typeof(VectorConverter)
     )]
     public required Vector2 PointC { get; set; }
@@ -669,7 +669,7 @@ With **CliFx**, this is achieved by simply giving each command a unique name thr
 Commands that have common name segments are considered to be hierarchically related, affecting how they appear in the help text:
 
 ```csharp
-// Default command, i.e. command without a name
+// Default command, i.e., command without a name
 [Command]
 public partial class DefaultCommand : ICommand
 {
@@ -1047,7 +1047,7 @@ $ CLIFX_PREVIEW=true ./myapp cmd arg1 arg2 -o foo --option bar1 bar2
 cmd <arg1> <arg2> [-o foo] [--option bar1 bar2]
 ```
 
-To disallow these modes (e.g. for production), simply pass `null` for the corresponding environment variable names:
+To disallow these modes (e.g., for production), simply pass `null` for the corresponding environment variable names:
 
 ```csharp
 public static async Task<int> Main() =>

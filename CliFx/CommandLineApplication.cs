@@ -124,7 +124,7 @@ public class CommandLineApplication(
         }
 
         // Starting from this point, we may produce exceptions that are meant for the
-        // end-user of the application (i.e. invalid input, command exception, etc.).
+        // end-user of the application (i.e., invalid input, command exception, etc.).
         // Catch these exceptions here, print them to the console, and don't let them
         // propagate further.
         try
@@ -156,7 +156,7 @@ public class CommandLineApplication(
     /// Returns the exit code which indicates whether the application completed successfully.
     /// </summary>
     /// <remarks>
-    /// When running WITHOUT a debugger attached (i.e. in production), this method swallows
+    /// When running WITHOUT a debugger attached (i.e., in production), this method swallows
     /// all inner exceptions and reports them to the console, instead of allowing them to propagate
     /// to the caller and potentially crash the application.
     /// </remarks>
@@ -191,7 +191,7 @@ public class CommandLineApplication(
     /// Returns the exit code which indicates whether the application completed successfully.
     /// </summary>
     /// <remarks>
-    /// When running WITHOUT a debugger attached (i.e. in production), this method swallows
+    /// When running WITHOUT a debugger attached (i.e., in production), this method swallows
     /// all inner exceptions and reports them to the console, instead of allowing them to propagate
     /// to the caller and potentially crash the application.
     /// </remarks>
@@ -209,7 +209,7 @@ public class CommandLineApplication(
     /// Returns the exit code which indicates whether the application completed successfully.
     /// </summary>
     /// <remarks>
-    /// When running WITHOUT a debugger attached (i.e. in production), this method swallows
+    /// When running WITHOUT a debugger attached (i.e., in production), this method swallows
     /// all inner exceptions and reports them to the console, instead of allowing them to propagate
     /// to the caller and potentially crash the application.
     /// </remarks>

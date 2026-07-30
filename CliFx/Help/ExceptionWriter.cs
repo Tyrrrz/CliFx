@@ -87,7 +87,7 @@ internal class ExceptionWriter(ConsoleWriter consoleWriter) : FormattedConsoleWr
             WriteException(exception.InnerException, depth + 1);
         }
 
-        // Non-thrown exceptions (e.g. inner exceptions) have no stacktrace
+        // Non-thrown exceptions (e.g., inner exceptions) have no stacktrace
         if (!string.IsNullOrWhiteSpace(exception.StackTrace))
         {
             // Parse and pretty-print the stacktrace

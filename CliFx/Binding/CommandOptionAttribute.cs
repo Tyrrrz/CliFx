@@ -30,7 +30,7 @@ public class CommandOptionAttribute : CommandInputAttribute
         : this(null, (char?)shortName) { }
 
     /// <summary>
-    /// Option name (i.e. the --name form).
+    /// Option name (i.e., the --name form).
     /// </summary>
     /// <remarks>
     /// Must contain at least two characters and start with a letter.
@@ -40,7 +40,7 @@ public class CommandOptionAttribute : CommandInputAttribute
     public string? Name { get; }
 
     /// <summary>
-    /// Option short name (i.e. the -n form).
+    /// Option short name (i.e., the -n form).
     /// </summary>
     /// <remarks>
     /// Either <see cref="Name" /> or <see cref="ShortName" /> must be set.

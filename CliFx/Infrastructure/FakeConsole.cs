@@ -88,7 +88,7 @@ public class FakeConsole : IConsole, IDisposable
     /// Simulates a cancellation request.
     /// </summary>
     /// <remarks>
-    /// If the command is not cancellation-aware (i.e. it doesn't call <see cref="IConsole.RegisterCancellationHandler" />),
+    /// If the command is not cancellation-aware (i.e., it doesn't call <see cref="IConsole.RegisterCancellationHandler" />),
     /// this method will not have any effect.
     /// </remarks>
     public void RequestCancellation(TimeSpan? delay = null)
