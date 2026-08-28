@@ -31,6 +31,17 @@ internal static class CommandDescriptor
                 """;
     }
 
+    private static string EmitExamples(IReadOnlyList<string> examples)
+    {
+        if (examples.Count == 0)
+            return "global::System.Array.Empty<string>()";
+
+        // lang=csharp
+        return $$"""
+            new[] { {{string.Join(", ", examples.Select(CSharp.Encode))}} }
+            """;
+    }
+
     private static string? TryEmitDefaultScalarConverter(ITypeSymbol type)
     {
         // Object
@@ -522,6 +533,7 @@ internal static class CommandDescriptor
                 new global::CliFx.Binding.CommandDescriptor<{{command.Type.GetGloballyQualifiedName()}}>(
                     {{CSharp.Encode(command.Name)}},
                     {{CSharp.Encode(command.Description)}},
+                    {{EmitExamples(command.Examples)}},
                     new global::CliFx.Binding.CommandInputDescriptor[]
                     {
                         {{string.Join(",", command.Inputs
