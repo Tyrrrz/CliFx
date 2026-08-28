@@ -13,6 +13,7 @@ public class CommandDescriptor(
         Type type,
     string? name,
     string? description,
+    IReadOnlyList<string> examples,
     IReadOnlyList<CommandInputDescriptor> inputs
 )
 {
@@ -29,6 +30,9 @@ public class CommandDescriptor(
 
     /// <inheritdoc cref="CommandAttribute.Description" />
     public string? Description { get; } = description;
+
+    /// <inheritdoc cref="CommandAttribute.Examples" />
+    public IReadOnlyList<string> Examples { get; } = examples;
 
     /// <summary>
     /// Inputs (parameters and options) of the command;
@@ -57,6 +61,10 @@ public class CommandDescriptor(
 public class CommandDescriptor<
     [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
         TCommand
->(string? name, string? description, IReadOnlyList<CommandInputDescriptor> inputs)
-    : CommandDescriptor(typeof(TCommand), name, description, inputs)
+>(
+    string? name,
+    string? description,
+    IReadOnlyList<string> examples,
+    IReadOnlyList<CommandInputDescriptor> inputs
+) : CommandDescriptor(typeof(TCommand), name, description, examples, inputs)
     where TCommand : ICommand;

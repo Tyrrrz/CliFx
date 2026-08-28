@@ -382,6 +382,81 @@ public class HelpSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     }
 
     [Fact]
+    public async Task I_can_request_help_to_see_the_usage_examples_of_a_command()
+    {
+        // Arrange
+        var application = new CommandLineApplicationBuilder()
+            .AddCommands(
+                CommandCompiler.Compile(
+                    // lang=csharp
+                    """
+                    [Command("foo", Examples = new[] { "--bar 42", "-b 42" })]
+                    public partial class Command : ICommand
+                    {
+                        [CommandOption("bar", 'b')]
+                        public int Bar { get; set; }
+
+                        public ValueTask ExecuteAsync(IConsole console) => default;
+                    }
+                    """
+                )
+            )
+            .UseConsole(FakeConsole)
+            .Build();
+
+        // Act
+        var exitCode = await application.RunAsync(
+            ["foo", "--help"],
+            new Dictionary<string, string>()
+        );
+
+        // Assert
+        exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
+        stdOut
+            .Should()
+            .ContainAllInOrder("USAGE", "foo [options]", "foo --bar 42", "foo -b 42", "OPTIONS");
+    }
+
+    [Fact]
+    public async Task I_do_not_see_any_usage_examples_if_the_command_does_not_define_any()
+    {
+        // Arrange
+        var application = new CommandLineApplicationBuilder()
+            .AddCommands(
+                CommandCompiler.Compile(
+                    // lang=csharp
+                    """
+                    [Command("foo")]
+                    public partial class Command : ICommand
+                    {
+                        [CommandOption("bar", 'b')]
+                        public int Bar { get; set; }
+
+                        public ValueTask ExecuteAsync(IConsole console) => default;
+                    }
+                    """
+                )
+            )
+            .UseConsole(FakeConsole)
+            .Build();
+
+        // Act
+        var exitCode = await application.RunAsync(
+            ["foo", "--help"],
+            new Dictionary<string, string>()
+        );
+
+        // Assert
+        exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
+        stdOut.Should().Contain("foo [options]");
+        stdOut.Should().NotContain("foo --bar 42");
+    }
+
+    [Fact]
     public async Task I_can_request_help_to_see_the_list_of_all_inputs()
     {
         // Arrange

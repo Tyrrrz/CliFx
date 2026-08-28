@@ -3,6 +3,7 @@ using System.Linq;
 using CliFx.Generators.Utils;
 using CliFx.Generators.Utils.Extensions;
 using Microsoft.CodeAnalysis;
+using PowerKit.Extensions;
 
 namespace CliFx.Generators.Binding;
 
@@ -10,6 +11,7 @@ internal partial record CommandSymbol(
     INamedTypeSymbol Type,
     string? Name,
     string? Description,
+    IReadOnlyList<string> Examples,
     IReadOnlyList<CommandInputSymbol> Inputs
 )
 {
@@ -71,10 +73,19 @@ internal partial record CommandSymbol
             attribute?.NamedArguments.FirstOrDefault(a => a.Key == "Description").Value.Value
             as string;
 
+        var examples =
+            attribute
+                ?.NamedArguments.Where(a => a.Key == "Examples")
+                .SelectMany(a => a.Value.Values)
+                .Select(v => v.Value as string)
+                .WhereNotNull()
+                .ToArray()
+            ?? [];
+
         var properties = type.GetProperties().ToArray();
         var parameters = CommandParameterSymbol.Resolve(properties, diagnostics);
         var options = CommandOptionSymbol.Resolve(properties, diagnostics);
 
-        return new CommandSymbol(type, name, description, [.. parameters, .. options]);
+        return new CommandSymbol(type, name, description, examples, [.. parameters, .. options]);
     }
 }

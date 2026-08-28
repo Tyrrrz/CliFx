@@ -29,4 +29,14 @@ public class CommandAttribute(string? name) : Attribute
     /// Used for display purposes in the help text.
     /// </summary>
     public string? Description { get; set; }
+
+    /// <summary>
+    /// Usage examples of the command.
+    /// Used for display purposes in the help text.
+    /// </summary>
+    /// <remarks>
+    /// Each example contains only what comes after the command name; the name itself
+    /// is prepended when the help text is rendered.
+    /// </remarks>
+    public string[] Examples { get; set; } = [];
 }
