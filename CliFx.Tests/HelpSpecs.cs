@@ -261,6 +261,52 @@ public class HelpSpecs(ITestOutputHelper testOutput) : SpecsBase(testOutput)
     }
 
     [Fact]
+    public async Task I_can_request_help_to_see_the_command_description_that_spans_multiple_lines()
+    {
+        // https://github.com/Tyrrrz/CliFx/issues/192
+
+        // Arrange
+        var application = new CommandLineApplicationBuilder()
+            .AddCommands(
+                CommandCompiler.Compile(
+                    // lang=csharp
+                    """"
+                    [Command(Description =
+                        """
+                        Here is line 1.
+
+                        Here is line 2.
+                        """
+                    )]
+                    public partial class Command : ICommand
+                    {
+                        [CommandParameter(0, Name = "foo", Description = "Here is a\nmultiline description.")]
+                        public string Foo { get; set; } = "";
+
+                        [CommandOption("bar", Description = "Here is another\nmultiline description.")]
+                        public string Bar { get; set; } = "";
+
+                        public ValueTask ExecuteAsync(IConsole console) => default;
+                    }
+                    """"
+                )
+            )
+            .UseConsole(FakeConsole)
+            .Build();
+
+        // Act
+        var exitCode = await application.RunAsync(["--help"], new Dictionary<string, string>());
+
+        // Assert
+        exitCode.Should().Be(0);
+
+        var stdOut = FakeConsole.ReadOutputString();
+        stdOut.Should().ContainAllInOrder("Here is line 1.", "Here is line 2.");
+        stdOut.Should().ContainAllInOrder("Here is a", "multiline description.");
+        stdOut.Should().ContainAllInOrder("Here is another", "multiline description.");
+    }
+
+    [Fact]
     public async Task I_can_request_help_to_see_the_usage_format_of_a_named_command()
     {
         // Arrange
