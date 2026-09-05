@@ -73,6 +73,19 @@ internal class HelpWriter(HelpContext context, ConsoleWriter consoleWriter)
             WriteLine();
         }
 
+        // Examples
+        foreach (var example in context.Command.Examples)
+        {
+            WriteHorizontalMargin();
+
+            WriteCommandInvocation();
+            Write(' ');
+
+            Write(example);
+
+            WriteLine();
+        }
+
         // Child commands
         if (context.Root.GetChildCommands(context.Command.Name).Any())
         {
