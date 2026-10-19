@@ -2,23 +2,11 @@
 using System.Collections.Generic;
 using AwesomeAssertions;
 using AwesomeAssertions.Primitives;
-using AwesomeAssertions.Specialized;
 
 namespace CliFx.Tests.Utils.Extensions;
 
 internal static class AssertionExtensions
 {
-    // FluentAssertions 8.4 introduced Throw() without a type argument, which AwesomeAssertions doesn't have
-    extension<TDelegate, TAssertions>(DelegateAssertions<TDelegate, TAssertions> assertions)
-        where TDelegate : Delegate
-        where TAssertions : DelegateAssertions<TDelegate, TAssertions>
-    {
-        public ExceptionAssertions<Exception> Throw(
-            string because = "",
-            params object[] becauseArgs
-        ) => assertions.Throw<Exception>(because, becauseArgs);
-    }
-
     extension(StringAssertions assertions)
     {
         public void ConsistOfLines(params IEnumerable<string> lines) =>

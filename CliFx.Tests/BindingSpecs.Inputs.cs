@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AwesomeAssertions;
@@ -92,7 +93,7 @@ public partial class BindingSpecs
 
         // Assert
         act.Should()
-            .Throw()
+            .Throw<Exception>()
             .WithMessage($"*{DiagnosticDescriptors.CommandInputConverterNotInferrable.Id}*");
     }
 
@@ -124,7 +125,7 @@ public partial class BindingSpecs
 
         // Assert
         act.Should()
-            .Throw()
+            .Throw<Exception>()
             .WithMessage($"*{DiagnosticDescriptors.CommandInputConverterNotInferrable.Id}*");
     }
 
@@ -149,7 +150,7 @@ public partial class BindingSpecs
 
         // Assert
         act.Should()
-            .Throw()
+            .Throw<Exception>()
             .WithMessage($"*{DiagnosticDescriptors.CommandInputConverterNotInferrable.Id}*");
     }
 }
