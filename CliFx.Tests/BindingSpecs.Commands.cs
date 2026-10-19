@@ -1,6 +1,7 @@
+using System;
+using AwesomeAssertions;
 using CliFx.Generators;
 using CliFx.Tests.Utils;
-using FluentAssertions;
 using Xunit;
 
 namespace CliFx.Tests;
@@ -24,7 +25,9 @@ public partial class BindingSpecs
             );
 
         // Assert
-        act.Should().Throw().WithMessage($"*{DiagnosticDescriptors.CommandTypeMustBePartial.Id}*");
+        act.Should()
+            .Throw<Exception>()
+            .WithMessage($"*{DiagnosticDescriptors.CommandTypeMustBePartial.Id}*");
     }
 
     [Fact]
@@ -45,7 +48,7 @@ public partial class BindingSpecs
 
         // Assert
         act.Should()
-            .Throw()
+            .Throw<Exception>()
             .WithMessage($"*{DiagnosticDescriptors.CommandTypeMustImplementICommand.Id}*");
     }
 
@@ -73,7 +76,7 @@ public partial class BindingSpecs
 
         // Assert
         act.Should()
-            .Throw()
+            .Throw<Exception>()
             .WithMessage($"*{DiagnosticDescriptors.CommandMustHaveUniqueName.Id}*");
     }
 }

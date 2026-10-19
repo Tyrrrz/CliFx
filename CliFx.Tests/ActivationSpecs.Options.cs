@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using AwesomeAssertions;
 using CliFx.Tests.Utils;
 using CliFx.Tests.Utils.Extensions;
 using CliWrap;
 using CliWrap.Buffered;
-using FluentAssertions;
 using Xunit;
 
 namespace CliFx.Tests;

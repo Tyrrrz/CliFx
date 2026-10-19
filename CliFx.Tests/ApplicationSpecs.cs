@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using AwesomeAssertions;
 using CliFx.Infrastructure;
 using CliFx.Tests.Utils;
 using CliFx.Tests.Utils.Extensions;
 using CliWrap;
-using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using Xunit;
 using Xunit.Abstractions;

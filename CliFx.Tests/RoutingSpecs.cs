@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using AwesomeAssertions;
 using CliFx.Tests.Utils;
-using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
 

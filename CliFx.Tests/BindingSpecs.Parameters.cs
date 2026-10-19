@@ -1,6 +1,7 @@
+using System;
+using AwesomeAssertions;
 using CliFx.Generators;
 using CliFx.Tests.Utils;
-using FluentAssertions;
 using Xunit;
 
 namespace CliFx.Tests;
@@ -31,7 +32,7 @@ public partial class BindingSpecs
 
         // Assert
         act.Should()
-            .Throw()
+            .Throw<Exception>()
             .WithMessage($"*{DiagnosticDescriptors.CommandParameterMustHaveUniqueOrder.Id}*");
     }
 
@@ -56,7 +57,7 @@ public partial class BindingSpecs
 
         // Assert
         act.Should()
-            .Throw()
+            .Throw<Exception>()
             .WithMessage($"*{DiagnosticDescriptors.CommandParameterMustHaveName.Id}*");
     }
 
@@ -84,7 +85,7 @@ public partial class BindingSpecs
 
         // Assert
         act.Should()
-            .Throw()
+            .Throw<Exception>()
             .WithMessage($"*{DiagnosticDescriptors.CommandParameterMustHaveUniqueName.Id}*");
     }
 
@@ -112,7 +113,7 @@ public partial class BindingSpecs
 
         // Assert
         act.Should()
-            .Throw()
+            .Throw<Exception>()
             .WithMessage(
                 $"*{DiagnosticDescriptors.CommandParameterMustHaveHighestOrderIfNotRequired.Id}*"
             );
@@ -142,7 +143,7 @@ public partial class BindingSpecs
 
         // Assert
         act.Should()
-            .Throw()
+            .Throw<Exception>()
             .WithMessage(
                 $"*{DiagnosticDescriptors.CommandParameterMustHaveHighestOrderIfSequenceBased.Id}*"
             );
@@ -177,7 +178,7 @@ public partial class BindingSpecs
 
         // Assert
         act.Should()
-            .Throw()
+            .Throw<Exception>()
             .WithMessage(
                 $"*{DiagnosticDescriptors.CommandParameterMustHaveHighestOrderIfSequenceBased.Id}*"
             );
