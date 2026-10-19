@@ -4,6 +4,7 @@ using AwesomeAssertions;
 using CliFx.Binding;
 using CliFx.Generators;
 using CliFx.Tests.Utils;
+using CliFx.Tests.Utils.Extensions;
 using Xunit;
 
 namespace CliFx.Tests;
@@ -31,7 +32,7 @@ public partial class BindingSpecs
 
         // Assert
         act.Should()
-            .Throw<Exception>()
+            .Throw()
             .WithMessage($"*{DiagnosticDescriptors.CommandOptionMustHaveValidName.Id}*");
     }
 
@@ -56,7 +57,7 @@ public partial class BindingSpecs
 
         // Assert
         act.Should()
-            .Throw<Exception>()
+            .Throw()
             .WithMessage($"*{DiagnosticDescriptors.CommandOptionMustHaveValidShortName.Id}*");
     }
 
@@ -81,7 +82,7 @@ public partial class BindingSpecs
 
         // Assert
         act.Should()
-            .Throw<Exception>()
+            .Throw()
             .WithMessage($"*{DiagnosticDescriptors.CommandOptionMustHaveNameOrShortName.Id}*");
     }
 
@@ -173,7 +174,7 @@ public partial class BindingSpecs
 
         // Assert
         act.Should()
-            .Throw<Exception>()
+            .Throw()
             .WithMessage(
                 $"*{DiagnosticDescriptors.CommandOptionShadowsConventionalHelpOption.Id}*"
             );
@@ -201,7 +202,7 @@ public partial class BindingSpecs
 
         // Assert
         act.Should()
-            .Throw<Exception>()
+            .Throw()
             .WithMessage(
                 $"*{DiagnosticDescriptors.CommandOptionShadowsConventionalVersionOption.Id}*"
             );
@@ -227,7 +228,7 @@ public partial class BindingSpecs
 
         // Assert
         act.Should()
-            .Throw<Exception>()
+            .Throw()
             .WithMessage($"*{DiagnosticDescriptors.CommandHelpOptionPropertyMustBeBound.Id}*");
     }
 
@@ -251,7 +252,7 @@ public partial class BindingSpecs
 
         // Assert
         act.Should()
-            .Throw<Exception>()
+            .Throw()
             .WithMessage($"*{DiagnosticDescriptors.CommandVersionOptionPropertyMustBeBound.Id}*");
     }
 
@@ -279,7 +280,7 @@ public partial class BindingSpecs
 
         // Assert
         act.Should()
-            .Throw<Exception>()
+            .Throw()
             .WithMessage($"*{DiagnosticDescriptors.CommandOptionMustHaveUniqueName.Id}*");
     }
 
@@ -307,7 +308,7 @@ public partial class BindingSpecs
 
         // Assert
         act.Should()
-            .Throw<Exception>()
+            .Throw()
             .WithMessage($"*{DiagnosticDescriptors.CommandOptionMustHaveUniqueShortName.Id}*");
     }
 }
