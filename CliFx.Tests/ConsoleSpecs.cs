@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using AwesomeAssertions;
 using CliFx.Infrastructure;
 using CliFx.Tests.Utils;
 using CliFx.Tests.Utils.Extensions;
 using CliWrap;
 using CliWrap.Buffered;
-using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
 

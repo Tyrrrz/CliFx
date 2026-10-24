@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using AwesomeAssertions;
 using CliFx.Tests.Utils;
 using CliFx.Tests.Utils.Extensions;
-using FluentAssertions;
 using Xunit;
 
 namespace CliFx.Tests;
