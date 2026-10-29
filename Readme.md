@@ -37,9 +37,6 @@ To learn more about the war and how you can help, [click here](https://tyrrrz.me
 
 - 📦 [NuGet](https://nuget.org/packages/CliFx): `dotnet add package CliFx`
 
-> [!TIP]
-> You can use [**Binternal**](https://github.com/Tyrrrz/Binternal) to internalize this library if you prefer to avoid taking an external dependency.
-
 ## Features
 
 - Complete application framework, not just an argument parser
@@ -50,7 +47,7 @@ To learn more about the war and how you can help, [click here](https://tyrrrz.me
 - Graceful cancellation via interrupt signals
 - Support for reading and writing binary data
 - Testable console interaction layer
-- Compatible with Native AOT and trimming
+- Compatible with AOT compilation and trimming
 - Targets .NET Standard 2.0+
 - No external dependencies
 
