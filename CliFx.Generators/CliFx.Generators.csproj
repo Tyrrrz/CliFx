@@ -14,7 +14,18 @@
   <ItemGroup>
     <PackageReference Include="Binternal" PrivateAssets="all" />
     <PackageReference Include="CSharpier.MsBuild" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all" />
+    <!-- Needs to be pinned to lowest supported version for compatibility with older SDKs -->
+    <PackageReference
+      Include="Microsoft.CodeAnalysis"
+      VersionOverride="4.11.0"
+      PrivateAssets="all"
+    />
+    <!-- Needs to be pinned to lowest supported version for compatibility with older SDKs -->
+    <PackageReference
+      Include="Microsoft.CodeAnalysis.CSharp"
+      VersionOverride="4.11.0"
+      PrivateAssets="all"
+    />
     <PackageReference Include="PolyShim" PrivateAssets="all" />
     <PackageReference Include="PowerKit" Internalize="true" PrivateAssets="all" />
   </ItemGroup>
